@@ -139,9 +139,6 @@
     <ClInclude Include="include\Core\GameObject\GameObject.h">
       <Filter>Header Files\Core\GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\GameObject\Object.h">
-      <Filter>Header Files\Core\GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\GameObject\GameObjectManagerImpl.h">
       <Filter>Header Files\Core\GameObject</Filter>
     </ClInclude>
