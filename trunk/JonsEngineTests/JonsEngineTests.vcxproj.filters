@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{f64df6e7-990b-4fd2-9f89-3bc613aeb236}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Memory">
+      <UniqueIdentifier>{7bdbe577-a127-4d2e-9288-3e66e96314f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Utils">
+      <UniqueIdentifier>{7b579384-0131-4891-a907-894dacfe3009}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\GameObject">
+      <UniqueIdentifier>{6b6d8906-631f-4f49-8b69-bdffbc50b745}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestClass1.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestManager.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Memory\MemoryTestManager.h">
+      <Filter>Source Files\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\GameObject\GameObjectTestManager.h">
+      <Filter>Source Files\Core\GameObject</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="JonsEngineTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestClass1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TestManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Memory\MemoryTestManager.cpp">
+      <Filter>Source Files\Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\GameObject\GameObjectTestManager.cpp">
+      <Filter>Source Files\Core\GameObject</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

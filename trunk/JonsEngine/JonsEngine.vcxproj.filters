@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{68d50880-3b36-46e7-b2ce-670c81b0d80d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Render">
+      <UniqueIdentifier>{a3d5ad5b-531b-4acc-884f-cf6a512e7c46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{5a494202-1728-4048-a253-a0de5440ecd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Render">
+      <UniqueIdentifier>{ff44cc03-febf-440e-aeba-dc7ede80161e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{51121a26-bfa3-4457-884d-c1a97d9788c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Logging">
+      <UniqueIdentifier>{a68ce750-d5ef-433a-a7b9-c6b7b87f1cd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Memory">
+      <UniqueIdentifier>{f9fdbb70-9e32-4b69-b412-2b72faf7d6b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Utils">
+      <UniqueIdentifier>{ab910717-264a-445e-8545-85e3e20a505b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Logging">
+      <UniqueIdentifier>{43bdffa5-ecf2-4b77-99bc-723680333003}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Memory">
+      <UniqueIdentifier>{13f874e1-d6ae-4407-a6fc-6717392ecbd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Utils">
+      <UniqueIdentifier>{05c56eae-62a1-484f-822e-7a6d9071a4ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Containers">
+      <UniqueIdentifier>{8f7619c7-3070-47dd-9384-05d95b47af54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thirdparty">
+      <UniqueIdentifier>{7b2a64d1-5223-4406-82fa-d4f188db9cc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\GameObject">
+      <UniqueIdentifier>{87657f2d-8617-464c-8032-723e7c23dfcc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\GameObject">
+      <UniqueIdentifier>{9bda9540-ac3d-4837-81c5-f3f9ca457cc7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Core\Engine.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Render\RenderManagerImpl.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Logging\JonsOutputStream.cpp">
+      <Filter>Source Files\Core\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Logging\JonsStreamBuf.cpp">
+      <Filter>Source Files\Core\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Logging\LogManagerImpl.cpp">
+      <Filter>Source Files\Core\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Memory\MemoryManagerImpl.cpp">
+      <Filter>Source Files\Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Utils\JonsThread.cpp">
+      <Filter>Source Files\Core\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Utils\JonsTime.cpp">
+      <Filter>Source Files\Core\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c">
+      <Filter>Thirdparty</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\GameObject\GameObjectManagerImpl.cpp">
+      <Filter>Source Files\Core\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Memory\MemoryBlock.cpp">
+      <Filter>Source Files\Core\Memory</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Render\RenderManagerImpl.h">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\ILogManager.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\IMemoryManager.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\IRenderManager.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Engine.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\JonsThread.h">
+      <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\JonsTime.h">
+      <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Logging\AndroidLogStream.h">
+      <Filter>Header Files\Core\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Logging\DummyLogStream.h">
+      <Filter>Header Files\Core\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Logging\JonsOutputStream.h">
+      <Filter>Header Files\Core\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Logging\JonsStreamBuf.h">
+      <Filter>Header Files\Core\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Logging\LogManagerImpl.h">
+      <Filter>Header Files\Core\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Memory\MemoryManagerImpl.h">
+      <Filter>Header Files\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\EngineDefs.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h">
+      <Filter>Thirdparty</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\GameObject\GameObject.h">
+      <Filter>Header Files\Core\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\GameObject\Object.h">
+      <Filter>Header Files\Core\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\GameObject\GameObjectManagerImpl.h">
+      <Filter>Header Files\Core\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\IGameObjectManager.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Memory\MemoryBlock.h">
+      <Filter>Header Files\Core\Memory</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
