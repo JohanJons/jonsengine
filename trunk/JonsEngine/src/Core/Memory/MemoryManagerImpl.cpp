@@ -89,9 +89,9 @@ namespace JonsEngine
 		void* alloc;
 
 		if (mUseDefaultMalloc)
-			alloc = dlmalloc(size);
-		else
 			alloc = malloc(size);
+		else
+			alloc = dlmalloc(size);
 
 		if (alloc)
 		{
@@ -109,9 +109,9 @@ namespace JonsEngine
 		void* alloc;
 
 		if (mUseDefaultMalloc)
-			alloc = dlrealloc(p,size);
-		else
 			alloc = realloc(p,size);
+		else
+			alloc = dlrealloc(p,size);
 
 		if (!alloc)
 			mLog->LogError() << "MemoryManagerImpl::Allocate: Unable to allocate memory!" << std::endl;
