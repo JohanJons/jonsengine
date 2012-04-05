@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JonsEngine", "JonsEngine.vcxproj", "{96000F2E-1268-46DB-AE59-2F0F4C3EBAC9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JonsEngineTests", "..\JonsEngineTests\JonsEngineTests.vcxproj", "{FBA30677-8B2D-4C07-B437-D2C046261DD9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{96000F2E-1268-46DB-AE59-2F0F4C3EBAC9} = {96000F2E-1268-46DB-AE59-2F0F4C3EBAC9}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{96000F2E-1268-46DB-AE59-2F0F4C3EBAC9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{96000F2E-1268-46DB-AE59-2F0F4C3EBAC9}.Debug|Win32.Build.0 = Debug|Win32
+		{96000F2E-1268-46DB-AE59-2F0F4C3EBAC9}.Release|Win32.ActiveCfg = Release|Win32
+		{96000F2E-1268-46DB-AE59-2F0F4C3EBAC9}.Release|Win32.Build.0 = Release|Win32
+		{FBA30677-8B2D-4C07-B437-D2C046261DD9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FBA30677-8B2D-4C07-B437-D2C046261DD9}.Debug|Win32.Build.0 = Debug|Win32
+		{FBA30677-8B2D-4C07-B437-D2C046261DD9}.Release|Win32.ActiveCfg = Release|Win32
+		{FBA30677-8B2D-4C07-B437-D2C046261DD9}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
