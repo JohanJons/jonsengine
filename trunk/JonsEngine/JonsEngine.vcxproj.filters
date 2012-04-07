@@ -54,6 +54,9 @@
     <Filter Include="Source Files\Core\GameObject">
       <UniqueIdentifier>{9bda9540-ac3d-4837-81c5-f3f9ca457cc7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Thirdparty\dlmalloc">
+      <UniqueIdentifier>{0815c268-49c7-420a-bc5b-abebc3b3dfbd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Engine.cpp">
@@ -80,14 +83,14 @@
     <ClCompile Include="src\Core\Utils\JonsTime.cpp">
       <Filter>Source Files\Core\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c">
-      <Filter>Thirdparty</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\GameObject\GameObjectManagerImpl.cpp">
       <Filter>Source Files\Core\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Memory\MemoryBlock.cpp">
       <Filter>Source Files\Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c">
+      <Filter>Thirdparty\dlmalloc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -133,9 +136,6 @@
     <ClInclude Include="interface\EngineDefs.h">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h">
-      <Filter>Thirdparty</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\GameObject\GameObject.h">
       <Filter>Header Files\Core\GameObject</Filter>
     </ClInclude>
@@ -147,6 +147,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\Memory\MemoryBlock.h">
       <Filter>Header Files\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h">
+      <Filter>Thirdparty\dlmalloc</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

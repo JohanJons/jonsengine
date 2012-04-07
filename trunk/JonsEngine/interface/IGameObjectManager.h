@@ -16,7 +16,7 @@ namespace JonsEngine
 	{
 	public:
 		IGameObjectManager() : mNextGameObjID(1)  { }
-		virtual ~IGameObjectManager() { }
+		virtual ~IGameObjectManager() { mObjects.clear(); }
 
 		virtual int32_t Init() = 0;
 		virtual bool Destroy() = 0;

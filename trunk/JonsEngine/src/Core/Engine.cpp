@@ -1,6 +1,6 @@
 #include "../../include/Core/Engine.h"
 
-JonsEngine::Engine* JonsEngine::Engine::mEngine = 0;
+JonsEngine::Engine* JonsEngine::Engine::mEngine = NULL;
 
 #ifdef ANDROID
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
@@ -29,8 +29,6 @@ namespace JonsEngine
 	Engine::Engine() : mRunning(false), mRenderManager(NULL), mMemoryManager(NULL), mGameObjectManager(NULL),
 						mLog(NULL)
 	{
-		mEngine = NULL;
-
 		#ifdef ANDROID
 			mJNIEnv = NULL;
 		#endif

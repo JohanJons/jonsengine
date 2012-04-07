@@ -2,6 +2,7 @@
 #define _MEMORY_MANAGER_IMPL_H
 
 #include <malloc.h>
+#include <vector>
 
 #include "../../../Interface/IMemoryManager.h"
 #include "../../../Interface/ILogManager.h"
@@ -32,6 +33,7 @@ namespace JonsEngine
 
 		inline uint64_t GetTotalAllocatedObjectsCount() { return mTotalAllocatedObjects; }
 		inline uint64_t GetCurrentAllocatedObjectsCount() { return mCurrentAllocatedObjects; }
+		
 
 	private:
 		ILogManager* mLog;
