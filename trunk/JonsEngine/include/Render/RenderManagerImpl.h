@@ -21,10 +21,10 @@ namespace JonsEngine
 	class RenderManagerImpl : public IRenderManager
 	{
 	public:
-		RenderManagerImpl(ILogManager* logger);
+		RenderManagerImpl();
 		~RenderManagerImpl();
 
-		int32_t Init();
+		bool Init(ILogManager* logger);
 		bool Destroy();
 		bool Start();
 		bool Stop();
@@ -39,6 +39,7 @@ namespace JonsEngine
 		ILogManager* mLog;
 
 		bool mRunning;
+		bool mInitialized;
 		int32_t mScreenWidth;
 		int32_t mScreenHeight;
 	};

@@ -1,6 +1,8 @@
 #ifndef _LOG_MANAGER_IMPL_H
 #define _LOG_MANAGER_IMPL_H
 
+#include <string>
+
 #ifdef ANDROID
 #include "jni.h"
 #include "AndroidLogStream.h"
@@ -20,15 +22,15 @@ namespace JonsEngine
 	class LogManagerImpl : public ILogManager
 	{
 	public:
-		#ifdef ANDROID
-			LogManagerImpl(JNIEnv* env);
-		#else
-			LogManagerImpl();
-		#endif
+		LogManagerImpl();
 		~LogManagerImpl();
 
-		int32_t Init();
-		int32_t Init(bool LogToFile, bool LogToStdOut);
+		bool Init();
+		#ifdef ANDROID
+			bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, JNIEnv* env);
+		#else
+			bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath);
+		#endif
 		bool Destroy();
 		bool Start();
 		bool Stop();
@@ -38,8 +40,7 @@ namespace JonsEngine
 		void AddStream(std::streambuf* sb);
 		void RemoveStream(std::streambuf* sb);
 		bool IsStreamAdded(std::streambuf* sb);
-		std::string GetLogName();
-		std::string GetLogPath();
+		std::string GetFileLogPath();
 
 		std::ostream& LogInfo();
 		std::ostream& LogDebug();
@@ -47,11 +48,14 @@ namespace JonsEngine
 		std::ostream& LogError();
 
 	private:
-		void BaseConstructor();
+		std::string InternalGetLogName();
+		std::string InternalGetLogPath();
 
 		bool mRunning;
+		bool mInitialized;
 		bool mLogToFileDefault;
 		bool mLogToOSDefault;
+		std::string mLogPath;
 		std::ofstream* mFileStream;
 		JonsStreamBuf* mStreamBuf;
 		DummyLogStreamBuf* mDummyStreamBuf;

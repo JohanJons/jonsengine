@@ -2,42 +2,24 @@
 
 namespace JonsEngine
 {
-	#ifdef ANDROID
-		LogManagerImpl::LogManagerImpl(JNIEnv* env) : mAndroidLogBuf(NULL), mJNIEnv(env)
-		{
-			BaseConstructor();
-
-		}
-	#else
-		LogManagerImpl::LogManagerImpl()
-		{
-			BaseConstructor();
-		}
-	#endif
-
-	void LogManagerImpl::BaseConstructor()
+	LogManagerImpl::LogManagerImpl() : mRunning(false), mLogToFileDefault(false), mLogToOSDefault(false), 
+										mStreamBuf(NULL), mFileStream(NULL), mDummyStreamBuf(NULL)
 	{
-		mRunning = false;
-		mLogToFileDefault = false;
-		mLogToOSDefault = false;
-		
-		mStreamBuf = NULL;
-		mFileStream = NULL;
 		mLogStream = NULL;
-		mDummyStreamBuf = NULL;
 	}
 
 	LogManagerImpl::~LogManagerImpl()
 	{
-		Destroy();
+		if (mInitialized)
+			Destroy();
 	}
 
-	int32_t LogManagerImpl::Init()
+	bool LogManagerImpl::Init()
 	{
-		return Init(true, false);
+		return Init(false, false, "");
 	}
 
-	int32_t LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault)
+	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, std::string absFilePath)
 	{
 		std::string LogPath;
 		mLogToFileDefault = LogToFileDefault;
@@ -49,9 +31,15 @@ namespace JonsEngine
 		{
 			if (mLogToFileDefault)
 			{
-				LogPath += GetLogPath(); 
-				LogPath += GetLogName();
+				if (absFilePath.empty())
+				{
+					LogPath += InternalGetLogPath(); 
+					LogPath += InternalGetLogName();
+				}
+				else
+					LogPath += absFilePath;
 
+				mLogPath = LogPath;
 				mFileStream = new std::ofstream(LogPath.c_str(), std::ios::trunc);
 			}
 
@@ -68,53 +56,63 @@ namespace JonsEngine
 			mLogStream = new JonsOutputStream(mStreamBuf);
 		}
 		
-		if (!mStreamBuf || !mLogStream)
-			return INIT_NOK;
+		if (mStreamBuf && mLogStream)
+		{
+			mInitialized = true;
+			return true;
+		}
 		else
-			return INIT_OK;
+			return false;
 	}
 
 	bool LogManagerImpl::Destroy()
 	{
-		bool res = true;
-
-		if (mRunning)
-			res &= Stop();
-
-		if (mFileStream)
+		if (mInitialized)
 		{
-			mFileStream->close();
-			delete mFileStream;
-			mFileStream = NULL;
-		}
+			bool res = true;
 
-		if (mStreamBuf)
-		{
-			delete mStreamBuf;
-			mStreamBuf = NULL;
-		}
+			if (mRunning)
+				res &= Stop();
 
-		if (mDummyStreamBuf)
-		{
-			delete mDummyStreamBuf;
-			mDummyStreamBuf = NULL;
-		}
-
-		#ifdef ANDROID
-			if (mAndroidLogBuf)
+			if (mFileStream)
 			{
-				delete mAndroidLogBuf;
-				mAndroidLogBuf = NULL;
+				mFileStream->close();
+				delete mFileStream;
+				mFileStream = NULL;
 			}
-		#endif
-		
-		if (mLogStream)
-		{
-			delete mLogStream;
-			mLogStream = NULL;
-		}
 
-		return (!mRunning && !mLogStream && !mDummyStreamBuf && !mStreamBuf && !mFileStream);
+			if (mStreamBuf)
+			{
+				delete mStreamBuf;
+				mStreamBuf = NULL;
+			}
+
+			if (mDummyStreamBuf)
+			{
+				delete mDummyStreamBuf;
+				mDummyStreamBuf = NULL;
+			}
+
+			#ifdef ANDROID
+				if (mAndroidLogBuf)
+				{
+					delete mAndroidLogBuf;
+					mAndroidLogBuf = NULL;
+				}
+			#endif
+		
+			if (mLogStream)
+			{
+				delete mLogStream;
+				mLogStream = NULL;
+			}
+
+			mInitialized = false;
+
+			return (!mRunning && !mLogStream && !mDummyStreamBuf && !mStreamBuf && !mFileStream);
+		}
+		else
+			return false;
 	}
 
 	bool LogManagerImpl::Start()
@@ -232,8 +230,12 @@ namespace JonsEngine
 			return false;
 	}
 
+	std::string LogManagerImpl::GetFileLogPath()
+	{
+		return mLogPath;
+	}
 
-	std::string LogManagerImpl::GetLogPath()
+	std::string LogManagerImpl::InternalGetLogPath()
 	{
 		std::string ret;
 
@@ -256,7 +258,7 @@ namespace JonsEngine
 			return ret;
 	}
 
-	std::string LogManagerImpl::GetLogName()
+	std::string LogManagerImpl::InternalGetLogName()
 	{
 		std::stringstream ret;
 

@@ -52,7 +52,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;JONSENGINE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;JONSENGINE_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>include\Core\Utils;include\Core\GameObject;include\Core\Memory;include\Core\Logging;include\Core\Containers;include\Render;include\Input;include\Core;include\Audio;include\;..\Thirdparty\boost_1_49_0;interface\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -94,6 +94,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
   <ItemGroup>
     <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c" />
     <ClCompile Include="src\Core\Engine.cpp" />
+    <ClCompile Include="src\Core\EngineSettings.cpp" />
     <ClCompile Include="src\Core\GameObject\GameObjectManagerImpl.cpp" />
     <ClCompile Include="src\Core\Logging\JonsOutputStream.cpp" />
     <ClCompile Include="src\Core\Logging\JonsStreamBuf.cpp" />
@@ -107,6 +108,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
     <ClInclude Include="include\Core\Engine.h" />
+    <ClInclude Include="include\Core\EngineSettings.h" />
     <ClInclude Include="include\Core\GameObject\GameObject.h" />
     <ClInclude Include="include\Core\GameObject\GameObjectManagerImpl.h" />
     <ClInclude Include="include\Core\Logging\AndroidLogStream.h" />

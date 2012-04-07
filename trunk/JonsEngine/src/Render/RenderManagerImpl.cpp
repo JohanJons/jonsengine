@@ -3,34 +3,47 @@
 namespace JonsEngine
 {
 
-	RenderManagerImpl::RenderManagerImpl(ILogManager* logger) : mLog(logger), mRunning(false), 
-																mScreenWidth(320), mScreenHeight(480)
+	RenderManagerImpl::RenderManagerImpl() :mRunning(false), mScreenWidth(320), mScreenHeight(480), mLog(NULL)
 	{
 	}
 
 	RenderManagerImpl::~RenderManagerImpl()
 	{
-		Destroy();
+		if (mInitialized)
+			Destroy();
 	}
 
-	int32_t RenderManagerImpl::Init()
+	bool RenderManagerImpl::Init(ILogManager* logger)
 	{
+		mLog = logger;
+
 		if (mLog)
-			return INIT_OK;
+		{
+			mInitialized = true;
+
+			return true;
+		}
 		else
-			return INIT_NOK;
+			return false;
 	}
 
 	bool RenderManagerImpl::Destroy()
 	{
-		bool res = true;
+		if (mInitialized)
+		{
+			bool res = true;
 
-		if (mRunning)
-			res &= Stop();
+			if (mRunning)
+				res &= Stop();
 
-		res &= !mRunning;
+			res &= !mRunning;
 
-		return res;
+			mInitialized = false;
+
+			return res;
+		}
+		else
+			return false;
 	}
 
 	bool RenderManagerImpl::Start()

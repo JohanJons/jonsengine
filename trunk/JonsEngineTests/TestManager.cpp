@@ -27,6 +27,10 @@ namespace JonsEngine
 			mRepeatTimes = 1;
 		}
 
+		mEngineSettings.SetLogToFile(true);
+		mEngineSettings.SetLogToSTDOut(true);
+		mEngineSettings.SetUseDLMalloc(true);
+
 		mEngine = Engine::GetEngine();
 	}
 
@@ -35,13 +39,9 @@ namespace JonsEngine
 		bool res = true;
 
 		/* Init Engine and test mgrs */
-		if(mEngine->Init(0,0,0,0))
+		if(mEngine->Init(mEngineSettings))
 		{
 			res = true;
-			res && mEngine->GetRenderManager()->Init();
-			res && mEngine->GetLogger()->Init(false,true);
-			res && mEngine->GetMemoryManager()->Init(false);
-			res && mEngine->GetGameObjectManager()->Init();
 
 			mMemTestMgr = new MemoryTestManager(mEngine->GetGameObjectManager());
 			mGameObjTestMgr = new GameObjectTestManager(mEngine->GetGameObjectManager());

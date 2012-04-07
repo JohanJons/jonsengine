@@ -5,36 +5,46 @@ namespace JonsEngine
 	IMemoryManager* GameObjectManagerImpl::IGameObjectManager::mMemoryMgr = NULL;
 	std::map<uint64_t, boost::weak_ptr<GameObject>> GameObjectManagerImpl::IGameObjectManager::mObjects;
 
-	GameObjectManagerImpl::GameObjectManagerImpl(ILogManager* logger, IMemoryManager* memmgr) : 
-										mRunning(false), mLog(logger)
+	GameObjectManagerImpl::GameObjectManagerImpl() : mRunning(false), mInitialized(false), mLog(NULL)
 	{
-		mMemoryMgr = memmgr;
+		mMemoryMgr = NULL;
 	}
 
 	GameObjectManagerImpl::~GameObjectManagerImpl()
 	{
-		Destroy();
+		if (mInitialized)
+			Destroy();
 	}
 
-	int32_t GameObjectManagerImpl::Init()
+	bool GameObjectManagerImpl::Init(ILogManager* logger, IMemoryManager* memmgr)
 	{
+		mLog = logger;
+		mMemoryMgr = memmgr;
 
-		if (mLog)
-			return INIT_OK;
+		if (mLog && mMemoryMgr)
+		{
+			mInitialized = true;
+			return true;
+		}
 		else
-			return INIT_NOK;
+			return false;
 	}
 
 	bool GameObjectManagerImpl::Destroy()
 	{
-		bool res = true;
+		if (mInitialized)
+		{
+			bool res = true;
 
-		if (mRunning)
-			res &= Stop();
+			if (mRunning)
+				res &= Stop();
 
-		
+			mInitialized = false;
 
-		return res;
+			return res;
+		}
+		else
+			return false;
 	}
 
 	bool GameObjectManagerImpl::Start()

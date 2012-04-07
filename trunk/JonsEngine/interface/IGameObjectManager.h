@@ -1,13 +1,13 @@
 #ifndef _I_GAMEOBJECT_MANAGER_H
 #define _I_GAMEOBJECT_MANAGER_H
 
+#include "../../Thirdparty/boost_1_49_0/boost/smart_ptr/shared_ptr.hpp"
+#include "../../Thirdparty/boost_1_49_0/boost/smart_ptr/weak_ptr.hpp"
 
 #include "EngineDefs.h"
 #include "IMemoryManager.h"
+#include "ILogManager.h"
 #include "../Include/Core/GameObject/GameObject.h"
-
-#include "../../Thirdparty/boost_1_49_0/boost/smart_ptr/shared_ptr.hpp"
-#include "../../Thirdparty/boost_1_49_0/boost/smart_ptr/weak_ptr.hpp"
 
 namespace JonsEngine
 {
@@ -18,7 +18,7 @@ namespace JonsEngine
 		IGameObjectManager() : mNextGameObjID(1)  { }
 		virtual ~IGameObjectManager() { mObjects.clear(); }
 
-		virtual int32_t Init() = 0;
+		virtual bool Init(ILogManager* logger, IMemoryManager* memmgr) = 0;
 		virtual bool Destroy() = 0;
 		virtual bool Start() = 0;
 		virtual bool Stop() = 0;

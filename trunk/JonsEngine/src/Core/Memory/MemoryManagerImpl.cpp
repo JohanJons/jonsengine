@@ -3,45 +3,56 @@
 namespace JonsEngine
 {
 
-	MemoryManagerImpl::MemoryManagerImpl(ILogManager* logger) : 
+	MemoryManagerImpl::MemoryManagerImpl() : 
 							mTotalAllocatedObjects(0), mCurrentAllocatedObjects(0), mRunning(false),
-							mUseDefaultMalloc(false), mLog(logger)
+							mUseDLMalloc(true), mInitialized(false), mLog(NULL)
 	{
 
 	}
 
 	MemoryManagerImpl::~MemoryManagerImpl()
 	{
-		Destroy();
+		if (mInitialized)
+			Destroy();
 	}
 
-	int32_t MemoryManagerImpl::Init(bool UseDefaultMalloc)
+	bool MemoryManagerImpl::Init(bool UseDLMalloc, ILogManager* logger)
 	{
-		if (UseDefaultMalloc)
-		{
-			mUseDefaultMalloc = UseDefaultMalloc;
-		}
-		return Init();
+		mUseDLMalloc = UseDLMalloc;
+
+		return Init(logger);
 	}
 
-	int32_t MemoryManagerImpl::Init()
+	bool MemoryManagerImpl::Init(ILogManager* logger)
 	{
+		mLog = logger;
+
 		if (mLog)
-			return INIT_OK;
+		{
+			mInitialized = true;
+			return true;
+		}
 		else
-			return INIT_NOK;
+			return false;
 	}
 
 	bool MemoryManagerImpl::Destroy()
 	{
-		bool res = true;
+		if (mInitialized)
+		{
+			bool res = true;
 
-		if (mRunning)
-			res &= Stop();
+			if (mRunning)
+				res &= Stop();
 
-		res &= !mRunning;
+			res &= !mRunning;
 
-		return res;
+			mInitialized = false;
+
+			return res;
+		}
+		else
+			return false;
 	}
 
 	bool MemoryManagerImpl::Start()
@@ -88,10 +99,10 @@ namespace JonsEngine
 	{
 		void* alloc;
 
-		if (mUseDefaultMalloc)
-			alloc = malloc(size);
-		else
+		if (mUseDLMalloc)
 			alloc = dlmalloc(size);
+		else
+			alloc = malloc(size);
 
 		if (alloc)
 		{
@@ -108,10 +119,10 @@ namespace JonsEngine
 	{
 		void* alloc;
 
-		if (mUseDefaultMalloc)
-			alloc = realloc(p,size);
-		else
+		if (mUseDLMalloc)
 			alloc = dlrealloc(p,size);
+		else
+			alloc = realloc(p,size);
 
 		if (!alloc)
 			mLog->LogError() << "MemoryManagerImpl::Allocate: Unable to allocate memory!" << std::endl;
@@ -123,10 +134,10 @@ namespace JonsEngine
 	{
 		if (obj)
 		{
-			if (mUseDefaultMalloc)
-				free(obj);
-			else
+			if (mUseDLMalloc)
 				dlfree(obj);
+			else
+				free(obj);
 
 			mCurrentAllocatedObjects--;
 		}

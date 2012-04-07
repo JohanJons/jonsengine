@@ -10,6 +10,9 @@
 #include "Memory/MemoryManagerImpl.h"
 #include "GameObject/GameObjectManagerImpl.h"
 
+#include "EngineSettings.h"
+
+
 namespace JonsEngine
 {
 	class Engine
@@ -18,15 +21,16 @@ namespace JonsEngine
 		static Engine* GetEngine();
 		~Engine();
 
-		bool Init(ILogManager* logger, IRenderManager* rendermgr, IMemoryManager* memmgr, IGameObjectManager* objfact);
+		bool Init(EngineSettings& initSettings);
 		bool Start();
 		bool Stop();
 		bool Destroy();
 		bool isRunning();
 		void Tick();
 
-		IRenderManager* GetRenderManager();
+		EngineSettings& GetEngineSettings();
 		IMemoryManager* GetMemoryManager();
+		IRenderManager* GetRenderManager();
 		IGameObjectManager* GetGameObjectManager();
 		ILogManager* GetLogger();
 
@@ -40,14 +44,17 @@ namespace JonsEngine
 		static Engine* mEngine;
 
 		bool mRunning;
+		bool mInitialized;
 		#ifdef ANDROID
 			JNIEnv* mJNIEnv;
 		#endif
 
-		ILogManager* mLog;
-		IRenderManager* mRenderManager;
-		IMemoryManager* mMemoryManager;
-		IGameObjectManager* mGameObjectManager;
+		EngineSettings mEngineSettings;
+		MemoryManagerImpl mMemoryManager;
+		LogManagerImpl mLog;
+		RenderManagerImpl mRenderManager;
+		GameObjectManagerImpl mGameObjectManager;
+
 
 	};
 

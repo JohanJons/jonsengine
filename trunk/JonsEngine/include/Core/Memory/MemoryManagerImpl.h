@@ -16,11 +16,11 @@ namespace JonsEngine
 	class MemoryManagerImpl : public IMemoryManager
 	{
 	public:
-		MemoryManagerImpl(ILogManager* logger);
+		MemoryManagerImpl();
 		~MemoryManagerImpl();
 
-		int32_t Init();
-		int32_t Init(bool UseDefaultMalloc);
+		bool Init(ILogManager* logger);
+		bool Init(bool UseDLMallocm, ILogManager* logger);
 		bool Destroy();
 		bool Start();
 		bool Stop();
@@ -39,7 +39,8 @@ namespace JonsEngine
 		ILogManager* mLog;
 
 		bool mRunning;
-		bool mUseDefaultMalloc;
+		bool mInitialized;
+		bool mUseDLMalloc;
 		uint64_t mTotalAllocatedObjects;
 		uint64_t mCurrentAllocatedObjects;
 

@@ -2,6 +2,7 @@
 #define _I_MEMORY_MANAGER_H
 
 #include "EngineDefs.h"
+#include "ILogManager.h"
 
 namespace JonsEngine
 {
@@ -11,8 +12,8 @@ namespace JonsEngine
 	public:
 		virtual ~IMemoryManager() { }
 
-		virtual int32_t Init() = 0;
-		virtual int32_t Init(bool UseMemoryPool) = 0;
+		virtual bool Init(ILogManager* logger) = 0;
+		virtual bool Init(bool UseDLMalloc, ILogManager* logger) = 0;
 		virtual bool Destroy() = 0;
 		virtual bool Start() = 0;
 		virtual bool Stop() = 0;

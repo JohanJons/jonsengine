@@ -26,8 +26,7 @@ namespace JonsEngine
 		Destroy();
 	}
 
-	Engine::Engine() : mRunning(false), mRenderManager(NULL), mMemoryManager(NULL), mGameObjectManager(NULL),
-						mLog(NULL)
+	Engine::Engine() : mRunning(false)
 	{
 		#ifdef ANDROID
 			mJNIEnv = NULL;
@@ -43,45 +42,38 @@ namespace JonsEngine
 		return mEngine;
 	}
 
-	bool Engine::Init(ILogManager* logger, IRenderManager* rendermgr, IMemoryManager* memmgr, IGameObjectManager* objmgr)
+	bool Engine::Init(EngineSettings& initSettings)
 	{
-		if (!mLog)
-		{
-			if (!logger)
-				#ifdef ANDROID
-					mLog = new LogManagerImpl(mJNIEnv);
-				#else
-					mLog = new LogManagerImpl();
-				#endif
-			else
-				mLog = logger;
-		}
+		bool res = true;
 
-		if (!mRenderManager)
-		{
-			if (!rendermgr)
-				mRenderManager = new RenderManagerImpl(mLog);
-			else
-				mRenderManager = rendermgr;
-		}
+		// Memory
+		bool useDLMalloc = initSettings.GetUseDLMalloc();
 
-		if (!mMemoryManager)
-		{
-			if (!memmgr)
-				mMemoryManager = new MemoryManagerImpl(mLog);
-			else
-				mMemoryManager = memmgr;
-		}
+		mEngineSettings.SetUseDLMalloc(useDLMalloc);
 
-		if (!mGameObjectManager)
-		{
-			if (!objmgr)
-				mGameObjectManager = new GameObjectManagerImpl(mLog, mMemoryManager);
-			else
-				mGameObjectManager = objmgr;
-		}
+		res &= mMemoryManager.Init(useDLMalloc, &mLog);
 
-		return (mLog && mRenderManager && mMemoryManager && mGameObjectManager);
+
+		// Log
+		bool LogToFile = initSettings.GetLogToFile();
+		bool LogToSTDOut = initSettings.GetLogToSTDOut();
+		std::string fileLocation = initSettings.GetLogToFileLocation();
+
+		mEngineSettings.SetLogToFile(LogToFile,fileLocation);
+		mEngineSettings.SetLogToSTDOut(LogToSTDOut);
+
+		res &= mLog.Init(LogToFile,LogToSTDOut,fileLocation);
+
+
+		// Render
+		res &= mRenderManager.Init(&mLog);
+
+
+		// GameObject 
+		res &= mGameObjectManager.Init(&mLog, &mMemoryManager);
+
+
+		return res;
 	}
 
 	bool Engine::Start()
@@ -91,18 +83,18 @@ namespace JonsEngine
 		if (!mRunning)
 		{
 			res = true;
-			res &= mLog->Start();
-			res &= mRenderManager->Start();
-			res &= mMemoryManager->Start();
-			res &= mGameObjectManager->Start();
+			res &= mLog.Start();
+			res &= mRenderManager.Start();
+			res &= mMemoryManager.Start();
+			res &= mGameObjectManager.Start();
 
 			if (res)
 				mRunning = true;
 			else
-				mLog->LogError() << "Engine::Start(): Unable to start Engine!" << std::endl;
+				mLog.LogError() << "Engine::Start(): Unable to start Engine!" << std::endl;
 		}
 		else 
-			mLog->LogWarn() << "Engine::Start(): Engine already running" << std::endl;
+			mLog.LogWarn() << "Engine::Start(): Engine already running" << std::endl;
 
 		return res;
 	}
@@ -114,18 +106,18 @@ namespace JonsEngine
 		if (mRunning)
 		{
 			res = true;
-			res &= mRenderManager->Stop();
-			res &= mMemoryManager->Stop();
-			res &= mGameObjectManager->Stop();
-			res &= mLog->Stop();
+			res &= mRenderManager.Stop();
+			res &= mMemoryManager.Stop();
+			res &= mGameObjectManager.Stop();
+			res &= mLog.Stop();
 
 			if (res)
 				mRunning = false;
 			else
-				mLog->LogError() << "Engine::Stop(): Unable to stop Engine!" << std::endl;
+				mLog.LogError() << "Engine::Stop(): Unable to stop Engine!" << std::endl;
 		}
 		else 
-			mLog->LogWarn() << "Engine::Stop(): Engine not running" << std::endl;
+			mLog.LogWarn() << "Engine::Stop(): Engine not running" << std::endl;
 
 		return res;
 	}
@@ -137,31 +129,10 @@ namespace JonsEngine
 		if (mRunning)
 			res &= Stop();
 
-		res &= mRenderManager->Destroy();
-		res &= mMemoryManager->Destroy();
-		res &= mGameObjectManager->Destroy();
-		res &= mLog->Destroy();
-
-		if (mRenderManager)
-		{
-			delete mRenderManager;
-			mRenderManager = NULL;
-		}
-		if (mMemoryManager)
-		{
-			delete mMemoryManager;
-			mMemoryManager = NULL;
-		}
-		if (mGameObjectManager)
-		{
-			delete mGameObjectManager;
-			mGameObjectManager = NULL;
-		}
-		if (mLog)
-		{
-			delete mLog;
-			mLog = NULL;
-		}
+		res &= mRenderManager.Destroy();
+		res &= mMemoryManager.Destroy();
+		res &= mGameObjectManager.Destroy();
+		res &= mLog.Destroy();
 
 		return res;
 	}
@@ -173,51 +144,32 @@ namespace JonsEngine
 
 	void Engine::Tick()
 	{
-		if (mRenderManager)
-			mRenderManager->Tick();
-		else
-			mLog->LogError() << "Engine::Tick(): Component is NULL" << std::endl;
+
+	}
+
+	EngineSettings& Engine::GetEngineSettings()
+	{
+		return mEngineSettings;
 	}
 
 	IRenderManager* Engine::GetRenderManager()
 	{
-		if (mRenderManager)
-			return mRenderManager;
-		else
-		{
-			mLog->LogError() << "Engine::GetRenderManager(): mRenderMgr is NULL!" << std::endl;
-			return NULL;
-		}
+		return &mRenderManager;
 	}
 
 	IMemoryManager* Engine::GetMemoryManager()
 	{
-		if (mMemoryManager)
-			return mMemoryManager;
-		else
-		{
-			mLog->LogError() << "Engine::GetMemoryManager(): mMemoryMgr is NULL!" << std::endl;
-			return NULL;
-		}
+		return &mMemoryManager;
 	}
 
 	IGameObjectManager* Engine::GetGameObjectManager()
 	{
-		if (mGameObjectManager)
-			return mGameObjectManager;
-		else
-		{
-			mLog->LogError() << "Engine::GetGameObjectManager(): mGameObjectMgr is NULL!" << std::endl;
-			return NULL;
-		}
+		return &mGameObjectManager;
 	}
 
 	ILogManager* Engine::GetLogger()
 	{
-		if (mLog)
-			return mLog;
-		else
-			return NULL;
+		return &mLog;
 	}
 
 

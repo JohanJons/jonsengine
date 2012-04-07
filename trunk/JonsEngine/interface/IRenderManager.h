@@ -2,6 +2,7 @@
 #define _I_RENDER_MANAGER_H
 
 #include "EngineDefs.h"
+#include "ILogManager.h"
 
 namespace JonsEngine
 {
@@ -11,7 +12,7 @@ namespace JonsEngine
 	public:
 		virtual ~IRenderManager() { }
 
-		virtual int32_t Init() = 0;
+		virtual bool Init(ILogManager* logger) = 0;
 		virtual bool Destroy() = 0;
 		virtual bool Start() = 0;
 		virtual bool Stop() = 0;

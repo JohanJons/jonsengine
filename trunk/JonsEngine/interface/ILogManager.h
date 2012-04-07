@@ -19,8 +19,12 @@ namespace JonsEngine
 	public:
 		virtual ~ILogManager() { }
 
-		virtual int32_t Init() = 0;
-		virtual int32_t Init(bool LogToFile, bool LogToStdOut) = 0;
+		virtual bool Init() = 0;
+		#ifdef ANDROID
+			virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, JNIEnv* env) = 0;
+		#else
+			virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath) = 0;
+		#endif
 		virtual bool Destroy() = 0;
 		virtual bool Start() = 0;
 		virtual bool Stop() = 0;
@@ -30,6 +34,7 @@ namespace JonsEngine
 		virtual void AddStream(std::streambuf* sb) = 0;
 		virtual void RemoveStream(std::streambuf* sb) = 0;
 		virtual bool IsStreamAdded(std::streambuf* sb) = 0;
+		virtual std::string GetFileLogPath() = 0;
 
 		virtual std::ostream& LogInfo() = 0;
 		virtual std::ostream& LogDebug() = 0;
