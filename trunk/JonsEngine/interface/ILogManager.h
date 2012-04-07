@@ -13,17 +13,18 @@
 
 namespace JonsEngine
 {
+	class IMemoryManager;
 
 	class ILogManager
 	{
 	public:
 		virtual ~ILogManager() { }
 
-		virtual bool Init() = 0;
+		virtual bool Init(IMemoryManager* memmgr) = 0;
 		#ifdef ANDROID
-			virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, JNIEnv* env) = 0;
+			virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, JNIEnv* env,IMemoryManager* memmgr) = 0;
 		#else
-			virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath) = 0;
+			virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath,IMemoryManager* memmgr) = 0;
 		#endif
 		virtual bool Destroy() = 0;
 		virtual bool Start() = 0;

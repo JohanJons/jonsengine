@@ -2,10 +2,10 @@
 #define _I_MEMORY_MANAGER_H
 
 #include "EngineDefs.h"
-#include "ILogManager.h"
 
 namespace JonsEngine
 {
+	class ILogManager;
 
 	class IMemoryManager
 	{

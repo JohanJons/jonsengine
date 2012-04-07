@@ -14,7 +14,7 @@ namespace JonsEngine
 	class MemoryTestManager 
 	{
 	public:
-		MemoryTestManager(IGameObjectManager* mObjFact);
+		MemoryTestManager(IGameObjectManager* mObjFact,Engine* engine);
 
 		/* Memory tests */
 		bool AllocateTest();
@@ -23,7 +23,7 @@ namespace JonsEngine
 		inline void AllocateTestAux() { mGameObjManager->CreateObject<TestClass1>(); }
 
 		IGameObjectManager* mGameObjManager;
-
+		Engine* mEngine;
 	};
 
 }

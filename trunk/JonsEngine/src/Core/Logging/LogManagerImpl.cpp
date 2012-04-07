@@ -3,7 +3,7 @@
 namespace JonsEngine
 {
 	LogManagerImpl::LogManagerImpl() : mRunning(false), mLogToFileDefault(false), mLogToOSDefault(false), 
-										mStreamBuf(NULL), mFileStream(NULL), mDummyStreamBuf(NULL)
+										mStreamBuf(NULL), mFileStream(NULL), mDummyStreamBuf(NULL), mMemoryManager(NULL)
 	{
 		mLogStream = NULL;
 	}
@@ -14,52 +14,58 @@ namespace JonsEngine
 			Destroy();
 	}
 
-	bool LogManagerImpl::Init()
+	bool LogManagerImpl::Init(IMemoryManager* memmgr)
 	{
-		return Init(false, false, "");
+		return Init(false, false, "",memmgr);
 	}
 
-	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, std::string absFilePath)
+	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, std::string absFilePath,IMemoryManager* memmgr)
 	{
-		std::string LogPath;
-		mLogToFileDefault = LogToFileDefault;
-		mLogToOSDefault = LogToOSDefault;
-
-		mStreamBuf = new JonsStreamBuf();
-
-		if (mStreamBuf)
+		if (memmgr)
 		{
-			if (mLogToFileDefault)
+			std::string LogPath;
+			mLogToFileDefault = LogToFileDefault;
+			mLogToOSDefault = LogToOSDefault;
+			mMemoryManager = memmgr;
+
+			mStreamBuf = new (mMemoryManager->Allocate(sizeof(JonsStreamBuf))) JonsStreamBuf();
+
+			if (mStreamBuf)
 			{
-				if (absFilePath.empty())
+				if (mLogToFileDefault)
 				{
-					LogPath += InternalGetLogPath(); 
-					LogPath += InternalGetLogName();
+					if (absFilePath.empty())
+					{
+						LogPath += InternalGetLogPath(); 
+						LogPath += InternalGetLogName();
+					}
+					else
+						LogPath += absFilePath;
+
+					mLogPath = LogPath;
+					mFileStream = new (mMemoryManager->Allocate(sizeof(std::ofstream))) std::ofstream(LogPath.c_str(), std::ios::trunc);
 				}
-				else
-					LogPath += absFilePath;
 
-				mLogPath = LogPath;
-				mFileStream = new std::ofstream(LogPath.c_str(), std::ios::trunc);
-			}
-
-			#ifdef ANDROID
-				if (mLogToOSDefault && !mAndroidLogBuf)
-					mAndroidLogBuf = new AndroidLogStreamBuf();
-			#endif
+				#ifdef ANDROID
+					if (mLogToOSDefault && !mAndroidLogBuf)
+						mAndroidLogBuf = new (mMemoryManager->Allocate(sizeof(AndroidLogStreamBuf))) AndroidLogStreamBuf();
+				#endif
 		
-			if (!mLogToOSDefault && !mLogToFileDefault)
+				if (!mLogToOSDefault && !mLogToFileDefault)
+				{
+					mDummyStreamBuf = new (mMemoryManager->Allocate(sizeof(DummyLogStreamBuf))) DummyLogStreamBuf();
+				}
+
+				mLogStream = new (mMemoryManager->Allocate(sizeof(JonsOutputStream))) JonsOutputStream(mStreamBuf);
+			}
+		
+			if (mStreamBuf && mLogStream)
 			{
-				mDummyStreamBuf = new DummyLogStreamBuf();
+				mInitialized = true;
+				return true;
 			}
-
-			mLogStream = new JonsOutputStream(mStreamBuf);
-		}
-		
-		if (mStreamBuf && mLogStream)
-		{
-			mInitialized = true;
-			return true;
+			else
+				return false;
 		}
 		else
 			return false;
@@ -77,33 +83,33 @@ namespace JonsEngine
 			if (mFileStream)
 			{
 				mFileStream->close();
-				delete mFileStream;
+				mMemoryManager->Deallocate(mFileStream);
 				mFileStream = NULL;
 			}
 
 			if (mStreamBuf)
 			{
-				delete mStreamBuf;
+				mMemoryManager->Deallocate(mStreamBuf);
 				mStreamBuf = NULL;
 			}
 
 			if (mDummyStreamBuf)
 			{
-				delete mDummyStreamBuf;
+				mMemoryManager->Deallocate(mDummyStreamBuf);
 				mDummyStreamBuf = NULL;
 			}
 
 			#ifdef ANDROID
 				if (mAndroidLogBuf)
 				{
-					delete mAndroidLogBuf;
+					mMemoryManager->Deallocate(mAndroidLogBuf);
 					mAndroidLogBuf = NULL;
 				}
 			#endif
 		
 			if (mLogStream)
 			{
-				delete mLogStream;
+				mMemoryManager->Deallocate(mLogStream);
 				mLogStream = NULL;
 			}
 

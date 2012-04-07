@@ -1,6 +1,5 @@
 #include "../../include/Core/Engine.h"
 
-JonsEngine::Engine* JonsEngine::Engine::mEngine = NULL;
 
 #ifdef ANDROID
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
@@ -33,45 +32,38 @@ namespace JonsEngine
 		#endif
 	}
 
-	Engine* Engine::GetEngine()
-	{
-		if (!mEngine)
-		{
-			mEngine = new Engine();
-		}
-		return mEngine;
-	}
-
 	bool Engine::Init(EngineSettings& initSettings)
 	{
 		bool res = true;
 
-		// Memory
+		// MemoryMgr must be the first one to be initialized as all other subsystems are dependant on it for memory allocation that might occur in their initialization and onwards
 		bool useDLMalloc = initSettings.GetUseDLMalloc();
 
 		mEngineSettings.SetUseDLMalloc(useDLMalloc);
 
 		res &= mMemoryManager.Init(useDLMalloc, &mLog);
 
+		// Only proceed if MemoryMgr is valid
+		if (res)
+		{
+			// Log
+			bool LogToFile = initSettings.GetLogToFile();
+			bool LogToSTDOut = initSettings.GetLogToSTDOut();
+			std::string fileLocation = initSettings.GetLogToFileLocation();
 
-		// Log
-		bool LogToFile = initSettings.GetLogToFile();
-		bool LogToSTDOut = initSettings.GetLogToSTDOut();
-		std::string fileLocation = initSettings.GetLogToFileLocation();
+			mEngineSettings.SetLogToFile(LogToFile,fileLocation);
+			mEngineSettings.SetLogToSTDOut(LogToSTDOut);
 
-		mEngineSettings.SetLogToFile(LogToFile,fileLocation);
-		mEngineSettings.SetLogToSTDOut(LogToSTDOut);
-
-		res &= mLog.Init(LogToFile,LogToSTDOut,fileLocation);
-
-
-		// Render
-		res &= mRenderManager.Init(&mLog);
+			res &= mLog.Init(LogToFile,LogToSTDOut,fileLocation,&mMemoryManager);
 
 
-		// GameObject 
-		res &= mGameObjectManager.Init(&mLog, &mMemoryManager);
+			// Render
+			res &= mRenderManager.Init(&mLog,&mMemoryManager);
 
+
+			// GameObject 
+			res &= mGameObjectManager.Init(&mLog, &mMemoryManager);
+		}
 
 		return res;
 	}
@@ -130,9 +122,11 @@ namespace JonsEngine
 			res &= Stop();
 
 		res &= mRenderManager.Destroy();
-		res &= mMemoryManager.Destroy();
 		res &= mGameObjectManager.Destroy();
 		res &= mLog.Destroy();
+
+		// MemoryMgr must be the last one to be destroyed as it is the allocator for the other subsystems
+		res &= mMemoryManager.Destroy();
 
 		return res;
 	}

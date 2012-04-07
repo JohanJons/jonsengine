@@ -13,7 +13,7 @@ namespace JonsEngine
 	class GameObjectTestManager
 	{
 	public:
-		GameObjectTestManager(IGameObjectManager* mGameObjFact);
+		GameObjectTestManager(IGameObjectManager* mGameObjFact,Engine* engine);
 
 		/* Object tests */
 		bool ReferenceTest();
@@ -25,6 +25,7 @@ namespace JonsEngine
 		bool GameObjectRefTest3(boost::shared_ptr<TestClass1> test1, boost::shared_ptr<TestClass1> test2);
 
 		IGameObjectManager* mGameObjManager;
+		Engine* mEngine;
 
 	};
 

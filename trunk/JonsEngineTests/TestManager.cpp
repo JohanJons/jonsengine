@@ -31,7 +31,7 @@ namespace JonsEngine
 		mEngineSettings.SetLogToSTDOut(true);
 		mEngineSettings.SetUseDLMalloc(true);
 
-		mEngine = Engine::GetEngine();
+		mEngine = new Engine();
 	}
 
 	bool TestManager::InitEngine()
@@ -43,8 +43,8 @@ namespace JonsEngine
 		{
 			res = true;
 
-			mMemTestMgr = new MemoryTestManager(mEngine->GetGameObjectManager());
-			mGameObjTestMgr = new GameObjectTestManager(mEngine->GetGameObjectManager());
+			mMemTestMgr = new MemoryTestManager(mEngine->GetGameObjectManager(), mEngine);
+			mGameObjTestMgr = new GameObjectTestManager(mEngine->GetGameObjectManager(),mEngine);
 		}
 		else
 			return false;
@@ -76,6 +76,8 @@ namespace JonsEngine
 	
 	bool TestManager::DestroyEngine()
 	{
+		bool res = true;
+
 		if (mMemTestMgr)
 		{
 			delete mMemTestMgr;
@@ -88,7 +90,11 @@ namespace JonsEngine
 			mGameObjTestMgr = NULL;
 		}
 
-		return mEngine->Destroy();
+		res &= mEngine->Destroy();
+
+		delete mEngine;
+
+		return res;
 	}
 
 

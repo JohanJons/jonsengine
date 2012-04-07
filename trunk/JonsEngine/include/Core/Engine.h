@@ -18,7 +18,7 @@ namespace JonsEngine
 	class Engine
 	{
 	public:
-		static Engine* GetEngine();
+		Engine();
 		~Engine();
 
 		bool Init(EngineSettings& initSettings);
@@ -40,9 +40,6 @@ namespace JonsEngine
 		#endif
 
 	private:
-		Engine();
-		static Engine* mEngine;
-
 		bool mRunning;
 		bool mInitialized;
 		#ifdef ANDROID

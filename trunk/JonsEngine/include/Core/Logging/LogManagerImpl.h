@@ -9,6 +9,7 @@
 #endif
 
 #include "../../../Interface/ILogManager.h"
+#include "../../../interface/IMemoryManager.h"
 #include "../Utils/JonsTime.h"
 #include "JonsStreamBuf.h"
 #include "JonsOutputStream.h"
@@ -25,11 +26,11 @@ namespace JonsEngine
 		LogManagerImpl();
 		~LogManagerImpl();
 
-		bool Init();
+		bool Init(IMemoryManager* memmgr);
 		#ifdef ANDROID
-			bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, JNIEnv* env);
+			bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, JNIEnv* env,IMemoryManager* memmgr);
 		#else
-			bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath);
+			bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath,IMemoryManager* memmgr);
 		#endif
 		bool Destroy();
 		bool Start();
@@ -51,6 +52,7 @@ namespace JonsEngine
 		std::string InternalGetLogName();
 		std::string InternalGetLogPath();
 
+		IMemoryManager* mMemoryManager;
 		bool mRunning;
 		bool mInitialized;
 		bool mLogToFileDefault;

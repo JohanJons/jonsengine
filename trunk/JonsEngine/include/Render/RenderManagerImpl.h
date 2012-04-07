@@ -24,7 +24,7 @@ namespace JonsEngine
 		RenderManagerImpl();
 		~RenderManagerImpl();
 
-		bool Init(ILogManager* logger);
+		bool Init(ILogManager* logger,IMemoryManager* memmgr);
 		bool Destroy();
 		bool Start();
 		bool Stop();
@@ -37,6 +37,7 @@ namespace JonsEngine
 
 	private:
 		ILogManager* mLog;
+		IMemoryManager* mMemoryManager;
 
 		bool mRunning;
 		bool mInitialized;

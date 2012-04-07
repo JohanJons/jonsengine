@@ -12,7 +12,7 @@ namespace JonsEngine
 	public:
 		virtual ~IRenderManager() { }
 
-		virtual bool Init(ILogManager* logger) = 0;
+		virtual bool Init(ILogManager* logger,IMemoryManager* memmgr) = 0;
 		virtual bool Destroy() = 0;
 		virtual bool Start() = 0;
 		virtual bool Stop() = 0;
