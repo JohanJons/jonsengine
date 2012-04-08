@@ -107,6 +107,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
+    <ClInclude Include="include\Core\Containers\JonsVector.h" />
     <ClInclude Include="include\Core\Engine.h" />
     <ClInclude Include="include\Core\EngineSettings.h" />
     <ClInclude Include="include\Core\GameObject\GameObject.h" />

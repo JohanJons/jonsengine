@@ -57,6 +57,9 @@
     <Filter Include="Thirdparty\dlmalloc">
       <UniqueIdentifier>{0815c268-49c7-420a-bc5b-abebc3b3dfbd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Core\Containers">
+      <UniqueIdentifier>{2ea7e2ba-7c3b-45f7-9b1a-2371f7affaae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Engine.cpp">
@@ -156,6 +159,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\EngineSettings.h">
       <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Containers\JonsVector.h">
+      <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
