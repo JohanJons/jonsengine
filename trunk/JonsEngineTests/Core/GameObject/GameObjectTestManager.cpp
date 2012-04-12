@@ -14,7 +14,7 @@ namespace JonsEngine
 
 		for (int32_t i = 0; i < JONSOBJECT_ITERATIONS; i++)
 		{
-			res && (GameObjectRefTest1() && mEngine->GetMemoryManager()->GetCurrentAllocatedObjectsCount() == 0);
+			res && (GameObjectRefTest1() && mEngine->GetMemoryManager()->GetUserAllocatedMemory() == 0);
 		}
 
 		if (res)
@@ -39,14 +39,14 @@ namespace JonsEngine
 		else
 			goto _bail;
 
-		if (mEngine->GetMemoryManager()->GetCurrentAllocatedObjectsCount() == 1)
+		if (mEngine->GetMemoryManager()->GetUserAllocatedMemory() == sizeof(TestClass1))
 		{
 			return ret;
 		}
 		else
 		{
-			mEngine->GetLogger()->LogError() << "TEST: GameObjectTestManager:GameObjectRefTest1: Allocated objects: "
-											<< mEngine->GetMemoryManager()->GetCurrentAllocatedObjectsCount()
+			mEngine->GetLogger()->LogError() << "TEST: GameObjectTestManager:GameObjectRefTest1: Allocated memory: "
+											<< mEngine->GetMemoryManager()->GetUserAllocatedMemory()
 											<< std::endl;
 			goto _bail;
 		}
@@ -70,14 +70,14 @@ namespace JonsEngine
 		else
 			goto _bail;
 
-		if (mEngine->GetMemoryManager()->GetCurrentAllocatedObjectsCount() == 2)
+		if (mEngine->GetMemoryManager()->GetUserAllocatedMemory() == sizeof(TestClass1)*2)
 		{
 			return ret;
 		}
 		else
 		{
-			mEngine->GetLogger()->LogError() << "TEST: GameObjectTestManager:GameObjectRefTest2: Allocated objects: "
-											<< mEngine->GetMemoryManager()->GetCurrentAllocatedObjectsCount()
+			mEngine->GetLogger()->LogError() << "TEST: GameObjectTestManager:GameObjectRefTest2: Allocated memory: "
+											<< mEngine->GetMemoryManager()->GetUserAllocatedMemory()
 											<< std::endl;
 			goto _bail;
 		}
@@ -101,14 +101,14 @@ namespace JonsEngine
 		else
 			goto _bail;
 
-		if (mEngine->GetMemoryManager()->GetCurrentAllocatedObjectsCount() == 3)
+		if (mEngine->GetMemoryManager()->GetUserAllocatedMemory() == sizeof(TestClass1)*3)
 		{
 			return ret;
 		}
 		else
 		{
-			mEngine->GetLogger()->LogError() << "TEST: GameObjectTestManager:GameObjectRefTest3: Allocated objects: "
-											<< mEngine->GetMemoryManager()->GetCurrentAllocatedObjectsCount()
+			mEngine->GetLogger()->LogError() << "TEST: GameObjectTestManager:GameObjectRefTest3: Allocated memory: "
+											<< mEngine->GetMemoryManager()->GetUserAllocatedMemory()
 										    << std::endl;
 			goto _bail;
 		}

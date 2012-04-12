@@ -15,7 +15,6 @@ namespace JonsEngine
 
 	TestManager::~TestManager()
 	{
-		delete mMemTestMgr;
 	}
 
 	void TestManager::Init(uint64_t RepeatTimes)
@@ -29,14 +28,14 @@ namespace JonsEngine
 
 		mEngineSettings.SetLogToFile(true);
 		mEngineSettings.SetLogToSTDOut(true);
-		mEngineSettings.SetUseDLMalloc(true);
-
-		mEngine = new Engine();
+		mEngineSettings.SetAllocatorBackEnd(DLMALLOC);
 	}
 
 	bool TestManager::InitEngine()
 	{
 		bool res = true;
+
+		mEngine = new Engine();
 
 		/* Init Engine and test mgrs */
 		if(mEngine->Init(mEngineSettings))

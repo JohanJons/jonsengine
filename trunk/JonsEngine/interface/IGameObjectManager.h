@@ -30,16 +30,15 @@ namespace JonsEngine
 		{
 			GameObject* ob = static_cast<GameObject*>(obj);
 			mObjects.erase(ob->GameObjectID);
-			
-			obj->~T();
-			mMemoryMgr->Deallocate(obj);
+		
+			mMemoryMgr->DeAllocateObject(obj,sizeof(T));
 		}
 
 		
 		template <class T>
 		boost::shared_ptr<T> CreateObject()
 		{
-			boost::shared_ptr<T> sPtr(new (mMemoryMgr->Allocate(sizeof(T))) T(),DestroyObject<T> );
+			boost::shared_ptr<T> sPtr(mMemoryMgr->AllocateObject<T>(),DestroyObject<T> );
 			boost::weak_ptr<GameObject> wPtr(sPtr);
 
 			wPtr.lock()->GameObjectID = mNextGameObjID;

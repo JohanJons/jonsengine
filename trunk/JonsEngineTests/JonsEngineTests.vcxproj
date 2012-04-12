@@ -41,7 +41,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)\Tests\Utils;$(SolutionDir)\Tests\Render;$(SolutionDir)\Tests\Memory;$(SolutionDir)\Tests\Core;$(SolutionDir)\Tests\;$(SolutionDir)\include\Utils;$(SolutionDir)\include\Render;$(SolutionDir)\include\Memory;$(SolutionDir)\include\Core;$(SolutionDir)\include;$(SolutionDir)\interface;$(IncludePath)</IncludePath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <LibraryPath>$(SolutionDir)\libs\win32;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\Thirdparty\Visual_Leak_Detector\lib\Win32\;$(SolutionDir)\libs\win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -57,12 +57,12 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <CompileAs>CompileAsCpp</CompileAs>
-      <AdditionalIncludeDirectories>..\Thirdparty\boost_1_49_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Thirdparty\Visual_Leak_Detector\Include\;..\Thirdparty\boost_1_49_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

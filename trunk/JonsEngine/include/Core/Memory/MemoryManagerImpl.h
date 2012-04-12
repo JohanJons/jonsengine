@@ -1,14 +1,13 @@
 #ifndef _MEMORY_MANAGER_IMPL_H
 #define _MEMORY_MANAGER_IMPL_H
 
-#include <malloc.h>
-#include <vector>
 
 #include "../../../Interface/IMemoryManager.h"
 #include "../../../Interface/ILogManager.h"
 #include "../../../Interface/EngineDefs.h"
 
-#include "../../../../Thirdparty/dlmalloc/dlmalloc.h"
+#include "Allocator.h"
+
 
 namespace JonsEngine
 {
@@ -20,29 +19,31 @@ namespace JonsEngine
 		~MemoryManagerImpl();
 
 		bool Init(ILogManager* logger);
-		bool Init(bool UseDLMallocm, ILogManager* logger);
+		bool Init(Allocator_BackEnd allocatorBackEnd, ILogManager* logger);
 		bool Destroy();
 		bool Start();
 		bool Stop();
 		bool isRunning();
 		void Tick();
 		
-		void* Allocate(size_t size);
+		void* Allocate(size_t size, Allocation_Mode mode = USER);
 		void* ReAllocate(void* p, size_t size);
-		void Deallocate(void* obj);
+		void DeAllocate(void* obj, size_t size, Allocation_Mode mode = USER);
 
-		inline uint64_t GetTotalAllocatedObjectsCount() { return mTotalAllocatedObjects; }
-		inline uint64_t GetCurrentAllocatedObjectsCount() { return mCurrentAllocatedObjects; }
-		
+		inline Allocator* GetAllocator() { return mAllocator; }
+		inline uint64_t GetTotalAllocatedMemory() { return (mUserAllocatedMemory + mInternalAllocatedMemory); }
+		inline uint64_t GetUserAllocatedMemory() { return mUserAllocatedMemory; }
+		inline uint64_t GetInternalAllocatedMemory() { return mInternalAllocatedMemory; }
 
 	private:
 		ILogManager* mLog;
+		Allocator* mAllocator;
 
 		bool mRunning;
 		bool mInitialized;
-		bool mUseDLMalloc;
-		uint64_t mTotalAllocatedObjects;
-		uint64_t mCurrentAllocatedObjects;
+		Allocator_BackEnd mAllocatorBackEnd;
+		uint64_t mUserAllocatedMemory;
+		uint64_t mInternalAllocatedMemory;
 
 	};
 

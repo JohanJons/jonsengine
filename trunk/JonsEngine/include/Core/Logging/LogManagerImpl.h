@@ -9,13 +9,13 @@
 #endif
 
 #include "../../../Interface/ILogManager.h"
+#include "../../../Interface/EngineDefs.h"
 #include "../../../interface/IMemoryManager.h"
+
 #include "../Utils/JonsTime.h"
 #include "JonsStreamBuf.h"
 #include "JonsOutputStream.h"
 #include "DummyLogStream.h"
-
-#include "../../../Interface/EngineDefs.h"
 
 
 namespace JonsEngine
@@ -66,8 +66,6 @@ namespace JonsEngine
 			JNIEnv* mJNIEnv;
 			AndroidLogStreamBuf* mAndroidLogBuf;
 		#endif
-
-		// REDIRECTER
 
 	};
 

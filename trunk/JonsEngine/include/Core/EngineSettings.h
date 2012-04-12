@@ -3,43 +3,51 @@
 
 #include <string>
 
-class EngineSettings
+#include "../../interface/EngineDefs.h"
+
+namespace JonsEngine
 {
-public:
-	// Logging
-	void SetLogToFile(bool res);		// default: false
-	void SetLogToFile(bool res,std::string fileLocation);
-	void SetLogToSTDOut(bool res);		// default: false
 
-	bool GetLogToFile();
-	std::string GetLogToFileLocation();
-	bool GetLogToSTDOut();
+	class EngineSettings
+	{
+	public:
+		EngineSettings();
 
-	// Memory
-	void SetUseDLMalloc(bool res);		// default: true
+		// Logging
+		void SetLogToFile(bool res);		// default: false
+		void SetLogToFile(bool res,std::string fileLocation);
+		void SetLogToSTDOut(bool res);		// default: false
 
-	bool GetUseDLMalloc();		
+		bool GetLogToFile();
+		std::string GetLogToFileLocation();
+		bool GetLogToSTDOut();
 
-	// GameObject
+		// Memory
+		void SetAllocatorBackEnd(Allocator_BackEnd allocatorBackend);		// default: Allocator_BackEnd.DLMALLOC
 
+		Allocator_BackEnd GetAllocatorBackEnd();		
 
-	// Render
-
-
-	// Audio
-
-
-	// Input
+		// GameObject
 
 
-private:
-	bool mLogToFile;
-	bool mLogToSTDOut;
-	std::string mLogToFileLocation;
+		// Render
 
-	bool mUseDLMalloc;
 
-};
+		// Audio
 
+
+		// Input
+
+
+	private:
+		bool mLogToFile;
+		bool mLogToSTDOut;
+		std::string mLogToFileLocation;
+
+		Allocator_BackEnd mAllocatorBackEnd;
+
+	};
+
+}
 
 #endif

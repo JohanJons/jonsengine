@@ -13,9 +13,6 @@ namespace JonsEngine
 		JonsOutputStream(JonsStreamBuf* buf);
 		~JonsOutputStream();
 
-	private:
-		JonsStreamBuf* mStreamBuf;
-
 	};
 }
 

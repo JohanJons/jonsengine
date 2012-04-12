@@ -89,14 +89,17 @@
     <ClCompile Include="src\Core\GameObject\GameObjectManagerImpl.cpp">
       <Filter>Source Files\Core\GameObject</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Memory\MemoryBlock.cpp">
-      <Filter>Source Files\Core\Memory</Filter>
-    </ClCompile>
     <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c">
       <Filter>Thirdparty\dlmalloc</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\EngineSettings.cpp">
       <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Memory\Allocator.cpp">
+      <Filter>Source Files\Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Containers\JonsVector.cpp">
+      <Filter>Source Files\Core\Containers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -151,9 +154,6 @@
     <ClInclude Include="interface\IGameObjectManager.h">
       <Filter>Interface</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Memory\MemoryBlock.h">
-      <Filter>Header Files\Core\Memory</Filter>
-    </ClInclude>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h">
       <Filter>Thirdparty\dlmalloc</Filter>
     </ClInclude>
@@ -162,6 +162,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\Containers\JonsVector.h">
       <Filter>Header Files\Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Memory\Allocator.h">
+      <Filter>Header Files\Core\Memory</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

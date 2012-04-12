@@ -3,13 +3,13 @@
 namespace JonsEngine
 {
 	JonsOutputStream::JonsOutputStream(JonsStreamBuf* buf)
-			: std::ostream(buf), mStreamBuf(buf)
+			: std::ostream(buf)
 	{
 		
 	}
 
 	JonsOutputStream::~JonsOutputStream()
 	{
-		mStreamBuf = NULL;
+		
 	}
 }

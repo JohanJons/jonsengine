@@ -12,7 +12,8 @@ namespace JonsEngine
 	/* TEST 1: Test memory allocation with and without memory pool */
 	bool MemoryTestManager::AllocateTest()
 	{
-		uint64_t remainingObjects = 0;
+		uint64_t userAllocatedMemory = 0;
+		uint64_t totalAllocatedMemory = 0;
 		uint64_t timeStart, timeStop;
 
 		timeStart = GetTimeSinceEpoch();
@@ -27,11 +28,12 @@ namespace JonsEngine
 									   << " msec"  << std::endl;
 
 
-		remainingObjects = mEngine->GetMemoryManager()->GetCurrentAllocatedObjectsCount();
-		if (remainingObjects != 0)
+		userAllocatedMemory = mEngine->GetMemoryManager()->GetUserAllocatedMemory();
+		totalAllocatedMemory = mEngine->GetMemoryManager()->GetTotalAllocatedMemory();
+		if (userAllocatedMemory != 0 && totalAllocatedMemory == mEngine->GetMemoryManager()->GetInternalAllocatedMemory())
 		{
-			mEngine->GetLogger()->LogError() << "TEST: MemoryTestManager:AllocateTest: Objects remaining after loop: "
-											<< remainingObjects  << std::endl;
+			mEngine->GetLogger()->LogError() << "TEST: MemoryTestManager:AllocateTest: Memory remaining after loop: "
+											<< userAllocatedMemory  << std::endl;
 			mEngine->GetLogger()->LogError() << "TEST: AllocateTest FAILED"  << std::endl;
 
 			return false;

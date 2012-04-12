@@ -10,6 +10,7 @@ namespace JonsEngine
 	JonsStreamBuf::~JonsStreamBuf()
 	{
 		mStreamBufs.clear();
+		mLine.clear();
 	}
 
 	void JonsStreamBuf::AddStream(std::streambuf* sb)
