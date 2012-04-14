@@ -8,6 +8,7 @@
 #include "../Render/RenderManagerImpl.h"
 #include "Logging/LogManagerImpl.h"
 #include "Memory/MemoryManagerImpl.h"
+#include "Containers/Vector.h"
 #include "GameObject/GameObjectManagerImpl.h"
 
 #include "EngineSettings.h"

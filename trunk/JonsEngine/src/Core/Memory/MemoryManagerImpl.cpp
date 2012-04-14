@@ -3,9 +3,7 @@
 namespace JonsEngine
 {
 
-	MemoryManagerImpl::MemoryManagerImpl() : 
-							mUserAllocatedMemory(0), mInternalAllocatedMemory(0), mRunning(false),
-							mAllocatorBackEnd(DLMALLOC), mInitialized(false), mLog(NULL), mAllocator(NULL)
+	MemoryManagerImpl::MemoryManagerImpl() : mRunning(false),mInitialized(false), mLog(NULL)
 	{
 
 	}
@@ -16,23 +14,13 @@ namespace JonsEngine
 			Destroy();
 	}
 
-	bool MemoryManagerImpl::Init(Allocator_BackEnd allocatorBackEnd, ILogManager* logger)
-	{
-		mAllocatorBackEnd = allocatorBackEnd;
-
-		return Init(logger);
-	}
-
 	bool MemoryManagerImpl::Init(ILogManager* logger)
 	{
 		mLog = logger;
 
-		if (mAllocatorBackEnd == DLMALLOC)
-			mAllocator =  new (dlmalloc(sizeof(Allocator))) Allocator(mAllocatorBackEnd);
-		else if (mAllocatorBackEnd == DEFAULT_MALLOC)
-			mAllocator = new Allocator(mAllocatorBackEnd);
+		mHeapAllocator.mLog = logger;
 
-		if (mLog && mAllocator)
+		if (mLog)
 		{
 			mInitialized = true;
 			return true;
@@ -49,20 +37,6 @@ namespace JonsEngine
 
 			if (mRunning)
 				res &= Stop();
-
-			if (mAllocatorBackEnd == DLMALLOC)
-			{
-				mAllocator->~Allocator();
-				dlfree(mAllocator);
-				mAllocator = NULL;
-			}
-			else if (mAllocatorBackEnd == DEFAULT_MALLOC)
-			{
-				delete mAllocator;
-				mAllocator = NULL;
-			}
-			else 
-				res &= false;
 
 			res &= !mRunning;
 
@@ -114,62 +88,26 @@ namespace JonsEngine
 
 	}
 
-	void* MemoryManagerImpl::Allocate(size_t size, Allocation_Mode mode)
+	uint64_t MemoryManagerImpl::GetTotalAllocatedMemory()
 	{
-		void* alloc = NULL;
+		uint64_t totalAllocatedMemory = 0;
 
-		if (mAllocator)
-		{
-			alloc = mAllocator->Allocate(size);
-		
-			if (alloc)
-			{
-				if (mode == USER) mUserAllocatedMemory += size;
-				if (mode == INTERNAL) mInternalAllocatedMemory += size;
-			}
-			else
-				mLog->LogError() << "MemoryManagerImpl::Allocate: Allocator not valid!" << std::endl;
-		}
-		return alloc;
-	}
-	
-	void* MemoryManagerImpl::ReAllocate(void* p, size_t size)
-	{
-		if (mAllocator)
-		{
-			void* alloc = mAllocator->ReAllocate(p,size);
+		// += heap memory
+		totalAllocatedMemory += mHeapAllocator.GetAllocatedMemory();
 
-			if (!alloc)
-				mLog->LogError() << "MemoryManagerImpl::Allocate: Unable to reallocate memory!" << std::endl;
+		//...
 
-			return alloc;
-		}
-		else 
-		{
-			mLog->LogError() << "MemoryManagerImpl::ReAllocate: Allocator not valid!" << std::endl;
-			return NULL;
-		}
+		return totalAllocatedMemory;
 	}
 
-	void MemoryManagerImpl::DeAllocate(void* obj,size_t size, Allocation_Mode mode)
+	void* MemoryManagerImpl::InternalAllocate(size_t size)
 	{
-		if (!obj)
-		{
-			mLog->LogError() << "MemoryManagerImpl::DeAllocate: Object not valid!" << std::endl;
-			return;
-		}
+		return mHeapAllocator.Allocate(size);
+	}
 
-
-		if (!mAllocator)
-		{
-			mLog->LogError() << "MemoryManagerImpl::DeAllocate: Allocator not valid!" << std::endl;
-			return;
-		}
-
-		mAllocator->DeAllocate(obj);
-
-		if (mode == USER) mUserAllocatedMemory -= size;
-		if (mode == INTERNAL) mInternalAllocatedMemory -= size;
+	void MemoryManagerImpl::InternalDeAllocate(void* p)
+	{ 
+		mHeapAllocator.DeAllocate(p);
 	}
 
 }

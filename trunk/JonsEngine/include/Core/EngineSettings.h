@@ -22,10 +22,7 @@ namespace JonsEngine
 		std::string GetLogToFileLocation();
 		bool GetLogToSTDOut();
 
-		// Memory
-		void SetAllocatorBackEnd(Allocator_BackEnd allocatorBackend);		// default: Allocator_BackEnd.DLMALLOC
-
-		Allocator_BackEnd GetAllocatorBackEnd();		
+		// Memory	
 
 		// GameObject
 
@@ -43,8 +40,6 @@ namespace JonsEngine
 		bool mLogToFile;
 		bool mLogToSTDOut;
 		std::string mLogToFileLocation;
-
-		Allocator_BackEnd mAllocatorBackEnd;
 
 	};
 

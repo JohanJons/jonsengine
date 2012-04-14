@@ -28,7 +28,6 @@ namespace JonsEngine
 
 		mEngineSettings.SetLogToFile(true);
 		mEngineSettings.SetLogToSTDOut(true);
-		mEngineSettings.SetAllocatorBackEnd(DLMALLOC);
 	}
 
 	bool TestManager::InitEngine()

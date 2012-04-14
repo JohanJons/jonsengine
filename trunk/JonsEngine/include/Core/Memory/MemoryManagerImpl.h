@@ -6,7 +6,7 @@
 #include "../../../Interface/ILogManager.h"
 #include "../../../Interface/EngineDefs.h"
 
-#include "Allocator.h"
+#include "HeapAllocator.h"
 
 
 namespace JonsEngine
@@ -19,31 +19,24 @@ namespace JonsEngine
 		~MemoryManagerImpl();
 
 		bool Init(ILogManager* logger);
-		bool Init(Allocator_BackEnd allocatorBackEnd, ILogManager* logger);
 		bool Destroy();
 		bool Start();
 		bool Stop();
 		bool isRunning();
 		void Tick();
-		
-		void* Allocate(size_t size, Allocation_Mode mode = USER);
-		void* ReAllocate(void* p, size_t size);
-		void DeAllocate(void* obj, size_t size, Allocation_Mode mode = USER);
 
-		inline Allocator* GetAllocator() { return mAllocator; }
-		inline uint64_t GetTotalAllocatedMemory() { return (mUserAllocatedMemory + mInternalAllocatedMemory); }
-		inline uint64_t GetUserAllocatedMemory() { return mUserAllocatedMemory; }
-		inline uint64_t GetInternalAllocatedMemory() { return mInternalAllocatedMemory; }
+		inline HeapAllocator* GetHeapAllocator() { return &mHeapAllocator; }
+		uint64_t GetTotalAllocatedMemory();
 
 	private:
+		void* InternalAllocate(size_t size);
+		void InternalDeAllocate(void* p);
+
 		ILogManager* mLog;
-		Allocator* mAllocator;
+		HeapAllocator mHeapAllocator;
 
 		bool mRunning;
 		bool mInitialized;
-		Allocator_BackEnd mAllocatorBackEnd;
-		uint64_t mUserAllocatedMemory;
-		uint64_t mInternalAllocatedMemory;
 
 	};
 

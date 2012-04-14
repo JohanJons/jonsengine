@@ -28,7 +28,7 @@ namespace JonsEngine
 			mLogToOSDefault = LogToOSDefault;
 			mMemoryManager = memmgr;
 
-			mStreamBuf = mMemoryManager->AllocateObject<JonsStreamBuf>(INTERNAL);
+			mStreamBuf = mMemoryManager->AllocateObject<JonsStreamBuf>();
 
 			if (mStreamBuf)
 			{
@@ -43,20 +43,20 @@ namespace JonsEngine
 						LogPath += absFilePath;
 
 					mLogPath = LogPath;
-					mFileStream = mMemoryManager->AllocateObject<std::ofstream>(LogPath.c_str(), std::ios::trunc, INTERNAL);
+					mFileStream = mMemoryManager->AllocateObject<std::ofstream>(LogPath.c_str(), std::ios::trunc);
 				}
 
 				#ifdef ANDROID
 					if (mLogToOSDefault && !mAndroidLogBuf)
-						mAndroidLogBuf = mMemoryManager->AllocateObject<AndroidLogStreamBuf>(INTERNAL);
+						mAndroidLogBuf = mMemoryManager->AllocateObject<AndroidLogStreamBuf>();
 				#endif
 		
 				if (!mLogToOSDefault && !mLogToFileDefault)
 				{
-					mDummyStreamBuf = mMemoryManager->AllocateObject<DummyLogStreamBuf>(INTERNAL);
+					mDummyStreamBuf = mMemoryManager->AllocateObject<DummyLogStreamBuf>();
 				}
 
-				mLogStream = mMemoryManager->AllocateObject<JonsOutputStream>(mStreamBuf,INTERNAL); 
+				mLogStream = mMemoryManager->AllocateObject<JonsOutputStream>(mStreamBuf); 
 			}
 		
 			if (mStreamBuf && mLogStream)
@@ -83,33 +83,33 @@ namespace JonsEngine
 			if (mFileStream)
 			{
 				mFileStream->close();
-				mMemoryManager->DeAllocateObject(mFileStream,sizeof(mFileStream));
+				mMemoryManager->DeAllocateObject(mFileStream);
 				mFileStream = NULL;
 			}
 
 			if (mStreamBuf)
 			{
-				mMemoryManager->DeAllocateObject(mStreamBuf,sizeof(mStreamBuf));
+				mMemoryManager->DeAllocateObject(mStreamBuf);
 				mStreamBuf = NULL;
 			}
 
 			if (mDummyStreamBuf)
 			{
-				mMemoryManager->DeAllocateObject(mDummyStreamBuf,sizeof(mDummyStreamBuf));
+				mMemoryManager->DeAllocateObject(mDummyStreamBuf);
 				mDummyStreamBuf = NULL;
 			}
 
 			#ifdef ANDROID
 				if (mAndroidLogBuf)
 				{
-					mMemoryManager->DeAllocateObject(mAndroidLogBuf,sizeof(mAndroidLogBuf));
+					mMemoryManager->DeAllocateObject(mAndroidLogBuf);
 					mAndroidLogBuf = NULL;
 				}
 			#endif
 		
 			if (mLogStream)
 			{
-				mMemoryManager->DeAllocateObject(mLogStream,sizeof(mLogStream));
+				mMemoryManager->DeAllocateObject(mLogStream);
 				mLogStream = NULL;
 			}
 

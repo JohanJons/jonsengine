@@ -93,13 +93,12 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c" />
-    <ClCompile Include="src\Core\Containers\JonsVector.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Core\EngineSettings.cpp" />
     <ClCompile Include="src\Core\GameObject\GameObjectManagerImpl.cpp" />
     <ClCompile Include="src\Core\Logging\JonsOutputStream.cpp" />
     <ClCompile Include="src\Core\Logging\JonsStreamBuf.cpp" />
-    <ClCompile Include="src\Core\Memory\Allocator.cpp" />
+    <ClCompile Include="src\Core\Memory\HeapAllocator.cpp" />
     <ClCompile Include="src\Core\Memory\MemoryManagerImpl.cpp" />
     <ClCompile Include="src\Render\RenderManagerImpl.cpp" />
     <ClCompile Include="src\Core\Utils\JonsThread.cpp" />
@@ -108,7 +107,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
-    <ClInclude Include="include\Core\Containers\JonsVector.h" />
+    <ClInclude Include="include\Core\Containers\Vector.h" />
     <ClInclude Include="include\Core\Engine.h" />
     <ClInclude Include="include\Core\EngineSettings.h" />
     <ClInclude Include="include\Core\GameObject\GameObject.h" />
@@ -118,7 +117,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Core\Logging\JonsOutputStream.h" />
     <ClInclude Include="include\Core\Logging\JonsStreamBuf.h" />
     <ClInclude Include="include\Core\Logging\LogManagerImpl.h" />
-    <ClInclude Include="include\Core\Memory\Allocator.h" />
+    <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
     <ClInclude Include="include\Core\Memory\MemoryManagerImpl.h" />
     <ClInclude Include="include\Render\RenderManagerImpl.h" />
     <ClInclude Include="include\Core\Utils\JonsThread.h" />

@@ -15,24 +15,6 @@ namespace JonsEngine
 	const std::string EngineLogTag = "JonsEngine";
 
 
-	//
-	// Memory
-	//
-
-	// Allocator backend
-	enum Allocator_BackEnd
-	{
-		DLMALLOC = 0,
-		DEFAULT_MALLOC
-	};
-
-	// Allocation mode
-	enum Allocation_Mode
-	{
-		INTERNAL = 0,
-		USER
-	};
-
 
 }
 

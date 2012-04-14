@@ -37,11 +37,7 @@ namespace JonsEngine
 		bool res = true;
 
 		// MemoryMgr must be the first one to be initialized as all other subsystems are dependant on it for memory allocation that might occur in their initialization and onwards
-		Allocator_BackEnd allocatorBackEnd = initSettings.GetAllocatorBackEnd();
-
-		mEngineSettings.SetAllocatorBackEnd(allocatorBackEnd);
-
-		res &= mMemoryManager.Init(allocatorBackEnd, &mLog);
+		res &= mMemoryManager.Init(&mLog);
 
 		// Only proceed if MemoryMgr is valid
 		if (res)

@@ -31,7 +31,7 @@ namespace JonsEngine
 			GameObject* ob = static_cast<GameObject*>(obj);
 			mObjects.erase(ob->GameObjectID);
 		
-			mMemoryMgr->DeAllocateObject(obj,sizeof(T));
+			mMemoryMgr->DeAllocateObject(obj);
 		}
 
 		

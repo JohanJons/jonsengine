@@ -95,11 +95,8 @@
     <ClCompile Include="src\Core\EngineSettings.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Memory\Allocator.cpp">
+    <ClCompile Include="src\Core\Memory\HeapAllocator.cpp">
       <Filter>Source Files\Core\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Containers\JonsVector.cpp">
-      <Filter>Source Files\Core\Containers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -160,11 +157,11 @@
     <ClInclude Include="include\Core\EngineSettings.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Containers\JonsVector.h">
-      <Filter>Header Files\Core\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Memory\Allocator.h">
+    <ClInclude Include="include\Core\Memory\HeapAllocator.h">
       <Filter>Header Files\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Containers\Vector.h">
+      <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
