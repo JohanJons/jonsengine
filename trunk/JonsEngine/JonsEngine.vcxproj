@@ -41,6 +41,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
+    <LibraryPath>C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\Visual_Leak_Detector\lib\Win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -53,7 +54,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;JONSENGINE_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>include\Core\Utils;include\Core\GameObject;include\Core\Memory;include\Core\Logging;include\Core\Containers;include\Render;include\Input;include\Core;include\Audio;include\;..\Thirdparty\boost_1_49_0;interface\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\Visual_Leak_Detector\include;include\Core\Utils;include\Core\GameObject;include\Core\Memory;include\Core\Logging;include\Core\Containers;include\Render;include\Input;include\Core;include\Audio;include\;..\Thirdparty\boost_1_49_0;interface\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

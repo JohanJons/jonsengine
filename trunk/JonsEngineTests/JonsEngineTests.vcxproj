@@ -41,7 +41,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)\Tests\Utils;$(SolutionDir)\Tests\Render;$(SolutionDir)\Tests\Memory;$(SolutionDir)\Tests\Core;$(SolutionDir)\Tests\;$(SolutionDir)\include\Utils;$(SolutionDir)\include\Render;$(SolutionDir)\include\Memory;$(SolutionDir)\include\Core;$(SolutionDir)\include;$(SolutionDir)\interface;$(IncludePath)</IncludePath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <LibraryPath>..\Thirdparty\Visual_Leak_Detector\lib\Win32\;$(SolutionDir)\libs\win32;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\Thirdparty\gtest-1.6.0\msvc\gtest\Debug\;..\Thirdparty\Visual_Leak_Detector\lib\Win32\;$(SolutionDir)\libs\win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -57,12 +57,13 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <CompileAs>CompileAsCpp</CompileAs>
-      <AdditionalIncludeDirectories>..\Thirdparty\Visual_Leak_Detector\Include\;..\Thirdparty\boost_1_49_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Thirdparty\gtest-1.6.0\include\;..\Thirdparty\Visual_Leak_Detector\Include\;..\Thirdparty\boost_1_49_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vld.lib;gtestd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -82,14 +83,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Core\Containers\VectorTest.h" />
     <ClInclude Include="Core\GameObject\GameObjectTestManager.h" />
     <ClInclude Include="Core\Memory\MemoryTestManager.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="targetver.h" />
     <ClInclude Include="TestClass1.h" />
+    <ClInclude Include="TestFixtures\RunningEngineFixture.h" />
     <ClInclude Include="TestManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Containers\VectorTest.cpp" />
     <ClCompile Include="Core\GameObject\GameObjectTestManager.cpp" />
     <ClCompile Include="JonsEngineTests.cpp" />
     <ClCompile Include="Core\Memory\MemoryTestManager.cpp" />

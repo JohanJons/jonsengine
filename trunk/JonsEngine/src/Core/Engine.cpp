@@ -1,6 +1,5 @@
 #include "../../include/Core/Engine.h"
 
-
 #ifdef ANDROID
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
@@ -25,7 +24,7 @@ namespace JonsEngine
 		Destroy();
 	}
 
-	Engine::Engine() : mRunning(false)
+	Engine::Engine() : mRunning(false), mInitialized(false)
 	{
 		#ifdef ANDROID
 			mJNIEnv = NULL;
@@ -59,6 +58,8 @@ namespace JonsEngine
 
 			// GameObject 
 			res &= mGameObjectManager.Init(&mLog, &mMemoryManager);
+
+			mInitialized = true;
 		}
 
 		return res;
@@ -123,6 +124,8 @@ namespace JonsEngine
 
 		// MemoryMgr must be the last one to be destroyed as it is the allocator for the other subsystems
 		res &= mMemoryManager.Destroy();
+
+		mInitialized = false;
 
 		return res;
 	}

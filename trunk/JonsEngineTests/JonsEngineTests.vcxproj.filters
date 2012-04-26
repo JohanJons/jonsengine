@@ -21,14 +21,14 @@
     <Filter Include="Source Files\Core\GameObject">
       <UniqueIdentifier>{6b6d8906-631f-4f49-8b69-bdffbc50b745}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Core\Containers">
+      <UniqueIdentifier>{fe08ecd0-b45f-4d99-a48f-e3f59ab72131}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TestFixtures">
+      <UniqueIdentifier>{06e97dbc-ea4a-45cd-acad-82e81a158dcd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TestClass1.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -40,6 +40,12 @@
     </ClInclude>
     <ClInclude Include="Core\GameObject\GameObjectTestManager.h">
       <Filter>Source Files\Core\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Containers\VectorTest.h">
+      <Filter>Source Files\Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="TestFixtures\RunningEngineFixture.h">
+      <Filter>Source Files\TestFixtures</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -57,6 +63,9 @@
     </ClCompile>
     <ClCompile Include="Core\GameObject\GameObjectTestManager.cpp">
       <Filter>Source Files\Core\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Containers\VectorTest.cpp">
+      <Filter>Source Files\Core\Containers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

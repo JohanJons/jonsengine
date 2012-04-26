@@ -45,7 +45,7 @@ namespace JonsEngine
 
 	uint64_t HeapAllocator::GetAllocatedMemory()
 	{
-		mallinfo mi = dlmallinfo();
+		struct mallinfo mi = dlmallinfo();
 
 		return (mi.arena + mi.hblkhd);
 	}

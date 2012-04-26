@@ -1,8 +1,6 @@
 #ifndef _ALLOCATOR_H
 #define _ALLOCATOR_H
 
-#include <malloc.h>
-
 #include "../../../../Thirdparty/dlmalloc/dlmalloc.h"
 
 #include "../../../interface/ILogManager.h"
