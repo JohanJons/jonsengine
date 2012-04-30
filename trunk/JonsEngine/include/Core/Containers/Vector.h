@@ -35,8 +35,8 @@ namespace JonsEngine
 		Iterator insert(Iterator position, const T& value);
 		void insert(Iterator position,size_t n, const T& value);
 		void insert(Iterator position,Iterator first, Iterator last);
-		void erase(Iterator position);
-		void erase(Iterator first, Iterator last);
+		Iterator erase(Iterator position);
+		Iterator erase(Iterator first, Iterator last);
 		void resize(size_t numElements);
 
 		void push_back(const T& item);
@@ -101,7 +101,7 @@ namespace JonsEngine
 	template <class T>
 	inline T& Vector<T>::back()
 	{
-		return *mEnd;
+		return *(mEnd-1);
 	}
 	
 	template <class T>
@@ -162,7 +162,6 @@ namespace JonsEngine
 	{
 		const size_t pos = (position - mBegin);
 
-		// no need to reallocate
 		if (mEnd != mCapacity)
 		{
 			memcpy(mBegin+pos+1,mBegin+pos,sizeof(T)*(mEnd-position));
@@ -181,10 +180,10 @@ namespace JonsEngine
 			memcpy(newBegin,mBegin,sizeof(T)*pos);
 			memcpy(newBegin+pos,&value,sizeof(T));
 			memcpy(newBegin+pos+1,mBegin+pos,(mEnd - position)*sizeof(T));
-			
-			mEnd = newBegin + (mEnd - mBegin) + 1;
 			mAllocator->DeAllocate(mBegin);
+
 			mBegin = newBegin;
+			mEnd = mBegin + prevSize + 1;
 			mCapacity = mBegin+newSize;
 
 			return mBegin+pos;
@@ -194,54 +193,104 @@ namespace JonsEngine
 	template <class T>
 	inline void Vector<T>::insert(Iterator position, size_t n, const T& value)
 	{
-		const size_t pos = (position - mBegin);
+  		const size_t pos = (position - mBegin);
 
-		// no need to reallocate
-		if (n <= uint32_t(mCapacity-mEnd))
+		if (n>0)
 		{
-			memcpy(mBegin+pos+n,mBegin+pos,sizeof(T)*(mEnd-position));
+			if (n <= uint32_t(mCapacity-mEnd))
+			{
+				memcpy(mBegin+pos+n,mBegin+pos,sizeof(T)*(mEnd-position));
 
-			for (uint32_t i = 0; i<n; i++)
-				memcpy(mBegin+pos+i,&value,sizeof(T));
+				for (uint32_t i = 0; i<n; i++)
+					memcpy(mBegin+pos+i,&value,sizeof(T));
 
-			mEnd += n;
-		}
-		else
-		{
-			// TODO MERGE
-			const size_t prevSize = mEnd - mBegin;
-			const size_t newSize = GetNewCapacity(prevSize,n);
-			T* newBegin = (T*) mAllocator->Allocate(newSize*sizeof(T));
+				mEnd += n;
+			}
+			else
+			{
+				const size_t prevSize = mEnd - mBegin;
+				const size_t newSize = GetNewCapacity(prevSize,n);
+				T* newBegin = (T*) mAllocator->Allocate(newSize*sizeof(T));
 
-			memcpy(newBegin,mBegin,sizeof(T)*pos);
-			memcpy(newBegin+pos,&value,sizeof(T)*n);
-			memcpy(newBegin+pos+n,mBegin+pos,(mEnd - position)*sizeof(T));
+				memcpy(newBegin,mBegin,sizeof(T)*pos);
+				for (uint32_t i = 0; i<n; i++)
+					memcpy(newBegin+pos+i,&value,sizeof(T));
+				memcpy(newBegin+pos+n,mBegin+pos,(mEnd - position)*sizeof(T));
 
-			mEnd = newBegin + (mEnd - mBegin) + n;
-			mAllocator->DeAllocate(mBegin);
-			mBegin = newBegin;
-			mCapacity = mBegin+newSize;
+				mAllocator->DeAllocate(mBegin);
+				mBegin = newBegin;
+				mEnd = mBegin + prevSize + n;
+				mCapacity = mBegin+newSize;
+			}
 		}
 	}
 	
 	template <class T>
 	inline void Vector<T>::insert(Iterator position,Iterator first, Iterator last)
 	{
+		const size_t insertSize = (last - first);
 
+		if (insertSize <= size_t(mCapacity - mEnd))
+		{
+			for (Iterator i = first; i < last && i != mEnd; i++)
+			{
+				memcpy(position,i,sizeof(T));
+				position++;
+
+				mEnd += insertSize;
+			}
+		}
+		else
+		{
+			const size_t prevSize = mEnd - mBegin;
+			const size_t pos = (position - mBegin);
+			const size_t newSize = GetNewCapacity(prevSize,insertSize);
+			T* newBegin = (T*) mAllocator->Allocate(newSize*sizeof(T));
+
+			memcpy(newBegin,mBegin,pos*sizeof(T));
+			memcpy(newBegin+pos,first,insertSize * sizeof(T));
+			memcpy(newBegin+pos+insertSize,mBegin+pos,(mEnd - position) * sizeof(T));
+
+			mBegin = newBegin;
+			mEnd = mBegin + prevSize + insertSize;
+			mCapacity = mBegin + newSize;
+		}
 	}
 
 	template <class T>
 	inline typename Vector<T>::Iterator 
 	Vector<T>::erase(Iterator position)
 	{
+		if (position != mEnd)
+		{
+			const size_t locPos = (position - mBegin);
 
+			position->~T();
+			memcpy(mBegin+locPos,mBegin+locPos+1,sizeof(T)*(mEnd - position));
+
+			mEnd--;
+	
+			return mBegin+locPos;
+		}
+		else
+			return mEnd;
 	}
 
 	template <class T>
 	inline typename Vector<T>::Iterator 
-	Vector<T>::erase(Iterator position)
+	Vector<T>::erase(Iterator first, Iterator end)
 	{
+		const size_t locBegin = (first - mBegin);
+		const size_t locEnd = (end - mBegin);
 
+		for (Iterator i = first; i != end; i++)
+			i->~T();
+
+		memcpy(mBegin+locBegin,mBegin+locEnd+1,sizeof(T)*(mEnd - end));
+
+		mEnd -= (end-first);
+
+		return mBegin+locBegin;
 	}
 
 	template <class T>
@@ -263,17 +312,32 @@ namespace JonsEngine
 	{
 		if (mEnd != mCapacity)
 		{
-			mEnd++;
 			memcpy(mEnd,&item,sizeof(T));
+			
+			mEnd++;
 		}
 		else
-			insert(mEnd,item);
+		{
+			const size_t prevSize = mEnd - mBegin;
+			const size_t newSize = GetNewCapacity(prevSize);
+
+			T* newBegin = (T*) mAllocator->Allocate(newSize*sizeof(T));
+			memcpy(newBegin,mBegin,prevSize*sizeof(T));
+
+			mBegin = newBegin;
+			mEnd = mBegin + prevSize;
+			mCapacity = mBegin+newSize;
+
+			memcpy(mEnd,&item,sizeof(T));
+			
+			mEnd++;
+		}
 	}
 
 	template <class T>
 	inline void Vector<T>::pop_back()
 	{
-		mEnd->~T();
+		(mEnd - 1)->~T();
 		mEnd--;
 	}
 
@@ -290,7 +354,7 @@ namespace JonsEngine
 	template <class T>
 	inline size_t Vector<T>::GetNewCapacity(size_t currentCapacity, size_t minimum)
 	{
-		return (currentCapacity >= 0 && currentCapacity <= minimum) ? (minimum+DefaultCapacityIncrease) : currentCapacity*DefaultCapacityIncrease;
+		return (currentCapacity >= 0 && currentCapacity*DefaultCapacityIncrease <= minimum+currentCapacity) ? (minimum+currentCapacity) : currentCapacity*DefaultCapacityIncrease;
 	}
 
 	/*template <class T>

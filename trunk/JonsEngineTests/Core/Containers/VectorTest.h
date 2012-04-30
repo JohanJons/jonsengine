@@ -31,9 +31,9 @@ namespace JonsEngine
 			RunningEngineFixture::TearDown();
 		}
 
-		Vector<int> mVector1;
-		Vector<int> mVector2;
-		Vector<int> mVector3;
+		Vector<int32_t> mVector1;
+		Vector<int32_t> mVector2;
+		Vector<int32_t> mVector3;
 	};
 
 }
