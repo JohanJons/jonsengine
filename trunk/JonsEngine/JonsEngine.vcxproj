@@ -54,7 +54,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;JONSENGINE_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\Visual_Leak_Detector\include;include\Core\Utils;include\Core\GameObject;include\Core\Memory;include\Core\Logging;include\Core\Containers;include\Render;include\Input;include\Core;include\Audio;include\;..\Thirdparty\boost_1_49_0;interface\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Thirdparty\threadpool-0_2_5-src\threadpool\boost;..\Thirdparty\Visual_Leak_Detector\include;include\Core\Utils;include\Core\GameObject;include\Core\Memory;include\Core\Logging;include\Core\Containers;include\Render;include\Input;include\Core;include\Audio;include\;..\Thirdparty\boost_1_49_0;interface\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>

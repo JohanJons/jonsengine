@@ -2,7 +2,6 @@ LOCAL_PATH:= $(call my-dir)
 TOP_PATH := $(LOCAL_PATH)
 
 include $(CLEAR_VARS)
-# Main engine
 LOCAL_MODULE    := jonsengine
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../include/ \
 					$(LOCAL_PATH)/../include/Core/ \

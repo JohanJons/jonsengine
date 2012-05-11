@@ -57,7 +57,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <CompileAs>CompileAsCpp</CompileAs>
-      <AdditionalIncludeDirectories>..\Thirdparty\gtest-1.6.0\include\;..\Thirdparty\Visual_Leak_Detector\Include\;..\Thirdparty\boost_1_49_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Thirdparty\threadpool-0_2_5-src\threadpool\boost;..\Thirdparty\gtest-1.6.0\include\;..\Thirdparty\Visual_Leak_Detector\Include\;..\Thirdparty\boost_1_49_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
