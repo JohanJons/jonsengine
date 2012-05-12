@@ -1,5 +1,5 @@
-#ifndef _ALLOCATOR_H
-#define _ALLOCATOR_H
+#ifndef _HEAP_ALLOCATOR_H
+#define _HEAP_ALLOCATOR_H
 
 #include "../../../../Thirdparty/dlmalloc/dlmalloc.h"
 

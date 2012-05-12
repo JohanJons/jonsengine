@@ -6,6 +6,10 @@ namespace JonsEngine
 										mStreamBuf(NULL), mFileStream(NULL), mDummyStreamBuf(NULL), mMemoryManager(NULL)
 	{
 		mLogStream = NULL;
+
+		#ifdef ANDROID
+			mAndroidLogBuf = NULL;
+		#endif
 	}
 
 	LogManagerImpl::~LogManagerImpl()
@@ -18,6 +22,15 @@ namespace JonsEngine
 	{
 		return Init(false, false, "",memmgr);
 	}
+
+	#ifdef ANDROID
+	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, std::string absFilePath,IMemoryManager* memmgr, JNIEnv* jenv)
+	{
+		mJNIEnv = jenv;
+
+		return Init(LogToFileDefault, LogToOSDefault, absFilePath, memmgr);
+	}
+	#endif
 
 	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, std::string absFilePath,IMemoryManager* memmgr)
 	{

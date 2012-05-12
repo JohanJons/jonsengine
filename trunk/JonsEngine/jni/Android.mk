@@ -9,31 +9,36 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/../include/ \
 					$(LOCAL_PATH)/../include/Render/ \
 					$(LOCAL_PATH)/../include/Core/Utils/ \
 					$(LOCAL_PATH)/../include/Core/Logging/ \
-					$(LOCAL_PATH)/../include/Core/Object/ \
-					$(LOCAL_PATH)/../include/Core/Memory/
+					$(LOCAL_PATH)/../include/Core/GameObject/ \
+					$(LOCAL_PATH)/../include/Core/Containers/ \
+					$(LOCAL_PATH)/../include/Core/Memory/ \
+					$(LOCAL_PATH)/../../Thirdparty/dlmalloc/ \
+					$(LOCAL_PATH)/../../Thirdparty/boost_1_49_0/
 					
 # Core
-LOCAL_SRC_FILES :=	../src/Core/Engine.cpp
+LOCAL_SRC_FILES :=	../src/Core/Engine.cpp \
+					../src/Core/EngineSettings.cpp
 
 # Rendering
 LOCAL_SRC_FILES +=	../src/Render/RenderManagerImpl.cpp
 
 # Utils
-LOCAL_SRC_FILES +=	../src/Core/Utils/JonsTime.cpp \
-					../src/Core/Utils/JonsThread.cpp
+LOCAL_SRC_FILES +=	../src/Core/Utils/JonsTime.cpp
 
 # Memory
 LOCAL_SRC_FILES +=	../src/Core/Memory/MemoryManagerImpl.cpp \
-					../src/Core/Memory/dlmalloc.c
+					../src/Core/Memory/HeapAllocator.cpp
 					
-# Object
-LOCAL_SRC_FILES +=	../src/Core/Object/ObjectManagerImpl.cpp
+# GameObject
+LOCAL_SRC_FILES +=	../src/Core/GameObject/GameObjectManagerImpl.cpp
 
 # Logging
 LOCAL_SRC_FILES +=	../src/Core/Logging/LogManagerImpl.cpp \
 					../src/Core/Logging/JonsStreamBuf.cpp \
 					../src/Core/Logging/JonsOutputStream.cpp
 					
+# Thirdparty
+LOCAL_SRC_FILES +=	../../Thirdparty/dlmalloc/dlmalloc.c
 					
 
 LOCAL_CFLAGS := -DSTRUCT_MALLINFO_DECLARED
@@ -50,15 +55,15 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE    := jonsenginetests
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/../Tests/ \
-					$(LOCAL_PATH)/../Tests/Core/Memory/ \
-					$(LOCAL_PATH)/../Tests/Core/Utils/ \
-					$(LOCAL_PATH)/../Tests/Core/
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../JonsEngineTests/ \
+					$(LOCAL_PATH)/../../JonsEngineTests/Core/Memory/ \
+					$(LOCAL_PATH)/../../JonsEngineTests/Core/Utils/ \
+					$(LOCAL_PATH)/../../JonsEngineTests/Core/
 					
-LOCAL_SRC_FILES :=	../Tests/TestManager.cpp \
-					../Tests/Core/Memory/MemoryTestManager.cpp \
-					../Tests/Core/GameObject/GameObjectTestManager.cpp \
-					../Tests/TestClass1.cpp
+LOCAL_SRC_FILES :=	../../JonsEngineTests/TestManager.cpp \
+					../../JonsEngineTests/Core/Memory/MemoryTestManager.cpp \
+					../../JonsEngineTests/Core/GameObject/GameObjectTestManager.cpp \
+					../../JonsEngineTests/TestClass1.cpp
 
 LOCAL_CFLAGS :=
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)

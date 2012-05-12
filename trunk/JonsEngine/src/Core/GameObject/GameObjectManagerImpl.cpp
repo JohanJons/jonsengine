@@ -3,7 +3,7 @@
 namespace JonsEngine
 {
 	IMemoryManager* GameObjectManagerImpl::IGameObjectManager::mMemoryMgr = NULL;
-	std::map<uint64_t, boost::weak_ptr<GameObject>> GameObjectManagerImpl::IGameObjectManager::mObjects;
+	std::map<uint64_t, boost::weak_ptr<GameObject> > GameObjectManagerImpl::IGameObjectManager::mObjects;
 
 	GameObjectManagerImpl::GameObjectManagerImpl() : mRunning(false), mInitialized(false), mLog(NULL)
 	{

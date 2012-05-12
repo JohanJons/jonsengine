@@ -111,7 +111,7 @@ namespace JonsEngine
 	}
 
 	template <class T>
-	inline typename Vector<T>& Vector<T>::operator=(const Vector<T>& x)
+	inline Vector<T>& Vector<T>::operator=(const Vector<T>& x)
 	{
 		if (&x != this)
 		{

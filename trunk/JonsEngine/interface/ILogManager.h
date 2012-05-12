@@ -6,6 +6,7 @@
 #include <sstream>
 
 #ifdef ANDROID
+#include <jni.h>
 #include <android/log.h>
 #endif
 
@@ -22,10 +23,9 @@ namespace JonsEngine
 
 		virtual bool Init(IMemoryManager* memmgr) = 0;
 		#ifdef ANDROID
-			virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, JNIEnv* env,IMemoryManager* memmgr) = 0;
-		#else
-			virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath,IMemoryManager* memmgr) = 0;
+			virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath,IMemoryManager* memmgr,JNIEnv* env) = 0;
 		#endif
+		virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath,IMemoryManager* memmgr) = 0;
 		virtual bool Destroy() = 0;
 		virtual bool Start() = 0;
 		virtual bool Stop() = 0;

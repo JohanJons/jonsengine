@@ -28,10 +28,9 @@ namespace JonsEngine
 
 		bool Init(IMemoryManager* memmgr);
 		#ifdef ANDROID
-			bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, JNIEnv* env,IMemoryManager* memmgr);
-		#else
-			bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath,IMemoryManager* memmgr);
+			bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, IMemoryManager* memmgr, JNIEnv* env);
 		#endif
+		bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath,IMemoryManager* memmgr);
 		bool Destroy();
 		bool Start();
 		bool Stop();

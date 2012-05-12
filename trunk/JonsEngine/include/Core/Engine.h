@@ -35,16 +35,12 @@ namespace JonsEngine
 		ILogManager* GetLogger();
 
 		#ifdef ANDROID
-			void SetJNIEnv(JNIEnv* env);
-			JNIEnv* GetJNIEnv();
+		static JNIEnv* mJNIEnv;
 		#endif
 
 	private:
 		bool mRunning;
 		bool mInitialized;
-		#ifdef ANDROID
-			JNIEnv* mJNIEnv;
-		#endif
 
 		EngineSettings mEngineSettings;
 		MemoryManagerImpl mMemoryManager;

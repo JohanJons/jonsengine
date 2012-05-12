@@ -27,9 +27,9 @@ namespace JonsEngine
 		/* Currently writes everything to LOG_DEBUG... parsing string to check for
 		 * log-level is probably too expensive.
 		 * Will think of something later */
-		std::streamsize xsputn (const char* s, std::streamsize n)
+		inline std::streamsize xsputn (const char* s, std::streamsize n)
 		{
-			__android_log_print(ANDROID_LOG_DEBUG, EngineLogTag, s);
+			__android_log_print(ANDROID_LOG_DEBUG, EngineLogTag.c_str(), s);
 			return n;
 		}
 		

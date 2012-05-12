@@ -1,16 +1,17 @@
 #include "../../include/Core/Engine.h"
 
 #ifdef ANDROID
+JNIEnv* JonsEngine::Engine::mJNIEnv = NULL;
+
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
     JNIEnv *env;
-    JonsEngine::Engine* engine = JonsEngine::Engine::GetEngine();
 
     if (vm->GetEnv((void**) &env, JNI_VERSION_1_6) != JNI_OK) {
         return -1;
     }
 
-	engine->SetJNIEnv(env);
+	JonsEngine::Engine::mJNIEnv = env;
     
     return JNI_VERSION_1_6;
 }
@@ -26,9 +27,7 @@ namespace JonsEngine
 
 	Engine::Engine() : mRunning(false), mInitialized(false)
 	{
-		#ifdef ANDROID
-			mJNIEnv = NULL;
-		#endif
+		
 	}
 
 	bool Engine::Init(EngineSettings& initSettings)
@@ -49,7 +48,11 @@ namespace JonsEngine
 			mEngineSettings.SetLogToFile(LogToFile,fileLocation);
 			mEngineSettings.SetLogToSTDOut(LogToSTDOut);
 
-			res &= mLog.Init(LogToFile,LogToSTDOut,fileLocation,&mMemoryManager);
+			#ifdef ANDROID
+				res &= mLog.Init(LogToFile,LogToSTDOut,fileLocation,&mMemoryManager,mJNIEnv);
+			#else
+				res &= mLog.Init(LogToFile,LogToSTDOut,fileLocation,&mMemoryManager);
+			#endif
 
 
 			// Render
@@ -164,17 +167,4 @@ namespace JonsEngine
 	{
 		return &mLog;
 	}
-
-
-	#ifdef ANDROID
-		void Engine::SetJNIEnv(JNIEnv* env)
-		{
-			mJNIEnv = env;
-		}
-
-		JNIEnv* Engine::GetJNIEnv()
-		{
-			return mJNIEnv;
-		}
-	#endif
 }

@@ -43,7 +43,7 @@ namespace JonsEngine
 
 			wPtr.lock()->GameObjectID = mNextGameObjID;
 			
-			mObjects.insert(std::pair<uint64_t,boost::weak_ptr<GameObject>>(mNextGameObjID,wPtr));
+			mObjects.insert(std::pair<uint64_t,boost::weak_ptr<GameObject> >(mNextGameObjID,wPtr));
 
 			mNextGameObjID++;
 			return sPtr;
@@ -51,7 +51,7 @@ namespace JonsEngine
 
 	protected:
 		static IMemoryManager* mMemoryMgr;
-		static std::map<uint64_t, boost::weak_ptr<GameObject>> mObjects;
+		static std::map<uint64_t, boost::weak_ptr<GameObject> > mObjects;
 		uint64_t mNextGameObjID;
 	};
 

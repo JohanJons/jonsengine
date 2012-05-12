@@ -35,14 +35,16 @@ namespace JonsEngine
 		bool res = true;
 
 		mEngine = new Engine();
-
+	
 		/* Init Engine and test mgrs */
 		if(mEngine->Init(mEngineSettings))
 		{
 			res = true;
-
+			
 			mMemTestMgr = new MemoryTestManager(mEngine->GetGameObjectManager(), mEngine);
+			
 			mGameObjTestMgr = new GameObjectTestManager(mEngine->GetGameObjectManager(),mEngine);
+			
 		}
 		else
 			return false;
@@ -105,10 +107,10 @@ namespace JonsEngine
 		{
 			/* Initialize Engine */
 			res &= InitEngine();
-
+			
 			/* Start Engine */
 			res &= StartEngine();
-
+			
 			/* Get logger */
 			mLogger = mEngine->GetLogger();
 
@@ -119,7 +121,6 @@ namespace JonsEngine
 			/* Run Object Tests */
 			if (res)
 				res &= RunGameObjectTests();
-
 			if (res)
 				mLogger->LogInfo() << "TEST: TESTING SUCCESSFULL" << std::endl;
 			else
@@ -127,6 +128,7 @@ namespace JonsEngine
 
 			/* Stop and Destroy Engine */
 			res &= StopEngine();
+
 			res &= DestroyEngine();
 
 			if (!res)
