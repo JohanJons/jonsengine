@@ -60,6 +60,12 @@
     <Filter Include="Source Files\Core\Containers">
       <UniqueIdentifier>{2ea7e2ba-7c3b-45f7-9b1a-2371f7affaae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Core\Threading">
+      <UniqueIdentifier>{18146542-e34f-41f3-ad55-3525c106ace0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Threading">
+      <UniqueIdentifier>{11337b56-64ba-402e-8f60-0787d4a83572}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Engine.cpp">
@@ -80,9 +86,6 @@
     <ClCompile Include="src\Core\Memory\MemoryManagerImpl.cpp">
       <Filter>Source Files\Core\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Utils\JonsThread.cpp">
-      <Filter>Source Files\Core\Utils</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Utils\JonsTime.cpp">
       <Filter>Source Files\Core\Utils</Filter>
     </ClCompile>
@@ -97,6 +100,9 @@
     </ClCompile>
     <ClCompile Include="src\Core\Memory\HeapAllocator.cpp">
       <Filter>Source Files\Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Threading\Thread.cpp">
+      <Filter>Source Files\Core\Threading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -114,9 +120,6 @@
     </ClInclude>
     <ClInclude Include="include\Core\Engine.h">
       <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Utils\JonsThread.h">
-      <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Utils\JonsTime.h">
       <Filter>Header Files\Core\Utils</Filter>
@@ -162,6 +165,12 @@
     </ClInclude>
     <ClInclude Include="include\Core\Containers\Vector.h">
       <Filter>Header Files\Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Threading\Thread.h">
+      <Filter>Header Files\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Threading\Threadpool.h">
+      <Filter>Header Files\Core\Threading</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -14,7 +14,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/../include/ \
 					$(LOCAL_PATH)/../include/Core/Memory/ \
 					$(LOCAL_PATH)/../../Thirdparty/dlmalloc/ \
 					$(LOCAL_PATH)/../../Thirdparty/boost_1_49_0/
-					
+				
 # Core
 LOCAL_SRC_FILES :=	../src/Core/Engine.cpp \
 					../src/Core/EngineSettings.cpp
@@ -50,25 +50,5 @@ LOCAL_EXPORT_LDLIBS := $(LOCAL_LDLIBS)
 include $(BUILD_STATIC_LIBRARY)
 
 
-
-# Testing library
-include $(CLEAR_VARS)
-
-LOCAL_MODULE    := jonsenginetests
-LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../JonsEngineTests/ \
-					$(LOCAL_PATH)/../../JonsEngineTests/Core/Memory/ \
-					$(LOCAL_PATH)/../../JonsEngineTests/Core/Utils/ \
-					$(LOCAL_PATH)/../../JonsEngineTests/Core/
-					
-LOCAL_SRC_FILES :=	../../JonsEngineTests/TestManager.cpp \
-					../../JonsEngineTests/Core/Memory/MemoryTestManager.cpp \
-					../../JonsEngineTests/Core/GameObject/GameObjectTestManager.cpp \
-					../../JonsEngineTests/TestClass1.cpp
-
-LOCAL_CFLAGS :=
-LOCAL_EXPORT_C_INCLUDES := $(LOCAL_C_INCLUDES)
-LOCAL_EXPORT_CFLAGS := $(LOCAL_CFLAGS)
-LOCAL_STATIC_LIBRARIES := jonsengine
-LOCAL_LDLIBS    :=-llog
-
-include $(BUILD_SHARED_LIBRARY)
+# include the testing mk
+include $(TOP_PATH)/../../JonsEngineTests/jni/Android.mk

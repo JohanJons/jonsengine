@@ -19,15 +19,15 @@ int32_t _tmain(int32_t argc, _TCHAR* argv[])
 
 	// start testing
 	::testing::InitGoogleTest(&argc,argv);
-	if (RUN_ALL_TESTS())
+	if (!RUN_ALL_TESTS())
 		std::cout << "TESTING SUCCESSFULL" << std::endl;
 	else
 		std::cout << "TESTING FAILED" << std::endl;
 
 
 	// old testing
-	//TestManager testMgr(1);
-	//testMgr.RunAllTests();
+	TestManager testMgr(2);
+	testMgr.RunAllTests();
 
 	std::cout << "Press key to terminate" << std::endl;
 	getchar();
