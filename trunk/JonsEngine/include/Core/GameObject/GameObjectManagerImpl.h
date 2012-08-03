@@ -17,7 +17,7 @@ namespace JonsEngine
 		GameObjectManagerImpl();
 		~GameObjectManagerImpl();
 
-		bool Init(ILogManager* logger, IMemoryManager* memmgr);
+		bool Init(ILogManager* const logger, IMemoryManager* const memmgr);
 		bool Destroy();
 		bool Start();
 		bool Stop();

@@ -14,8 +14,6 @@ namespace JonsEngine
 	// Log tag
 	const std::string EngineLogTag = "JonsEngine";
 
-
-
 }
 
 #endif

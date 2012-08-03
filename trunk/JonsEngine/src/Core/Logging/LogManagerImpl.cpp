@@ -18,13 +18,13 @@ namespace JonsEngine
 			Destroy();
 	}
 
-	bool LogManagerImpl::Init(IMemoryManager* memmgr)
+	bool LogManagerImpl::Init(IMemoryManager* const memmgr)
 	{
-		return Init(false, false, "",memmgr);
+		return Init(false, false, "", memmgr);
 	}
 
 	#ifdef ANDROID
-	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, std::string absFilePath,IMemoryManager* memmgr, JNIEnv* jenv)
+	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, std::string absFilePath,IMemoryManager* const memmgr, JNIEnv* jenv)
 	{
 		mJNIEnv = jenv;
 
@@ -32,7 +32,7 @@ namespace JonsEngine
 	}
 	#endif
 
-	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, std::string absFilePath,IMemoryManager* memmgr)
+	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, std::string absFilePath, IMemoryManager* const memmgr)
 	{
 		if (memmgr)
 		{
@@ -229,19 +229,19 @@ namespace JonsEngine
 	}
 
 
-	void LogManagerImpl::AddStream(std::streambuf* sb)
+	void LogManagerImpl::AddStream(std::streambuf* const sb)
 	{
 		if (sb)
 			mStreamBuf->AddStream(sb);
 	}
 
-	void LogManagerImpl::RemoveStream(std::streambuf* sb)
+	void LogManagerImpl::RemoveStream(std::streambuf* const sb)
 	{
 		if (sb)
 			mStreamBuf->RemoveStream(sb);
 	}
 
-	bool LogManagerImpl::IsStreamAdded(std::streambuf* sb)
+	bool LogManagerImpl::IsStreamAdded(std::streambuf* const sb)
 	{
 		if (sb)
 			return mStreamBuf->IsStreamAdded(sb);

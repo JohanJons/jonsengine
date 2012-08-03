@@ -13,7 +13,7 @@ namespace JonsEngine
 	public:
 		virtual ~IMemoryManager() { }
 
-		virtual bool Init(ILogManager* logger) = 0;
+		virtual bool Init(ILogManager* const logger) = 0;
 		virtual bool Destroy() = 0;
 		virtual bool Start() = 0;
 		virtual bool Stop() = 0;
@@ -35,7 +35,7 @@ namespace JonsEngine
 			InternalDeAllocate(obj);
 		}
 
-		virtual HeapAllocator* GetHeapAllocator() = 0;
+		virtual HeapAllocator* const GetHeapAllocator() = 0;
 		virtual uint64_t GetTotalAllocatedMemory() = 0;
 
 	private:

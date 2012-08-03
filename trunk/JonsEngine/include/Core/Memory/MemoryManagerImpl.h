@@ -17,14 +17,14 @@ namespace JonsEngine
 		MemoryManagerImpl();
 		~MemoryManagerImpl();
 
-		bool Init(ILogManager* logger);
+		bool Init(ILogManager* const logger);
 		bool Destroy();
 		bool Start();
 		bool Stop();
 		bool isRunning();
 		void Tick();
 
-		inline HeapAllocator* GetHeapAllocator() { return &mHeapAllocator; }
+		inline HeapAllocator* const GetHeapAllocator() { return &mHeapAllocator; }
 		uint64_t GetTotalAllocatedMemory();
 
 	private:

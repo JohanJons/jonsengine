@@ -106,7 +106,7 @@ namespace JonsEngine
 		{
 			clear();
 
-			mAllocator->DeAllocate(mBegin);
+			mAllocator->Deallocate(mBegin);
 		}
 	}
 
@@ -242,7 +242,7 @@ namespace JonsEngine
 		{
 			clear();
 
-			mAllocator->DeAllocate(mBegin);
+			mAllocator->Deallocate(mBegin);
 
 			mCapacity = mEnd = mBegin = NULL;
 		}
@@ -288,7 +288,7 @@ namespace JonsEngine
 			memcpy(newBegin, mBegin, sizeof(T)*pos);
 			memcpy(newBegin+pos, &value, sizeof(T));
 			memcpy(newBegin+pos+1, mBegin+pos, (mEnd - position) * sizeof(T));
-			mAllocator->DeAllocate(mBegin);
+			mAllocator->Deallocate(mBegin);
 
 			mBegin = newBegin;
 			mEnd = mBegin + prevSize + 1;
@@ -326,7 +326,7 @@ namespace JonsEngine
 				memcpy(newBegin+pos+n,mBegin+pos, (mEnd - position) * sizeof(T));
 
 				if (mBegin)
-					mAllocator->DeAllocate(mBegin);
+					mAllocator->Deallocate(mBegin);
 
 				mBegin = newBegin;
 				mEnd = mBegin + prevSize + n;
@@ -364,7 +364,7 @@ namespace JonsEngine
 			memcpy(newBegin+pos+insertSize, mBegin+pos, (mEnd - position) * sizeof(T));
 
 			if (mBegin)
-				mAllocator->DeAllocate(mBegin);
+				mAllocator->Deallocate(mBegin);
 
 			mBegin = newBegin;
 			mEnd = mBegin + prevSize + insertSize;
@@ -437,7 +437,7 @@ namespace JonsEngine
 
 			T* newBegin = (T*) mAllocator->Allocate(newSize * sizeof(T));
 			memcpy(newBegin, mBegin, prevSize * sizeof(T));
-			mAllocator->DeAllocate(mBegin);
+			mAllocator->Deallocate(mBegin);
 
 			mBegin = newBegin;
 			mEnd = mBegin + prevSize;

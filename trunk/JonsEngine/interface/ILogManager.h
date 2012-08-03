@@ -21,20 +21,20 @@ namespace JonsEngine
 	public:
 		virtual ~ILogManager() { }
 
-		virtual bool Init(IMemoryManager* memmgr) = 0;
+		virtual bool Init(IMemoryManager* const memmgr) = 0;
 		#ifdef ANDROID
-			virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath,IMemoryManager* memmgr,JNIEnv* env) = 0;
+			virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, IMemoryManager* const memmgr,JNIEnv* env) = 0;
 		#endif
-		virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath,IMemoryManager* memmgr) = 0;
+		virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, IMemoryManager* const memmgr) = 0;
 		virtual bool Destroy() = 0;
 		virtual bool Start() = 0;
 		virtual bool Stop() = 0;
 		virtual bool isRunning() = 0;
 		virtual void Tick() = 0;
 
-		virtual void AddStream(std::streambuf* sb) = 0;
-		virtual void RemoveStream(std::streambuf* sb) = 0;
-		virtual bool IsStreamAdded(std::streambuf* sb) = 0;
+		virtual void AddStream(std::streambuf* const sb) = 0;
+		virtual void RemoveStream(std::streambuf* const sb) = 0;
+		virtual bool IsStreamAdded(std::streambuf* const sb) = 0;
 		virtual std::string GetFileLogPath() = 0;
 
 		virtual std::ostream& LogInfo() = 0;

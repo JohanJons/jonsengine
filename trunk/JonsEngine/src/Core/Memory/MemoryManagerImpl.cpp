@@ -3,7 +3,7 @@
 namespace JonsEngine
 {
 
-	MemoryManagerImpl::MemoryManagerImpl() : mRunning(false),mInitialized(false), mLog(NULL)
+	MemoryManagerImpl::MemoryManagerImpl() : mRunning(false), mInitialized(false), mLog(NULL), mHeapAllocator(HeapAllocator::DLMALLOC)
 	{
 
 	}
@@ -14,11 +14,11 @@ namespace JonsEngine
 			Destroy();
 	}
 
-	bool MemoryManagerImpl::Init(ILogManager* logger)
+	bool MemoryManagerImpl::Init(ILogManager* const logger)
 	{
 		mLog = logger;
 
-		mHeapAllocator.mLog = logger;
+		mHeapAllocator.SetLogger(logger);
 
 		if (mLog)
 		{
@@ -107,7 +107,7 @@ namespace JonsEngine
 
 	void MemoryManagerImpl::InternalDeAllocate(void* p)
 	{ 
-		mHeapAllocator.DeAllocate(p);
+		mHeapAllocator.Deallocate(p);
 	}
 
 }

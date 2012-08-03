@@ -16,7 +16,7 @@ namespace JonsEngine
 			Destroy();
 	}
 
-	bool GameObjectManagerImpl::Init(ILogManager* logger, IMemoryManager* memmgr)
+	bool GameObjectManagerImpl::Init(ILogManager* const logger, IMemoryManager* const memmgr)
 	{
 		mLog = logger;
 		mMemoryMgr = memmgr;

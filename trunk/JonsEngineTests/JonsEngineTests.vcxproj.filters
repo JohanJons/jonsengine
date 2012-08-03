@@ -15,9 +15,6 @@
     <Filter Include="Source Files\Core\Memory">
       <UniqueIdentifier>{7bdbe577-a127-4d2e-9288-3e66e96314f6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Core\Utils">
-      <UniqueIdentifier>{7b579384-0131-4891-a907-894dacfe3009}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Core\GameObject">
       <UniqueIdentifier>{6b6d8906-631f-4f49-8b69-bdffbc50b745}</UniqueIdentifier>
     </Filter>
@@ -26,6 +23,9 @@
     </Filter>
     <Filter Include="Source Files\TestFixtures">
       <UniqueIdentifier>{06e97dbc-ea4a-45cd-acad-82e81a158dcd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Threading">
+      <UniqueIdentifier>{b36506e8-45f6-4e4f-b7b6-56c6a7156032}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -47,6 +47,9 @@
     <ClInclude Include="TestFixtures\RunningEngineFixture.h">
       <Filter>Source Files\TestFixtures</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Threading\ThreadTest.h">
+      <Filter>Source Files\Core\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JonsEngineTests.cpp">
@@ -66,6 +69,9 @@
     </ClCompile>
     <ClCompile Include="Core\Containers\VectorTest.cpp">
       <Filter>Source Files\Core\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Threading\ThreadTest.cpp">
+      <Filter>Source Files\Core\Threading</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

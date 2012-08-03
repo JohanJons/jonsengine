@@ -13,7 +13,7 @@ namespace JonsEngine
 			Destroy();
 	}
 
-	bool RenderManagerImpl::Init(ILogManager* logger,IMemoryManager* memmgr)
+	bool RenderManagerImpl::Init(ILogManager* const logger, IMemoryManager* const memmgr)
 	{
 		mLog = logger;
 		mMemoryManager = memmgr;

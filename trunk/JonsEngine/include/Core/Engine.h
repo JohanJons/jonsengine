@@ -42,9 +42,9 @@ namespace JonsEngine
 		bool mRunning;
 		bool mInitialized;
 
+		LogManagerImpl mLog;
 		EngineSettings mEngineSettings;
 		MemoryManagerImpl mMemoryManager;
-		LogManagerImpl mLog;
 		RenderManagerImpl mRenderManager;
 		GameObjectManagerImpl mGameObjectManager;
 

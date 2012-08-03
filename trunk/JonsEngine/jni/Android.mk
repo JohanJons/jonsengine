@@ -18,6 +18,9 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/../include/ \
 # Core
 LOCAL_SRC_FILES :=	../src/Core/Engine.cpp \
 					../src/Core/EngineSettings.cpp
+					
+# Threading
+LOCAL_SRC_FILES +=	../src/Core/Threading/Thread.cpp
 
 # Rendering
 LOCAL_SRC_FILES +=	../src/Render/RenderManagerImpl.cpp

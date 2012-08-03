@@ -6,6 +6,7 @@ LOCAL_MODULE	:= jonsenginetests
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../ \
 					$(LOCAL_PATH)/../Core/Memory/ \
 					$(LOCAL_PATH)/../Core/Utils/ \
+					$(LOCAL_PATH)/../Core/Containers/ \
 					$(LOCAL_PATH)/../Core/
 					
 LOCAL_SRC_FILES :=	../TestManager.cpp \

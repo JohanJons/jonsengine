@@ -18,7 +18,7 @@ namespace JonsEngine
 		IGameObjectManager() : mNextGameObjID(1)  { }
 		virtual ~IGameObjectManager() { mObjects.clear(); }
 
-		virtual bool Init(ILogManager* logger, IMemoryManager* memmgr) = 0;
+		virtual bool Init(ILogManager* const logger, IMemoryManager* const memmgr) = 0;
 		virtual bool Destroy() = 0;
 		virtual bool Start() = 0;
 		virtual bool Stop() = 0;
