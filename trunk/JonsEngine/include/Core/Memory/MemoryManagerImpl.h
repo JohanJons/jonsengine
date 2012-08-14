@@ -25,7 +25,7 @@ namespace JonsEngine
 		void Tick();
 
 		inline HeapAllocator* const GetHeapAllocator() { return &mHeapAllocator; }
-		uint64_t GetTotalAllocatedMemory();
+		uint64_t GetTotalAllocatedMemory() const;
 
 	private:
 		void* InternalAllocate(size_t size);
@@ -33,7 +33,6 @@ namespace JonsEngine
 
 		ILogManager* mLog;
 		HeapAllocator mHeapAllocator;
-
 		bool mRunning;
 		bool mInitialized;
 

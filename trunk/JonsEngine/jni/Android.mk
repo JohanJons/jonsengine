@@ -20,7 +20,9 @@ LOCAL_SRC_FILES :=	../src/Core/Engine.cpp \
 					../src/Core/EngineSettings.cpp
 					
 # Threading
-LOCAL_SRC_FILES +=	../src/Core/Threading/Thread.cpp
+LOCAL_SRC_FILES +=	../src/Core/Threading/Thread.cpp \
+					../src/Core/Threading/Mutex.cpp \
+					../src/Core/Threading/ConditionVariable.cpp
 
 # Rendering
 LOCAL_SRC_FILES +=	../src/Render/RenderManagerImpl.cpp

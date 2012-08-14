@@ -35,8 +35,8 @@ namespace JonsEngine
 			InternalDeAllocate(obj);
 		}
 
-		virtual HeapAllocator* const GetHeapAllocator() = 0;
-		virtual uint64_t GetTotalAllocatedMemory() = 0;
+		virtual HeapAllocator* const GetHeapAllocator()  = 0;
+		virtual uint64_t GetTotalAllocatedMemory() const = 0;
 
 	private:
 		virtual void* InternalAllocate(size_t size) = 0;

@@ -20,8 +20,8 @@ namespace JonsEngine
 		virtual void Tick() = 0;
 
 		virtual void ResizeWindow(int32_t width, int32_t height) = 0;
-		virtual int32_t GetWindowWidth() = 0;
-		virtual int32_t GetWindowHeight() = 0;
+		virtual int32_t GetWindowWidth() const = 0;
+		virtual int32_t GetWindowHeight() const = 0;
 	};
 
 }

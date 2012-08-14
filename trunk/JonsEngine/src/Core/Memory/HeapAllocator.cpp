@@ -54,7 +54,7 @@ namespace JonsEngine
 			mLog->LogError() << "HeapAllocator::DeAllocate: Object not valid!" << std::endl;
 	}
 
-	uint64_t HeapAllocator::GetAllocatedMemory()
+	uint64_t HeapAllocator::GetAllocatedMemory() const
 	{
 
 		if (mBackend == HeapAllocator::DLMALLOC)

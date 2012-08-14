@@ -37,7 +37,7 @@ namespace JonsEngine
 		mEngine = new Engine();
 	
 		/* Init Engine and test mgrs */
-		if(mEngine->Init(mEngineSettings))
+		if(mEngine->Init())
 		{
 			res = true;
 			

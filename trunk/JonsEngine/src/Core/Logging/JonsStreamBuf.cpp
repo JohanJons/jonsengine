@@ -25,7 +25,7 @@ namespace JonsEngine
 			mStreamBufs.remove(sb);
 	}
 
-	bool JonsStreamBuf::IsStreamAdded(std::streambuf* sb)
+	bool JonsStreamBuf::IsStreamAdded(std::streambuf* sb) const
 	{
 		if (sb)
 			return (std::find(mStreamBufs.begin(),mStreamBufs.end(),sb) != mStreamBufs.end());

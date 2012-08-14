@@ -15,12 +15,12 @@ namespace JonsEngine
 
 		// Logging
 		void SetLogToFile(bool res);		// default: false
-		void SetLogToFile(bool res,std::string fileLocation);
+		void SetLogToFile(bool res, const std::string& fileLocation);
 		void SetLogToSTDOut(bool res);		// default: false
 
-		bool GetLogToFile();
-		std::string GetLogToFileLocation();
-		bool GetLogToSTDOut();
+		bool GetLogToFile() const;
+		std::string GetLogToFileLocation() const;
+		bool GetLogToSTDOut() const;
 
 		// Memory	
 

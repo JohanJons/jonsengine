@@ -107,6 +107,12 @@
     <ClCompile Include="src\Core\Threading\Mutex.cpp">
       <Filter>Source Files\Core\Threading</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Threading\ThreadPool.cpp">
+      <Filter>Source Files\Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Threading\ConditionVariable.cpp">
+      <Filter>Source Files\Core\Threading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Render\RenderManagerImpl.h">
@@ -180,6 +186,9 @@
     </ClInclude>
     <ClInclude Include="interface\IMemoryAllocator.h">
       <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Threading\ConditionVariable.h">
+      <Filter>Header Files\Core\Threading</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

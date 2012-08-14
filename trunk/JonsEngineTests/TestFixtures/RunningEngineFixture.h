@@ -12,11 +12,11 @@ namespace JonsEngine
 	 public:
 		 virtual void SetUp()
 		 {
-			mEngineSettings.SetLogToFile(false);
-			mEngineSettings.SetLogToSTDOut(false);
+			mEngine.GetEngineSettings().SetLogToFile(false);
+			mEngine.GetEngineSettings().SetLogToSTDOut(false);
 
 			// init engine
-			ASSERT_TRUE(mEngine.Init(mEngineSettings));
+			ASSERT_TRUE(mEngine.Init());
 
 			// start engine
 			ASSERT_TRUE(mEngine.Start());
@@ -35,7 +35,6 @@ namespace JonsEngine
 
 	 protected:
 		 Engine mEngine;
-		 EngineSettings mEngineSettings;
 	 };
 
 }

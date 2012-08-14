@@ -9,11 +9,19 @@
 	#include <pthread.h>
 #endif
 
+#include "../../../interface/EngineDefs.h"
+
 namespace JonsEngine
 {
 	class Mutex
 	{
 	public:
+		enum MutexState
+		{
+			UNLOCKED = 0,
+			LOCKED
+		};
+
 		#if defined _WIN32 || _WIN64
 			typedef HANDLE MutexHandle;
 		#else
@@ -23,11 +31,15 @@ namespace JonsEngine
 		Mutex();
 		~Mutex();
 
-		void Lock();
-		void Unlock();
+		int32_t Lock();
+		int32_t Unlock();
+
+		MutexHandle& GetNativeHandle();
+		const MutexState& GetMutexState() const;
 
 	private:
 		MutexHandle mHandle;
+		MutexState mState;
 	};
 }
 

@@ -100,12 +100,12 @@ namespace JonsEngine
 			mLog->LogWarn() << "RenderManagerImpl::ResizeWindow(): Illegal parameters supplied" << std::endl;
 	}
 
-	int32_t RenderManagerImpl::GetWindowWidth()
+	int32_t RenderManagerImpl::GetWindowWidth() const
 	{
 		return mScreenWidth;
 	}
 
-	int32_t RenderManagerImpl::GetWindowHeight()
+	int32_t RenderManagerImpl::GetWindowHeight() const
 	{
 		return mScreenHeight;
 	}

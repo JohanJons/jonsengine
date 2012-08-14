@@ -17,7 +17,7 @@ namespace JonsEngine
 
 		void AddStream(std::streambuf* sb);
 		void RemoveStream(std::streambuf* sb);
-		bool IsStreamAdded(std::streambuf* sb);
+		bool IsStreamAdded(std::streambuf* sb) const;
 
 	private:
 		std::list<std::streambuf*> mStreamBufs;

@@ -102,8 +102,10 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Core\Logging\JonsStreamBuf.cpp" />
     <ClCompile Include="src\Core\Memory\HeapAllocator.cpp" />
     <ClCompile Include="src\Core\Memory\MemoryManagerImpl.cpp" />
+    <ClCompile Include="src\Core\Threading\ConditionVariable.cpp" />
     <ClCompile Include="src\Core\Threading\Mutex.cpp" />
     <ClCompile Include="src\Core\Threading\Thread.cpp" />
+    <ClCompile Include="src\Core\Threading\ThreadPool.cpp" />
     <ClCompile Include="src\Render\RenderManagerImpl.cpp" />
     <ClCompile Include="src\Core\Logging\LogManagerImpl.cpp" />
     <ClCompile Include="src\Core\Utils\JonsTime.cpp" />
@@ -122,6 +124,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Core\Logging\LogManagerImpl.h" />
     <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
     <ClInclude Include="include\Core\Memory\MemoryManagerImpl.h" />
+    <ClInclude Include="include\Core\Threading\ConditionVariable.h" />
     <ClInclude Include="include\Core\Threading\Mutex.h" />
     <ClInclude Include="include\Core\Threading\Thread.h" />
     <ClInclude Include="include\Core\Threading\Threadpool.h" />

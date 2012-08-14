@@ -14,7 +14,7 @@ namespace JonsEngine
 		mLogToFile = res;
 	}
 
-	void EngineSettings::SetLogToFile(bool res, std::string fileLocation)
+	void EngineSettings::SetLogToFile(bool res, const std::string& fileLocation)
 	{
 		mLogToFileLocation = fileLocation;
 
@@ -26,7 +26,7 @@ namespace JonsEngine
 		mLogToSTDOut = res;
 	}
 
-	bool EngineSettings::GetLogToFile() { return mLogToFile; }
-	std::string EngineSettings::GetLogToFileLocation() { return mLogToFileLocation; }
-	bool EngineSettings::GetLogToSTDOut() { return mLogToSTDOut; }
+	bool EngineSettings::GetLogToFile() const { return mLogToFile; }
+	std::string EngineSettings::GetLogToFileLocation() const { return mLogToFileLocation; }
+	bool EngineSettings::GetLogToSTDOut() const { return mLogToSTDOut; }
 }

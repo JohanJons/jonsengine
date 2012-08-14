@@ -24,7 +24,7 @@ namespace JonsEngine
         void* Reallocate(void* p, size_t size);
         void Deallocate(void* p);
 
-		uint64_t GetAllocatedMemory();
+		uint64_t GetAllocatedMemory() const;
 
 		void SetLogger(ILogManager* const logger);
 

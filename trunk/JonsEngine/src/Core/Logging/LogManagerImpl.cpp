@@ -24,7 +24,7 @@ namespace JonsEngine
 	}
 
 	#ifdef ANDROID
-	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, std::string absFilePath,IMemoryManager* const memmgr, JNIEnv* jenv)
+	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, const std::string& absFilePath,IMemoryManager* const memmgr, JNIEnv* jenv)
 	{
 		mJNIEnv = jenv;
 
@@ -32,7 +32,7 @@ namespace JonsEngine
 	}
 	#endif
 
-	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, std::string absFilePath, IMemoryManager* const memmgr)
+	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, const std::string& absFilePath, IMemoryManager* const memmgr)
 	{
 		if (memmgr)
 		{
@@ -241,7 +241,7 @@ namespace JonsEngine
 			mStreamBuf->RemoveStream(sb);
 	}
 
-	bool LogManagerImpl::IsStreamAdded(std::streambuf* const sb)
+	bool LogManagerImpl::IsStreamAdded(std::streambuf* const sb) const
 	{
 		if (sb)
 			return mStreamBuf->IsStreamAdded(sb);
@@ -249,12 +249,12 @@ namespace JonsEngine
 			return false;
 	}
 
-	std::string LogManagerImpl::GetFileLogPath()
+	const std::string& LogManagerImpl::GetFileLogPath() const
 	{
 		return mLogPath;
 	}
 
-	std::string LogManagerImpl::InternalGetLogPath()
+	const std::string LogManagerImpl::InternalGetLogPath() const
 	{
 		std::string ret;
 
@@ -277,7 +277,7 @@ namespace JonsEngine
 			return ret;
 	}
 
-	std::string LogManagerImpl::InternalGetLogName()
+	const std::string LogManagerImpl::InternalGetLogName() const
 	{
 		std::stringstream ret;
 

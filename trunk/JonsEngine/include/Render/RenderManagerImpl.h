@@ -32,8 +32,8 @@ namespace JonsEngine
 		void Tick();
 
 		void ResizeWindow(int32_t width, int32_t height);
-		int32_t GetWindowWidth();
-		int32_t GetWindowHeight();
+		int32_t GetWindowWidth() const;
+		int32_t GetWindowHeight() const;
 
 	private:
 		ILogManager* mLog;

@@ -28,9 +28,9 @@ namespace JonsEngine
 
 		bool Init(IMemoryManager* const memmgr);
 		#ifdef ANDROID
-			bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, IMemoryManager*  const memmgr, JNIEnv* env);
+			bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath, IMemoryManager*  const memmgr, JNIEnv* env);
 		#endif
-		bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, IMemoryManager* const memmgr);
+		bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath, IMemoryManager* const memmgr);
 		bool Destroy();
 		bool Start();
 		bool Stop();
@@ -39,8 +39,8 @@ namespace JonsEngine
 
 		void AddStream(std::streambuf* const sb);
 		void RemoveStream(std::streambuf* const sb);
-		bool IsStreamAdded(std::streambuf* const sb);
-		std::string GetFileLogPath();
+		bool IsStreamAdded(std::streambuf* const sb) const;
+		const std::string& GetFileLogPath() const;
 
 		std::ostream& LogInfo();
 		std::ostream& LogDebug();
@@ -48,8 +48,8 @@ namespace JonsEngine
 		std::ostream& LogError();
 
 	private:
-		std::string InternalGetLogName();
-		std::string InternalGetLogPath();
+		const std::string InternalGetLogName() const;
+		const std::string InternalGetLogPath() const;
 
 		IMemoryManager* mMemoryManager;
 		bool mRunning;

@@ -50,6 +50,12 @@
     <ClInclude Include="Core\Threading\ThreadTest.h">
       <Filter>Source Files\Core\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Threading\MutexTest.h">
+      <Filter>Source Files\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Threading\ConditionVariableTest.h">
+      <Filter>Source Files\Core\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JonsEngineTests.cpp">
@@ -71,6 +77,12 @@
       <Filter>Source Files\Core\Containers</Filter>
     </ClCompile>
     <ClCompile Include="Core\Threading\ThreadTest.cpp">
+      <Filter>Source Files\Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Threading\MutexTest.cpp">
+      <Filter>Source Files\Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Threading\ConditionVariableTest.cpp">
       <Filter>Source Files\Core\Threading</Filter>
     </ClCompile>
   </ItemGroup>

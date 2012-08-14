@@ -13,88 +13,6 @@ namespace JonsEngine
 {
 	/*
 	 *
-	 * Free-standing functions
-	 *
-	 */
-
-	/*
-	 * Sleeps the current thread of execution
-	 * @param milliseconds: number of milliseconds to sleep
-	 */
-	void jons_SleepCurrentThread(uint32_t milliseconds)
-	{
-		#if defined _WIN32 || _WIN64
-			Sleep(milliseconds);
-		#elif defined ANDROID
-			timespec interval;
-			interval.tv_sec = (long)(milliseconds/1000); 
-			interval.tv_nsec = (long)(milliseconds%1000) * 1000000; 
-
-			nanosleep(&interval, 0);
-		#endif
-	}
-
-	/*
-	 * Returns the backend native thread handle
-	 * @ret: The native thread backend for the current thread
-	 */
-	ThreadHandle jons_GetCurrentThreadNativeHandle()
-	{
-		ThreadHandle handle;
-
-		#if defined _WIN32 || _WIN64
-			handle = GetCurrentThread();
-		#elif defined ANDROID
-			handle = pthread_self();
-		#endif
-
-		return handle;
-	}
-
-	/*
-	 * Sets the priority of the current thread
-	 * @param priority: the priority to set this thread to
-	 * @ret: 0 for success, -1 for fail
-	 */
-	int32_t jons_SetThreadPriority(int32_t priority)
-	{
-		int32_t ret = -1;
-
-		#if defined _WIN32 || _WIN64
-			ret = jons_SetThreadPriority(GetCurrentThread(), priority);
-		#elif defined ANDROID
-			ret = jons_SetThreadPriority(pthread_self(), priority);
-		#endif
-
-		return ret;
-	}
-
-	/*
-	 * Sets the priority of a given thread
-	 * @param handle: the native handle of the thread to set priority to
-	 * @param priority: the priority to set to thread given by handle
-	 * @ret: 0 for success, -1 for fail
-	 */
-	int32_t jons_SetThreadPriority(ThreadHandle handle, int32_t priority)
-	{
-		int32_t ret = -1;
-
-		#if defined _WIN32 || _WIN64
-			ret = SetThreadPriority(handle, priority) ? 0 : -1;
-		#elif defined ANDROID
-			struct sched_param sp;
-			memset(&sp, 0, sizeof(struct sched_param));
-			sp.sched_priority = priority;
-
-			ret = pthread_setschedparam(handle, SCHED_RR, &sp);
-		#endif
-
-		return ret;
-	}
-
-
-	/*
-	 *
 	 * Thread wrapper class
 	 *
 	 */
@@ -172,12 +90,12 @@ namespace JonsEngine
 		return NULL;
 	}
 
-	ThreadHandle Thread::GetNativeHandle()
+	Thread::ThreadHandle& Thread::GetNativeHandle()
 	{
 		return mHandle;
 	}
 
-	Thread::ThreadState Thread::GetThreadState()
+	Thread::ThreadState Thread::GetThreadState() const
 	{
 		if (mThreadInfo != NULL)
 			return mThreadInfo->mState;
@@ -214,7 +132,7 @@ namespace JonsEngine
 			return -1;
 	}
 
-	ThreadHandle Thread::_CreateThread(void* (*start) (void*), void* arg)
+	Thread::ThreadHandle Thread::_CreateThread(void* (*start) (void*), void* arg)
 	{
 		ThreadHandle handle = NULL;
 
@@ -238,5 +156,87 @@ namespace JonsEngine
 		#elif defined ANDROID
 			pthread_join(handle, NULL);
 		#endif
+	}
+
+
+	/*
+	 *
+	 * Free-standing functions
+	 *
+	 */
+
+	/*
+	 * Sleeps the current thread of execution
+	 * @param milliseconds: number of milliseconds to sleep
+	 */
+	void jons_SleepCurrentThread(uint32_t milliseconds)
+	{
+		#if defined _WIN32 || _WIN64
+			Sleep(milliseconds);
+		#elif defined ANDROID
+			timespec interval;
+			interval.tv_sec = (long)(milliseconds/1000); 
+			interval.tv_nsec = (long)(milliseconds%1000) * 1000000; 
+
+			nanosleep(&interval, 0);
+		#endif
+	}
+
+	/*
+	 * Returns the backend native thread handle
+	 * @ret: The native thread backend for the current thread
+	 */
+	Thread::ThreadHandle jons_GetCurrentThreadNativeHandle()
+	{
+		Thread::ThreadHandle handle;
+
+		#if defined _WIN32 || _WIN64
+			handle = GetCurrentThread();
+		#elif defined ANDROID
+			handle = pthread_self();
+		#endif
+
+		return handle;
+	}
+
+	/*
+	 * Sets the priority of the current thread
+	 * @param priority: the priority to set this thread to
+	 * @ret: 0 for success, -1 for fail
+	 */
+	int32_t jons_SetThreadPriority(int32_t priority)
+	{
+		int32_t ret = -1;
+
+		#if defined _WIN32 || _WIN64
+			ret = jons_SetThreadPriority(GetCurrentThread(), priority);
+		#elif defined ANDROID
+			ret = jons_SetThreadPriority(pthread_self(), priority);
+		#endif
+
+		return ret;
+	}
+
+	/*
+	 * Sets the priority of a given thread
+	 * @param handle: the native handle of the thread to set priority to
+	 * @param priority: the priority to set to thread given by handle
+	 * @ret: 0 for success, -1 for fail
+	 */
+	int32_t jons_SetThreadPriority(Thread::ThreadHandle handle, int32_t priority)
+	{
+		int32_t ret = -1;
+
+		#if defined _WIN32 || _WIN64
+			ret = SetThreadPriority(handle, priority) ? 0 : -1;
+		#elif defined ANDROID
+			struct sched_param sp;
+			memset(&sp, 0, sizeof(struct sched_param));
+			sp.sched_priority = priority;
+
+			ret = pthread_setschedparam(handle, SCHED_RR, &sp);
+		#endif
+
+		return ret;
 	}
 }

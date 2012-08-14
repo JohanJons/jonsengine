@@ -23,9 +23,9 @@ namespace JonsEngine
 
 		virtual bool Init(IMemoryManager* const memmgr) = 0;
 		#ifdef ANDROID
-			virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, IMemoryManager* const memmgr,JNIEnv* env) = 0;
+			virtual bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath, IMemoryManager* const memmgr, JNIEnv* env) = 0;
 		#endif
-		virtual bool Init(bool LogToFile, bool LogToStdOut, std::string absFilePath, IMemoryManager* const memmgr) = 0;
+		virtual bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath, IMemoryManager* const memmgr) = 0;
 		virtual bool Destroy() = 0;
 		virtual bool Start() = 0;
 		virtual bool Stop() = 0;
@@ -34,8 +34,8 @@ namespace JonsEngine
 
 		virtual void AddStream(std::streambuf* const sb) = 0;
 		virtual void RemoveStream(std::streambuf* const sb) = 0;
-		virtual bool IsStreamAdded(std::streambuf* const sb) = 0;
-		virtual std::string GetFileLogPath() = 0;
+		virtual bool IsStreamAdded(std::streambuf* const sb) const = 0;
+		virtual const std::string& GetFileLogPath() const = 0;
 
 		virtual std::ostream& LogInfo() = 0;
 		virtual std::ostream& LogDebug() = 0;

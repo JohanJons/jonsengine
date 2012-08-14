@@ -87,8 +87,8 @@ namespace JonsEngine
 	{
 
 	}
-
-	uint64_t MemoryManagerImpl::GetTotalAllocatedMemory()
+	 
+	uint64_t MemoryManagerImpl::GetTotalAllocatedMemory() const
 	{
 		uint64_t totalAllocatedMemory = 0;
 

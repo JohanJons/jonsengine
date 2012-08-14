@@ -30,7 +30,7 @@ namespace JonsEngine
 		
 	}
 
-	bool Engine::Init(EngineSettings& initSettings)
+	bool Engine::Init()
 	{
 		bool res = true;
 
@@ -41,23 +41,14 @@ namespace JonsEngine
 		if (res)
 		{
 			// Log
-			bool LogToFile = initSettings.GetLogToFile();
-			bool LogToSTDOut = initSettings.GetLogToSTDOut();
-			std::string fileLocation = initSettings.GetLogToFileLocation();
-
-			mEngineSettings.SetLogToFile(LogToFile,fileLocation);
-			mEngineSettings.SetLogToSTDOut(LogToSTDOut);
-
 			#ifdef ANDROID
-				res &= mLog.Init(LogToFile,LogToSTDOut,fileLocation,&mMemoryManager,mJNIEnv);
+				res &= mLog.Init(mEngineSettings.GetLogToFile(), mEngineSettings.GetLogToSTDOut(), mEngineSettings.GetLogToFileLocation(), &mMemoryManager, mJNIEnv);
 			#else
-				res &= mLog.Init(LogToFile,LogToSTDOut,fileLocation,&mMemoryManager);
+				res &= mLog.Init(mEngineSettings.GetLogToFile(), mEngineSettings.GetLogToSTDOut(), mEngineSettings.GetLogToFileLocation(), &mMemoryManager);
 			#endif
-
 
 			// Render
 			res &= mRenderManager.Init(&mLog,&mMemoryManager);
-
 
 			// GameObject 
 			res &= mGameObjectManager.Init(&mLog, &mMemoryManager);
@@ -148,22 +139,22 @@ namespace JonsEngine
 		return mEngineSettings;
 	}
 
-	IRenderManager* Engine::GetRenderManager()
+	IRenderManager* const Engine::GetRenderManager()
 	{
 		return &mRenderManager;
 	}
 
-	IMemoryManager* Engine::GetMemoryManager()
+	IMemoryManager* const Engine::GetMemoryManager()
 	{
 		return &mMemoryManager;
 	}
 
-	IGameObjectManager* Engine::GetGameObjectManager()
+	IGameObjectManager* const Engine::GetGameObjectManager()
 	{
 		return &mGameObjectManager;
 	}
 
-	ILogManager* Engine::GetLogger()
+	ILogManager* const Engine::GetLogger()
 	{
 		return &mLog;
 	}

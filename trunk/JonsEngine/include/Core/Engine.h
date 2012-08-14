@@ -21,7 +21,7 @@ namespace JonsEngine
 		Engine();
 		~Engine();
 
-		bool Init(EngineSettings& initSettings);
+		bool Init();
 		bool Start();
 		bool Stop();
 		bool Destroy();
@@ -29,13 +29,13 @@ namespace JonsEngine
 		void Tick();
 
 		EngineSettings& GetEngineSettings();
-		IMemoryManager* GetMemoryManager();
-		IRenderManager* GetRenderManager();
-		IGameObjectManager* GetGameObjectManager();
-		ILogManager* GetLogger();
+		IMemoryManager* const GetMemoryManager();
+		IRenderManager* const GetRenderManager();
+		IGameObjectManager* const GetGameObjectManager();
+		ILogManager* const GetLogger();
 
 		#ifdef ANDROID
-		static JNIEnv* mJNIEnv;
+			static JNIEnv* mJNIEnv;
 		#endif
 
 	private:

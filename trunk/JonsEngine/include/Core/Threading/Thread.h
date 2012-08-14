@@ -7,25 +7,17 @@
 
 namespace JonsEngine
 {
-	#if defined _WIN32 || _WIN64
-		typedef void* ThreadHandle;  
-	#else
-		#include <pthread.h>
-		typedef pthread_t ThreadHandle;
-	#endif
-
-
-	/* Free-standing functions */
-	void jons_SleepCurrentThread(uint32_t milliseconds);
-	ThreadHandle jons_GetCurrentThreadNativeHandle();
-	int32_t jons_SetThreadPriority(int32_t priority);
-	int32_t jons_SetThreadPriority(ThreadHandle handle, int32_t priority);
-
-
 	/* Thread wrapper class */
 	class Thread
 	{
 	public:
+		#if defined _WIN32 || _WIN64
+			typedef void* ThreadHandle;  
+		#else
+			#include <pthread.h>
+			typedef pthread_t ThreadHandle;
+		#endif
+
 		enum ThreadState
 		{
 			DETACHED = 0,
@@ -41,14 +33,15 @@ namespace JonsEngine
 		};
 
 		Thread();
-		Thread(void* (*start) (void*), void* arg, IMemoryAllocator* const allocator);
+		Thread(void* (*start) (void*), void* arg, IMemoryAllocator* allocator);
 		~Thread();
 
 		Thread& operator=(Thread& other);
 		int32_t Join();
 		int32_t SetPriority(int32_t priority);
-		ThreadHandle GetNativeHandle();
-		ThreadState GetThreadState();
+
+		ThreadHandle& GetNativeHandle();
+		ThreadState GetThreadState() const;
 
 	private:
 		ThreadHandle mHandle;
@@ -62,6 +55,13 @@ namespace JonsEngine
 		void _JoinThread(ThreadHandle& handle);
 
 	};
+
+
+	/* Free-standing functions */
+	void jons_SleepCurrentThread(uint32_t milliseconds);
+	Thread::ThreadHandle jons_GetCurrentThreadNativeHandle();
+	int32_t jons_SetThreadPriority(int32_t priority);
+	int32_t jons_SetThreadPriority(Thread::ThreadHandle handle, int32_t priority);
 }
 
 #endif
