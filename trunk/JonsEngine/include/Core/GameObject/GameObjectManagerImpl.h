@@ -3,11 +3,12 @@
 
 #include <map>
 
-#include "../../../Interface/IGameObjectManager.h"
-#include "../../../Interface/ILogManager.h"
-#include "../../../Interface/IMemoryManager.h"
-#include "../../../Interface/EngineDefs.h"
-#include "GameObject.h"
+#include "interface/Core/GameObject/IGameObjectManager.h"
+#include "interface/Core/Logging/ILogManager.h"
+#include "interface/Core/Memory/IMemoryManager.h"
+#include "interface/Core/EngineDefs.h"
+
+#include "include/Core/GameObject/GameObject.h"
 
 namespace JonsEngine
 {

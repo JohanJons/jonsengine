@@ -1,8 +1,8 @@
 #ifndef _I_RENDER_MANAGER_H
 #define _I_RENDER_MANAGER_H
 
-#include "EngineDefs.h"
-#include "ILogManager.h"
+#include "interface/Core/EngineDefs.h"
+#include "interface/Core/Logging/ILogManager.h"
 
 namespace JonsEngine
 {

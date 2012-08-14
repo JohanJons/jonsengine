@@ -54,7 +54,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;JONSENGINE_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Thirdparty\Visual_Leak_Detector\include;include\Core\Utils;include\Core\GameObject;include\Core\Memory;include\Core\Logging;include\Core\Containers;include\Render;include\Input;include\Core;include\Audio;include\;..\Thirdparty\boost_1_49_0;interface\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\boost_1_49_0;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -130,12 +130,12 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Core\Threading\Threadpool.h" />
     <ClInclude Include="include\Render\RenderManagerImpl.h" />
     <ClInclude Include="include\Core\Utils\JonsTime.h" />
-    <ClInclude Include="interface\EngineDefs.h" />
-    <ClInclude Include="interface\IGameObjectManager.h" />
-    <ClInclude Include="interface\ILogManager.h" />
-    <ClInclude Include="interface\IMemoryAllocator.h" />
-    <ClInclude Include="interface\IMemoryManager.h" />
-    <ClInclude Include="interface\IRenderManager.h" />
+    <ClInclude Include="interface\Core\EngineDefs.h" />
+    <ClInclude Include="interface\Core\GameObject\IGameObjectManager.h" />
+    <ClInclude Include="interface\Core\Logging\ILogManager.h" />
+    <ClInclude Include="interface\Core\Memory\IMemoryAllocator.h" />
+    <ClInclude Include="interface\Core\Memory\IMemoryManager.h" />
+    <ClInclude Include="interface\Render\IRenderManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

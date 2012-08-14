@@ -21,9 +21,6 @@
     <Filter Include="Header Files\Render">
       <UniqueIdentifier>{ff44cc03-febf-440e-aeba-dc7ede80161e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface">
-      <UniqueIdentifier>{51121a26-bfa3-4457-884d-c1a97d9788c9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Core\Logging">
       <UniqueIdentifier>{a68ce750-d5ef-433a-a7b9-c6b7b87f1cd4}</UniqueIdentifier>
     </Filter>
@@ -65,6 +62,27 @@
     </Filter>
     <Filter Include="Source Files\Core\Threading">
       <UniqueIdentifier>{11337b56-64ba-402e-8f60-0787d4a83572}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{d22703f0-95ef-4c15-8f0b-a00a78a86760}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Core">
+      <UniqueIdentifier>{e73de4e3-e2c0-4257-8a0f-e5678bca889e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Render">
+      <UniqueIdentifier>{196d120e-d1f7-456f-96c5-493e0f5f3ab9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Core\Logging">
+      <UniqueIdentifier>{c56894c9-541d-48ef-a844-2911fb29ff66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Core\Memory">
+      <UniqueIdentifier>{9c415328-54b8-42be-9ad0-5b91fc832c59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Core\GameObject">
+      <UniqueIdentifier>{84f9ae72-ef3e-471a-8503-7593bedcd551}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Core\Threading">
+      <UniqueIdentifier>{24eb6380-22f4-4319-b633-5edc40be4795}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -118,15 +136,6 @@
     <ClInclude Include="include\Render\RenderManagerImpl.h">
       <Filter>Header Files\Render</Filter>
     </ClInclude>
-    <ClInclude Include="interface\ILogManager.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\IMemoryManager.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\IRenderManager.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Engine.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
@@ -151,17 +160,11 @@
     <ClInclude Include="include\Core\Memory\MemoryManagerImpl.h">
       <Filter>Header Files\Core\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="interface\EngineDefs.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\GameObject\GameObject.h">
       <Filter>Header Files\Core\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\GameObject\GameObjectManagerImpl.h">
       <Filter>Header Files\Core\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\IGameObjectManager.h">
-      <Filter>Interface</Filter>
     </ClInclude>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h">
       <Filter>Thirdparty\dlmalloc</Filter>
@@ -184,11 +187,26 @@
     <ClInclude Include="include\Core\Threading\Mutex.h">
       <Filter>Header Files\Core\Threading</Filter>
     </ClInclude>
-    <ClInclude Include="interface\IMemoryAllocator.h">
-      <Filter>Interface</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Threading\ConditionVariable.h">
       <Filter>Header Files\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\Render\IRenderManager.h">
+      <Filter>Interface\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\Core\EngineDefs.h">
+      <Filter>Interface\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\Core\Memory\IMemoryAllocator.h">
+      <Filter>Interface\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\Core\Memory\IMemoryManager.h">
+      <Filter>Interface\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\Core\Logging\ILogManager.h">
+      <Filter>Interface\Core\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\Core\GameObject\IGameObjectManager.h">
+      <Filter>Interface\Core\GameObject</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

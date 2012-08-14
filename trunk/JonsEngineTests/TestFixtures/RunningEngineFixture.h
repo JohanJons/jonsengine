@@ -3,7 +3,7 @@
 
 #include "gtest/gtest.h"
 
-#include "Engine.h"
+#include "include/Core/Engine.h"
 
 namespace JonsEngine
 {

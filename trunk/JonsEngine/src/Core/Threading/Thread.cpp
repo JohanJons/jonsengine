@@ -1,4 +1,4 @@
-#include "../../../include/Core/Threading/Thread.h"
+#include "include/Core/Threading/Thread.h"
 
 #if defined _WIN32 || _WIN64
 	#define WIN32_LEAN_AND_MEAN

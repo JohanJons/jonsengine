@@ -1,9 +1,10 @@
 #ifndef _TEST_MANAGER_H
 #define _TEST_MANAGER_H
 
-#include "Core/Memory/MemoryTestManager.h"
-#include "Core/GameObject/GameObjectTestManager.h"
-#include "Core/Engine.h"
+#include "include/Core/Engine.h"
+
+#include "../JonsEngineTests/Core/Memory/MemoryTestManager.h"
+#include "../JonsEngineTests/Core/GameObject/GameObjectTestManager.h"
 
 namespace JonsEngine
 {

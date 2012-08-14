@@ -10,7 +10,7 @@
 #include <android/log.h>
 #endif
 
-#include "EngineDefs.h"
+#include "interface/Core/EngineDefs.h"
 
 namespace JonsEngine
 {

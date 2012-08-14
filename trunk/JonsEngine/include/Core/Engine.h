@@ -5,12 +5,12 @@
 #include "jni.h"
 #endif
 
-#include "../Render/RenderManagerImpl.h"
-#include "Logging/LogManagerImpl.h"
-#include "Memory/MemoryManagerImpl.h"
-#include "Containers/Vector.h"
-#include "GameObject/GameObjectManagerImpl.h"
-#include "EngineSettings.h"
+#include "include/Render/RenderManagerImpl.h"
+#include "include/Core/Logging/LogManagerImpl.h"
+#include "include/Core/Memory/MemoryManagerImpl.h"
+#include "include/Core/Containers/Vector.h"
+#include "include/Core/GameObject/GameObjectManagerImpl.h"
+#include "include/Core/EngineSettings.h"
 
 
 namespace JonsEngine

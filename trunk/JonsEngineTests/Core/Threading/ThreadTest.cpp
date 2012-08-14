@@ -1,4 +1,4 @@
-#include "ThreadTest.h"
+#include "../JonsEngineTests/Core/Threading/ThreadTest.h"
 
 
 namespace JonsEngine

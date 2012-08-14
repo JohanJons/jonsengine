@@ -5,17 +5,18 @@
 
 #ifdef ANDROID
 #include "jni.h"
-#include "AndroidLogStream.h"
+#include "include/Core/Logging/AndroidLogStream.h"
 #endif
 
-#include "../../../Interface/ILogManager.h"
-#include "../../../Interface/EngineDefs.h"
-#include "../../../interface/IMemoryManager.h"
+#include "interface/Core/Logging/ILogManager.h"
+#include "interface/Core/EngineDefs.h"
+#include "interface/Core/Memory/IMemoryManager.h"
 
-#include "../Utils/JonsTime.h"
-#include "JonsStreamBuf.h"
-#include "JonsOutputStream.h"
-#include "DummyLogStream.h"
+#include "include/Core/Logging/JonsStreamBuf.h"
+#include "include/Core/Logging/JonsOutputStream.h"
+#include "include/Core/Logging/DummyLogStream.h"
+
+#include "include/Core/Utils/JonsTime.h"
 
 
 namespace JonsEngine

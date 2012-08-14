@@ -10,9 +10,9 @@
 	#include <time.h>
 #endif
 
-#include "../../../interface/EngineDefs.h"
+#include "interface/Core/EngineDefs.h"
 
-#include "Mutex.h"
+#include "include/Core/Threading/Mutex.h"
 
 namespace JonsEngine
 {
@@ -35,7 +35,7 @@ namespace JonsEngine
 		~ConditionVariable();
 
 		void Wait();
-		void TimedWait(uint64_t milliseconds);
+		void TimedWait(uint32_t milliseconds);
 		void Signal();
 		void Broadcast();
 

@@ -11,9 +11,9 @@
 #include <gl\GLU.h>
 #endif
 
-#include "../../Interface/IRenderManager.h"
-#include "../../Interface/ILogManager.h"
-#include "../../Interface/EngineDefs.h"
+#include "interface/Render/IRenderManager.h"
+#include "interface/Core/Logging/ILogManager.h"
+#include "interface/Core/EngineDefs.h"
 
 namespace JonsEngine
 {

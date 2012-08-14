@@ -3,9 +3,9 @@
 
 #include "gtest/gtest.h"
 
-#include "Core/Threading/Thread.h"
+#include "include/Core/Threading/Thread.h"
 
-#include "../../TestFixtures/RunningEngineFixture.h"
+#include "../JonsEngineTests/TestFixtures/RunningEngineFixture.h"
 
 
 namespace JonsEngine

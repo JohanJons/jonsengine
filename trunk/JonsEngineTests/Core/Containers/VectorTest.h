@@ -3,9 +3,9 @@
 
 #include "gtest/gtest.h"
 
-#include "Core/Containers/Vector.h"
+#include "include/Core/Containers/Vector.h"
 
-#include "../../TestFixtures/RunningEngineFixture.h"
+#include "../JonsEngineTests/TestFixtures/RunningEngineFixture.h"
 
 
 namespace JonsEngine

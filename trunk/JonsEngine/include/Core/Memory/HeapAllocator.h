@@ -1,10 +1,10 @@
 #ifndef _HEAP_ALLOCATOR_H
 #define _HEAP_ALLOCATOR_H
 
-#include "../../../../Thirdparty/dlmalloc/dlmalloc.h"
+#include "interface/Core/Logging/ILogManager.h"
+#include "interface/Core/Memory/IMemoryAllocator.h"
 
-#include "../../../interface/ILogManager.h"
-#include "../../../interface/IMemoryAllocator.h"
+#include "../Thirdparty/dlmalloc/dlmalloc.h"
 
 namespace JonsEngine
 {

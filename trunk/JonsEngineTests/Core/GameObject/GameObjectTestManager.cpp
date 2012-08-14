@@ -1,4 +1,4 @@
-#include "GameObjectTestManager.h"
+#include "../JonsEngineTests/Core/GameObject/GameObjectTestManager.h"
 
 namespace JonsEngine
 {

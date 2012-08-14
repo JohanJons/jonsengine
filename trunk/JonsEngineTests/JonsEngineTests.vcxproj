@@ -39,7 +39,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\Tests\Utils;$(SolutionDir)\Tests\Render;$(SolutionDir)\Tests\Memory;$(SolutionDir)\Tests\Core;$(SolutionDir)\Tests\;$(SolutionDir)\include\Utils;$(SolutionDir)\include\Render;$(SolutionDir)\include\Memory;$(SolutionDir)\include\Core;$(SolutionDir)\include;$(SolutionDir)\interface;$(IncludePath)</IncludePath>
+    <IncludePath>$(IncludePath)</IncludePath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
     <LibraryPath>..\Thirdparty\gtest-1.6.0\msvc\gtest\Debug\;..\Thirdparty\Visual_Leak_Detector\lib\Win32\;$(SolutionDir)\libs\win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
@@ -57,7 +57,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <CompileAs>CompileAsCpp</CompileAs>
-      <AdditionalIncludeDirectories>..\Thirdparty\gtest-1.6.0\include\;..\Thirdparty\Visual_Leak_Detector\Include\;..\Thirdparty\boost_1_49_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\Visual_Leak_Detector\include;$(SolutionDir)\..\Thirdparty\boost_1_49_0;$(SolutionDir)\..\Thirdparty\gtest-1.6.0/include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>

@@ -1,4 +1,4 @@
-#include "../../include/Core/Engine.h"
+#include "include/Core/Engine.h"
 
 #ifdef ANDROID
 JNIEnv* JonsEngine::Engine::mJNIEnv = NULL;

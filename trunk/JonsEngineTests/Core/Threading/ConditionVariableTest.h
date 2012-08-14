@@ -3,10 +3,10 @@
 
 #include "gtest/gtest.h"
 
-#include "Core/Threading/Thread.h"
-#include "Core/Threading/ConditionVariable.h"
+#include "include/Core/Threading/Thread.h"
+#include "include/Core/Threading/ConditionVariable.h"
 
-#include "../../TestFixtures/RunningEngineFixture.h"
+#include "../JonsEngineTests/TestFixtures/RunningEngineFixture.h"
 
 
 namespace JonsEngine

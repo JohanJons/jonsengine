@@ -8,7 +8,7 @@
 #include <time.h>
 #include <string>
 
-#include "../../../Interface/EngineDefs.h"
+#include "interface/Core/EngineDefs.h"
 
 namespace JonsEngine
 {

@@ -1,4 +1,4 @@
-#include "../../../Include/Core/Logging/LogManagerImpl.h"
+#include "include/Core/Logging/LogManagerImpl.h"
 
 namespace JonsEngine
 {

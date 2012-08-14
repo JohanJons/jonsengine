@@ -9,7 +9,7 @@
 	#include <pthread.h>
 #endif
 
-#include "../../../interface/EngineDefs.h"
+#include "interface/Core/EngineDefs.h"
 
 namespace JonsEngine
 {

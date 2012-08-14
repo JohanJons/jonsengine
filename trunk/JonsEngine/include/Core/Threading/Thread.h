@@ -1,9 +1,9 @@
 #ifndef _JONS_THREAD_H
 #define _JONS_THREAD_H
 
-#include "../../../interface/EngineDefs.h"
+#include "interface/Core/EngineDefs.h"
 
-#include "../../Core/Memory/HeapAllocator.h"
+#include "include/Core/Memory/HeapAllocator.h"
 
 namespace JonsEngine
 {

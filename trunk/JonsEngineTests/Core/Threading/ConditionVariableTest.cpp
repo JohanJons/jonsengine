@@ -1,4 +1,4 @@
-#include "ConditionVariableTest.h"
+#include "../JonsEngineTests/Core/Threading/ConditionVariableTest.h"
 
 
 namespace JonsEngine

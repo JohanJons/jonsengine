@@ -1,4 +1,4 @@
-#include "../../../Include/Core/Logging/JonsStreamBuf.h"
+#include "include/Core/Logging/JonsStreamBuf.h"
 
 namespace JonsEngine
 {

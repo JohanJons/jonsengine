@@ -1,8 +1,8 @@
 #ifndef _JONS_VECTOR_H
 #define _JONS_VECTOR_H
 
+#include "include/Core/Memory/HeapAllocator.h"
 
-#include "../Memory/HeapAllocator.h"
 
 namespace JonsEngine
 {

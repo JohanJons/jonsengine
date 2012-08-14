@@ -2,11 +2,11 @@
 #define _MEMORY_MANAGER_IMPL_H
 
 
-#include "../../../Interface/IMemoryManager.h"
-#include "../../../Interface/ILogManager.h"
-#include "../../../Interface/EngineDefs.h"
+#include "interface/Core/Memory/IMemoryManager.h"
+#include "interface/Core/Logging/ILogManager.h"
+#include "interface/Core/EngineDefs.h"
 
-#include "HeapAllocator.h"
+#include "include/Core/Memory/HeapAllocator.h"
 
 namespace JonsEngine
 {

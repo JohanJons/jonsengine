@@ -6,7 +6,7 @@
 #include <iostream>
 #include <android/log.h>
 
-#include "../../../Interface/EngineDefs.h"
+#include "interface/Core/EngineDefs.h"
 
 namespace JonsEngine
 {

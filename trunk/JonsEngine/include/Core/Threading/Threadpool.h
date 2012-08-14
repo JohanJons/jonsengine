@@ -1,10 +1,10 @@
 #ifndef _JONS_THREAD_POOL_H
 #define _JONS_THREAD_POOL_H
 
-#include "../../../interface/EngineDefs.h"
+#include "interface/Core/EngineDefs.h"
 
-#include "Thread.h"
-#include "Mutex.h"
+#include "include/Core/Threading/Thread.h"
+#include "include/Core/Threading/Mutex.h"
 
 namespace JonsEngine
 {

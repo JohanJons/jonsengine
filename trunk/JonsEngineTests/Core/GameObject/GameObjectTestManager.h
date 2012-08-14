@@ -1,10 +1,11 @@
 #ifndef _GAMEOBJECT_MANAGER_TEST_H
 #define _GAMEOBJECT_MANAGER_TEST_H
 
-#include "Core/Engine.h"
-#include "../../TestClass1.h"
-#include "Core/GameObject/GameObject.h"
-#include "Core/Utils/JonsTime.h"
+#include "include/Core/Engine.h"
+#include "include/Core/GameObject/GameObject.h"
+#include "include/Core/Utils/JonsTime.h"
+
+#include "../JonsEngineTests/TestClass1.h"
 
 #define JONSOBJECT_ITERATIONS 1000
 

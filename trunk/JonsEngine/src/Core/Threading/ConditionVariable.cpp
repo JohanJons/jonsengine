@@ -1,4 +1,4 @@
-#include "../../../include/Core/Threading/ConditionVariable.h"
+#include "include/Core/Threading/ConditionVariable.h"
 
 namespace JonsEngine
 {
@@ -39,7 +39,7 @@ namespace JonsEngine
 		mCondVarState = ConditionVariable::READY;
 	}
 
-	void ConditionVariable::TimedWait(uint64_t milliseconds)
+	void ConditionVariable::TimedWait(uint32_t milliseconds)
 	{
 		mCondVarState = ConditionVariable::WAITING;
 

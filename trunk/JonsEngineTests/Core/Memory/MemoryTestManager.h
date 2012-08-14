@@ -1,10 +1,11 @@
 #ifndef _MEMORY_MANAGER_TEST_H
 #define _MEMORY_MANAGER_TEST_H
 
-#include "Core/Engine.h"
-#include "../../TestClass1.h"
-#include "Core/GameObject/GameObject.h"
-#include "Core/Utils/JonsTime.h"
+#include "include/Core/Engine.h"
+#include "include/Core/GameObject/GameObject.h"
+#include "include/Core/Utils/JonsTime.h"
+
+#include "../JonsEngineTests/TestClass1.h"
 
 #define ALLOCATE_NUM_LOOPS 20
 #define ALLOCATE_NUM_ALLOCATIONS 1000000
