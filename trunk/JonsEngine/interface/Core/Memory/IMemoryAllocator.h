@@ -1,7 +1,7 @@
 #ifndef _I_MEMORY_ALLOCATOR_H
 #define _I_MEMORY_ALLOCATOR_H
 
-#include "interface/Core/EngineDefs.h"
+#include "include/Core/EngineDefs.h"
 
 namespace JonsEngine
 {

@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <list>
 
-#include "interface/Core/EngineDefs.h"
+#include "include/Core/EngineDefs.h"
 
 namespace JonsEngine
 {

@@ -1,11 +1,11 @@
 #ifndef _I_GAMEOBJECT_MANAGER_H
 #define _I_GAMEOBJECT_MANAGER_H
 
-#include "interface/Core/EngineDefs.h"
 #include "interface/Core/Memory/IMemoryManager.h"
 #include "interface/Core/Logging/ILogManager.h"
 
 #include "include/Core/GameObject/GameObject.h"
+#include "include/Core/EngineDefs.h"
 
 #include "../Thirdparty/boost_1_49_0/boost/smart_ptr/shared_ptr.hpp"
 #include "../Thirdparty/boost_1_49_0/boost/smart_ptr/weak_ptr.hpp"

@@ -9,12 +9,12 @@
 #endif
 
 #include "interface/Core/Logging/ILogManager.h"
-#include "interface/Core/EngineDefs.h"
 #include "interface/Core/Memory/IMemoryManager.h"
 
 #include "include/Core/Logging/JonsStreamBuf.h"
 #include "include/Core/Logging/JonsOutputStream.h"
 #include "include/Core/Logging/DummyLogStream.h"
+#include "include/Core/EngineDefs.h"
 
 #include "include/Core/Utils/JonsTime.h"
 
