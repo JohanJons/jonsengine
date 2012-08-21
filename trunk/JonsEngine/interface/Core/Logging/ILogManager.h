@@ -10,6 +10,8 @@
 #include <android/log.h>
 #endif
 
+#include "interface/Core/Memory/IMemoryAllocator.h"
+
 #include "include/Core/EngineDefs.h"
 
 namespace JonsEngine
@@ -21,11 +23,11 @@ namespace JonsEngine
 	public:
 		virtual ~ILogManager() { }
 
-		virtual bool Init(IMemoryManager* const memmgr) = 0;
+		virtual bool Init(IMemoryAllocator* const memmgr) = 0;
 		#ifdef ANDROID
-			virtual bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath, IMemoryManager* const memmgr, JNIEnv* env) = 0;
+			virtual bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath, IMemoryAllocator* const memmgr, JNIEnv* env) = 0;
 		#endif
-		virtual bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath, IMemoryManager* const memmgr) = 0;
+		virtual bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath, IMemoryAllocator* const memmgr) = 0;
 		virtual bool Destroy() = 0;
 		virtual bool Start() = 0;
 		virtual bool Stop() = 0;

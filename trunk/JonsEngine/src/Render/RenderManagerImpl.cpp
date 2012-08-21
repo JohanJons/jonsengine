@@ -3,7 +3,8 @@
 namespace JonsEngine
 {
 
-	RenderManagerImpl::RenderManagerImpl() :mRunning(false), mScreenWidth(320), mScreenHeight(480), mLog(NULL)
+	RenderManagerImpl::RenderManagerImpl(ILogManager& logger, IMemoryAllocator& memAllocator) : mRunning(false), mScreenWidth(320), mScreenHeight(480),
+																								mLog(logger), mMemoryAllocator(memAllocator)
 	{
 	}
 
@@ -13,19 +14,13 @@ namespace JonsEngine
 			Destroy();
 	}
 
-	bool RenderManagerImpl::Init(ILogManager* const logger, IMemoryManager* const memmgr)
+	bool RenderManagerImpl::Init()
 	{
-		mLog = logger;
-		mMemoryManager = memmgr;
+		bool ret = true;
 
-		if (mLog && mMemoryManager)
-		{
-			mInitialized = true;
+		mInitialized = true;
 
-			return true;
-		}
-		else
-			return false;
+		return ret;
 	}
 
 	bool RenderManagerImpl::Destroy()
@@ -58,7 +53,7 @@ namespace JonsEngine
 			mRunning = true;
 		}
 		else
-			mLog->LogWarn() <<  "RenderManagerImpl::Start(): RenderManager already started!" << std::endl;
+			mLog.LogWarn() <<  "RenderManagerImpl::Start(): RenderManager already started!" << std::endl;
 
 		return res;
 	}
@@ -73,7 +68,7 @@ namespace JonsEngine
 
 		}
 		else
-			mLog->LogWarn() <<  "RenderManagerImpl::Stop(): RenderManager already stopped!" << std::endl;
+			mLog.LogWarn() <<  "RenderManagerImpl::Stop(): RenderManager already stopped!" << std::endl;
 
 		return res;
 	}
@@ -97,7 +92,7 @@ namespace JonsEngine
 			mScreenHeight = height;
 		}
 		else
-			mLog->LogWarn() << "RenderManagerImpl::ResizeWindow(): Illegal parameters supplied" << std::endl;
+			mLog.LogWarn() << "RenderManagerImpl::ResizeWindow(): Illegal parameters supplied" << std::endl;
 	}
 
 	int32_t RenderManagerImpl::GetWindowWidth() const

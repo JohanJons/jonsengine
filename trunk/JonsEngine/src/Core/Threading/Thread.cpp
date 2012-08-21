@@ -16,13 +16,13 @@ namespace JonsEngine
 	 * Thread wrapper class
 	 *
 	 */
-	Thread::Thread() : mHandle(NULL), mAllocator(&SYSTEM_DEFAULT_HEAP_ALLOCATOR), mThreadInfo(NULL)
+	Thread::Thread(IMemoryAllocator& allocator, ILogManager& logger) : mHandle(NULL), mAllocator(allocator), mThreadInfo(NULL), mLogger(logger)
 	{
 	}
 
-	Thread::Thread(void* (*start) (void*), void* arg, IMemoryAllocator* allocator) : mAllocator(allocator)
+	Thread::Thread(void* (*start) (void*), void* arg, IMemoryAllocator& allocator, ILogManager& logger) : mAllocator(allocator), mLogger(logger)
 	{
-		mThreadInfo = (ThreadInfo*) mAllocator->Allocate(sizeof(ThreadInfo));
+		mThreadInfo = (ThreadInfo*) mAllocator.Allocate(sizeof(ThreadInfo));
 
 		mThreadInfo->mArg = arg;
 		mThreadInfo->mFunctionPointer = start;
@@ -107,7 +107,7 @@ namespace JonsEngine
 	{
 		if (mThreadInfo != NULL && mThreadInfo->mState == Thread::FINISHED)
 		{
-			mAllocator->Deallocate(mThreadInfo);
+			mAllocator.Deallocate(mThreadInfo);
 
 			mThreadInfo = NULL;
 			Detach();
@@ -123,7 +123,6 @@ namespace JonsEngine
 		if (mThreadInfo != NULL && (mThreadInfo->mState == Thread::RUNNING || mThreadInfo->mState == Thread::FINISHED))
 		{
 			mThreadInfo = NULL;
-			mAllocator = NULL;
 			mHandle = NULL;
 
 			return 0;

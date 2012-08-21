@@ -5,27 +5,35 @@ namespace JonsEngine
 {
 
 	int ConditionVariableTest::mCount = 0;
-	Mutex ConditionVariableTest::mMutex;
-	ConditionVariable ConditionVariableTest::mCondVar;
+	IMutex* ConditionVariableTest::mMutex = NULL;
+	IConditionVariable* ConditionVariableTest::mCondVar = NULL;
 
 	/**
 	 * Wait/Broadcast test
 	 */
 	TEST_F(ConditionVariableTest, Wait)
 	{
-		Thread tr1(&Incrementto4, NULL, mEngine.GetMemoryManager()->GetHeapAllocator()), 
-				tr2(&Incrementto7, NULL, mEngine.GetMemoryManager()->GetHeapAllocator()),
-				tr3(&Incrementto10, NULL, mEngine.GetMemoryManager()->GetHeapAllocator());
+		mMutex = mEngine.GetThreadingFactory().CreateMutex();
+		mCondVar = mEngine.GetThreadingFactory().CreateConditionVariable();
+		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(&Incrementto4, (void*)1000);
+		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(&Incrementto7, (void*)1000);
+		IThread* tr3 = mEngine.GetThreadingFactory().CreateThread(&Incrementto10, (void*)1000);
 
 		for (;;)
 		{
-			mCondVar.Wait();
+			mCondVar->Wait();
 
-			if (tr1.GetThreadState() == Thread::FINISHED &&
-				tr2.GetThreadState() == Thread::FINISHED &&
-				tr3.GetThreadState() == Thread::FINISHED)
+			if (tr1->GetThreadState() == Thread::FINISHED &&
+				tr2->GetThreadState() == Thread::FINISHED &&
+				tr3->GetThreadState() == Thread::FINISHED)
 				break;
 		}
+
+		mEngine.GetThreadingFactory().DestroyThread(tr1);
+		mEngine.GetThreadingFactory().DestroyThread(tr2);
+		mEngine.GetThreadingFactory().DestroyThread(tr3);
+		mEngine.GetThreadingFactory().DestroyMutex(mMutex);
+		mEngine.GetThreadingFactory().DestroyConditionVariable(mCondVar);
 	}
 
 	/**
@@ -33,17 +41,22 @@ namespace JonsEngine
 	 */
 	TEST_F(ConditionVariableTest, TimedWait)
 	{
-		Thread tr1(&signal, NULL, mEngine.GetMemoryManager()->GetHeapAllocator());
+		mCondVar = mEngine.GetThreadingFactory().CreateConditionVariable();
+		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(&signal, NULL);
 
-		mCondVar.TimedWait(1000);
+		mCondVar->TimedWait(1000);
 
 		ASSERT_EQ(mCount, 10);
 
-		Thread tr2(&setCountTo14, NULL, mEngine.GetMemoryManager()->GetHeapAllocator());
+		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(&setCountTo14, NULL);
 
-		mCondVar.TimedWait(500);
+		mCondVar->TimedWait(500);
 
 		ASSERT_EQ(mCount, 14);
+
+		mEngine.GetThreadingFactory().DestroyThread(tr1);
+		mEngine.GetThreadingFactory().DestroyThread(tr2);
+		mEngine.GetThreadingFactory().DestroyConditionVariable(mCondVar);
 	}
 
 	/**
@@ -51,7 +64,11 @@ namespace JonsEngine
 	 */
 	TEST_F(ConditionVariableTest, GetNativeConditionVariableHandle)
 	{
-		ConditionVariable::ConditionVariableHandle handle = mCondVar.GetNativeConditionVariableHandle();
+		mCondVar = mEngine.GetThreadingFactory().CreateConditionVariable();
+
+		ConditionVariable::ConditionVariableHandle handle = mCondVar->GetNativeConditionVariableHandle();
+
+		mEngine.GetThreadingFactory().DestroyConditionVariable(mCondVar);
 	}
 
 	/**
@@ -59,16 +76,21 @@ namespace JonsEngine
 	 */
 	TEST_F(ConditionVariableTest, GetConditionVariableState)
 	{
-		ASSERT_EQ(ConditionVariable::READY, mCondVar.GetConditionVariableState());
+		mCondVar = mEngine.GetThreadingFactory().CreateConditionVariable();
 
-		Thread tr1(&timedWait500ms, NULL, mEngine.GetMemoryManager()->GetHeapAllocator());
+		ASSERT_EQ(ConditionVariable::READY, mCondVar->GetConditionVariableState());
+
+		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(&timedWait500ms, NULL);
 
 		jons_SleepCurrentThread(100);
 
-		ASSERT_EQ(ConditionVariable::WAITING, mCondVar.GetConditionVariableState());
+		ASSERT_EQ(ConditionVariable::WAITING, mCondVar->GetConditionVariableState());
 
 		jons_SleepCurrentThread(1000);
 
-		ASSERT_EQ(ConditionVariable::READY, mCondVar.GetConditionVariableState());
+		ASSERT_EQ(ConditionVariable::READY, mCondVar->GetConditionVariableState());
+
+		mEngine.GetThreadingFactory().DestroyThread(tr1);
+		mEngine.GetThreadingFactory().DestroyConditionVariable(mCondVar);
 	}
 }

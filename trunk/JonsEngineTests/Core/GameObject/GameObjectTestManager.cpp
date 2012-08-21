@@ -18,9 +18,9 @@ namespace JonsEngine
 		}
 
 		if (res)
-			mEngine->GetLogger()->LogInfo() << "TEST: ReferenceTest SUCCESSFULL"  << std::endl;
+			mEngine->GetLogger().LogInfo() << "TEST: ReferenceTest SUCCESSFULL"  << std::endl;
 		else
-			mEngine->GetLogger()->LogError() << "TEST: ReferenceTest FAILED" << std::endl;
+			mEngine->GetLogger().LogError() << "TEST: ReferenceTest FAILED" << std::endl;
 
 		return res;
 	}
@@ -42,7 +42,7 @@ namespace JonsEngine
 		return ret;
 
 	_bail:
-		mEngine->GetLogger()->LogError() << "TEST: GameObjectTestManager:GameObjectRefTest1: FAILED"  << std::endl;
+		mEngine->GetLogger().LogError() << "TEST: GameObjectTestManager:GameObjectRefTest1: FAILED"  << std::endl;
 		return false;
 	}
 
@@ -63,7 +63,7 @@ namespace JonsEngine
 		return ret;
 
 	_bail:
-		mEngine->GetLogger()->LogError() << "TEST: GameObjectTestManager:GameObjectRefTest2: FAILED"  << std::endl;
+		mEngine->GetLogger().LogError() << "TEST: GameObjectTestManager:GameObjectRefTest2: FAILED"  << std::endl;
 		return false;
 	}
 
@@ -84,7 +84,7 @@ namespace JonsEngine
 		return ret;
 
 	_bail:
-		mEngine->GetLogger()->LogError() << "TEST: GameObjectTestManager:GameObjectRefTest3: FAILED" << std::endl;
+		mEngine->GetLogger().LogError() << "TEST: GameObjectTestManager:GameObjectRefTest3: FAILED" << std::endl;
 		return false;
 	}
 

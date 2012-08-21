@@ -9,11 +9,13 @@ namespace JonsEngine
 	TEST_F(ThreadTest, jons_SleepCurrentThread)
 	{
 		int num = 0;
-		Thread thread(&SetNumberTo14, (void*)&num, mEngine.GetMemoryManager()->GetHeapAllocator());
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&SetNumberTo14, (void*)&num);
 
 		jons_SleepCurrentThread(200);
 
 		ASSERT_EQ(num, 14);
+
+		mEngine.GetThreadingFactory().DestroyThread(thread);
 	}
 
 	/**
@@ -37,9 +39,11 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, jons_SetThreadPriority2)
 	{
-		Thread thread(&Sleeper, (void*)1000, mEngine.GetMemoryManager()->GetHeapAllocator());
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)100);
 
-		ASSERT_EQ(0, jons_SetThreadPriority(thread.GetNativeHandle(), THREAD_PRIORITY_ABOVE_NORMAL));
+		ASSERT_EQ(0, jons_SetThreadPriority(thread->GetNativeHandle(), THREAD_PRIORITY_ABOVE_NORMAL));
+
+		mEngine.GetThreadingFactory().DestroyThread(thread);
 	}
 
 	/**
@@ -47,7 +51,7 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, Constructor1)
 	{
-		Thread* thread = new Thread();
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread();
 		
 		ASSERT_EQ(Thread::DETACHED, thread->GetThreadState());
 		ASSERT_EQ(NULL, thread->GetNativeHandle());
@@ -55,7 +59,7 @@ namespace JonsEngine
 
 		ASSERT_EQ(-1, thread->Join());
 
-		delete thread;
+		mEngine.GetThreadingFactory().DestroyThread(thread);
 	}
 
 	/**
@@ -63,7 +67,7 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, Constructor2)
 	{
-		Thread* thread = new Thread(&Sleeper, (void*)500, mEngine.GetMemoryManager()->GetHeapAllocator());
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)500);
 
 		ASSERT_EQ(Thread::RUNNING, thread->GetThreadState());
 
@@ -71,7 +75,7 @@ namespace JonsEngine
 
 		ASSERT_EQ(Thread::FINISHED, thread->GetThreadState());
 
-		delete thread;
+		mEngine.GetThreadingFactory().DestroyThread(thread);
 	}
 
 	/**
@@ -79,8 +83,8 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, operatorAssign)
 	{
-		Thread* tr1 = new Thread();
-		Thread* tr2 = new Thread(&Sleeper, (void*)500, mEngine.GetMemoryManager()->GetHeapAllocator());
+		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread();
+		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)500);
 		
 		ASSERT_EQ(Thread::DETACHED, tr1->GetThreadState());
 		ASSERT_EQ(Thread::RUNNING, tr2->GetThreadState());
@@ -90,8 +94,8 @@ namespace JonsEngine
 		ASSERT_EQ(Thread::RUNNING, tr1->GetThreadState());
 		ASSERT_EQ(Thread::DETACHED, tr2->GetThreadState());
 
-		delete tr2;
-		delete tr1;
+		mEngine.GetThreadingFactory().DestroyThread(tr1);
+		mEngine.GetThreadingFactory().DestroyThread(tr2);
 	}
 	
 	/**
@@ -99,7 +103,7 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, Join)
 	{
-		Thread* thread = new Thread(&Sleeper, (void*)1000, mEngine.GetMemoryManager()->GetHeapAllocator());
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)1000);
 
 		ASSERT_EQ(thread->GetThreadState(), Thread::RUNNING);
 
@@ -107,7 +111,7 @@ namespace JonsEngine
 
 		ASSERT_EQ(thread->GetThreadState(), Thread::FINISHED);
 
-		delete thread;
+		mEngine.GetThreadingFactory().DestroyThread(thread);
 	}
 	
 	/**
@@ -115,11 +119,11 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, SetPriority)
 	{
-		Thread* thread = new Thread(&Sleeper, (void*)500, mEngine.GetMemoryManager()->GetHeapAllocator());
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)500);
 
 		ASSERT_EQ(0, thread->SetPriority(THREAD_PRIORITY_ABOVE_NORMAL));
 
-		delete thread;
+		mEngine.GetThreadingFactory().DestroyThread(thread);
 	}
 
 	/**
@@ -127,13 +131,13 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, GetNativeHandle)
 	{
-		Thread* thread = new Thread(&Sleeper, (void*)500, mEngine.GetMemoryManager()->GetHeapAllocator());
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)500);
 
 		Thread::ThreadHandle handle = thread->GetNativeHandle();
 
 		ASSERT_EQ(NULL, jons_SetThreadPriority(handle, THREAD_PRIORITY_ABOVE_NORMAL));
 
-		delete thread;
+		mEngine.GetThreadingFactory().DestroyThread(thread);
 	}
 
 	/**
@@ -141,7 +145,7 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, GetThreadState)
 	{
-		Thread* thread = new Thread(&Sleeper, (void*)500, mEngine.GetMemoryManager()->GetHeapAllocator());
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)500);
 
 		ASSERT_EQ(Thread::RUNNING, thread->GetThreadState());
 
@@ -149,6 +153,6 @@ namespace JonsEngine
 
 		ASSERT_EQ(Thread::FINISHED, thread->GetThreadState());
 		
-		delete thread;
+		mEngine.GetThreadingFactory().DestroyThread(thread);
 	}
 }

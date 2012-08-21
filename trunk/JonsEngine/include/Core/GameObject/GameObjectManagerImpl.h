@@ -15,10 +15,10 @@ namespace JonsEngine
 	class GameObjectManagerImpl : public IGameObjectManager
 	{
 	public:
-		GameObjectManagerImpl();
+		GameObjectManagerImpl(ILogManager& logger, IMemoryAllocator* memAllocator);
 		~GameObjectManagerImpl();
 
-		bool Init(ILogManager* const logger, IMemoryManager* const memmgr);
+		bool Init();
 		bool Destroy();
 		bool Start();
 		bool Stop();
@@ -26,7 +26,7 @@ namespace JonsEngine
 		void Tick();
 
 	private:
-		ILogManager* mLog;
+		ILogManager& mLog;
 		bool mRunning;
 		bool mInitialized;
 	};

@@ -31,6 +31,8 @@ namespace JonsEngine
 
 			// destroy engine
 			ASSERT_TRUE(mEngine.Destroy());
+
+			ASSERT_FALSE(mEngine.isRunning());
 		 }
 
 	 protected:

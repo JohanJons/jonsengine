@@ -2,15 +2,13 @@
 
 namespace JonsEngine
 {
-	Mutex::Mutex()
+	Mutex::Mutex(ILogManager& logger) : mLogger(logger), mState(Mutex::UNLOCKED)
 	{
 		#if defined _WIN32 || _WIN64
 			mHandle = CreateMutex(NULL, FALSE, NULL);
 		#else
 			pthread_mutex_init(&mHandle, NULL);
 		#endif
-
-		mState = Mutex::UNLOCKED;
 	}
 
 	Mutex::~Mutex()

@@ -37,7 +37,7 @@ namespace JonsEngine
 
 			mCount = 10;
 
-			mCondVar.Signal();
+			mCondVar->Signal();
 
 			return NULL;
 		}
@@ -51,7 +51,7 @@ namespace JonsEngine
 
 		static void* timedWait500ms(void* arg)
 		{
-			mCondVar.TimedWait(500);
+			mCondVar->TimedWait(500);
 
 			return NULL;
 		}
@@ -62,14 +62,14 @@ namespace JonsEngine
 			{
 				if (mCount < 4)
 				{
-					mMutex.Lock();
+					mMutex->Lock();
 					mCount++;
 					if (mCount == 4)
 					{
-						mCondVar.Broadcast();
+						mCondVar->Broadcast();
 						return NULL;
 					}
-					mMutex.Unlock();
+					mMutex->Unlock();
 				}
 				
 				jons_SleepCurrentThread(50);
@@ -82,17 +82,17 @@ namespace JonsEngine
 			{
 				if (mCount >= 4 && mCount < 7)
 				{
-					mMutex.Lock();
+					mMutex->Lock();
 					mCount++;
 					if (mCount == 7)
 					{
-						mCondVar.Broadcast();
+						mCondVar->Broadcast();
 						return NULL;
 					}
-					mMutex.Unlock();
+					mMutex->Unlock();
 				}
 				else
-					mCondVar.Wait();
+					mCondVar->Wait();
 
 				jons_SleepCurrentThread(50);
 			}
@@ -104,25 +104,25 @@ namespace JonsEngine
 			{
 				if (mCount >= 7)
 				{
-					mMutex.Lock();
+					mMutex->Lock();
 					mCount++;
 					if (mCount == 10)
 					{
-						mCondVar.Broadcast();
+						mCondVar->Broadcast();
 						return NULL;
 					}
-					mMutex.Unlock();
+					mMutex->Unlock();
 				}
 				else
-					mCondVar.Wait();
+					mCondVar->Wait();
 
 				jons_SleepCurrentThread(50);
 			}
 		}
 
 		static int mCount;
-		static Mutex mMutex;
-		static ConditionVariable mCondVar;
+		static IMutex* mMutex;
+		static IConditionVariable* mCondVar;
 
 	};
 

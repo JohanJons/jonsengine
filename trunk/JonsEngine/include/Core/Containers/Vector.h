@@ -1,7 +1,7 @@
 #ifndef _JONS_VECTOR_H
 #define _JONS_VECTOR_H
 
-#include "include/Core/Memory/HeapAllocator.h"
+#include "interface/Core/Memory/IMemoryAllocator.h"
 
 
 namespace JonsEngine
@@ -17,11 +17,11 @@ namespace JonsEngine
 		typedef T& reference;
 		typedef const T& const_reference;
 
-		Vector(HeapAllocator* allocator);
-		Vector(HeapAllocator* allocator, size_t size);
+		Vector(IMemoryAllocator& allocator);
+		Vector(IMemoryAllocator& allocator, size_t size);
 		Vector(const Vector<T>& vec);
 		~Vector();
-		HeapAllocator* GetAllocator() const;
+		IMemoryAllocator& GetAllocator() const;
 		Vector<T>& operator=(const Vector<T>& x);
 
 		iterator begin();
@@ -68,31 +68,30 @@ namespace JonsEngine
 		T* mBegin;
 		T* mEnd;
 		T* mCapacity;
-		HeapAllocator* mAllocator;
+		IMemoryAllocator& mAllocator;
 
 	};
 
 	template <class T>
-	inline Vector<T>::Vector(HeapAllocator* allocator) : mAllocator(allocator), mCapacity(NULL), mBegin(NULL), mEnd(NULL), DefaultCapacityIncrease(2)
+	inline Vector<T>::Vector(IMemoryAllocator& allocator) : mAllocator(allocator), mCapacity(NULL), mBegin(NULL), mEnd(NULL), DefaultCapacityIncrease(2)
 	{
 	}
 
 	template <class T>
-	inline Vector<T>::Vector(HeapAllocator* allocator, size_t size) : mAllocator(allocator), DefaultCapacityIncrease(2)
+	inline Vector<T>::Vector(IMemoryAllocator& allocator, size_t size) : mAllocator(allocator), DefaultCapacityIncrease(2)
 	{
-		mBegin = (T*) mAllocator->Allocate(sizeof(T)*size);
+		mBegin = (T*) mAllocator.Allocate(sizeof(T)*size);
 		mEnd = mBegin;
 		mCapacity = mBegin + size;
 	}
 
 	template <class T>
-	inline Vector<T>::Vector(const Vector<T>& vec) : DefaultCapacityIncrease(2)
+	inline Vector<T>::Vector(const Vector<T>& vec) : DefaultCapacityIncrease(2), mAllocator(vec.GetAllocator())
 	{
 		const size_t vecSize = vec.size();
 		const size_t vecCap = vec.capacity();
 
-		mAllocator = vec.GetAllocator();
-		mBegin = (T*) mAllocator->Allocate(vecCap * sizeof(T));
+		mBegin = (T*) mAllocator.Allocate(vecCap * sizeof(T));
 
 		memcpy(mBegin, vec.begin(), vecSize * sizeof(T));
 		mEnd = mBegin + vecSize;
@@ -106,7 +105,7 @@ namespace JonsEngine
 		{
 			clear();
 
-			mAllocator->Deallocate(mBegin);
+			mAllocator.Deallocate(mBegin);
 		}
 	}
 
@@ -119,7 +118,7 @@ namespace JonsEngine
 
 			reset();
 			mAllocator = x.GetAllocator();
-			mBegin = (T*) mAllocator->Allocate(sizeof(T)*newSize);
+			mBegin = (T*) mAllocator.Allocate(sizeof(T)*newSize);
 			memcpy(mBegin,x.begin(),sizeof(T)*newSize);
 			mCapacity = mEnd = mBegin + newSize;
 		}
@@ -127,7 +126,7 @@ namespace JonsEngine
 	}
 
 	template <class T>
-	inline HeapAllocator* Vector<T>::GetAllocator() const
+	inline IMemoryAllocator& Vector<T>::GetAllocator() const
 	{
 		return mAllocator;
 	}
@@ -242,7 +241,7 @@ namespace JonsEngine
 		{
 			clear();
 
-			mAllocator->Deallocate(mBegin);
+			mAllocator.Deallocate(mBegin);
 
 			mCapacity = mEnd = mBegin = NULL;
 		}
@@ -283,12 +282,12 @@ namespace JonsEngine
 		{
 			const size_t prevSize = mEnd - mBegin;
 			const size_t newSize = GetNewCapacity(prevSize);
-			T* newBegin = (T*) mAllocator->Allocate(newSize * sizeof(T));
+			T* newBegin = (T*) mAllocator.Allocate(newSize * sizeof(T));
 
 			memcpy(newBegin, mBegin, sizeof(T)*pos);
 			memcpy(newBegin+pos, &value, sizeof(T));
 			memcpy(newBegin+pos+1, mBegin+pos, (mEnd - position) * sizeof(T));
-			mAllocator->Deallocate(mBegin);
+			mAllocator.Deallocate(mBegin);
 
 			mBegin = newBegin;
 			mEnd = mBegin + prevSize + 1;
@@ -318,7 +317,7 @@ namespace JonsEngine
 			{
 				const size_t prevSize = mEnd - mBegin;
 				const size_t newSize = GetNewCapacity(prevSize, n);
-				T* newBegin = (T*) mAllocator->Allocate(newSize * sizeof(T));
+				T* newBegin = (T*) mAllocator.Allocate(newSize * sizeof(T));
 
 				memcpy(newBegin, mBegin, sizeof(T) * pos);
 				for (uint32_t i = 0; i<n; i++)
@@ -326,7 +325,7 @@ namespace JonsEngine
 				memcpy(newBegin+pos+n,mBegin+pos, (mEnd - position) * sizeof(T));
 
 				if (mBegin)
-					mAllocator->Deallocate(mBegin);
+					mAllocator.Deallocate(mBegin);
 
 				mBegin = newBegin;
 				mEnd = mBegin + prevSize + n;
@@ -357,14 +356,14 @@ namespace JonsEngine
 			const size_t prevSize = mEnd - mBegin;
 			const size_t pos = (position - mBegin);
 			const size_t newSize = GetNewCapacity(prevSize, insertSize);
-			T* newBegin = (T*) mAllocator->Allocate(newSize * sizeof(T));
+			T* newBegin = (T*) mAllocator.Allocate(newSize * sizeof(T));
 
 			memcpy(newBegin,mBegin, pos * sizeof(T));
 			memcpy(newBegin+pos, first, insertSize * sizeof(T));
 			memcpy(newBegin+pos+insertSize, mBegin+pos, (mEnd - position) * sizeof(T));
 
 			if (mBegin)
-				mAllocator->Deallocate(mBegin);
+				mAllocator.Deallocate(mBegin);
 
 			mBegin = newBegin;
 			mEnd = mBegin + prevSize + insertSize;
@@ -435,9 +434,9 @@ namespace JonsEngine
 			const size_t prevSize = mEnd - mBegin;
 			const size_t newSize = GetNewCapacity(prevSize);
 
-			T* newBegin = (T*) mAllocator->Allocate(newSize * sizeof(T));
+			T* newBegin = (T*) mAllocator.Allocate(newSize * sizeof(T));
 			memcpy(newBegin, mBegin, prevSize * sizeof(T));
-			mAllocator->Deallocate(mBegin);
+			mAllocator.Deallocate(mBegin);
 
 			mBegin = newBegin;
 			mEnd = mBegin + prevSize;

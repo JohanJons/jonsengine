@@ -107,9 +107,6 @@
     <ClCompile Include="src\Core\Utils\JonsTime.cpp">
       <Filter>Source Files\Core\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\GameObject\GameObjectManagerImpl.cpp">
-      <Filter>Source Files\Core\GameObject</Filter>
-    </ClCompile>
     <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c">
       <Filter>Thirdparty\dlmalloc</Filter>
     </ClCompile>
@@ -130,6 +127,12 @@
     </ClCompile>
     <ClCompile Include="src\Core\Threading\ConditionVariable.cpp">
       <Filter>Source Files\Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Threading\ThreadingFactory.cpp">
+      <Filter>Source Files\Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\GameObject\GameObjectManagerImpl.cpp">
+      <Filter>Source Files\Core\GameObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -193,9 +196,6 @@
     <ClInclude Include="interface\Render\IRenderManager.h">
       <Filter>Interface\Render</Filter>
     </ClInclude>
-    <ClInclude Include="interface\Core\EngineDefs.h">
-      <Filter>Interface\Core</Filter>
-    </ClInclude>
     <ClInclude Include="interface\Core\Memory\IMemoryAllocator.h">
       <Filter>Interface\Core\Memory</Filter>
     </ClInclude>
@@ -207,6 +207,27 @@
     </ClInclude>
     <ClInclude Include="interface\Core\GameObject\IGameObjectManager.h">
       <Filter>Interface\Core\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\EngineDefs.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\Core\Threading\IConditionVariable.h">
+      <Filter>Interface\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\Core\Threading\IMutex.h">
+      <Filter>Interface\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\Core\Threading\IThread.h">
+      <Filter>Interface\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Threading\ThreadingFactory.h">
+      <Filter>Header Files\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\Core\Threading\IThreadingFactory.h">
+      <Filter>Interface\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\EngineCore.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

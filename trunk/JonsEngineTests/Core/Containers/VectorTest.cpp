@@ -27,9 +27,8 @@ namespace JonsEngine
 		for (size_t i = 0; i < mVector2.size(); i++)
 			ASSERT_EQ(mVector2[i], mVector1[i]);
 		ASSERT_EQ(mVector1.capacity(), mVector2.capacity());
-		ASSERT_EQ(mVector1.GetAllocator(), mVector2.GetAllocator());
 
-		mVector1 = Vector<int>(mEngine.GetMemoryManager()->GetHeapAllocator());
+		mVector1 = Vector<int>(mEngine.GetMemoryManager().GetHeapAllocator());
 		ASSERT_EQ(0,mVector1.size());
 		ASSERT_EQ(0,mVector1.capacity());
 		for (size_t i = 0; i < mVector1.size(); i++)
@@ -41,7 +40,7 @@ namespace JonsEngine
 	 */
 	TEST_F(VectorTest, GetAllocator)
 	{
-		ASSERT_EQ(mEngine.GetMemoryManager()->GetHeapAllocator(),mVector1.GetAllocator());
+		mVector1.GetAllocator();
 	}
 
 	/**

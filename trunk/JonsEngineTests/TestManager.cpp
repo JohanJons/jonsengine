@@ -41,9 +41,9 @@ namespace JonsEngine
 		{
 			res = true;
 			
-			mMemTestMgr = new MemoryTestManager(mEngine->GetGameObjectManager(), mEngine);
+			mMemTestMgr = new MemoryTestManager(&mEngine->GetGameObjectManager(), mEngine);
 			
-			mGameObjTestMgr = new GameObjectTestManager(mEngine->GetGameObjectManager(),mEngine);
+			mGameObjTestMgr = new GameObjectTestManager(&mEngine->GetGameObjectManager(),mEngine);
 			
 		}
 		else
@@ -112,7 +112,7 @@ namespace JonsEngine
 			res &= StartEngine();
 			
 			/* Get logger */
-			mLogger = mEngine->GetLogger();
+			mLogger = &mEngine->GetLogger();
 
 			/* Run Memory Tests */
 			if (res)

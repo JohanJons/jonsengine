@@ -2,15 +2,13 @@
 
 namespace JonsEngine
 {
-	ConditionVariable::ConditionVariable()
+	ConditionVariable::ConditionVariable(ILogManager& logger) : mLogger(logger), mCondVarState(ConditionVariable::READY)
 	{
 		#if defined _WIN32 || _WIN64
 			mCondVarHandle = CreateEvent(NULL, TRUE, FALSE, NULL);
 		#else
 			pthread_cond_init(&mCondVarHandle, NULL);
 		#endif
-
-		mCondVarState = ConditionVariable::READY;
 	}
 
 	ConditionVariable::~ConditionVariable()

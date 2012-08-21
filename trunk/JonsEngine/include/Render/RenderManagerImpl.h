@@ -22,10 +22,10 @@ namespace JonsEngine
 	class RenderManagerImpl : public IRenderManager
 	{
 	public:
-		RenderManagerImpl();
+		RenderManagerImpl(ILogManager& logger, IMemoryAllocator& memAllocator);
 		~RenderManagerImpl();
 
-		bool Init(ILogManager* const logger, IMemoryManager* const memmgr);
+		bool Init();
 		bool Destroy();
 		bool Start();
 		bool Stop();
@@ -37,8 +37,8 @@ namespace JonsEngine
 		int32_t GetWindowHeight() const;
 
 	private:
-		ILogManager* mLog;
-		IMemoryManager* mMemoryManager;
+		ILogManager& mLog;
+		IMemoryAllocator& mMemoryAllocator;
 
 		bool mRunning;
 		bool mInitialized;

@@ -26,15 +26,15 @@ namespace JonsEngine
 
 		uint64_t GetAllocatedMemory() const;
 
-		void SetLogger(ILogManager* const logger);
+		void SetLogger(ILogManager* logger);
 
 	private:
+		void* InternalAllocate(size_t size);
+		void InternalDeallocate(void* p);
+
 		HeapAllocatorBackend mBackend;
 		ILogManager* mLog;
 	};
-
-	// using system defaults (malloc/free/realloc)
-	static HeapAllocator SYSTEM_DEFAULT_HEAP_ALLOCATOR(HeapAllocator::SYSTEM_DEFAULT);
 }
 
 

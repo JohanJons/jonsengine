@@ -14,9 +14,9 @@ namespace JonsEngine
 	class VectorTest : public RunningEngineFixture
 	{
 	public:
-		VectorTest() : mVector1(mEngine.GetMemoryManager()->GetHeapAllocator()),
-						mVector2(mEngine.GetMemoryManager()->GetHeapAllocator(),5),
-						mVector3(mEngine.GetMemoryManager()->GetHeapAllocator(),10)
+		VectorTest() : mVector1(mEngine.GetMemoryManager().GetHeapAllocator()),
+						mVector2(mEngine.GetMemoryManager().GetHeapAllocator(),5),
+						mVector3(mEngine.GetMemoryManager().GetHeapAllocator(),10)
 		{
 
 		}

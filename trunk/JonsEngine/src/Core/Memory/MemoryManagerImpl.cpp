@@ -14,15 +14,16 @@ namespace JonsEngine
 			Destroy();
 	}
 
-	bool MemoryManagerImpl::Init(ILogManager* const logger)
+	bool MemoryManagerImpl::Init(ILogManager* logger)
 	{
 		mLog = logger;
-
-		mHeapAllocator.SetLogger(logger);
 
 		if (mLog)
 		{
 			mInitialized = true;
+
+			mHeapAllocator.SetLogger(mLog);
+
 			return true;
 		}
 		else
@@ -87,7 +88,7 @@ namespace JonsEngine
 	{
 
 	}
-	 
+
 	uint64_t MemoryManagerImpl::GetTotalAllocatedMemory() const
 	{
 		uint64_t totalAllocatedMemory = 0;
@@ -98,16 +99,6 @@ namespace JonsEngine
 		//...
 
 		return totalAllocatedMemory;
-	}
-
-	void* MemoryManagerImpl::InternalAllocate(size_t size)
-	{
-		return mHeapAllocator.Allocate(size);
-	}
-
-	void MemoryManagerImpl::InternalDeAllocate(void* p)
-	{ 
-		mHeapAllocator.Deallocate(p);
 	}
 
 }

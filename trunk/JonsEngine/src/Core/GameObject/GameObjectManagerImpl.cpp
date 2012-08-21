@@ -2,12 +2,12 @@
 
 namespace JonsEngine
 {
-	IMemoryManager* GameObjectManagerImpl::IGameObjectManager::mMemoryMgr = NULL;
+	IMemoryAllocator* GameObjectManagerImpl::IGameObjectManager::mMemoryAllocator = NULL;
 	std::map<uint64_t, boost::weak_ptr<GameObject> > GameObjectManagerImpl::IGameObjectManager::mObjects;
 
-	GameObjectManagerImpl::GameObjectManagerImpl() : mRunning(false), mInitialized(false), mLog(NULL)
+	GameObjectManagerImpl::GameObjectManagerImpl(ILogManager& logger, IMemoryAllocator* memAllocator) : mRunning(false), mInitialized(false), mLog(logger)
 	{
-		mMemoryMgr = NULL;
+		mMemoryAllocator = memAllocator;
 	}
 
 	GameObjectManagerImpl::~GameObjectManagerImpl()
@@ -16,18 +16,13 @@ namespace JonsEngine
 			Destroy();
 	}
 
-	bool GameObjectManagerImpl::Init(ILogManager* const logger, IMemoryManager* const memmgr)
+	bool GameObjectManagerImpl::Init()
 	{
-		mLog = logger;
-		mMemoryMgr = memmgr;
+		bool ret = true;
 
-		if (mLog && mMemoryMgr)
-		{
-			mInitialized = true;
-			return true;
-		}
-		else
-			return false;
+		mInitialized = true;
+		
+		return ret;
 	}
 
 	bool GameObjectManagerImpl::Destroy()
@@ -57,7 +52,7 @@ namespace JonsEngine
 
 		}
 		else
-			mLog->LogWarn() <<  "GameObjectManagerImpl::Start(): GameObjectManager already started!" << std::endl;
+			mLog.LogWarn() <<  "GameObjectManagerImpl::Start(): GameObjectManager already started!" << std::endl;
 
 		return res;
 	}
@@ -72,7 +67,7 @@ namespace JonsEngine
 
 		}
 		else
-			mLog->LogWarn() <<  "GameObjectManagerImpl::Stop(): GameObjectManager already stopped!" << std::endl;
+			mLog.LogWarn() <<  "GameObjectManagerImpl::Stop(): GameObjectManager already stopped!" << std::endl;
 
 		return res;
 	}
