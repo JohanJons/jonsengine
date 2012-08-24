@@ -26,6 +26,7 @@ namespace JonsEngine
 
 		virtual ~IThread() { }
 
+		IThread& operator=(IThread& other);
 		virtual int32_t Join() = 0;
 		virtual int32_t SetPriority(int32_t priority) = 0;
 

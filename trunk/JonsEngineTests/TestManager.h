@@ -29,7 +29,6 @@ namespace JonsEngine
 		bool DestroyEngine();
 
 		Engine* mEngine;
-		EngineSettings mEngineSettings;
 		ILogManager* mLogger;
 
 		MemoryTestManager* mMemTestMgr;

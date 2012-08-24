@@ -50,8 +50,21 @@ namespace JonsEngine
 			mThreadInfo = other.mThreadInfo;
 			mHandle = other.mHandle;
 			mAllocator = other.mAllocator;
-			
+
 			other.Detach();
+		}
+
+		return *this;
+	}
+
+	IThread& IThread::operator=(IThread& other)
+	{
+		if (&other != this)
+		{
+			Thread* threadThis = static_cast<Thread*>(this);
+			Thread* threadOther = static_cast<Thread*>(&other);
+
+			*threadThis = *threadOther;
 		}
 
 		return *this;

@@ -25,9 +25,6 @@ namespace JonsEngine
 		{
 			mRepeatTimes = 1;
 		}
-
-		mEngineSettings.SetLogToFile(true);
-		mEngineSettings.SetLogToSTDOut(true);
 	}
 
 	bool TestManager::InitEngine()
@@ -35,6 +32,9 @@ namespace JonsEngine
 		bool res = true;
 
 		mEngine = new Engine();
+
+		mEngine->GetEngineSettings().SetLogToSTDOut(true);
+		mEngine->GetEngineSettings().SetLogToFile(true);
 	
 		/* Init Engine and test mgrs */
 		if(mEngine->Init())

@@ -23,11 +23,10 @@ namespace JonsEngine
 	public:
 		virtual ~ILogManager() { }
 
-		virtual bool Init(IMemoryAllocator* const memmgr) = 0;
 		#ifdef ANDROID
-			virtual bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath, IMemoryAllocator* const memmgr, JNIEnv* env) = 0;
+			virtual bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath, JNIEnv* env) = 0;
 		#endif
-		virtual bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath, IMemoryAllocator* const memmgr) = 0;
+		virtual bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath) = 0;
 		virtual bool Destroy() = 0;
 		virtual bool Start() = 0;
 		virtual bool Stop() = 0;
@@ -43,9 +42,6 @@ namespace JonsEngine
 		virtual std::ostream& LogDebug() = 0;
 		virtual std::ostream& LogWarn() = 0;
 		virtual std::ostream& LogError() = 0;
-
-	protected:
-		std::ostream* mLogStream;
 	};
 
 }

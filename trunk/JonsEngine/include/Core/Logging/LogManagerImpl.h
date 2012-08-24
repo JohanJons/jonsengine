@@ -27,11 +27,10 @@ namespace JonsEngine
 		LogManagerImpl();
 		~LogManagerImpl();
 
-		bool Init(IMemoryAllocator* const memmgr);
 		#ifdef ANDROID
-			bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath, IMemoryAllocator*  const memmgr, JNIEnv* env);
+			bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath, JNIEnv* env);
 		#endif
-		bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath, IMemoryAllocator* const memmgr);
+		bool Init(bool LogToFile, bool LogToStdOut, const std::string& absFilePath);
 		bool Destroy();
 		bool Start();
 		bool Stop();
@@ -52,19 +51,19 @@ namespace JonsEngine
 		const std::string InternalGetLogName() const;
 		const std::string InternalGetLogPath() const;
 
-		IMemoryAllocator* mMemoryAllocator;
 		bool mRunning;
 		bool mInitialized;
 		bool mLogToFileDefault;
 		bool mLogToOSDefault;
+		std::ostream mLogStream;
 		std::string mLogPath;
-		std::ofstream* mFileStream;
-		JonsStreamBuf* mStreamBuf;
-		DummyLogStreamBuf* mDummyStreamBuf;
+		std::ofstream mFileStream;
+		JonsStreamBuf mStreamBuf;
+		DummyLogStreamBuf mDummyStreamBuf;
 
 		#ifdef ANDROID
 			JNIEnv* mJNIEnv;
-			AndroidLogStreamBuf* mAndroidLogBuf;
+			AndroidLogStreamBuf mAndroidLogBuf;
 		#endif
 
 	};

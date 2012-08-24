@@ -3,10 +3,8 @@
 namespace JonsEngine
 {
 	LogManagerImpl::LogManagerImpl() : mRunning(false), mLogToFileDefault(false), mLogToOSDefault(false), 
-										mStreamBuf(NULL), mFileStream(NULL), mDummyStreamBuf(NULL), mMemoryAllocator(NULL)
+										mStreamBuf(), mFileStream(), mDummyStreamBuf(), mLogStream(&mStreamBuf)
 	{
-		mLogStream = NULL;
-
 		#ifdef ANDROID
 			mAndroidLogBuf = NULL;
 		#endif
@@ -18,117 +16,73 @@ namespace JonsEngine
 			Destroy();
 	}
 
-	bool LogManagerImpl::Init(IMemoryAllocator* const memAllocator)
-	{
-		return Init(false, false, "", memAllocator);
-	}
-
 	#ifdef ANDROID
-	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, const std::string& absFilePath, IMemoryAllocator* const memAllocator, JNIEnv* jenv)
+	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, const std::string& absFilePath, JNIEnv* jenv)
 	{
 		mJNIEnv = jenv;
 
-		return Init(LogToFileDefault, LogToOSDefault, absFilePath, memAllocator);
+		return Init(LogToFileDefault, LogToOSDefault, absFilePath);
 	}
 	#endif
 
-	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, const std::string& absFilePath, IMemoryAllocator* const memAllocator)
+	bool LogManagerImpl::Init(bool LogToFileDefault, bool LogToOSDefault, const std::string& absFilePath)
 	{
-		if (memAllocator)
+		bool ret = true;
+		std::string LogPath;
+		mLogToFileDefault = LogToFileDefault;
+		mLogToOSDefault = LogToOSDefault;
+
+		
+		if (mLogToFileDefault)
 		{
-			std::string LogPath;
-			mLogToFileDefault = LogToFileDefault;
-			mLogToOSDefault = LogToOSDefault;
-			mMemoryAllocator = memAllocator;
-
-			mStreamBuf = mMemoryAllocator->AllocateObject<JonsStreamBuf>();
-
-			if (mStreamBuf)
+			if (absFilePath.empty())
 			{
-				if (mLogToFileDefault)
-				{
-					if (absFilePath.empty())
-					{
-						LogPath += InternalGetLogPath(); 
-						LogPath += InternalGetLogName();
-					}
-					else
-						LogPath += absFilePath;
-
-					mLogPath = LogPath;
-					mFileStream = mMemoryAllocator->AllocateObject<std::ofstream>(LogPath.c_str(), std::ios::trunc);
-				}
-
-				#ifdef ANDROID
-					if (mLogToOSDefault && !mAndroidLogBuf)
-						mAndroidLogBuf = mMemoryAllocator->AllocateObject<AndroidLogStreamBuf>();
-				#endif
-		
-				if (!mLogToOSDefault && !mLogToFileDefault)
-				{
-					mDummyStreamBuf = mMemoryAllocator->AllocateObject<DummyLogStreamBuf>();
-				}
-
-				mLogStream = mMemoryAllocator->AllocateObject<JonsOutputStream>(mStreamBuf); 
-			}
-		
-			if (mStreamBuf && mLogStream)
-			{
-				mInitialized = true;
-				return true;
+				LogPath += InternalGetLogPath(); 
+				LogPath += InternalGetLogName();
 			}
 			else
-				return false;
+				LogPath += absFilePath;
+
+			mLogPath = LogPath;
+			//mFileStream = mMemoryAllocator->AllocateObject<std::ofstream>(LogPath.c_str(), std::ios::trunc);
 		}
-		else
-			return false;
+
+		#ifdef ANDROID
+		//	if (mLogToOSDefault && !mAndroidLogBuf)
+		//		mAndroidLogBuf = mMemoryAllocator->AllocateObject<AndroidLogStreamBuf>();
+		#endif
+		
+		if (!mLogToOSDefault && !mLogToFileDefault)
+		{
+			//mDummyStreamBuf = mMemoryAllocator->AllocateObject<DummyLogStreamBuf>();
+		}
+
+		//mLogStream = mMemoryAllocator->AllocateObject<JonsOutputStream>(mStreamBuf); 
+		
+		
+		if (ret)
+			mInitialized = true;
+		
+		return ret;
+
+		
 	}
 
 	bool LogManagerImpl::Destroy()
 	{
 		if (mInitialized)
 		{
-			bool res = true;
+			bool ret = true;
 
 			if (mRunning)
-				res &= Stop();
+				ret &= Stop();
 
-			if (mFileStream)
-			{
-				mFileStream->close();
-				mMemoryAllocator->DeallocateObject(mFileStream);
-				mFileStream = NULL;
-			}
-
-			if (mStreamBuf)
-			{
-				mMemoryAllocator->DeallocateObject(mStreamBuf);
-				mStreamBuf = NULL;
-			}
-
-			if (mDummyStreamBuf)
-			{
-				mMemoryAllocator->DeallocateObject(mDummyStreamBuf);
-				mDummyStreamBuf = NULL;
-			}
-
-			#ifdef ANDROID
-				if (mAndroidLogBuf)
-				{
-					mMemoryAllocator->DeallocateObject(mAndroidLogBuf);
-					mAndroidLogBuf = NULL;
-				}
-			#endif
-		
-			if (mLogStream)
-			{
-				mMemoryAllocator->DeallocateObject(mLogStream);
-				mLogStream = NULL;
-			}
+			if (mFileStream.is_open())
+				mFileStream.close();
 
 			mInitialized = false;
 
-			return (!mRunning && !mLogStream && !mDummyStreamBuf && !mStreamBuf && !mFileStream);
+			return ret;
 		}
 		else
 			return false;
@@ -143,18 +97,18 @@ namespace JonsEngine
 			mRunning = true;
 
 			/* Default File logging */
-			if (mFileStream && mLogToFileDefault)
+			if (mLogToFileDefault)
 			{
-				AddStream(mFileStream->rdbuf());
-				res &= IsStreamAdded(mFileStream->rdbuf());
+				AddStream(mFileStream.rdbuf());
+				res &= IsStreamAdded(mFileStream.rdbuf());
 			}
 
 			/* Default OS logging */
 			#ifdef ANDROID
-				if (mAndroidLogBuf && mLogToOSDefault)
+				if (mLogToOSDefault)
 				{
-					AddStream(mAndroidLogBuf);
-					res &= IsStreamAdded(mAndroidLogBuf);
+					AddStream(&mAndroidLogBuf);
+					res &= IsStreamAdded(&mAndroidLogBuf);
 				}
 			#else
 				if (mLogToOSDefault)
@@ -165,10 +119,10 @@ namespace JonsEngine
 			#endif
 
 			/* Dummy logger */
-			if (mDummyStreamBuf && !mLogToOSDefault && !mFileStream)
+			if (!mLogToOSDefault && !mLogToFileDefault)
 			{
-				AddStream(mDummyStreamBuf);
-				res &= IsStreamAdded(mDummyStreamBuf);
+				AddStream(&mDummyStreamBuf);
+				res &= IsStreamAdded(&mDummyStreamBuf);
 			}
 
 		}
@@ -185,18 +139,18 @@ namespace JonsEngine
 			mRunning = false;
 
 			/* Default File logging */
-			if (mFileStream && mLogToFileDefault && IsStreamAdded(mFileStream->rdbuf()))
+			if (mLogToFileDefault && IsStreamAdded(mFileStream.rdbuf()))
 			{
-				RemoveStream(mFileStream->rdbuf());
-				res &= !IsStreamAdded(mFileStream->rdbuf());
+				RemoveStream(mFileStream.rdbuf());
+				res &= !IsStreamAdded(mFileStream.rdbuf());
 			}
 
 			/* Default OS logging */
 			#ifdef ANDROID
-				if (mAndroidLogBuf && mLogToOSDefault && IsStreamAdded(mAndroidLogBuf))
+				if (mLogToOSDefault && IsStreamAdded(&mAndroidLogBuf))
 				{
-					RemoveStream(mAndroidLogBuf);
-					res &= !IsStreamAdded(mAndroidLogBuf);
+					RemoveStream(&mAndroidLogBuf);
+					res &= !IsStreamAdded(&mAndroidLogBuf);
 				}
 			#else
 				if (mLogToOSDefault && IsStreamAdded(std::cout.rdbuf()))
@@ -207,10 +161,10 @@ namespace JonsEngine
 			#endif
 
 			/* Dummy logger */
-			if (mDummyStreamBuf && !mLogToOSDefault && !mFileStream && IsStreamAdded(mDummyStreamBuf))
+			if (!mLogToOSDefault && !mLogToFileDefault && IsStreamAdded(&mDummyStreamBuf))
 			{
-				RemoveStream(mDummyStreamBuf);
-				res &= !IsStreamAdded(mDummyStreamBuf);
+				RemoveStream(&mDummyStreamBuf);
+				res &= !IsStreamAdded(&mDummyStreamBuf);
 			}
 		}
 
@@ -232,19 +186,19 @@ namespace JonsEngine
 	void LogManagerImpl::AddStream(std::streambuf* const sb)
 	{
 		if (sb)
-			mStreamBuf->AddStream(sb);
+			mStreamBuf.AddStream(sb);
 	}
 
 	void LogManagerImpl::RemoveStream(std::streambuf* const sb)
 	{
 		if (sb)
-			mStreamBuf->RemoveStream(sb);
+			mStreamBuf.RemoveStream(sb);
 	}
 
 	bool LogManagerImpl::IsStreamAdded(std::streambuf* const sb) const
 	{
 		if (sb)
-			return mStreamBuf->IsStreamAdded(sb);
+			return mStreamBuf.IsStreamAdded(sb);
 		else
 			return false;
 	}
@@ -295,30 +249,30 @@ namespace JonsEngine
 	
 	std::ostream& LogManagerImpl::LogInfo()
 	{
-		*mLogStream << EngineLogTag << "_INFO: ";
+		mLogStream << EngineLogTag << "_INFO: ";
 
-		return (*mLogStream);
+		return mLogStream;
 	}
 
 	std::ostream& LogManagerImpl::LogDebug()
 	{
-		*mLogStream << EngineLogTag << "_DEBUG: ";
+		mLogStream << EngineLogTag << "_DEBUG: ";
 
-		return (*mLogStream);
+		return mLogStream;
 	}
 
 	std::ostream& LogManagerImpl::LogWarn()
 	{
-		*mLogStream << EngineLogTag << "_WARN: ";
+		mLogStream << EngineLogTag << "_WARN: ";
 
-		return (*mLogStream);
+		return mLogStream;
 	}
 
 	std::ostream& LogManagerImpl::LogError()
 	{
-		*mLogStream << EngineLogTag << "_ERROR: ";
+		mLogStream << EngineLogTag << "_ERROR: ";
 
-		return (*mLogStream);
+		return mLogStream;
 	}
 
 }

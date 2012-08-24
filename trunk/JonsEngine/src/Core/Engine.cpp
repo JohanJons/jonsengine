@@ -56,9 +56,9 @@ namespace JonsEngine
 
 		// Log
 		#ifdef ANDROID
-			ret &= mLog.Init(mEngineSettings.GetLogToFile(), mEngineSettings.GetLogToSTDOut(), mEngineSettings.GetLogToFileLocation(), &mMemoryManager.GetHeapAllocator(), mJNIEnv);
+			ret &= mLog.Init(mEngineSettings.GetLogToFile(), mEngineSettings.GetLogToSTDOut(), mEngineSettings.GetLogToFileLocation(), mJNIEnv);
 		#else
-			ret &= mLog.Init(mEngineSettings.GetLogToFile(), mEngineSettings.GetLogToSTDOut(), mEngineSettings.GetLogToFileLocation(), &mMemoryManager.GetHeapAllocator());
+			ret &= mLog.Init(mEngineSettings.GetLogToFile(), mEngineSettings.GetLogToSTDOut(), mEngineSettings.GetLogToFileLocation());
 		#endif
 
 		// Render
