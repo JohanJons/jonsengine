@@ -9,7 +9,6 @@
 #endif
 
 #include "interface/Core/Logging/ILogManager.h"
-#include "interface/Core/Memory/IMemoryManager.h"
 #include "interface/Core/EngineDefs.h"
 
 #include "include/Core/Logging/JonsStreamBuf.h"

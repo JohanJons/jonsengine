@@ -1,7 +1,6 @@
 #ifndef _HEAP_ALLOCATOR_H
 #define _HEAP_ALLOCATOR_H
 
-#include "interface/Core/Logging/ILogManager.h"
 #include "interface/Core/Memory/IMemoryAllocator.h"
 
 #include "../Thirdparty/dlmalloc/dlmalloc.h"
@@ -26,14 +25,11 @@ namespace JonsEngine
 
 		uint64_t GetAllocatedMemory() const;
 
-		void SetLogger(ILogManager* logger);
-
 	private:
 		void* InternalAllocate(size_t size);
 		void InternalDeallocate(void* p);
 
 		HeapAllocatorBackend mBackend;
-		ILogManager* mLog;
 	};
 }
 

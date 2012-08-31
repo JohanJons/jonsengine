@@ -7,16 +7,12 @@
 
 #ifdef ANDROID
 #include <jni.h>
-#include <android/log.h>
 #endif
 
-#include "interface/Core/Memory/IMemoryAllocator.h"
 #include "interface/Core/EngineDefs.h"
 
 namespace JonsEngine
 {
-	class IMemoryManager;
-
 	class ILogManager
 	{
 	public:

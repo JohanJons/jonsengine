@@ -16,56 +16,56 @@ namespace JonsEngine
 
 		// 0 args to constructor
 		template <class T>
-		inline T* AllocateObject() { return new (InternalAllocate(sizeof(T), alignof(T))) T(); }
+		inline T* AllocateObject() { return new (InternalAllocate(sizeof(T))) T(); }
 
 		// 1 args to constructor
 		template <class T, typename arg0>
-		inline T* AllocateObject(const arg0& a0) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0); }
+		inline T* AllocateObject(const arg0& a0) { return new (InternalAllocate(sizeof(T))) T(a0); }
 
 		template <class T, typename arg0>
-		inline T* AllocateObject(arg0& a0) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0); }
+		inline T* AllocateObject(arg0& a0) { return new (InternalAllocate(sizeof(T))) T(a0); }
 
 		// 2 args to constructor
 		template <class T, typename arg0, typename arg1>
-		inline T* AllocateObject(arg0& a0, arg1& a1) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0,a1); }
+		inline T* AllocateObject(arg0& a0, arg1& a1) { return new (InternalAllocate(sizeof(T))) T(a0,a1); }
 
 		template <class T, typename arg0, typename arg1>
-		inline T* AllocateObject(const arg0& a0, arg1& a1) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0,a1); }
+		inline T* AllocateObject(const arg0& a0, arg1& a1) { return new (InternalAllocate(sizeof(T))) T(a0,a1); }
 
 		template <class T, typename arg0, typename arg1>
-		inline T* AllocateObject(arg0& a0, const arg1& a1) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0,a1); }
+		inline T* AllocateObject(arg0& a0, const arg1& a1) { return new (InternalAllocate(sizeof(T))) T(a0,a1); }
 
 		template <class T, typename arg0, typename arg1>
-		inline T* AllocateObject(const arg0& a0, const arg1& a1) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0,a1); }
+		inline T* AllocateObject(const arg0& a0, const arg1& a1) { return new (InternalAllocate(sizeof(T))) T(a0,a1); }
 
 		// 3 args to constructor
 		template <class T, typename arg0, typename arg1, typename arg2>
-		inline T* AllocateObject(arg0& a0, arg1& a1, arg2& a2) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0,a1,a2); }
+		inline T* AllocateObject(arg0& a0, arg1& a1, arg2& a2) { return new (InternalAllocate(sizeof(T))) T(a0,a1,a2); }
 
 		template <class T, typename arg0, typename arg1, typename arg2>
-		inline T* AllocateObject(const arg0& a0, arg1& a1, arg2& a2) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0,a1,a2); }
+		inline T* AllocateObject(const arg0& a0, arg1& a1, arg2& a2) { return new (InternalAllocate(sizeof(T))) T(a0,a1,a2); }
 
 		template <class T, typename arg0, typename arg1, typename arg2>
-		inline T* AllocateObject(arg0& a0, const arg1& a1, arg2& a2) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0,a1,a2); }
+		inline T* AllocateObject(arg0& a0, const arg1& a1, arg2& a2) { return new (InternalAllocate(sizeof(T))) T(a0,a1,a2); }
 
 		template <class T, typename arg0, typename arg1, typename arg2>
-		inline T* AllocateObject(arg0& a0, arg1& a1, const arg2& a2) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0,a1,a2); }
+		inline T* AllocateObject(arg0& a0, arg1& a1, const arg2& a2) { return new (InternalAllocate(sizeof(T))) T(a0,a1,a2); }
 
 		template <class T, typename arg0, typename arg1, typename arg2>
-		inline T* AllocateObject(const arg0& a0, const arg1& a1, arg2& a2) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0,a1,a2); }
+		inline T* AllocateObject(const arg0& a0, const arg1& a1, arg2& a2) { return new (InternalAllocate(sizeof(T))) T(a0,a1,a2); }
 
 		template <class T, typename arg0, typename arg1, typename arg2>
-		inline T* AllocateObject(const arg0& a0, arg1& a1, const arg2& a2) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0,a1,a2); }
+		inline T* AllocateObject(const arg0& a0, arg1& a1, const arg2& a2) { return new (InternalAllocate(sizeof(T))) T(a0,a1,a2); }
 
 		template <class T, typename arg0, typename arg1, typename arg2>
-		inline T* AllocateObject(arg0& a0, const arg1& a1, const arg2& a2) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0,a1,a2); }
+		inline T* AllocateObject(arg0& a0, const arg1& a1, const arg2& a2) { return new (InternalAllocate(sizeof(T))) T(a0,a1,a2); }
 
 		template <class T, typename arg0, typename arg1, typename arg2>
-		inline T* AllocateObject(const arg0& a0, const arg1& a1, const arg2& a2) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0,a1,a2); }
+		inline T* AllocateObject(const arg0& a0, const arg1& a1, const arg2& a2) { return new (InternalAllocate(sizeof(T))) T(a0,a1,a2); }
 
 		// 4 args to constructor
 		template <class T, typename arg0, typename arg1, typename arg2, typename arg3>
-		inline T* AllocateObject(arg0 a0, arg1 a1, arg2 a2, arg3 a3) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0,a1,a2,a3); }
+		inline T* AllocateObject(arg0 a0, arg1 a1, arg2 a2, arg3 a3) { return new (InternalAllocate(sizeof(T))) T(a0,a1,a2,a3); }
 		/*template <class T, typename arg0, typename arg1, typename arg2, typename arg3>
 		inline T* AllocateObject(arg0& a0, arg1& a1, arg2& a2, arg3& a3) { return new (InternalAllocate(sizeof(T), alignof(T))) T(a0,a1,a2,a3); }
 

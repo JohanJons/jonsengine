@@ -2,17 +2,14 @@
 #define _JONS_THREADING_FACTORY_H
 
 #include "interface/Core/Threading/IThreadingFactory.h"
-#include "interface/Core/Memory/IMemoryAllocator.h"
-
-#include "include/Core/Threading/Thread.h"
-#include "include/Core/Threading/Mutex.h"
-#include "include/Core/Threading/ConditionVariable.h"
-#include "include/Core/Threading/Threadpool.h"
 
 #include "include/Core/Containers/Vector.h"
 
 namespace JonsEngine
 {
+	class ILogManager;
+	class IMemoryAllocator;
+
 	class ThreadingFactory : public IThreadingFactory
 	{
 	public:

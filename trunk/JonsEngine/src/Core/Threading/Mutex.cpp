@@ -1,3 +1,11 @@
+#if defined _WIN32 || _WIN64
+	#define WIN32_LEAN_AND_MEAN
+	#include <windows.h>
+	#undef WIN32_LEAN_AND_MEAN
+#else
+	#include <pthread.h>
+#endif
+
 #include "include/Core/Threading/Mutex.h"
 
 namespace JonsEngine
@@ -50,11 +58,6 @@ namespace JonsEngine
 			mState = Mutex::UNLOCKED;
 
 		return ret;
-	}
-
-	Mutex::MutexHandle& Mutex::GetNativeHandle()
-	{
-		return mHandle;
 	}
 
 	const Mutex::MutexState& Mutex::GetMutexState() const

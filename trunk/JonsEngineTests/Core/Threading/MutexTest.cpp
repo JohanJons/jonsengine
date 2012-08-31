@@ -22,18 +22,6 @@ namespace JonsEngine
 	}
 
 	/**
-	 * GetNativeHandle test
-	 */
-	TEST_F(MutexTest, GetNativeHandle)
-	{
-		IMutex* mutex = mEngine.GetThreadingFactory().CreateMutex();
-		
-		Mutex::MutexHandle handle = mutex->GetNativeHandle();
-
-		mEngine.GetThreadingFactory().DestroyMutex(mutex);
-	}
-
-	/**
 	 * GetMutexState test
 	 */
 	TEST_F(MutexTest, GetMutexState)

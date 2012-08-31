@@ -1,3 +1,12 @@
+#if defined _WIN32 || _WIN64
+	#define WIN32_LEAN_AND_MEAN
+	#include <windows.h>
+	#undef WIN32_LEAN_AND_MEAN
+#else
+	#include <pthread.h>
+	#include <time.h>
+#endif
+
 #include "include/Core/Threading/ConditionVariable.h"
 
 namespace JonsEngine
@@ -91,11 +100,6 @@ namespace JonsEngine
 
 			mMutex.Unlock();
 		#endif
-	}
-
-	ConditionVariable::ConditionVariableHandle& ConditionVariable::GetNativeConditionVariableHandle()
-	{
-		return mCondVarHandle;
 	}
 
 	const ConditionVariable::ConditionVariableState& ConditionVariable::GetConditionVariableState() const

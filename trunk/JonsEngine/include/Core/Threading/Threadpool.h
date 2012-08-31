@@ -2,15 +2,13 @@
 #define _JONS_THREAD_POOL_H
 
 #include "interface/Core/Threading/IThreadPool.h"
-#include "interface/Core/Logging/ILogManager.h"
-#include "interface/Core/Memory/IMemoryAllocator.h"
 #include "interface/Core/EngineDefs.h"
-
-#include "include/Core/Threading/Thread.h"
-#include "include/Core/Threading/Mutex.h"
 
 namespace JonsEngine
 {
+	class IMemoryAllocator;
+	class ILogManager;
+
 	class ThreadPool : public IThreadPool
 	{
 	public:

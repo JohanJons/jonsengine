@@ -1,7 +1,7 @@
 #ifndef _I_GAMEOBJECT_MANAGER_H
 #define _I_GAMEOBJECT_MANAGER_H
 
-#include "interface/Core/Memory/IMemoryManager.h"
+#include "interface/Core/Memory/IMemoryAllocator.h"
 #include "interface/Core/Logging/ILogManager.h"
 #include "interface/Core/EngineDefs.h"
 

@@ -3,13 +3,13 @@
 
 
 #include "interface/Core/Memory/IMemoryManager.h"
-#include "interface/Core/Logging/ILogManager.h"
 #include "interface/Core/EngineDefs.h"
 
 #include "include/Core/Memory/HeapAllocator.h"
 
 namespace JonsEngine
 {
+	class ILogManager;
 
 	class MemoryManagerImpl : public IMemoryManager
 	{
@@ -17,7 +17,7 @@ namespace JonsEngine
 		MemoryManagerImpl();
 		~MemoryManagerImpl();
 
-		bool Init(ILogManager* logger);
+		bool Init();
 		bool Destroy();
 		bool Start();
 		bool Stop();
@@ -31,7 +31,6 @@ namespace JonsEngine
 		void* InternalAllocate(size_t size);
 		void InternalDeAllocate(void* p);
 
-		ILogManager* mLog;
 		HeapAllocator mHeapAllocator;
 		bool mRunning;
 		bool mInitialized;

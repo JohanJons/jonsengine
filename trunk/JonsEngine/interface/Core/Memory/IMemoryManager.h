@@ -13,7 +13,7 @@ namespace JonsEngine
 	public:
 		virtual ~IMemoryManager() { }
 
-		virtual bool Init(ILogManager* logger) = 0;
+		virtual bool Init() = 0;
 		virtual bool Destroy() = 0;
 		virtual bool Start() = 0;
 		virtual bool Stop() = 0;

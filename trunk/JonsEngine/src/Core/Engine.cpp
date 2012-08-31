@@ -52,7 +52,7 @@ namespace JonsEngine
 
 		// MemoryMgr must be the first one to be initialized as all other subsystems are dependant on it for memory allocation that might occur in their initialization and onwards
 		// Likewise, last to be destroyed
-		ret &= mMemoryManager.Init(&mLog);
+		ret &= mMemoryManager.Init();
 
 		// Log
 		#ifdef ANDROID

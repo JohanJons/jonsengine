@@ -1,5 +1,8 @@
 #include "include/Core/Threading/Thread.h"
 
+#include "interface/Core/Memory/IMemoryAllocator.h"
+#include "interface/Core/Logging/ILogManager.h"
+
 #if defined _WIN32 || _WIN64
 	#define WIN32_LEAN_AND_MEAN
 	#include <Windows.h>
@@ -101,11 +104,6 @@ namespace JonsEngine
 		}
 
 		return NULL;
-	}
-
-	Thread::ThreadHandle& Thread::GetNativeHandle()
-	{
-		return mHandle;
 	}
 
 	Thread::ThreadState Thread::GetThreadState() const

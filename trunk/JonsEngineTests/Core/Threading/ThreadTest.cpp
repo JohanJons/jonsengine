@@ -19,32 +19,11 @@ namespace JonsEngine
 	}
 
 	/**
-	 * Thread jons_GetCurrentThreadNativeHandle test
-	 */
-	TEST_F(ThreadTest, jons_GetCurrentThreadNativeHandle)
-	{
-		jons_GetCurrentThreadNativeHandle();
-	}
-
-	/**
 	 * Thread jons_SetThreadPriority test
 	 */
 	TEST_F(ThreadTest, jons_SetThreadPriority)
 	{
 		ASSERT_EQ(0, jons_SetThreadPriority(THREAD_PRIORITY_ABOVE_NORMAL));
-	}
-
-	/**
-	 * Thread jons_SetThreadPriority2 test
-	 */
-	TEST_F(ThreadTest, jons_SetThreadPriority2)
-	{
-		int arg = 100;
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
-
-		ASSERT_EQ(0, jons_SetThreadPriority(thread->GetNativeHandle(), THREAD_PRIORITY_ABOVE_NORMAL));
-
-		mEngine.GetThreadingFactory().DestroyThread(thread);
 	}
 
 	/**
@@ -55,7 +34,6 @@ namespace JonsEngine
 		IThread* thread = mEngine.GetThreadingFactory().CreateThread();
 		
 		ASSERT_EQ(Thread::DETACHED, thread->GetThreadState());
-		ASSERT_EQ(NULL, thread->GetNativeHandle());
 		ASSERT_EQ(-1, thread->SetPriority(THREAD_PRIORITY_ABOVE_NORMAL));
 
 		ASSERT_EQ(-1, thread->Join());
@@ -128,21 +106,6 @@ namespace JonsEngine
 		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
 
 		ASSERT_EQ(0, thread->SetPriority(THREAD_PRIORITY_ABOVE_NORMAL));
-
-		mEngine.GetThreadingFactory().DestroyThread(thread);
-	}
-
-	/**
-	 * Thread GetNativeHandle test
-	 */
-	TEST_F(ThreadTest, GetNativeHandle)
-	{
-		int arg = 500;
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
-
-		Thread::ThreadHandle handle = thread->GetNativeHandle();
-
-		ASSERT_EQ(NULL, jons_SetThreadPriority(handle, THREAD_PRIORITY_ABOVE_NORMAL));
 
 		mEngine.GetThreadingFactory().DestroyThread(thread);
 	}

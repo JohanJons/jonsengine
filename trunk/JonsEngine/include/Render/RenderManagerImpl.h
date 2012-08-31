@@ -12,12 +12,13 @@
 #endif
 
 #include "interface/Render/IRenderManager.h"
-#include "interface/Core/Logging/ILogManager.h"
 
 #include "interface/Core/EngineDefs.h"
 
 namespace JonsEngine
 {
+	class ILogManager;
+	class IMemoryAllocator;
 
 	class RenderManagerImpl : public IRenderManager
 	{

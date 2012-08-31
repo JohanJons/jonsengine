@@ -3,7 +3,7 @@
 namespace JonsEngine
 {
 
-	MemoryManagerImpl::MemoryManagerImpl() : mRunning(false), mInitialized(false), mLog(NULL), mHeapAllocator(HeapAllocator::DLMALLOC)
+	MemoryManagerImpl::MemoryManagerImpl() : mRunning(false), mInitialized(false), mHeapAllocator(HeapAllocator::DLMALLOC)
 	{
 
 	}
@@ -14,20 +14,13 @@ namespace JonsEngine
 			Destroy();
 	}
 
-	bool MemoryManagerImpl::Init(ILogManager* logger)
+	bool MemoryManagerImpl::Init()
 	{
-		mLog = logger;
+		bool ret = true;
 
-		if (mLog)
-		{
-			mInitialized = true;
+		mInitialized = true;
 
-			mHeapAllocator.SetLogger(mLog);
-
-			return true;
-		}
-		else
-			return false;
+		return ret;
 	}
 
 	bool MemoryManagerImpl::Destroy()
@@ -54,12 +47,7 @@ namespace JonsEngine
 		bool res = true;
 
 		if (!mRunning)
-		{
 			mRunning = true;
-
-		}
-		else
-			mLog->LogWarn() <<  "MemoryManagerImpl::Start(): MemoryManager already started!" << std::endl;
 
 		return res;
 	}
@@ -69,12 +57,7 @@ namespace JonsEngine
 		bool res = true;
 
 		if (mRunning)
-		{
 			mRunning = false;
-
-		}
-		else
-			mLog->LogWarn() <<  "MemoryManagerImpl::Stop(): MemoryManager already stopped!" << std::endl;
 
 		return res;
 	}

@@ -1,5 +1,8 @@
 #include "include/Render/RenderManagerImpl.h"
 
+#include "interface/Core/Logging/ILogManager.h"
+#include "interface/Core/Memory/IMemoryAllocator.h"
+
 namespace JonsEngine
 {
 

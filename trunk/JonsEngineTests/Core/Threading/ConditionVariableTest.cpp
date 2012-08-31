@@ -60,18 +60,6 @@ namespace JonsEngine
 	}
 
 	/**
-	 * GetNativeConditionVariableHandle test
-	 */
-	TEST_F(ConditionVariableTest, GetNativeConditionVariableHandle)
-	{
-		mCondVar = mEngine.GetThreadingFactory().CreateConditionVariable();
-
-		ConditionVariable::ConditionVariableHandle handle = mCondVar->GetNativeConditionVariableHandle();
-
-		mEngine.GetThreadingFactory().DestroyConditionVariable(mCondVar);
-	}
-
-	/**
 	 * GetConditionVariableState test
 	 */
 	TEST_F(ConditionVariableTest, GetConditionVariableState)

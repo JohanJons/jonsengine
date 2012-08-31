@@ -2,7 +2,7 @@
 
 namespace JonsEngine
 {
-	HeapAllocator::HeapAllocator(HeapAllocatorBackend backend) : mLog(NULL), mBackend(backend)
+	HeapAllocator::HeapAllocator(HeapAllocatorBackend backend) : mBackend(backend)
 	{
 	}
 	
@@ -20,9 +20,6 @@ namespace JonsEngine
 		else if (mBackend == HeapAllocator::SYSTEM_DEFAULT)
 			alloc = malloc(size);
 
-		if(!alloc)
-			mLog->LogError() << "HeapAllocator::Allocate: Unable to allocate memory!" << std::endl;
-
 		return alloc;
 	}
 
@@ -35,9 +32,6 @@ namespace JonsEngine
 		else if (mBackend == HeapAllocator::SYSTEM_DEFAULT)
 			alloc = realloc(p, size);
 		
-		if (!alloc)
-			mLog->LogError() << "HeapAllocator::ReAllocate: Unable to reallocate memory!" << std::endl;
-
 		return alloc;
 	}
 
@@ -50,8 +44,6 @@ namespace JonsEngine
 			else if (mBackend == HeapAllocator::SYSTEM_DEFAULT)
 				free(p);
 		}
-		else
-			mLog->LogError() << "HeapAllocator::DeAllocate: Object not valid!" << std::endl;
 	}
 
 	uint64_t HeapAllocator::GetAllocatedMemory() const
@@ -80,10 +72,5 @@ namespace JonsEngine
 	void HeapAllocator::InternalDeallocate(void* p)
 	{ 
 		Deallocate(p);
-	}
-
-	void HeapAllocator::SetLogger(ILogManager* logger)
-	{
-		mLog = logger;
 	}
 }
