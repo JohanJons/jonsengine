@@ -39,7 +39,8 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, jons_SetThreadPriority2)
 	{
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)100);
+		int arg = 100;
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
 
 		ASSERT_EQ(0, jons_SetThreadPriority(thread->GetNativeHandle(), THREAD_PRIORITY_ABOVE_NORMAL));
 
@@ -67,7 +68,8 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, Constructor2)
 	{
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)500);
+		int arg = 500;
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
 
 		ASSERT_EQ(Thread::RUNNING, thread->GetThreadState());
 
@@ -83,8 +85,10 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, operatorAssign)
 	{
+		int arg = 500;
+		IThread::Task tsk = &Sleeper;
 		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread();
-		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)500);
+		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(tsk, (void*)&arg);
 		
 		ASSERT_EQ(Thread::DETACHED, tr1->GetThreadState());
 		ASSERT_EQ(Thread::RUNNING, tr2->GetThreadState());
@@ -103,7 +107,8 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, Join)
 	{
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)1000);
+		int arg = 500;
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
 
 		ASSERT_EQ(thread->GetThreadState(), Thread::RUNNING);
 
@@ -119,7 +124,8 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, SetPriority)
 	{
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)500);
+		int arg = 500;
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
 
 		ASSERT_EQ(0, thread->SetPriority(THREAD_PRIORITY_ABOVE_NORMAL));
 
@@ -131,7 +137,8 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, GetNativeHandle)
 	{
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)500);
+		int arg = 500;
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
 
 		Thread::ThreadHandle handle = thread->GetNativeHandle();
 
@@ -145,7 +152,8 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, GetThreadState)
 	{
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)500);
+		int arg = 500;
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
 
 		ASSERT_EQ(Thread::RUNNING, thread->GetThreadState());
 

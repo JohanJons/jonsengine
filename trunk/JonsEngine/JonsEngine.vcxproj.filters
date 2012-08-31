@@ -69,9 +69,6 @@
     <Filter Include="Interface\Core">
       <UniqueIdentifier>{e73de4e3-e2c0-4257-8a0f-e5678bca889e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface\Render">
-      <UniqueIdentifier>{196d120e-d1f7-456f-96c5-493e0f5f3ab9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Interface\Core\Logging">
       <UniqueIdentifier>{c56894c9-541d-48ef-a844-2911fb29ff66}</UniqueIdentifier>
     </Filter>
@@ -83,6 +80,9 @@
     </Filter>
     <Filter Include="Interface\Core\Threading">
       <UniqueIdentifier>{24eb6380-22f4-4319-b633-5edc40be4795}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Render">
+      <UniqueIdentifier>{196d120e-d1f7-456f-96c5-493e0f5f3ab9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -184,9 +184,6 @@
     <ClInclude Include="include\Core\Threading\Thread.h">
       <Filter>Header Files\Core\Threading</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Threading\Threadpool.h">
-      <Filter>Header Files\Core\Threading</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Threading\Mutex.h">
       <Filter>Header Files\Core\Threading</Filter>
     </ClInclude>
@@ -208,9 +205,6 @@
     <ClInclude Include="interface\Core\GameObject\IGameObjectManager.h">
       <Filter>Interface\Core\GameObject</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\EngineDefs.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
     <ClInclude Include="interface\Core\Threading\IConditionVariable.h">
       <Filter>Interface\Core\Threading</Filter>
     </ClInclude>
@@ -228,6 +222,15 @@
     </ClInclude>
     <ClInclude Include="include\Core\EngineCore.h">
       <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\Core\Threading\IThreadPool.h">
+      <Filter>Interface\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Threading\ThreadPool.h">
+      <Filter>Header Files\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="interface\Core\EngineDefs.h">
+      <Filter>Interface\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

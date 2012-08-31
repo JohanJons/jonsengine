@@ -2,7 +2,7 @@
 
 namespace JonsEngine
 {
-	ThreadPool::ThreadPool(uint32_t numThreads)
+	ThreadPool::ThreadPool(IMemoryAllocator& allocator, ILogManager& logger, uint32_t numThreads) : mMemoryAllocator(allocator), mLogger(logger), mNumThreads(numThreads)
 	{
 
 	}
@@ -24,7 +24,7 @@ namespace JonsEngine
 
 	uint32_t ThreadPool::GetNumThreads() const
 	{
-		return 0;
+		return mNumThreads;
 	}
 
 }

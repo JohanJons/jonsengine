@@ -2,6 +2,8 @@
 #define _JONS_THREAD_H
 
 #include "interface/Core/Threading/IThread.h"
+#include "interface/Core/Memory/IMemoryAllocator.h"
+#include "interface/Core/Logging/ILogManager.h"
 
 namespace JonsEngine
 {
@@ -11,13 +13,16 @@ namespace JonsEngine
 	public:
 		struct ThreadInfo
 		{
+			ThreadInfo() : mState(DETACHED), mTask(NULL), mArg(NULL)
+			{ }
+
 			ThreadState mState;
-			void* (*mFunctionPointer) (void*);
+			Task mTask;
 			void* mArg;
 		};
 
 		Thread(IMemoryAllocator& allocator, ILogManager& logger);
-		Thread(void* (*start) (void*), void* arg, IMemoryAllocator& allocator, ILogManager& logger);
+		Thread(Task task, void* arg, IMemoryAllocator& allocator, ILogManager& logger);
 		~Thread();
 
 		Thread& operator=(Thread& other);

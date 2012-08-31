@@ -1,8 +1,9 @@
 #ifndef _JONS_ITHREAD_H
 #define _JONS_ITHREAD_H
 
-#include "include/Core/EngineDefs.h"
-#include "include/Core/Memory/HeapAllocator.h"
+#include "interface/Core/EngineDefs.h"
+
+#include "boost/function.hpp"
 
 namespace JonsEngine
 {
@@ -23,6 +24,8 @@ namespace JonsEngine
 			RUNNING,
 			FINISHED
 		};
+
+		typedef boost::function1<void, void*> Task;
 
 		virtual ~IThread() { }
 

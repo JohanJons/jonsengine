@@ -116,7 +116,6 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Core\Containers\Vector.h" />
     <ClInclude Include="include\Core\Engine.h" />
     <ClInclude Include="include\Core\EngineCore.h" />
-    <ClInclude Include="include\Core\EngineDefs.h" />
     <ClInclude Include="include\Core\EngineSettings.h" />
     <ClInclude Include="include\Core\GameObject\GameObject.h" />
     <ClInclude Include="include\Core\GameObject\GameObjectManagerImpl.h" />
@@ -131,9 +130,10 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Core\Threading\Mutex.h" />
     <ClInclude Include="include\Core\Threading\Thread.h" />
     <ClInclude Include="include\Core\Threading\ThreadingFactory.h" />
-    <ClInclude Include="include\Core\Threading\Threadpool.h" />
+    <ClInclude Include="include\Core\Threading\ThreadPool.h" />
     <ClInclude Include="include\Render\RenderManagerImpl.h" />
     <ClInclude Include="include\Core\Utils\JonsTime.h" />
+    <ClInclude Include="interface\Core\EngineDefs.h" />
     <ClInclude Include="interface\Core\GameObject\IGameObjectManager.h" />
     <ClInclude Include="interface\Core\Logging\ILogManager.h" />
     <ClInclude Include="interface\Core\Memory\IMemoryAllocator.h" />
@@ -142,6 +142,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="interface\Core\Threading\IMutex.h" />
     <ClInclude Include="interface\Core\Threading\IThread.h" />
     <ClInclude Include="interface\Core\Threading\IThreadingFactory.h" />
+    <ClInclude Include="interface\Core\Threading\IThreadPool.h" />
     <ClInclude Include="interface\Render\IRenderManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

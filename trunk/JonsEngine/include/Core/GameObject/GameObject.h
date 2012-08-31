@@ -2,8 +2,7 @@
 #define _JONS_GAMEOBJECT_H
 
 #include "interface/Core/Memory/IMemoryManager.h"
-
-#include "include/Core/EngineDefs.h"
+#include "interface/Core/EngineDefs.h"
 
 namespace JonsEngine
 {

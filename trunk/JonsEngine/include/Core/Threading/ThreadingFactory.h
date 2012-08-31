@@ -7,6 +7,7 @@
 #include "include/Core/Threading/Thread.h"
 #include "include/Core/Threading/Mutex.h"
 #include "include/Core/Threading/ConditionVariable.h"
+#include "include/Core/Threading/Threadpool.h"
 
 #include "include/Core/Containers/Vector.h"
 
@@ -22,13 +23,15 @@ namespace JonsEngine
 		bool Destroy();
 
 		IThread* const CreateThread();
-		IThread* const CreateThread(void* (*start) (void*), void* arg);
+		IThread* const CreateThread(IThread::Task task, void* arg);
 		IMutex* const CreateMutex();
 		IConditionVariable* const CreateConditionVariable();
+		IThreadPool* const CreateThreadPool(uint32_t numThreads);
 
 		void DestroyThread(IThread* const thread);
 		void DestroyMutex(IMutex* const mutex);
 		void DestroyConditionVariable(IConditionVariable* const condVar);
+		void DestroyThreadPool(IThreadPool* const thread);
 
 	private:
 		IMemoryAllocator& mMemoryAllocator;

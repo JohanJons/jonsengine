@@ -6,8 +6,8 @@
 #include "interface/Core/GameObject/IGameObjectManager.h"
 #include "interface/Core/Logging/ILogManager.h"
 #include "interface/Core/Memory/IMemoryManager.h"
+#include "interface/Core/EngineDefs.h"
 
-#include "include/Core/EngineDefs.h"
 #include "include/Core/GameObject/GameObject.h"
 
 namespace JonsEngine

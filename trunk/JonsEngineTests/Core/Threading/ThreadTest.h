@@ -27,24 +27,19 @@ namespace JonsEngine
 		{
 			RunningEngineFixture::TearDown();
 		}
-
-		static void* SetNumberTo14(void* number)
-		{
-			*(int32_t*)number = 14;
-
-			return 0;
-		}
-
-		static void* Sleeper(void* arg)
-		{
-			int32_t sleepTime = (int32_t)arg;
-
-			jons_SleepCurrentThread((int32_t)sleepTime);
-
-			return 0;
-		}
 	};
 
+	void SetNumberTo14(void* number)
+	{
+		*(int32_t*)number = 14;
+	}
+
+	void Sleeper(void* arg)
+	{
+		int32_t sleepTime = *(int32_t*)arg;
+
+		jons_SleepCurrentThread((int32_t)sleepTime);
+	}
 }
 
 

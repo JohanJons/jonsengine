@@ -1,7 +1,7 @@
 #ifndef _I_MEMORY_MANAGER_H
 #define _I_MEMORY_MANAGER_H
 
-#include "include/Core/EngineDefs.h"
+#include "interface/Core/EngineDefs.h"
 
 namespace JonsEngine
 {

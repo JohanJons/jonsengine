@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "include/Core/EngineDefs.h"
+#include "interface/Core/EngineDefs.h"
 
 namespace JonsEngine
 {

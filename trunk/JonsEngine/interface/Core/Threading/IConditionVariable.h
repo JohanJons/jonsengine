@@ -10,8 +10,9 @@
 	#include <time.h>
 #endif
 
-#include "include/Core/EngineDefs.h"
-#include "include/Core/Threading/Mutex.h"
+#include "interface/Core/EngineDefs.h"
+#include "interface/Core/Threading/IMutex.h"
+#include "interface/Core/Logging/ILogManager.h"
 
 namespace JonsEngine
 {

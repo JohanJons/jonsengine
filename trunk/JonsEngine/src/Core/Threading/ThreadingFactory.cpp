@@ -36,11 +36,11 @@ namespace JonsEngine
 		return ret;
 	}
 
-	IThread* const ThreadingFactory::CreateThread(void* (*start) (void*), void* arg)
+	IThread* const ThreadingFactory::CreateThread(IThread::Task task, void* arg)
 	{
 		IThread* ret = NULL;
 
-		ret = mMemoryAllocator.AllocateObject<Thread, void*(void*), void*, IMemoryAllocator&, ILogManager&>(start, arg, mMemoryAllocator, mLogger);
+		ret = mMemoryAllocator.AllocateObject<Thread, IThread::Task, void*, IMemoryAllocator&, ILogManager&>(task, arg, mMemoryAllocator, mLogger);
 
 		return ret;
 	}
@@ -62,6 +62,15 @@ namespace JonsEngine
 
 		return ret;
 	}
+
+	IThreadPool* const ThreadingFactory::CreateThreadPool(uint32_t numThreads)
+	{
+		IThreadPool* ret = NULL;
+
+		ret = mMemoryAllocator.AllocateObject<ThreadPool, IMemoryAllocator&, ILogManager&, uint32_t>(mMemoryAllocator, mLogger, numThreads);
+
+		return ret;
+	}
 		
 	void ThreadingFactory::DestroyThread(IThread* const thread)
 	{
@@ -79,5 +88,8 @@ namespace JonsEngine
 		mMemoryAllocator.DeallocateObject<IConditionVariable>(condVar);
 	}
 
-
+	void ThreadingFactory::DestroyThreadPool(IThreadPool* const thread)
+	{
+		mMemoryAllocator.DeallocateObject<IThreadPool>(thread);
+	}
 }

@@ -57,7 +57,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <CompileAs>CompileAsCpp</CompileAs>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\Visual_Leak_Detector\include;$(SolutionDir)\..\Thirdparty\boost_1_49_0;$(SolutionDir)\..\Thirdparty\gtest-1.6.0/include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\boost_1_49_0;$(SolutionDir)\..\Thirdparty\Visual_Leak_Detector\include;$(SolutionDir)\..\Thirdparty\gtest-1.6.0/include;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>

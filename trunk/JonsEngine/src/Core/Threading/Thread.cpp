@@ -20,12 +20,12 @@ namespace JonsEngine
 	{
 	}
 
-	Thread::Thread(void* (*start) (void*), void* arg, IMemoryAllocator& allocator, ILogManager& logger) : mAllocator(allocator), mLogger(logger)
+	Thread::Thread(Task task, void* arg, IMemoryAllocator& allocator, ILogManager& logger) : mAllocator(allocator), mLogger(logger)
 	{
 		mThreadInfo = (ThreadInfo*) mAllocator.Allocate(sizeof(ThreadInfo));
 
+		mThreadInfo->mTask = task;
 		mThreadInfo->mArg = arg;
-		mThreadInfo->mFunctionPointer = start;
 		mThreadInfo->mState = Thread::RUNNING;
 
 		mHandle = _CreateThread(&Run, (void*)mThreadInfo);
@@ -95,7 +95,7 @@ namespace JonsEngine
 
 		if (thread)
 		{
-			thread->mFunctionPointer(thread->mArg);
+			thread->mTask(thread->mArg);
 			
 			thread->mState = Thread::FINISHED;
 		}

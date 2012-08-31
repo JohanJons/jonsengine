@@ -4,8 +4,8 @@
 
 #include "interface/Core/Memory/IMemoryManager.h"
 #include "interface/Core/Logging/ILogManager.h"
+#include "interface/Core/EngineDefs.h"
 
-#include "include/Core/EngineDefs.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
 namespace JonsEngine

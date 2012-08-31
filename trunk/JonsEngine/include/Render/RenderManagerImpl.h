@@ -14,7 +14,7 @@
 #include "interface/Render/IRenderManager.h"
 #include "interface/Core/Logging/ILogManager.h"
 
-#include "include/Core/EngineDefs.h"
+#include "interface/Core/EngineDefs.h"
 
 namespace JonsEngine
 {

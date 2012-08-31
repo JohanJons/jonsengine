@@ -9,7 +9,7 @@
 	#include <pthread.h>
 #endif
 
-#include "include/Core/EngineDefs.h"
+#include "interface/Core/EngineDefs.h"
 
 namespace JonsEngine
 {
@@ -23,7 +23,7 @@ namespace JonsEngine
 		};
 
 		#if defined _WIN32 || _WIN64
-			typedef HANDLE MutexHandle;
+			typedef void* MutexHandle;
 		#else
 			typedef pthread_mutex_t MutexHandle;
 		#endif
