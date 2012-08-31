@@ -64,9 +64,8 @@ namespace JonsEngine
 	TEST_F(ThreadTest, operatorAssign)
 	{
 		int arg = 500;
-		IThread::Task tsk = &Sleeper;
 		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread();
-		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(tsk, (void*)&arg);
+		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
 		
 		ASSERT_EQ(Thread::DETACHED, tr1->GetThreadState());
 		ASSERT_EQ(Thread::RUNNING, tr2->GetThreadState());

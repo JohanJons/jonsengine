@@ -25,11 +25,11 @@ namespace JonsEngine
 
 	Thread::Thread(Task task, void* arg, IMemoryAllocator& allocator, ILogManager& logger) : mAllocator(allocator), mLogger(logger)
 	{
-		mThreadInfo = (ThreadInfo*) mAllocator.Allocate(sizeof(ThreadInfo));
+		mThreadInfo = (ThreadInfo*) mAllocator.AllocateObject<ThreadInfo>();
 
-		mThreadInfo->mTask = task;
 		mThreadInfo->mArg = arg;
 		mThreadInfo->mState = Thread::RUNNING;
+		mThreadInfo->mTask = task;
 
 		mHandle = _CreateThread(&Run, (void*)mThreadInfo);
 		if (!mHandle)
