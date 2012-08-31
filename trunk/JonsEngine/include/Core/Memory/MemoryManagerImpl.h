@@ -1,7 +1,6 @@
 #ifndef _MEMORY_MANAGER_IMPL_H
 #define _MEMORY_MANAGER_IMPL_H
 
-
 #include "interface/Core/Memory/IMemoryManager.h"
 #include "interface/Core/EngineDefs.h"
 
