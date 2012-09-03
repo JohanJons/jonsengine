@@ -15,7 +15,7 @@ namespace JonsEngine
 		virtual ~IThreadingFactory() { }
 
 		virtual IThread* const CreateThread() = 0;
-		virtual IThread* const CreateThread(IThread::Task task, void* arg) = 0;
+		virtual IThread* const CreateThread(Task task, void* arg) = 0;
 		virtual IMutex* const CreateMutex() = 0;
 		virtual IConditionVariable* const CreateConditionVariable() = 0;
 		virtual IThreadPool* const CreateThreadPool(uint32_t numThreads) = 0;

@@ -12,7 +12,7 @@ namespace JonsEngine
 		
 	}
 
-	void ThreadPool::AddTask()
+	void ThreadPool::AddTask(Task task)
 	{
 
 	}

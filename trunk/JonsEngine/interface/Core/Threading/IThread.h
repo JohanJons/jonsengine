@@ -7,6 +7,9 @@
 
 namespace JonsEngine
 {
+	/* Task definition */
+	typedef boost::function1<void, void*> Task;
+
 	/* Thread wrapper class */
 	class IThread
 	{
@@ -17,8 +20,6 @@ namespace JonsEngine
 			RUNNING,
 			FINISHED
 		};
-
-		typedef boost::function1<void, void*> Task;
 
 		virtual ~IThread() { }
 

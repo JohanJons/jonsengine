@@ -15,7 +15,7 @@ namespace JonsEngine
 		ThreadPool(IMemoryAllocator& allocator, ILogManager& logger, uint32_t numThreads);
 		~ThreadPool();
 
-		void AddTask();
+		void AddTask(Task task);
 		void Wait();
 
 		uint32_t GetNumThreads() const;
