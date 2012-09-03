@@ -36,6 +36,7 @@ namespace JonsEngine
 		Vector<IThread*> mCreatedThreads;
 		Vector<IMutex*> mCreatedMutexes;
 		Vector<IConditionVariable*> mCreatedCondVars;
+		Vector<IThreadPool*> mCreatedThreadPools;
 	};
 
 }

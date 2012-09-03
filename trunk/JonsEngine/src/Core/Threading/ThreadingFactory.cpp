@@ -11,7 +11,7 @@
 namespace JonsEngine
 {
 	ThreadingFactory::ThreadingFactory(ILogManager& logger, IMemoryAllocator& memAllocator) : mMemoryAllocator(memAllocator), mLogger(logger), 
-										mCreatedThreads(memAllocator), mCreatedMutexes(memAllocator), mCreatedCondVars(memAllocator)
+										mCreatedThreads(memAllocator), mCreatedMutexes(memAllocator), mCreatedCondVars(memAllocator), mCreatedThreadPools(memAllocator)
 	{
 
 	}
@@ -32,6 +32,22 @@ namespace JonsEngine
 	{
 		bool ret = true;
 
+		// clear threads
+		for (Vector<IThread*>::iterator iter = mCreatedThreads.begin(); iter != mCreatedThreads.end();)
+			iter = mCreatedThreads.erase(iter);
+
+		// clear mutexes
+		for (Vector<IMutex*>::iterator iter = mCreatedMutexes.begin(); iter != mCreatedMutexes.end();)
+			iter = mCreatedMutexes.erase(iter);
+
+		// clear condvars
+		for (Vector<IConditionVariable*>::iterator iter = mCreatedCondVars.begin(); iter != mCreatedCondVars.end();)
+			iter = mCreatedCondVars.erase(iter);
+
+		// clear threadpools
+		for (Vector<IThreadPool*>::iterator iter = mCreatedThreadPools.begin(); iter != mCreatedThreadPools.end();)
+			iter = mCreatedThreadPools.erase(iter);
+
 		return ret;
 	}
 
@@ -40,6 +56,9 @@ namespace JonsEngine
 		IThread* ret = NULL;
 
 		ret = mMemoryAllocator.AllocateObject<Thread, IMemoryAllocator&, ILogManager&>(mMemoryAllocator, mLogger);
+
+		if (ret != NULL)
+			mCreatedThreads.push_back(ret);
 
 		return ret;
 	}
@@ -50,6 +69,9 @@ namespace JonsEngine
 
 		ret = mMemoryAllocator.AllocateObject<Thread, Task, void*, IMemoryAllocator&, ILogManager&>(task, arg, mMemoryAllocator, mLogger);
 
+		if (ret != NULL)
+			mCreatedThreads.push_back(ret);
+
 		return ret;
 	}
 		
@@ -58,6 +80,9 @@ namespace JonsEngine
 		IMutex* ret = NULL;
 
 		ret = mMemoryAllocator.AllocateObject<Mutex, ILogManager&>(mLogger);
+
+		if (ret != NULL)
+			mCreatedMutexes.push_back(ret);
 
 		return ret;
 	}
@@ -68,6 +93,9 @@ namespace JonsEngine
 
 		ret = mMemoryAllocator.AllocateObject<ConditionVariable, ILogManager&>(mLogger);
 
+		if (ret != NULL)
+			mCreatedCondVars.push_back(ret);
+
 		return ret;
 	}
 
@@ -77,27 +105,77 @@ namespace JonsEngine
 
 		ret = mMemoryAllocator.AllocateObject<ThreadPool, IMemoryAllocator&, ILogManager&, uint32_t>(mMemoryAllocator, mLogger, numThreads);
 
+		if (ret != NULL)
+			mCreatedThreadPools.push_back(ret);
+
 		return ret;
 	}
 		
 	void ThreadingFactory::DestroyThread(IThread* const thread)
 	{
+		if (thread)
+		{
+			mMemoryAllocator.DeallocateObject<IThread>(thread);
 
-		mMemoryAllocator.DeallocateObject<IThread>(thread);
+			for (Vector<IThread*>::iterator iter = mCreatedThreads.begin(); iter != mCreatedThreads.end(); iter++)
+			{
+				if (*iter == thread)
+				{
+					mCreatedThreads.erase(iter);
+					break;
+				}
+			}
+		}
 	}
 		
 	void ThreadingFactory::DestroyMutex(IMutex* const mutex)
 	{
-		mMemoryAllocator.DeallocateObject<IMutex>(mutex);
+		if (mutex)
+		{
+			mMemoryAllocator.DeallocateObject<IMutex>(mutex);
+
+			for (Vector<IMutex*>::iterator iter = mCreatedMutexes.begin(); iter != mCreatedMutexes.end(); iter++)
+			{
+				if (*iter == mutex)
+				{
+					mCreatedMutexes.erase(iter);
+					break;
+				}
+			}
+		}
 	}
 		
 	void ThreadingFactory::DestroyConditionVariable(IConditionVariable* const condVar)
 	{
-		mMemoryAllocator.DeallocateObject<IConditionVariable>(condVar);
+		if (condVar)
+		{
+			mMemoryAllocator.DeallocateObject<IConditionVariable>(condVar);
+
+			for (Vector<IConditionVariable*>::iterator iter = mCreatedCondVars.begin(); iter != mCreatedCondVars.end(); iter++)
+			{
+				if (*iter == condVar)
+				{
+					mCreatedCondVars.erase(iter);
+					break;
+				}
+			}
+		}
 	}
 
-	void ThreadingFactory::DestroyThreadPool(IThreadPool* const thread)
+	void ThreadingFactory::DestroyThreadPool(IThreadPool* const tp)
 	{
-		mMemoryAllocator.DeallocateObject<IThreadPool>(thread);
+		if (tp)
+		{
+			mMemoryAllocator.DeallocateObject<IThreadPool>(tp);
+
+			for (Vector<IThreadPool*>::iterator iter = mCreatedThreadPools.begin(); iter != mCreatedThreadPools.end(); iter++)
+			{
+				if (*iter == tp)
+				{
+					mCreatedThreadPools.erase(iter);
+					break;
+				}
+			}
+		}
 	}
 }
