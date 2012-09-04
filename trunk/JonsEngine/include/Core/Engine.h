@@ -9,8 +9,6 @@
 #include "include/Core/EngineCore.h"
 
 #include "include/Render/RenderManagerImpl.h"
-#include "include/Core/Logging/LogManagerImpl.h"
-#include "include/Core/Memory/MemoryManagerImpl.h"
 #include "include/Core/GameObject/GameObjectManagerImpl.h"
 
 #include "include/Core/Threading/ThreadingFactory.h"

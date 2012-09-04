@@ -23,7 +23,7 @@ namespace JonsEngine
 		IThread* const CreateThread(Task task, void* arg);
 		IMutex* const CreateMutex();
 		IConditionVariable* const CreateConditionVariable();
-		IThreadPool* const CreateThreadPool(uint32_t numThreads);
+		IThreadPool* const CreateThreadPool(uint32_t initialNumThreads);
 
 		void DestroyThread(IThread* const thread);
 		void DestroyMutex(IMutex* const mutex);

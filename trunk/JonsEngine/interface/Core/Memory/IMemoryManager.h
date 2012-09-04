@@ -6,7 +6,7 @@
 namespace JonsEngine
 {
 	class ILogManager;
-	class HeapAllocator;
+	class IMemoryAllocator;
 
 	class IMemoryManager
 	{
@@ -20,7 +20,7 @@ namespace JonsEngine
 		virtual bool isRunning() = 0;
 		virtual void Tick() = 0;
 
-		virtual HeapAllocator& GetHeapAllocator()  = 0;
+		virtual IMemoryAllocator& GetHeapAllocator()  = 0;
 		virtual uint64_t GetTotalAllocatedMemory() const = 0;
 	};
 

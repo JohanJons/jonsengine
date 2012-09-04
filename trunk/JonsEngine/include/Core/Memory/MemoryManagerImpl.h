@@ -9,6 +9,7 @@
 namespace JonsEngine
 {
 	class ILogManager;
+	class IMemoryAllocator;
 
 	class MemoryManagerImpl : public IMemoryManager
 	{
@@ -23,7 +24,7 @@ namespace JonsEngine
 		bool isRunning();
 		void Tick();
 
-		inline HeapAllocator& GetHeapAllocator() { return mHeapAllocator; }
+		inline IMemoryAllocator& GetHeapAllocator() { return mHeapAllocator; }
 		uint64_t GetTotalAllocatedMemory() const;
 
 	private:

@@ -33,20 +33,20 @@ namespace JonsEngine
 		bool ret = true;
 
 		// clear threads
-		for (Vector<IThread*>::iterator iter = mCreatedThreads.begin(); iter != mCreatedThreads.end();)
-			iter = mCreatedThreads.erase(iter);
+		for (Vector<IThread*>::iterator iter = mCreatedThreads.begin(); iter != mCreatedThreads.end(); iter = mCreatedThreads.begin())
+			DestroyThread(*iter);
 
 		// clear mutexes
-		for (Vector<IMutex*>::iterator iter = mCreatedMutexes.begin(); iter != mCreatedMutexes.end();)
-			iter = mCreatedMutexes.erase(iter);
+		for (Vector<IMutex*>::iterator iter = mCreatedMutexes.begin(); iter != mCreatedMutexes.end(); iter = mCreatedMutexes.begin())
+			DestroyMutex(*iter);
 
 		// clear condvars
-		for (Vector<IConditionVariable*>::iterator iter = mCreatedCondVars.begin(); iter != mCreatedCondVars.end();)
-			iter = mCreatedCondVars.erase(iter);
+		for (Vector<IConditionVariable*>::iterator iter = mCreatedCondVars.begin(); iter != mCreatedCondVars.end(); iter = mCreatedCondVars.begin())
+			DestroyConditionVariable(*iter);
 
 		// clear threadpools
-		for (Vector<IThreadPool*>::iterator iter = mCreatedThreadPools.begin(); iter != mCreatedThreadPools.end();)
-			iter = mCreatedThreadPools.erase(iter);
+		for (Vector<IThreadPool*>::iterator iter = mCreatedThreadPools.begin(); iter != mCreatedThreadPools.end(); iter = mCreatedThreadPools.begin())
+			DestroyThreadPool(*iter);
 
 		return ret;
 	}
@@ -99,11 +99,11 @@ namespace JonsEngine
 		return ret;
 	}
 
-	IThreadPool* const ThreadingFactory::CreateThreadPool(uint32_t numThreads)
+	IThreadPool* const ThreadingFactory::CreateThreadPool(uint32_t initialNumThreads)
 	{
 		IThreadPool* ret = NULL;
 
-		ret = mMemoryAllocator.AllocateObject<ThreadPool, IMemoryAllocator&, ILogManager&, uint32_t>(mMemoryAllocator, mLogger, numThreads);
+		ret = mMemoryAllocator.AllocateObject<ThreadPool, IMemoryAllocator&, ILogManager&, IThreadingFactory&, uint32_t>(mMemoryAllocator, mLogger, *this, initialNumThreads);
 
 		if (ret != NULL)
 			mCreatedThreadPools.push_back(ret);

@@ -88,6 +88,7 @@
     <ClInclude Include="Core\Memory\MemoryTestManager.h" />
     <ClInclude Include="Core\Threading\ConditionVariableTest.h" />
     <ClInclude Include="Core\Threading\MutexTest.h" />
+    <ClInclude Include="Core\Threading\ThreadPoolTest.h" />
     <ClInclude Include="Core\Threading\ThreadTest.h" />
     <ClInclude Include="TestClass1.h" />
     <ClInclude Include="TestFixtures\RunningEngineFixture.h" />
@@ -98,6 +99,7 @@
     <ClCompile Include="Core\GameObject\GameObjectTestManager.cpp" />
     <ClCompile Include="Core\Threading\ConditionVariableTest.cpp" />
     <ClCompile Include="Core\Threading\MutexTest.cpp" />
+    <ClCompile Include="Core\Threading\ThreadPoolTest.cpp" />
     <ClCompile Include="Core\Threading\ThreadTest.cpp" />
     <ClCompile Include="JonsEngineTests.cpp" />
     <ClCompile Include="Core\Memory\MemoryTestManager.cpp" />

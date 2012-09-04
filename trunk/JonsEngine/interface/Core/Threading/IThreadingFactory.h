@@ -18,7 +18,7 @@ namespace JonsEngine
 		virtual IThread* const CreateThread(Task task, void* arg) = 0;
 		virtual IMutex* const CreateMutex() = 0;
 		virtual IConditionVariable* const CreateConditionVariable() = 0;
-		virtual IThreadPool* const CreateThreadPool(uint32_t numThreads) = 0;
+		virtual IThreadPool* const CreateThreadPool(uint32_t initialNumThreads) = 0;
 
 		virtual void DestroyThread(IThread* const thread) = 0;
 		virtual void DestroyMutex(IMutex* const mutex) = 0;
