@@ -8,7 +8,7 @@
 namespace JonsEngine
 {
 	/* Task definition */
-	typedef boost::function1<void, void*> Task;
+	typedef boost::function0<void> Task;
 
 	/* Thread wrapper class */
 	class IThread

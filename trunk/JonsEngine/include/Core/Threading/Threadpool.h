@@ -11,6 +11,8 @@ namespace JonsEngine
 	class IMemoryAllocator;
 	class ILogManager;
 	class IThreadingFactory;
+	class IMutex;
+	class IConditionVariable;
 
 	class ThreadPool : public IThreadPool
 	{
@@ -18,11 +20,12 @@ namespace JonsEngine
 		ThreadPool(IMemoryAllocator& allocator, ILogManager& logger, IThreadingFactory& factory, uint32_t initialNumThreads);
 		~ThreadPool();
 
-		void AddTask(Task task);
+		void AddTask(const Task& task);
 		void ClearTasks();
 		size_t PendingTasks() const;
 		bool Empty() const;
 		void Wait();
+		void Wait(const size_t taskLimit);
 
 		void SetNumThreads(uint32_t num);
 		uint32_t GetNumThreads() const;
@@ -33,8 +36,13 @@ namespace JonsEngine
 		IMemoryAllocator& mMemoryAllocator;
 		ILogManager& mLogger;
 		IThreadingFactory& mFactory;
-		uint32_t mNumThreads;
+
+		IMutex* mMutex;
+		IConditionVariable* mCondVar_WorkDone;
+		IConditionVariable* mCondVar_NewTaskOrKillWorker;
 		Vector<Task> mScheduledTasks;
+		uint32_t mNumThreads;
+		uint32_t mDesiredNumThreads;
 	};
 }
 

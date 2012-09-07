@@ -31,32 +31,26 @@ namespace JonsEngine
 			RunningEngineFixture::TearDown();
 		}
 
-		static void* signal(void* arg)
+		static void signal()
 		{
 			jons_SleepCurrentThread(50);
 
 			mCount = 10;
 
 			mCondVar->Signal();
-
-			return NULL;
 		}
 
-		static void* setCountTo14(void* arg)
+		static void setCountTo14()
 		{
-			mCount = 14;	
-
-			return NULL;
+			mCount = 14;
 		}
 
-		static void* timedWait500ms(void* arg)
+		static void timedWait500ms()
 		{
 			mCondVar->TimedWait(500);
-
-			return NULL;
 		}
 
-		static void* Incrementto4(void* arg)
+		static void Incrementto4()
 		{
 			for (;;)
 			{
@@ -67,7 +61,7 @@ namespace JonsEngine
 					if (mCount == 4)
 					{
 						mCondVar->Broadcast();
-						return NULL;
+						return;
 					}
 					mMutex->Unlock();
 				}
@@ -76,7 +70,7 @@ namespace JonsEngine
 			}
 		}
 
-		static void* Incrementto7(void* arg)
+		static void Incrementto7()
 		{
 			for (;;)
 			{
@@ -87,7 +81,7 @@ namespace JonsEngine
 					if (mCount == 7)
 					{
 						mCondVar->Broadcast();
-						return NULL;
+						return;
 					}
 					mMutex->Unlock();
 				}
@@ -98,7 +92,7 @@ namespace JonsEngine
 			}
 		}
 
-		static void* Incrementto10(void* arg)
+		static void Incrementto10()
 		{
 			for (;;)
 			{
@@ -109,7 +103,7 @@ namespace JonsEngine
 					if (mCount == 10)
 					{
 						mCondVar->Broadcast();
-						return NULL;
+						return;
 					}
 					mMutex->Unlock();
 				}

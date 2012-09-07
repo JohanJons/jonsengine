@@ -11,11 +11,12 @@ namespace JonsEngine
 	public:
 		virtual ~IThreadPool() { }
 
-		virtual void AddTask(Task task) = 0;
+		virtual void AddTask(const Task& task) = 0;
 		virtual void ClearTasks() = 0;
 		virtual size_t PendingTasks() const = 0;
 		virtual bool Empty() const = 0;
 		virtual void Wait() = 0;
+		virtual void Wait(const size_t taskLimit) = 0;
 
 		virtual void SetNumThreads(uint32_t num) = 0;
 		virtual uint32_t GetNumThreads() const = 0;

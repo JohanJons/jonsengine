@@ -23,11 +23,10 @@ namespace JonsEngine
 	{
 	}
 
-	Thread::Thread(Task task, void* arg, IMemoryAllocator& allocator, ILogManager& logger) : mAllocator(allocator), mLogger(logger)
+	Thread::Thread(Task task, IMemoryAllocator& allocator, ILogManager& logger) : mAllocator(allocator), mLogger(logger)
 	{
 		mThreadInfo = (ThreadInfo*) mAllocator.AllocateObject<ThreadInfo>();
 
-		mThreadInfo->mArg = arg;
 		mThreadInfo->mState = Thread::RUNNING;
 		mThreadInfo->mTask = task;
 
@@ -98,7 +97,7 @@ namespace JonsEngine
 
 		if (thread)
 		{
-			thread->mTask(thread->mArg);
+			thread->mTask();
 			
 			thread->mState = Thread::FINISHED;
 		}

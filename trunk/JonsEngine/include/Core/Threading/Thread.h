@@ -24,16 +24,15 @@ namespace JonsEngine
 
 		struct ThreadInfo
 		{
-			ThreadInfo() : mState(DETACHED), mTask(NULL), mArg(NULL)
+			ThreadInfo() : mState(DETACHED), mTask(NULL)
 			{ }
 
 			ThreadState mState;
 			Task mTask;
-			void* mArg;
 		};
 
 		Thread(IMemoryAllocator& allocator, ILogManager& logger);
-		Thread(Task task, void* arg, IMemoryAllocator& allocator, ILogManager& logger);
+		Thread(Task task, IMemoryAllocator& allocator, ILogManager& logger);
 		~Thread();
 
 		Thread& operator=(Thread& other);

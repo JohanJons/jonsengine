@@ -1,5 +1,6 @@
 #include "../JonsEngineTests/Core/Threading/ThreadTest.h"
 
+#include "boost/bind.hpp"
 
 namespace JonsEngine
 {
@@ -8,8 +9,8 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, jons_SleepCurrentThread)
 	{
-		int num = 0;
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&SetNumberTo14, (void*)&num);
+		int32_t num = 0;
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(boost::bind(&ThreadTest::SetNumberTo14, this, &num));
 
 		jons_SleepCurrentThread(200);
 
@@ -46,8 +47,8 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, Constructor2)
 	{
-		int arg = 500;
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
+		int32_t arg = 500;
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(boost::bind(&Sleeper, &arg));
 
 		ASSERT_EQ(Thread::RUNNING, thread->GetThreadState());
 
@@ -63,9 +64,9 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, operatorAssign)
 	{
-		int arg = 500;
+		int32_t arg = 500;
 		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread();
-		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
+		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(boost::bind(&Sleeper, &arg));
 		
 		ASSERT_EQ(Thread::DETACHED, tr1->GetThreadState());
 		ASSERT_EQ(Thread::RUNNING, tr2->GetThreadState());
@@ -84,8 +85,8 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, Join)
 	{
-		int arg = 500;
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
+		int32_t arg = 500;
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(boost::bind(&Sleeper, &arg));
 
 		ASSERT_EQ(thread->GetThreadState(), Thread::RUNNING);
 
@@ -101,8 +102,8 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, SetPriority)
 	{
-		int arg = 500;
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
+		int32_t arg = 500;
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(boost::bind(&Sleeper, &arg));
 
 		ASSERT_EQ(0, thread->SetPriority(THREAD_PRIORITY_ABOVE_NORMAL));
 
@@ -114,8 +115,8 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, GetThreadState)
 	{
-		int arg = 500;
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(&Sleeper, (void*)&arg);
+		int32_t arg = 500;
+		IThread* thread = mEngine.GetThreadingFactory().CreateThread(boost::bind(&Sleeper, &arg));
 
 		ASSERT_EQ(Thread::RUNNING, thread->GetThreadState());
 

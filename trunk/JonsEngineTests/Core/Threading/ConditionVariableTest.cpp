@@ -1,5 +1,6 @@
 #include "../JonsEngineTests/Core/Threading/ConditionVariableTest.h"
 
+#include "boost/bind.hpp"
 
 namespace JonsEngine
 {
@@ -15,9 +16,9 @@ namespace JonsEngine
 	{
 		mMutex = mEngine.GetThreadingFactory().CreateMutex();
 		mCondVar = mEngine.GetThreadingFactory().CreateConditionVariable();
-		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(&Incrementto4, (void*)1000);
-		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(&Incrementto7, (void*)1000);
-		IThread* tr3 = mEngine.GetThreadingFactory().CreateThread(&Incrementto10, (void*)1000);
+		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(&Incrementto4);
+		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(&Incrementto7);
+		IThread* tr3 = mEngine.GetThreadingFactory().CreateThread(&Incrementto10);
 
 		for (;;)
 		{
@@ -42,13 +43,13 @@ namespace JonsEngine
 	TEST_F(ConditionVariableTest, TimedWait)
 	{
 		mCondVar = mEngine.GetThreadingFactory().CreateConditionVariable();
-		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(&signal, NULL);
+		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(&signal);
 
 		mCondVar->TimedWait(1000);
 
 		ASSERT_EQ(mCount, 10);
 
-		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(&setCountTo14, NULL);
+		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(&setCountTo14);
 
 		mCondVar->TimedWait(500);
 
@@ -68,7 +69,7 @@ namespace JonsEngine
 
 		ASSERT_EQ(ConditionVariable::READY, mCondVar->GetConditionVariableState());
 
-		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(&timedWait500ms, NULL);
+		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(&timedWait500ms);
 
 		jons_SleepCurrentThread(100);
 

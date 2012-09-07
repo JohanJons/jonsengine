@@ -19,15 +19,11 @@ namespace JonsEngine
 			
 		}
 
-		static void* incrementer(void* arg)
+		static void incrementer(IMutex* mutex)
 		{
-			Mutex* mutex = static_cast<Mutex*>(arg);
-
 			mutex->Lock();
 			mCount++;
 			mutex->Unlock();
-
-			return NULL;
 		}
 
 		virtual void SetUp()

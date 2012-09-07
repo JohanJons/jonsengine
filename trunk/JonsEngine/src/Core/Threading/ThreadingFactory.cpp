@@ -63,11 +63,11 @@ namespace JonsEngine
 		return ret;
 	}
 
-	IThread* const ThreadingFactory::CreateThread(Task task, void* arg)
+	IThread* const ThreadingFactory::CreateThread(Task task)
 	{
 		IThread* ret = NULL;
 
-		ret = mMemoryAllocator.AllocateObject<Thread, Task, void*, IMemoryAllocator&, ILogManager&>(task, arg, mMemoryAllocator, mLogger);
+		ret = mMemoryAllocator.AllocateObject<Thread, Task, IMemoryAllocator&, ILogManager&>(task, mMemoryAllocator, mLogger);
 
 		if (ret != NULL)
 			mCreatedThreads.push_back(ret);

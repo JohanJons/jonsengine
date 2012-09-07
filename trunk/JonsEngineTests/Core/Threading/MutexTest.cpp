@@ -1,5 +1,6 @@
 #include "../JonsEngineTests/Core/Threading/MutexTest.h"
 
+#include "boost/bind.hpp"
 
 namespace JonsEngine
 {
@@ -13,7 +14,7 @@ namespace JonsEngine
 		IMutex* mutex = mEngine.GetThreadingFactory().CreateMutex();
 
 		for (int i = 0; i<10; i++)
-			mEngine.GetThreadingFactory().CreateThread(&incrementer, (void*)mutex);
+			mEngine.GetThreadingFactory().CreateThread(boost::bind(&incrementer, mutex));
 		jons_SleepCurrentThread(500);
 
 		ASSERT_EQ(10, MutexTest::mCount);
