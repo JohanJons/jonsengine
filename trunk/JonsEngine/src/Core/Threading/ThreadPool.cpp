@@ -5,15 +5,17 @@
 #include "interface/Core/Threading/IMutex.h"
 #include "interface/Core/Threading/IConditionVariable.h"
 
+#include "include/Core/Threading/ScopedLock.h"
+
 #include "boost/bind.hpp"
 
 namespace JonsEngine
 {
 	ThreadPool::ThreadPool(IMemoryAllocator& allocator, ILogManager& logger, IThreadingFactory& factory, uint32_t initialNumThreads) : mMemoryAllocator(allocator), mLogger(logger), mFactory(factory), mMutex(NULL), 
-																																	mNumThreads(0), mDesiredNumThreads(0), mScheduledTasks(allocator), mCondVar_WorkDone(NULL), mCondVar_NewTaskOrKillWorker(NULL)
+																																	mNumThreads(0), mDesiredNumThreads(0), mScheduledTasks(allocator), mCondVar_WorkDoneOrWorkerKilled(NULL), mCondVar_NewTaskOrKillWorker(NULL)
 	{
 		mMutex = mFactory.CreateMutex();
-		mCondVar_WorkDone = mFactory.CreateConditionVariable();
+		mCondVar_WorkDoneOrWorkerKilled = mFactory.CreateConditionVariable();
 		mCondVar_NewTaskOrKillWorker = mFactory.CreateConditionVariable();
 
 		SetNumThreads(initialNumThreads);
@@ -21,11 +23,14 @@ namespace JonsEngine
 
 	ThreadPool::~ThreadPool()
 	{
+		// order and block untill all workers are dead
+		TerminateAllWorkers();
+
 		if (mMutex)
 			mFactory.DestroyMutex(mMutex);
 
-		if (mCondVar_WorkDone)
-			mFactory.DestroyConditionVariable(mCondVar_WorkDone);
+		if (mCondVar_WorkDoneOrWorkerKilled)
+			mFactory.DestroyConditionVariable(mCondVar_WorkDoneOrWorkerKilled);
 
 		if (mCondVar_NewTaskOrKillWorker)
 			mFactory.DestroyConditionVariable(mCondVar_NewTaskOrKillWorker);
@@ -45,12 +50,11 @@ namespace JonsEngine
 			return;
 		}
 
-		mMutex->Lock();
+		ScopedLock lock(mMutex);
 
+		// schedule task and notify atleast one worker
 		mScheduledTasks.push_back(task);
 		mCondVar_NewTaskOrKillWorker->Signal();
-
-		mMutex->Unlock();
 	}
 
 	void ThreadPool::ClearTasks()
@@ -61,11 +65,9 @@ namespace JonsEngine
 			return;
 		}
 
-		mMutex->Lock();
+		ScopedLock lock(mMutex);
 
 		mScheduledTasks.clear();
-
-		mMutex->Unlock();
 	}
 
 	size_t ThreadPool::PendingTasks() const
@@ -76,12 +78,9 @@ namespace JonsEngine
 			return 0;
 		}
 
-		mMutex->Lock();
+		ScopedLock lock(mMutex);
 
 		size_t ret = mScheduledTasks.size();
-
-		mMutex->Unlock();
-
 
 		return ret;
 	}
@@ -94,12 +93,9 @@ namespace JonsEngine
 			return false;
 		}
 
-		mMutex->Lock();
+		ScopedLock lock(mMutex);
 
 		bool ret = mScheduledTasks.empty();
-
-		mMutex->Unlock();
-
 
 		return ret;
 	}
@@ -112,28 +108,17 @@ namespace JonsEngine
 			return;
 		}
 
-		if (!mCondVar_WorkDone)
+		if (!mCondVar_WorkDoneOrWorkerKilled)
 		{
 			mLogger.LogError() << "ThreadPool::Wait(): Condition Variable is invalid" << std::endl;
 			return;
 		}
 
-		bool waiting = true;
-
-		while (waiting)
+		while(!mScheduledTasks.empty())
 		{
-			mMutex->Lock();
+			ScopedLock lock(mMutex);
 
-			bool isEmpty = mScheduledTasks.empty();
-
-			mMutex->Unlock();
-
-			if (isEmpty)
-			{
-				waiting = false;
-			}
-			else
-				mCondVar_WorkDone->Wait();
+			mCondVar_WorkDoneOrWorkerKilled->Wait(mMutex);
 		}
 	}
 
@@ -145,27 +130,17 @@ namespace JonsEngine
 			return;
 		}
 
-		if (!mCondVar_WorkDone)
+		if (!mCondVar_WorkDoneOrWorkerKilled)
 		{
 			mLogger.LogError() << "ThreadPool::Wait(): Condition Variable is invalid" << std::endl;
 			return;
 		}
 
-		mMutex->Lock();
-
-		size_t tasksLeft = mScheduledTasks.size();
-
-		mMutex->Unlock();
-
-		while (tasksLeft > taskLimit)
+		while (mScheduledTasks.size() > taskLimit)
 		{
-			mCondVar_WorkDone->Wait();
+			ScopedLock lock(mMutex);
 
-			mMutex->Lock();
-
-			tasksLeft = mScheduledTasks.size();
-
-			mMutex->Unlock();
+			mCondVar_WorkDoneOrWorkerKilled->Wait(mMutex);
 		}
 	}
 
@@ -177,7 +152,7 @@ namespace JonsEngine
 			return;
 		}
 
-		mMutex->Lock();
+		ScopedLock lock(mMutex);
 
 		mDesiredNumThreads = num;
 
@@ -191,8 +166,6 @@ namespace JonsEngine
 		}
 		else
 			mCondVar_NewTaskOrKillWorker->Broadcast();
-
-		mMutex->Unlock();
 	}
 
 	uint32_t ThreadPool::GetNumThreads() const
@@ -203,12 +176,9 @@ namespace JonsEngine
 			return 0;
 		}
 
-		mMutex->Lock();
+		ScopedLock lock(mMutex);
 
 		uint32_t ret = mNumThreads;
-
-		mMutex->Unlock();
-
 
 		return ret;
 	}
@@ -221,7 +191,7 @@ namespace JonsEngine
 			return;
 		}
 
-		if (!mCondVar_WorkDone || !mCondVar_NewTaskOrKillWorker)
+		if (!mCondVar_WorkDoneOrWorkerKilled || !mCondVar_NewTaskOrKillWorker)
 		{
 			mLogger.LogError() << "ThreadPool::Worker(): Condition Variables are invalid" << std::endl;
 			return;
@@ -231,25 +201,50 @@ namespace JonsEngine
 
 		while (running)
 		{
-			mMutex->Lock();
-
 			Task task = NULL;
 
-			// either terminate the worker, or check for tasks
-			if (mDesiredNumThreads < mNumThreads)
 			{
-				running = false;
-			}
-			else
-			{
-				if (!mScheduledTasks.empty())
+				ScopedLock lock(mMutex);
+
+				if (mDesiredNumThreads < mNumThreads)
+				{
+					running = false;
+					mNumThreads--;
+				}
+				else if (!mScheduledTasks.empty())
 				{
 					task = mScheduledTasks.front();
 					mScheduledTasks.erase(mScheduledTasks.begin());
 				}
-				
-			
+				else
+					mCondVar_NewTaskOrKillWorker->Wait(mMutex);
 			}
+
+			if (task)
+			{
+				task();
+				mCondVar_WorkDoneOrWorkerKilled->Signal();
+			}
+			else if (!running)
+				mCondVar_WorkDoneOrWorkerKilled->Signal();
 		}
+	}
+
+	void ThreadPool::TerminateAllWorkers()
+	{
+		if (!mMutex)
+		{
+			mLogger.LogError() << "ThreadPool::TerminateAllWorkers(): Mutex is invalid" << std::endl;
+			return;
+		}
+
+		ScopedLock lock(mMutex);
+
+		mDesiredNumThreads = 0;
+
+		mCondVar_NewTaskOrKillWorker->Broadcast();
+
+		while (GetNumThreads())
+			mCondVar_WorkDoneOrWorkerKilled->Wait(mMutex);
 	}
 }

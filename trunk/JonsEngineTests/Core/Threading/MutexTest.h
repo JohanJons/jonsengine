@@ -19,17 +19,15 @@ namespace JonsEngine
 			
 		}
 
-		static void incrementer(IMutex* mutex)
+		static void incrementer(IMutex* mutex, int32_t* count)
 		{
 			mutex->Lock();
-			mCount++;
+			(*count)++;
 			mutex->Unlock();
 		}
 
 		virtual void SetUp()
 		{
-			mCount = 0;
-
 			RunningEngineFixture::SetUp();
 		}
 
@@ -37,8 +35,6 @@ namespace JonsEngine
 		{
 			RunningEngineFixture::TearDown();
 		}
-
-		static int mCount;
 
 	};
 

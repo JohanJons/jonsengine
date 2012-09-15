@@ -5,6 +5,7 @@
 
 #include "include/Core/Threading/Thread.h"
 #include "include/Core/Threading/ConditionVariable.h"
+#include "include/Core/Threading/ScopedLock.h"
 
 #include "../JonsEngineTests/TestFixtures/RunningEngineFixture.h"
 
@@ -21,8 +22,6 @@ namespace JonsEngine
 
 		virtual void SetUp()
 		{
-			mCount = 0;
-
 			RunningEngineFixture::SetUp();
 		}
 
@@ -31,93 +30,33 @@ namespace JonsEngine
 			RunningEngineFixture::TearDown();
 		}
 
-		static void signal()
-		{
-			jons_SleepCurrentThread(50);
+		void Increment(int32_t* intPtr, bool* waiting, IMutex* mutex, IConditionVariable* condVar)
+		{ 
+			ScopedLock lock(mutex);
 
-			mCount = 10;
+			while (*waiting)
+				condVar->Wait(mutex);
 
-			mCondVar->Signal();
+			(*intPtr)++;
 		}
 
-		static void setCountTo14()
+		void Signal(int32_t* intPtr, bool* waiting, IMutex* mutex, IConditionVariable* condVar)
 		{
-			mCount = 14;
+			ScopedLock lock(mutex);
+
+			(*intPtr)++;
+
+			*waiting = false;
+
+			condVar->Signal();
 		}
 
-		static void timedWait500ms()
+		void timedWait100ms(IMutex* mutex, IConditionVariable* condVar)
 		{
-			mCondVar->TimedWait(500);
+			ScopedLock lock(mutex);
+
+			condVar->TimedWait(mutex, 100);
 		}
-
-		static void Incrementto4()
-		{
-			for (;;)
-			{
-				if (mCount < 4)
-				{
-					mMutex->Lock();
-					mCount++;
-					if (mCount == 4)
-					{
-						mCondVar->Broadcast();
-						return;
-					}
-					mMutex->Unlock();
-				}
-				
-				jons_SleepCurrentThread(50);
-			}
-		}
-
-		static void Incrementto7()
-		{
-			for (;;)
-			{
-				if (mCount >= 4 && mCount < 7)
-				{
-					mMutex->Lock();
-					mCount++;
-					if (mCount == 7)
-					{
-						mCondVar->Broadcast();
-						return;
-					}
-					mMutex->Unlock();
-				}
-				else
-					mCondVar->Wait();
-
-				jons_SleepCurrentThread(50);
-			}
-		}
-
-		static void Incrementto10()
-		{
-			for (;;)
-			{
-				if (mCount >= 7)
-				{
-					mMutex->Lock();
-					mCount++;
-					if (mCount == 10)
-					{
-						mCondVar->Broadcast();
-						return;
-					}
-					mMutex->Unlock();
-				}
-				else
-					mCondVar->Wait();
-
-				jons_SleepCurrentThread(50);
-			}
-		}
-
-		static int mCount;
-		static IMutex* mMutex;
-		static IConditionVariable* mCondVar;
-
 	};
 
 }

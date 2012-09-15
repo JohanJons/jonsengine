@@ -4,20 +4,19 @@
 
 namespace JonsEngine
 {
-	int MutexTest::mCount = 0;
-
 	/**
 	 * Lock/Unlock test
 	 */
 	TEST_F(MutexTest, Lock)
 	{
 		IMutex* mutex = mEngine.GetThreadingFactory().CreateMutex();
+		int count = 0;
 
 		for (int i = 0; i<10; i++)
-			mEngine.GetThreadingFactory().CreateThread(boost::bind(&incrementer, mutex));
+			mEngine.GetThreadingFactory().CreateThread(boost::bind(&incrementer, mutex, &count));
 		jons_SleepCurrentThread(500);
 
-		ASSERT_EQ(10, MutexTest::mCount);
+		ASSERT_EQ(10, count);
 
 		// Engine destructor will destroy allocated threads...
 	}

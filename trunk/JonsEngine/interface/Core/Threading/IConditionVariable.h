@@ -5,6 +5,8 @@
 
 namespace JonsEngine
 {
+	class IMutex;
+
 	class IConditionVariable
 	{
 	public:
@@ -16,8 +18,8 @@ namespace JonsEngine
 
 		virtual ~IConditionVariable() { }
 
-		virtual void Wait() = 0;
-		virtual void TimedWait(uint32_t milliseconds) = 0;
+		virtual void Wait(IMutex* mutex) = 0;
+		virtual void TimedWait(IMutex* mutex, uint32_t milliseconds) = 0;
 		virtual void Signal() = 0;
 		virtual void Broadcast() = 0;
 

@@ -5,36 +5,33 @@
 namespace JonsEngine
 {
 
-	int ConditionVariableTest::mCount = 0;
-	IMutex* ConditionVariableTest::mMutex = NULL;
-	IConditionVariable* ConditionVariableTest::mCondVar = NULL;
 
 	/**
 	 * Wait/Broadcast test
 	 */
 	TEST_F(ConditionVariableTest, Wait)
 	{
-		mMutex = mEngine.GetThreadingFactory().CreateMutex();
-		mCondVar = mEngine.GetThreadingFactory().CreateConditionVariable();
-		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(&Incrementto4);
-		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(&Incrementto7);
-		IThread* tr3 = mEngine.GetThreadingFactory().CreateThread(&Incrementto10);
+		int32_t count = 0;
+		bool waiting = true;
+		IMutex* mutex = mEngine.GetThreadingFactory().CreateMutex();
+		IConditionVariable* condVar = mEngine.GetThreadingFactory().CreateConditionVariable();
+		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(boost::bind(&ConditionVariableTest::Increment, this, &count, &waiting, mutex, condVar));
+		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(boost::bind(&ConditionVariableTest::Increment, this, &count, &waiting, mutex, condVar));
 
-		for (;;)
 		{
-			mCondVar->Wait();
+			jons_SleepCurrentThread(10);
 
-			if (tr1->GetThreadState() == Thread::FINISHED &&
-				tr2->GetThreadState() == Thread::FINISHED &&
-				tr3->GetThreadState() == Thread::FINISHED)
-				break;
+			ScopedLock lock(mutex);
+
+			waiting = false;
+
+			condVar->Broadcast();
 		}
 
 		mEngine.GetThreadingFactory().DestroyThread(tr1);
 		mEngine.GetThreadingFactory().DestroyThread(tr2);
-		mEngine.GetThreadingFactory().DestroyThread(tr3);
-		mEngine.GetThreadingFactory().DestroyMutex(mMutex);
-		mEngine.GetThreadingFactory().DestroyConditionVariable(mCondVar);
+		mEngine.GetThreadingFactory().DestroyMutex(mutex);
+		mEngine.GetThreadingFactory().DestroyConditionVariable(condVar);
 	}
 
 	/**
@@ -42,22 +39,26 @@ namespace JonsEngine
 	 */
 	TEST_F(ConditionVariableTest, TimedWait)
 	{
-		mCondVar = mEngine.GetThreadingFactory().CreateConditionVariable();
-		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(&signal);
+		int32_t count = 0;
+		bool waiting = true;
+		IConditionVariable* condVar = mEngine.GetThreadingFactory().CreateConditionVariable();
+		IMutex* mutex = mEngine.GetThreadingFactory().CreateMutex();
+		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(boost::bind(&ConditionVariableTest::Signal, this, &count, &waiting, mutex, condVar));
 
-		mCondVar->TimedWait(1000);
+		{
+			ScopedLock lock(mutex);
 
-		ASSERT_EQ(mCount, 10);
+			while (waiting)
+				condVar->TimedWait(mutex, 1000);
 
-		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(&setCountTo14);
+			ASSERT_EQ(count, 1);
 
-		mCondVar->TimedWait(500);
-
-		ASSERT_EQ(mCount, 14);
+			condVar->TimedWait(mutex, 500);
+		}
 
 		mEngine.GetThreadingFactory().DestroyThread(tr1);
-		mEngine.GetThreadingFactory().DestroyThread(tr2);
-		mEngine.GetThreadingFactory().DestroyConditionVariable(mCondVar);
+		mEngine.GetThreadingFactory().DestroyMutex(mutex);
+		mEngine.GetThreadingFactory().DestroyConditionVariable(condVar);
 	}
 
 	/**
@@ -65,21 +66,23 @@ namespace JonsEngine
 	 */
 	TEST_F(ConditionVariableTest, GetConditionVariableState)
 	{
-		mCondVar = mEngine.GetThreadingFactory().CreateConditionVariable();
+		IConditionVariable* condVar = mEngine.GetThreadingFactory().CreateConditionVariable();
+		IMutex* mutex = mEngine.GetThreadingFactory().CreateMutex();
 
-		ASSERT_EQ(ConditionVariable::READY, mCondVar->GetConditionVariableState());
+		ASSERT_EQ(ConditionVariable::READY, condVar->GetConditionVariableState());
 
-		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(&timedWait500ms);
+		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread(boost::bind(&ConditionVariableTest::timedWait100ms, this, mutex, condVar));
 
-		jons_SleepCurrentThread(100);
+		jons_SleepCurrentThread(20);
 
-		ASSERT_EQ(ConditionVariable::WAITING, mCondVar->GetConditionVariableState());
+		ASSERT_EQ(ConditionVariable::WAITING, condVar->GetConditionVariableState());
 
-		jons_SleepCurrentThread(1000);
+		jons_SleepCurrentThread(200);
 
-		ASSERT_EQ(ConditionVariable::READY, mCondVar->GetConditionVariableState());
+		ASSERT_EQ(ConditionVariable::READY, condVar->GetConditionVariableState());
 
 		mEngine.GetThreadingFactory().DestroyThread(tr1);
-		mEngine.GetThreadingFactory().DestroyConditionVariable(mCondVar);
+		mEngine.GetThreadingFactory().DestroyMutex(mutex);
+		mEngine.GetThreadingFactory().DestroyConditionVariable(condVar);
 	}
 }

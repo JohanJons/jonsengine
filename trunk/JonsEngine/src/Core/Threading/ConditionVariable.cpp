@@ -8,13 +8,14 @@
 #endif
 
 #include "include/Core/Threading/ConditionVariable.h"
+#include "include/Core/Threading/Mutex.h"
 
 namespace JonsEngine
 {
 	ConditionVariable::ConditionVariable(ILogManager& logger) : mLogger(logger), mCondVarState(ConditionVariable::READY)
 	{
 		#if defined _WIN32 || _WIN64
-			mCondVarHandle = CreateEvent(NULL, TRUE, FALSE, NULL);
+			InitializeConditionVariable(&mCondVarHandle);
 		#else
 			pthread_cond_init(&mCondVarHandle, NULL);
 		#endif
@@ -22,41 +23,37 @@ namespace JonsEngine
 
 	ConditionVariable::~ConditionVariable()
 	{
-		#if defined _WIN32 || _WIN64
-			CloseHandle(mCondVarHandle);
-		#else
+		#ifdef ANDROID
 			pthread_cond_destroy(&mCondVarHandle);
 		#endif
 	}
 
-	void ConditionVariable::Wait()
+	void ConditionVariable::Wait(IMutex* mutex)
 	{
+		MutexHandle& mutexHandle = static_cast<Mutex*>(mutex)->GetMutexHandle();
+
 		mCondVarState = ConditionVariable::WAITING;
 
 		#if defined _WIN32 || _WIN64
-			WaitForSingleObject(mCondVarHandle, INFINITE);
+			SleepConditionVariableCS(&mCondVarHandle, &mutexHandle, INFINITE);
 		#else
-			mMutex.Lock();
-
-			pthread_cond_wait(&mCondVarHandle, &mMutex.GetNativeHandle());
-
-			mMutex.Unlock();
+			pthread_cond_wait(&mCondVarHandle, &mutexHandle);
 		#endif
 
 		mCondVarState = ConditionVariable::READY;
 	}
 
-	void ConditionVariable::TimedWait(uint32_t milliseconds)
+	void ConditionVariable::TimedWait(IMutex* mutex, uint32_t milliseconds)
 	{
+		MutexHandle& mutexHandle = static_cast<Mutex*>(mutex)->GetMutexHandle();
+
 		mCondVarState = ConditionVariable::WAITING;
 
 		#if defined _WIN32 || _WIN64
-			WaitForSingleObject(mCondVarHandle, milliseconds);
+			SleepConditionVariableCS(&mCondVarHandle, &mutexHandle, milliseconds);
 		#else
 			struct timespec ts;
 			struct timeval tp;
-
-			mMutex.Lock();
 
 			gettimeofday(&tp, NULL);
 
@@ -64,9 +61,7 @@ namespace JonsEngine
 			ts.tv_nsec = tp.tv_usec * 1000;
 			ts.tv_sec += milliseconds/1000;
 
-			pthread_cond_timedwait(&mCondVarHandle, &mMutex.GetNativeHandle(), &ts);
-
-			mMutex.Unlock();
+			pthread_cond_timedwait(&mCondVarHandle, &mutexHandle, &ts);
 		#endif
 
 		mCondVarState = ConditionVariable::READY;
@@ -75,30 +70,18 @@ namespace JonsEngine
 	void ConditionVariable::Signal()
 	{
 		#if defined _WIN32 || _WIN64
-			SetEvent(mCondVarHandle);
-
-			ResetEvent(mCondVarHandle);
+			WakeConditionVariable(&mCondVarHandle);
 		#else
-			mMutex.Lock();
-
 			pthread_cond_signal(&mCondVarHandle);
-
-			mMutex.Unlock();
 		#endif
 	}
 
 	void ConditionVariable::Broadcast()
 	{
 		#if defined _WIN32 || _WIN64
-			SetEvent(mCondVarHandle);
-
-			ResetEvent(mCondVarHandle);
+			WakeAllConditionVariable(&mCondVarHandle);
 		#else
-			mMutex.Lock();
-
 			pthread_cond_broadcast(&mCondVarHandle);
-
-			mMutex.Unlock();
 		#endif
 	}
 

@@ -104,6 +104,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Core\Memory\MemoryManagerImpl.cpp" />
     <ClCompile Include="src\Core\Threading\ConditionVariable.cpp" />
     <ClCompile Include="src\Core\Threading\Mutex.cpp" />
+    <ClCompile Include="src\Core\Threading\ScopedLock.cpp" />
     <ClCompile Include="src\Core\Threading\Thread.cpp" />
     <ClCompile Include="src\Core\Threading\ThreadingFactory.cpp" />
     <ClCompile Include="src\Core\Threading\ThreadPool.cpp" />
@@ -128,6 +129,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Core\Memory\MemoryManagerImpl.h" />
     <ClInclude Include="include\Core\Threading\ConditionVariable.h" />
     <ClInclude Include="include\Core\Threading\Mutex.h" />
+    <ClInclude Include="include\Core\Threading\ScopedLock.h" />
     <ClInclude Include="include\Core\Threading\Thread.h" />
     <ClInclude Include="include\Core\Threading\ThreadingFactory.h" />
     <ClInclude Include="include\Core\Threading\ThreadPool.h" />

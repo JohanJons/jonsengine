@@ -26,6 +26,10 @@ namespace JonsEngine
 			RunningEngineFixture::TearDown();
 		}
 
+		void Arbeit()
+		{
+
+		}
 	};
 
 }

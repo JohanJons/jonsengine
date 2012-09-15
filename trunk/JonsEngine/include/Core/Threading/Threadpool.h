@@ -32,13 +32,14 @@ namespace JonsEngine
 
 	private:
 		void Worker(void* arg);
+		void TerminateAllWorkers();
 
 		IMemoryAllocator& mMemoryAllocator;
 		ILogManager& mLogger;
 		IThreadingFactory& mFactory;
 
 		IMutex* mMutex;
-		IConditionVariable* mCondVar_WorkDone;
+		IConditionVariable* mCondVar_WorkDoneOrWorkerKilled;
 		IConditionVariable* mCondVar_NewTaskOrKillWorker;
 		Vector<Task> mScheduledTasks;
 		uint32_t mNumThreads;

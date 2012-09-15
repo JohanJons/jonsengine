@@ -141,7 +141,7 @@ namespace JonsEngine
 			return -1;
 	}
 
-	Thread::ThreadHandle Thread::_CreateThread(void* (*start) (void*), void* arg)
+	ThreadHandle Thread::_CreateThread(void* (*start) (void*), void* arg)
 	{
 		ThreadHandle handle = NULL;
 
@@ -166,7 +166,6 @@ namespace JonsEngine
 			pthread_join(handle, NULL);
 		#endif
 	}
-
 
 	/*
 	 *
@@ -195,9 +194,9 @@ namespace JonsEngine
 	 * Returns the backend native thread handle
 	 * @ret: The native thread backend for the current thread
 	 */
-	Thread::ThreadHandle jons_GetCurrentThreadNativeHandle()
+	ThreadHandle jons_GetCurrentThreadNativeHandle()
 	{
-		Thread::ThreadHandle handle;
+		ThreadHandle handle;
 
 		#if defined _WIN32 || _WIN64
 			handle = GetCurrentThread();
@@ -232,7 +231,7 @@ namespace JonsEngine
 	 * @param priority: the priority to set to thread given by handle
 	 * @ret: 0 for success, -1 for fail
 	 */
-	int32_t jons_SetThreadPriority(Thread::ThreadHandle handle, int32_t priority)
+	int32_t jons_SetThreadPriority(ThreadHandle handle, int32_t priority)
 	{
 		int32_t ret = -1;
 

@@ -8,8 +8,6 @@
 // google unit test framework
 #include "gtest/gtest.h"
 
-
-
 using namespace JonsEngine;
 
 int32_t _tmain(int32_t argc, _TCHAR* argv[])

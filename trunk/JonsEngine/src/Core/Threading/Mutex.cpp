@@ -13,7 +13,7 @@ namespace JonsEngine
 	Mutex::Mutex(ILogManager& logger) : mLogger(logger), mState(Mutex::UNLOCKED)
 	{
 		#if defined _WIN32 || _WIN64
-			mHandle = CreateMutex(NULL, FALSE, NULL);
+			InitializeCriticalSection(&mHandle);
 		#else
 			pthread_mutex_init(&mHandle, NULL);
 		#endif
@@ -22,8 +22,8 @@ namespace JonsEngine
 	Mutex::~Mutex()
 	{
 		#if defined _WIN32 || _WIN64
-			CloseHandle(mHandle);
-		#else
+			DeleteCriticalSection(&mHandle);
+		#elif ANDROID
 			pthread_mutex_destroy(&mHandle);
 		#endif
 	}
@@ -33,7 +33,7 @@ namespace JonsEngine
 		int32_t ret = 0;
 
 		#if defined _WIN32 || _WIN64
-			ret = WaitForSingleObject(mHandle, INFINITE);
+			EnterCriticalSection(&mHandle);
 		#else
 			ret = pthread_mutex_lock(&mHandle);
 		#endif
@@ -49,7 +49,7 @@ namespace JonsEngine
 		int32_t ret = 0;
 
 		#if defined _WIN32 || _WIN64
-			ret = ReleaseMutex(mHandle) ? 0 : -1;
+			LeaveCriticalSection(&mHandle);
 		#else
 			ret = pthread_mutex_unlock(&mHandle);
 		#endif
@@ -63,5 +63,10 @@ namespace JonsEngine
 	const Mutex::MutexState& Mutex::GetMutexState() const
 	{
 		return mState;
+	}
+
+	MutexHandle& Mutex::GetMutexHandle()
+	{
+		return mHandle;
 	}
 }

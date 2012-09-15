@@ -32,14 +32,14 @@ namespace JonsEngine
 		{
 			*number = 14;
 		}
+
+		void Sleeper(int32_t* arg)
+		{
+			int32_t sleepTime = *arg;
+
+			jons_SleepCurrentThread(sleepTime);
+		}
 	};
-
-	void Sleeper(int32_t* arg)
-	{
-		int32_t sleepTime = *arg;
-
-		jons_SleepCurrentThread(sleepTime);
-	}
 }
 
 

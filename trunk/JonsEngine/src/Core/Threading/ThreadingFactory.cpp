@@ -1,5 +1,3 @@
-#include "include/Core/Threading/ThreadingFactory.h"
-
 #include "interface/Core/Logging/ILogManager.h"
 #include "interface/Core/Memory/IMemoryAllocator.h"
 
@@ -7,6 +5,10 @@
 #include "include/Core/Threading/ConditionVariable.h"
 #include "include/Core/Threading/Mutex.h"
 #include "include/Core/Threading/ThreadPool.h"
+
+// because of windows.h...
+#include "include/Core/Threading/ThreadingFactory.h"
+
 
 namespace JonsEngine
 {

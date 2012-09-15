@@ -2,13 +2,14 @@
 #define _JONS_ITHREADING_FACTORY_H
 
 #include "interface/Core/Threading/IThread.h"
-#include "interface/Core/Threading/IMutex.h"
-#include "interface/Core/Threading/IConditionVariable.h"
-#include "interface/Core/Threading/IThreadPool.h"
 #include "interface/Core/EngineDefs.h"
 
 namespace JonsEngine
 {
+	class IMutex;
+	class IConditionVariable;
+	class IThreadPool;
+
 	class IThreadingFactory
 	{
 	public:

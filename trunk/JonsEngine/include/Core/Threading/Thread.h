@@ -12,16 +12,16 @@ namespace JonsEngine
 	class IMemoryAllocator;
 	class ILogManager;
 
+	#if defined _WIN32 || _WIN64
+		typedef void* ThreadHandle;  
+	#else
+		typedef pthread_t ThreadHandle;
+	#endif
+
 	/* Thread wrapper class */
 	class Thread : public IThread
 	{
 	public:
-		#if defined _WIN32 || _WIN64
-			typedef void* ThreadHandle;  
-		#else
-			typedef pthread_t ThreadHandle;
-		#endif
-
 		struct ThreadInfo
 		{
 			ThreadInfo() : mState(DETACHED), mTask(NULL)
@@ -54,8 +54,8 @@ namespace JonsEngine
 		void _JoinThread(ThreadHandle& handle);
 	};
 
-	Thread::ThreadHandle jons_GetCurrentThreadNativeHandle();
-	int32_t jons_SetThreadPriority(Thread::ThreadHandle handle, int32_t priority);
+	ThreadHandle jons_GetCurrentThreadNativeHandle();
+	int32_t jons_SetThreadPriority(ThreadHandle handle, int32_t priority);
 }
 
 #endif

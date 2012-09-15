@@ -134,6 +134,9 @@
     <ClCompile Include="src\Core\GameObject\GameObjectManagerImpl.cpp">
       <Filter>Source Files\Core\GameObject</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Threading\ScopedLock.cpp">
+      <Filter>Source Files\Core\Threading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Render\RenderManagerImpl.h">
@@ -177,9 +180,6 @@
     </ClInclude>
     <ClInclude Include="include\Core\Memory\HeapAllocator.h">
       <Filter>Header Files\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Containers\Vector.h">
-      <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Threading\Thread.h">
       <Filter>Header Files\Core\Threading</Filter>
@@ -231,6 +231,12 @@
     </ClInclude>
     <ClInclude Include="interface\Core\EngineDefs.h">
       <Filter>Interface\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Threading\ScopedLock.h">
+      <Filter>Header Files\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Containers\Vector.h">
+      <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
