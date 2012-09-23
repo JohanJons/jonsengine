@@ -30,19 +30,19 @@ namespace JonsEngine
 			RunningEngineFixture::TearDown();
 		}
 
-		void Increment(int32_t* intPtr, bool* waiting, IMutex* mutex, IConditionVariable* condVar)
+		void Increment(int32_t* intPtr, bool* waiting, Mutex* mutex, ConditionVariable* condVar)
 		{ 
-			ScopedLock lock(mutex);
+			ScopedLock lock(*mutex);
 
 			while (*waiting)
-				condVar->Wait(mutex);
+				condVar->Wait(*mutex);
 
 			(*intPtr)++;
 		}
 
-		void Signal(int32_t* intPtr, bool* waiting, IMutex* mutex, IConditionVariable* condVar)
+		void Signal(int32_t* intPtr, bool* waiting, Mutex* mutex, ConditionVariable* condVar)
 		{
-			ScopedLock lock(mutex);
+			ScopedLock lock(*mutex);
 
 			(*intPtr)++;
 
@@ -51,11 +51,11 @@ namespace JonsEngine
 			condVar->Signal();
 		}
 
-		void timedWait100ms(IMutex* mutex, IConditionVariable* condVar)
+		void timedWait100ms(Mutex* mutex, ConditionVariable* condVar)
 		{
-			ScopedLock lock(mutex);
+			ScopedLock lock(*mutex);
 
-			condVar->TimedWait(mutex, 100);
+			condVar->TimedWait(*mutex, 100);
 		}
 	};
 

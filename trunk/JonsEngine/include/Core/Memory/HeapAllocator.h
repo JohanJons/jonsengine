@@ -1,9 +1,11 @@
-#ifndef _HEAP_ALLOCATOR_H
-#define _HEAP_ALLOCATOR_H
+#pragma once
 
 #include "interface/Core/Memory/IMemoryAllocator.h"
 
 #include "../Thirdparty/dlmalloc/dlmalloc.h"
+
+#include <string.h>
+
 
 namespace JonsEngine
 {
@@ -16,7 +18,7 @@ namespace JonsEngine
 			DLMALLOC
 		};
 
-		HeapAllocator(HeapAllocatorBackend backend);
+		HeapAllocator(const std::string& allocatorName, const HeapAllocatorBackend backend);
 		~HeapAllocator();
 
 		void* Allocate(size_t size);
@@ -24,15 +26,19 @@ namespace JonsEngine
         void Deallocate(void* p);
 
 		uint64_t GetAllocatedMemory() const;
+		const std::string& GetAllocatorName() const;
 
 	private:
 		void* InternalAllocate(size_t size);
 		void InternalDeallocate(void* p);
 
-		HeapAllocatorBackend mBackend;
+		const HeapAllocatorBackend mBackend;
+		const std::string& mAllocatorName;
 	};
+
+
+	namespace Globals
+	{
+		IMemoryAllocator& GetDefaultHeapAllocator();
+	}
 }
-
-
-
-#endif

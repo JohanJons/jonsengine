@@ -2,7 +2,15 @@
 
 namespace JonsEngine
 {
-	HeapAllocator::HeapAllocator(HeapAllocatorBackend backend) : mBackend(backend)
+	static HeapAllocator gHeapAllocator("DefaultHeapAllocator", HeapAllocator::DLMALLOC);
+
+	IMemoryAllocator& Globals::GetDefaultHeapAllocator()
+	{
+		return gHeapAllocator;
+	}
+
+
+	HeapAllocator::HeapAllocator(const std::string& allocatorName, HeapAllocatorBackend backend) : mAllocatorName(allocatorName), mBackend(backend)
 	{
 	}
 	
@@ -62,6 +70,11 @@ namespace JonsEngine
 		else
 			return 0;
 
+	}
+
+	const std::string& HeapAllocator::GetAllocatorName() const
+	{
+		return mAllocatorName;
 	}
 
 	void* HeapAllocator::InternalAllocate(size_t size)

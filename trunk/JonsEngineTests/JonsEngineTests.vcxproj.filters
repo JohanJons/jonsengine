@@ -29,18 +29,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="TestClass1.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TestManager.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Memory\MemoryTestManager.h">
-      <Filter>Source Files\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\GameObject\GameObjectTestManager.h">
-      <Filter>Source Files\Core\GameObject</Filter>
-    </ClInclude>
     <ClInclude Include="Core\Containers\VectorTest.h">
       <Filter>Source Files\Core\Containers</Filter>
     </ClInclude>
@@ -63,18 +51,6 @@
   <ItemGroup>
     <ClCompile Include="JonsEngineTests.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TestClass1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TestManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Memory\MemoryTestManager.cpp">
-      <Filter>Source Files\Core\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\GameObject\GameObjectTestManager.cpp">
-      <Filter>Source Files\Core\GameObject</Filter>
     </ClCompile>
     <ClCompile Include="Core\Containers\VectorTest.cpp">
       <Filter>Source Files\Core\Containers</Filter>

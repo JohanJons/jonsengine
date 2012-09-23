@@ -1,5 +1,4 @@
-#ifndef _I_MEMORY_ALLOCATOR_H
-#define _I_MEMORY_ALLOCATOR_H
+#pragma once
 
 #include "interface/Core/EngineDefs.h"
 
@@ -122,6 +121,7 @@ namespace JonsEngine
 		}
 
 		virtual uint64_t GetAllocatedMemory() const = 0;
+		virtual const std::string& GetAllocatorName() const = 0;
 
 	private:
 		virtual void* InternalAllocate(size_t size) = 0;
@@ -129,5 +129,3 @@ namespace JonsEngine
 	};
 
 }
-
-#endif

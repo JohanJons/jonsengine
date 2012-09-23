@@ -1,23 +1,23 @@
-#ifndef _JONS_THREAD_POOL_H
-#define _JONS_THREAD_POOL_H
+#pragma once
 
-#include "interface/Core/Threading/IThreadPool.h"
 #include "interface/Core/EngineDefs.h"
 
+#include "include/Core/Threading/Thread.h"
+#include "include/Core/Threading/Mutex.h"
+#include "include/Core/Threading/ConditionVariable.h"
 #include "include/Core/Containers/Vector.h"
 
 namespace JonsEngine
 {
 	class IMemoryAllocator;
-	class ILogManager;
-	class IThreadingFactory;
-	class IMutex;
-	class IConditionVariable;
+	class Logger;
+	class Mutex;
+	class ConditionVariable;
 
-	class ThreadPool : public IThreadPool
+	class ThreadPool
 	{
 	public:
-		ThreadPool(IMemoryAllocator& allocator, ILogManager& logger, IThreadingFactory& factory, uint32_t initialNumThreads);
+		ThreadPool(uint32_t initialNumThreads);
 		~ThreadPool();
 
 		void AddTask(const Task& task);
@@ -25,9 +25,20 @@ namespace JonsEngine
 		size_t PendingTasks() const;
 		bool Empty() const;
 		void Wait();
+
+		/*
+		 * Waits untill there are only a given number of tasks left
+		 */
 		void Wait(const size_t taskLimit);
 
+		/*
+		 * Sets the number of active threads
+		 */
 		void SetNumThreads(uint32_t num);
+
+		/*
+		 * Gets the number of active threads
+		 */
 		uint32_t GetNumThreads() const;
 
 	private:
@@ -35,16 +46,15 @@ namespace JonsEngine
 		void TerminateAllWorkers();
 
 		IMemoryAllocator& mMemoryAllocator;
-		ILogManager& mLogger;
-		IThreadingFactory& mFactory;
+		Logger& mLogger;
 
-		IMutex* mMutex;
-		IConditionVariable* mCondVar_WorkDoneOrWorkerKilled;
-		IConditionVariable* mCondVar_NewTaskOrKillWorker;
+		mutable Mutex mMutex;
+		ConditionVariable mCondVar_WorkDoneOrWorkerKilled;
+		ConditionVariable mCondVar_NewTaskOrKillWorker;
+
 		Vector<Task> mScheduledTasks;
+		Vector<Thread*> mWorkerThreads;
 		uint32_t mNumThreads;
 		uint32_t mDesiredNumThreads;
 	};
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _JONS_OUTPUT_STREAM_H
-#define _JONS_OUTPUT_STREAM_H
+#pragma once
 
 #include <iostream>
 
@@ -15,5 +14,3 @@ namespace JonsEngine
 
 	};
 }
-
-#endif

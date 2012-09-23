@@ -1,34 +1,42 @@
-#ifndef _JONS_CONDITION_VARIABLE_H
-#define _JONS_CONDITION_VARIABLE_H
-
-#include "interface/Core/Threading/IConditionVariable.h"
+#pragma once
 
 #if defined _WIN32 || _WIN64
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#undef WIN32_LEAN_AND_MEAN
-#elif ANDROID
-#include <pthread.h>
+	#define WIN32_LEAN_AND_MEAN
+	#include <windows.h>
+	#undef WIN32_LEAN_AND_MEAN
+#else
+	#include <pthread.h>
+	#include <time.h>
 #endif
+
+#include <stdint.h>
 
 namespace JonsEngine
 {
-	#if defined _WIN32 || _WIN64
-		typedef CONDITION_VARIABLE ConditionVariableHandle;
-	#else
-		typedef pthread_cond_t ConditionVariableHandle;
-	#endif
+	class Logger;
+	class IMemoryAllocator;
+	class Mutex;
 
-	class ILogManager;
-
-	class ConditionVariable : public IConditionVariable
+	class ConditionVariable
 	{
 	public:
-		ConditionVariable(ILogManager& logger);
+		enum ConditionVariableState
+		{
+			READY,
+			WAITING
+		};
+
+		#if defined _WIN32 || _WIN64
+			typedef CONDITION_VARIABLE ConditionVariableHandle;
+		#else
+			typedef pthread_cond_t ConditionVariableHandle;
+		#endif
+
+		ConditionVariable();
 		~ConditionVariable();
 
-		void Wait(IMutex* mutex);
-		void TimedWait(IMutex* mutex, uint32_t milliseconds);
+		void Wait(Mutex& mutex);
+		void TimedWait(Mutex& mutex, uint32_t milliseconds);
 		void Signal();
 		void Broadcast();
 
@@ -37,9 +45,7 @@ namespace JonsEngine
 	private:
 		ConditionVariableHandle mCondVarHandle;
 		ConditionVariableState mCondVarState;
-		ILogManager& mLogger;
+		Logger& mLogger;
 		
 	};
 }
-
-#endif

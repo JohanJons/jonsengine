@@ -1,21 +1,7 @@
 #include "include/Core/Engine.h"
 
-#ifdef ANDROID
-JNIEnv* JonsEngine::Engine::mJNIEnv = NULL;
-
-jint JNI_OnLoad(JavaVM* vm, void* reserved)
-{
-    JNIEnv *env;
-
-    if (vm->GetEnv((void**) &env, JNI_VERSION_1_6) != JNI_OK) {
-        return -1;
-    }
-
-	JonsEngine::Engine::mJNIEnv = env;
-    
-    return JNI_VERSION_1_6;
-}
-#endif
+#include "include/Core/Logging/Logger.h"
+#include "include/Core/Memory/HeapAllocator.h"
 
 namespace JonsEngine
 {
@@ -25,10 +11,7 @@ namespace JonsEngine
 		Destroy();
 	}
 
-	Engine::Engine() : mRunning(false), mInitialized(false),
-						mRenderManager(mLog, mMemoryManager.GetHeapAllocator()),
-						mGameObjectManager(mLog, &mMemoryManager.GetHeapAllocator()),
-						mThreadingFactory(mLog, mMemoryManager.GetHeapAllocator())
+	Engine::Engine() : mRunning(false), mInitialized(false), mLog(JonsEngine::GetGlobalLogger())
 	{
 		
 	}
@@ -38,7 +21,6 @@ namespace JonsEngine
 		bool res = true;
 
 		res &= InitializeManagers();
-		res &= InitializeFactories();
 
 		if (res)
 			mInitialized = true;
@@ -48,33 +30,11 @@ namespace JonsEngine
 
 	bool Engine::InitializeManagers()
 	{
-		bool ret = true; 
-
-		// MemoryMgr must be the first one to be initialized as all other subsystems are dependant on it for memory allocation that might occur in their initialization and onwards
-		// Likewise, last to be destroyed
-		ret &= mMemoryManager.Init();
-
-		// Log
-		#ifdef ANDROID
-			ret &= mLog.Init(mEngineSettings.GetLogToFile(), mEngineSettings.GetLogToSTDOut(), mEngineSettings.GetLogToFileLocation(), mJNIEnv);
-		#else
-			ret &= mLog.Init(mEngineSettings.GetLogToFile(), mEngineSettings.GetLogToSTDOut(), mEngineSettings.GetLogToFileLocation());
-		#endif
+		bool ret = true;
 
 		// Render
-		ret &= mRenderManager.Init();
 
 		// GameObject 
-		ret &= mGameObjectManager.Init();
-
-		return ret;
-	}
-		
-	bool Engine::InitializeFactories()
-	{
-		bool ret = true; 
-
-		ret &= mThreadingFactory.Init();
 
 		return ret;
 	}
@@ -86,10 +46,6 @@ namespace JonsEngine
 		if (!mRunning)
 		{
 			res = true;
-			res &= mLog.Start();
-			res &= mRenderManager.Start();
-			res &= mMemoryManager.Start();
-			res &= mGameObjectManager.Start();
 
 			if (res)
 				mRunning = true;
@@ -109,10 +65,6 @@ namespace JonsEngine
 		if (mRunning)
 		{
 			res = true;
-			res &= mRenderManager.Stop();
-			res &= mMemoryManager.Stop();
-			res &= mGameObjectManager.Stop();
-			res &= mLog.Stop();
 
 			if (res)
 				mRunning = false;
@@ -132,7 +84,6 @@ namespace JonsEngine
 		if (mRunning)
 			res &= Stop();
 
-		res &= DestroyFactories();
 		res &= DestroyManagers();
 
 		if (res)
@@ -141,25 +92,9 @@ namespace JonsEngine
 		return res;
 	}
 
-	bool Engine::DestroyFactories()
-	{
-		bool ret = true;
-
-		ret &= mThreadingFactory.Destroy();
-
-		return ret;
-	}
-
 	bool Engine::DestroyManagers()
 	{
 		bool ret = true;
-
-		ret &= mRenderManager.Destroy();
-		ret &= mGameObjectManager.Destroy();
-		ret &= mLog.Destroy();
-
-		// MemoryMgr must be the last one to be destroyed as it is the allocator for the other subsystems
-		ret &= mMemoryManager.Destroy();
 
 		return ret;
 	}
@@ -177,30 +112,5 @@ namespace JonsEngine
 	EngineSettings& Engine::GetEngineSettings()
 	{
 		return mEngineSettings;
-	}
-
-	IRenderManager& Engine::GetRenderManager()
-	{
-		return mRenderManager;
-	}
-
-	IMemoryManager& Engine::GetMemoryManager()
-	{
-		return mMemoryManager;
-	}
-
-	IGameObjectManager& Engine::GetGameObjectManager()
-	{
-		return mGameObjectManager;
-	}
-
-	ILogManager& Engine::GetLogger()
-	{
-		return mLog;
-	}
-
-	IThreadingFactory& Engine::GetThreadingFactory()
-	{
-		return mThreadingFactory;
 	}
 }

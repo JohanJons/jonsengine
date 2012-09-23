@@ -19,7 +19,7 @@ namespace JonsEngine
 			
 		}
 
-		static void incrementer(IMutex* mutex, int32_t* count)
+		static void incrementer(Mutex* mutex, int32_t* count)
 		{
 			mutex->Lock();
 			(*count)++;

@@ -1,20 +1,13 @@
-#if defined _WIN32 || _WIN64
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h>
-	#undef WIN32_LEAN_AND_MEAN
-#else
-	#include <pthread.h>
-#endif
-
 #include "include/Core/Threading/Mutex.h"
 
 namespace JonsEngine
 {
-	Mutex::Mutex(ILogManager& logger) : mLogger(logger), mState(Mutex::UNLOCKED)
+
+	Mutex::Mutex() : mState(UNLOCKED)
 	{
 		#if defined _WIN32 || _WIN64
 			InitializeCriticalSection(&mHandle);
-		#else
+		#elif ANDROID
 			pthread_mutex_init(&mHandle, NULL);
 		#endif
 	}
@@ -34,12 +27,12 @@ namespace JonsEngine
 
 		#if defined _WIN32 || _WIN64
 			EnterCriticalSection(&mHandle);
-		#else
+		#elif ANDROID
 			ret = pthread_mutex_lock(&mHandle);
 		#endif
 
 		if (!ret)
-			mState = Mutex::LOCKED;
+			mState = LOCKED;
 
 		return ret;
 	}
@@ -50,12 +43,12 @@ namespace JonsEngine
 
 		#if defined _WIN32 || _WIN64
 			LeaveCriticalSection(&mHandle);
-		#else
+		#elif ANDROID
 			ret = pthread_mutex_unlock(&mHandle);
 		#endif
 
 		if (!ret)
-			mState = Mutex::UNLOCKED;
+			mState = UNLOCKED;
 
 		return ret;
 	}
@@ -65,7 +58,7 @@ namespace JonsEngine
 		return mState;
 	}
 
-	MutexHandle& Mutex::GetMutexHandle()
+	Mutex::MutexHandle& Mutex::GetMutexHandle()
 	{
 		return mHandle;
 	}

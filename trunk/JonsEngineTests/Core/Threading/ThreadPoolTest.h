@@ -5,6 +5,10 @@
 
 #include "../JonsEngineTests/TestFixtures/RunningEngineFixture.h"
 
+#include "include/Core/Threading/ThreadPool.h"
+
+#include "boost/bind.hpp"
+
 
 namespace JonsEngine
 {
@@ -13,7 +17,6 @@ namespace JonsEngine
 	public:
 		ThreadPoolTest()
 		{
-			
 		}
 
 		virtual void SetUp()
@@ -26,9 +29,15 @@ namespace JonsEngine
 			RunningEngineFixture::TearDown();
 		}
 
+		void AddTasks(ThreadPool& pool, uint32_t numTasks)
+		{
+			for (uint32_t i = 0; i < numTasks; i++)
+				pool.AddTask(boost::bind(&ThreadPoolTest::Arbeit, this));
+		}
+
 		void Arbeit()
 		{
-
+			jons_SleepCurrentThread(20);
 		}
 	};
 

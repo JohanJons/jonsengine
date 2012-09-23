@@ -2,6 +2,8 @@
 
 #include "boost/bind.hpp"
 
+#define THREAD_TEST_PRIO 1
+
 namespace JonsEngine
 {
 	/**
@@ -10,21 +12,11 @@ namespace JonsEngine
 	TEST_F(ThreadTest, jons_SleepCurrentThread)
 	{
 		int32_t num = 0;
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(boost::bind(&ThreadTest::SetNumberTo14, this, &num));
+		Thread thread(boost::bind(&ThreadTest::SetNumberTo14, this, &num));
 
 		jons_SleepCurrentThread(200);
 
 		ASSERT_EQ(num, 14);
-
-		mEngine.GetThreadingFactory().DestroyThread(thread);
-	}
-
-	/**
-	 * Thread jons_SetThreadPriority test
-	 */
-	TEST_F(ThreadTest, jons_SetThreadPriority)
-	{
-		ASSERT_EQ(0, jons_SetThreadPriority(THREAD_PRIORITY_ABOVE_NORMAL));
 	}
 
 	/**
@@ -32,14 +24,12 @@ namespace JonsEngine
 	 */
 	TEST_F(ThreadTest, Constructor1)
 	{
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread();
+		Thread thread;
 		
-		ASSERT_EQ(Thread::DETACHED, thread->GetThreadState());
-		ASSERT_EQ(-1, thread->SetPriority(THREAD_PRIORITY_ABOVE_NORMAL));
+		ASSERT_EQ(Thread::DETACHED, thread.GetThreadState());
+		ASSERT_EQ(-1, thread.SetPriority(THREAD_TEST_PRIO));
 
-		ASSERT_EQ(-1, thread->Join());
-
-		mEngine.GetThreadingFactory().DestroyThread(thread);
+		ASSERT_EQ(-1, thread.Join());
 	}
 
 	/**
@@ -48,15 +38,13 @@ namespace JonsEngine
 	TEST_F(ThreadTest, Constructor2)
 	{
 		int32_t arg = 500;
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(boost::bind(&ThreadTest::Sleeper, this, &arg));
+		Thread thread(boost::bind(&ThreadTest::Sleeper, this, &arg));
 
-		ASSERT_EQ(Thread::RUNNING, thread->GetThreadState());
+		ASSERT_EQ(Thread::RUNNING, thread.GetThreadState());
 
 		jons_SleepCurrentThread(1000);
 
-		ASSERT_EQ(Thread::FINISHED, thread->GetThreadState());
-
-		mEngine.GetThreadingFactory().DestroyThread(thread);
+		ASSERT_EQ(Thread::FINISHED, thread.GetThreadState());
 	}
 
 	/**
@@ -65,19 +53,16 @@ namespace JonsEngine
 	TEST_F(ThreadTest, operatorAssign)
 	{
 		int32_t arg = 500;
-		IThread* tr1 = mEngine.GetThreadingFactory().CreateThread();
-		IThread* tr2 = mEngine.GetThreadingFactory().CreateThread(boost::bind(&ThreadTest::Sleeper, this, &arg));
+		Thread thread1;
+		Thread thread2(boost::bind(&ThreadTest::Sleeper, this, &arg));
 		
-		ASSERT_EQ(Thread::DETACHED, tr1->GetThreadState());
-		ASSERT_EQ(Thread::RUNNING, tr2->GetThreadState());
+		ASSERT_EQ(Thread::DETACHED, thread1.GetThreadState());
+		ASSERT_EQ(Thread::RUNNING, thread2.GetThreadState());
 
-		*tr1 = *tr2;
+		thread1 = thread2;
 
-		ASSERT_EQ(Thread::RUNNING, tr1->GetThreadState());
-		ASSERT_EQ(Thread::DETACHED, tr2->GetThreadState());
-
-		mEngine.GetThreadingFactory().DestroyThread(tr1);
-		mEngine.GetThreadingFactory().DestroyThread(tr2);
+		ASSERT_EQ(Thread::RUNNING, thread1.GetThreadState());
+		ASSERT_EQ(Thread::DETACHED, thread2.GetThreadState());
 	}
 	
 	/**
@@ -86,15 +71,13 @@ namespace JonsEngine
 	TEST_F(ThreadTest, Join)
 	{
 		int32_t arg = 500;
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(boost::bind(&ThreadTest::Sleeper, this, &arg));
+		Thread thread(boost::bind(&ThreadTest::Sleeper, this, &arg));
 
-		ASSERT_EQ(thread->GetThreadState(), Thread::RUNNING);
+		ASSERT_EQ(thread.GetThreadState(), Thread::RUNNING);
 
-		thread->Join();
+		thread.Join();
 
-		ASSERT_EQ(thread->GetThreadState(), Thread::FINISHED);
-
-		mEngine.GetThreadingFactory().DestroyThread(thread);
+		ASSERT_EQ(thread.GetThreadState(), Thread::FINISHED);
 	}
 	
 	/**
@@ -103,11 +86,9 @@ namespace JonsEngine
 	TEST_F(ThreadTest, SetPriority)
 	{
 		int32_t arg = 500;
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(boost::bind(&ThreadTest::Sleeper, this, &arg));
+		Thread thread(boost::bind(&ThreadTest::Sleeper, this, &arg));
 
-		ASSERT_EQ(0, thread->SetPriority(THREAD_PRIORITY_ABOVE_NORMAL));
-
-		mEngine.GetThreadingFactory().DestroyThread(thread);
+		ASSERT_EQ(0, thread.SetPriority(THREAD_TEST_PRIO));
 	}
 
 	/**
@@ -116,14 +97,12 @@ namespace JonsEngine
 	TEST_F(ThreadTest, GetThreadState)
 	{
 		int32_t arg = 500;
-		IThread* thread = mEngine.GetThreadingFactory().CreateThread(boost::bind(&ThreadTest::Sleeper, this, &arg));
+		Thread thread(boost::bind(&ThreadTest::Sleeper, this, &arg));
 
-		ASSERT_EQ(Thread::RUNNING, thread->GetThreadState());
+		ASSERT_EQ(Thread::RUNNING, thread.GetThreadState());
 
 		jons_SleepCurrentThread(1000);
 
-		ASSERT_EQ(Thread::FINISHED, thread->GetThreadState());
-		
-		mEngine.GetThreadingFactory().DestroyThread(thread);
+		ASSERT_EQ(Thread::FINISHED, thread.GetThreadState());
 	}
 }

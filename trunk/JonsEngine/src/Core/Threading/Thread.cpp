@@ -1,7 +1,8 @@
 #include "include/Core/Threading/Thread.h"
 
-#include "interface/Core/Memory/IMemoryAllocator.h"
-#include "interface/Core/Logging/ILogManager.h"
+#include "include/Core/Memory/HeapAllocator.h"
+#include "include/Core/Logging/Logger.h"
+
 
 #if defined _WIN32 || _WIN64
 	#define WIN32_LEAN_AND_MEAN
@@ -19,11 +20,11 @@ namespace JonsEngine
 	 * Thread wrapper class
 	 *
 	 */
-	Thread::Thread(IMemoryAllocator& allocator, ILogManager& logger) : mHandle(NULL), mAllocator(allocator), mThreadInfo(NULL), mLogger(logger)
+	Thread::Thread() : mHandle(NULL), mAllocator(Globals::GetDefaultHeapAllocator()), mThreadInfo(NULL), mLogger(JonsEngine::GetGlobalLogger())
 	{
 	}
 
-	Thread::Thread(Task task, IMemoryAllocator& allocator, ILogManager& logger) : mAllocator(allocator), mLogger(logger)
+	Thread::Thread(Task task) : mAllocator(Globals::GetDefaultHeapAllocator()), mLogger(JonsEngine::GetGlobalLogger())
 	{
 		mThreadInfo = (ThreadInfo*) mAllocator.AllocateObject<ThreadInfo>();
 
@@ -54,19 +55,6 @@ namespace JonsEngine
 			mAllocator = other.mAllocator;
 
 			other.Detach();
-		}
-
-		return *this;
-	}
-
-	IThread& IThread::operator=(IThread& other)
-	{
-		if (&other != this)
-		{
-			Thread* threadThis = static_cast<Thread*>(this);
-			Thread* threadOther = static_cast<Thread*>(&other);
-
-			*threadThis = *threadOther;
 		}
 
 		return *this;
@@ -113,6 +101,29 @@ namespace JonsEngine
 			return Thread::DETACHED;
 	}
 
+	/*
+	 * Sets the priority of a given thread
+	 * @param handle: the native handle of the thread to set priority to
+	 * @param priority: the priority to set to thread given by handle
+	 * @ret: 0 for success, -1 for fail
+	 */
+	int32_t Thread::jons_SetThreadPriority(Thread::ThreadHandle handle, int32_t priority)
+	{
+		int32_t ret = -1;
+
+		#if defined _WIN32 || _WIN64
+			ret = SetThreadPriority(handle, priority) ? 0 : -1;
+		#elif defined ANDROID
+			struct sched_param sp;
+			memset(&sp, 0, sizeof(struct sched_param));
+			sp.sched_priority = priority;
+
+			ret = pthread_setschedparam(handle, SCHED_RR, &sp);
+		#endif
+
+		return ret;
+	}
+
 	int32_t Thread::Destroy()
 	{
 		if (mThreadInfo != NULL && mThreadInfo->mState == Thread::FINISHED)
@@ -141,7 +152,7 @@ namespace JonsEngine
 			return -1;
 	}
 
-	ThreadHandle Thread::_CreateThread(void* (*start) (void*), void* arg)
+	Thread::ThreadHandle Thread::_CreateThread(void* (*start) (void*), void* arg)
 	{
 		ThreadHandle handle = NULL;
 
@@ -167,10 +178,10 @@ namespace JonsEngine
 		#endif
 	}
 
+
+
 	/*
-	 *
-	 * Free-standing functions
-	 *
+	 * Free-standing function
 	 */
 
 	/*
@@ -188,63 +199,5 @@ namespace JonsEngine
 
 			nanosleep(&interval, 0);
 		#endif
-	}
-
-	/*
-	 * Returns the backend native thread handle
-	 * @ret: The native thread backend for the current thread
-	 */
-	ThreadHandle jons_GetCurrentThreadNativeHandle()
-	{
-		ThreadHandle handle;
-
-		#if defined _WIN32 || _WIN64
-			handle = GetCurrentThread();
-		#elif defined ANDROID
-			handle = pthread_self();
-		#endif
-
-		return handle;
-	}
-
-	/*
-	 * Sets the priority of the current thread
-	 * @param priority: the priority to set this thread to
-	 * @ret: 0 for success, -1 for fail
-	 */
-	int32_t jons_SetThreadPriority(int32_t priority)
-	{
-		int32_t ret = -1;
-
-		#if defined _WIN32 || _WIN64
-			ret = jons_SetThreadPriority(GetCurrentThread(), priority);
-		#elif defined ANDROID
-			ret = jons_SetThreadPriority(pthread_self(), priority);
-		#endif
-
-		return ret;
-	}
-
-	/*
-	 * Sets the priority of a given thread
-	 * @param handle: the native handle of the thread to set priority to
-	 * @param priority: the priority to set to thread given by handle
-	 * @ret: 0 for success, -1 for fail
-	 */
-	int32_t jons_SetThreadPriority(ThreadHandle handle, int32_t priority)
-	{
-		int32_t ret = -1;
-
-		#if defined _WIN32 || _WIN64
-			ret = SetThreadPriority(handle, priority) ? 0 : -1;
-		#elif defined ANDROID
-			struct sched_param sp;
-			memset(&sp, 0, sizeof(struct sched_param));
-			sp.sched_priority = priority;
-
-			ret = pthread_setschedparam(handle, SCHED_RR, &sp);
-		#endif
-
-		return ret;
 	}
 }

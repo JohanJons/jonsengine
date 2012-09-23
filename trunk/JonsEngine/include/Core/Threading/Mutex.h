@@ -1,30 +1,36 @@
-#ifndef _JONS_MUTEX_H
-#define _JONS_MUTEX_H
+#pragma once
 
-#include "interface/Core/Threading/IMutex.h"
+#include "interface/Core/EngineDefs.h"
 
+// TODO: better way than to include windows header
 #if defined _WIN32 || _WIN64
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#undef WIN32_LEAN_AND_MEAN
+	#define WIN32_LEAN_AND_MEAN
+	#include <Windows.h>
+	#undef WIN32_LEAN_AND_MEAN
 #elif ANDROID
-#include <pthread.h>
+	#include <pthread.h>
 #endif
 
 namespace JonsEngine
 {
-	#if defined _WIN32 || _WIN64
-		typedef CRITICAL_SECTION MutexHandle;
-	#else
-		typedef pthread_mutex_t MutexHandle;
-	#endif
-
 	class ILogManager;
 
-	class Mutex : public IMutex
+	class Mutex
 	{
 	public:
-		Mutex(ILogManager& logger);
+		enum MutexState
+		{
+			UNLOCKED = 0,
+			LOCKED
+		};
+
+		#if defined _WIN32 || _WIN64
+			typedef CRITICAL_SECTION MutexHandle;
+		#elif ANDROID
+			typedef pthread_mutex_t MutexHandle;
+		#endif
+
+		Mutex();
 		~Mutex();
 
 		int32_t Lock();
@@ -36,8 +42,5 @@ namespace JonsEngine
 	private:
 		MutexHandle mHandle;
 		MutexState mState;
-		ILogManager& mLogger;
 	};
 }
-
-#endif

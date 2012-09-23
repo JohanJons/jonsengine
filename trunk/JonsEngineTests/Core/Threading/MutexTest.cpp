@@ -9,16 +9,17 @@ namespace JonsEngine
 	 */
 	TEST_F(MutexTest, Lock)
 	{
-		IMutex* mutex = mEngine.GetThreadingFactory().CreateMutex();
+		Mutex mutex;
 		int count = 0;
 
-		for (int i = 0; i<10; i++)
-			mEngine.GetThreadingFactory().CreateThread(boost::bind(&incrementer, mutex, &count));
+		Thread thread1(boost::bind(&incrementer, &mutex, &count));
+		Thread thread2(boost::bind(&incrementer, &mutex, &count));
+		Thread thread3(boost::bind(&incrementer, &mutex, &count));
+		Thread thread4(boost::bind(&incrementer, &mutex, &count));
+
 		jons_SleepCurrentThread(500);
 
-		ASSERT_EQ(10, count);
-
-		// Engine destructor will destroy allocated threads...
+		ASSERT_EQ(4, count);
 	}
 
 	/**
@@ -26,16 +27,16 @@ namespace JonsEngine
 	 */
 	TEST_F(MutexTest, GetMutexState)
 	{
-		IMutex* mutex = mEngine.GetThreadingFactory().CreateMutex();
+		Mutex mutex;
 
-		ASSERT_EQ(Mutex::UNLOCKED, mutex->GetMutexState());
+		ASSERT_EQ(Mutex::UNLOCKED, mutex.GetMutexState());
 
-		mutex->Lock();
+		mutex.Lock();
 
-		ASSERT_EQ(Mutex::LOCKED, mutex->GetMutexState());
+		ASSERT_EQ(Mutex::LOCKED, mutex.GetMutexState());
 
-		mutex->Unlock();
+		mutex.Unlock();
 
-		ASSERT_EQ(Mutex::UNLOCKED, mutex->GetMutexState());
+		ASSERT_EQ(Mutex::UNLOCKED, mutex.GetMutexState());
 	}
 }

@@ -1,22 +1,13 @@
-#ifndef _ENGINE_H
-#define _ENGINE_H
-
-#ifdef ANDROID
-#include "jni.h"
-#endif
+#pragma once
 
 #include "include/Core/EngineSettings.h"
-#include "include/Core/EngineCore.h"
-
-#include "include/Render/RenderManagerImpl.h"
-#include "include/Core/GameObject/GameObjectManagerImpl.h"
-
-#include "include/Core/Threading/ThreadingFactory.h"
 
 
 namespace JonsEngine
 {
-	class Engine : EngineCore
+	class Logger;
+
+	class Engine
 	{
 	public:
 		Engine();
@@ -29,40 +20,16 @@ namespace JonsEngine
 		bool isRunning();
 		void Tick();
 
-		/* Managers */
 		EngineSettings& GetEngineSettings();
-		IMemoryManager& GetMemoryManager();
-		IRenderManager& GetRenderManager();
-		IGameObjectManager& GetGameObjectManager();
-		ILogManager& GetLogger();
-
-		/* Factories */
-		IThreadingFactory& GetThreadingFactory();
-
-
-		#ifdef ANDROID
-			static JNIEnv* mJNIEnv;
-		#endif
 
 	private:
 		bool InitializeManagers();
-		bool InitializeFactories();
 		bool DestroyManagers();
-		bool DestroyFactories();
 
 		bool mRunning;
 		bool mInitialized;
 		EngineSettings mEngineSettings;
-
-		/* Managers */
-		RenderManagerImpl mRenderManager;
-		GameObjectManagerImpl mGameObjectManager;
-
-		/* Factories */
-		ThreadingFactory mThreadingFactory;
-
+		Logger& mLog;
 	};
 
 }
-
-#endif

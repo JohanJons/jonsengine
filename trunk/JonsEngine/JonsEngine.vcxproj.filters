@@ -89,20 +89,11 @@
     <ClCompile Include="src\Core\Engine.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Render\RenderManagerImpl.cpp">
-      <Filter>Source Files\Render</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Logging\JonsOutputStream.cpp">
       <Filter>Source Files\Core\Logging</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Logging\JonsStreamBuf.cpp">
       <Filter>Source Files\Core\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Logging\LogManagerImpl.cpp">
-      <Filter>Source Files\Core\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Memory\MemoryManagerImpl.cpp">
-      <Filter>Source Files\Core\Memory</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Utils\JonsTime.cpp">
       <Filter>Source Files\Core\Utils</Filter>
@@ -128,49 +119,22 @@
     <ClCompile Include="src\Core\Threading\ConditionVariable.cpp">
       <Filter>Source Files\Core\Threading</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Threading\ThreadingFactory.cpp">
-      <Filter>Source Files\Core\Threading</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\GameObject\GameObjectManagerImpl.cpp">
-      <Filter>Source Files\Core\GameObject</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Threading\ScopedLock.cpp">
-      <Filter>Source Files\Core\Threading</Filter>
+    <ClCompile Include="src\Core\Logging\Logger.cpp">
+      <Filter>Source Files\Core\Logging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Render\RenderManagerImpl.h">
-      <Filter>Header Files\Render</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Engine.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Utils\JonsTime.h">
       <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Logging\AndroidLogStream.h">
-      <Filter>Header Files\Core\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Logging\DummyLogStream.h">
-      <Filter>Header Files\Core\Logging</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Logging\JonsOutputStream.h">
       <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Logging\JonsStreamBuf.h">
       <Filter>Header Files\Core\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Logging\LogManagerImpl.h">
-      <Filter>Header Files\Core\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Memory\MemoryManagerImpl.h">
-      <Filter>Header Files\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\GameObject\GameObject.h">
-      <Filter>Header Files\Core\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\GameObject\GameObjectManagerImpl.h">
-      <Filter>Header Files\Core\GameObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h">
       <Filter>Thirdparty\dlmalloc</Filter>
@@ -190,41 +154,8 @@
     <ClInclude Include="include\Core\Threading\ConditionVariable.h">
       <Filter>Header Files\Core\Threading</Filter>
     </ClInclude>
-    <ClInclude Include="interface\Render\IRenderManager.h">
-      <Filter>Interface\Render</Filter>
-    </ClInclude>
     <ClInclude Include="interface\Core\Memory\IMemoryAllocator.h">
       <Filter>Interface\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\Core\Memory\IMemoryManager.h">
-      <Filter>Interface\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\Core\Logging\ILogManager.h">
-      <Filter>Interface\Core\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\Core\GameObject\IGameObjectManager.h">
-      <Filter>Interface\Core\GameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\Core\Threading\IConditionVariable.h">
-      <Filter>Interface\Core\Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\Core\Threading\IMutex.h">
-      <Filter>Interface\Core\Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\Core\Threading\IThread.h">
-      <Filter>Interface\Core\Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Threading\ThreadingFactory.h">
-      <Filter>Header Files\Core\Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\Core\Threading\IThreadingFactory.h">
-      <Filter>Interface\Core\Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\EngineCore.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="interface\Core\Threading\IThreadPool.h">
-      <Filter>Interface\Core\Threading</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Threading\ThreadPool.h">
       <Filter>Header Files\Core\Threading</Filter>
@@ -237,6 +168,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\Containers\Vector.h">
       <Filter>Header Files\Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Logging\Logger.h">
+      <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

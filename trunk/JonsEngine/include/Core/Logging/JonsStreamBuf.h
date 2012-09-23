@@ -1,5 +1,4 @@
-#ifndef _JONS_STREAM_BUF_H
-#define _JONS_STREAM_BUF_H
+#pragma once
 
 #include <iostream>
 #include <algorithm>
@@ -28,5 +27,3 @@ namespace JonsEngine
 
 	};
 }
-
-#endif

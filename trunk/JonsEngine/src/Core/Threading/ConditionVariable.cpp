@@ -1,18 +1,12 @@
-#if defined _WIN32 || _WIN64
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h>
-	#undef WIN32_LEAN_AND_MEAN
-#else
-	#include <pthread.h>
-	#include <time.h>
-#endif
-
 #include "include/Core/Threading/ConditionVariable.h"
+
 #include "include/Core/Threading/Mutex.h"
+#include "include/Core/Logging/Logger.h"
+
 
 namespace JonsEngine
 {
-	ConditionVariable::ConditionVariable(ILogManager& logger) : mLogger(logger), mCondVarState(ConditionVariable::READY)
+	ConditionVariable::ConditionVariable() : mLogger(JonsEngine::GetGlobalLogger()), mCondVarState(ConditionVariable::READY)
 	{
 		#if defined _WIN32 || _WIN64
 			InitializeConditionVariable(&mCondVarHandle);
@@ -28,24 +22,24 @@ namespace JonsEngine
 		#endif
 	}
 
-	void ConditionVariable::Wait(IMutex* mutex)
+	void ConditionVariable::Wait(Mutex& mutex)
 	{
-		MutexHandle& mutexHandle = static_cast<Mutex*>(mutex)->GetMutexHandle();
+		Mutex::MutexHandle& mutexHandle = mutex.GetMutexHandle();
 
 		mCondVarState = ConditionVariable::WAITING;
 
 		#if defined _WIN32 || _WIN64
 			SleepConditionVariableCS(&mCondVarHandle, &mutexHandle, INFINITE);
 		#else
-			pthread_cond_wait(&mCondVarHandle, &mutexHandle);
+			pthread_cond_wait(&mCondVarHandle, mutexHandle);
 		#endif
 
 		mCondVarState = ConditionVariable::READY;
 	}
 
-	void ConditionVariable::TimedWait(IMutex* mutex, uint32_t milliseconds)
+	void ConditionVariable::TimedWait(Mutex& mutex, uint32_t milliseconds)
 	{
-		MutexHandle& mutexHandle = static_cast<Mutex*>(mutex)->GetMutexHandle();
+		Mutex::MutexHandle& mutexHandle = mutex.GetMutexHandle();
 
 		mCondVarState = ConditionVariable::WAITING;
 
@@ -72,7 +66,7 @@ namespace JonsEngine
 		#if defined _WIN32 || _WIN64
 			WakeConditionVariable(&mCondVarHandle);
 		#else
-			pthread_cond_signal(&mCondVarHandle);
+			pthread_cond_signal(&mCondVarHandle->mHandle);
 		#endif
 	}
 

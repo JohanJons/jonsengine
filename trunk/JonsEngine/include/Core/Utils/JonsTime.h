@@ -1,5 +1,4 @@
-#ifndef _JONS_TIME_H
-#define _JONS_TIME_H
+#pragma once
 
 #if defined _WIN32 || _WIN64
 #include <WinSock2.h>
@@ -20,5 +19,3 @@ namespace JonsEngine
 	int32_t GetMonth();
 	int32_t GetYear();
 }
-
-#endif

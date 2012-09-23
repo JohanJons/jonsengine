@@ -1,5 +1,4 @@
-#ifndef _ENGINE_SETTINGS_H
-#define _ENGINE_SETTINGS_H
+#pragma once
 
 #include <string>
 
@@ -14,13 +13,6 @@ namespace JonsEngine
 		EngineSettings();
 
 		// Logging
-		void SetLogToFile(bool res);		// default: false
-		void SetLogToFile(bool res, const std::string& fileLocation);
-		void SetLogToSTDOut(bool res);		// default: false
-
-		bool GetLogToFile() const;
-		std::string GetLogToFileLocation() const;
-		bool GetLogToSTDOut() const;
 
 		// Memory	
 
@@ -35,14 +27,6 @@ namespace JonsEngine
 
 		// Input
 
-
-	private:
-		bool mLogToFile;
-		bool mLogToSTDOut;
-		std::string mLogToFileLocation;
-
 	};
 
 }
-
-#endif

@@ -12,8 +12,6 @@ namespace JonsEngine
 	 public:
 		 virtual void SetUp()
 		 {
-			mEngine.GetEngineSettings().SetLogToFile(false);
-			mEngine.GetEngineSettings().SetLogToSTDOut(true);
 
 			// init engine
 			ASSERT_TRUE(mEngine.Init());

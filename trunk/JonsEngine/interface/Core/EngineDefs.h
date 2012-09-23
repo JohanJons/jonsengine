@@ -1,5 +1,4 @@
-#ifndef _ENGINE_DEFS_H
-#define _ENGINE_DEFS_H
+#pragma once
 
 // Use stdint.h defintion of int32_t, uint64_t, etc by default across the engine
 #include <stdint.h>
@@ -15,5 +14,3 @@ namespace JonsEngine
 	const std::string EngineLogTag = "JonsEngine";
 
 }
-
-#endif

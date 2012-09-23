@@ -1,5 +1,4 @@
-#ifndef _JONS_VECTOR_H
-#define _JONS_VECTOR_H
+#pragma once
 
 #include "interface/Core/Memory/IMemoryAllocator.h"
 
@@ -472,5 +471,3 @@ namespace JonsEngine
 	}
 
 }
-
-#endif

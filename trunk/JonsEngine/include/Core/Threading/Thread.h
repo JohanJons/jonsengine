@@ -1,27 +1,39 @@
-#ifndef _JONS_THREAD_H
-#define _JONS_THREAD_H
+#pragma once
 
 #ifdef ANDROID
 #include <pthread.h>
 #endif
 
-#include "interface/Core/Threading/IThread.h"
+#include "boost/function.hpp"
 
 namespace JonsEngine
 {
 	class IMemoryAllocator;
-	class ILogManager;
+	class Logger;
 
-	#if defined _WIN32 || _WIN64
-		typedef void* ThreadHandle;  
-	#else
-		typedef pthread_t ThreadHandle;
-	#endif
+	/* Free-standing function */
+	void jons_SleepCurrentThread(uint32_t milliseconds);
+
+	/* Task definition */
+	typedef boost::function0<void> Task;
 
 	/* Thread wrapper class */
-	class Thread : public IThread
+	class Thread
 	{
 	public:
+		enum ThreadState
+		{
+			DETACHED = 0,
+			RUNNING,
+			FINISHED
+		};
+
+		#if defined _WIN32 || _WIN64
+			typedef void* ThreadHandle;  
+		#else
+			typedef pthread_t ThreadHandle;
+		#endif
+
 		struct ThreadInfo
 		{
 			ThreadInfo() : mState(DETACHED), mTask(NULL)
@@ -31,8 +43,8 @@ namespace JonsEngine
 			Task mTask;
 		};
 
-		Thread(IMemoryAllocator& allocator, ILogManager& logger);
-		Thread(Task task, IMemoryAllocator& allocator, ILogManager& logger);
+		Thread();
+		Thread(Task task);
 		~Thread();
 
 		Thread& operator=(Thread& other);
@@ -42,20 +54,18 @@ namespace JonsEngine
 		ThreadState GetThreadState() const;
 
 	private:
-		ThreadHandle mHandle;
-		ThreadInfo* mThreadInfo;
-		IMemoryAllocator& mAllocator;
-		ILogManager& mLogger;
-
+		int32_t jons_SetThreadPriority(ThreadHandle handle, int32_t priority);
 		int32_t Destroy();
 		int32_t Detach();
 		static void* Run(void* arg);
 		ThreadHandle _CreateThread(void* (*start) (void*), void* arg);
 		void _JoinThread(ThreadHandle& handle);
+
+		ThreadHandle mHandle;
+		ThreadInfo* mThreadInfo;
+		IMemoryAllocator& mAllocator;
+		Logger& mLogger;
 	};
 
-	ThreadHandle jons_GetCurrentThreadNativeHandle();
-	int32_t jons_SetThreadPriority(ThreadHandle handle, int32_t priority);
+	
 }
-
-#endif

@@ -1,19 +1,18 @@
-#ifndef _JONS_SCOPED_LOCK_H
-#define _JONS_SCOPED_LOCK_H
+#pragma once
+
+#include "include/Core/Threading/Mutex.h"
 
 namespace JonsEngine
 {
-	class IMutex;
+	class Mutex;
 
 	class ScopedLock
 	{
 	public:
-		ScopedLock(IMutex* mutex);
-		~ScopedLock();
+		inline ScopedLock(Mutex& mutex) : mMutex(mutex)		{ mMutex.Lock(); }
+		inline ~ScopedLock()								{ mMutex.Unlock(); }
 
 	private:
-		IMutex* mMutex;
+		Mutex& mMutex;
 	};
 }
-
-#endif
