@@ -1,7 +1,7 @@
 #pragma once
 
 #include "include/Core/EngineSettings.h"
-
+#include "include/Core/Logging/Logger.h"
 
 namespace JonsEngine
 {
@@ -29,7 +29,7 @@ namespace JonsEngine
 		bool mRunning;
 		bool mInitialized;
 		EngineSettings mEngineSettings;
-		ILogger& mLog;
+		Logger mLog;
 	};
 
 }

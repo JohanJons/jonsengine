@@ -2,6 +2,7 @@
 
 #include "interface/Core/EngineDefs.h"
 
+#include "include/Core/Logging/Logger.h"
 #include "include/Core/Threading/Thread.h"
 #include "include/Core/Threading/Mutex.h"
 #include "include/Core/Threading/ConditionVariable.h"
@@ -10,7 +11,6 @@
 namespace JonsEngine
 {
 	class IMemoryAllocator;
-	class ILogger;
 
 	class ThreadPool
 	{
@@ -44,7 +44,7 @@ namespace JonsEngine
 		void TerminateAllWorkers();
 
 		IMemoryAllocator& mMemoryAllocator;
-		ILogger& mLogger;
+		Logger mLogger;
 
 		mutable Mutex mMutex;
 		ConditionVariable mCondVar_WorkDoneOrWorkerKilled;

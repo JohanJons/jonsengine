@@ -9,6 +9,10 @@ namespace JonsEngine
 	public:
 		virtual ~IMemoryAllocator() { }
 
+		/*
+		 * Allocates given number of bytes.
+		 * @
+		 */
 		virtual void* Allocate(size_t size) = 0;
         virtual void* Reallocate(void* p, size_t size) = 0;
         virtual void Deallocate(void* p) = 0;

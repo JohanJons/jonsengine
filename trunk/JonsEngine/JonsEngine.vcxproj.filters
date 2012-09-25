@@ -119,6 +119,9 @@
     <ClCompile Include="src\Core\Threading\ConditionVariable.cpp">
       <Filter>Source Files\Core\Threading</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Logging\LogManager.cpp">
+      <Filter>Source Files\Core\Logging</Filter>
+    </ClCompile>
     <ClCompile Include="src\Core\Logging\Logger.cpp">
       <Filter>Source Files\Core\Logging</Filter>
     </ClCompile>
@@ -169,11 +172,11 @@
     <ClInclude Include="include\Core\Containers\Vector.h">
       <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Logging\Logger.h">
+    <ClInclude Include="include\Core\Logging\LogManager.h">
       <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="interface\Core\Logging\ILogger.h">
-      <Filter>Interface\Core\Logging</Filter>
+    <ClInclude Include="include\Core\Logging\Logger.h">
+      <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

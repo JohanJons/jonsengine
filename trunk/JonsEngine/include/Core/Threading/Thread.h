@@ -64,7 +64,6 @@ namespace JonsEngine
 		ThreadHandle mHandle;
 		ThreadInfo* mThreadInfo;
 		IMemoryAllocator& mAllocator;
-		ILogger& mLogger;
 	};
 
 	

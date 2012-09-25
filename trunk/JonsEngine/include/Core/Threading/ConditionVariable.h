@@ -13,7 +13,6 @@
 
 namespace JonsEngine
 {
-	class ILogger;
 	class IMemoryAllocator;
 	class Mutex;
 
@@ -45,7 +44,6 @@ namespace JonsEngine
 	private:
 		ConditionVariableHandle mCondVarHandle;
 		ConditionVariableState mCondVarState;
-		ILogger& mLogger;
 		
 	};
 }

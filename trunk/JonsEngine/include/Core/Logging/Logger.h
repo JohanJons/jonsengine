@@ -1,48 +1,31 @@
 #pragma once
 
-#include "interface/Core/Logging/ILogger.h"
-#include "interface/Core/EngineDefs.h"
+#include "include/Core/Logging/LogManager.h"
 
-#include "include/Core/Logging/JonsStreamBuf.h"
-#include "include/Core/Logging/JonsOutputStream.h"
-
-#include "include/Core/Utils/JonsTime.h"
-
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <string>
+
+
+#define JONS_LOG_DEBUG(logger, logMsg)			{ logger.Log(LogManager::LEVEL_DEBUG, logMsg);	  }
+#define JONS_LOG_INFO(logger, logMsg)			{ logger.Log(LogManager::LEVEL_INFO, logMsg);	  }
+#define JONS_LOG_WARNING(logger, logMsg)		{ logger.Log(LogManager::LEVEL_WARNING, logMsg);  }
+#define JONS_LOG_ERROR(logger, logMsg)			{ logger.Log(LogManager::LEVEL_ERROR, logMsg);	  }
+#define JONS_LOG_CRITICAL(logger, logMsg)		{ logger.Log(LogManager::LEVEL_CRITICAL, logMsg); }
 
 
 namespace JonsEngine
 {
-	class Logger : public ILogger
+	class Logger
 	{
 	public:
-		Logger();
+		Logger(const std::string& loggerName);
 		~Logger();
 
-		void AddStream(std::streambuf* const sb);
-		void RemoveStream(std::streambuf* const sb);
-		bool IsStreamAdded(std::streambuf* const sb) const;
-		const std::string& GetFileLogPath() const;
+		void Log(LogManager::LogLevel level, const std::string& logMsg);
 
-		std::ostream& LogInfo();
-		std::ostream& LogDebug();
-		std::ostream& LogWarn();
-		std::ostream& LogError();
+		inline const std::string& GetLoggerName() const		{ return mLoggerName; }
+
 
 	private:
-		void Init();
-		void Destroy();
-
-		const std::string InternalGetLogName() const;
-		const std::string InternalGetLogPath() const;
-
-		std::ostream mLogStream;
-		std::string mLogPath;
-		std::ofstream mFileStream;
-		JonsStreamBuf mStreamBuf;
-
+		const std::string& mLoggerName;
 	};
 }

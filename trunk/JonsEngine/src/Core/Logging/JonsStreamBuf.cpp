@@ -4,6 +4,10 @@
 
 using namespace std;
 
+//
+// TODO: change sync/overflow into something better?
+//
+
 namespace JonsEngine
 {
 	JonsStreamBuf::JonsStreamBuf() : streambuf()

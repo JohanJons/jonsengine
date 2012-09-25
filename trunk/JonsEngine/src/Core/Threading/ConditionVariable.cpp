@@ -1,13 +1,11 @@
 #include "include/Core/Threading/ConditionVariable.h"
 
-#include "interface/Core/Logging/ILogger.h"
-
 #include "include/Core/Threading/Mutex.h"
 
 
 namespace JonsEngine
 {
-	ConditionVariable::ConditionVariable() : mLogger(Globals::GetDefaultLogger()), mCondVarState(ConditionVariable::READY)
+	ConditionVariable::ConditionVariable() : mCondVarState(ConditionVariable::READY)
 	{
 		#if defined _WIN32 || _WIN64
 			InitializeConditionVariable(&mCondVarHandle);

@@ -99,12 +99,13 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Core\EngineSettings.cpp" />
     <ClCompile Include="src\Core\Logging\JonsOutputStream.cpp" />
     <ClCompile Include="src\Core\Logging\JonsStreamBuf.cpp" />
+    <ClCompile Include="src\Core\Logging\Logger.cpp" />
     <ClCompile Include="src\Core\Memory\HeapAllocator.cpp" />
     <ClCompile Include="src\Core\Threading\ConditionVariable.cpp" />
     <ClCompile Include="src\Core\Threading\Mutex.cpp" />
     <ClCompile Include="src\Core\Threading\Thread.cpp" />
     <ClCompile Include="src\Core\Threading\ThreadPool.cpp" />
-    <ClCompile Include="src\Core\Logging\Logger.cpp" />
+    <ClCompile Include="src\Core\Logging\LogManager.cpp" />
     <ClCompile Include="src\Core\Utils\JonsTime.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +116,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Core\Logging\JonsOutputStream.h" />
     <ClInclude Include="include\Core\Logging\JonsStreamBuf.h" />
     <ClInclude Include="include\Core\Logging\Logger.h" />
+    <ClInclude Include="include\Core\Logging\LogManager.h" />
     <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
     <ClInclude Include="include\Core\Threading\ConditionVariable.h" />
     <ClInclude Include="include\Core\Threading\Mutex.h" />
@@ -123,7 +125,6 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Core\Threading\ThreadPool.h" />
     <ClInclude Include="include\Core\Utils\JonsTime.h" />
     <ClInclude Include="interface\Core\EngineDefs.h" />
-    <ClInclude Include="interface\Core\Logging\ILogger.h" />
     <ClInclude Include="interface\Core\Memory\IMemoryAllocator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

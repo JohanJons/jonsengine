@@ -1,6 +1,5 @@
 #include "include/Core/Engine.h"
 
-#include "interface/Core/Logging/ILogger.h"
 #include "interface/Core/Memory/IMemoryAllocator.h"
 
 namespace JonsEngine
@@ -11,7 +10,7 @@ namespace JonsEngine
 		Destroy();
 	}
 
-	Engine::Engine() : mRunning(false), mInitialized(false), mLog(Globals::GetDefaultLogger())
+	Engine::Engine() : mRunning(false), mInitialized(false), mLog(EngineTag)
 	{
 		
 	}
@@ -50,10 +49,12 @@ namespace JonsEngine
 			if (res)
 				mRunning = true;
 			else
-				mLog.LogError() << "Engine::Start(): Unable to start Engine!" << std::endl;
+				JONS_LOG_ERROR(mLog, "Engine::Start(): Unable to start Engine!");
 		}
 		else 
-			mLog.LogWarn() << "Engine::Start(): Engine already running" << std::endl;
+			JONS_LOG_WARNING(mLog, "Engine::Start(): Engine already running");
+
+		JONS_LOG_INFO(mLog, "-------- STARTING ENGINE --------");
 
 		return res;
 	}
@@ -69,10 +70,12 @@ namespace JonsEngine
 			if (res)
 				mRunning = false;
 			else
-				mLog.LogError() << "Engine::Stop(): Unable to stop Engine!" << std::endl;
+				JONS_LOG_ERROR(mLog, "Engine::Stop(): Unable to stop Engine!");
 		}
 		else 
-			mLog.LogWarn() << "Engine::Stop(): Engine not running" << std::endl;
+			JONS_LOG_WARNING(mLog, "Engine::Stop(): Engine not running");
+
+		JONS_LOG_INFO(mLog, "-------- STOPPING ENGINE --------");
 
 		return res;
 	}

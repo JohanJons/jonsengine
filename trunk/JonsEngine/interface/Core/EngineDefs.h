@@ -6,11 +6,16 @@
 
 namespace JonsEngine
 {
-	//
-	// Logging
-	//
+	/*
+	 * Logging
+	 */
 
-	// Log tag
-	const std::string EngineLogTag = "JonsEngine";
+	// GameEngine Log tag
+	const std::string GameEngineTag = "JonsEngine";
 
+	// Engine module tag
+	const std::string EngineTag = "ENGINE";
+
+	// Threading module tag
+	const std::string ThreadingTag = "THREADING";
 }

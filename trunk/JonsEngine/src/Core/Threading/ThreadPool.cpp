@@ -10,7 +10,7 @@
 
 namespace JonsEngine
 {
-	ThreadPool::ThreadPool(uint32_t initialNumThreads) : mMemoryAllocator(Globals::GetDefaultHeapAllocator()), mLogger(Globals::GetDefaultLogger()),
+	ThreadPool::ThreadPool(uint32_t initialNumThreads) : mMemoryAllocator(Globals::GetDefaultHeapAllocator()), mLogger(ThreadingTag),
 															mNumThreads(0), mDesiredNumThreads(0), mScheduledTasks(Globals::GetDefaultHeapAllocator()),
 															mWorkerThreads(Globals::GetDefaultHeapAllocator())
 	{

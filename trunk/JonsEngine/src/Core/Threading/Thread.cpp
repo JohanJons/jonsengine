@@ -1,8 +1,6 @@
 #include "include/Core/Threading/Thread.h"
 
 #include "interface/Core/Memory/IMemoryAllocator.h"
-#include "interface/Core/Logging/ILogger.h"
-
 
 #if defined _WIN32 || _WIN64
 	#define WIN32_LEAN_AND_MEAN
@@ -13,18 +11,37 @@
 	#include <time.h>
 #endif
 
+
 namespace JonsEngine
 {
-	/*
-	 *
-	 * Thread wrapper class
-	 *
-	 */
-	Thread::Thread() : mHandle(NULL), mAllocator(Globals::GetDefaultHeapAllocator()), mThreadInfo(NULL), mLogger(Globals::GetDefaultLogger())
+	/////////////////////////////////////////////////////
+	/////				Free functions				/////
+	/////////////////////////////////////////////////////
+
+	void jons_SleepCurrentThread(uint32_t milliseconds)
+	{
+		#if defined _WIN32 || _WIN64
+			Sleep(milliseconds);
+		#elif defined ANDROID
+			timespec interval;
+			interval.tv_sec = (long)(milliseconds/1000); 
+			interval.tv_nsec = (long)(milliseconds%1000) * 1000000; 
+
+			nanosleep(&interval, 0);
+		#endif
+	}
+
+
+
+	/////////////////////////////////////////////////////////////
+	/////				Thread implementation				/////
+	/////////////////////////////////////////////////////////////
+
+	Thread::Thread() : mHandle(NULL), mAllocator(Globals::GetDefaultHeapAllocator()), mThreadInfo(NULL)
 	{
 	}
 
-	Thread::Thread(Task task) : mAllocator(Globals::GetDefaultHeapAllocator()), mLogger(Globals::GetDefaultLogger())
+	Thread::Thread(Task task) : mAllocator(Globals::GetDefaultHeapAllocator())
 	{
 		mThreadInfo = (ThreadInfo*) mAllocator.AllocateObject<ThreadInfo>();
 
@@ -101,12 +118,6 @@ namespace JonsEngine
 			return Thread::DETACHED;
 	}
 
-	/*
-	 * Sets the priority of a given thread
-	 * @param handle: the native handle of the thread to set priority to
-	 * @param priority: the priority to set to thread given by handle
-	 * @ret: 0 for success, -1 for fail
-	 */
 	int32_t Thread::jons_SetThreadPriority(Thread::ThreadHandle handle, int32_t priority)
 	{
 		int32_t ret = -1;
@@ -175,29 +186,6 @@ namespace JonsEngine
 			}
 		#elif defined ANDROID
 			pthread_join(handle, NULL);
-		#endif
-	}
-
-
-
-	/*
-	 * Free-standing function
-	 */
-
-	/*
-	 * Sleeps the current thread of execution
-	 * @param milliseconds: number of milliseconds to sleep
-	 */
-	void jons_SleepCurrentThread(uint32_t milliseconds)
-	{
-		#if defined _WIN32 || _WIN64
-			Sleep(milliseconds);
-		#elif defined ANDROID
-			timespec interval;
-			interval.tv_sec = (long)(milliseconds/1000); 
-			interval.tv_nsec = (long)(milliseconds%1000) * 1000000; 
-
-			nanosleep(&interval, 0);
 		#endif
 	}
 }
