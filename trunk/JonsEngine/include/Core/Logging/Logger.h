@@ -1,5 +1,6 @@
 #pragma once
 
+#include "interface/Core/Logging/ILogger.h"
 #include "interface/Core/EngineDefs.h"
 
 #include "include/Core/Logging/JonsStreamBuf.h"
@@ -15,7 +16,7 @@
 
 namespace JonsEngine
 {
-	class Logger
+	class Logger : public ILogger
 	{
 	public:
 		Logger();
@@ -44,6 +45,4 @@ namespace JonsEngine
 		JonsStreamBuf mStreamBuf;
 
 	};
-
-	Logger& GetGlobalLogger();
 }

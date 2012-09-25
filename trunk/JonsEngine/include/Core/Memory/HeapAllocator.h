@@ -35,10 +35,4 @@ namespace JonsEngine
 		const HeapAllocatorBackend mBackend;
 		const std::string& mAllocatorName;
 	};
-
-
-	namespace Globals
-	{
-		IMemoryAllocator& GetDefaultHeapAllocator();
-	}
 }

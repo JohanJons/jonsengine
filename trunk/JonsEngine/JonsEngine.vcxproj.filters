@@ -172,5 +172,8 @@
     <ClInclude Include="include\Core\Logging\Logger.h">
       <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
+    <ClInclude Include="interface\Core\Logging\ILogger.h">
+      <Filter>Interface\Core\Logging</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

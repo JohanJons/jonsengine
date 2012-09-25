@@ -10,9 +10,7 @@
 namespace JonsEngine
 {
 	class IMemoryAllocator;
-	class Logger;
-	class Mutex;
-	class ConditionVariable;
+	class ILogger;
 
 	class ThreadPool
 	{
@@ -46,7 +44,7 @@ namespace JonsEngine
 		void TerminateAllWorkers();
 
 		IMemoryAllocator& mMemoryAllocator;
-		Logger& mLogger;
+		ILogger& mLogger;
 
 		mutable Mutex mMutex;
 		ConditionVariable mCondVar_WorkDoneOrWorkerKilled;

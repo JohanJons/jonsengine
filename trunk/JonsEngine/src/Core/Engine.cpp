@@ -1,7 +1,7 @@
 #include "include/Core/Engine.h"
 
-#include "include/Core/Logging/Logger.h"
-#include "include/Core/Memory/HeapAllocator.h"
+#include "interface/Core/Logging/ILogger.h"
+#include "interface/Core/Memory/IMemoryAllocator.h"
 
 namespace JonsEngine
 {
@@ -11,7 +11,7 @@ namespace JonsEngine
 		Destroy();
 	}
 
-	Engine::Engine() : mRunning(false), mInitialized(false), mLog(JonsEngine::GetGlobalLogger())
+	Engine::Engine() : mRunning(false), mInitialized(false), mLog(Globals::GetDefaultLogger())
 	{
 		
 	}

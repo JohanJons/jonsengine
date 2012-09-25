@@ -2,21 +2,21 @@
 
 namespace JonsEngine
 {
-	//
-	// Default globally accessable logger
-	//
+	/*
+	 * Default globally accessable logger
+	 */
 	static Logger gLogger;
 
-	Logger& GetGlobalLogger()
+	ILogger& Globals::GetDefaultLogger()
 	{
 		return gLogger;
 	}
 
 
 
-	//
-	// LoggerImpl implementation
-	//
+	/*
+	 * LoggerImpl implementation
+	 */
 	Logger::Logger() : mStreamBuf(), mFileStream(), mLogStream(&mStreamBuf), mLogPath(InternalGetLogName())
 	{
 	}

@@ -9,7 +9,7 @@
 namespace JonsEngine
 {
 	class IMemoryAllocator;
-	class Logger;
+	class ILogger;
 
 	/* Free-standing function */
 	void jons_SleepCurrentThread(uint32_t milliseconds);
@@ -64,7 +64,7 @@ namespace JonsEngine
 		ThreadHandle mHandle;
 		ThreadInfo* mThreadInfo;
 		IMemoryAllocator& mAllocator;
-		Logger& mLogger;
+		ILogger& mLogger;
 	};
 
 	

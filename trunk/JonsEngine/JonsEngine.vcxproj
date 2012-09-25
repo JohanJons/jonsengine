@@ -123,6 +123,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Core\Threading\ThreadPool.h" />
     <ClInclude Include="include\Core\Utils\JonsTime.h" />
     <ClInclude Include="interface\Core\EngineDefs.h" />
+    <ClInclude Include="interface\Core\Logging\ILogger.h" />
     <ClInclude Include="interface\Core\Memory\IMemoryAllocator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

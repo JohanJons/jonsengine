@@ -19,6 +19,8 @@ namespace JonsEngine
 		bool IsStreamAdded(std::streambuf* sb) const;
 
 	private:
+		void SyncCharacter(std::streambuf*);
+
 		std::list<std::streambuf*> mStreamBufs;
 		std::string mLine;
 

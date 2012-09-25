@@ -1,7 +1,7 @@
 #include "include/Core/Threading/Thread.h"
 
-#include "include/Core/Memory/HeapAllocator.h"
-#include "include/Core/Logging/Logger.h"
+#include "interface/Core/Memory/IMemoryAllocator.h"
+#include "interface/Core/Logging/ILogger.h"
 
 
 #if defined _WIN32 || _WIN64
@@ -20,11 +20,11 @@ namespace JonsEngine
 	 * Thread wrapper class
 	 *
 	 */
-	Thread::Thread() : mHandle(NULL), mAllocator(Globals::GetDefaultHeapAllocator()), mThreadInfo(NULL), mLogger(JonsEngine::GetGlobalLogger())
+	Thread::Thread() : mHandle(NULL), mAllocator(Globals::GetDefaultHeapAllocator()), mThreadInfo(NULL), mLogger(Globals::GetDefaultLogger())
 	{
 	}
 
-	Thread::Thread(Task task) : mAllocator(Globals::GetDefaultHeapAllocator()), mLogger(JonsEngine::GetGlobalLogger())
+	Thread::Thread(Task task) : mAllocator(Globals::GetDefaultHeapAllocator()), mLogger(Globals::GetDefaultLogger())
 	{
 		mThreadInfo = (ThreadInfo*) mAllocator.AllocateObject<ThreadInfo>();
 

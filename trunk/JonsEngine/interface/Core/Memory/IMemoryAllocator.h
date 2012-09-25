@@ -128,4 +128,10 @@ namespace JonsEngine
 		virtual void InternalDeallocate(void* p) = 0;
 	};
 
+
+	namespace Globals
+	{
+		IMemoryAllocator& GetDefaultHeapAllocator();
+	}
+
 }

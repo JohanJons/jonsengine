@@ -1,8 +1,12 @@
 #include "include/Core/Logging/JonsStreamBuf.h"
 
+#include <algorithm>
+
+using namespace std;
+
 namespace JonsEngine
 {
-	JonsStreamBuf::JonsStreamBuf() : std::streambuf()
+	JonsStreamBuf::JonsStreamBuf() : streambuf()
 	{
 		
 	}
@@ -13,22 +17,22 @@ namespace JonsEngine
 		mLine.clear();
 	}
 
-	void JonsStreamBuf::AddStream(std::streambuf* sb)
+	void JonsStreamBuf::AddStream(streambuf* sb)
 	{
 		if (sb)
 			mStreamBufs.push_back(sb);
 	}
 
-	void JonsStreamBuf::RemoveStream(std::streambuf* sb)
+	void JonsStreamBuf::RemoveStream(streambuf* sb)
 	{
 		if (sb)
 			mStreamBufs.remove(sb);
 	}
 
-	bool JonsStreamBuf::IsStreamAdded(std::streambuf* sb) const
+	bool JonsStreamBuf::IsStreamAdded(streambuf* sb) const
 	{
 		if (sb)
-			return (std::find(mStreamBufs.begin(),mStreamBufs.end(),sb) != mStreamBufs.end());
+			return (find(mStreamBufs.begin(), mStreamBufs.end(), sb) != mStreamBufs.end());
 		else
 			return false;
 	}
@@ -50,17 +54,16 @@ namespace JonsEngine
 	{
 		int32_t res = 0;
 
-		for(std::list<std::streambuf*>::iterator it = mStreamBufs.begin(); it != mStreamBufs.end(); ++it)
-		{
-			if (*it)
-			{
-				(*it)->sputn(mLine.c_str(),mLine.length());
-				res &= (*it)->pubsync();
-			}
-		}				
+		for_each(mStreamBufs.begin(), mStreamBufs.end(), bind1st(mem_fun(&JonsStreamBuf::SyncCharacter), this));
 
 		mLine.clear();
 
 		return res == 0 ? 0 : -1;
+	}
+
+	void JonsStreamBuf::SyncCharacter(streambuf* buffer)
+	{
+		buffer->sputn(mLine.c_str(), mLine.length());
+		buffer->pubsync();
 	}
 }

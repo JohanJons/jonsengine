@@ -5,7 +5,7 @@
 
 namespace JonsEngine
 {
-	class Logger;
+	class ILogger;
 
 	class Engine
 	{
@@ -29,7 +29,7 @@ namespace JonsEngine
 		bool mRunning;
 		bool mInitialized;
 		EngineSettings mEngineSettings;
-		Logger& mLog;
+		ILogger& mLog;
 	};
 
 }
