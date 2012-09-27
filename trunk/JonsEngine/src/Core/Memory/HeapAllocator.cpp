@@ -33,34 +33,34 @@ namespace JonsEngine
 	{
 		void* alloc = NULL;
 
-		if (mBackend == HeapAllocator::DLMALLOC)
+		if (mBackend == HeapAllocator::DLMALLOC && size)
 			alloc = dlmalloc(size);
-		else if (mBackend == HeapAllocator::SYSTEM_DEFAULT)
+		else if (mBackend == HeapAllocator::SYSTEM_DEFAULT && size)
 			alloc = malloc(size);
 
 		return alloc;
 	}
 
-    void* HeapAllocator::Reallocate(void* p, size_t size)
+    void* HeapAllocator::Reallocate(void* memblock, size_t size)
 	{
 		void* alloc = NULL;
 
-		if (mBackend == HeapAllocator::DLMALLOC)
-			alloc = dlrealloc(p, size);
-		else if (mBackend == HeapAllocator::SYSTEM_DEFAULT)
-			alloc = realloc(p, size);
+		if (mBackend == HeapAllocator::DLMALLOC && memblock && size)
+			alloc = dlrealloc(memblock, size);
+		else if (mBackend == HeapAllocator::SYSTEM_DEFAULT && memblock && size)
+			alloc = realloc(memblock, size);
 		
 		return alloc;
 	}
 
-    void HeapAllocator::Deallocate(void* p)
+    void HeapAllocator::Deallocate(void* memblock)
 	{
-		if (p)
+		if (memblock)
 		{
-			if (mBackend == HeapAllocator::DLMALLOC)
-				dlfree(p);
-			else if (mBackend == HeapAllocator::SYSTEM_DEFAULT)
-				free(p);
+			if (mBackend == HeapAllocator::DLMALLOC && memblock)
+				dlfree(memblock);
+			else if (mBackend == HeapAllocator::SYSTEM_DEFAULT && memblock)
+				free(memblock);
 		}
 	}
 
@@ -92,8 +92,8 @@ namespace JonsEngine
 		return Allocate(size);
 	}
 
-	void HeapAllocator::InternalDeallocate(void* p)
+	void HeapAllocator::InternalDeallocate(void* memblock)
 	{ 
-		Deallocate(p);
+		Deallocate(memblock);
 	}
 }

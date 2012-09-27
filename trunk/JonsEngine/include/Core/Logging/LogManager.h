@@ -43,7 +43,7 @@ namespace JonsEngine
 		LogLevel GetLevelFilter() const;
 
 	private:
-		LogManager(int i);
+		LogManager();
 
 		void Init();
 		void Destroy();

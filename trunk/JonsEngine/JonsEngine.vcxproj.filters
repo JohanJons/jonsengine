@@ -12,14 +12,8 @@
     <Filter Include="Source Files\Core">
       <UniqueIdentifier>{68d50880-3b36-46e7-b2ce-670c81b0d80d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Render">
-      <UniqueIdentifier>{a3d5ad5b-531b-4acc-884f-cf6a512e7c46}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Core">
       <UniqueIdentifier>{5a494202-1728-4048-a253-a0de5440ecd2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Render">
-      <UniqueIdentifier>{ff44cc03-febf-440e-aeba-dc7ede80161e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Core\Logging">
       <UniqueIdentifier>{a68ce750-d5ef-433a-a7b9-c6b7b87f1cd4}</UniqueIdentifier>
@@ -81,7 +75,13 @@
     <Filter Include="Interface\Core\Threading">
       <UniqueIdentifier>{24eb6380-22f4-4319-b633-5edc40be4795}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Interface\Render">
+    <Filter Include="Source Files\Video">
+      <UniqueIdentifier>{a3d5ad5b-531b-4acc-884f-cf6a512e7c46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Video">
+      <UniqueIdentifier>{ff44cc03-febf-440e-aeba-dc7ede80161e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface\Video">
       <UniqueIdentifier>{196d120e-d1f7-456f-96c5-493e0f5f3ab9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

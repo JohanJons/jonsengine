@@ -22,15 +22,15 @@ namespace JonsEngine
 		~HeapAllocator();
 
 		void* Allocate(size_t size);
-        void* Reallocate(void* p, size_t size);
-        void Deallocate(void* p);
+        void* Reallocate(void* memblock, size_t size);
+        void Deallocate(void* memblock);
 
 		uint64_t GetAllocatedMemory() const;
 		const std::string& GetAllocatorName() const;
 
 	private:
 		void* InternalAllocate(size_t size);
-		void InternalDeallocate(void* p);
+		void InternalDeallocate(void* memblock);
 
 		const HeapAllocatorBackend mBackend;
 		const std::string& mAllocatorName;
