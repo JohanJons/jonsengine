@@ -1,6 +1,6 @@
 #pragma once
 
-#include "interface/Core/EngineDefs.h"
+#include "include/Core/EngineDefs.h"
 
 // TODO: better way than to include windows header
 #if defined _WIN32 || _WIN64

@@ -1,6 +1,6 @@
 #include "include/Core/Threading/Thread.h"
 
-#include "interface/Core/Memory/IMemoryAllocator.h"
+#include "include/Core/Memory/IMemoryAllocator.h"
 
 #if defined _WIN32 || _WIN64
 	#define WIN32_LEAN_AND_MEAN

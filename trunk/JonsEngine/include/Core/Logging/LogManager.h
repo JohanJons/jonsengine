@@ -1,7 +1,6 @@
 #pragma once
 
-#include "interface/Core/EngineDefs.h"
-
+#include "include/Core/EngineDefs.h"
 #include "include/Core/Logging/JonsStreamBuf.h"
 #include "include/Core/Logging/JonsOutputStream.h"
 

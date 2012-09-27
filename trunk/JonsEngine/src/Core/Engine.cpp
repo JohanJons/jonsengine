@@ -1,6 +1,6 @@
 #include "include/Core/Engine.h"
 
-#include "interface/Core/Memory/IMemoryAllocator.h"
+#include "include/Core/Memory/IMemoryAllocator.h"
 
 namespace JonsEngine
 {

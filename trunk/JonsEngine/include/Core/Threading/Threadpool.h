@@ -1,7 +1,6 @@
 #pragma once
 
-#include "interface/Core/EngineDefs.h"
-
+#include "include/Core/EngineDefs.h"
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Threading/Thread.h"
 #include "include/Core/Threading/Mutex.h"
