@@ -19,7 +19,7 @@ namespace JonsEngine
 		Thread thread2(boost::bind(&ConditionVariableTest::Increment, this, &count, &waiting, &mutex, &condVar));
 
 		{
-			jons_SleepCurrentThread(10);
+			SleepCurrentThread(10);
 
 			ScopedLock lock(mutex);
 
@@ -64,11 +64,11 @@ namespace JonsEngine
 
 		Thread tr1(boost::bind(&ConditionVariableTest::timedWait100ms, this, &mutex, &condVar));
 
-		jons_SleepCurrentThread(20);
+		SleepCurrentThread(20);
 
 		ASSERT_EQ(ConditionVariable::WAITING, condVar.GetConditionVariableState());
 
-		jons_SleepCurrentThread(200);
+		SleepCurrentThread(200);
 
 		ASSERT_EQ(ConditionVariable::READY, condVar.GetConditionVariableState());
 	}

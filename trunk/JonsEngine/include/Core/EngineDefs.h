@@ -10,8 +10,6 @@ namespace JonsEngine
 	 * Logging
 	 */
 
-	// Log tags; defined in LogManager.cpp
+	// defined in LogManager.cpp
 	extern const std::string GameEngineTag;
-	extern const std::string EngineTag;
-	extern const std::string ThreadingTag;
 }

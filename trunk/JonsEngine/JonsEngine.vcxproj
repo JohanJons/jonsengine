@@ -19,7 +19,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -32,16 +32,19 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Thirdparty\glfw-2.7.6\support\msvc100\JonsEngineCommon.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Thirdparty\glfw-2.7.6\support\msvc100\JonsEngineCommon.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
     <SourcePath>$(SourcePath)</SourcePath>
-    <LibraryPath>C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\Visual_Leak_Detector\lib\Win32;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)/bin/$(Configuration)/$(Platform)/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -53,20 +56,21 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;JONSENGINE_EXPORTS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\boost_1_49_0;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\glfw-2.7.6\include;$(SolutionDir)\..\Thirdparty\glew-1.9.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>winmm.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;OpenGL32.lib;glew32.lib;GLFW.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <PostBuildEvent>
-      <Command>if not exist "$(SolutionDir)libs\win32" md "$(SolutionDir)libs\win32"
-xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -107,23 +111,29 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Core\Threading\ThreadPool.cpp" />
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
     <ClCompile Include="src\Core\Utils\JonsTime.cpp" />
+    <ClCompile Include="src\Video\RenderBase.cpp" />
+    <ClCompile Include="src\Video\RenderOpenGL.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
     <ClInclude Include="include\Core\Containers\Vector.h" />
     <ClInclude Include="include\Core\Engine.h" />
+    <ClInclude Include="include\Core\EngineDefs.h" />
     <ClInclude Include="include\Core\EngineSettings.h" />
     <ClInclude Include="include\Core\Logging\JonsOutputStream.h" />
     <ClInclude Include="include\Core\Logging\JonsStreamBuf.h" />
     <ClInclude Include="include\Core\Logging\Logger.h" />
     <ClInclude Include="include\Core\Logging\LogManager.h" />
     <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
+    <ClInclude Include="include\Core\Memory\IMemoryAllocator.h" />
     <ClInclude Include="include\Core\Threading\ConditionVariable.h" />
     <ClInclude Include="include\Core\Threading\Mutex.h" />
     <ClInclude Include="include\Core\Threading\ScopedLock.h" />
     <ClInclude Include="include\Core\Threading\Thread.h" />
     <ClInclude Include="include\Core\Threading\ThreadPool.h" />
     <ClInclude Include="include\Core\Utils\JonsTime.h" />
+    <ClInclude Include="include\Video\RenderBase.h" />
+    <ClInclude Include="include\Video\RenderOpenGL.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

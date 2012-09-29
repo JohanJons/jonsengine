@@ -3,9 +3,15 @@
 #include <string>
 
 #include "include/Core/EngineDefs.h"
+#include "include/Video/RenderBase.h"
 
 namespace JonsEngine
 {
+	enum RenderBackend
+	{
+		OPENGL = 0,
+		NONE
+	};
 
 	class EngineSettings
 	{
@@ -13,17 +19,22 @@ namespace JonsEngine
 		EngineSettings();
 
 		// Video
+		void SetRenderBackend(RenderBackend backend);
 		void SetFullscreen(bool fullscreen);
 		void SetWindowTitle(const std::string& title);
-		void SetScreenHeight(uint32_t height);
-		void SetScreenWidth(uint32_t width);
+		void SetScreenHeight(uint16_t height);
+		void SetScreenWidth(uint16_t width);
 		void SetFrameLimit(uint16_t frameLimit);
+		void SetFrameLimitEnabled(bool useFrameLimit);
 
-		inline bool IsFullscreen() const						{ return mFullscreen; }
-		inline const std::string& GetWindowTitle() const		{ return mWindowTitle; }
-		inline uint32_t GetScreenHeight() const					{ return mScreenHeight; }
-		inline uint32_t GetScreenWidth() const					{ return mScreenWidth; }
-		inline uint16_t GetFrameLimit() const					{ return mFrameLimit; }
+		RenderBackend GetRenderBackend() const;
+		bool IsFullscreen() const;
+		const std::string& GetWindowTitle() const;
+		uint32_t GetScreenHeight() const;
+		uint32_t GetScreenWidth() const;
+		uint16_t GetFrameLimit() const;
+		bool IsFrameLimitEnabled() const;
+		const ScreenMode& GetScreenMode() const;
 
 
 		// Audio
@@ -32,11 +43,9 @@ namespace JonsEngine
 
 
 	private:
-		bool mFullscreen;
+		RenderBackend mRenderBackend;
+		ScreenMode mScreenMode;
 		std::string mWindowTitle;
-		uint32_t mScreenHeight;
-		uint32_t mScreenWidth;
-		uint16_t mFrameLimit;
 	};
 
 }

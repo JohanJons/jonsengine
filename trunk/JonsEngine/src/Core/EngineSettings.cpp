@@ -2,13 +2,13 @@
 
 namespace JonsEngine
 {
-	EngineSettings::EngineSettings() : mFullscreen(false), mWindowTitle("JonsEngine Game"), mScreenHeight(800), mScreenWidth(600), mFrameLimit(60)
+	EngineSettings::EngineSettings() : mRenderBackend(OPENGL), mWindowTitle("JonsEngine Game")
 	{
 	}
 
 	void EngineSettings::SetFullscreen(bool fullscreen)
 	{
-		mFullscreen = fullscreen;
+		mScreenMode.Fullscreen = fullscreen;
 	}
 		
 	void EngineSettings::SetWindowTitle(const std::string& title)
@@ -16,19 +16,33 @@ namespace JonsEngine
 		mWindowTitle = title;
 	}
 		
-	void EngineSettings::SetScreenHeight(uint32_t height)
+	void EngineSettings::SetScreenHeight(uint16_t height)
 	{
-		mScreenHeight = height;
+		mScreenMode.ScreenHeight = height;
 	}
 		
-	void EngineSettings::SetScreenWidth(uint32_t width)
+	void EngineSettings::SetScreenWidth(uint16_t width)
 	{
-		mScreenWidth = width;
+		mScreenMode.ScreenWidth = width;
 	}
 		
 	void EngineSettings::SetFrameLimit(uint16_t frameLimit)
 	{
-		mFrameLimit = frameLimit;
+		mScreenMode.FrameLimit = frameLimit;
 	}
+
+	void EngineSettings::SetFrameLimitEnabled(bool useFrameLimit)
+	{
+		mScreenMode.FrameLimitEnabled = useFrameLimit;
+	}
+
+
+	RenderBackend EngineSettings::GetRenderBackend() const			{ return mRenderBackend;			}
+	bool EngineSettings::IsFullscreen() const						{ return mScreenMode.Fullscreen;	}
+	const std::string& EngineSettings::GetWindowTitle() const		{ return mWindowTitle;				}
+	uint32_t EngineSettings::GetScreenHeight() const				{ return mScreenMode.ScreenHeight;	}
+	uint32_t EngineSettings::GetScreenWidth() const					{ return mScreenMode.ScreenWidth;	}
+	uint16_t EngineSettings::GetFrameLimit() const					{ return mScreenMode.FrameLimit;	}
+	const ScreenMode& EngineSettings::GetScreenMode() const			{ return mScreenMode;				}
 
 }

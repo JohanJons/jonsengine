@@ -104,6 +104,12 @@
     <ClCompile Include="src\Core\Logging\Logger.cpp">
       <Filter>Source Files\Core\Logging</Filter>
     </ClCompile>
+    <ClCompile Include="src\Video\RenderBase.cpp">
+      <Filter>Source Files\Video</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Video\RenderOpenGL.cpp">
+      <Filter>Source Files\Video</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -150,6 +156,18 @@
     </ClInclude>
     <ClInclude Include="include\Core\Logging\Logger.h">
       <Filter>Header Files\Core\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\RenderBase.h">
+      <Filter>Header Files\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\RenderOpenGL.h">
+      <Filter>Header Files\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Memory\IMemoryAllocator.h">
+      <Filter>Header Files\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\EngineDefs.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

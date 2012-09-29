@@ -4,15 +4,19 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JonsEngine", "JonsEngine.vcxproj", "{96000F2E-1268-46DB-AE59-2F0F4C3EBAC9}"
 	ProjectSection(ProjectDependencies) = postProject
 		{1AD99A16-DBF2-7838-CE9F-97BA798AD85B} = {1AD99A16-DBF2-7838-CE9F-97BA798AD85B}
+		{4DA03747-F505-4A98-9124-03B3B73B9B3B} = {4DA03747-F505-4A98-9124-03B3B73B9B3B}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JonsEngineTests", "..\JonsEngineTests\JonsEngineTests.vcxproj", "{FBA30677-8B2D-4C07-B437-D2C046261DD9}"
 	ProjectSection(ProjectDependencies) = postProject
 		{1AD99A16-DBF2-7838-CE9F-97BA798AD85B} = {1AD99A16-DBF2-7838-CE9F-97BA798AD85B}
 		{96000F2E-1268-46DB-AE59-2F0F4C3EBAC9} = {96000F2E-1268-46DB-AE59-2F0F4C3EBAC9}
+		{4DA03747-F505-4A98-9124-03B3B73B9B3B} = {4DA03747-F505-4A98-9124-03B3B73B9B3B}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glew_static", "..\Thirdparty\glew-1.9.0\build\vc10\glew_static.vcxproj", "{1AD99A16-DBF2-7838-CE9F-97BA798AD85B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLFW", "..\Thirdparty\glfw-2.7.6\support\msvc100\GLFW.vcxproj", "{4DA03747-F505-4A98-9124-03B3B73B9B3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +57,16 @@ Global
 		{1AD99A16-DBF2-7838-CE9F-97BA798AD85B}.Release|Win32.Build.0 = Release|Win32
 		{1AD99A16-DBF2-7838-CE9F-97BA798AD85B}.Template|Win32.ActiveCfg = Template|Win32
 		{1AD99A16-DBF2-7838-CE9F-97BA798AD85B}.Template|Win32.Build.0 = Template|Win32
+		{4DA03747-F505-4A98-9124-03B3B73B9B3B}.Debug MX|Win32.ActiveCfg = Debug|Win32
+		{4DA03747-F505-4A98-9124-03B3B73B9B3B}.Debug MX|Win32.Build.0 = Debug|Win32
+		{4DA03747-F505-4A98-9124-03B3B73B9B3B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4DA03747-F505-4A98-9124-03B3B73B9B3B}.Debug|Win32.Build.0 = Debug|Win32
+		{4DA03747-F505-4A98-9124-03B3B73B9B3B}.Release MX|Win32.ActiveCfg = Release|Win32
+		{4DA03747-F505-4A98-9124-03B3B73B9B3B}.Release MX|Win32.Build.0 = Release|Win32
+		{4DA03747-F505-4A98-9124-03B3B73B9B3B}.Release|Win32.ActiveCfg = Release|Win32
+		{4DA03747-F505-4A98-9124-03B3B73B9B3B}.Release|Win32.Build.0 = Release|Win32
+		{4DA03747-F505-4A98-9124-03B3B73B9B3B}.Template|Win32.ActiveCfg = Release|Win32
+		{4DA03747-F505-4A98-9124-03B3B73B9B3B}.Template|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

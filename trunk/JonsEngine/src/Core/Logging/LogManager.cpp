@@ -4,9 +4,6 @@ namespace JonsEngine
 {
 	// Defintion of engine log tags
 	const std::string GameEngineTag		=		"JonsEngine";
-	const std::string EngineTag			=		"ENGINE";
-	const std::string ThreadingTag		=		"THREADING";
-
 
 	// LogManager singleton
 	LogManager LogManager::mInstance;
@@ -28,7 +25,7 @@ namespace JonsEngine
 
 	void LogManager::Init()
 	{
-		mFileStream.open(mLogPath);
+		mFileStream.open(mLogPath, std::ifstream::trunc);
 
 		AddOutputStream(mFileStream.rdbuf());
 	}
@@ -87,12 +84,6 @@ namespace JonsEngine
 		std::stringstream ret;
 
 		ret << GameEngineTag;
-		ret << "_"; ret << GetHour();
-		ret << "_"; ret << GetMinute();
-		ret << "_";
-		ret << "_"; ret << GetDay();
-		ret << "_"; ret << GetMonth();
-		ret << "_"; ret << GetYear();
 		ret << ".txt";
 
 		return ret.str();

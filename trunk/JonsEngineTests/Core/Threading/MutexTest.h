@@ -11,7 +11,7 @@
 
 namespace JonsEngine
 {
-	class MutexTest : public RunningEngineFixture
+	class MutexTest : public ::testing::Test
 	{
 	public:
 		MutexTest()
@@ -25,17 +25,6 @@ namespace JonsEngine
 			(*count)++;
 			mutex->Unlock();
 		}
-
-		virtual void SetUp()
-		{
-			RunningEngineFixture::SetUp();
-		}
-
-		virtual void TearDown()
-		{
-			RunningEngineFixture::TearDown();
-		}
-
 	};
 
 }

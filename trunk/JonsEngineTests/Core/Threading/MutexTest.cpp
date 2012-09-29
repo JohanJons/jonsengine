@@ -17,7 +17,7 @@ namespace JonsEngine
 		Thread thread3(boost::bind(&incrementer, &mutex, &count));
 		Thread thread4(boost::bind(&incrementer, &mutex, &count));
 
-		jons_SleepCurrentThread(500);
+		SleepCurrentThread(500);
 
 		ASSERT_EQ(4, count);
 	}

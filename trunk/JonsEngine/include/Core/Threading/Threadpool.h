@@ -1,7 +1,6 @@
 #pragma once
 
 #include "include/Core/EngineDefs.h"
-#include "include/Core/Logging/Logger.h"
 #include "include/Core/Threading/Thread.h"
 #include "include/Core/Threading/Mutex.h"
 #include "include/Core/Threading/ConditionVariable.h"
@@ -10,6 +9,7 @@
 namespace JonsEngine
 {
 	class IMemoryAllocator;
+	class Logger;
 
 	class ThreadPool
 	{
@@ -43,7 +43,7 @@ namespace JonsEngine
 		void TerminateAllWorkers();
 
 		IMemoryAllocator& mMemoryAllocator;
-		Logger mLogger;
+		Logger& mLogger;
 
 		mutable Mutex mMutex;
 		ConditionVariable mCondVar_WorkDoneOrWorkerKilled;

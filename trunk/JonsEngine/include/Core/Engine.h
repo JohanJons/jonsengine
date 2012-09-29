@@ -1,11 +1,12 @@
 #pragma once
 
 #include "include/Core/EngineSettings.h"
-#include "include/Core/Logging/Logger.h"
 
 namespace JonsEngine
 {
-	class ILogger;
+	class IMemoryAllocator;
+	class Logger;
+	class RenderBase;
 
 	class Engine
 	{
@@ -14,8 +15,6 @@ namespace JonsEngine
 		~Engine();
 
 		bool Init();
-		bool Start();
-		bool Stop();
 		bool Destroy();
 		bool isRunning();
 		void Tick();
@@ -23,13 +22,16 @@ namespace JonsEngine
 		EngineSettings& GetEngineSettings();
 
 	private:
-		bool InitializeManagers();
-		bool DestroyManagers();
+		bool InitializeModules();
+		bool DestroyModules();
 
 		bool mRunning;
-		bool mInitialized;
 		EngineSettings mEngineSettings;
-		Logger mLog;
+		Logger& mLog;
+		IMemoryAllocator& mMemoryAllocator;
+
+		/* Modules */
+		RenderBase* mRenderBackend;
 	};
 
 }

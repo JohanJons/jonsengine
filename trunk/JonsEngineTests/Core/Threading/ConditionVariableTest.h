@@ -12,22 +12,12 @@
 
 namespace JonsEngine
 {
-	class ConditionVariableTest : public RunningEngineFixture
+	class ConditionVariableTest : public ::testing::Test
 	{
 	public:
 		ConditionVariableTest()
 		{
 			
-		}
-
-		virtual void SetUp()
-		{
-			RunningEngineFixture::SetUp();
-		}
-
-		virtual void TearDown()
-		{
-			RunningEngineFixture::TearDown();
 		}
 
 		void Increment(int32_t* intPtr, bool* waiting, Mutex* mutex, ConditionVariable* condVar)

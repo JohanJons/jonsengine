@@ -12,7 +12,7 @@ namespace JonsEngine
 	class ILogger;
 
 	/* Free-standing function */
-	void jons_SleepCurrentThread(uint32_t milliseconds);
+	void SleepCurrentThread(uint32_t milliseconds);
 
 	/* Task definition */
 	typedef boost::function0<void> Task;

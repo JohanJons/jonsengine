@@ -6,11 +6,16 @@ namespace JonsEngine
 	/////				Default HeapAllocator				/////
 	/////////////////////////////////////////////////////////////
 
-	static HeapAllocator gHeapAllocator("DefaultHeapAllocator", HeapAllocator::DLMALLOC);
-
-	IMemoryAllocator& Globals::GetDefaultHeapAllocator()
+	namespace Globals
 	{
-		return gHeapAllocator;
+
+		static HeapAllocator gHeapAllocator("DefaultHeapAllocator", HeapAllocator::DLMALLOC);
+
+		IMemoryAllocator& GetDefaultHeapAllocator()
+		{
+			return gHeapAllocator;
+		}
+
 	}
 
 

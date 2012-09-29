@@ -134,7 +134,7 @@ namespace JonsEngine
 
 		pool.SetNumThreads(3);
 
-		jons_SleepCurrentThread(50);
+		SleepCurrentThread(100);
 
 		ASSERT_EQ(pool.GetNumThreads(), 3);
 	}

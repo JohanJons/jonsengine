@@ -12,21 +12,11 @@
 
 namespace JonsEngine
 {
-	class ThreadPoolTest : public RunningEngineFixture
+	class ThreadPoolTest : public ::testing::Test
 	{
 	public:
 		ThreadPoolTest()
 		{
-		}
-
-		virtual void SetUp()
-		{
-			RunningEngineFixture::SetUp();
-		}
-
-		virtual void TearDown()
-		{
-			RunningEngineFixture::TearDown();
 		}
 
 		void AddTasks(ThreadPool& pool, uint32_t numTasks)
@@ -37,7 +27,7 @@ namespace JonsEngine
 
 		void Arbeit()
 		{
-			jons_SleepCurrentThread(20);
+			SleepCurrentThread(20);
 		}
 	};
 

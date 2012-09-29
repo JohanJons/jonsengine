@@ -7,14 +7,14 @@
 namespace JonsEngine
 {
 	/**
-	 * Thread jons_SleepCurrentThread test
+	 * Thread SleepCurrentThread test
 	 */
-	TEST_F(ThreadTest, jons_SleepCurrentThread)
+	TEST_F(ThreadTest, SleepCurrentThread)
 	{
 		int32_t num = 0;
 		Thread thread(boost::bind(&ThreadTest::SetNumberTo14, this, &num));
 
-		jons_SleepCurrentThread(200);
+		SleepCurrentThread(200);
 
 		ASSERT_EQ(num, 14);
 	}
@@ -42,7 +42,7 @@ namespace JonsEngine
 
 		ASSERT_EQ(Thread::RUNNING, thread.GetThreadState());
 
-		jons_SleepCurrentThread(1000);
+		SleepCurrentThread(1000);
 
 		ASSERT_EQ(Thread::FINISHED, thread.GetThreadState());
 	}
@@ -101,7 +101,7 @@ namespace JonsEngine
 
 		ASSERT_EQ(Thread::RUNNING, thread.GetThreadState());
 
-		jons_SleepCurrentThread(1000);
+		SleepCurrentThread(1000);
 
 		ASSERT_EQ(Thread::FINISHED, thread.GetThreadState());
 	}

@@ -12,7 +12,7 @@
 namespace JonsEngine
 {
 
-	class VectorTest : public RunningEngineFixture
+	class VectorTest : public ::testing::Test
 	{
 	public:
 		VectorTest() : mVector1(Globals::GetDefaultHeapAllocator()),
@@ -20,16 +20,6 @@ namespace JonsEngine
 						mVector3(Globals::GetDefaultHeapAllocator(), 10)
 		{
 
-		}
-
-		virtual void SetUp()
-		{
-			RunningEngineFixture::SetUp();
-		}
-
-		virtual void TearDown()
-		{
-			RunningEngineFixture::TearDown();
 		}
 
 		Vector<int32_t> mVector1;

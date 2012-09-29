@@ -10,22 +10,12 @@
 
 namespace JonsEngine
 {
-	class ThreadTest : public RunningEngineFixture
+	class ThreadTest : public ::testing::Test
 	{
 	public:
 		ThreadTest()
 		{
 			
-		}
-
-		virtual void SetUp()
-		{
-			RunningEngineFixture::SetUp();
-		}
-
-		virtual void TearDown()
-		{
-			RunningEngineFixture::TearDown();
 		}
 
 		void SetNumberTo14(int32_t* number)
@@ -37,7 +27,7 @@ namespace JonsEngine
 		{
 			int32_t sleepTime = *arg;
 
-			jons_SleepCurrentThread(sleepTime);
+			SleepCurrentThread(sleepTime);
 		}
 	};
 }

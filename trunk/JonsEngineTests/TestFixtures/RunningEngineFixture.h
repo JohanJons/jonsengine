@@ -7,26 +7,19 @@
 
 namespace JonsEngine
 {
-	 class RunningEngineFixture : public ::testing::Test
+	 class RunningEngineFixture : public ::testing::Environment
 	 {
 	 public:
 		 virtual void SetUp()
 		 {
-
 			// init engine
 			ASSERT_TRUE(mEngine.Init());
-
-			// start engine
-			ASSERT_TRUE(mEngine.Start());
 
 			ASSERT_TRUE(mEngine.isRunning());
 		 }
 		
 		 virtual void TearDown()
 		 {
-			// stop engine
-			ASSERT_TRUE(mEngine.Stop());
-
 			// destroy engine
 			ASSERT_TRUE(mEngine.Destroy());
 

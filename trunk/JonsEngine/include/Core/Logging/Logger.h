@@ -26,6 +26,13 @@ namespace JonsEngine
 
 
 	private:
-		const std::string& mLoggerName;
+		const std::string mLoggerName;
 	};
+
+	namespace Globals
+	{
+		Logger& GetEngineLogger();
+		Logger& GetVideoLogger();
+		Logger& GetThreadingLogger();
+	}
 }

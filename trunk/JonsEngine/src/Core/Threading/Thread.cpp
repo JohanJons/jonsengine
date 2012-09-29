@@ -18,7 +18,7 @@ namespace JonsEngine
 	/////				Free functions				/////
 	/////////////////////////////////////////////////////
 
-	void jons_SleepCurrentThread(uint32_t milliseconds)
+	void SleepCurrentThread(uint32_t milliseconds)
 	{
 		#if defined _WIN32 || _WIN64
 			Sleep(milliseconds);

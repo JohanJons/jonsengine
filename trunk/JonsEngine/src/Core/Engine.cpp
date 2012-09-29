@@ -1,105 +1,73 @@
 #include "include/Core/Engine.h"
 
-#include "include/Core/Memory/IMemoryAllocator.h"
+#include "include/Core/Logging/Logger.h"
+#include "include/Core/Memory/HeapAllocator.h"
+#include "include/Video/RenderOpenGL.h"
 
 namespace JonsEngine
 {
 
-	Engine::~Engine()
+	Engine::Engine() : mRunning(false), mLog(Globals::GetEngineLogger()), mRenderBackend(NULL), mMemoryAllocator(Globals::GetDefaultHeapAllocator())
 	{
-		Destroy();
+
 	}
 
-	Engine::Engine() : mRunning(false), mInitialized(false), mLog(EngineTag)
+	Engine::~Engine()
 	{
-		
+		if (mRunning)
+			Destroy();
 	}
 
 	bool Engine::Init()
 	{
-		bool res = true;
-
-		res &= InitializeManagers();
-
-		if (res)
-			mInitialized = true;
-
-		return res;
-	}
-
-	bool Engine::InitializeManagers()
-	{
-		bool ret = true;
-
-		// Render
-
-		// GameObject 
-
-		return ret;
-	}
-
-	bool Engine::Start()
-	{
-		bool res = false;
-
 		if (!mRunning)
 		{
-			res = true;
+			bool res = true;
 
-			if (res)
+			JONS_LOG_INFO(mLog, "-------- INITIALIZING ENGINE --------")
+
+			res &= InitializeModules();
+
+			if (res && !mRunning)
+			{
 				mRunning = true;
-			else
-				JONS_LOG_ERROR(mLog, "Engine::Start(): Unable to start Engine!");
+				JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
+			}
+
+			return res;
 		}
-		else 
-			JONS_LOG_WARNING(mLog, "Engine::Start(): Engine already running");
-
-		JONS_LOG_INFO(mLog, "-------- STARTING ENGINE --------");
-
-		return res;
-	}
-
-	bool Engine::Stop()
-	{
-		bool res = false;
-
-		if (mRunning)
+		else
 		{
-			res = true;
+			JONS_LOG_WARNING(mLog, "Engine::Init(): Engine already initialized!")
 
-			if (res)
-				mRunning = false;
-			else
-				JONS_LOG_ERROR(mLog, "Engine::Stop(): Unable to stop Engine!");
+			return false;
 		}
-		else 
-			JONS_LOG_WARNING(mLog, "Engine::Stop(): Engine not running");
-
-		JONS_LOG_INFO(mLog, "-------- STOPPING ENGINE --------");
-
-		return res;
 	}
 
 	bool Engine::Destroy()
 	{
-		bool res = true;
-
 		if (mRunning)
-			res &= Stop();
+		{
+			bool res = true;
 
-		res &= DestroyManagers();
+			JONS_LOG_INFO(mLog, "-------- SHUTTING DOWN ENGINE --------")
 
-		if (res)
-			mInitialized = false;
+			res &= DestroyModules();
 
-		return res;
-	}
+			if (res && mRunning)
+			{
+				mRunning = false;
+				JONS_LOG_INFO(mLog, "-------- ENGINE DESTROYED --------")
+			}
 
-	bool Engine::DestroyManagers()
-	{
-		bool ret = true;
+			return res;
+		}
+		else
+		{
+			JONS_LOG_WARNING(mLog, "Engine::Destroy(): Engine not initialized!")
 
-		return ret;
+			return false;
+		}
 	}
 
 	bool Engine::isRunning()
@@ -109,11 +77,49 @@ namespace JonsEngine
 
 	void Engine::Tick()
 	{
+		if (mRunning)
+		{
+			mRenderBackend->StartFrame();
 
+			mRenderBackend->EndFrame();
+		}
 	}
 
 	EngineSettings& Engine::GetEngineSettings()
 	{
 		return mEngineSettings;
+	}
+
+	bool Engine::InitializeModules()
+	{
+		bool initResult = true;
+
+		// Create and Initialize rendering backend
+		if (!mRenderBackend)
+		{
+			if (mEngineSettings.GetRenderBackend() == OPENGL)
+				mRenderBackend = mMemoryAllocator.AllocateObject<RenderOpenGL>();
+
+			if (mRenderBackend->Init( mEngineSettings ))
+				JONS_LOG_INFO(mLog, "Engine::InitializeModules(): Render initialized.")
+			else
+				JONS_LOG_ERROR(mLog, "Engine::InitializeModules(): Render failed to initialize!")
+		}
+
+		return (mRenderBackend != NULL);
+	}
+
+	bool Engine::DestroyModules()
+	{
+		// Destroy rendering backend
+		if (mRenderBackend)
+		{
+			mMemoryAllocator.DeallocateObject<RenderBase>(mRenderBackend);
+			mRenderBackend = NULL;
+
+			JONS_LOG_INFO(mLog, "Engine::DestroyModules(): Destroyed Render.")
+		}
+
+		return (!mRenderBackend);
 	}
 }

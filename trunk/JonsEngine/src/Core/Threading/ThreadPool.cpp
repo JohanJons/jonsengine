@@ -10,7 +10,7 @@
 
 namespace JonsEngine
 {
-	ThreadPool::ThreadPool(uint32_t initialNumThreads) : mMemoryAllocator(Globals::GetDefaultHeapAllocator()), mLogger(ThreadingTag),
+	ThreadPool::ThreadPool(uint32_t initialNumThreads) : mMemoryAllocator(Globals::GetDefaultHeapAllocator()), mLogger(Globals::GetThreadingLogger()),
 															mNumThreads(0), mDesiredNumThreads(0), mScheduledTasks(Globals::GetDefaultHeapAllocator()),
 															mWorkerThreads(Globals::GetDefaultHeapAllocator())
 	{
@@ -86,6 +86,9 @@ namespace JonsEngine
 	void ThreadPool::SetNumThreads(uint32_t num)
 	{
 		ScopedLock lock(mMutex);
+
+		if (mDesiredNumThreads == num)
+			return;
 
 		mDesiredNumThreads = num;
 
