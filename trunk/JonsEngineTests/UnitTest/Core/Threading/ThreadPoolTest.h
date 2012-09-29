@@ -3,7 +3,7 @@
 
 #include "gtest/gtest.h"
 
-#include "../JonsEngineTests/TestFixtures/RunningEngineFixture.h"
+#include "../../TestFixtures/RunningEngineFixture.h"
 
 #include "include/Core/Threading/ThreadPool.h"
 

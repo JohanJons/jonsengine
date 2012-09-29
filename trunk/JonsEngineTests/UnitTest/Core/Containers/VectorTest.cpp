@@ -1,4 +1,4 @@
-#include "../JonsEngineTests/Core/Containers/VectorTest.h"
+#include "VectorTest.h"
 
 
 namespace JonsEngine

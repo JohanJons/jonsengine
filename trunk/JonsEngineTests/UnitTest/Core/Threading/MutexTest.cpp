@@ -1,4 +1,4 @@
-#include "../JonsEngineTests/Core/Threading/MutexTest.h"
+#include "MutexTest.h"
 
 #include "boost/bind.hpp"
 

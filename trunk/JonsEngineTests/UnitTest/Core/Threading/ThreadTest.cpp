@@ -1,4 +1,4 @@
-#include "../JonsEngineTests/Core/Threading/ThreadTest.h"
+#include "ThreadTest.h"
 
 #include "boost/bind.hpp"
 

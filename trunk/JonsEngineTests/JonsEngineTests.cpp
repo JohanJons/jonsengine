@@ -6,7 +6,7 @@
 // google unit test framework
 #include "gtest/gtest.h"
 
-#include "TestFixtures/RunningEngineFixture.h"
+#include "UnitTest/TestFixtures/RunningEngineFixture.h"
 
 
 #include <iostream>
@@ -23,14 +23,15 @@ int32_t _tmain(int32_t argc, _TCHAR* argv[])
 
 	::testing::AddGlobalTestEnvironment(new RunningEngineFixture());
 
-	// start basic testing
+	// start basic unit testing
 	::testing::InitGoogleTest(&argc,argv);
 	if (!RUN_ALL_TESTS())
 		std::cout << "TESTING SUCCESSFULL" << std::endl;
 	else
 		std::cout << "TESTING FAILED" << std::endl;
 
-	// run an integrated test
+	// run an example usage/integrated test
+
 
 	std::cout << "Press key to terminate" << std::endl;
 	getchar();

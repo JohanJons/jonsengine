@@ -6,7 +6,7 @@
 #include "include/Core/Containers/Vector.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
-#include "../JonsEngineTests/TestFixtures/RunningEngineFixture.h"
+#include "../../TestFixtures/RunningEngineFixture.h"
 
 
 namespace JonsEngine

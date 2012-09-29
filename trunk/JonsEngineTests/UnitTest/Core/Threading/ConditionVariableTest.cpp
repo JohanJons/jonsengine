@@ -1,4 +1,4 @@
-#include "../JonsEngineTests/Core/Threading/ConditionVariableTest.h"
+#include "ConditionVariableTest.h"
 
 #include "boost/bind.hpp"
 

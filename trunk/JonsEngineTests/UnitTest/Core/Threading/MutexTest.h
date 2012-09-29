@@ -6,7 +6,7 @@
 #include "include/Core/Threading/Thread.h"
 #include "include/Core/Threading/Mutex.h"
 
-#include "../JonsEngineTests/TestFixtures/RunningEngineFixture.h"
+#include "../../TestFixtures/RunningEngineFixture.h"
 
 
 namespace JonsEngine

@@ -85,20 +85,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Core\Containers\VectorTest.h" />
-    <ClInclude Include="Core\Threading\ConditionVariableTest.h" />
-    <ClInclude Include="Core\Threading\MutexTest.h" />
-    <ClInclude Include="Core\Threading\ThreadPoolTest.h" />
-    <ClInclude Include="Core\Threading\ThreadTest.h" />
-    <ClInclude Include="TestFixtures\RunningEngineFixture.h" />
+    <ClInclude Include="UnitTest\Core\Containers\VectorTest.h" />
+    <ClInclude Include="UnitTest\Core\Threading\ConditionVariableTest.h" />
+    <ClInclude Include="UnitTest\Core\Threading\MutexTest.h" />
+    <ClInclude Include="UnitTest\Core\Threading\ThreadPoolTest.h" />
+    <ClInclude Include="UnitTest\Core\Threading\ThreadTest.h" />
+    <ClInclude Include="UnitTest\TestFixtures\RunningEngineFixture.h" />
+    <ClInclude Include="UsageTest\main.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Core\Containers\VectorTest.cpp" />
-    <ClCompile Include="Core\Threading\ConditionVariableTest.cpp" />
-    <ClCompile Include="Core\Threading\MutexTest.cpp" />
-    <ClCompile Include="Core\Threading\ThreadPoolTest.cpp" />
-    <ClCompile Include="Core\Threading\ThreadTest.cpp" />
     <ClCompile Include="JonsEngineTests.cpp" />
+    <ClCompile Include="UnitTest\Core\Containers\VectorTest.cpp" />
+    <ClCompile Include="UnitTest\Core\Threading\ConditionVariableTest.cpp" />
+    <ClCompile Include="UnitTest\Core\Threading\MutexTest.cpp" />
+    <ClCompile Include="UnitTest\Core\Threading\ThreadPoolTest.cpp" />
+    <ClCompile Include="UnitTest\Core\Threading\ThreadTest.cpp" />
+    <ClCompile Include="UsageTest\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JonsEngine\JonsEngine.vcxproj">

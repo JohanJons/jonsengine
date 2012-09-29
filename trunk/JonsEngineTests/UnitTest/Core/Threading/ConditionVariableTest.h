@@ -7,7 +7,7 @@
 #include "include/Core/Threading/ConditionVariable.h"
 #include "include/Core/Threading/ScopedLock.h"
 
-#include "../JonsEngineTests/TestFixtures/RunningEngineFixture.h"
+#include "../../TestFixtures/RunningEngineFixture.h"
 
 
 namespace JonsEngine

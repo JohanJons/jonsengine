@@ -5,7 +5,7 @@
 
 #include "include/Core/Threading/Thread.h"
 
-#include "../JonsEngineTests/TestFixtures/RunningEngineFixture.h"
+#include "../../TestFixtures/RunningEngineFixture.h"
 
 
 namespace JonsEngine

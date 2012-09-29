@@ -9,63 +9,69 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Source Files\Core">
-      <UniqueIdentifier>{f64df6e7-990b-4fd2-9f89-3bc613aeb236}</UniqueIdentifier>
+    <Filter Include="Source Files\UsageTest">
+      <UniqueIdentifier>{12fa0e93-5613-4e7c-9060-1ae78d2d6bdc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Core\Memory">
-      <UniqueIdentifier>{7bdbe577-a127-4d2e-9288-3e66e96314f6}</UniqueIdentifier>
+    <Filter Include="Source Files\UnitTest">
+      <UniqueIdentifier>{bf112193-4404-4d0e-aaf1-122bd15cb335}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Core\GameObject">
-      <UniqueIdentifier>{6b6d8906-631f-4f49-8b69-bdffbc50b745}</UniqueIdentifier>
+    <Filter Include="Source Files\UnitTest\TestFixture">
+      <UniqueIdentifier>{376418fd-0b44-42af-abfc-d703f04c2f3e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Core\Containers">
-      <UniqueIdentifier>{fe08ecd0-b45f-4d99-a48f-e3f59ab72131}</UniqueIdentifier>
+    <Filter Include="Source Files\UnitTest\Core">
+      <UniqueIdentifier>{b01bbf91-5a78-4180-8fd7-b87fc72dd2e5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\TestFixtures">
-      <UniqueIdentifier>{06e97dbc-ea4a-45cd-acad-82e81a158dcd}</UniqueIdentifier>
+    <Filter Include="Source Files\UnitTest\Core\Containers">
+      <UniqueIdentifier>{ec304895-e439-4d46-8d53-b56832217986}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Core\Threading">
-      <UniqueIdentifier>{b36506e8-45f6-4e4f-b7b6-56c6a7156032}</UniqueIdentifier>
+    <Filter Include="Source Files\UnitTest\Core\Threading">
+      <UniqueIdentifier>{14366197-7df3-4270-9b7e-d1615b7e6657}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\Containers\VectorTest.h">
-      <Filter>Source Files\Core\Containers</Filter>
+    <ClInclude Include="UsageTest\main.h">
+      <Filter>Source Files\UsageTest</Filter>
     </ClInclude>
-    <ClInclude Include="TestFixtures\RunningEngineFixture.h">
-      <Filter>Source Files\TestFixtures</Filter>
+    <ClInclude Include="UnitTest\Core\Containers\VectorTest.h">
+      <Filter>Source Files\UnitTest\Core\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Threading\ThreadTest.h">
-      <Filter>Source Files\Core\Threading</Filter>
+    <ClInclude Include="UnitTest\Core\Threading\ConditionVariableTest.h">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Threading\MutexTest.h">
-      <Filter>Source Files\Core\Threading</Filter>
+    <ClInclude Include="UnitTest\Core\Threading\MutexTest.h">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Threading\ConditionVariableTest.h">
-      <Filter>Source Files\Core\Threading</Filter>
+    <ClInclude Include="UnitTest\Core\Threading\ThreadPoolTest.h">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Threading\ThreadPoolTest.h">
-      <Filter>Source Files\Core\Threading</Filter>
+    <ClInclude Include="UnitTest\Core\Threading\ThreadTest.h">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTest\TestFixtures\RunningEngineFixture.h">
+      <Filter>Source Files\UnitTest\TestFixture</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JonsEngineTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Containers\VectorTest.cpp">
-      <Filter>Source Files\Core\Containers</Filter>
+    <ClCompile Include="UsageTest\main.cpp">
+      <Filter>Source Files\UsageTest</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Threading\ThreadTest.cpp">
-      <Filter>Source Files\Core\Threading</Filter>
+    <ClCompile Include="UnitTest\Core\Containers\VectorTest.cpp">
+      <Filter>Source Files\UnitTest\Core\Containers</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Threading\MutexTest.cpp">
-      <Filter>Source Files\Core\Threading</Filter>
+    <ClCompile Include="UnitTest\Core\Threading\ConditionVariableTest.cpp">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Threading\ConditionVariableTest.cpp">
-      <Filter>Source Files\Core\Threading</Filter>
+    <ClCompile Include="UnitTest\Core\Threading\MutexTest.cpp">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Threading\ThreadPoolTest.cpp">
-      <Filter>Source Files\Core\Threading</Filter>
+    <ClCompile Include="UnitTest\Core\Threading\ThreadPoolTest.cpp">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTest\Core\Threading\ThreadTest.cpp">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
