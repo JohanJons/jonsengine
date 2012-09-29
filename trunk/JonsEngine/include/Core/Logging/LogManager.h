@@ -3,6 +3,7 @@
 #include "include/Core/EngineDefs.h"
 #include "include/Core/Logging/JonsStreamBuf.h"
 #include "include/Core/Logging/JonsOutputStream.h"
+#include "include/Core/Threading/ScopedLock.h"
 
 #include "include/Core/Utils/JonsTime.h"
 
@@ -10,8 +11,6 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-
-// TODO - Add multithread support
 
 namespace JonsEngine
 {
@@ -34,7 +33,7 @@ namespace JonsEngine
 
 		void AddOutputStream(std::streambuf* const sb);
 		void RemoveOutputStream(std::streambuf* const sb);
-		bool IsOutputStreamAdded(std::streambuf* const sb) const;
+		bool IsOutputStreamAdded(std::streambuf* const sb);
 
 		const std::string& GetFileLogPath() const;
 
@@ -56,6 +55,7 @@ namespace JonsEngine
 		std::ofstream mFileStream;
 		JonsStreamBuf mStreamBuf;
 		LogLevel  mLogFilter;
+		Mutex mMutex;
 
 	};
 }
