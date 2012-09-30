@@ -21,6 +21,8 @@ namespace JonsEngine
 
 		EngineSettings& GetEngineSettings();
 
+		RenderBase* GetRender() const;
+
 	private:
 		bool InitializeModules();
 		bool DestroyModules();

@@ -32,11 +32,11 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\Thirdparty\glfw-2.7.6\support\msvc100\JonsEngineCommon.props" />
+    <Import Project="..\JonsEngine\JonsEngineCommon.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\Thirdparty\glfw-2.7.6\support\msvc100\JonsEngineCommon.props" />
+    <Import Project="..\JonsEngine\JonsEngineCommon.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -55,7 +55,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;JONSENGINE_RUN_UNIT_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <CompileAs>CompileAsCpp</CompileAs>
@@ -91,7 +91,6 @@
     <ClInclude Include="UnitTest\Core\Threading\ThreadPoolTest.h" />
     <ClInclude Include="UnitTest\Core\Threading\ThreadTest.h" />
     <ClInclude Include="UnitTest\TestFixtures\RunningEngineFixture.h" />
-    <ClInclude Include="UsageTest\main.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="JonsEngineTests.cpp" />
@@ -100,7 +99,6 @@
     <ClCompile Include="UnitTest\Core\Threading\MutexTest.cpp" />
     <ClCompile Include="UnitTest\Core\Threading\ThreadPoolTest.cpp" />
     <ClCompile Include="UnitTest\Core\Threading\ThreadTest.cpp" />
-    <ClCompile Include="UsageTest\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JonsEngine\JonsEngine.vcxproj">

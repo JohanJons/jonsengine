@@ -18,6 +18,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glew_static", "..\Thirdpart
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLFW", "..\Thirdparty\glfw-2.7.6\support\msvc100\GLFW.vcxproj", "{4DA03747-F505-4A98-9124-03B3B73B9B3B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JonsGame", "..\JonsGame\JonsGame.vcxproj", "{45F3DCBE-B625-4942-A943-A5AF20F042A4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1AD99A16-DBF2-7838-CE9F-97BA798AD85B} = {1AD99A16-DBF2-7838-CE9F-97BA798AD85B}
+		{96000F2E-1268-46DB-AE59-2F0F4C3EBAC9} = {96000F2E-1268-46DB-AE59-2F0F4C3EBAC9}
+		{4DA03747-F505-4A98-9124-03B3B73B9B3B} = {4DA03747-F505-4A98-9124-03B3B73B9B3B}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug MX|Win32 = Debug MX|Win32
@@ -67,6 +74,16 @@ Global
 		{4DA03747-F505-4A98-9124-03B3B73B9B3B}.Release|Win32.Build.0 = Release|Win32
 		{4DA03747-F505-4A98-9124-03B3B73B9B3B}.Template|Win32.ActiveCfg = Release|Win32
 		{4DA03747-F505-4A98-9124-03B3B73B9B3B}.Template|Win32.Build.0 = Release|Win32
+		{45F3DCBE-B625-4942-A943-A5AF20F042A4}.Debug MX|Win32.ActiveCfg = Debug|Win32
+		{45F3DCBE-B625-4942-A943-A5AF20F042A4}.Debug MX|Win32.Build.0 = Debug|Win32
+		{45F3DCBE-B625-4942-A943-A5AF20F042A4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{45F3DCBE-B625-4942-A943-A5AF20F042A4}.Debug|Win32.Build.0 = Debug|Win32
+		{45F3DCBE-B625-4942-A943-A5AF20F042A4}.Release MX|Win32.ActiveCfg = Release|Win32
+		{45F3DCBE-B625-4942-A943-A5AF20F042A4}.Release MX|Win32.Build.0 = Release|Win32
+		{45F3DCBE-B625-4942-A943-A5AF20F042A4}.Release|Win32.ActiveCfg = Release|Win32
+		{45F3DCBE-B625-4942-A943-A5AF20F042A4}.Release|Win32.Build.0 = Release|Win32
+		{45F3DCBE-B625-4942-A943-A5AF20F042A4}.Template|Win32.ActiveCfg = Release|Win32
+		{45F3DCBE-B625-4942-A943-A5AF20F042A4}.Template|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

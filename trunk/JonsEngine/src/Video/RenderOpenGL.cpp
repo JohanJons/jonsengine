@@ -81,6 +81,11 @@ namespace JonsEngine
 		return (glfwGetWindowParam(GLFW_OPENED) == GL_TRUE);
 	}
 
+	const uint16_t RenderOpenGL::GetCurrentFPS() const
+	{
+		return static_cast<uint16_t>(1 / (mThisFrameTime - mLastFrameTime));
+	}
+
 	void RenderOpenGL::SetFullscreen(bool fullscreen)
 	{
 		if (!IsWindowOpened())
@@ -112,6 +117,7 @@ namespace JonsEngine
 			mScreenMode.ScreenHeight != height)
 		{
 			glfwSetWindowSize(width, height);
+			glViewport(0, 0, (GLsizei) width, (GLsizei)height);
 
 			mScreenMode.ScreenWidth = width;
 			mScreenMode.ScreenHeight = height;
@@ -134,14 +140,44 @@ namespace JonsEngine
 		}
 	}
 
-		
-	void RenderOpenGL::StartFrame()
+	void RenderOpenGL::DrawLine(const Vec3& pointA, const Vec3& pointB)
 	{
 
 	}
 		
+	void RenderOpenGL::DrawTriangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC)
+	{
+
+	}
+		
+	void RenderOpenGL::DrawRectangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC, const Vec3& pointD)
+	{
+
+	}
+		
+	void RenderOpenGL::StartFrame()
+	{
+		mLastFrameTime = mThisFrameTime;
+
+		if (mScreenMode.FrameLimitEnabled)
+		{
+			mStartFrameTime = glfwGetTime();
+		}
+	}
+		
 	void RenderOpenGL::EndFrame()
 	{
+		if (mScreenMode.FrameLimitEnabled)
+		{
+			mThisFrameTime = glfwGetTime();
+
+			const double endFrameTime = glfwGetTime() - mStartFrameTime;
+			const double frameTime = 1.0f / mScreenMode.FrameLimit;
+
+			if (endFrameTime < frameTime)
+				glfwSleep(frameTime - endFrameTime);
+		}
+
 		glfwSwapBuffers();
 	}
 

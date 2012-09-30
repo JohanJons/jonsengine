@@ -9,9 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Source Files\UsageTest">
-      <UniqueIdentifier>{12fa0e93-5613-4e7c-9060-1ae78d2d6bdc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\UnitTest">
       <UniqueIdentifier>{bf112193-4404-4d0e-aaf1-122bd15cb335}</UniqueIdentifier>
     </Filter>
@@ -29,9 +26,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="UsageTest\main.h">
-      <Filter>Source Files\UsageTest</Filter>
-    </ClInclude>
     <ClInclude Include="UnitTest\Core\Containers\VectorTest.h">
       <Filter>Source Files\UnitTest\Core\Containers</Filter>
     </ClInclude>
@@ -54,9 +48,6 @@
   <ItemGroup>
     <ClCompile Include="JonsEngineTests.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UsageTest\main.cpp">
-      <Filter>Source Files\UsageTest</Filter>
     </ClCompile>
     <ClCompile Include="UnitTest\Core\Containers\VectorTest.cpp">
       <Filter>Source Files\UnitTest\Core\Containers</Filter>

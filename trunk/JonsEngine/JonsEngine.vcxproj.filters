@@ -169,5 +169,8 @@
     <ClInclude Include="include\Core\EngineDefs.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
+    <ClInclude Include="include\Core\Utils\Math.h">
+      <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

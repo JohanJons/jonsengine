@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/EngineDefs.h"
+#include "include/Core/Utils/Math.h"
 
 namespace JonsEngine
 {
@@ -33,10 +34,15 @@ namespace JonsEngine
 		virtual bool SetupWindow(const ScreenMode& screenMode) = 0;
 		virtual void CloseWindow() = 0;
 		virtual bool IsWindowOpened() const = 0;
+		virtual const uint16_t GetCurrentFPS() const = 0;
 
 		virtual void SetFullscreen(bool fullscreen) = 0;
 		virtual void SetScreenResolution(const uint16_t width, const uint16_t height) = 0;
 		virtual void SetWindowTitle(const std::string& windowTitle) = 0;
+
+		virtual void DrawLine(const Vec3& pointA, const Vec3& pointB) = 0;
+		virtual void DrawTriangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC) = 0;
+		virtual void DrawRectangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC, const Vec3& pointD) = 0;
 
 		inline bool IsRunning() const									{ return mRunning;		}
 		inline const ScreenMode& GetScreenMode() const					{ return mScreenMode;	}

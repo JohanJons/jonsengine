@@ -81,6 +81,8 @@ namespace JonsEngine
 		{
 			mRenderBackend->StartFrame();
 
+			//mRenderBackend->
+
 			mRenderBackend->EndFrame();
 		}
 	}
@@ -88,6 +90,11 @@ namespace JonsEngine
 	EngineSettings& Engine::GetEngineSettings()
 	{
 		return mEngineSettings;
+	}
+
+	RenderBase* Engine::GetRender() const
+	{
+		return mRenderBackend;
 	}
 
 	bool Engine::InitializeModules()

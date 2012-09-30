@@ -1,8 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?> 
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
-  <ItemDefinitionGroup />
+  <PropertyGroup>
+    <OutDir>$(SolutionDir)/bin/$(Configuration)/$(Platform)/</OutDir>
+    <LibraryPath>$(SolutionDir)/bin/$(Configuration)/$(Platform)/;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>GLEW_STATIC;GLFW_NO_GLU;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\glm-0.9.3.4;$(SolutionDir)\..\Thirdparty\boost_1_49_0;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup />
 </Project>

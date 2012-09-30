@@ -32,11 +32,11 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\Thirdparty\glfw-2.7.6\support\msvc100\JonsEngineCommon.props" />
+    <Import Project="JonsEngineCommon.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\Thirdparty\glfw-2.7.6\support\msvc100\JonsEngineCommon.props" />
+    <Import Project="JonsEngineCommon.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -132,6 +132,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Core\Threading\Thread.h" />
     <ClInclude Include="include\Core\Threading\ThreadPool.h" />
     <ClInclude Include="include\Core\Utils\JonsTime.h" />
+    <ClInclude Include="include\Core\Utils\Math.h" />
     <ClInclude Include="include\Video\RenderBase.h" />
     <ClInclude Include="include\Video\RenderOpenGL.h" />
   </ItemGroup>
