@@ -107,7 +107,13 @@
     <ClCompile Include="src\Video\RenderBase.cpp">
       <Filter>Source Files\Video</Filter>
     </ClCompile>
+    <ClCompile Include="src\Video\Shader.cpp">
+      <Filter>Source Files\Video</Filter>
+    </ClCompile>
     <ClCompile Include="src\Video\RenderOpenGL.cpp">
+      <Filter>Source Files\Video</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Video\ShaderProgram.cpp">
       <Filter>Source Files\Video</Filter>
     </ClCompile>
   </ItemGroup>
@@ -160,17 +166,23 @@
     <ClInclude Include="include\Video\RenderBase.h">
       <Filter>Header Files\Video</Filter>
     </ClInclude>
-    <ClInclude Include="include\Video\RenderOpenGL.h">
-      <Filter>Header Files\Video</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Memory\IMemoryAllocator.h">
       <Filter>Header Files\Core\Memory</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\EngineDefs.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Utils\Math.h">
+    <ClInclude Include="include\Core\Utils\Types.h">
       <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\Shader.h">
+      <Filter>Header Files\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\RenderOpenGL.h">
+      <Filter>Header Files\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\ShaderProgram.h">
+      <Filter>Header Files\Video</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

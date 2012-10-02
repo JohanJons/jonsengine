@@ -92,7 +92,7 @@ namespace JonsEngine
 		return mEngineSettings;
 	}
 
-	RenderBase* Engine::GetRender() const
+	RenderBase* Engine::GetRenderer() const
 	{
 		return mRenderBackend;
 	}

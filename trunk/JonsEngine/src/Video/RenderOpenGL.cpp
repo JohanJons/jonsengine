@@ -3,8 +3,9 @@
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Logging/Logger.h"
 
-#include "GL/glew.h"
 #include "GL/glfw.h"
+#include <glm/gtc/type_ptr.hpp>
+
 
 namespace JonsEngine
 {
@@ -32,7 +33,12 @@ namespace JonsEngine
 		ret &= InitializeGLEW();
 
 		if (ret)
+		{
+			// openGL context should be ready now
+			glGenBuffers(1, &mVertexBuffer);
+
 			mRunning = true;
+		}
 		else
 			Destroy();
 
@@ -81,7 +87,7 @@ namespace JonsEngine
 		return (glfwGetWindowParam(GLFW_OPENED) == GL_TRUE);
 	}
 
-	const uint16_t RenderOpenGL::GetCurrentFPS() const
+	uint16_t RenderOpenGL::GetCurrentFPS() const
 	{
 		return static_cast<uint16_t>(1 / (mThisFrameTime - mLastFrameTime));
 	}
@@ -140,6 +146,11 @@ namespace JonsEngine
 		}
 	}
 
+	void RenderOpenGL::RenderVertexArrays()
+	{
+
+	}
+
 	void RenderOpenGL::DrawLine(const Vec3& pointA, const Vec3& pointB)
 	{
 
@@ -147,7 +158,19 @@ namespace JonsEngine
 		
 	void RenderOpenGL::DrawTriangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC)
 	{
+		/*mVertices.push_back(pointA);
+		mVertices.push_back(pointB);
+		mVertices.push_back(pointC);*/
 
+		glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3), glm::value_ptr(pointA), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3), glm::value_ptr(pointB), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3), glm::value_ptr(pointC), GL_STATIC_DRAW);
+
+		PrimitiveInfo primInfo;
+		primInfo.Mode = GL_TRIANGLES;
+		primInfo.Count = 3;
+		mPrimitiveInfo.push_back(primInfo);
 	}
 		
 	void RenderOpenGL::DrawRectangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC, const Vec3& pointD)

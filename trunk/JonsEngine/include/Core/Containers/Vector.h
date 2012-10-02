@@ -11,11 +11,12 @@ namespace JonsEngine
 	{
 	public:
 		const size_t DefaultCapacityIncrease;
-		typedef T* iterator; 
-		typedef const T* const_iterator;
+		typedef T* iterator;
 		typedef T& reference;
+		typedef const T* const_iterator;
 		typedef const T& const_reference;
 
+		Vector();
 		Vector(IMemoryAllocator& allocator);
 		Vector(IMemoryAllocator& allocator, size_t size);
 		Vector(const Vector<T>& vec);
@@ -70,6 +71,11 @@ namespace JonsEngine
 		IMemoryAllocator& mAllocator;
 
 	};
+
+	template <class T>
+	inline Vector<T>::Vector() : mAllocator(Globals::GetDefaultHeapAllocator()), mCapacity(NULL), mBegin(NULL), mEnd(NULL), DefaultCapacityIncrease(2)
+	{
+	}
 
 	template <class T>
 	inline Vector<T>::Vector(IMemoryAllocator& allocator) : mAllocator(allocator), mCapacity(NULL), mBegin(NULL), mEnd(NULL), DefaultCapacityIncrease(2)
