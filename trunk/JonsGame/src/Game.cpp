@@ -1,5 +1,8 @@
 #include "include/Game.h"
+#include "include/Shaders.h"
 
+#include "include/Video/Shader.h"
+#include "include/Video/ShaderProgram.h"
 #include "include/Core/Utils/Types.h"
 
 #include <Windows.h>
@@ -31,11 +34,31 @@ namespace JonsGame
 		tri.vecB.x = 0.0; tri.vecB.y = 0.5; tri.vecB.z = 0.0;
 		tri.vecC.x = 0.5; tri.vecC.y = -0.5; tri.vecC.z = 0.0;
 
-		mEngine.GetRenderer()->DrawTriangle(tri.vecA, tri.vecB, tri.vecC);
+		Shader vertexShader("VertexShader", Shader::VERTEX_SHADER);
+		Shader fragmentShader("FragmentShader", Shader::FRAGMENT_SHADER);
 
-		while (true)
+		vertexShader.Compile(gVertexShader);
+		fragmentShader.Compile(gFragmentShader);
+
+		if (vertexShader.IsCompiled() && fragmentShader.IsCompiled())
 		{
-			mEngine.Tick();
+			ShaderProgram shaderProgram("MyShaderProgram");
+			shaderProgram.AddShader(&vertexShader);
+			shaderProgram.AddShader(&fragmentShader);
+
+			shaderProgram.BindAttribLocation(0, "position");
+
+			shaderProgram.LinkProgram();
+
+			if (shaderProgram.IsLinked())
+				shaderProgram.UseProgram(true);
+
+			mEngine.GetRenderer()->DrawTriangle(tri.vecA, tri.vecB, tri.vecC);
+
+			while (true)
+			{
+				mEngine.Tick();
+			}
 		}
 
 		mEngine.Destroy();

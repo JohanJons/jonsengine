@@ -33,12 +33,23 @@ namespace JonsEngine
 		if (status == GL_FALSE)
 		{
 			JONS_LOG_ERROR(mLogger, "Shader::Compile(): Failed to compile shader");
+
+			GLint infoLogLength;
+        glGetShaderiv(mShaderHandle, GL_INFO_LOG_LENGTH, &infoLogLength);
+        
+        GLchar *strInfoLog = new GLchar[infoLogLength + 1];
+        glGetShaderInfoLog(mShaderHandle, infoLogLength, NULL, strInfoLog);
 			Destroy();
 			return false;
 		}
 		
 		mIsCompiled = true;
 		return true;
+	}
+
+	const std::string& Shader::GetName() const
+	{
+		return mName;
 	}
 
 	bool Shader::IsCompiled() const

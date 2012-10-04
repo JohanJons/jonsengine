@@ -16,6 +16,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Game.h" />
+    <ClInclude Include="include\Shaders.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{45F3DCBE-B625-4942-A943-A5AF20F042A4}</ProjectGuid>

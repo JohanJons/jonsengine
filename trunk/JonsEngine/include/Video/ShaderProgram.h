@@ -19,10 +19,15 @@ namespace JonsEngine
 
 		void AddShader(Shader* shader);
 		void RemoveShader(Shader* shader);
+		void ClearShaders();
 
 		void BindAttribLocation(GLuint index, const std::string& name);
 		bool LinkProgram();
-		void UseProgram();
+		void UnlinkProgram();
+		void UseProgram(bool use);
+		void SetName(const std::string& name);
+
+		const std::string& GetName() const;
 		bool IsLinked() const;
 
 	private:
@@ -31,7 +36,7 @@ namespace JonsEngine
 		void DetachShader(Shader* shader);
 
 		Logger& mLogger;
-		const std::string mName;
+		std::string mName;
 		bool mIsLinked;
 		GLuint mProgramHandle;
 		Vector<Shader*> mAddedShaders;

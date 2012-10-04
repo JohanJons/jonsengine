@@ -17,17 +17,27 @@ namespace JonsEngine
 	ShaderProgram::~ShaderProgram()
 	{
 		Destroy();
+
+		ClearShaders();
 	}
 
 		
 	void ShaderProgram::AddShader(Shader* shader)
 	{	
-		mAddedShaders.push_back(shader);
+		if (shader->IsCompiled())
+			mAddedShaders.push_back(shader);
+		else
+			JONS_LOG_ERROR(mLogger, "ShaderProgram::AddShader(): Shader not compiled");
 	}
 
 	void ShaderProgram::RemoveShader(Shader* shader)
 	{
 		mAddedShaders.erase(std::find(mAddedShaders.begin(), mAddedShaders.end(), shader));
+	}
+
+	void ShaderProgram::ClearShaders()
+	{
+		mAddedShaders.clear();
 	}
 
 	void ShaderProgram::BindAttribLocation(GLuint index, const std::string& name)
@@ -67,10 +77,31 @@ namespace JonsEngine
 		mIsLinked = true;
 		return true;
 	}
-		
-	void ShaderProgram::UseProgram()
+
+	void ShaderProgram::UnlinkProgram()
 	{
-		glUseProgram(mProgramHandle);
+		if (!mIsLinked)
+			JONS_LOG_ERROR(mLogger, "ShaderProgram::UnlinkProgram(): Program not linked");
+
+		Destroy();
+	}
+
+	void ShaderProgram::SetName(const std::string& name)
+	{
+		mName = name;
+	}
+		
+	void ShaderProgram::UseProgram(bool use)
+	{
+		if (use)
+			glUseProgram(mProgramHandle);
+		else
+			glUseProgram(0);
+	}
+
+	const std::string& ShaderProgram::GetName() const
+	{
+		return mName;
 	}
 
 	bool ShaderProgram::IsLinked() const
@@ -81,7 +112,9 @@ namespace JonsEngine
 	void ShaderProgram::Destroy()
 	{
 		glDeleteProgram(mProgramHandle);
+		mName.clear();
 		mProgramHandle = 0;
+		mIsLinked = false;
 	}
 
 	void ShaderProgram::AttachShader(Shader* shader)

@@ -81,7 +81,7 @@ namespace JonsEngine
 		{
 			mRenderBackend->StartFrame();
 
-			//mRenderBackend->
+			mRenderBackend->RenderVertexArrays();
 
 			mRenderBackend->EndFrame();
 		}

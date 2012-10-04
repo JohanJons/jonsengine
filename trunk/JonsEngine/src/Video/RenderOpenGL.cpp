@@ -36,6 +36,7 @@ namespace JonsEngine
 		{
 			// openGL context should be ready now
 			glGenBuffers(1, &mVertexBuffer);
+			glClearColor (1.0, 1.0, 1.0, 0.0);
 
 			mRunning = true;
 		}
@@ -158,14 +159,11 @@ namespace JonsEngine
 		
 	void RenderOpenGL::DrawTriangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC)
 	{
-		/*mVertices.push_back(pointA);
-		mVertices.push_back(pointB);
-		mVertices.push_back(pointC);*/
+		Vec3 arr[] = { pointA, pointB, pointC };
 
 		glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3), glm::value_ptr(pointA), GL_STATIC_DRAW);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3), glm::value_ptr(pointB), GL_STATIC_DRAW);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3), glm::value_ptr(pointC), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3)*3, arr, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		PrimitiveInfo primInfo;
 		primInfo.Mode = GL_TRIANGLES;
@@ -183,9 +181,9 @@ namespace JonsEngine
 		mLastFrameTime = mThisFrameTime;
 
 		if (mScreenMode.FrameLimitEnabled)
-		{
 			mStartFrameTime = glfwGetTime();
-		}
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 		
 	void RenderOpenGL::EndFrame()
