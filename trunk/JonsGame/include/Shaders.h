@@ -18,6 +18,6 @@ namespace JonsGame
 										out vec4 outColor;								\n \
 										void main()										\n \
 										{												\n \
-											outColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);	\n \
+											outColor = vec4(1.0f, 0.5f, 0.5f, 1.0f);	\n \
 										}												\n";
 }

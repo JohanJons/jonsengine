@@ -55,7 +55,9 @@ namespace JonsEngine
 		double mThisFrameTime;
 
 		// rendering 
-		GLuint mVertexBuffer;
+		GLuint mVBO_VertexShader;
+		GLuint mVBO_FragmentShader;
+		GLuint mVAO;
 		Vector<Vec3> mVertices;
 		Vector<PrimitiveInfo> mPrimitiveInfo;
 

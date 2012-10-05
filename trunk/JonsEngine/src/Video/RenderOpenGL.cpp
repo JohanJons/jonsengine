@@ -35,8 +35,10 @@ namespace JonsEngine
 		if (ret)
 		{
 			// openGL context should be ready now
-			glGenBuffers(1, &mVertexBuffer);
-			glClearColor (1.0, 1.0, 1.0, 0.0);
+			glGenBuffers(1, &mVBO_VertexShader);
+			glGenBuffers(1, &mVBO_FragmentShader);
+			glGenVertexArrays(1, &mVAO);
+			glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
 
 			mRunning = true;
 		}
@@ -149,7 +151,9 @@ namespace JonsEngine
 
 	void RenderOpenGL::RenderVertexArrays()
 	{
-
+		glBindVertexArray(mVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindVertexArray(0);
 	}
 
 	void RenderOpenGL::DrawLine(const Vec3& pointA, const Vec3& pointB)
@@ -159,11 +163,40 @@ namespace JonsEngine
 		
 	void RenderOpenGL::DrawTriangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC)
 	{
-		Vec3 arr[] = { pointA, pointB, pointC };
+		const float vertexPositions[] = {
+			0.75f, 0.75f, 0.0f,
+			0.75f, -0.75f, 0.0f,
+			-0.75f, -0.75f, 0.0f,
+		};
 
-		glBindBuffer(GL_ARRAY_BUFFER, mVertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3)*3, arr, GL_STATIC_DRAW);
+		/*const float vertexColor[] = {
+			1.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 1.0f,
+		};*/
+
+		// vertex shader
+		glBindVertexArray(mVAO);
+
+		glBindBuffer(GL_ARRAY_BUFFER, mVBO_VertexShader);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		glEnableVertexAttribArray(0);
+
+		// fragment shader
+		//glBindBuffer(GL_ARRAY_BUFFER, mVBO_FragmentShader);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(vertexColor), vertexColor, GL_STATIC_DRAW);
+
+		//glVertexAttribPointer(, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+		//glEnableVertexAttribArray(1);
+
+
+		// unbind
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
 
 		PrimitiveInfo primInfo;
 		primInfo.Mode = GL_TRIANGLES;
@@ -173,7 +206,7 @@ namespace JonsEngine
 		
 	void RenderOpenGL::DrawRectangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC, const Vec3& pointD)
 	{
-
+		
 	}
 		
 	void RenderOpenGL::StartFrame()

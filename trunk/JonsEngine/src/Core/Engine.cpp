@@ -108,9 +108,9 @@ namespace JonsEngine
 				mRenderBackend = mMemoryAllocator.AllocateObject<RenderOpenGL>();
 
 			if (mRenderBackend->Init( mEngineSettings ))
-				JONS_LOG_INFO(mLog, "Engine::InitializeModules(): Render initialized.")
+				JONS_LOG_INFO(mLog, "Engine::InitializeModules(): Renderer initialized.")
 			else
-				JONS_LOG_ERROR(mLog, "Engine::InitializeModules(): Render failed to initialize!")
+				JONS_LOG_ERROR(mLog, "Engine::InitializeModules(): Renderer failed to initialize!")
 		}
 
 		return (mRenderBackend != NULL);
@@ -124,7 +124,7 @@ namespace JonsEngine
 			mMemoryAllocator.DeallocateObject<RenderBase>(mRenderBackend);
 			mRenderBackend = NULL;
 
-			JONS_LOG_INFO(mLog, "Engine::DestroyModules(): Destroyed Render.")
+			JONS_LOG_INFO(mLog, "Engine::DestroyModules(): Destroyed Renderer.")
 		}
 
 		return (!mRenderBackend);
