@@ -4,6 +4,8 @@
 #include "include/Core/Memory/HeapAllocator.h"
 #include "include/Video/RenderOpenGL.h"
 
+#include "GL/glfw.h"
+
 namespace JonsEngine
 {
 
@@ -26,7 +28,17 @@ namespace JonsEngine
 
 			JONS_LOG_INFO(mLog, "-------- INITIALIZING ENGINE --------")
 
+			// Initialize GLFW
+			GLenum glfwErr = glfwInit();
+			if (glfwErr != GL_TRUE)
+			{
+				JONS_LOG_ERROR(mLog, "Engine::Init(): Unable to initialize GLFW!")
+				return false;
+			}
+
+			// intialize subsystems
 			res &= InitializeModules();
+
 
 			if (res && !mRunning)
 			{
@@ -97,6 +109,11 @@ namespace JonsEngine
 		return mRenderBackend;
 	}
 
+	InputManager* Engine::GetInputManager()
+	{
+		return &mInputManager;
+	}
+
 	bool Engine::InitializeModules()
 	{
 		bool initResult = true;
@@ -107,10 +124,17 @@ namespace JonsEngine
 			if (mEngineSettings.GetRenderBackend() == OPENGL)
 				mRenderBackend = mMemoryAllocator.AllocateObject<RenderOpenGL>();
 
-			if (mRenderBackend->Init( mEngineSettings ))
+			if (mRenderBackend->Init(mEngineSettings))
 				JONS_LOG_INFO(mLog, "Engine::InitializeModules(): Renderer initialized.")
 			else
 				JONS_LOG_ERROR(mLog, "Engine::InitializeModules(): Renderer failed to initialize!")
+
+
+			if (mInputManager.Init(mEngineSettings))
+				JONS_LOG_INFO(mLog, "Engine::InitializeModules(): InputManager initialized.")
+			else
+				JONS_LOG_ERROR(mLog, "Engine::InitializeModules(): InputManager failed to initialize!")
+
 		}
 
 		return (mRenderBackend != NULL);

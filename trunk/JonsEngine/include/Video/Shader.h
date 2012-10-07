@@ -25,6 +25,7 @@ namespace JonsEngine
 
 		bool Compile(const std::string& shader);
 
+		void SetName(const std::string& name);
 		const std::string& GetName() const;
 		bool IsCompiled() const;
 
@@ -33,7 +34,7 @@ namespace JonsEngine
 		void Destroy();
 
 		Logger& mLogger;
-		const std::string mName;
+		std::string mName;
 		const ShaderType mShaderType;
 		GLuint mShaderHandle;
 		bool mIsCompiled;

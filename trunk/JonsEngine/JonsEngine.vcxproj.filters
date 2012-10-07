@@ -39,12 +39,6 @@
     <Filter Include="Thirdparty">
       <UniqueIdentifier>{7b2a64d1-5223-4406-82fa-d4f188db9cc9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Core\GameObject">
-      <UniqueIdentifier>{87657f2d-8617-464c-8032-723e7c23dfcc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Core\GameObject">
-      <UniqueIdentifier>{9bda9540-ac3d-4837-81c5-f3f9ca457cc7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Thirdparty\dlmalloc">
       <UniqueIdentifier>{0815c268-49c7-420a-bc5b-abebc3b3dfbd}</UniqueIdentifier>
     </Filter>
@@ -62,6 +56,12 @@
     </Filter>
     <Filter Include="Header Files\Video">
       <UniqueIdentifier>{ff44cc03-febf-440e-aeba-dc7ede80161e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Input">
+      <UniqueIdentifier>{0589469a-d5b2-4b4f-a1d1-78d13b8ec233}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{ae728930-1c33-4a76-b666-cfe6f16f8dac}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +115,9 @@
     </ClCompile>
     <ClCompile Include="src\Video\ShaderProgram.cpp">
       <Filter>Source Files\Video</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\InputManager.cpp">
+      <Filter>Source Files\Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -183,6 +186,15 @@
     </ClInclude>
     <ClInclude Include="include\Video\ShaderProgram.h">
       <Filter>Header Files\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input\InputManager.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input\IKeyListener.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input\IMouseListener.h">
+      <Filter>Header Files\Input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

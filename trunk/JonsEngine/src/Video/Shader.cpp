@@ -41,6 +41,11 @@ namespace JonsEngine
 		return true;
 	}
 
+	void Shader::SetName(const std::string& name)
+	{
+		mName = name;
+	}
+
 	const std::string& Shader::GetName() const
 	{
 		return mName;
@@ -55,6 +60,7 @@ namespace JonsEngine
 	{
 		glDeleteShader(mShaderHandle);
 		mShaderHandle = 0;
+		mIsCompiled = false;
 	}
 
 }

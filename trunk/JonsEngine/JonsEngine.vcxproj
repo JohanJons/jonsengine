@@ -111,6 +111,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Core\Threading\ThreadPool.cpp" />
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
     <ClCompile Include="src\Core\Utils\JonsTime.cpp" />
+    <ClCompile Include="src\Input\InputManager.cpp" />
     <ClCompile Include="src\Video\RenderBase.cpp" />
     <ClCompile Include="src\Video\RenderOpenGL.cpp" />
     <ClCompile Include="src\Video\Shader.cpp" />
@@ -135,6 +136,9 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Core\Threading\ThreadPool.h" />
     <ClInclude Include="include\Core\Utils\JonsTime.h" />
     <ClInclude Include="include\Core\Utils\Types.h" />
+    <ClInclude Include="include\Input\IKeyListener.h" />
+    <ClInclude Include="include\Input\IMouseListener.h" />
+    <ClInclude Include="include\Input\InputManager.h" />
     <ClInclude Include="include\Video\RenderBase.h" />
     <ClInclude Include="include\Video\RenderOpenGL.h" />
     <ClInclude Include="include\Video\Shader.h" />
