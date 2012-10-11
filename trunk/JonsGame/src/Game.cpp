@@ -1,8 +1,8 @@
 #include "include/Game.h"
 #include "include/Shaders.h"
 
-#include "include/Video/Shader.h"
-#include "include/Video/ShaderProgram.h"
+#include "include/Video/OpenGL/Shader.h"
+#include "include/Video/OpenGL/ShaderProgram.h"
 #include "include/Core/Utils/Types.h"
 
 #include <Windows.h>

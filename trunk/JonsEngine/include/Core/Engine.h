@@ -1,13 +1,13 @@
 #pragma once
 
 #include "include/Core/EngineSettings.h"
-#include "include/Input/InputManager.h"
 
 namespace JonsEngine
 {
 	class IMemoryAllocator;
 	class Logger;
 	class RenderBase;
+	class InputManager;
 
 	class Engine
 	{
@@ -23,9 +23,11 @@ namespace JonsEngine
 		EngineSettings& GetEngineSettings();
 
 		RenderBase* GetRenderer() const;
-		InputManager* GetInputManager();
+		InputManager* GetInputManager() const;
 
 	private:
+		bool SetupEnvironment();
+		bool InitializeGLFW();
 		bool InitializeModules();
 		bool DestroyModules();
 
@@ -36,7 +38,7 @@ namespace JonsEngine
 
 		/* Modules */
 		RenderBase* mRenderBackend;
-		InputManager mInputManager;
+		InputManager* mInputManager;
 	};
 
 }

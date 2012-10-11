@@ -63,6 +63,12 @@
     <Filter Include="Source Files\Input">
       <UniqueIdentifier>{ae728930-1c33-4a76-b666-cfe6f16f8dac}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Video\OpenGL">
+      <UniqueIdentifier>{911dcb5c-05b8-4bfa-8f92-ae99563ab968}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Video\OpenGL">
+      <UniqueIdentifier>{b020985c-9da4-4ad3-979d-4cd16d0ceffd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Engine.cpp">
@@ -107,17 +113,17 @@
     <ClCompile Include="src\Video\RenderBase.cpp">
       <Filter>Source Files\Video</Filter>
     </ClCompile>
-    <ClCompile Include="src\Video\Shader.cpp">
-      <Filter>Source Files\Video</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Video\RenderOpenGL.cpp">
-      <Filter>Source Files\Video</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Video\ShaderProgram.cpp">
-      <Filter>Source Files\Video</Filter>
-    </ClCompile>
     <ClCompile Include="src\Input\InputManager.cpp">
       <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Video\OpenGL\RenderOpenGL.cpp">
+      <Filter>Source Files\Video\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Video\OpenGL\Shader.cpp">
+      <Filter>Source Files\Video\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Video\OpenGL\ShaderProgram.cpp">
+      <Filter>Source Files\Video\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -178,15 +184,6 @@
     <ClInclude Include="include\Core\Utils\Types.h">
       <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="include\Video\Shader.h">
-      <Filter>Header Files\Video</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Video\RenderOpenGL.h">
-      <Filter>Header Files\Video</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Video\ShaderProgram.h">
-      <Filter>Header Files\Video</Filter>
-    </ClInclude>
     <ClInclude Include="include\Input\InputManager.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
@@ -195,6 +192,21 @@
     </ClInclude>
     <ClInclude Include="include\Input\IMouseListener.h">
       <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input\KeyEvent.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input\MouseEvent.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\OpenGL\RenderOpenGL.h">
+      <Filter>Header Files\Video\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\OpenGL\Shader.h">
+      <Filter>Header Files\Video\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\OpenGL\ShaderProgram.h">
+      <Filter>Header Files\Video\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

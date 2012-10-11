@@ -9,6 +9,8 @@
 
 namespace JonsEngine
 {
+	static InputManager* gInputManagerInstance = NULL;
+
 	InputManager::InputManager()
 	{
 	}
@@ -19,7 +21,8 @@ namespace JonsEngine
 
 	bool InputManager::Init(const EngineSettings& engineSettings)
 	{
-		glfwSetCharCallback(boost::bind(&InputManager::glfwCharCallback, this, _1, _1));
+		glfwSetCharCallback(glfwCharCallback);
+		gInputManagerInstance = this;
 
 		return true;
 	}
@@ -69,6 +72,7 @@ namespace JonsEngine
 	{
 		return mMouseListeners;
 	}
+
 
 	void GLFWCALL InputManager::glfwCharCallback(int, int)
 	{

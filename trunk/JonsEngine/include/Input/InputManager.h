@@ -30,7 +30,7 @@ namespace JonsEngine
 		const Vector<IMouseListener*>& GetMouseListeners() const;
 
 	private:
-		void GLFWCALL glfwCharCallback(int, int);
+		static void GLFWCALL glfwCharCallback(int, int);
 
 		Vector<IKeyListener*> mKeyListeners;
 		Vector<IMouseListener*> mMouseListeners;

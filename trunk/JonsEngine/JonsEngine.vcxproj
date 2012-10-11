@@ -112,10 +112,10 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
     <ClCompile Include="src\Core\Utils\JonsTime.cpp" />
     <ClCompile Include="src\Input\InputManager.cpp" />
+    <ClCompile Include="src\Video\OpenGL\RenderOpenGL.cpp" />
+    <ClCompile Include="src\Video\OpenGL\Shader.cpp" />
+    <ClCompile Include="src\Video\OpenGL\ShaderProgram.cpp" />
     <ClCompile Include="src\Video\RenderBase.cpp" />
-    <ClCompile Include="src\Video\RenderOpenGL.cpp" />
-    <ClCompile Include="src\Video\Shader.cpp" />
-    <ClCompile Include="src\Video\ShaderProgram.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
@@ -139,10 +139,12 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Input\IKeyListener.h" />
     <ClInclude Include="include\Input\IMouseListener.h" />
     <ClInclude Include="include\Input\InputManager.h" />
+    <ClInclude Include="include\Input\KeyEvent.h" />
+    <ClInclude Include="include\Input\MouseEvent.h" />
+    <ClInclude Include="include\Video\OpenGL\RenderOpenGL.h" />
+    <ClInclude Include="include\Video\OpenGL\Shader.h" />
+    <ClInclude Include="include\Video\OpenGL\ShaderProgram.h" />
     <ClInclude Include="include\Video\RenderBase.h" />
-    <ClInclude Include="include\Video\RenderOpenGL.h" />
-    <ClInclude Include="include\Video\Shader.h" />
-    <ClInclude Include="include\Video\ShaderProgram.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

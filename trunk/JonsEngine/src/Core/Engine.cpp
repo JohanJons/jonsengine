@@ -2,14 +2,15 @@
 
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Memory/HeapAllocator.h"
-#include "include/Video/RenderOpenGL.h"
+#include "include/Video/OpenGL/RenderOpenGL.h"
+#include "include/Input/InputManager.h"
 
 #include "GL/glfw.h"
 
 namespace JonsEngine
 {
 
-	Engine::Engine() : mRunning(false), mLog(Globals::GetEngineLogger()), mRenderBackend(NULL), mMemoryAllocator(Globals::GetDefaultHeapAllocator())
+	Engine::Engine() : mRunning(false), mLog(Globals::GetEngineLogger()), mMemoryAllocator(Globals::GetDefaultHeapAllocator()), mRenderBackend(NULL), mInputManager(NULL)
 	{
 
 	}
@@ -28,16 +29,14 @@ namespace JonsEngine
 
 			JONS_LOG_INFO(mLog, "-------- INITIALIZING ENGINE --------")
 
-			// Initialize GLFW
-			GLenum glfwErr = glfwInit();
-			if (glfwErr != GL_TRUE)
-			{
-				JONS_LOG_ERROR(mLog, "Engine::Init(): Unable to initialize GLFW!")
-				return false;
-			}
+			// Setup environment
+			res &= SetupEnvironment();
 
 			// intialize subsystems
-			res &= InitializeModules();
+			if (res)
+				res &= InitializeModules();
+			else
+				JONS_LOG_ERROR(mLog, "Engine::Init(): Failed to setup environment")
 
 
 			if (res && !mRunning)
@@ -109,9 +108,30 @@ namespace JonsEngine
 		return mRenderBackend;
 	}
 
-	InputManager* Engine::GetInputManager()
+	InputManager* Engine::GetInputManager() const
 	{
-		return &mInputManager;
+		return mInputManager;
+	}
+
+	bool Engine::SetupEnvironment()
+	{
+		#if defined _WIN32 || _WIN64
+			return InitializeGLFW();
+		#else
+			return false;
+		#endif
+	}
+
+	bool Engine::InitializeGLFW()
+	{
+		GLenum glfwErr = glfwInit();
+		if (glfwErr != GL_TRUE)
+		{
+			JONS_LOG_ERROR(mLog, "Engine::Init(): Unable to initialize GLFW!")
+			return false;
+		}
+		else
+			return true;
 	}
 
 	bool Engine::InitializeModules()
@@ -124,20 +144,24 @@ namespace JonsEngine
 			if (mEngineSettings.GetRenderBackend() == OPENGL)
 				mRenderBackend = mMemoryAllocator.AllocateObject<RenderOpenGL>();
 
-			if (mRenderBackend->Init(mEngineSettings))
-				JONS_LOG_INFO(mLog, "Engine::InitializeModules(): Renderer initialized.")
-			else
+			if (!mRenderBackend->Init(mEngineSettings))
+			{
 				JONS_LOG_ERROR(mLog, "Engine::InitializeModules(): Renderer failed to initialize!")
-
-
-			if (mInputManager.Init(mEngineSettings))
-				JONS_LOG_INFO(mLog, "Engine::InitializeModules(): InputManager initialized.")
-			else
-				JONS_LOG_ERROR(mLog, "Engine::InitializeModules(): InputManager failed to initialize!")
-
+				return false;
+			}
 		}
 
-		return (mRenderBackend != NULL);
+		if (!mInputManager)
+		{
+			mInputManager = mMemoryAllocator.AllocateObject<InputManager>();
+			if (!mInputManager->Init(mEngineSettings))
+			{
+				JONS_LOG_ERROR(mLog, "Engine::InitializeModules(): InputManager failed to initialize!")
+				return false;
+			}
+		}
+
+		return (mRenderBackend != NULL && mInputManager != NULL);
 	}
 
 	bool Engine::DestroyModules()
@@ -147,10 +171,15 @@ namespace JonsEngine
 		{
 			mMemoryAllocator.DeallocateObject<RenderBase>(mRenderBackend);
 			mRenderBackend = NULL;
-
-			JONS_LOG_INFO(mLog, "Engine::DestroyModules(): Destroyed Renderer.")
 		}
 
-		return (!mRenderBackend);
+		// Destroy input manager backend
+		if (mInputManager)
+		{
+			mMemoryAllocator.DeallocateObject<InputManager>(mInputManager);
+			mInputManager = NULL;
+		}
+
+		return (!mRenderBackend && !mInputManager);
 	}
 }
