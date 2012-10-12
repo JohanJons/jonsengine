@@ -27,8 +27,8 @@ namespace JonsEngine
 
 		ret &= InitializeGLFW();
 
-		ret &= SetupWindow(engineSettings.GetScreenMode());
-		SetWindowTitle(engineSettings.GetWindowTitle());
+		ret &= SetupWindow(engineSettings.ScreenMode);
+		SetWindowTitle(engineSettings.WindowTitle);
 
 		ret &= InitializeGLEW();
 
@@ -223,6 +223,13 @@ namespace JonsEngine
 
 	bool RenderOpenGL::InitializeGLFW()
 	{
+		GLenum glfwErr = glfwInit();
+		if (glfwErr != GL_TRUE)
+		{
+			JONS_LOG_ERROR(mLogger, "Engine::Init(): Unable to initialize GLFW!")
+			return false;
+		}
+
 		// setup a forward-compatible context with openGL 3.3
 		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
 		glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);

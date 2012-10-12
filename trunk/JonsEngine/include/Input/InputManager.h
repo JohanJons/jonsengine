@@ -2,13 +2,12 @@
 
 #include "include/Core/Containers/Vector.h"
 
-#include "GL/glfw.h"
-
 namespace JonsEngine
 {
 	class IKeyListener;
 	class IMouseListener;
-	class EngineSettings;
+	class Logger;
+	struct EngineSettings;
 
 	class InputManager
 	{
@@ -30,8 +29,9 @@ namespace JonsEngine
 		const Vector<IMouseListener*>& GetMouseListeners() const;
 
 	private:
-		static void GLFWCALL glfwCharCallback(int, int);
+		static void glfwCharCallback(int, int);
 
+		Logger& mLogger;
 		Vector<IKeyListener*> mKeyListeners;
 		Vector<IMouseListener*> mMouseListeners;
 	};

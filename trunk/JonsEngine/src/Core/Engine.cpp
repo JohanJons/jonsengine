@@ -29,15 +29,8 @@ namespace JonsEngine
 
 			JONS_LOG_INFO(mLog, "-------- INITIALIZING ENGINE --------")
 
-			// Setup environment
-			res &= SetupEnvironment();
-
 			// intialize subsystems
-			if (res)
-				res &= InitializeModules();
-			else
-				JONS_LOG_ERROR(mLog, "Engine::Init(): Failed to setup environment")
-
+			res &= InitializeModules();
 
 			if (res && !mRunning)
 			{
@@ -113,27 +106,6 @@ namespace JonsEngine
 		return mInputManager;
 	}
 
-	bool Engine::SetupEnvironment()
-	{
-		#if defined _WIN32 || _WIN64
-			return InitializeGLFW();
-		#else
-			return false;
-		#endif
-	}
-
-	bool Engine::InitializeGLFW()
-	{
-		GLenum glfwErr = glfwInit();
-		if (glfwErr != GL_TRUE)
-		{
-			JONS_LOG_ERROR(mLog, "Engine::Init(): Unable to initialize GLFW!")
-			return false;
-		}
-		else
-			return true;
-	}
-
 	bool Engine::InitializeModules()
 	{
 		bool initResult = true;
@@ -141,7 +113,7 @@ namespace JonsEngine
 		// Create and Initialize rendering backend
 		if (!mRenderBackend)
 		{
-			if (mEngineSettings.GetRenderBackend() == OPENGL)
+			if (mEngineSettings.RenderBackend == OPENGL)
 				mRenderBackend = mMemoryAllocator.AllocateObject<RenderOpenGL>();
 
 			if (!mRenderBackend->Init(mEngineSettings))

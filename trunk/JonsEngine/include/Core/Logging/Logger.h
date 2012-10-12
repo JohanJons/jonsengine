@@ -33,6 +33,7 @@ namespace JonsEngine
 	{
 		Logger& GetEngineLogger();
 		Logger& GetVideoLogger();
+		Logger& GetInputLogger();
 		Logger& GetThreadingLogger();
 	}
 }

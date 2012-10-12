@@ -10,10 +10,12 @@ namespace JonsEngine
 	{
 		static Logger gEngineLogger("ENGINE");
 		static Logger gVideoLogger("VIDEO");
+		static Logger gInputLogger("INPUT");
 		static Logger gThreadingLogger("THREADING");
 
 		Logger& GetEngineLogger()			{ return gEngineLogger;		}
 		Logger& GetVideoLogger()			{ return gVideoLogger;		}
+		Logger& GetInputLogger()			{ return gInputLogger;		}
 		Logger& GetThreadingLogger()		{ return gThreadingLogger;	}
 
 	}

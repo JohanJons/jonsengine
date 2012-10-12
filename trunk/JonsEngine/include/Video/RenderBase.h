@@ -5,7 +5,7 @@
 
 namespace JonsEngine
 {
-	class EngineSettings;
+	struct EngineSettings;
 
 	struct ScreenMode
 	{
@@ -46,7 +46,7 @@ namespace JonsEngine
 		virtual void DrawRectangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC, const Vec3& pointD) = 0;
 
 
-		inline bool IsRunning() const	                         { return mRunning;		}
+		inline bool IsRunning() const									{ return mRunning;		}
 		inline const ScreenMode& GetScreenMode() const					{ return mScreenMode;	}
 		inline const std::string& GetWindowTitle() const				{ return mWindowTitle;	}
 			

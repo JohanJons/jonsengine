@@ -2,7 +2,10 @@
 
 #include "include/Input/InputManager.h"
 
+#include "include/Core/Logging/Logger.h"
+
 #include "boost/bind.hpp"
+#include "GL/glfw.h"
 
 #include <algorithm>
 
@@ -11,7 +14,7 @@ namespace JonsEngine
 {
 	static InputManager* gInputManagerInstance = NULL;
 
-	InputManager::InputManager()
+	InputManager::InputManager() : mLogger(Globals::GetInputLogger())
 	{
 	}
 		
@@ -23,6 +26,13 @@ namespace JonsEngine
 	{
 		glfwSetCharCallback(glfwCharCallback);
 		gInputManagerInstance = this;
+
+		GLenum glfwErr = glfwInit();
+		if (glfwErr != GL_TRUE)
+		{
+			JONS_LOG_ERROR(mLogger, "Engine::Init(): Unable to initialize GLFW!")
+			return false;
+		}
 
 		return true;
 	}

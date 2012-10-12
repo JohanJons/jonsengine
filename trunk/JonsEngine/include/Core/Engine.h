@@ -26,8 +26,6 @@ namespace JonsEngine
 		InputManager* GetInputManager() const;
 
 	private:
-		bool SetupEnvironment();
-		bool InitializeGLFW();
 		bool InitializeModules();
 		bool DestroyModules();
 
