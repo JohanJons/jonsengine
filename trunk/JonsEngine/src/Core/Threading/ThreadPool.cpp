@@ -10,154 +10,154 @@
 
 namespace JonsEngine
 {
-	ThreadPool::ThreadPool(uint32_t initialNumThreads) : mMemoryAllocator(Globals::GetDefaultHeapAllocator()), mLogger(Globals::GetThreadingLogger()),
-															mNumThreads(0), mDesiredNumThreads(0), mScheduledTasks(Globals::GetDefaultHeapAllocator()),
-															mWorkerThreads(Globals::GetDefaultHeapAllocator())
-	{
-		SetNumThreads(initialNumThreads);
-	}
+    ThreadPool::ThreadPool(uint32_t initialNumThreads) : mMemoryAllocator(Globals::GetDefaultHeapAllocator()), mLogger(Globals::GetThreadingLogger()),
+                                                            mNumThreads(0), mDesiredNumThreads(0), mScheduledTasks(Globals::GetDefaultHeapAllocator()),
+                                                            mWorkerThreads(Globals::GetDefaultHeapAllocator())
+    {
+        SetNumThreads(initialNumThreads);
+    }
 
-	ThreadPool::~ThreadPool()
-	{
-		// order and block untill all workers are dead
-		TerminateAllWorkers();
+    ThreadPool::~ThreadPool()
+    {
+        // order and block untill all workers are dead
+        TerminateAllWorkers();
 
-		for(Vector<Thread*>::iterator it = mWorkerThreads.begin(); it != mWorkerThreads.end();)
-		{
-			mMemoryAllocator.DeallocateObject<Thread>(*it);
-			it = mWorkerThreads.erase(it);
-		}
-	}
+        for(Vector<Thread*>::iterator it = mWorkerThreads.begin(); it != mWorkerThreads.end();)
+        {
+            mMemoryAllocator.DeallocateObject<Thread>(*it);
+            it = mWorkerThreads.erase(it);
+        }
+    }
 
-	void ThreadPool::AddTask(const Task& task)
-	{
-		ScopedLock lock(mMutex);
+    void ThreadPool::AddTask(const Task& task)
+    {
+        ScopedLock lock(mMutex);
 
-		// schedule task and notify atleast one worker
-		mScheduledTasks.push_back(task);
-		mCondVar_NewTaskOrKillWorker.Signal();
-	}
+        // schedule task and notify atleast one worker
+        mScheduledTasks.push_back(task);
+        mCondVar_NewTaskOrKillWorker.Signal();
+    }
 
-	void ThreadPool::ClearTasks()
-	{
-		ScopedLock lock(mMutex);
+    void ThreadPool::ClearTasks()
+    {
+        ScopedLock lock(mMutex);
 
-		mScheduledTasks.clear();
-	}
+        mScheduledTasks.clear();
+    }
 
-	size_t ThreadPool::PendingTasks() const
-	{
-		ScopedLock lock(mMutex);
+    size_t ThreadPool::PendingTasks() const
+    {
+        ScopedLock lock(mMutex);
 
-		size_t ret = mScheduledTasks.size();
+        size_t ret = mScheduledTasks.size();
 
-		return ret;
-	}
+        return ret;
+    }
 
-	bool ThreadPool::Empty() const
-	{
-		ScopedLock lock(mMutex);
+    bool ThreadPool::Empty() const
+    {
+        ScopedLock lock(mMutex);
 
-		bool ret = mScheduledTasks.empty();
+        bool ret = mScheduledTasks.empty();
 
-		return ret;
-	}
-	
-	void ThreadPool::Wait()
-	{
-		while(!mScheduledTasks.empty())
-		{
-			ScopedLock lock(mMutex);
+        return ret;
+    }
+    
+    void ThreadPool::Wait()
+    {
+        while(!mScheduledTasks.empty())
+        {
+            ScopedLock lock(mMutex);
 
-			mCondVar_WorkDoneOrWorkerKilled.Wait(mMutex);
-		}
-	}
+            mCondVar_WorkDoneOrWorkerKilled.Wait(mMutex);
+        }
+    }
 
-	void ThreadPool::Wait(const size_t taskLimit)
-	{
-		while (mScheduledTasks.size() > taskLimit)
-		{
-			ScopedLock lock(mMutex);
+    void ThreadPool::Wait(const size_t taskLimit)
+    {
+        while (mScheduledTasks.size() > taskLimit)
+        {
+            ScopedLock lock(mMutex);
 
-			mCondVar_WorkDoneOrWorkerKilled.Wait(mMutex);
-		}
-	}
+            mCondVar_WorkDoneOrWorkerKilled.Wait(mMutex);
+        }
+    }
 
-	void ThreadPool::SetNumThreads(uint32_t num)
-	{
-		ScopedLock lock(mMutex);
+    void ThreadPool::SetNumThreads(uint32_t num)
+    {
+        ScopedLock lock(mMutex);
 
-		if (mDesiredNumThreads == num)
-			return;
+        if (mDesiredNumThreads == num)
+            return;
 
-		mDesiredNumThreads = num;
+        mDesiredNumThreads = num;
 
-		if (mNumThreads < num)
-		{
-			while (mNumThreads < num)
-			{
-				Thread* thread = mMemoryAllocator.AllocateObject<Thread>(boost::bind(&ThreadPool::Worker, this, (void*)NULL));
-				mWorkerThreads.push_back(thread);
-				mNumThreads++;
-			}
-		}
-		else
-			mCondVar_NewTaskOrKillWorker.Broadcast();
-	}
+        if (mNumThreads < num)
+        {
+            while (mNumThreads < num)
+            {
+                Thread* thread = mMemoryAllocator.AllocateObject<Thread>(boost::bind(&ThreadPool::Worker, this, (void*)NULL));
+                mWorkerThreads.push_back(thread);
+                mNumThreads++;
+            }
+        }
+        else
+            mCondVar_NewTaskOrKillWorker.Broadcast();
+    }
 
-	uint32_t ThreadPool::GetNumThreads() const
-	{
-		ScopedLock lock(mMutex);
+    uint32_t ThreadPool::GetNumThreads() const
+    {
+        ScopedLock lock(mMutex);
 
-		uint32_t ret = mNumThreads;
+        uint32_t ret = mNumThreads;
 
-		return ret;
-	}
+        return ret;
+    }
 
-	void ThreadPool::Worker(void* arg)
-	{
-		bool running = true;
+    void ThreadPool::Worker(void* arg)
+    {
+        bool running = true;
 
-		while (running)
-		{
-			Task task = NULL;
+        while (running)
+        {
+            Task task = NULL;
 
-			{
-				ScopedLock lock(mMutex);
+            {
+                ScopedLock lock(mMutex);
 
-				if (mDesiredNumThreads < mNumThreads)
-				{
-					running = false;
-					mNumThreads--;
-				}
-				else if (!mScheduledTasks.empty())
-				{
-					task = mScheduledTasks.front();
-					mScheduledTasks.erase(mScheduledTasks.begin());
-				}
-				else
-					mCondVar_NewTaskOrKillWorker.Wait(mMutex);
-			}
+                if (mDesiredNumThreads < mNumThreads)
+                {
+                    running = false;
+                    mNumThreads--;
+                }
+                else if (!mScheduledTasks.empty())
+                {
+                    task = mScheduledTasks.front();
+                    mScheduledTasks.erase(mScheduledTasks.begin());
+                }
+                else
+                    mCondVar_NewTaskOrKillWorker.Wait(mMutex);
+            }
 
-			if (task)
-			{
-				task();
-				mCondVar_WorkDoneOrWorkerKilled.Signal();
-			}
-			else if (!running)
-				mCondVar_WorkDoneOrWorkerKilled.Signal();
-		}
-	}
+            if (task)
+            {
+                task();
+                mCondVar_WorkDoneOrWorkerKilled.Signal();
+            }
+            else if (!running)
+                mCondVar_WorkDoneOrWorkerKilled.Signal();
+        }
+    }
 
-	void ThreadPool::TerminateAllWorkers()
-	{
-		ScopedLock lock(mMutex);
+    void ThreadPool::TerminateAllWorkers()
+    {
+        ScopedLock lock(mMutex);
 
-		mDesiredNumThreads = 0;
+        mDesiredNumThreads = 0;
 
-		mCondVar_NewTaskOrKillWorker.Broadcast();
+        mCondVar_NewTaskOrKillWorker.Broadcast();
 
-		while (GetNumThreads())
-			mCondVar_WorkDoneOrWorkerKilled.Wait(mMutex);
-	}
+        while (GetNumThreads())
+            mCondVar_WorkDoneOrWorkerKilled.Wait(mMutex);
+    }
 }

@@ -6,11 +6,11 @@
 
 namespace JonsEngine
 {
-	class JonsOutputStream : public std::ostream
-	{
-	public:
-		JonsOutputStream(JonsStreamBuf* buf);
-		~JonsOutputStream();
+    class JonsOutputStream : public std::ostream
+    {
+    public:
+        JonsOutputStream(JonsStreamBuf* buf);
+        ~JonsOutputStream();
 
-	};
+    };
 }

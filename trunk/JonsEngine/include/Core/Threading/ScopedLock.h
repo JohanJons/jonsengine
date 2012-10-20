@@ -4,15 +4,21 @@
 
 namespace JonsEngine
 {
-	class Mutex;
+    class Mutex;
 
-	class ScopedLock
-	{
-	public:
-		inline ScopedLock(Mutex& mutex) : mMutex(mutex)		{ mMutex.Lock(); }
-		inline ~ScopedLock()								{ mMutex.Unlock(); }
+    /* ScopedLock definition */
+    class ScopedLock
+    {
+    public:
+        ScopedLock(Mutex& mutex);
+        ~ScopedLock();
 
-	private:
-		Mutex& mMutex;
-	};
+    private:
+        Mutex& mMutex;
+    };
+
+
+    /* ScopedLock inlines */
+    inline ScopedLock::ScopedLock(Mutex& mutex) : mMutex(mutex)		{ mMutex.Lock();    }
+    inline ScopedLock::~ScopedLock()								{ mMutex.Unlock();  }
 }

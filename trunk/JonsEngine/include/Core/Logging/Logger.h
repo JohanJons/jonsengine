@@ -14,26 +14,33 @@
 
 namespace JonsEngine
 {
-	class Logger
-	{
-	public:
-		Logger(const std::string& loggerName);
-		~Logger();
+    /* Logger class definition */
+    class Logger
+    {
+    public:
+        Logger(const std::string& loggerName);
+        ~Logger();
 
-		void Log(LogManager::LogLevel level, const std::string& logMsg);
+        void Log(LogManager::LogLevel level, const std::string& logMsg);
 
-		inline const std::string& GetLoggerName() const		{ return mLoggerName; }
+        const std::string& GetLoggerName() const;
 
 
-	private:
-		const std::string mLoggerName;
-	};
+    private:
+        const std::string mLoggerName;
+    };
 
-	namespace Globals
-	{
-		Logger& GetEngineLogger();
-		Logger& GetVideoLogger();
-		Logger& GetInputLogger();
-		Logger& GetThreadingLogger();
-	}
+
+    /* Logger Inlines */
+    inline const std::string& Logger::GetLoggerName() const     { return mLoggerName; }
+
+
+    /* Logger free functions */
+    namespace Globals
+    {
+        Logger& GetEngineLogger();
+        Logger& GetVideoLogger();
+        Logger& GetInputLogger();
+        Logger& GetThreadingLogger();
+    }
 }

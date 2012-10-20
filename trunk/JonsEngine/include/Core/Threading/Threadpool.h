@@ -8,50 +8,52 @@
 
 namespace JonsEngine
 {
-	class IMemoryAllocator;
-	class Logger;
+    class IMemoryAllocator;
+    class Logger;
 
-	class ThreadPool
-	{
-	public:
-		ThreadPool(uint32_t initialNumThreads);
-		~ThreadPool();
+    /* ThreadPool definition */
+    class ThreadPool
+    {
+    public:
+        ThreadPool(uint32_t initialNumThreads);
+        ~ThreadPool();
 
-		void AddTask(const Task& task);
-		void ClearTasks();
-		size_t PendingTasks() const;
-		bool Empty() const;
-		void Wait();
+        void AddTask(const Task& task);
+        void ClearTasks();
+        size_t PendingTasks() const;
+        bool Empty() const;
+        void Wait();
 
-		/*
-		 * Waits untill there are only a given number of tasks left
-		 */
-		void Wait(const size_t taskLimit);
+        /*
+         * Waits untill there are only a given number of tasks left
+         */
+        void Wait(const size_t taskLimit);
 
-		/*
-		 * Sets the number of active threads
-		 */
-		void SetNumThreads(uint32_t num);
+        /*
+         * Sets the number of active threads
+         */
+        void SetNumThreads(uint32_t num);
 
-		/*
-		 * Gets the number of active threads
-		 */
-		uint32_t GetNumThreads() const;
+        /*
+         * Gets the number of active threads
+         */
+        uint32_t GetNumThreads() const;
 
-	private:
-		void Worker(void* arg);
-		void TerminateAllWorkers();
 
-		IMemoryAllocator& mMemoryAllocator;
-		Logger& mLogger;
+    private:
+        void Worker(void* arg);
+        void TerminateAllWorkers();
 
-		mutable Mutex mMutex;
-		ConditionVariable mCondVar_WorkDoneOrWorkerKilled;
-		ConditionVariable mCondVar_NewTaskOrKillWorker;
+        IMemoryAllocator& mMemoryAllocator;
+        Logger& mLogger;
 
-		Vector<Task> mScheduledTasks;
-		Vector<Thread*> mWorkerThreads;
-		uint32_t mNumThreads;
-		uint32_t mDesiredNumThreads;
-	};
+        mutable Mutex mMutex;
+        ConditionVariable mCondVar_WorkDoneOrWorkerKilled;
+        ConditionVariable mCondVar_NewTaskOrKillWorker;
+
+        Vector<Task> mScheduledTasks;
+        Vector<Thread*> mWorkerThreads;
+        uint32_t mNumThreads;
+        uint32_t mDesiredNumThreads;
+    };
 }

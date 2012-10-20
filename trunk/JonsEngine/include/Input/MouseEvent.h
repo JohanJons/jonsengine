@@ -2,14 +2,14 @@
 
 namespace JonsEngine
 {
-	class MouseEvent
-	{
-	public:
-		MouseEvent();
-		~MouseEvent();
+    class MouseEvent
+    {
+    public:
+        MouseEvent();
+        ~MouseEvent();
 
 
 
-	};
+    };
 
 }

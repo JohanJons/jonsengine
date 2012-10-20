@@ -2,13 +2,13 @@
 
 namespace JonsEngine
 {
-	class IKeyListener
-	{
-	public:
-		virtual ~IKeyListener() = 0;
+    class IKeyListener
+    {
+    public:
+        virtual ~IKeyListener() = 0;
 
 
 
-	};
+    };
 
 }

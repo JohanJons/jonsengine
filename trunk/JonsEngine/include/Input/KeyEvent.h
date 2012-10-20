@@ -2,14 +2,14 @@
 
 namespace JonsEngine
 {
-	class KeyEvent
-	{
-	public:
-		KeyEvent();
-		~KeyEvent();
+    class KeyEvent
+    {
+    public:
+        KeyEvent();
+        ~KeyEvent();
 
 
 
-	};
+    };
 
 }

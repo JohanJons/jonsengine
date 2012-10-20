@@ -7,25 +7,24 @@
 
 namespace JonsEngine
 {
-	enum RenderBackend
-	{
-		OPENGL = 0,
-		NONE
-	};
+    enum RenderBackend
+    {
+        OPENGL = 0,
+        NONE
+    };
 
-	struct EngineSettings
-	{
-		EngineSettings();
+    /* EngineSettings definition */
+    struct EngineSettings
+    {
+        EngineSettings();
 
-		// Video
-		RenderBackend RenderBackend;
-		ScreenMode ScreenMode;
-		std::string WindowTitle;
+        // Video
+        RenderBackend RenderBackend;
+        ScreenMode ScreenMode;
+        std::string WindowTitle;
 
-		// Audio
 
-		// Input
+        // Input
 
-	};
-
+    };
 }

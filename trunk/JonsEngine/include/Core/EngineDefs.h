@@ -6,10 +6,10 @@
 
 namespace JonsEngine
 {
-	/*
-	 * Logging
-	 */
+    /*
+     * Logging
+     */
 
-	// defined in LogManager.cpp
-	extern const std::string GameEngineTag;
+    // defined in LogManager.cpp
+    extern const std::string GameEngineTag;
 }

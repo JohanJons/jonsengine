@@ -11,11 +11,11 @@
 
 namespace JonsEngine
 {
-	uint64_t GetTimeSinceEpoch();
-	int32_t GetSecond();
-	int32_t GetMinute();
-	int32_t GetHour();
-	int32_t GetDay();
-	int32_t GetMonth();
-	int32_t GetYear();
+    uint64_t GetTimeSinceEpoch();
+    int32_t GetSecond();
+    int32_t GetMinute();
+    int32_t GetHour();
+    int32_t GetDay();
+    int32_t GetMonth();
+    int32_t GetYear();
 }

@@ -2,13 +2,13 @@
 
 namespace JonsEngine
 {
-	class IMouseListener
-	{
-	public:
-		virtual ~IMouseListener() = 0;
+    class IMouseListener
+    {
+    public:
+        virtual ~IMouseListener() = 0;
 
 
 
-	};
+    };
 
 }

@@ -2,25 +2,25 @@
 
 namespace JonsEngine
 {
-	/////////////////////////////////////////////////////
-	/////				ScreenMode					/////
-	/////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////
+    /////				ScreenMode					/////
+    /////////////////////////////////////////////////////
 
-	ScreenMode::ScreenMode() : ScreenWidth(800), ScreenHeight(600), FrameLimit(60), FrameLimitEnabled(true), Fullscreen(false)
-	{
-	}
+    ScreenMode::ScreenMode() : ScreenWidth(800), ScreenHeight(600), FrameLimit(60), FrameLimitEnabled(true), Fullscreen(false)
+    {
+    }
 
 
 
-	/////////////////////////////////////////////////
-	/////				RenderBase				/////
-	/////////////////////////////////////////////////
+    /////////////////////////////////////////////////
+    /////				RenderBase				/////
+    /////////////////////////////////////////////////
 
-	RenderBase::RenderBase()  : mRunning(false), mScreenMode(), mWindowTitle("JonsEngine Game")
-	{
-	}
-		
-	RenderBase::~RenderBase()
-	{
-	}
+    RenderBase::RenderBase()  : mRunning(false), mScreenMode(), mWindowTitle("JonsEngine Game")
+    {
+    }
+        
+    RenderBase::~RenderBase()
+    {
+    }
 }
