@@ -58,8 +58,8 @@ namespace JonsEngine
 
 
     /* RenderBase inlines */
-    inline bool RenderBase::IsRunning() const									{ return mRunning;		}
-    inline const ScreenMode& RenderBase::GetScreenMode() const					{ return mScreenMode;	}
-    inline const std::string& RenderBase::GetWindowTitle() const				{ return mWindowTitle;	}
+    inline bool RenderBase::IsRunning() const                                   { return mRunning;      }
+    inline const ScreenMode& RenderBase::GetScreenMode() const                  { return mScreenMode;   }
+    inline const std::string& RenderBase::GetWindowTitle() const                { return mWindowTitle;  }
 
 }

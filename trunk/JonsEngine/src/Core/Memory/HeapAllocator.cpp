@@ -3,7 +3,7 @@
 namespace JonsEngine
 {
     /////////////////////////////////////////////////////////////
-    /////				Default HeapAllocator				/////
+    /////               Default HeapAllocator               /////
     /////////////////////////////////////////////////////////////
 
     namespace Globals
@@ -22,7 +22,7 @@ namespace JonsEngine
 
 
     /////////////////////////////////////////////////////////////////////
-    /////				HeapAllocator implementation				/////
+    /////               HeapAllocator implementation                /////
     /////////////////////////////////////////////////////////////////////
 
     HeapAllocator::HeapAllocator(const std::string& allocatorName, HeapAllocatorBackend backend) : mAllocatorName(allocatorName), mBackend(backend)

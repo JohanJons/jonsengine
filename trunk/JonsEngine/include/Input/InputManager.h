@@ -2,6 +2,8 @@
 
 #include "include/Core/Containers/Vector.h"
 
+#include "boost/function.hpp"
+
 namespace JonsEngine
 {
     class IKeyListener;
@@ -13,6 +15,8 @@ namespace JonsEngine
     class InputManager
     {
     public:
+        typedef boost::function
+
         InputManager();
         ~InputManager();
 

@@ -35,7 +35,7 @@ namespace JonsEngine
         /**
          * Allocates a given object and passes on up to 4 given arguments to its constructor.
          * @param [...]: arguments that will be passed to the constructor of the object allocated. Can pass up to 4 arguments.
-         *				 For more, allocate memory and call object constructor manually
+         *               For more, allocate memory and call object constructor manually
          * @return: address of the constructed object if successfull, otherwise NULL.
          */
         // 0 args to constructor

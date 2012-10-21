@@ -3,7 +3,7 @@
 namespace JonsEngine
 {
     /////////////////////////////////////////////////////////////////
-    /////				Global logger definitions				/////
+    /////               Global logger definitions               /////
     /////////////////////////////////////////////////////////////////
 
     namespace Globals
@@ -13,17 +13,17 @@ namespace JonsEngine
         static Logger gInputLogger("INPUT");
         static Logger gThreadingLogger("THREADING");
 
-        Logger& GetEngineLogger()			{ return gEngineLogger;		}
-        Logger& GetVideoLogger()			{ return gVideoLogger;		}
-        Logger& GetInputLogger()			{ return gInputLogger;		}
-        Logger& GetThreadingLogger()		{ return gThreadingLogger;	}
+        Logger& GetEngineLogger()           { return gEngineLogger;     }
+        Logger& GetVideoLogger()            { return gVideoLogger;      }
+        Logger& GetInputLogger()            { return gInputLogger;      }
+        Logger& GetThreadingLogger()        { return gThreadingLogger;  }
 
     }
 
 
 
     /////////////////////////////////////////////////////////////
-    /////				Logger implementation				/////
+    /////               Logger implementation               /////
     /////////////////////////////////////////////////////////////
 
     Logger::Logger(const std::string& loggerName) : mLoggerName(loggerName) 

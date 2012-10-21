@@ -15,7 +15,7 @@
 namespace JonsEngine
 {
     /////////////////////////////////////////////////////
-    /////				Free functions				/////
+    /////               Free functions              /////
     /////////////////////////////////////////////////////
 
     void SleepCurrentThread(uint32_t milliseconds)
@@ -34,7 +34,7 @@ namespace JonsEngine
 
 
     /////////////////////////////////////////////////////////////
-    /////				Thread implementation				/////
+    /////               Thread implementation               /////
     /////////////////////////////////////////////////////////////
 
     Thread::Thread() : mHandle(NULL), mAllocator(Globals::GetDefaultHeapAllocator()), mThreadInfo(NULL)

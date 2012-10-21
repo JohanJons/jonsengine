@@ -20,6 +20,7 @@ namespace JonsEngine
         
     InputManager::~InputManager()
     {
+        Destroy();
     }
 
     bool InputManager::Init(const EngineSettings& engineSettings)
@@ -39,6 +40,7 @@ namespace JonsEngine
         
     void InputManager::Destroy()
     {
+        glfwSetCharCallback(NULL);
     }
 
 

@@ -3,7 +3,7 @@
 namespace JonsEngine
 {
     // Defintion of engine log tags
-    const std::string GameEngineTag		=		"JonsEngine";
+    const std::string GameEngineTag     =       "JonsEngine";
 
     // LogManager singleton
     LogManager LogManager::mInstance;
@@ -98,12 +98,12 @@ namespace JonsEngine
     {
         switch (level)
         {
-            case LEVEL_DEBUG:		{	return "DEBUG";		break;	}
-            case LEVEL_INFO:		{	return "INFO";		break;	}
-            case LEVEL_WARNING:		{	return "WARNING";	break;	}
-            case LEVEL_ERROR:		{	return "ERROR";		break;	}
-            case LEVEL_CRITICAL:	{	return "CRITICAL";	break;	}
-            default:				{	return "UNKNOWN";	break;	}
+            case LEVEL_DEBUG:       {   return "DEBUG";     break;  }
+            case LEVEL_INFO:        {   return "INFO";      break;  }
+            case LEVEL_WARNING:     {   return "WARNING";   break;  }
+            case LEVEL_ERROR:       {   return "ERROR";     break;  }
+            case LEVEL_CRITICAL:    {   return "CRITICAL";  break;  }
+            default:                {   return "UNKNOWN";   break;  }
         }
 
     }

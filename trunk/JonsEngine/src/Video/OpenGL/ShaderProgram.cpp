@@ -23,7 +23,7 @@ namespace JonsEngine
 
         
     void ShaderProgram::AddShader(Shader* shader)
-    {	
+    {   
         if (shader->IsCompiled())
             mAddedShaders.push_back(shader);
         else

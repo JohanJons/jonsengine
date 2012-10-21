@@ -19,6 +19,6 @@ namespace JonsEngine
 
 
     /* ScopedLock inlines */
-    inline ScopedLock::ScopedLock(Mutex& mutex) : mMutex(mutex)		{ mMutex.Lock();    }
-    inline ScopedLock::~ScopedLock()								{ mMutex.Unlock();  }
+    inline ScopedLock::ScopedLock(Mutex& mutex) : mMutex(mutex)     { mMutex.Lock();    }
+    inline ScopedLock::~ScopedLock()                                { mMutex.Unlock();  }
 }

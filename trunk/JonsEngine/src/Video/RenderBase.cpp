@@ -3,7 +3,7 @@
 namespace JonsEngine
 {
     /////////////////////////////////////////////////////
-    /////				ScreenMode					/////
+    /////               ScreenMode                  /////
     /////////////////////////////////////////////////////
 
     ScreenMode::ScreenMode() : ScreenWidth(800), ScreenHeight(600), FrameLimit(60), FrameLimitEnabled(true), Fullscreen(false)
@@ -13,7 +13,7 @@ namespace JonsEngine
 
 
     /////////////////////////////////////////////////
-    /////				RenderBase				/////
+    /////               RenderBase              /////
     /////////////////////////////////////////////////
 
     RenderBase::RenderBase()  : mRunning(false), mScreenMode(), mWindowTitle("JonsEngine Game")
