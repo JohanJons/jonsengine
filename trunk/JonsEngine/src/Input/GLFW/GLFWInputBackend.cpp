@@ -10,7 +10,7 @@ namespace JonsEngine
     static GLFWInputBackend* gGLFWInputBackendInstance = NULL;
 
     GLFWInputBackend::GLFWInputBackend(const MouseButtonCallback& onMouseButton, const MouseMotionCallback& onMouseMotion, const KeyCallback& onKey) : mLogger(Globals::GetInputLogger()),
-                                                                                                                         mOnMouseButton(onMouseButton), mOnMouseMotion(onMouseMotion), mOnKey(onKey)
+                                      mOnMouseButton(onMouseButton), mOnMouseMotion(onMouseMotion), mOnKey(onKey)
     {
         gGLFWInputBackendInstance = this;
 

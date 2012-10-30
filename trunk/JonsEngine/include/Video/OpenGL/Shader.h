@@ -31,8 +31,6 @@ namespace JonsEngine
 
         
     protected:
-        void Destroy();
-
         Logger& mLogger;
         std::string mName;
         const ShaderType mShaderType;

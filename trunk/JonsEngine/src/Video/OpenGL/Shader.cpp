@@ -11,7 +11,9 @@ namespace JonsEngine
         
     Shader::~Shader()
     {
-        Destroy();
+        glDeleteShader(mShaderHandle);
+        mShaderHandle = 0;
+        mIsCompiled = false;
     }
         
     bool Shader::Compile(const std::string& shaderSource)
@@ -33,7 +35,6 @@ namespace JonsEngine
         if (status == GL_FALSE)
         {
             JONS_LOG_ERROR(mLogger, "Shader::Compile(): Failed to compile shader");
-            Destroy();
             return false;
         }
         
@@ -55,12 +56,4 @@ namespace JonsEngine
     {
         return mIsCompiled;
     }
-
-    void Shader::Destroy()
-    {
-        glDeleteShader(mShaderHandle);
-        mShaderHandle = 0;
-        mIsCompiled = false;
-    }
-
 }

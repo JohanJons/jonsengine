@@ -50,7 +50,6 @@ namespace JonsEngine
 
         Logger& mLogger;
         IMemoryAllocator& mMemoryAllocator;
-        const EngineSettings& mEngineSettings;
         InputBackend* mInputBackend;
 
         Vector<MouseButtonCallback> mMouseButtonCallbacks;

@@ -4,6 +4,7 @@
 #include "include/Core/Logging/Logger.h"
 
 #include "boost/bind.hpp"
+#include "boost/foreach.hpp"
 
 #include <algorithm>
 
@@ -16,7 +17,10 @@ namespace JonsEngine
         
     ShaderProgram::~ShaderProgram()
     {
-        Destroy();
+        glDeleteProgram(mProgramHandle);
+        mName.clear();
+        mProgramHandle = 0;
+        mIsLinked = false;
 
         ClearShaders();
     }
@@ -59,7 +63,9 @@ namespace JonsEngine
         if (mProgramHandle == 0)
             mProgramHandle = glCreateProgram();
 
-        std::for_each(mAddedShaders.begin(), mAddedShaders.end(), boost::bind(&ShaderProgram::AttachShader, this, _1));
+        //std::for_each(mAddedShaders.begin(), mAddedShaders.end(), boost::bind(&ShaderProgram::AttachShader, this, _1));
+        BOOST_FOREACH(Shader* shader, mAddedShaders)
+            glAttachShader(mProgramHandle, shader->mShaderHandle);
 
         glLinkProgram(mProgramHandle);
 
@@ -68,11 +74,12 @@ namespace JonsEngine
         if (status == GL_FALSE)
         {
             JONS_LOG_ERROR(mLogger, "ShaderProgram::LinkProgram(): Failed to link program");
-            Destroy();
             return false;
         }
 
-        std::for_each(mAddedShaders.begin(), mAddedShaders.end(), boost::bind(&ShaderProgram::DetachShader, this, _1));
+        //std::for_each(mAddedShaders.begin(), mAddedShaders.end(), boost::bind(&ShaderProgram::DetachShader, this, _1));
+        BOOST_FOREACH(Shader* shader, mAddedShaders)
+            glDetachShader(mProgramHandle, shader->mShaderHandle);
 
         mIsLinked = true;
         return true;
@@ -82,8 +89,6 @@ namespace JonsEngine
     {
         if (!mIsLinked)
             JONS_LOG_ERROR(mLogger, "ShaderProgram::UnlinkProgram(): Program not linked");
-
-        Destroy();
     }
 
     void ShaderProgram::SetName(const std::string& name)
@@ -107,23 +112,5 @@ namespace JonsEngine
     bool ShaderProgram::IsLinked() const
     {
         return mIsLinked;
-    }
-
-    void ShaderProgram::Destroy()
-    {
-        glDeleteProgram(mProgramHandle);
-        mName.clear();
-        mProgramHandle = 0;
-        mIsLinked = false;
-    }
-
-    void ShaderProgram::AttachShader(Shader* shader)
-    {
-        glAttachShader(mProgramHandle, shader->mShaderHandle);
-    }
-
-    void ShaderProgram::DetachShader(Shader* shader)
-    {
-        glDetachShader(mProgramHandle, shader->mShaderHandle);
     }
 }

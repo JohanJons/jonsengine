@@ -32,10 +32,6 @@ namespace JonsEngine
 
 
     private:
-        void Destroy();
-        void AttachShader(Shader* shader);
-        void DetachShader(Shader* shader);
-
         Logger& mLogger;
         std::string mName;
         bool mIsLinked;
