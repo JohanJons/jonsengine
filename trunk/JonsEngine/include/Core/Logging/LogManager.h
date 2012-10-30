@@ -44,9 +44,6 @@ namespace JonsEngine
     private:
         LogManager();
 
-        void Init();
-        void Destroy();
-
         const std::string InternalGetLogName() const;
         const std::string LogLevelToString(LogLevel level);
 

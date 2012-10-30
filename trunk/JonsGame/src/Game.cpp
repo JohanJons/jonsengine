@@ -4,7 +4,9 @@
 #include "include/Video/OpenGL/Shader.h"
 #include "include/Video/OpenGL/ShaderProgram.h"
 #include "include/Core/Utils/Types.h"
+#include "include/Input/InputManager.h"
 
+#include "boost/bind.hpp"
 #include <Windows.h>
 #include <iostream>
 #include <string>
@@ -15,20 +17,19 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-
-	Game::Game()
+	Game::Game() 
 	{
+        mEngine = new Engine(mSettings);
 	}
 		
 	Game::~Game()
 	{
+        delete mEngine;
 	}
 
 		
 	void Game::Run()
 	{
-		mEngine.Init();
-
 		Triangle tri;
 		tri.vecA.x = -0.5; tri.vecA.y = -0.5; tri.vecA.z = 0.0;
 		tri.vecB.x = 0.0; tri.vecB.y = 0.5; tri.vecB.z = 0.0;
@@ -53,14 +54,24 @@ namespace JonsGame
 			if (shaderProgram.IsLinked())
 				shaderProgram.UseProgram(true);
 
-			mEngine.GetRenderer()->DrawTriangle(tri.vecA, tri.vecB, tri.vecC);
+			mEngine->GetRenderer()->DrawTriangle(tri.vecA, tri.vecB, tri.vecC);
+
+            mEngine->GetInputManager().RegisterKeyCallback(boost::bind(&Game::OnKeyEvent, this, _1));
+            //bool keke = mEngine.GetInputManager()->IsCallbackRegistered(boost::bind(&Game::OnKeyEvent, this, _1));
+           // mEngine.GetInputManager()->UnregisterKeyCallback(boost::bind(&Game::OnKeyEvent, this, _1));
+            //bool keke2 = mEngine.GetInputManager()->IsCallbackRegistered(boost::bind(&Game::OnKeyEvent, this, _1));
+           //mEngine.GetInputManager()->RegisterKeyCallback(lol);
+            //bool keke = mEngine.GetInputManager()->IsCallbackRegistered(lol);
 
 			while (true)
 			{
-				mEngine.Tick();
+				mEngine->Tick();
 			}
 		}
-
-		mEngine.Destroy();
 	}
+
+    void Game::OnKeyEvent(const KeyEvent& evnt)
+    {
+        
+    }
 }

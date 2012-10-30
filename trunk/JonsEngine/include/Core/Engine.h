@@ -1,50 +1,46 @@
 #pragma once
 
 #include "include/Core/EngineSettings.h"
+#include "include/Input/InputManager.h"
 
 namespace JonsEngine
 {
     class IMemoryAllocator;
     class Logger;
     class RenderBase;
-    class InputManager;
 
     /* Engine definition */
     class Engine
     {
     public:
-        Engine();
+        Engine(const EngineSettings& settings);
         ~Engine();
 
-        bool Init();
-        bool Destroy();
-        bool isRunning();
         void Tick();
 
-        EngineSettings& GetEngineSettings();
+        const EngineSettings& GetEngineSettings() const;
 
         RenderBase* GetRenderer() const;
-        InputManager* GetInputManager() const;
+        InputManager& GetInputManager();
 
 
     private:
         bool InitializeModules();
         bool DestroyModules();
 
-        bool mRunning;
         EngineSettings mEngineSettings;
         Logger& mLog;
         IMemoryAllocator& mMemoryAllocator;
 
         /* Modules */
         RenderBase* mRenderBackend;
-        InputManager* mInputManager;
+        InputManager mInputManager;
     };
 
 
     /* Engine inlines */
-    inline EngineSettings& Engine::GetEngineSettings()         { return mEngineSettings;   }
-    inline RenderBase* Engine::GetRenderer() const             { return mRenderBackend;    }
-    inline InputManager* Engine::GetInputManager() const       { return mInputManager;     }
+    inline const EngineSettings& Engine::GetEngineSettings() const      { return mEngineSettings;   }
+    inline RenderBase* Engine::GetRenderer() const                      { return mRenderBackend;    }
+    inline InputManager& Engine::GetInputManager()                      { return mInputManager;     }
 
 }

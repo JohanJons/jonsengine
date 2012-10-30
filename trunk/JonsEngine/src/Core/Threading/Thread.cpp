@@ -41,7 +41,7 @@ namespace JonsEngine
     {
     }
 
-    Thread::Thread(Task task) : mAllocator(Globals::GetDefaultHeapAllocator())
+    Thread::Thread(const Task& task) : mAllocator(Globals::GetDefaultHeapAllocator())
     {
         mThreadInfo = (ThreadInfo*) mAllocator.AllocateObject<ThreadInfo>();
 

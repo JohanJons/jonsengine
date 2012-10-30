@@ -25,9 +25,6 @@ namespace JonsEngine
         RenderBase();
         virtual ~RenderBase();
 
-        virtual bool Init(const EngineSettings& engineSettings) = 0;
-        virtual void Destroy() = 0;
-
         virtual void StartFrame() = 0;
         virtual void EndFrame() = 0;
 
@@ -45,20 +42,17 @@ namespace JonsEngine
         virtual void DrawTriangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC) = 0;
         virtual void DrawRectangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC, const Vec3& pointD) = 0;
 
-        bool IsRunning() const;
         const ScreenMode& GetScreenMode() const;
         const std::string& GetWindowTitle() const;
             
 
     protected:
-        bool mRunning;
         ScreenMode mScreenMode;
         std::string mWindowTitle;
     };
 
 
     /* RenderBase inlines */
-    inline bool RenderBase::IsRunning() const                                   { return mRunning;      }
     inline const ScreenMode& RenderBase::GetScreenMode() const                  { return mScreenMode;   }
     inline const std::string& RenderBase::GetWindowTitle() const                { return mWindowTitle;  }
 

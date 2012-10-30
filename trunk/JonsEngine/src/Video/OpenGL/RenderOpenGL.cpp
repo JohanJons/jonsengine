@@ -10,18 +10,7 @@
 namespace JonsEngine
 {
 
-    RenderOpenGL::RenderOpenGL() : mLogger(Globals::GetVideoLogger())
-    {
-    }
-        
-    RenderOpenGL::~RenderOpenGL()
-    {
-        if (mRunning)
-            Destroy();
-    }
-
-        
-    bool RenderOpenGL::Init(const EngineSettings& engineSettings)
+    RenderOpenGL::RenderOpenGL(const EngineSettings& engineSettings) : mLogger(Globals::GetVideoLogger())
     {
         bool ret = true;
 
@@ -39,19 +28,13 @@ namespace JonsEngine
             glGenBuffers(1, &mVBO_FragmentShader);
             glGenVertexArrays(1, &mVAO);
             glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
-
-            mRunning = true;
         }
         else
-            Destroy();
-
-        return ret;
+            JONS_LOG_ERROR(mLogger, "RenderOpenGL::RenderOpenGL(): Unable to initialize RenderOpenGL!");
     }
         
-    void RenderOpenGL::Destroy()
+    RenderOpenGL::~RenderOpenGL()
     {
-        mRunning = false;
-
         CloseWindow();
 
         glfwTerminate();

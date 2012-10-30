@@ -1,49 +1,93 @@
 #pragma once
 
+#include "include/Input/KeyCallback.h"
+#include "include/Input/MouseCallback.h"
 #include "include/Core/Containers/Vector.h"
+#include "include/Core/EngineSettings.h"
 
-#include "boost/function.hpp"
 
 namespace JonsEngine
 {
-    class IKeyListener;
-    class IMouseListener;
+    struct MouseButtonEvent;
+    struct MouseMotionEvent;
+    struct KeyEvent;
     class Logger;
-    struct EngineSettings;
+    class InputBackend;
+
 
     /* InputManager definition */
     class InputManager
     {
     public:
-        typedef boost::function
-
-        InputManager();
+        InputManager(const EngineSettings& engineSettings);
         ~InputManager();
 
-        bool Init(const EngineSettings& engineSettings);
-        void Destroy();
+        void RegisterMouseButtonCallback(const MouseButtonCallback& callback);
+        void RegisterMouseMotionCallback(const MouseMotionCallback& callback);
+        void RegisterKeyCallback(const KeyCallback& callback);
 
-        void AddKeyListener(IKeyListener* listener);
-        void RemoveKeyListener(IKeyListener* listener);
-        void ClearKeyListeners();
-        const Vector<IKeyListener*>& GetKeyListeners() const;
+        template <typename T>
+        void UnregisterMouseButtonCallback(const T& callback);
+        template <typename T>
+        void UnregisterMouseMotionCallback(const T& callback);
+        template <typename T>
+        void UnregisterKeyCallback(const T& callback);
 
-        void AddMouseListener(IMouseListener* listener);
-        void RemoveMouseListener(IMouseListener* listener);
-        void ClearMouseListeners();
-        const Vector<IMouseListener*>& GetMouseListeners() const;
+        template <typename T>
+        bool IsCallbackRegistered(const T& callback) const;
+                                                        
+        void ClearAllCallbacks();
+        void Poll();
 
 
     private:
-        static void glfwCharCallback(int, int);
+        void ClearAllEvents();
+        InputBackend* CreateBackend(InputBackend::InputBackendType backend);
+
+        void OnMouseButton(const MouseButtonEvent& ev);
+        void OnMouseMotion(const MouseMotionEvent& ev);
+        void OnKey(const KeyEvent& ev);
 
         Logger& mLogger;
-        Vector<IKeyListener*> mKeyListeners;
-        Vector<IMouseListener*> mMouseListeners;
+        IMemoryAllocator& mMemoryAllocator;
+        const EngineSettings& mEngineSettings;
+        InputBackend* mInputBackend;
+
+        Vector<MouseButtonCallback> mMouseButtonCallbacks;
+        Vector<MouseMotionCallback> mMouseMotionCallbacks;
+        Vector<KeyCallback>         mKeyCallbacks;
+
+        Vector<MouseButtonEvent>    mMouseButtonEvents;
+        Vector<MouseMotionEvent>    mMouseMotionEvents;
+        Vector<KeyEvent>            mKeyEvents;
     };
 
 
     /* InputManager inlines */
-    inline const Vector<IKeyListener*>& InputManager::GetKeyListeners() const          { return mKeyListeners;     }
-    inline const Vector<IMouseListener*>& InputManager::GetMouseListeners() const      { return mMouseListeners;   }
+    template <typename T>
+    inline void InputManager::UnregisterMouseButtonCallback(const T& callback)
+    {
+        mMouseButtonCallbacks.erase(std::find(mMouseButtonCallbacks.begin(), mMouseButtonCallbacks.end(), callback));
+    }
+    
+    template <typename T>
+    inline void InputManager::UnregisterMouseMotionCallback(const T& callback)
+    {
+        mMouseMotionCallbacks.erase(std::find(mMouseMotionCallbacks.begin(), mMouseMotionCallbacks.end(), callback));
+    }
+    
+    template <typename T>
+    inline void InputManager::UnregisterKeyCallback(const T& callback)
+    {
+        mKeyCallbacks.erase(std::find(mKeyCallbacks.begin(), mKeyCallbacks.end(), callback));
+    }
+
+    template <typename T>
+    inline bool InputManager::IsCallbackRegistered(const T& callback) const
+    { 
+        return ((std::find(mMouseButtonCallbacks.begin(), mMouseButtonCallbacks.end(), callback) != mMouseButtonCallbacks.end()) ||
+                (std::find(mMouseMotionCallbacks.begin(), mMouseMotionCallbacks.end(), callback) != mMouseMotionCallbacks.end()) ||
+                (std::find(mKeyCallbacks.begin(), mKeyCallbacks.end(), callback) != mKeyCallbacks.end()));
+    }
+    
 }

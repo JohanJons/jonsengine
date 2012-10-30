@@ -16,7 +16,7 @@ namespace JonsEngine
     /////               RenderBase              /////
     /////////////////////////////////////////////////
 
-    RenderBase::RenderBase()  : mRunning(false), mScreenMode(), mWindowTitle("JonsEngine Game")
+    RenderBase::RenderBase()  : mScreenMode(), mWindowTitle("JonsEngine Game")
     {
     }
         

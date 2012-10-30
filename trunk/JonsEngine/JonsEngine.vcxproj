@@ -111,6 +111,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Core\Threading\ThreadPool.cpp" />
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
     <ClCompile Include="src\Core\Utils\JonsTime.cpp" />
+    <ClCompile Include="src\Input\GLFW\GLFWInputBackend.cpp" />
     <ClCompile Include="src\Input\InputManager.cpp" />
     <ClCompile Include="src\Video\OpenGL\RenderOpenGL.cpp" />
     <ClCompile Include="src\Video\OpenGL\Shader.cpp" />
@@ -136,11 +137,11 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Core\Threading\ThreadPool.h" />
     <ClInclude Include="include\Core\Utils\JonsTime.h" />
     <ClInclude Include="include\Core\Utils\Types.h" />
-    <ClInclude Include="include\Input\IKeyListener.h" />
-    <ClInclude Include="include\Input\IMouseListener.h" />
+    <ClInclude Include="include\Input\GLFW\GLFWInputBackend.h" />
+    <ClInclude Include="include\Input\InputBackend.h" />
     <ClInclude Include="include\Input\InputManager.h" />
-    <ClInclude Include="include\Input\KeyEvent.h" />
-    <ClInclude Include="include\Input\MouseEvent.h" />
+    <ClInclude Include="include\Input\KeyCallback.h" />
+    <ClInclude Include="include\Input\MouseCallback.h" />
     <ClInclude Include="include\Video\OpenGL\RenderOpenGL.h" />
     <ClInclude Include="include\Video\OpenGL\Shader.h" />
     <ClInclude Include="include\Video\OpenGL\ShaderProgram.h" />

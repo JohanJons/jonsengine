@@ -69,6 +69,12 @@
     <Filter Include="Header Files\Video\OpenGL">
       <UniqueIdentifier>{b020985c-9da4-4ad3-979d-4cd16d0ceffd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Input\GLFW">
+      <UniqueIdentifier>{1f6a127d-50a7-452e-b6c8-1497121840c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input\GLFW">
+      <UniqueIdentifier>{813e16ef-5181-46af-9ce8-7afbc4401824}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Engine.cpp">
@@ -124,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="src\Video\OpenGL\ShaderProgram.cpp">
       <Filter>Source Files\Video\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Input\GLFW\GLFWInputBackend.cpp">
+      <Filter>Source Files\Input\GLFW</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -187,18 +196,6 @@
     <ClInclude Include="include\Input\InputManager.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="include\Input\IKeyListener.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Input\IMouseListener.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Input\KeyEvent.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Input\MouseEvent.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
     <ClInclude Include="include\Video\OpenGL\RenderOpenGL.h">
       <Filter>Header Files\Video\OpenGL</Filter>
     </ClInclude>
@@ -207,6 +204,18 @@
     </ClInclude>
     <ClInclude Include="include\Video\OpenGL\ShaderProgram.h">
       <Filter>Header Files\Video\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input\GLFW\GLFWInputBackend.h">
+      <Filter>Header Files\Input\GLFW</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input\KeyCallback.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input\MouseCallback.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input\InputBackend.h">
+      <Filter>Header Files\Input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

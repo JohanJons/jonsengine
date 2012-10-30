@@ -15,16 +15,6 @@ namespace JonsEngine
 
     LogManager::LogManager() : mStreamBuf(), mFileStream(), mLogStream(&mStreamBuf), mLogPath(InternalGetLogName()), mLogFilter(LEVEL_INFO), mMutex()
     {
-        Init();
-    }
-
-    LogManager::~LogManager()
-    {
-        Destroy();
-    }
-
-    void LogManager::Init()
-    {
         ScopedLock lock(mMutex);
 
         mFileStream.open(mLogPath, std::ifstream::trunc);
@@ -32,7 +22,7 @@ namespace JonsEngine
         AddOutputStream(mFileStream.rdbuf());
     }
 
-    void LogManager::Destroy()
+    LogManager::~LogManager()
     {
         ScopedLock lock(mMutex);
 

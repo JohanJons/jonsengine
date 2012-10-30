@@ -10,85 +10,33 @@
 namespace JonsEngine
 {
 
-    Engine::Engine() : mRunning(false), mLog(Globals::GetEngineLogger()), mMemoryAllocator(Globals::GetDefaultHeapAllocator()), mRenderBackend(NULL), mInputManager(NULL)
+    Engine::Engine(const EngineSettings& settings) : mLog(Globals::GetEngineLogger()), mMemoryAllocator(Globals::GetDefaultHeapAllocator()), mEngineSettings(settings), mRenderBackend(NULL), mInputManager(settings)
     {
+        JONS_LOG_INFO(mLog, "-------- INITIALIZING ENGINE --------")
 
+        InitializeModules();
+
+        JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
     }
 
     Engine::~Engine()
     {
-        if (mRunning)
-            Destroy();
-    }
+        JONS_LOG_INFO(mLog, "-------- SHUTTING DOWN ENGINE --------")
 
-    bool Engine::Init()
-    {
-        if (!mRunning)
-        {
-            bool res = true;
+        DestroyModules();
 
-            JONS_LOG_INFO(mLog, "-------- INITIALIZING ENGINE --------")
-
-            // intialize subsystems
-            res &= InitializeModules();
-
-            if (res && !mRunning)
-            {
-                mRunning = true;
-                JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
-            }
-
-            return res;
-        }
-        else
-        {
-            JONS_LOG_WARNING(mLog, "Engine::Init(): Engine already initialized!")
-
-            return false;
-        }
-    }
-
-    bool Engine::Destroy()
-    {
-        if (mRunning)
-        {
-            bool res = true;
-
-            JONS_LOG_INFO(mLog, "-------- SHUTTING DOWN ENGINE --------")
-
-            res &= DestroyModules();
-
-            if (res && mRunning)
-            {
-                mRunning = false;
-                JONS_LOG_INFO(mLog, "-------- ENGINE DESTROYED --------")
-            }
-
-            return res;
-        }
-        else
-        {
-            JONS_LOG_WARNING(mLog, "Engine::Destroy(): Engine not initialized!")
-
-            return false;
-        }
-    }
-
-    bool Engine::isRunning()
-    {
-        return mRunning;
+        JONS_LOG_INFO(mLog, "-------- ENGINE DESTROYED --------")
     }
 
     void Engine::Tick()
     {
-        if (mRunning)
-        {
-            mRenderBackend->StartFrame();
+        mRenderBackend->StartFrame();
 
-            mRenderBackend->RenderVertexArrays();
+        mInputManager.Poll();
 
-            mRenderBackend->EndFrame();
-        }
+        mRenderBackend->RenderVertexArrays();
+
+        mRenderBackend->EndFrame();
     }
 
     bool Engine::InitializeModules()
@@ -98,27 +46,11 @@ namespace JonsEngine
         // Create and Initialize rendering backend
         if (!mRenderBackend)
         {
-            if (mEngineSettings.RenderBackend == OPENGL)
-                mRenderBackend = mMemoryAllocator.AllocateObject<RenderOpenGL>();
-
-            if (!mRenderBackend->Init(mEngineSettings))
-            {
-                JONS_LOG_ERROR(mLog, "Engine::InitializeModules(): Renderer failed to initialize!")
-                return false;
-            }
+            if (mEngineSettings.RenderBackend == EngineSettings::RENDER_OPENGL)
+                mRenderBackend = mMemoryAllocator.AllocateObject<RenderOpenGL>(mEngineSettings);
         }
 
-        if (!mInputManager)
-        {
-            mInputManager = mMemoryAllocator.AllocateObject<InputManager>();
-            if (!mInputManager->Init(mEngineSettings))
-            {
-                JONS_LOG_ERROR(mLog, "Engine::InitializeModules(): InputManager failed to initialize!")
-                return false;
-            }
-        }
-
-        return (mRenderBackend != NULL && mInputManager != NULL);
+        return (mRenderBackend != NULL);
     }
 
     bool Engine::DestroyModules()
@@ -130,13 +62,6 @@ namespace JonsEngine
             mRenderBackend = NULL;
         }
 
-        // Destroy input manager backend
-        if (mInputManager)
-        {
-            mMemoryAllocator.DeallocateObject<InputManager>(mInputManager);
-            mInputManager = NULL;
-        }
-
-        return (!mRenderBackend && !mInputManager);
+        return (!mRenderBackend);
     }
 }

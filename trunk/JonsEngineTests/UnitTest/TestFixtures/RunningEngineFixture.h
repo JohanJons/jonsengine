@@ -12,22 +12,17 @@ namespace JonsEngine
 	 public:
 		 virtual void SetUp()
 		 {
-			// init engine
-			ASSERT_TRUE(mEngine.Init());
-
-			ASSERT_TRUE(mEngine.isRunning());
+             mEngine = new Engine(mSettings);
 		 }
 		
 		 virtual void TearDown()
 		 {
-			// destroy engine
-			ASSERT_TRUE(mEngine.Destroy());
-
-			ASSERT_FALSE(mEngine.isRunning());
+            delete mEngine;
 		 }
 
 	 protected:
-		 Engine mEngine;
+         EngineSettings mSettings;
+		 Engine* mEngine;
 	 };
 
 }

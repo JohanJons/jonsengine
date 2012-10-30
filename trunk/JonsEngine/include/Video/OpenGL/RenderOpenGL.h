@@ -18,11 +18,8 @@ namespace JonsEngine
     class RenderOpenGL : public RenderBase
     {
     public:
-        RenderOpenGL();
+        RenderOpenGL(const EngineSettings& engineSettings);
         ~RenderOpenGL();
-
-        bool Init(const EngineSettings& engineSettings);
-        void Destroy();
 
         bool SetupWindow(const ScreenMode& screenMode);
         void CloseWindow();

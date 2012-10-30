@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/Engine.h"
+#include "include/Input/KeyCallback.h"
 
 namespace JonsGame
 {
@@ -12,8 +13,10 @@ namespace JonsGame
 
 		void Run();
 
-	private:
-		JonsEngine::Engine mEngine;
-	};
+        void OnKeyEvent(const JonsEngine::KeyEvent& evnt);
 
+	private:
+        JonsEngine::EngineSettings mSettings;
+		JonsEngine::Engine* mEngine;
+	};
 }

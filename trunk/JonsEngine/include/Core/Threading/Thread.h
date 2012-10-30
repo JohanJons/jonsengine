@@ -15,7 +15,7 @@ namespace JonsEngine
     void SleepCurrentThread(uint32_t milliseconds);
 
     /* Task definition */
-    typedef boost::function0<void> Task;
+    typedef boost::function<void ()> Task;
 
     /* Thread definition */
     class Thread
@@ -44,7 +44,7 @@ namespace JonsEngine
         };
 
         Thread();
-        Thread(Task task);
+        Thread(const Task& task);
         ~Thread();
 
         Thread& operator=(Thread& other);

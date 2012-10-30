@@ -4,27 +4,28 @@
 
 #include "include/Core/EngineDefs.h"
 #include "include/Video/RenderBase.h"
+#include "include/Input/InputBackend.h"
 
 namespace JonsEngine
 {
-    enum RenderBackend
-    {
-        OPENGL = 0,
-        NONE
-    };
-
     /* EngineSettings definition */
     struct EngineSettings
     {
+        enum RenderBackendType
+        {
+            RENDER_OPENGL = 0,
+            RENDER_NONE
+        };
+
         EngineSettings();
 
         // Video
-        RenderBackend RenderBackend;
+        RenderBackendType RenderBackend;
         ScreenMode ScreenMode;
         std::string WindowTitle;
 
 
         // Input
-
+        InputBackend::InputBackendType InputBackend;
     };
 }
