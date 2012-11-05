@@ -2,9 +2,6 @@
 
 #include "include/Input/InputBackend.h"
 
-#include "include/Input/KeyCallback.h"
-#include "include/Input/MouseCallback.h"
-
 namespace JonsEngine
 {
     class Logger;
@@ -14,8 +11,16 @@ namespace JonsEngine
     class GLFWInputBackend : public InputBackend
     {
     public:
-        GLFWInputBackend(const MouseButtonCallback& onMouseButton, const MouseMotionCallback& onMouseMotion, const KeyCallback& onKey);
+        GLFWInputBackend();
         ~GLFWInputBackend();
+
+        void SetMouseButtonCallback(const MouseButtonCallback& onMouseButton);
+        void SetMouseMotionCallback(const MouseMotionCallback& onMouseMotion);
+        void SetKeyCallback(const KeyCallback& onKey);
+
+        bool IsMouseButtonCallbackSet() const;
+        bool IsMouseMotionCallbackSet() const;
+        bool IsKeyCallbackSet() const;
 
         InputBackendType GetInputBackendType() const;
 
@@ -25,9 +30,9 @@ namespace JonsEngine
         static void glfwOnMouseMotion(int posX, int posY );
         static void glfwOnKey(int key, int action);
 
-        const MouseButtonCallback& mOnMouseButton;
-        const MouseMotionCallback& mOnMouseMotion;
-        const KeyCallback& mOnKey;
+        MouseButtonCallback mOnMouseButton;
+        MouseMotionCallback mOnMouseMotion;
+        KeyCallback mOnKey;
 
         Logger& mLogger;
     };

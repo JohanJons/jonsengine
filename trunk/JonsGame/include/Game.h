@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/Engine.h"
+#include "include/Input/MouseCallback.h"
 #include "include/Input/KeyCallback.h"
 
 namespace JonsGame
@@ -13,6 +14,8 @@ namespace JonsGame
 
 		void Run();
 
+        void OnMouseButtonEvent(const JonsEngine::MouseButtonEvent& evnt);
+        void OnMouseMotionEvent(const JonsEngine::MouseMotionEvent& evnt);
         void OnKeyEvent(const JonsEngine::KeyEvent& evnt);
 
 	private:

@@ -1,56 +1,69 @@
-#include "include/Video/OpenGL/RenderOpenGL.h"
+#include "include/Video/OpenGL/OpenGLRenderBackend.h"
 
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Logging/Logger.h"
 
 #include "GL/glfw.h"
 #include <glm/gtc/type_ptr.hpp>
+#include <exception>
 
 
 namespace JonsEngine
 {
 
-    RenderOpenGL::RenderOpenGL(const EngineSettings& engineSettings) : mLogger(Globals::GetVideoLogger())
+    OpenGLRenderBackend::OpenGLRenderBackend(const EngineSettings& engineSettings) : mLogger(Globals::GetVideoLogger()), mWindowTitle("JonsEngine Game"), mStartFrameTime(0), mLastFrameTime(0), mThisFrameTime(0)
     {
-        bool ret = true;
+        GLenum glfwErr = glfwInit();
+        if (glfwErr != GL_TRUE)
+        {
+            JONS_LOG_ERROR(mLogger, "OpenGLRenderBackend::OpenGLRenderBackend(): Unable to initialize GLFW!");
+            throw std::exception("OpenGLRenderBackend::OpenGLRenderBackend(): Unable to initialize GLFW!");
+        }
 
-        ret &= InitializeGLFW();
+        // setup a forward-compatible context with openGL 3.3
+        glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
+        glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
+        glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-        ret &= SetupWindow(engineSettings.ScreenMode);
+        SetupWindow(engineSettings.ScreenMode);
         SetWindowTitle(engineSettings.WindowTitle);
 
-        ret &= InitializeGLEW();
+        // Initialize GLEW for fetching openGL
+        // 'glewExperimental = GL_TRUE' needed to initialize openGL core profile; see GLEW doc
+        glewExperimental = GL_TRUE;
+        GLenum glewErr = glewInit();
 
-        if (ret)
+        if (!GLEW_VERSION_3_3)
         {
-            // openGL context should be ready now
-            glGenBuffers(1, &mVBO_VertexShader);
-            glGenBuffers(1, &mVBO_FragmentShader);
-            glGenVertexArrays(1, &mVAO);
-            glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
+            JONS_LOG_ERROR(mLogger, "OpenGLRenderBackend::OpenGLRenderBackend(): Minimum OpenGL driver (OpenGL 3.3) not supported!");
+            throw std::exception("OpenGLRenderBackend::OpenGLRenderBackend(): Minimum OpenGL driver (OpenGL 3.3) not supported!");
         }
-        else
-            JONS_LOG_ERROR(mLogger, "RenderOpenGL::RenderOpenGL(): Unable to initialize RenderOpenGL!");
+
+        // openGL context should be ready now
+        glGenBuffers(1, &mVBO_VertexShader);
+        glGenBuffers(1, &mVBO_FragmentShader);
+        glGenVertexArrays(1, &mVAO);
+        glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
     }
         
-    RenderOpenGL::~RenderOpenGL()
+    OpenGLRenderBackend::~OpenGLRenderBackend()
     {
         CloseWindow();
 
         glfwTerminate();
     }
 
-    bool RenderOpenGL::SetupWindow(const ScreenMode& screenMode)
+    bool OpenGLRenderBackend::SetupWindow(const ScreenMode& screenMode)
     {
         if (IsWindowOpened())
         {
-            JONS_LOG_ERROR(mLogger, "RenderOpenGL::SetupWindow(): Window already opened, close it first.");
+            JONS_LOG_ERROR(mLogger, "OpenGLRenderBackend::SetupWindow(): Window already opened, close it first.");
             return false;
         }
 
         if (glfwOpenWindow(screenMode.ScreenWidth, screenMode.ScreenHeight, 0, 0 , 0, 0, 0, 0, screenMode.Fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW) != GL_TRUE)
         {
-            JONS_LOG_ERROR(mLogger, "RenderOpenGL::SetupWindow(): Failed to create main screen!")
+            JONS_LOG_ERROR(mLogger, "OpenGLRenderBackend::SetupWindow(): Failed to create main screen!")
             return false;
         }
         else 
@@ -60,29 +73,29 @@ namespace JonsEngine
         }
     }
 
-    void RenderOpenGL::CloseWindow()
+    void OpenGLRenderBackend::CloseWindow()
     {
         if (IsWindowOpened())
             glfwCloseWindow();
         else
-            JONS_LOG_WARNING(mLogger, "RenderOpenGL::CloseWindow(): Window not opened.");
+            JONS_LOG_WARNING(mLogger, "OpenGLRenderBackend::CloseWindow(): Window not opened.");
     }
         
-    bool RenderOpenGL::IsWindowOpened() const
+    bool OpenGLRenderBackend::IsWindowOpened() const
     {
         return (glfwGetWindowParam(GLFW_OPENED) == GL_TRUE);
     }
 
-    uint16_t RenderOpenGL::GetCurrentFPS() const
+    uint16_t OpenGLRenderBackend::GetCurrentFPS() const
     {
         return static_cast<uint16_t>(1 / (mThisFrameTime - mLastFrameTime));
     }
 
-    void RenderOpenGL::SetFullscreen(bool fullscreen)
+    void OpenGLRenderBackend::SetFullscreen(bool fullscreen)
     {
         if (!IsWindowOpened())
         {
-            JONS_LOG_WARNING(mLogger, "RenderOpenGL::SetFullscreen(): Window not opened");
+            JONS_LOG_WARNING(mLogger, "OpenGLRenderBackend::SetFullscreen(): Window not opened");
             return;
         }
 
@@ -97,11 +110,11 @@ namespace JonsEngine
         }
     }
         
-    void RenderOpenGL::SetScreenResolution(const uint16_t width, const uint16_t height)
+    void OpenGLRenderBackend::SetScreenResolution(const uint16_t width, const uint16_t height)
     {
         if (!IsWindowOpened())
         {
-            JONS_LOG_WARNING(mLogger, "RenderOpenGL::SetScreenResolution(): Window not opened");
+            JONS_LOG_WARNING(mLogger, "OpenGLRenderBackend::SetScreenResolution(): Window not opened");
             return;
         }
 
@@ -116,11 +129,11 @@ namespace JonsEngine
         }
     }
         
-    void RenderOpenGL::SetWindowTitle(const std::string& windowTitle)
+    void OpenGLRenderBackend::SetWindowTitle(const std::string& windowTitle)
     {
         if (!IsWindowOpened())
         {
-            JONS_LOG_WARNING(mLogger, "RenderOpenGL::SetWindowTitle(): Window not opened");
+            JONS_LOG_WARNING(mLogger, "OpenGLRenderBackend::SetWindowTitle(): Window not opened");
             return;
         }
 
@@ -132,19 +145,19 @@ namespace JonsEngine
         }
     }
 
-    void RenderOpenGL::RenderVertexArrays()
+    void OpenGLRenderBackend::RenderVertexArrays()
     {
         glBindVertexArray(mVAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(0);
     }
 
-    void RenderOpenGL::DrawLine(const Vec3& pointA, const Vec3& pointB)
+    void OpenGLRenderBackend::DrawLine(const Vec3& pointA, const Vec3& pointB)
     {
 
     }
         
-    void RenderOpenGL::DrawTriangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC)
+    void OpenGLRenderBackend::DrawTriangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC)
     {
         const float vertexPositions[] = {
             0.75f, 0.75f, 0.0f,
@@ -173,12 +186,12 @@ namespace JonsEngine
         mPrimitiveInfo.push_back(primInfo);
     }
         
-    void RenderOpenGL::DrawRectangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC, const Vec3& pointD)
+    void OpenGLRenderBackend::DrawRectangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC, const Vec3& pointD)
     {
         
     }
         
-    void RenderOpenGL::StartFrame()
+    void OpenGLRenderBackend::StartFrame()
     {
         mLastFrameTime = mThisFrameTime;
 
@@ -188,7 +201,7 @@ namespace JonsEngine
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
         
-    void RenderOpenGL::EndFrame()
+    void OpenGLRenderBackend::EndFrame()
     {
         if (mScreenMode.FrameLimitEnabled)
         {
@@ -202,38 +215,5 @@ namespace JonsEngine
         }
 
         glfwSwapBuffers();
-    }
-
-    bool RenderOpenGL::InitializeGLFW()
-    {
-        GLenum glfwErr = glfwInit();
-        if (glfwErr != GL_TRUE)
-        {
-            JONS_LOG_ERROR(mLogger, "Engine::Init(): Unable to initialize GLFW!")
-            return false;
-        }
-
-        // setup a forward-compatible context with openGL 3.3
-        glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
-        glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
-        glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-            
-        return true;
-    }
-        
-    bool RenderOpenGL::InitializeGLEW()
-    {
-        // Initialize GLEW for fetching openGL
-        // 'glewExperimental = GL_TRUE' needed to initialize openGL core profile; see GLEW doc
-        glewExperimental = GL_TRUE;
-        GLenum glewErr = glewInit();
-
-        if (!GLEW_VERSION_3_3)
-        {
-            JONS_LOG_ERROR(mLogger, "RenderOpenGL::Init(): Minimum OpenGL driver (OpenGL 3.3) not supported!")
-            return false;
-        }
-        else
-            return true;
     }
 }

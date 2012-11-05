@@ -1,13 +1,13 @@
 #pragma once
 
 #include "include/Core/EngineSettings.h"
+#include "include/Video/Renderer.h"
 #include "include/Input/InputManager.h"
 
 namespace JonsEngine
 {
     class IMemoryAllocator;
     class Logger;
-    class RenderBase;
 
     /* Engine definition */
     class Engine
@@ -18,29 +18,22 @@ namespace JonsEngine
 
         void Tick();
 
-        const EngineSettings& GetEngineSettings() const;
-
-        RenderBase* GetRenderer() const;
+        Renderer& GetRenderer();
         InputManager& GetInputManager();
 
 
     private:
-        bool InitializeModules();
-        bool DestroyModules();
-
-        EngineSettings mEngineSettings;
         Logger& mLog;
         IMemoryAllocator& mMemoryAllocator;
 
         /* Modules */
-        RenderBase* mRenderBackend;
+        Renderer mRenderer;
         InputManager mInputManager;
     };
 
 
     /* Engine inlines */
-    inline const EngineSettings& Engine::GetEngineSettings() const      { return mEngineSettings;   }
-    inline RenderBase* Engine::GetRenderer() const                      { return mRenderBackend;    }
+    inline Renderer& Engine::GetRenderer()                              { return mRenderer;         }
     inline InputManager& Engine::GetInputManager()                      { return mInputManager;     }
 
 }

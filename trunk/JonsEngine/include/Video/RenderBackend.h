@@ -5,8 +5,7 @@
 
 namespace JonsEngine
 {
-    struct EngineSettings;
-
+    /* ScreenMode definition */
     struct ScreenMode
     {
         ScreenMode();
@@ -18,12 +17,18 @@ namespace JonsEngine
         bool Fullscreen;
     };
 
-    /* RenderBase definition */
-    class RenderBase
+
+    /* RenderBackend definition */
+    class RenderBackend
     {
     public:
-        RenderBase();
-        virtual ~RenderBase();
+        enum RenderBackendType
+        {
+            OPENGL = 0,
+            NONE
+        };
+
+        virtual ~RenderBackend() { }
 
         virtual void StartFrame() = 0;
         virtual void EndFrame() = 0;
@@ -42,18 +47,15 @@ namespace JonsEngine
         virtual void DrawTriangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC) = 0;
         virtual void DrawRectangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC, const Vec3& pointD) = 0;
 
-        const ScreenMode& GetScreenMode() const;
-        const std::string& GetWindowTitle() const;
-            
+        virtual const ScreenMode& GetScreenMode() const = 0;
+        virtual const std::string& GetWindowTitle() const = 0;
 
-    protected:
-        ScreenMode mScreenMode;
-        std::string mWindowTitle;
+        virtual RenderBackendType GetRenderBackendType() const = 0;
     };
 
 
-    /* RenderBase inlines */
-    inline const ScreenMode& RenderBase::GetScreenMode() const                  { return mScreenMode;   }
-    inline const std::string& RenderBase::GetWindowTitle() const                { return mWindowTitle;  }
-
+    /* ScreenMode inlines */
+    inline ScreenMode::ScreenMode() : ScreenWidth(800), ScreenHeight(600), FrameLimit(60), FrameLimitEnabled(true), Fullscreen(false)
+    {
+    }
 }

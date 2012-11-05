@@ -116,14 +116,8 @@
     <ClCompile Include="src\Core\Logging\Logger.cpp">
       <Filter>Source Files\Core\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="src\Video\RenderBase.cpp">
-      <Filter>Source Files\Video</Filter>
-    </ClCompile>
     <ClCompile Include="src\Input\InputManager.cpp">
       <Filter>Source Files\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Video\OpenGL\RenderOpenGL.cpp">
-      <Filter>Source Files\Video\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="src\Video\OpenGL\Shader.cpp">
       <Filter>Source Files\Video\OpenGL</Filter>
@@ -133,6 +127,12 @@
     </ClCompile>
     <ClCompile Include="src\Input\GLFW\GLFWInputBackend.cpp">
       <Filter>Source Files\Input\GLFW</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Video\Renderer.cpp">
+      <Filter>Source Files\Video</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Video\OpenGL\OpenGLRenderBackend.cpp">
+      <Filter>Source Files\Video\OpenGL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -181,9 +181,6 @@
     <ClInclude Include="include\Core\Logging\Logger.h">
       <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="include\Video\RenderBase.h">
-      <Filter>Header Files\Video</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Memory\IMemoryAllocator.h">
       <Filter>Header Files\Core\Memory</Filter>
     </ClInclude>
@@ -195,9 +192,6 @@
     </ClInclude>
     <ClInclude Include="include\Input\InputManager.h">
       <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Video\OpenGL\RenderOpenGL.h">
-      <Filter>Header Files\Video\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="include\Video\OpenGL\Shader.h">
       <Filter>Header Files\Video\OpenGL</Filter>
@@ -215,6 +209,21 @@
       <Filter>Header Files\Input</Filter>
     </ClInclude>
     <ClInclude Include="include\Input\InputBackend.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\Renderer.h">
+      <Filter>Header Files\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\RenderBackend.h">
+      <Filter>Header Files\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\OpenGL\OpenGLRenderBackend.h">
+      <Filter>Header Files\Video\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\DummyRenderBackend.h">
+      <Filter>Header Files\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Input\DummyInputBackend.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
   </ItemGroup>

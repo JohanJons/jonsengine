@@ -2,7 +2,8 @@
 
 namespace JonsEngine
 {
-    EngineSettings::EngineSettings() :  RenderBackend(RENDER_OPENGL), WindowTitle("JonsEngine Game"),
+    EngineSettings::EngineSettings() :  WindowTitle("JonsEngine Game"),
+                                        RenderBackend(RenderBackend::OPENGL),
                                         InputBackend(InputBackend::GLFW)
     {
     }

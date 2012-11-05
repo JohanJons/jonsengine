@@ -3,6 +3,7 @@
 #include "include/Input/InputManager.h"
 
 #include "include/Input/GLFW/GLFWInputBackend.h"
+#include "include/Input/DummyInputBackend.h"
 #include "include/Core/Logging/Logger.h"
 
 #include "boost/bind.hpp"
@@ -23,9 +24,29 @@ namespace JonsEngine
         mMemoryAllocator.DeallocateObject(mInputBackend);
     }
 
-    void InputManager::RegisterMouseButtonCallback(const MouseButtonCallback& callback)                { mMouseButtonCallbacks.push_back(callback);  }
-    void InputManager::RegisterMouseMotionCallback(const MouseMotionCallback& callback)                { mMouseMotionCallbacks.push_back(callback);  }  
-    void InputManager::RegisterKeyCallback(const KeyCallback& callback)                                { mKeyCallbacks.push_back(callback);          }
+    void InputManager::RegisterMouseButtonCallback(const MouseButtonCallback& callback)
+    { 
+        mMouseButtonCallbacks.push_back(callback);
+
+        if (!mInputBackend->IsMouseButtonCallbackSet())
+            mInputBackend->SetMouseButtonCallback(boost::bind(&InputManager::OnMouseButton, this, _1));
+    }
+
+    void InputManager::RegisterMouseMotionCallback(const MouseMotionCallback& callback)
+    { 
+        mMouseMotionCallbacks.push_back(callback);
+
+        if (!mInputBackend->IsMouseMotionCallbackSet())
+            mInputBackend->SetMouseMotionCallback(boost::bind(&InputManager::OnMouseMotion, this, _1));
+    }  
+
+    void InputManager::RegisterKeyCallback(const KeyCallback& callback)
+    { 
+        mKeyCallbacks.push_back(callback);
+
+        if (!mInputBackend->IsKeyCallbackSet())
+            mInputBackend->SetKeyCallback(boost::bind(&InputManager::OnKey, this, _1));
+    }
 
     void InputManager::ClearAllCallbacks()
     {
@@ -54,6 +75,8 @@ namespace JonsEngine
             BOOST_FOREACH(KeyCallback callback, mKeyCallbacks)
                 callback(ev);
         }
+
+        ClearAllEvents();
     }
 
     void InputManager::ClearAllEvents()
@@ -65,12 +88,18 @@ namespace JonsEngine
 
     InputBackend* InputManager::CreateBackend(InputBackend::InputBackendType backend)
     {
-        if (backend == InputBackend::GLFW)
-            return mMemoryAllocator.AllocateObject<GLFWInputBackend>(boost::bind(&InputManager::OnMouseButton, this, _1), 
-                                                                     boost::bind(&InputManager::OnMouseMotion, this, _1),
-                                                                     boost::bind(&InputManager::OnKey, this, _1));
-        else
-            return NULL;
+        switch (backend)
+        {
+            case InputBackend::GLFW:
+                return mMemoryAllocator.AllocateObject<GLFWInputBackend>();
+                break;
+
+
+            default:
+                return mMemoryAllocator.AllocateObject<DummyInputBackend>();
+                break;
+
+        }
     }
 
     void InputManager::OnMouseButton(const MouseButtonEvent& ev)

@@ -1,12 +1,14 @@
 #pragma once
 
-#include "include/Video/RenderBase.h"
+#include "include/Video/RenderBackend.h"
 #include "include/Core/Containers/Vector.h"
 
 #include "GL/glew.h"
+#include <string>
 
 namespace JonsEngine
 {
+    struct EngineSettings;
     class Logger;
 
     struct PrimitiveInfo
@@ -15,11 +17,15 @@ namespace JonsEngine
         GLsizei Count;
     };
 
-    class RenderOpenGL : public RenderBase
+    /* OpenGLRenderBackend definition */
+    class OpenGLRenderBackend : public RenderBackend
     {
     public:
-        RenderOpenGL(const EngineSettings& engineSettings);
-        ~RenderOpenGL();
+        OpenGLRenderBackend(const EngineSettings& engineSettings);
+        ~OpenGLRenderBackend();
+
+        void StartFrame();
+        void EndFrame();
 
         bool SetupWindow(const ScreenMode& screenMode);
         void CloseWindow();
@@ -35,20 +41,19 @@ namespace JonsEngine
         void DrawTriangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC);
         void DrawRectangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC, const Vec3& pointD);
 
-        void StartFrame();
-        void EndFrame();
+        const ScreenMode& GetScreenMode() const;
+        const std::string& GetWindowTitle() const;
+
+        RenderBackendType GetRenderBackendType() const;
 
 
     private:
-        bool InitializeGLFW();
-        bool InitializeGLEW();
-
         Logger& mLogger;
-        ScreenMode mScreenMode;
         std::string mWindowTitle;
-        double mStartFrameTime;
+        ScreenMode mScreenMode;
 
         // FPS
+        double mStartFrameTime;
         double mLastFrameTime;
         double mThisFrameTime;
 
@@ -59,4 +64,10 @@ namespace JonsEngine
         Vector<Vec3> mVertices;
         Vector<PrimitiveInfo> mPrimitiveInfo;
     };
+
+
+    /* OpenGLRenderBackend inlines */
+    inline const ScreenMode& OpenGLRenderBackend::GetScreenMode() const                             { return mScreenMode;   }
+    inline const std::string& OpenGLRenderBackend::GetWindowTitle() const                           { return mWindowTitle;  }
+    inline RenderBackend::RenderBackendType OpenGLRenderBackend::GetRenderBackendType() const       { return OPENGL;        }
 }

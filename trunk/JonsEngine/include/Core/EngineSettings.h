@@ -3,7 +3,7 @@
 #include <string>
 
 #include "include/Core/EngineDefs.h"
-#include "include/Video/RenderBase.h"
+#include "include/Video/RenderBackend.h"
 #include "include/Input/InputBackend.h"
 
 namespace JonsEngine
@@ -11,16 +11,10 @@ namespace JonsEngine
     /* EngineSettings definition */
     struct EngineSettings
     {
-        enum RenderBackendType
-        {
-            RENDER_OPENGL = 0,
-            RENDER_NONE
-        };
-
         EngineSettings();
 
         // Video
-        RenderBackendType RenderBackend;
+        RenderBackend::RenderBackendType RenderBackend;
         ScreenMode ScreenMode;
         std::string WindowTitle;
 

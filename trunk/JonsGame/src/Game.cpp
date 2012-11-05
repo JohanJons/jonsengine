@@ -17,9 +17,8 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-	Game::Game() 
+	Game::Game() : mEngine(new Engine(mSettings))
 	{
-        mEngine = new Engine(mSettings);
 	}
 		
 	Game::~Game()
@@ -54,15 +53,12 @@ namespace JonsGame
 			if (shaderProgram.IsLinked())
 				shaderProgram.UseProgram(true);
 
-			mEngine->GetRenderer()->DrawTriangle(tri.vecA, tri.vecB, tri.vecC);
+			mEngine->GetRenderer().DrawTriangle(tri.vecA, tri.vecB, tri.vecC);
 
+            mEngine->GetInputManager().RegisterMouseButtonCallback(boost::bind(&Game::OnMouseButtonEvent, this, _1));
+            mEngine->GetInputManager().RegisterMouseMotionCallback(boost::bind(&Game::OnMouseMotionEvent, this, _1));
             mEngine->GetInputManager().RegisterKeyCallback(boost::bind(&Game::OnKeyEvent, this, _1));
-            //bool keke = mEngine.GetInputManager()->IsCallbackRegistered(boost::bind(&Game::OnKeyEvent, this, _1));
-           // mEngine.GetInputManager()->UnregisterKeyCallback(boost::bind(&Game::OnKeyEvent, this, _1));
-            //bool keke2 = mEngine.GetInputManager()->IsCallbackRegistered(boost::bind(&Game::OnKeyEvent, this, _1));
-           //mEngine.GetInputManager()->RegisterKeyCallback(lol);
-            //bool keke = mEngine.GetInputManager()->IsCallbackRegistered(lol);
-
+            
 			while (true)
 			{
 				mEngine->Tick();
@@ -73,5 +69,15 @@ namespace JonsGame
     void Game::OnKeyEvent(const KeyEvent& evnt)
     {
         
+    }
+
+    void Game::OnMouseButtonEvent(const JonsEngine::MouseButtonEvent& evnt)
+    {
+
+    }
+        
+    void Game::OnMouseMotionEvent(const JonsEngine::MouseMotionEvent& evnt)
+    {
+
     }
 }
