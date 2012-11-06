@@ -9,6 +9,7 @@ namespace JonsEngine
     struct MouseButtonEvent;
     struct MouseMotionEvent;
 
+
     /* MouseButtonCallback definition */
     typedef boost::function<void (const MouseButtonEvent&)> MouseButtonCallback;
 
@@ -35,7 +36,7 @@ namespace JonsEngine
         MouseButton Button;         /* Button pressed */
         MouseButtonState State;     /* State of button */
 
-        /* Default constructor */
+       
         MouseButtonEvent(MouseButton button, MouseButtonState state);
     };
 
@@ -46,9 +47,10 @@ namespace JonsEngine
         uint32_t PosX;      /* Mouse X-position */
         uint32_t PosY;      /* Mouse Y-position */
 
-        /* Default constructor */
+        
         MouseMotionEvent(uint32_t x, uint32_t y);
     };
+
 
 
     /* MouseButtonEvent inlines */

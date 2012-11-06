@@ -8,13 +8,14 @@ namespace JonsEngine
     /* ScreenMode definition */
     struct ScreenMode
     {
-        ScreenMode();
-
         uint16_t ScreenWidth;
         uint16_t ScreenHeight;
         uint16_t FrameLimit;
         bool FrameLimitEnabled;
         bool Fullscreen;
+
+
+        ScreenMode();
     };
 
 
@@ -52,6 +53,7 @@ namespace JonsEngine
 
         virtual RenderBackendType GetRenderBackendType() const = 0;
     };
+
 
 
     /* ScreenMode inlines */

@@ -1,13 +1,14 @@
 #pragma once
 
-#include "include/Video/RenderBackend.h"
 #include "include/Core/EngineDefs.h"
 #include "include/Core/Utils/Types.h"
 
 namespace JonsEngine
 {
     struct EngineSettings;
+    struct ScreenMode;
     class IMemoryAllocator;
+    class RenderBackend;
 
     class Renderer
     {

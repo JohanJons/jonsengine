@@ -26,7 +26,6 @@ namespace JonsEngine
         KeyState State;         /* State of the key */
 
 
-        /* Default constructor */
         KeyEvent(uint16_t keyCode, KeyState state);
     };
 

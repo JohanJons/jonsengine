@@ -1,5 +1,6 @@
 #include "include/Video/Renderer.h"
 
+#include "include/Video/RenderBackend.h"
 #include "include/Video/DummyRenderBackend.h"
 #include "include/Video/OpenGL/OpenGLRenderBackend.h"
 #include "include/Core/EngineSettings.h"

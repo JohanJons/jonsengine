@@ -23,6 +23,7 @@ namespace JonsEngine
         InputBackendType GetInputBackendType() const;
     };
 
+
     /* InputBackend inlines */
     inline void DummyInputBackend::SetMouseButtonCallback(const MouseButtonCallback& onMouseButton)     { }
     inline void DummyInputBackend::SetMouseMotionCallback(const MouseMotionCallback& onMouseMotion)     { }
