@@ -6,7 +6,6 @@
 #include "include/Video/Renderer.h"
 #include "include/Input/InputManager.h"
 
-#include "GL/glfw.h"
 
 namespace JonsEngine
 {

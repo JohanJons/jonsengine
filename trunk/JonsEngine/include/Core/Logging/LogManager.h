@@ -27,7 +27,7 @@ namespace JonsEngine
             LEVEL_CRITICAL
         };
 
-        static LogManager& Instance();
+        LogManager();
         ~LogManager();
 
         void Log(LogLevel level, const std::string& logMsg);
@@ -42,12 +42,9 @@ namespace JonsEngine
         LogLevel GetLevelFilter() const;
 
     private:
-        LogManager();
-
         const std::string InternalGetLogName() const;
         const std::string LogLevelToString(LogLevel level);
 
-        static LogManager mInstance;
         std::ostream mLogStream;
         std::string mLogPath;
         std::ofstream mFileStream;
@@ -61,4 +58,11 @@ namespace JonsEngine
     /* LogManager inlines */
     inline const std::string& LogManager::GetFileLogPath() const           { return mLogPath;      }
     inline LogManager::LogLevel LogManager::GetLevelFilter() const         { return mLogFilter;    }
+
+
+    /* LogManager free functions */
+    namespace Globals
+    {
+        LogManager& GetLogManager();
+    }
 }

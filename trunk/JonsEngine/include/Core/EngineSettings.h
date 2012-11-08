@@ -11,8 +11,6 @@ namespace JonsEngine
     /* EngineSettings definition */
     struct EngineSettings
     {
-        EngineSettings();
-
         // Video
         RenderBackend::RenderBackendType RenderBackend;
         ScreenMode ScreenMode;
@@ -21,5 +19,14 @@ namespace JonsEngine
 
         // Input
         InputBackend::InputBackendType InputBackend;
+
+
+        EngineSettings();
     };
+
+
+    /* EngineSettings inlines */
+    inline EngineSettings::EngineSettings() : WindowTitle("JonsEngine Game"), RenderBackend(RenderBackend::OPENGL), InputBackend(InputBackend::GLFW)
+    {
+    }
 }

@@ -5,15 +5,15 @@ namespace JonsEngine
     // Defintion of engine log tags
     const std::string GameEngineTag     =       "JonsEngine";
 
-    // LogManager singleton
-    LogManager LogManager::mInstance;
-    LogManager& LogManager::Instance()
+    namespace Globals
     {
-        return mInstance;
+        static LogManager gLogManager;
+
+        LogManager& GetLogManager()         { return gLogManager; }
     }
 
 
-    LogManager::LogManager() : mStreamBuf(), mFileStream(), mLogStream(&mStreamBuf), mLogPath(InternalGetLogName()), mLogFilter(LEVEL_INFO), mMutex()
+    LogManager::LogManager() : mLogStream(&mStreamBuf), mLogPath(InternalGetLogName()), mLogFilter(LEVEL_INFO)
     {
         ScopedLock lock(mMutex);
 

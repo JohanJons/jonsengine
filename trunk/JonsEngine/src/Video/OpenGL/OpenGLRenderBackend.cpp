@@ -41,6 +41,7 @@ namespace JonsEngine
 
         // openGL context should be ready now
         glGenBuffers(1, &mVBO_VertexShader);
+        glGenBuffers(1, &mVBO_VertexShader_color);
         glGenBuffers(1, &mVBO_FragmentShader);
         glGenVertexArrays(1, &mVAO);
         glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
@@ -165,16 +166,26 @@ namespace JonsEngine
             -0.75f, -0.75f, 0.0f,
         };
 
+        const float vertexColors[] = {
+            1.0f, 0.0f, 0.0f,
+            0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 1.0f,
+        };
+
 
         // vertex shader
         glBindVertexArray(mVAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, mVBO_VertexShader);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
-
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
+        glBindBuffer(GL_ARRAY_BUFFER, mVBO_VertexShader_color);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertexColors), vertexColors, GL_STATIC_DRAW);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
         glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
 
         // unbind
         glBindBuffer(GL_ARRAY_BUFFER, 0);

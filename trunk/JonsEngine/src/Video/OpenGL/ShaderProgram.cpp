@@ -18,7 +18,6 @@ namespace JonsEngine
     ShaderProgram::~ShaderProgram()
     {
         glDeleteProgram(mProgramHandle);
-        mName.clear();
         mProgramHandle = 0;
         mIsLinked = false;
 
@@ -63,7 +62,6 @@ namespace JonsEngine
         if (mProgramHandle == 0)
             mProgramHandle = glCreateProgram();
 
-        //std::for_each(mAddedShaders.begin(), mAddedShaders.end(), boost::bind(&ShaderProgram::AttachShader, this, _1));
         BOOST_FOREACH(Shader* shader, mAddedShaders)
             glAttachShader(mProgramHandle, shader->mShaderHandle);
 
@@ -77,7 +75,6 @@ namespace JonsEngine
             return false;
         }
 
-        //std::for_each(mAddedShaders.begin(), mAddedShaders.end(), boost::bind(&ShaderProgram::DetachShader, this, _1));
         BOOST_FOREACH(Shader* shader, mAddedShaders)
             glDetachShader(mProgramHandle, shader->mShaderHandle);
 
@@ -89,11 +86,6 @@ namespace JonsEngine
     {
         if (!mIsLinked)
             JONS_LOG_ERROR(mLogger, "ShaderProgram::UnlinkProgram(): Program not linked");
-    }
-
-    void ShaderProgram::SetName(const std::string& name)
-    {
-        mName = name;
     }
         
     void ShaderProgram::UseProgram(bool use)

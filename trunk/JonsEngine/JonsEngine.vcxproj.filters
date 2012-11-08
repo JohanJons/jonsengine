@@ -92,9 +92,6 @@
     <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c">
       <Filter>Thirdparty\dlmalloc</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\EngineSettings.cpp">
-      <Filter>Source Files\Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Memory\HeapAllocator.cpp">
       <Filter>Source Files\Core\Memory</Filter>
     </ClCompile>

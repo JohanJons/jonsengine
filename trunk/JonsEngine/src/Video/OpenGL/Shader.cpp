@@ -1,6 +1,9 @@
 #include "include/Video/OpenGL/Shader.h"
 
 #include "include/Core/Logging/Logger.h"
+#include "include/Core/EngineDefs.h"
+
+#include <array>
 
 namespace JonsEngine
 {
@@ -34,17 +37,22 @@ namespace JonsEngine
         glGetShaderiv(mShaderHandle, GL_COMPILE_STATUS, &status);
         if (status == GL_FALSE)
         {
-            JONS_LOG_ERROR(mLogger, "Shader::Compile(): Failed to compile shader");
+            GLint errorLogSize = 250;
+            std::array<GLchar, 250> errorLog;
+
+            glGetShaderiv(mShaderHandle, GL_INFO_LOG_LENGTH, &errorLogSize);
+ 
+	        glGetShaderInfoLog(mShaderHandle, errorLogSize, &errorLogSize, &errorLog[0]);
+
+            std::string msg = "Shader::Compile(): Failed to compile shader: "; 
+            msg.append(&errorLog[0]);
+
+            JONS_LOG_ERROR(mLogger, msg);
             return false;
         }
         
         mIsCompiled = true;
         return true;
-    }
-
-    void Shader::SetName(const std::string& name)
-    {
-        mName = name;
     }
 
     const std::string& Shader::GetName() const

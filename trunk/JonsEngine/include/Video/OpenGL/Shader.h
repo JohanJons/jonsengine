@@ -25,14 +25,13 @@ namespace JonsEngine
 
         bool Compile(const std::string& shader);
 
-        void SetName(const std::string& name);
         const std::string& GetName() const;
         bool IsCompiled() const;
 
         
     protected:
         Logger& mLogger;
-        std::string mName;
+        const std::string mName;
         const ShaderType mShaderType;
         GLuint mShaderHandle;
         bool mIsCompiled;

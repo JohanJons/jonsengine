@@ -34,7 +34,7 @@ namespace JonsEngine
         void InternalDeallocate(void* memblock);
 
         const HeapAllocatorBackend mBackend;
-        const std::string& mAllocatorName;
+        const std::string mAllocatorName;
     };
 
 

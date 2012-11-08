@@ -25,7 +25,6 @@ namespace JonsEngine
         bool LinkProgram();
         void UnlinkProgram();
         void UseProgram(bool use);
-        void SetName(const std::string& name);
 
         const std::string& GetName() const;
         bool IsLinked() const;
@@ -33,7 +32,7 @@ namespace JonsEngine
 
     private:
         Logger& mLogger;
-        std::string mName;
+        const std::string mName;
         bool mIsLinked;
         GLuint mProgramHandle;
         Vector<Shader*> mAddedShaders;

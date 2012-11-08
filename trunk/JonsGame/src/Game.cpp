@@ -46,7 +46,8 @@ namespace JonsGame
 			shaderProgram.AddShader(&vertexShader);
 			shaderProgram.AddShader(&fragmentShader);
 
-			shaderProgram.BindAttribLocation(0, "position");
+			shaderProgram.BindAttribLocation(0, "in_position");
+            shaderProgram.BindAttribLocation(1, "in_color");
 
 			shaderProgram.LinkProgram();
 
@@ -58,7 +59,7 @@ namespace JonsGame
             mEngine->GetInputManager().RegisterMouseButtonCallback(boost::bind(&Game::OnMouseButtonEvent, this, _1));
             mEngine->GetInputManager().RegisterMouseMotionCallback(boost::bind(&Game::OnMouseMotionEvent, this, _1));
             mEngine->GetInputManager().RegisterKeyCallback(boost::bind(&Game::OnKeyEvent, this, _1));
-            
+
 			while (true)
 			{
 				mEngine->Tick();

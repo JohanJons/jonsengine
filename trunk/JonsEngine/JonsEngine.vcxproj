@@ -100,7 +100,6 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
   <ItemGroup>
     <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c" />
     <ClCompile Include="src\Core\Engine.cpp" />
-    <ClCompile Include="src\Core\EngineSettings.cpp" />
     <ClCompile Include="src\Core\Logging\JonsOutputStream.cpp" />
     <ClCompile Include="src\Core\Logging\JonsStreamBuf.cpp" />
     <ClCompile Include="src\Core\Logging\Logger.cpp" />

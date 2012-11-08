@@ -38,6 +38,6 @@ namespace JonsEngine
     {
         const std::string msg = mLoggerName + ": " +  logMsg;
 
-        LogManager::Instance().Log(level, msg);
+        Globals::GetLogManager().Log(level, msg);
     }
 }
