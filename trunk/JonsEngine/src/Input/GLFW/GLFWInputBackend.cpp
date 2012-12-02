@@ -9,7 +9,7 @@ namespace JonsEngine
 {
     static GLFWInputBackend* gGLFWInputBackendInstance = NULL;
 
-    GLFWInputBackend::GLFWInputBackend() : mOnMouseButton(NULL), mOnMouseMotion(NULL), mOnKey(NULL), mLogger(Globals::GetInputLogger())
+    GLFWInputBackend::GLFWInputBackend() : mOnMouseButton(NULL), mOnMouseMotion(NULL), mOnKey(NULL), mLogger(Logger::GetInputLogger())
     {
         GLenum glfwErr = glfwInit();
         if (glfwErr != GL_TRUE)

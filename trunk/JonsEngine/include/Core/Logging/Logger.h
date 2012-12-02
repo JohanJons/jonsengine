@@ -21,6 +21,10 @@ namespace JonsEngine
         Logger(const std::string& loggerName);
         ~Logger();
 
+        static Logger& GetCoreLogger();
+        static Logger& GetVideoLogger();
+        static Logger& GetInputLogger();
+
         void Log(LogManager::LogLevel level, const std::string& logMsg);
 
         const std::string& GetLoggerName() const;
@@ -33,14 +37,4 @@ namespace JonsEngine
 
     /* Logger Inlines */
     inline const std::string& Logger::GetLoggerName() const     { return mLoggerName; }
-
-
-    /* Logger free functions */
-    namespace Globals
-    {
-        Logger& GetEngineLogger();
-        Logger& GetVideoLogger();
-        Logger& GetInputLogger();
-        Logger& GetThreadingLogger();
-    }
 }

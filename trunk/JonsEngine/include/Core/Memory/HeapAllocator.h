@@ -9,6 +9,10 @@
 
 namespace JonsEngine
 {
+    /*
+     * Allocates memory on the heap using either system default or DLMALLOC allocation strategy
+     */
+
     /* HeapAllocator definition */
     class HeapAllocator : public IMemoryAllocator
     {
@@ -21,6 +25,8 @@ namespace JonsEngine
 
         HeapAllocator(const std::string& allocatorName, const HeapAllocatorBackend backend);
         ~HeapAllocator();
+
+        static HeapAllocator& GetDefaultHeapAllocator();
 
         void* Allocate(size_t size);
         void* Reallocate(void* memblock, size_t size);

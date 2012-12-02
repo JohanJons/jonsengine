@@ -9,6 +9,11 @@ namespace JonsEngine
     class IMemoryAllocator;
     class Logger;
 
+    /*
+     * Engine is the central controller object.
+     * It creates all subsystems and is responsible for advancing the game.
+     */
+
     /* Engine definition */
     class Engine
     {

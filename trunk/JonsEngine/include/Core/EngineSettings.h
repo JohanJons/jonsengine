@@ -8,6 +8,11 @@
 
 namespace JonsEngine
 {
+    /*
+     * EngineSettings is used when bootstraping the engine. 
+     * Parameters can be changed to alter the engine properties
+     */
+
     /* EngineSettings definition */
     struct EngineSettings
     {

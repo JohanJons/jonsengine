@@ -10,6 +10,5 @@ namespace JonsEngine
      * Logging
      */
 
-    // defined in LogManager.cpp
-    extern const std::string GameEngineTag;
+    const std::string GameEngineTag = "JonsEngine";
 }

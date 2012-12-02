@@ -11,11 +11,6 @@ namespace JonsEngine
     struct EngineSettings;
     class Logger;
 
-    struct PrimitiveInfo
-    {
-        GLenum Mode;
-        GLsizei Count;
-    };
 
     /* OpenGLRenderBackend definition */
     class OpenGLRenderBackend : public RenderBackend
@@ -59,11 +54,9 @@ namespace JonsEngine
 
         // rendering 
         GLuint mVBO_VertexShader;
-        GLuint mVBO_VertexShader_color;
         GLuint mVBO_FragmentShader;
         GLuint mVAO;
         Vector<Vec3> mVertices;
-        Vector<PrimitiveInfo> mPrimitiveInfo;
     };
 
 

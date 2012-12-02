@@ -4,11 +4,11 @@
 #include "include/Video/DummyRenderBackend.h"
 #include "include/Video/OpenGL/OpenGLRenderBackend.h"
 #include "include/Core/EngineSettings.h"
-#include "include/Core/Memory/IMemoryAllocator.h"
+#include "include/Core/Memory/HeapAllocator.h"
 
 namespace JonsEngine
 {
-    Renderer::Renderer(const EngineSettings& engineSettings)  : mMemoryAllocator(Globals::GetDefaultHeapAllocator()), mRenderBackend(CreateBackend(engineSettings))
+    Renderer::Renderer(const EngineSettings& engineSettings)  : mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mRenderBackend(CreateBackend(engineSettings))
     {
     }
         

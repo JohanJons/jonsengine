@@ -167,16 +167,4 @@ namespace JonsEngine
         virtual void* InternalAllocate(size_t size) = 0;
         virtual void InternalDeallocate(void* p) = 0;
     };
-
-
-    namespace Globals
-    {
-        /**
-         * Returns the default engine heap allocator.
-         * @return: The default heap allocator for the engine.
-         */
-
-        IMemoryAllocator& GetDefaultHeapAllocator();
-    }
-
 }

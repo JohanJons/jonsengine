@@ -8,7 +8,7 @@
 namespace JonsEngine
 {
 
-    Shader::Shader(const std::string& name, ShaderType type) : mLogger(Globals::GetVideoLogger()), mName(name), mShaderHandle(0), mShaderType(type), mIsCompiled(false)
+    Shader::Shader(const std::string& name, ShaderType type) : mLogger(Logger::GetVideoLogger()), mName(name), mShaderHandle(0), mShaderType(type), mIsCompiled(false)
     {
     }
         

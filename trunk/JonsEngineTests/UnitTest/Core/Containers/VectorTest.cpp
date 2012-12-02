@@ -28,7 +28,7 @@ namespace JonsEngine
 			ASSERT_EQ(mVector2[i], mVector1[i]);
 		ASSERT_EQ(mVector1.capacity(), mVector2.capacity());
 
-		mVector1 = Vector<int>(Globals::GetDefaultHeapAllocator());
+		mVector1 = Vector<int>(HeapAllocator::GetDefaultHeapAllocator());
 		ASSERT_EQ(0,mVector1.size());
 		ASSERT_EQ(0,mVector1.capacity());
 		for (size_t i = 0; i < mVector1.size(); i++)

@@ -11,7 +11,7 @@
 namespace JonsEngine
 {
 
-    OpenGLRenderBackend::OpenGLRenderBackend(const EngineSettings& engineSettings) : mLogger(Globals::GetVideoLogger()), mWindowTitle("JonsEngine Game"), mStartFrameTime(0), mLastFrameTime(0), mThisFrameTime(0)
+    OpenGLRenderBackend::OpenGLRenderBackend(const EngineSettings& engineSettings) : mLogger(Logger::GetVideoLogger()), mWindowTitle("JonsEngine Game"), mStartFrameTime(0), mLastFrameTime(0), mThisFrameTime(0)
     {
         GLenum glfwErr = glfwInit();
         if (glfwErr != GL_TRUE)
@@ -39,12 +39,14 @@ namespace JonsEngine
             throw std::exception("OpenGLRenderBackend::OpenGLRenderBackend(): Minimum OpenGL driver (OpenGL 3.3) not supported!");
         }
 
+        glEnable(GL_CULL_FACE);
+	    glCullFace(GL_BACK);
+	    glFrontFace(GL_CW);
+
         // openGL context should be ready now
         glGenBuffers(1, &mVBO_VertexShader);
-        glGenBuffers(1, &mVBO_VertexShader_color);
         glGenBuffers(1, &mVBO_FragmentShader);
         glGenVertexArrays(1, &mVAO);
-        glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
     }
         
     OpenGLRenderBackend::~OpenGLRenderBackend()
@@ -149,7 +151,7 @@ namespace JonsEngine
     void OpenGLRenderBackend::RenderVertexArrays()
     {
         glBindVertexArray(mVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
     }
 
@@ -160,16 +162,60 @@ namespace JonsEngine
         
     void OpenGLRenderBackend::DrawTriangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC)
     {
-        const float vertexPositions[] = {
+        /*const float vertexPositions[] = {
             0.75f, 0.75f, 0.0f,
             0.75f, -0.75f, 0.0f,
             -0.75f, -0.75f, 0.0f,
-        };
+        };*/
+        const float vertexPositions[] =
+        {
+             0.25f,  0.25f, -1.25f,
+	         0.25f, -0.25f, -1.25f,
+	        -0.25f,  0.25f, -1.25f,
 
-        const float vertexColors[] = {
-            1.0f, 0.0f, 0.0f,
-            0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 1.0f,
+	         0.25f, -0.25f, -1.25f,
+	        -0.25f, -0.25f, -1.25f,
+	        -0.25f,  0.25f, -1.25f,
+
+	         0.25f,  0.25f, -2.75f,
+	        -0.25f,  0.25f, -2.75f,
+	         0.25f, -0.25f, -2.75f,
+
+	         0.25f, -0.25f, -2.75f,
+	        -0.25f,  0.25f, -2.75f,
+	        -0.25f, -0.25f, -2.75f,
+
+	        -0.25f,  0.25f, -1.25f,
+	        -0.25f, -0.25f, -1.25f,
+	        -0.25f, -0.25f, -2.75f,
+
+	        -0.25f,  0.25f, -1.25f,
+	        -0.25f, -0.25f, -2.75f,
+	        -0.25f,  0.25f, -2.75f,
+
+	         0.25f,  0.25f, -1.25f,
+	         0.25f, -0.25f, -2.75f,
+	         0.25f, -0.25f, -1.25f,
+
+	         0.25f,  0.25f, -1.25f,
+	         0.25f,  0.25f, -2.75f,
+	         0.25f, -0.25f, -2.75f,
+
+	         0.25f,  0.25f, -2.75f,
+	         0.25f,  0.25f, -1.25f,
+	        -0.25f,  0.25f, -1.25f,
+
+	         0.25f,  0.25f, -2.75f,
+	        -0.25f,  0.25f, -1.25f,
+	        -0.25f,  0.25f, -2.75f,
+
+	         0.25f, -0.25f, -2.75f,
+	        -0.25f, -0.25f, -1.25f,
+	         0.25f, -0.25f, -1.25f,
+
+	         0.25f, -0.25f, -2.75f,
+	        -0.25f, -0.25f, -2.75f,
+	        -0.25f, -0.25f, -1.25f,
         };
 
 
@@ -180,21 +226,11 @@ namespace JonsEngine
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, mVBO_VertexShader_color);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertexColors), vertexColors, GL_STATIC_DRAW);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
         glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
 
         // unbind
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
-
-        PrimitiveInfo primInfo;
-        primInfo.Mode = GL_TRIANGLES;
-        primInfo.Count = 3;
-        mPrimitiveInfo.push_back(primInfo);
     }
         
     void OpenGLRenderBackend::DrawRectangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC, const Vec3& pointD)
@@ -210,6 +246,7 @@ namespace JonsEngine
             mStartFrameTime = glfwGetTime();
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     }
         
     void OpenGLRenderBackend::EndFrame()

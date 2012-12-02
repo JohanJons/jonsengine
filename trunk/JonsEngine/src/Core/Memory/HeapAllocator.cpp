@@ -2,28 +2,8 @@
 
 namespace JonsEngine
 {
-    /////////////////////////////////////////////////////////////
-    /////               Default HeapAllocator               /////
-    /////////////////////////////////////////////////////////////
+    static HeapAllocator gHeapAllocator("DefaultHeapAllocator", HeapAllocator::DLMALLOC);
 
-    namespace Globals
-    {
-
-        static HeapAllocator gHeapAllocator("DefaultHeapAllocator", HeapAllocator::DLMALLOC);
-
-        IMemoryAllocator& GetDefaultHeapAllocator()
-        {
-            return gHeapAllocator;
-        }
-
-    }
-
-
-
-
-    /////////////////////////////////////////////////////////////////////
-    /////               HeapAllocator implementation                /////
-    /////////////////////////////////////////////////////////////////////
 
     HeapAllocator::HeapAllocator(const std::string& allocatorName, HeapAllocatorBackend backend) : mAllocatorName(allocatorName), mBackend(backend)
     {
@@ -32,6 +12,11 @@ namespace JonsEngine
     HeapAllocator::~HeapAllocator()
     {
         dlmalloc_trim(0);
+    }
+
+    HeapAllocator& HeapAllocator::GetDefaultHeapAllocator()
+    {
+        return gHeapAllocator;
     }
 
     void* HeapAllocator::Allocate(size_t size)

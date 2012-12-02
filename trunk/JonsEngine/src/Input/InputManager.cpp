@@ -5,6 +5,7 @@
 #include "include/Input/GLFW/GLFWInputBackend.h"
 #include "include/Input/DummyInputBackend.h"
 #include "include/Core/Logging/Logger.h"
+#include "include/Core/Memory/HeapAllocator.h"
 
 #include "boost/bind.hpp"
 #include "boost/foreach.hpp"
@@ -12,7 +13,7 @@
 
 namespace JonsEngine
 {
-    InputManager::InputManager(const EngineSettings& engineSettings) : mLogger(Globals::GetInputLogger()), mMemoryAllocator(Globals::GetDefaultHeapAllocator()), mInputBackend(CreateBackend(engineSettings.InputBackend))
+    InputManager::InputManager(const EngineSettings& engineSettings) : mLogger(Logger::GetInputLogger()), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mInputBackend(CreateBackend(engineSettings.InputBackend))
     {
     }
         

@@ -10,7 +10,7 @@
 namespace JonsEngine
 {
 
-    Engine::Engine(const EngineSettings& settings) : mLog(Globals::GetEngineLogger()), mMemoryAllocator(Globals::GetDefaultHeapAllocator()), mRenderer(settings), mInputManager(settings)
+    Engine::Engine(const EngineSettings& settings) : mLog(Logger::GetCoreLogger()), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mRenderer(settings), mInputManager(settings)
     {
         JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
     }

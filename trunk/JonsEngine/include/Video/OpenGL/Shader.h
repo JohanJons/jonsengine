@@ -26,6 +26,7 @@ namespace JonsEngine
         bool Compile(const std::string& shader);
 
         const std::string& GetName() const;
+        bool GetShaderType() const;
         bool IsCompiled() const;
 
         

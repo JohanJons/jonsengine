@@ -15,9 +15,9 @@ namespace JonsEngine
 	class VectorTest : public ::testing::Test
 	{
 	public:
-		VectorTest() : mVector1(Globals::GetDefaultHeapAllocator()),
-						mVector2(Globals::GetDefaultHeapAllocator(), 5),
-						mVector3(Globals::GetDefaultHeapAllocator(), 10)
+		VectorTest() : mVector1(HeapAllocator::GetDefaultHeapAllocator()),
+						mVector2(HeapAllocator::GetDefaultHeapAllocator(), 5),
+						mVector3(HeapAllocator::GetDefaultHeapAllocator(), 10)
 		{
 
 		}

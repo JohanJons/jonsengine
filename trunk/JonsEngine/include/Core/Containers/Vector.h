@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/Core/Memory/IMemoryAllocator.h"
+#include "include/Core/Memory/HeapAllocator.h"
 
 
 namespace JonsEngine
@@ -73,7 +73,7 @@ namespace JonsEngine
     };
 
     template <class T>
-    inline Vector<T>::Vector() : mAllocator(Globals::GetDefaultHeapAllocator()), mCapacity(NULL), mBegin(NULL), mEnd(NULL), DefaultCapacityIncrease(2)
+    inline Vector<T>::Vector() : mAllocator(HeapAllocator::GetDefaultHeapAllocator()), mCapacity(NULL), mBegin(NULL), mEnd(NULL), DefaultCapacityIncrease(2)
     {
     }
 

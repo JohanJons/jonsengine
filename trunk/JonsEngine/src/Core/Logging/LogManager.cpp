@@ -2,9 +2,6 @@
 
 namespace JonsEngine
 {
-    // Defintion of engine log tags
-    const std::string GameEngineTag     =       "JonsEngine";
-
     namespace Globals
     {
         static LogManager gLogManager;

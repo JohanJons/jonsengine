@@ -131,6 +131,9 @@
     <ClCompile Include="src\Video\OpenGL\OpenGLRenderBackend.cpp">
       <Filter>Source Files\Video\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Utils\Math.cpp">
+      <Filter>Source Files\Core\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -222,6 +225,9 @@
     </ClInclude>
     <ClInclude Include="include\Input\DummyInputBackend.h">
       <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\Math.h">
+      <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

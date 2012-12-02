@@ -4,6 +4,7 @@
 #include "include/Video/OpenGL/Shader.h"
 #include "include/Video/OpenGL/ShaderProgram.h"
 #include "include/Core/Utils/Types.h"
+#include "include/Core/Utils/Math.h"
 #include "include/Input/InputManager.h"
 
 #include "boost/bind.hpp"
@@ -47,9 +48,14 @@ namespace JonsGame
 			shaderProgram.AddShader(&fragmentShader);
 
 			shaderProgram.BindAttribLocation(0, "in_position");
-            shaderProgram.BindAttribLocation(1, "in_color");
 
 			shaderProgram.LinkProgram();
+
+            uniformBuffer uni;
+            uni.mColor.x = 1.0f; uni.mColor.y = 1.0f; uni.mColor.z = 1.0f; uni.mColor.w = 1.0f;
+            uni.mOffset.x = 0.5f; uni.mOffset.y = 0.5f;
+            uni.mPerspMatrix = CreatePerspectiveMatrix(45.0f, 1.0f, 0.5f, 3.0f);
+            shaderProgram.SetUniformBuffer(uni,"Uni");  
 
 			if (shaderProgram.IsLinked())
 				shaderProgram.UseProgram(true);

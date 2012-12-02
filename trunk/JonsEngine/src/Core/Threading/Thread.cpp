@@ -1,6 +1,6 @@
 #include "include/Core/Threading/Thread.h"
 
-#include "include/Core/Memory/IMemoryAllocator.h"
+#include "include/Core/Memory/HeapAllocator.h"
 
 #if defined _WIN32 || _WIN64
     #define WIN32_LEAN_AND_MEAN
@@ -37,11 +37,11 @@ namespace JonsEngine
     /////               Thread implementation               /////
     /////////////////////////////////////////////////////////////
 
-    Thread::Thread() : mHandle(NULL), mAllocator(Globals::GetDefaultHeapAllocator()), mThreadInfo(NULL)
+    Thread::Thread() : mHandle(NULL), mAllocator(HeapAllocator::GetDefaultHeapAllocator()), mThreadInfo(NULL)
     {
     }
 
-    Thread::Thread(const Task& task) : mAllocator(Globals::GetDefaultHeapAllocator())
+    Thread::Thread(const Task& task) : mAllocator(HeapAllocator::GetDefaultHeapAllocator())
     {
         mThreadInfo = (ThreadInfo*) mAllocator.AllocateObject<ThreadInfo>();
 
