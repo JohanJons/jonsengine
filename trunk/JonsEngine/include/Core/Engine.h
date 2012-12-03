@@ -11,7 +11,7 @@ namespace JonsEngine
 
     /*
      * Engine is the central controller object.
-     * It creates all subsystems and is responsible for advancing the game.
+     * It creates all subsystems and is responsible for advancing the engine state.
      */
 
     /* Engine definition */

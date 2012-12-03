@@ -5,8 +5,6 @@
 #include "include/Core/Logging/JonsOutputStream.h"
 #include "include/Core/Threading/ScopedLock.h"
 
-#include "include/Core/Utils/JonsTime.h"
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -14,6 +12,10 @@
 
 namespace JonsEngine
 {
+    /*
+     * Provides loglevel-adjustable, thread-safe logging to any given outstream, by default to a textfile. 
+     */
+
     /* LogManager definition */
     class LogManager
     {
@@ -27,7 +29,7 @@ namespace JonsEngine
             LEVEL_CRITICAL
         };
 
-        LogManager();
+        LogManager(const std::string logPrefix);
         ~LogManager();
         static LogManager& GetDefaultLogManager();
 
@@ -42,15 +44,17 @@ namespace JonsEngine
         void SetLevelFilter(LogLevel level);
         LogLevel GetLevelFilter() const;
 
+
     private:
         const std::string InternalGetLogName() const;
         const std::string LogLevelToString(LogLevel level);
 
+        const std::string mLogPrefix;
         std::ostream mLogStream;
         std::string mLogPath;
         std::ofstream mFileStream;
         JonsStreamBuf mStreamBuf;
-        LogLevel  mLogFilter;
+        LogLevel mLogFilter;
         Mutex mMutex;
 
     };

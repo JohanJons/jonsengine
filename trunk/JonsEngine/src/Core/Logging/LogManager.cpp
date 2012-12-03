@@ -2,10 +2,10 @@
 
 namespace JonsEngine
 {
-    static LogManager gLogManager;
+    static LogManager gLogManager(GameEngineTag);
 
 
-    LogManager::LogManager() : mLogStream(&mStreamBuf), mLogPath(InternalGetLogName()), mLogFilter(LEVEL_INFO)
+    LogManager::LogManager(const std::string logPrefix) : mLogPrefix(logPrefix), mLogStream(&mStreamBuf), mLogPath(InternalGetLogName()), mLogFilter(LEVEL_INFO)
     {
         ScopedLock lock(mMutex);
 
@@ -34,7 +34,7 @@ namespace JonsEngine
         if (level < mLogFilter)
             return;
 
-        mLogStream << GameEngineTag << " - " + LogLevelToString(level) + " - " << logMsg << std::endl;
+        mLogStream << mLogPrefix << " - " + LogLevelToString(level) + " - " << logMsg << std::endl;
     }
 
     void LogManager::AddOutputStream(std::streambuf* const sb)
@@ -74,7 +74,7 @@ namespace JonsEngine
     {
         std::stringstream ret;
 
-        ret << GameEngineTag;
+        ret << mLogPrefix;
         ret << "_Log";
         ret << ".txt";
 
