@@ -20,7 +20,6 @@ namespace JonsEngine
     public:
         Logger(const std::string& loggerName);
         ~Logger();
-
         static Logger& GetCoreLogger();
         static Logger& GetVideoLogger();
         static Logger& GetInputLogger();

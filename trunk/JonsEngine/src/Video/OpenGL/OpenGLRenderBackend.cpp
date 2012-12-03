@@ -162,11 +162,6 @@ namespace JonsEngine
         
     void OpenGLRenderBackend::DrawTriangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC)
     {
-        /*const float vertexPositions[] = {
-            0.75f, 0.75f, 0.0f,
-            0.75f, -0.75f, 0.0f,
-            -0.75f, -0.75f, 0.0f,
-        };*/
         const float vertexPositions[] =
         {
              0.25f,  0.25f, -1.25f,

@@ -25,7 +25,6 @@ namespace JonsEngine
 
         HeapAllocator(const std::string& allocatorName, const HeapAllocatorBackend backend);
         ~HeapAllocator();
-
         static HeapAllocator& GetDefaultHeapAllocator();
 
         void* Allocate(size_t size);

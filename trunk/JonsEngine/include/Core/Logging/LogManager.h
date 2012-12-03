@@ -29,6 +29,7 @@ namespace JonsEngine
 
         LogManager();
         ~LogManager();
+        static LogManager& GetDefaultLogManager();
 
         void Log(LogLevel level, const std::string& logMsg);
 
@@ -58,11 +59,4 @@ namespace JonsEngine
     /* LogManager inlines */
     inline const std::string& LogManager::GetFileLogPath() const           { return mLogPath;      }
     inline LogManager::LogLevel LogManager::GetLevelFilter() const         { return mLogFilter;    }
-
-
-    /* LogManager free functions */
-    namespace Globals
-    {
-        LogManager& GetLogManager();
-    }
 }

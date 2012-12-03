@@ -2,12 +2,7 @@
 
 namespace JonsEngine
 {
-    namespace Globals
-    {
-        static LogManager gLogManager;
-
-        LogManager& GetLogManager()         { return gLogManager; }
-    }
+    static LogManager gLogManager;
 
 
     LogManager::LogManager() : mLogStream(&mStreamBuf), mLogPath(InternalGetLogName()), mLogFilter(LEVEL_INFO)
@@ -25,6 +20,11 @@ namespace JonsEngine
 
         if (mFileStream.is_open())
             mFileStream.close();
+    }
+
+    LogManager& LogManager::GetDefaultLogManager()
+    {
+        return gLogManager;
     }
 
     void LogManager::Log(LogLevel level, const std::string& logMsg)
