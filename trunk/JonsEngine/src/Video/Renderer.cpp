@@ -20,7 +20,7 @@ namespace JonsEngine
     void Renderer::StartFrame()                                                                                         { mRenderBackend->StartFrame();  }
     void Renderer::EndFrame()                                                                                           { mRenderBackend->EndFrame();    }
 
-    bool Renderer::SetupWindow(const ScreenMode& screenMode)                                                            { return mRenderBackend->SetupWindow(screenMode);   }
+    bool Renderer::SetupWindow()                                                                                        { return mRenderBackend->SetupWindow();   }
     void Renderer::CloseWindow()                                                                                        { mRenderBackend->CloseWindow();                    }
     bool Renderer::IsWindowOpened() const                                                                               { return mRenderBackend->IsWindowOpened();          }
     uint16_t Renderer::GetCurrentFPS() const                                                                            { return mRenderBackend->GetCurrentFPS();           }

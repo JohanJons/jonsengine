@@ -22,7 +22,7 @@ namespace JonsEngine
         void StartFrame();
         void EndFrame();
 
-        bool SetupWindow(const ScreenMode& screenMode);
+        bool SetupWindow();
         void CloseWindow();
         bool IsWindowOpened() const;
         uint16_t GetCurrentFPS() const;
@@ -43,6 +43,8 @@ namespace JonsEngine
 
 
     private:
+        void UpdateViewport();
+
         Logger& mLogger;
         std::string mWindowTitle;
         ScreenMode mScreenMode;
@@ -54,7 +56,7 @@ namespace JonsEngine
 
         // rendering 
         GLuint mVBO_VertexShader;
-        GLuint mVBO_FragmentShader;
+        GLuint mIndexBuffer;
         GLuint mVAO;
         Vector<Vec3> mVertices;
     };

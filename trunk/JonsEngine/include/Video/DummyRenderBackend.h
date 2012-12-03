@@ -7,8 +7,11 @@
 
 namespace JonsEngine
 {
+    /*
+     * A default rendering backend that can be used when no proper backend is available during initialization
+     */
+
     /* DummyRenderBackend definition */
-    /* Used when no proper backend specified in initialization */
     class DummyRenderBackend : public RenderBackend
     {
     public:
@@ -18,7 +21,7 @@ namespace JonsEngine
         void StartFrame();
         void EndFrame();
 
-        bool SetupWindow(const ScreenMode& screenMode);
+        bool SetupWindow();
         void CloseWindow();
         bool IsWindowOpened() const;
         uint16_t GetCurrentFPS() const;
@@ -51,7 +54,7 @@ namespace JonsEngine
     inline void DummyRenderBackend::StartFrame()                                                                                        { }
     inline void DummyRenderBackend::EndFrame()                                                                                          { }
 
-    inline bool DummyRenderBackend::SetupWindow(const ScreenMode& screenMode)                                                           { return false; }
+    inline bool DummyRenderBackend::SetupWindow()                                                                                       { return false; }
     inline void DummyRenderBackend::CloseWindow()                                                                                       {               }
     inline bool DummyRenderBackend::IsWindowOpened() const                                                                              { return false; }
     inline uint16_t DummyRenderBackend::GetCurrentFPS() const                                                                           { return 0;     }
@@ -69,6 +72,4 @@ namespace JonsEngine
     inline const std::string& DummyRenderBackend::GetWindowTitle() const                                                                { return mWindowTitle;  }
 
     inline RenderBackend::RenderBackendType DummyRenderBackend::GetRenderBackendType() const                                            { return NONE;  }
-
-
 }

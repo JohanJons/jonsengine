@@ -10,6 +10,8 @@ namespace JonsEngine
     class IMemoryAllocator;
     class RenderBackend;
 
+
+    /* Renderer definition */
     class Renderer
     {
     public:
@@ -19,7 +21,7 @@ namespace JonsEngine
         void StartFrame();
         void EndFrame();
 
-        bool SetupWindow(const ScreenMode& screenMode);
+        bool SetupWindow();
         void CloseWindow();
         bool IsWindowOpened() const;
         uint16_t GetCurrentFPS() const;

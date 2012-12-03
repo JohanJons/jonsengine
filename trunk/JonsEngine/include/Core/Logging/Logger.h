@@ -14,6 +14,10 @@
 
 namespace JonsEngine
 {
+    /*
+     * Object used to log to the default logmanager 
+     */
+
     /* Logger class definition */
     class Logger
     {

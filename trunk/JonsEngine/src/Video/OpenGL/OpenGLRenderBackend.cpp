@@ -10,7 +10,6 @@
 
 namespace JonsEngine
 {
-
     OpenGLRenderBackend::OpenGLRenderBackend(const EngineSettings& engineSettings) : mLogger(Logger::GetVideoLogger()), mWindowTitle("JonsEngine Game"), mStartFrameTime(0), mLastFrameTime(0), mThisFrameTime(0)
     {
         GLenum glfwErr = glfwInit();
@@ -25,7 +24,8 @@ namespace JonsEngine
         glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
         glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-        SetupWindow(engineSettings.ScreenMode);
+        mScreenMode = engineSettings.ScreenMode;
+        SetupWindow();
         SetWindowTitle(engineSettings.WindowTitle);
 
         // Initialize GLEW for fetching openGL
@@ -45,7 +45,7 @@ namespace JonsEngine
 
         // openGL context should be ready now
         glGenBuffers(1, &mVBO_VertexShader);
-        glGenBuffers(1, &mVBO_FragmentShader);
+        glGenBuffers(1, &mIndexBuffer);
         glGenVertexArrays(1, &mVAO);
     }
         
@@ -56,23 +56,49 @@ namespace JonsEngine
         glfwTerminate();
     }
 
-    bool OpenGLRenderBackend::SetupWindow(const ScreenMode& screenMode)
+    void OpenGLRenderBackend::StartFrame()
     {
-        if (IsWindowOpened())
+        mLastFrameTime = mThisFrameTime;
+
+        if (mScreenMode.FrameLimitEnabled)
+            mStartFrameTime = glfwGetTime();
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    }
+        
+    void OpenGLRenderBackend::EndFrame()
+    {
+        if (mScreenMode.FrameLimitEnabled)
         {
-            JONS_LOG_ERROR(mLogger, "OpenGLRenderBackend::SetupWindow(): Window already opened, close it first.");
-            return false;
+            mThisFrameTime = glfwGetTime();
+
+            const double endFrameTime = glfwGetTime() - mStartFrameTime;
+            const double frameTime = 1.0f / mScreenMode.FrameLimit;
+
+            if (endFrameTime < frameTime)
+                glfwSleep(frameTime - endFrameTime);
         }
 
-        if (glfwOpenWindow(screenMode.ScreenWidth, screenMode.ScreenHeight, 0, 0 , 0, 0, 0, 0, screenMode.Fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW) != GL_TRUE)
+        glfwSwapBuffers();
+    }
+
+    bool OpenGLRenderBackend::SetupWindow()
+    {
+        if (IsWindowOpened())
+            CloseWindow();
+
+        if (!glfwOpenWindow(mScreenMode.ScreenWidth, mScreenMode.ScreenHeight, 0, 0 , 0, 0, 0, 0, mScreenMode.Fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW) != GL_TRUE)
         {
-            JONS_LOG_ERROR(mLogger, "OpenGLRenderBackend::SetupWindow(): Failed to create main screen!")
-            return false;
+            SetWindowTitle(mWindowTitle);
+            UpdateViewport();
+
+            return true;
         }
         else 
         {
-            mScreenMode = screenMode;
-            return true;
+            JONS_LOG_ERROR(mLogger, "OpenGLRenderBackend::SetupWindow(): Failed to create main window!")
+            return false;
         }
     }
 
@@ -96,62 +122,39 @@ namespace JonsEngine
 
     void OpenGLRenderBackend::SetFullscreen(bool fullscreen)
     {
-        if (!IsWindowOpened())
-        {
-            JONS_LOG_WARNING(mLogger, "OpenGLRenderBackend::SetFullscreen(): Window not opened");
-            return;
-        }
-
-        if (mScreenMode.Fullscreen != fullscreen)
+        if (mScreenMode.Fullscreen != fullscreen && IsWindowOpened())
         {
             // need to tear down window and reset opengl context with GLFW..
-            CloseWindow();
-            
-            mScreenMode.Fullscreen = fullscreen;
-
-            SetupWindow(mScreenMode);
+            SetupWindow();
         }
+
+        mScreenMode.Fullscreen = fullscreen;
     }
         
     void OpenGLRenderBackend::SetScreenResolution(const uint16_t width, const uint16_t height)
     {
-        if (!IsWindowOpened())
-        {
-            JONS_LOG_WARNING(mLogger, "OpenGLRenderBackend::SetScreenResolution(): Window not opened");
-            return;
-        }
-
-        if (mScreenMode.ScreenWidth != width ||
-            mScreenMode.ScreenHeight != height)
-        {
+        if (IsWindowOpened() && (mScreenMode.ScreenWidth != width || mScreenMode.ScreenHeight != height))
             glfwSetWindowSize(width, height);
-            glViewport(0, 0, (GLsizei) width, (GLsizei)height);
 
-            mScreenMode.ScreenWidth = width;
-            mScreenMode.ScreenHeight = height;
-        }
+        mScreenMode.ScreenWidth = width;
+        mScreenMode.ScreenHeight = height;
+
+        UpdateViewport();
     }
         
     void OpenGLRenderBackend::SetWindowTitle(const std::string& windowTitle)
     {
-        if (!IsWindowOpened())
-        {
-            JONS_LOG_WARNING(mLogger, "OpenGLRenderBackend::SetWindowTitle(): Window not opened");
-            return;
-        }
-
-        if (mWindowTitle.compare(windowTitle) != 0)
-        {
+        if (IsWindowOpened() && mWindowTitle.compare(windowTitle) != 0)
             glfwSetWindowTitle(windowTitle.c_str());
 
-            mWindowTitle = windowTitle;
-        }
+        mWindowTitle = windowTitle;
     }
 
     void OpenGLRenderBackend::RenderVertexArrays()
     {
         glBindVertexArray(mVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        //glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawElements(GL_TRIANGLES, 4, GL_UNSIGNED_SHORT, 0);
         glBindVertexArray(0);
     }
 
@@ -163,6 +166,20 @@ namespace JonsEngine
     void OpenGLRenderBackend::DrawTriangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC)
     {
         const float vertexPositions[] =
+        {
+            -0.5f, 0.5f, 0.0f,
+            0.5f, 0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f,
+            -0.5f, -0.5f, 0.0f,
+        };
+
+        const GLshort indexData[] =
+        {
+            0, 1, 2,
+            3, 0, 1 
+        };
+
+        /*const float vertexPositions[] =
         {
              0.25f,  0.25f, -1.25f,
 	         0.25f, -0.25f, -1.25f,
@@ -211,19 +228,26 @@ namespace JonsEngine
 	         0.25f, -0.25f, -2.75f,
 	        -0.25f, -0.25f, -2.75f,
 	        -0.25f, -0.25f, -1.25f,
-        };
+        };*/
+
+        // buffer data
+        glBindBuffer(GL_ARRAY_BUFFER, mVBO_VertexShader);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexData), indexData, GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 
-        // vertex shader
+        // setup VAO
         glBindVertexArray(mVAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, mVBO_VertexShader);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
         glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBuffer);
 
-        // unbind
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
     }
@@ -232,31 +256,12 @@ namespace JonsEngine
     {
         
     }
-        
-    void OpenGLRenderBackend::StartFrame()
-    {
-        mLastFrameTime = mThisFrameTime;
 
-        if (mScreenMode.FrameLimitEnabled)
-            mStartFrameTime = glfwGetTime();
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    }
-        
-    void OpenGLRenderBackend::EndFrame()
+    void OpenGLRenderBackend::UpdateViewport()
     {
-        if (mScreenMode.FrameLimitEnabled)
+        if (IsWindowOpened())
         {
-            mThisFrameTime = glfwGetTime();
-
-            const double endFrameTime = glfwGetTime() - mStartFrameTime;
-            const double frameTime = 1.0f / mScreenMode.FrameLimit;
-
-            if (endFrameTime < frameTime)
-                glfwSleep(frameTime - endFrameTime);
+            glViewport(0, 0, (GLsizei) mScreenMode.ScreenWidth, (GLsizei)mScreenMode.ScreenHeight);
         }
-
-        glfwSwapBuffers();
     }
 }

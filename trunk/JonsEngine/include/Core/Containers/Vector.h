@@ -5,7 +5,11 @@
 
 namespace JonsEngine
 {
+    /*
+     * Custom vector implementation. Small differences to std::vector, such as more control over dynamic memory allocation
+     */
 
+    /* Vector definition */
     template <class T>
     class Vector
     {

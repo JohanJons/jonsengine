@@ -11,6 +11,10 @@ namespace JonsEngine
     class Logger;
     class Shader;
 
+    /*
+     * C++ wrapper around GLSL shaderprograms
+     */
+
     /* ShaderProgram definition */
     class ShaderProgram
     {

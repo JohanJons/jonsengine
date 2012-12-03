@@ -1,7 +1,8 @@
 #pragma once
 
 // Use stdint.h defintion of int32_t, uint64_t, etc by default across the engine
-#include <stdint.h>
+#include <cstdint>
+#include <cstddef>
 #include <string>
 
 namespace JonsEngine

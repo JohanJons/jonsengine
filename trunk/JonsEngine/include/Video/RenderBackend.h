@@ -34,7 +34,7 @@ namespace JonsEngine
         virtual void StartFrame() = 0;
         virtual void EndFrame() = 0;
 
-        virtual bool SetupWindow(const ScreenMode& screenMode) = 0;
+        virtual bool SetupWindow() = 0;
         virtual void CloseWindow() = 0;
         virtual bool IsWindowOpened() const = 0;
         virtual uint16_t GetCurrentFPS() const = 0;

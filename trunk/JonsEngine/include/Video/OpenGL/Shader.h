@@ -8,6 +8,11 @@ namespace JonsEngine
 {
     class Logger;
 
+    /*
+     * C++ wrapper around GLSL shaders
+     */
+
+    /* Shader definition */
     class Shader
     {
     public:

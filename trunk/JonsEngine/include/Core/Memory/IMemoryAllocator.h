@@ -4,6 +4,11 @@
 
 namespace JonsEngine
 {
+    /*
+     * Common interface for memory allocator schemes such as HeapAllocator
+     */
+
+    /* IMemoryAllocator definition */
     class IMemoryAllocator
     {
     public:
