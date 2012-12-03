@@ -18,60 +18,26 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-	Game::Game() : mEngine(new Engine(mSettings))
-	{
-	}
-		
-	Game::~Game()
-	{
+    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true)
+    {
+    }
+        
+    Game::~Game()
+    {
         delete mEngine;
-	}
+    }
 
-		
-	void Game::Run()
-	{
-		Triangle tri;
-		tri.vecA.x = -0.5; tri.vecA.y = -0.5; tri.vecA.z = 0.0;
-		tri.vecB.x = 0.0; tri.vecB.y = 0.5; tri.vecB.z = 0.0;
-		tri.vecC.x = 0.5; tri.vecC.y = -0.5; tri.vecC.z = 0.0;
+        
+    void Game::Run()
+    {
+        SetupInputCallbacks();
+        TestRendering();
 
-		Shader vertexShader("VertexShader", Shader::VERTEX_SHADER);
-		Shader fragmentShader("FragmentShader", Shader::FRAGMENT_SHADER);
-
-		vertexShader.Compile(gVertexShader);
-		fragmentShader.Compile(gFragmentShader);
-
-		if (vertexShader.IsCompiled() && fragmentShader.IsCompiled())
-		{
-			ShaderProgram shaderProgram("MyShaderProgram");
-			shaderProgram.AddShader(&vertexShader);
-			shaderProgram.AddShader(&fragmentShader);
-
-			shaderProgram.BindAttribLocation(0, "in_position");
-
-			shaderProgram.LinkProgram();
-
-            uniformBuffer uni;
-            uni.mColor.x = 1.0f; uni.mColor.y = 1.0f; uni.mColor.z = 1.0f; uni.mColor.w = 1.0f;
-            uni.mOffset.x = 0.5f; uni.mOffset.y = 0.5f;
-            uni.mPerspMatrix = CreatePerspectiveMatrix(45.0f, 1.0f, 0.5f, 3.0f);
-            shaderProgram.SetUniformBuffer(uni,"Uni");  
-
-			if (shaderProgram.IsLinked())
-				shaderProgram.UseProgram(true);
-
-			mEngine->GetRenderer().DrawTriangle(tri.vecA, tri.vecB, tri.vecC);
-
-            mEngine->GetInputManager().RegisterMouseButtonCallback(boost::bind(&Game::OnMouseButtonEvent, this, _1));
-            mEngine->GetInputManager().RegisterMouseMotionCallback(boost::bind(&Game::OnMouseMotionEvent, this, _1));
-            mEngine->GetInputManager().RegisterKeyCallback(boost::bind(&Game::OnKeyEvent, this, _1));
-
-			while (true)
-			{
-				mEngine->Tick();
-			}
-		}
-	}
+        while (mRunning)
+        {
+            mEngine->Tick();
+        }
+    }
 
     void Game::OnKeyEvent(const KeyEvent& evnt)
     {
@@ -86,5 +52,48 @@ namespace JonsGame
     void Game::OnMouseMotionEvent(const JonsEngine::MouseMotionEvent& evnt)
     {
 
+    }
+
+    void Game::SetupInputCallbacks()
+    {
+        mEngine->GetInputManager().RegisterMouseButtonCallback(boost::bind(&Game::OnMouseButtonEvent, this, _1));
+        mEngine->GetInputManager().RegisterMouseMotionCallback(boost::bind(&Game::OnMouseMotionEvent, this, _1));
+        mEngine->GetInputManager().RegisterKeyCallback(boost::bind(&Game::OnKeyEvent, this, _1));
+    }
+        
+    void Game::TestRendering()
+    {
+        Triangle tri;
+        tri.vecA.x = -0.5; tri.vecA.y = -0.5; tri.vecA.z = 0.0;
+        tri.vecB.x = 0.0; tri.vecB.y = 0.5; tri.vecB.z = 0.0;
+        tri.vecC.x = 0.5; tri.vecC.y = -0.5; tri.vecC.z = 0.0;
+
+        Shader vertexShader("VertexShader", Shader::VERTEX_SHADER);
+        Shader fragmentShader("FragmentShader", Shader::FRAGMENT_SHADER);
+
+        vertexShader.Compile(gVertexShader);
+        fragmentShader.Compile(gFragmentShader);
+
+        if (vertexShader.IsCompiled() && fragmentShader.IsCompiled())
+        {
+            ShaderProgram shaderProgram("MyShaderProgram");
+            shaderProgram.AddShader(&vertexShader);
+            shaderProgram.AddShader(&fragmentShader);
+
+            shaderProgram.BindAttribLocation(0, "in_position");
+
+            shaderProgram.LinkProgram();
+
+            uniformBuffer uni;
+            uni.mColor.x = 1.0f; uni.mColor.y = 1.0f; uni.mColor.z = 1.0f; uni.mColor.w = 1.0f;
+            uni.mOffset.x = 0.5f; uni.mOffset.y = 0.5f;
+            uni.mPerspMatrix = CreatePerspectiveMatrix(45.0f, 1.0f, 0.5f, 3.0f);
+            shaderProgram.SetUniformBuffer(uni,"Uni");  
+
+            if (shaderProgram.IsLinked())
+                shaderProgram.UseProgram(true);
+
+            mEngine->GetRenderer().DrawTriangle(tri.vecA, tri.vecB, tri.vecC);
+        }
     }
 }

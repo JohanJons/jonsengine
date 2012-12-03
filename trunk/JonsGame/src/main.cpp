@@ -4,11 +4,11 @@
 
 int CALLBACK WinMain(_In_  HINSTANCE hInstance, _In_  HINSTANCE hPrevInstance, _In_  LPSTR lpCmdLine,_In_  int nCmdShow)
 {
-	JonsGame::Game* game = new JonsGame::Game();
+    JonsGame::Game* game = new JonsGame::Game();
 
-	game->Run();
+    game->Run();
 
-	delete game;
+    delete game;
 
-	return 0;
+    return 0;
 }
