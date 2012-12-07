@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
-
+#include "glm/gtc/type_ptr.hpp"
 
 namespace JonsEngine
 {
@@ -14,6 +14,11 @@ namespace JonsEngine
     typedef glm::vec4 Vec4;
 
     typedef glm::mat4 Mat4;
+
+    inline const float* GetTypeValue(Vec2 vec)         { return glm::value_ptr(vec); }
+    inline const float* GetTypeValue(Vec3 vec)         { return glm::value_ptr(vec); }
+    inline const float* GetTypeValue(Vec4 vec)         { return glm::value_ptr(vec); }
+    inline const float* GetTypeValue(Mat4 mat)         { return glm::value_ptr(mat); }
 
     struct Line
     {

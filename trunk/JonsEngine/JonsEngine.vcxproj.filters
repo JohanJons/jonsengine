@@ -134,6 +134,9 @@
     <ClCompile Include="src\Core\Utils\Math.cpp">
       <Filter>Source Files\Core\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\Video\OpenGL\UniformBuffer.cpp">
+      <Filter>Source Files\Video\OpenGL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -228,6 +231,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\Utils\Math.h">
       <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\OpenGL\UniformBuffer.h">
+      <Filter>Header Files\Video\OpenGL</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

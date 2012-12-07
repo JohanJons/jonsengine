@@ -116,6 +116,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Video\OpenGL\OpenGLRenderBackend.cpp" />
     <ClCompile Include="src\Video\OpenGL\Shader.cpp" />
     <ClCompile Include="src\Video\OpenGL\ShaderProgram.cpp" />
+    <ClCompile Include="src\Video\OpenGL\UniformBuffer.cpp" />
     <ClCompile Include="src\Video\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +149,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Video\OpenGL\OpenGLRenderBackend.h" />
     <ClInclude Include="include\Video\OpenGL\Shader.h" />
     <ClInclude Include="include\Video\OpenGL\ShaderProgram.h" />
+    <ClInclude Include="include\Video\OpenGL\UniformBuffer.h" />
     <ClInclude Include="include\Video\RenderBackend.h" />
     <ClInclude Include="include\Video\Renderer.h" />
   </ItemGroup>
