@@ -21,8 +21,10 @@ namespace JonsGame
                                         out vec3 ex_color;                          \n	\
                                         void main()									\n	\
                                         {											\n	\
-                                            gl_Position = vec4(in_position, 1.0f) + vec4(mOffset.x, mOffset.y, 0.0, 0.0);	\n	\
-                                            ex_color = mColor.xyz;                  \n	\
+                                            vec4 camPos = vec4(in_position, 1.0f) + vec4(mOffset.x, mOffset.y, 0.0, 0.0);	\n	\
+                                                                                    \n \
+                                            gl_Position = mPerspMatrix * camPos;    \n \
+                                            ex_color = mColor.xyz;                  \n \
                                         }											\n";
 
 
@@ -35,10 +37,20 @@ namespace JonsGame
                                         }												\n";
 
 
-    struct uniformBuffer
+    struct ShaderData
     {
         Vec4 mColor;
         Vec2 mOffset;
         Mat4 mPerspMatrix;
+
+        void CopyUniformData(uint8_t* destination) const
+        {
+            size_t index = 0;
+            memcpy(destination, GetTypeValue(mColor), sizeof(mColor));
+            index += sizeof(mColor);
+            memcpy(destination+index, GetTypeValue(mOffset), sizeof(mOffset));
+            index += sizeof(mOffset);
+            memcpy(destination+index, GetTypeValue(mPerspMatrix), sizeof(mPerspMatrix));
+        }
     };
 }

@@ -53,6 +53,8 @@ namespace JonsEngine
     template <typename T>
     void ShaderProgram::SetUniformBuffer(const T& uniBuffer, const std::string& name)
     {
+        uint8_t buffer[sizeof(T)];
+
         glBindBuffer(GL_UNIFORM_BUFFER, mUniformBuffer);
         glBufferData(GL_UNIFORM_BUFFER, sizeof(uniBuffer), &uniBuffer, GL_DYNAMIC_DRAW);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);

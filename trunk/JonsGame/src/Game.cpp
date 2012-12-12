@@ -3,6 +3,7 @@
 
 #include "include/Video/OpenGL/Shader.h"
 #include "include/Video/OpenGL/ShaderProgram.h"
+#include "include/Video/OpenGL/UniformBuffer.h"
 #include "include/Core/Utils/Types.h"
 #include "include/Core/Utils/Math.h"
 #include "include/Input/InputManager.h"
@@ -84,11 +85,16 @@ namespace JonsGame
 
             shaderProgram.LinkProgram();
 
-            uniformBuffer uni;
-            uni.mColor.x = 1.0f; uni.mColor.y = 1.0f; uni.mColor.z = 1.0f; uni.mColor.w = 1.0f;
-            uni.mOffset.x = 0.5f; uni.mOffset.y = 0.5f;
-            uni.mPerspMatrix = CreatePerspectiveMatrix(45.0f, 1.0f, 0.5f, 3.0f);
-            shaderProgram.SetUniformBuffer(uni,"Uni");  
+            ShaderData shaderData;
+            shaderData.mColor.x = 1.0f; shaderData.mColor.y = 1.0f; shaderData.mColor.z = 1.0f; shaderData.mColor.w = 1.0f;
+            shaderData.mOffset.x = 0.5f; shaderData.mOffset.y = 0.5f;
+
+            uint16_t h = mEngine->GetRenderer().GetScreenMode().ScreenHeight;
+            uint16_t w = mEngine->GetRenderer().GetScreenMode().ScreenWidth;
+            shaderData.mPerspMatrix = CreatePerspectiveMatrix(45.0f, w/(float) h, 0.5f, 5.0f);
+            //shaderProgram.SetUniformBuffer(uni,"Uni");
+            UniformBuffer uniBuffer("Uni");
+            uniBuffer.SetData(shaderData);
 
             if (shaderProgram.IsLinked())
                 shaderProgram.UseProgram(true);
