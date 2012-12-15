@@ -1,9 +1,12 @@
 #pragma once
 
 #include "include/Core/EngineDefs.h"
+#include "include/Core/Containers/vector.h"
 
 #include "GL/glew.h"
+
 #include <string>
+#include <algorithm>
 
 namespace JonsEngine
 {
@@ -11,6 +14,8 @@ namespace JonsEngine
     class UniformBuffer
     {
     public:
+        friend class ShaderProgram;
+
         UniformBuffer(const std::string& name);
         ~UniformBuffer();
 
@@ -20,7 +25,9 @@ namespace JonsEngine
 
     private:
         const std::string mName;
+        GLuint mBindingIndex;
         GLuint mBuffer;
+        size_t mBufferSize;
     };
 
 
@@ -28,11 +35,15 @@ namespace JonsEngine
     template<typename T>
     inline void UniformBuffer::SetData(const T& data)
     {
-        uint8_t buffer[sizeof(T)];
+        vector<float> buffer;
         data.CopyUniformData(buffer);
 
+        mBufferSize = buffer.size() * sizeof(float);
+
         glBindBuffer(GL_UNIFORM_BUFFER, mBuffer);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(T), buffer, GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, mBufferSize, buffer.begin(), GL_STATIC_DRAW);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+        glBindBufferRange(GL_UNIFORM_BUFFER, mBindingIndex, mBuffer, 0, mBufferSize);
     }
 }

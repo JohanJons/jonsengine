@@ -3,6 +3,7 @@
 #include "include/Core/Engine.h"
 #include "include/Input/MouseCallback.h"
 #include "include/Input/KeyCallback.h"
+#include "include/Video/OpenGL/UniformBuffer.h"
 
 namespace JonsGame
 {
@@ -26,5 +27,7 @@ namespace JonsGame
         JonsEngine::EngineSettings mSettings;
         JonsEngine::Engine* mEngine;
         bool mRunning;
+
+        JonsEngine::UniformBuffer mUniBuffer;
     };
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "include/Core/Containers/vector.h"
+
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
@@ -15,10 +17,11 @@ namespace JonsEngine
 
     typedef glm::mat4 Mat4;
 
-    inline const float* GetTypeValue(Vec2 vec)         { return glm::value_ptr(vec); }
-    inline const float* GetTypeValue(Vec3 vec)         { return glm::value_ptr(vec); }
-    inline const float* GetTypeValue(Vec4 vec)         { return glm::value_ptr(vec); }
-    inline const float* GetTypeValue(Mat4 mat)         { return glm::value_ptr(mat); }
+    const vector<float> _GetTypeValues(const float* valuePtr, size_t numValues);
+    inline const vector<float> GetTypeValues(const Vec2& vec)        { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float)); }        
+    inline const vector<float> GetTypeValues(const Vec3& vec)        { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float)); }
+    inline const vector<float> GetTypeValues(const Vec4& vec)        { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float)); }
+    inline const vector<float> GetTypeValues(const Mat4& mat)        { return _GetTypeValues(glm::value_ptr(mat), sizeof(mat)/sizeof(float)); }
 
     struct Line
     {
@@ -33,4 +36,12 @@ namespace JonsEngine
         Vec3 vecC;
     };
 
+    inline const vector<float> _GetTypeValues(const float* valuePtr, size_t numValues)
+    {
+        vector<float> ret; 
+        for(size_t i = 0; i < numValues; i++)
+            ret.push_back(*(valuePtr + i));
+
+        return ret;
+    }
 }

@@ -4,7 +4,7 @@
 #include "include/Core/Threading/Thread.h"
 #include "include/Core/Threading/Mutex.h"
 #include "include/Core/Threading/ConditionVariable.h"
-#include "include/Core/Containers/Vector.h"
+#include "include/Core/Containers/vector.h"
 
 namespace JonsEngine
 {
@@ -51,8 +51,8 @@ namespace JonsEngine
         ConditionVariable mCondVar_WorkDoneOrWorkerKilled;
         ConditionVariable mCondVar_NewTaskOrKillWorker;
 
-        Vector<Task> mScheduledTasks;
-        Vector<Thread*> mWorkerThreads;
+        vector<Task> mScheduledTasks;
+        vector<Thread*> mWorkerThreads;
         uint32_t mNumThreads;
         uint32_t mDesiredNumThreads;
     };

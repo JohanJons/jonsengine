@@ -1,7 +1,7 @@
 #pragma once
 
 #include "include/Video/RenderBackend.h"
-#include "include/Core/Containers/Vector.h"
+#include "include/Core/Containers/vector.h"
 
 #include "GL/glew.h"
 #include <string>
@@ -58,7 +58,7 @@ namespace JonsEngine
         GLuint mVBO_VertexShader;
         GLuint mIndexBuffer;
         GLuint mVAO;
-        Vector<Vec3> mVertices;
+        vector<Vec3> mVertices;
     };
 
 

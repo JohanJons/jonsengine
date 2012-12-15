@@ -2,7 +2,7 @@
 
 #include "include/Input/KeyCallback.h"
 #include "include/Input/MouseCallback.h"
-#include "include/Core/Containers/Vector.h"
+#include "include/Core/Containers/vector.h"
 #include "include/Core/EngineSettings.h"
 
 
@@ -52,13 +52,13 @@ namespace JonsEngine
         IMemoryAllocator& mMemoryAllocator;
         InputBackend* mInputBackend;
 
-        Vector<MouseButtonCallback> mMouseButtonCallbacks;
-        Vector<MouseMotionCallback> mMouseMotionCallbacks;
-        Vector<KeyCallback>         mKeyCallbacks;
+        vector<MouseButtonCallback> mMouseButtonCallbacks;
+        vector<MouseMotionCallback> mMouseMotionCallbacks;
+        vector<KeyCallback>         mKeyCallbacks;
 
-        Vector<MouseButtonEvent>    mMouseButtonEvents;
-        Vector<MouseMotionEvent>    mMouseMotionEvents;
-        Vector<KeyEvent>            mKeyEvents;
+        vector<MouseButtonEvent>    mMouseButtonEvents;
+        vector<MouseMotionEvent>    mMouseMotionEvents;
+        vector<KeyEvent>            mKeyEvents;
     };
 
 

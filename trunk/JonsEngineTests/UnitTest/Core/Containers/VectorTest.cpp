@@ -9,7 +9,7 @@ namespace JonsEngine
 	TEST_F(VectorTest, copyConstructor)
 	{
 		mVector1.insert(mVector1.begin(),10,1);
-		Vector<int> vecCopy(mVector1);
+		vector<int> vecCopy(mVector1);
 
 		ASSERT_EQ(mVector1.size(), vecCopy.size());
 		ASSERT_EQ(mVector1.capacity(), vecCopy.capacity());
@@ -28,7 +28,7 @@ namespace JonsEngine
 			ASSERT_EQ(mVector2[i], mVector1[i]);
 		ASSERT_EQ(mVector1.capacity(), mVector2.capacity());
 
-		mVector1 = Vector<int>(HeapAllocator::GetDefaultHeapAllocator());
+		mVector1 = vector<int>(HeapAllocator::GetDefaultHeapAllocator());
 		ASSERT_EQ(0,mVector1.size());
 		ASSERT_EQ(0,mVector1.capacity());
 		for (size_t i = 0; i < mVector1.size(); i++)
@@ -53,7 +53,7 @@ namespace JonsEngine
 		mVector1.push_back(3);
 		ASSERT_EQ(3,mVector1.size());
 
-		Vector<int>::iterator iter = mVector1.begin();
+		vector<int>::iterator iter = mVector1.begin();
 		ASSERT_EQ(*iter++,1);
 		ASSERT_EQ(*iter++,2);
 		ASSERT_EQ(*iter,3);
@@ -70,7 +70,7 @@ namespace JonsEngine
 		mVector1.push_back(3);
 		ASSERT_EQ(3,mVector1.size());
 
-		Vector<int>::iterator iter = mVector1.end();
+		vector<int>::iterator iter = mVector1.end();
 		ASSERT_EQ(*--iter,3); 
 		ASSERT_EQ(*--iter,2);
 		ASSERT_EQ(*--iter,1);
@@ -264,17 +264,17 @@ namespace JonsEngine
 
 		mVector1.assign(7,1);
 		ASSERT_EQ(7,mVector1.size());
-		for (Vector<int>::iterator iter = mVector1.begin(); iter != mVector1.end(); iter++)
+		for (vector<int>::iterator iter = mVector1.begin(); iter != mVector1.end(); iter++)
 			ASSERT_EQ(1,*iter);
 
 		mVector2.assign(mVector1.begin()+1,mVector1.end());
 		ASSERT_EQ(6,mVector2.size());
-		for (Vector<int>::iterator iter = mVector2.begin(); iter != mVector2.end(); iter++)
+		for (vector<int>::iterator iter = mVector2.begin(); iter != mVector2.end(); iter++)
 			ASSERT_EQ(1,*iter);
 
 		mVector3.assign(11,1);
 		ASSERT_EQ(11,mVector3.size());
-		for (Vector<int>::iterator iter = mVector3.begin(); iter != mVector3.end(); iter++)
+		for (vector<int>::iterator iter = mVector3.begin(); iter != mVector3.end(); iter++)
 			ASSERT_EQ(1,*iter);
 
 		mVector1.reset();
@@ -334,34 +334,34 @@ namespace JonsEngine
 
 		mVector1.insert(mVector1.begin(),5,1);
 		ASSERT_EQ(5,mVector1.size());
-		for (Vector<int>::iterator i = mVector1.begin(); i != mVector1.end(); i++)
+		for (vector<int>::iterator i = mVector1.begin(); i != mVector1.end(); i++)
 			ASSERT_EQ(*i,1);
 
 		mVector1.insert(mVector1.begin(),2,2);
 		ASSERT_EQ(7,mVector1.size());
-		for (Vector<int>::iterator i = mVector1.begin(); i != mVector1.begin()+2; i++)
+		for (vector<int>::iterator i = mVector1.begin(); i != mVector1.begin()+2; i++)
 			ASSERT_EQ(*i,2);
-		for (Vector<int>::iterator i = mVector1.begin()+2; i != mVector1.end(); i++)
+		for (vector<int>::iterator i = mVector1.begin()+2; i != mVector1.end(); i++)
 			ASSERT_EQ(*i,1);
 
 		mVector1.insert(mVector1.begin()+2,2,3);
 		ASSERT_EQ(9,mVector1.size());
-		for (Vector<int>::iterator i = mVector1.begin(); i != mVector1.begin()+2; i++)
+		for (vector<int>::iterator i = mVector1.begin(); i != mVector1.begin()+2; i++)
 			ASSERT_EQ(*i,2);
-		for (Vector<int>::iterator i = mVector1.begin()+2; i != mVector1.begin()+4; i++)
+		for (vector<int>::iterator i = mVector1.begin()+2; i != mVector1.begin()+4; i++)
 			ASSERT_EQ(*i,3);
-		for (Vector<int>::iterator i = mVector1.begin()+4; i != mVector1.end(); i++)
+		for (vector<int>::iterator i = mVector1.begin()+4; i != mVector1.end(); i++)
 			ASSERT_EQ(*i,1);
 
 		mVector1.insert(mVector1.end(),5,4);
 		ASSERT_EQ(14,mVector1.size());
-		for (Vector<int>::iterator i = mVector1.begin(); i != mVector1.begin()+2; i++)
+		for (vector<int>::iterator i = mVector1.begin(); i != mVector1.begin()+2; i++)
 			ASSERT_EQ(*i,2);
-		for (Vector<int>::iterator i = mVector1.begin()+2; i != mVector1.begin()+4; i++)
+		for (vector<int>::iterator i = mVector1.begin()+2; i != mVector1.begin()+4; i++)
 			ASSERT_EQ(*i,3);
-		for (Vector<int>::iterator i = mVector1.begin()+4; i != mVector1.begin()+9; i++)
+		for (vector<int>::iterator i = mVector1.begin()+4; i != mVector1.begin()+9; i++)
 			ASSERT_EQ(*i,1);
-		for (Vector<int>::iterator i = mVector1.begin()+9; i != mVector1.end(); i++)
+		for (vector<int>::iterator i = mVector1.begin()+9; i != mVector1.end(); i++)
 			ASSERT_EQ(*i,4);
 
 		mVector1.insert(mVector1.begin()+4,130,5);
@@ -395,13 +395,13 @@ namespace JonsEngine
 		mVector1.insert(mVector1.end(),mVector1.begin(),mVector1.end());
 		ASSERT_EQ(4,mVector1.size());
 		ASSERT_EQ(4,mVector1.capacity());
-		for (Vector<int>::iterator i = mVector1.begin(); i < mVector1.end(); i++)
+		for (vector<int>::iterator i = mVector1.begin(); i < mVector1.end(); i++)
 			ASSERT_EQ(1,*i);
 
 		mVector1.insert(mVector1.begin(),mVector1.begin()+2,mVector1.end());
 		ASSERT_EQ(6,mVector1.size());
 		ASSERT_EQ(8,mVector1.capacity());
-		for (Vector<int>::iterator i = mVector1.begin(); i < mVector1.end(); i++)
+		for (vector<int>::iterator i = mVector1.begin(); i < mVector1.end(); i++)
 			ASSERT_EQ(1,*i);
 
 

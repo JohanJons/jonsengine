@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/Core/Containers/Vector.h"
+#include "include/Core/Containers/vector.h"
 
 #include "GL/glew.h"
 
@@ -10,6 +10,7 @@ namespace JonsEngine
 {
     class Logger;
     class Shader;
+    class UniformBuffer;
 
     /*
      * C++ wrapper around GLSL shaderprograms
@@ -29,10 +30,8 @@ namespace JonsEngine
         bool LinkProgram();
         void UseProgram(bool use);
 
-        template <typename T>
-        void SetUniformBuffer(const T& uniBuffer, const std::string& name);
-
         void BindAttribLocation(GLuint index, const std::string& name);
+        void UseUniform(UniformBuffer& buffer, bool use);
 
         const std::string& GetName() const;
         bool IsLinked() const;
@@ -43,23 +42,6 @@ namespace JonsEngine
         const std::string mName;
         GLuint mProgramHandle;
         GLuint mUniformBuffer;
-        Vector<Shader*> mAddedShaders;
+        vector<Shader*> mAddedShaders;
     };
-
-
-
-
-    /* ShaderProgram inlines */
-    template <typename T>
-    void ShaderProgram::SetUniformBuffer(const T& uniBuffer, const std::string& name)
-    {
-        uint8_t buffer[sizeof(T)];
-
-        glBindBuffer(GL_UNIFORM_BUFFER, mUniformBuffer);
-        glBufferData(GL_UNIFORM_BUFFER, sizeof(uniBuffer), &uniBuffer, GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-        glUniformBlockBinding(mProgramHandle, glGetUniformBlockIndex(mProgramHandle, name.c_str()), 0);
-        glBindBufferRange(GL_UNIFORM_BUFFER, 0, mUniformBuffer, 0, sizeof(uniBuffer));
-    }
 }

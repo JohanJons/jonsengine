@@ -3,7 +3,7 @@
 
 #include "gtest/gtest.h"
 
-#include "include/Core/Containers/Vector.h"
+#include "include/Core/Containers/vector.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
 #include "../../TestFixtures/RunningEngineFixture.h"
@@ -22,9 +22,9 @@ namespace JonsEngine
 
 		}
 
-		Vector<int32_t> mVector1;
-		Vector<int32_t> mVector2;
-		Vector<int32_t> mVector3;
+		vector<int32_t> mVector1;
+		vector<int32_t> mVector2;
+		vector<int32_t> mVector3;
 	};
 
 }

@@ -22,7 +22,7 @@ namespace JonsEngine
         // order and block untill all workers are dead
         TerminateAllWorkers();
 
-        for(Vector<Thread*>::iterator it = mWorkerThreads.begin(); it != mWorkerThreads.end();)
+        for(vector<Thread*>::iterator it = mWorkerThreads.begin(); it != mWorkerThreads.end();)
         {
             mMemoryAllocator.DeallocateObject<Thread>(*it);
             it = mWorkerThreads.erase(it);

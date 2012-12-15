@@ -41,7 +41,7 @@ namespace JonsEngine
 
         glEnable(GL_CULL_FACE);
 	    glCullFace(GL_BACK);
-	    glFrontFace(GL_CW);
+	    glFrontFace(GL_CCW);
 
         // openGL context should be ready now
         glGenBuffers(1, &mVBO_VertexShader);
@@ -153,8 +153,7 @@ namespace JonsEngine
     void OpenGLRenderBackend::RenderVertexArrays()
     {
         glBindVertexArray(mVAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 36);
-        glDrawElements(GL_TRIANGLES, 4, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
         glBindVertexArray(0);
     }
 
@@ -167,68 +166,47 @@ namespace JonsEngine
     {
         const float vertexPositions[] =
         {
-            -0.5f, 0.5f, 0.0f,
-            0.5f, 0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f,
+            // front vertices
+            -1.0f, -1.5f, -5.0f,
+            -1.5f, -1.5f, -5.0f,
+            -1.5f, -1.0f, -5.0f,
+            -1.0f, -1.0f, -5.0f,
+
+            // back vertices
+            -1.0f, -1.5f, -5.5f,
+            -1.5f, -1.5f, -5.5f,
+            -1.5f, -1.0f, -5.5f,
+            -1.0f, -1.0f, -5.5f
         };
+
+ 
 
         const GLshort indexData[] =
         {
-            0, 1, 2,
-            3, 0, 1 
+            // back
+            5, 4, 7,
+            5, 7, 6,
+
+            // right
+            1, 5, 6,
+            1, 6, 2,
+
+            // left
+            0, 4, 7,
+            0, 7, 3,
+
+            // top
+            5, 4, 0,
+            5, 0, 1,
+
+            // bottom
+            6, 7, 3,
+            6, 3, 2,
+
+            // front
+            1, 0, 3,
+            1, 3, 2
         };
-
-        /*const float vertexPositions[] =
-        {
-             0.25f,  0.25f, -1.25f,
-	         0.25f, -0.25f, -1.25f,
-	        -0.25f,  0.25f, -1.25f,
-
-	         0.25f, -0.25f, -1.25f,
-	        -0.25f, -0.25f, -1.25f,
-	        -0.25f,  0.25f, -1.25f,
-
-	         0.25f,  0.25f, -2.75f,
-	        -0.25f,  0.25f, -2.75f,
-	         0.25f, -0.25f, -2.75f,
-
-	         0.25f, -0.25f, -2.75f,
-	        -0.25f,  0.25f, -2.75f,
-	        -0.25f, -0.25f, -2.75f,
-
-	        -0.25f,  0.25f, -1.25f,
-	        -0.25f, -0.25f, -1.25f,
-	        -0.25f, -0.25f, -2.75f,
-
-	        -0.25f,  0.25f, -1.25f,
-	        -0.25f, -0.25f, -2.75f,
-	        -0.25f,  0.25f, -2.75f,
-
-	         0.25f,  0.25f, -1.25f,
-	         0.25f, -0.25f, -2.75f,
-	         0.25f, -0.25f, -1.25f,
-
-	         0.25f,  0.25f, -1.25f,
-	         0.25f,  0.25f, -2.75f,
-	         0.25f, -0.25f, -2.75f,
-
-	         0.25f,  0.25f, -2.75f,
-	         0.25f,  0.25f, -1.25f,
-	        -0.25f,  0.25f, -1.25f,
-
-	         0.25f,  0.25f, -2.75f,
-	        -0.25f,  0.25f, -1.25f,
-	        -0.25f,  0.25f, -2.75f,
-
-	         0.25f, -0.25f, -2.75f,
-	        -0.25f, -0.25f, -1.25f,
-	         0.25f, -0.25f, -1.25f,
-
-	         0.25f, -0.25f, -2.75f,
-	        -0.25f, -0.25f, -2.75f,
-	        -0.25f, -0.25f, -1.25f,
-        };*/
 
         // buffer data
         glBindBuffer(GL_ARRAY_BUFFER, mVBO_VertexShader);

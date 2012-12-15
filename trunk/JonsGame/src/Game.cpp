@@ -3,7 +3,6 @@
 
 #include "include/Video/OpenGL/Shader.h"
 #include "include/Video/OpenGL/ShaderProgram.h"
-#include "include/Video/OpenGL/UniformBuffer.h"
 #include "include/Core/Utils/Types.h"
 #include "include/Core/Utils/Math.h"
 #include "include/Input/InputManager.h"
@@ -19,7 +18,7 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true)
+    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mUniBuffer("Uni")
     {
     }
         
@@ -86,18 +85,18 @@ namespace JonsGame
             shaderProgram.LinkProgram();
 
             ShaderData shaderData;
-            shaderData.mColor.x = 1.0f; shaderData.mColor.y = 1.0f; shaderData.mColor.z = 1.0f; shaderData.mColor.w = 1.0f;
-            shaderData.mOffset.x = 0.5f; shaderData.mOffset.y = 0.5f;
+            shaderData.mColor.x = 1.0f; shaderData.mColor.y = 0.5f; shaderData.mColor.z = 0.5f; shaderData.mColor.w = 1.0f;
 
             uint16_t h = mEngine->GetRenderer().GetScreenMode().ScreenHeight;
             uint16_t w = mEngine->GetRenderer().GetScreenMode().ScreenWidth;
-            shaderData.mPerspMatrix = CreatePerspectiveMatrix(45.0f, w/(float) h, 0.5f, 5.0f);
-            //shaderProgram.SetUniformBuffer(uni,"Uni");
-            UniformBuffer uniBuffer("Uni");
-            uniBuffer.SetData(shaderData);
+            shaderData.mPerspMatrix = CreatePerspectiveMatrix(45.0f, w/(float) h, 0.5f, 10.0f);
+
+            mUniBuffer.SetData(shaderData);
 
             if (shaderProgram.IsLinked())
                 shaderProgram.UseProgram(true);
+
+            shaderProgram.UseUniform(mUniBuffer, true);
 
             mEngine->GetRenderer().DrawTriangle(tri.vecA, tri.vecB, tri.vecC);
         }

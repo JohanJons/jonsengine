@@ -1,6 +1,7 @@
 #include "include/Video/OpenGL/ShaderProgram.h"
 
 #include "include/Video/OpenGL/Shader.h"
+#include "include/Video/OpenGL/UniformBuffer.h"
 #include "include/Core/Logging/Logger.h"
 
 #include "boost/bind.hpp"
@@ -82,6 +83,14 @@ namespace JonsEngine
     void ShaderProgram::BindAttribLocation(GLuint index, const std::string& name)
     {
         glBindAttribLocation(mProgramHandle, index, name.c_str());
+    }
+
+    void ShaderProgram::UseUniform(UniformBuffer& buffer, bool use)
+    {
+        GLuint blockIndex = glGetUniformBlockIndex(mProgramHandle, buffer.mName.c_str());
+
+        glUniformBlockBinding(mProgramHandle, blockIndex, use ? buffer.mBindingIndex : 0);
+        glBindBufferRange(GL_UNIFORM_BUFFER, buffer.mBindingIndex, buffer.mBuffer, 0, buffer.mBufferSize);
     }
 
     const std::string& ShaderProgram::GetName() const

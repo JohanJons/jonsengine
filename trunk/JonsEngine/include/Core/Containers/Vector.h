@@ -9,9 +9,9 @@ namespace JonsEngine
      * Custom vector implementation. Small differences to std::vector, such as more control over dynamic memory allocation
      */
 
-    /* Vector definition */
+    /* vector definition */
     template <class T>
-    class Vector
+    class vector
     {
     public:
         const size_t DefaultCapacityIncrease;
@@ -20,13 +20,13 @@ namespace JonsEngine
         typedef const T* const_iterator;
         typedef const T& const_reference;
 
-        Vector();
-        Vector(IMemoryAllocator& allocator);
-        Vector(IMemoryAllocator& allocator, size_t size);
-        Vector(const Vector<T>& vec);
-        ~Vector();
+        vector();
+        vector(IMemoryAllocator& allocator);
+        vector(IMemoryAllocator& allocator, size_t size);
+        vector(const vector<T>& vec);
+        ~vector();
         IMemoryAllocator& GetAllocator() const;
-        Vector<T>& operator=(const Vector<T>& x);
+        vector<T>& operator=(const vector<T>& x);
 
         iterator begin();
         const_iterator begin() const;
@@ -77,17 +77,17 @@ namespace JonsEngine
     };
 
     template <class T>
-    inline Vector<T>::Vector() : mAllocator(HeapAllocator::GetDefaultHeapAllocator()), mCapacity(NULL), mBegin(NULL), mEnd(NULL), DefaultCapacityIncrease(2)
+    inline vector<T>::vector() : mAllocator(HeapAllocator::GetDefaultHeapAllocator()), mCapacity(NULL), mBegin(NULL), mEnd(NULL), DefaultCapacityIncrease(2)
     {
     }
 
     template <class T>
-    inline Vector<T>::Vector(IMemoryAllocator& allocator) : mAllocator(allocator), mCapacity(NULL), mBegin(NULL), mEnd(NULL), DefaultCapacityIncrease(2)
+    inline vector<T>::vector(IMemoryAllocator& allocator) : mAllocator(allocator), mCapacity(NULL), mBegin(NULL), mEnd(NULL), DefaultCapacityIncrease(2)
     {
     }
 
     template <class T>
-    inline Vector<T>::Vector(IMemoryAllocator& allocator, size_t size) : mAllocator(allocator), DefaultCapacityIncrease(2)
+    inline vector<T>::vector(IMemoryAllocator& allocator, size_t size) : mAllocator(allocator), DefaultCapacityIncrease(2)
     {
         mBegin = (T*) mAllocator.Allocate(sizeof(T)*size);
         mEnd = mBegin;
@@ -95,7 +95,7 @@ namespace JonsEngine
     }
 
     template <class T>
-    inline Vector<T>::Vector(const Vector<T>& vec) : DefaultCapacityIncrease(2), mAllocator(vec.GetAllocator())
+    inline vector<T>::vector(const vector<T>& vec) : DefaultCapacityIncrease(2), mAllocator(vec.GetAllocator())
     {
         const size_t vecSize = vec.size();
         const size_t vecCap = vec.capacity();
@@ -108,7 +108,7 @@ namespace JonsEngine
     }
 
     template <class T>
-    inline Vector<T>::~Vector()
+    inline vector<T>::~vector()
     {
         if (mBegin)
         {
@@ -119,7 +119,7 @@ namespace JonsEngine
     }
 
     template <class T>
-    inline Vector<T>& Vector<T>::operator=(const Vector<T>& x)
+    inline vector<T>& vector<T>::operator=(const vector<T>& x)
     {
         if (&x != this)
         {
@@ -135,107 +135,107 @@ namespace JonsEngine
     }
 
     template <class T>
-    inline IMemoryAllocator& Vector<T>::GetAllocator() const
+    inline IMemoryAllocator& vector<T>::GetAllocator() const
     {
         return mAllocator;
     }
 
     template <class T>
-    inline typename Vector<T>::iterator
-    Vector<T>::begin()
+    inline typename vector<T>::iterator
+    vector<T>::begin()
     {
         return mBegin;
     }
 
     template <class T>
-    inline typename Vector<T>::const_iterator
-    Vector<T>::begin() const
+    inline typename vector<T>::const_iterator
+    vector<T>::begin() const
     {
         return mBegin;
     }
     
     template <class T>
-    inline typename Vector<T>::iterator
-    Vector<T>::end()
+    inline typename vector<T>::iterator
+    vector<T>::end()
     {
         return mEnd;
     }
 
     template <class T>
-    inline typename Vector<T>::const_iterator
-    Vector<T>::end() const
+    inline typename vector<T>::const_iterator
+    vector<T>::end() const
     {
         return mEnd;
     }
 
     template <class T>
-    inline typename Vector<T>::reference Vector<T>::front()
+    inline typename vector<T>::reference vector<T>::front()
     {
         return *mBegin;
     }
 
     template <class T>
-    inline typename Vector<T>::const_reference Vector<T>::front() const
+    inline typename vector<T>::const_reference vector<T>::front() const
     {
         return *mBegin;
     }
     
     template <class T>
-    inline typename Vector<T>::reference Vector<T>::back()
+    inline typename vector<T>::reference vector<T>::back()
     {
         return *(mEnd-1);
     }
 
     template <class T>
-    inline typename Vector<T>::const_reference Vector<T>::back() const
+    inline typename vector<T>::const_reference vector<T>::back() const
     {
         return *(mEnd-1);
     }
     
     template <class T>
-    inline typename Vector<T>::reference Vector<T>::at(size_t n)
+    inline typename vector<T>::reference vector<T>::at(size_t n)
     {
         return *(mBegin+n);
     }
 
     template <class T>
-    inline typename Vector<T>::const_reference Vector<T>::at(size_t n) const
+    inline typename vector<T>::const_reference vector<T>::at(size_t n) const
     {
         return *(mBegin+n);
     }
 
     template <class T>
-    inline typename Vector<T>::reference Vector<T>::operator[](size_t n)
+    inline typename vector<T>::reference vector<T>::operator[](size_t n)
     {
         return *(mBegin+n);
     }
 
     template <class T>
-    inline typename Vector<T>::const_reference Vector<T>::operator[](size_t n) const
+    inline typename vector<T>::const_reference vector<T>::operator[](size_t n) const
     {
         return *(mBegin+n);
     }
 
     template <class T>
-    inline size_t Vector<T>::capacity() const
+    inline size_t vector<T>::capacity() const
     {
         return (size_t)(mCapacity - mBegin);
     }
 
     template <class T>
-    inline size_t Vector<T>::size() const
+    inline size_t vector<T>::size() const
     {
         return (size_t)(mEnd - mBegin);
     }
 
     template <class T>
-    inline bool Vector<T>::empty() const
+    inline bool vector<T>::empty() const
     {
         return (mBegin == mEnd);
     }
 
     template <class T>
-    inline void Vector<T>::clear()
+    inline void vector<T>::clear()
     {
         for (T* p = mBegin; p != mEnd; p++)
             p->~T();
@@ -244,7 +244,7 @@ namespace JonsEngine
     }
 
     template <class T>
-    inline void Vector<T>::reset()
+    inline void vector<T>::reset()
     {
         if (mBegin)
         {
@@ -257,7 +257,7 @@ namespace JonsEngine
     }
 
     template <class T>
-    inline void Vector<T>::assign(iterator first, iterator last)
+    inline void vector<T>::assign(iterator first, iterator last)
     {
         clear();
 
@@ -265,7 +265,7 @@ namespace JonsEngine
     }
     
     template <class T>
-    inline void Vector<T>::assign(size_t size, const T& value)
+    inline void vector<T>::assign(size_t size, const T& value)
     {
         clear();
 
@@ -273,8 +273,8 @@ namespace JonsEngine
     }
 
     template <class T>
-    inline typename Vector<T>::iterator 
-    Vector<T>::insert(iterator position, const T& value)
+    inline typename vector<T>::iterator 
+    vector<T>::insert(iterator position, const T& value)
     {
         const size_t pos = (position - mBegin);
 
@@ -307,7 +307,7 @@ namespace JonsEngine
     }
     
     template <class T>
-    inline void Vector<T>::insert(iterator position, size_t n, const T& value)
+    inline void vector<T>::insert(iterator position, size_t n, const T& value)
     {
         const size_t pos = (position - mBegin);
 
@@ -344,7 +344,7 @@ namespace JonsEngine
     }
     
     template <class T>
-    inline void Vector<T>::insert(iterator position,iterator first, iterator last)
+    inline void vector<T>::insert(iterator position,iterator first, iterator last)
     {
         const size_t insertPos = (position - mBegin);
         const size_t insertSize = (last - first);
@@ -381,8 +381,8 @@ namespace JonsEngine
     }
 
     template <class T>
-    inline typename Vector<T>::iterator 
-    Vector<T>::erase(iterator position)
+    inline typename vector<T>::iterator 
+    vector<T>::erase(iterator position)
     {
         if (position != mEnd)
         {
@@ -400,8 +400,8 @@ namespace JonsEngine
     }
 
     template <class T>
-    inline typename Vector<T>::iterator 
-    Vector<T>::erase(iterator first, iterator end)
+    inline typename vector<T>::iterator 
+    vector<T>::erase(iterator first, iterator end)
     {
         const size_t locBegin = (first - mBegin);
         const size_t locEnd = (end - mBegin);
@@ -417,7 +417,7 @@ namespace JonsEngine
     }
 
     template <class T>
-    inline void Vector<T>::resize(size_t numElements,T obj)
+    inline void vector<T>::resize(size_t numElements,T obj)
     {
         const size_t prevSize = mEnd - mBegin;
         
@@ -430,7 +430,7 @@ namespace JonsEngine
 
 
     template <class T>
-    inline void Vector<T>::push_back(const T& item)
+    inline void vector<T>::push_back(const T& item)
     {
         if (mEnd != mCapacity)
         {
@@ -458,7 +458,7 @@ namespace JonsEngine
     }
 
     template <class T>
-    inline void Vector<T>::pop_back()
+    inline void vector<T>::pop_back()
     {
         (mEnd - 1)->~T();
         mEnd--;
@@ -470,12 +470,12 @@ namespace JonsEngine
      * Private
      */
     template <class T>
-    inline size_t Vector<T>::GetNewCapacity(size_t currentCapacity)
+    inline size_t vector<T>::GetNewCapacity(size_t currentCapacity)
     {
         return (currentCapacity > 0) ? (DefaultCapacityIncrease*currentCapacity) : DefaultCapacityIncrease;
     }
     template <class T>
-    inline size_t Vector<T>::GetNewCapacity(size_t currentCapacity, size_t minimum)
+    inline size_t vector<T>::GetNewCapacity(size_t currentCapacity, size_t minimum)
     {
         return (currentCapacity >= 0 && currentCapacity*DefaultCapacityIncrease <= minimum+currentCapacity) ? (minimum+currentCapacity) : currentCapacity*DefaultCapacityIncrease;
     }

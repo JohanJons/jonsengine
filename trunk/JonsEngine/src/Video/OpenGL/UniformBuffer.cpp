@@ -2,7 +2,9 @@
 
 namespace JonsEngine
 {
-    UniformBuffer::UniformBuffer(const std::string& name) : mName(name)
+    static GLuint gNextBindingIndex = 0;
+
+    UniformBuffer::UniformBuffer(const std::string& name) : mName(name), mBindingIndex(++gNextBindingIndex), mBufferSize(0)
     {
         glGenBuffers(1, &mBuffer);
     }
