@@ -37,6 +37,11 @@ namespace JonsEngine
         bool IsCallbackRegistered(const T& callback) const;
                                                         
         void ClearAllCallbacks();
+
+        /*
+         * Dispatches queued input events to all registered callbacks.
+         * Is called by the Engine once per frame.
+         */
         void Poll();
 
 

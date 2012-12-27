@@ -90,6 +90,9 @@
     <ClInclude Include="UnitTest\Core\Threading\MutexTest.h" />
     <ClInclude Include="UnitTest\Core\Threading\ThreadPoolTest.h" />
     <ClInclude Include="UnitTest\Core\Threading\ThreadTest.h" />
+    <ClInclude Include="UnitTest\Scene\SceneManagerTest.h" />
+    <ClInclude Include="UnitTest\Scene\SceneNodeTest.h" />
+    <ClInclude Include="UnitTest\Scene\SceneTest.h" />
     <ClInclude Include="UnitTest\TestFixtures\RunningEngineFixture.h" />
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +102,10 @@
     <ClCompile Include="UnitTest\Core\Threading\MutexTest.cpp" />
     <ClCompile Include="UnitTest\Core\Threading\ThreadPoolTest.cpp" />
     <ClCompile Include="UnitTest\Core\Threading\ThreadTest.cpp" />
+    <ClCompile Include="UnitTest\Scene\SceneManagerTest.cpp" />
+    <ClCompile Include="UnitTest\Scene\SceneNodeTest.cpp" />
+    <ClCompile Include="UnitTest\Scene\SceneTest.cpp" />
+    <ClCompile Include="UnitTest\TestFixtures\RunningEngineFixture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\JonsEngine\JonsEngine.vcxproj">

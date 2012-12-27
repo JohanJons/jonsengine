@@ -21,10 +21,9 @@ namespace JonsEngine
 		 }
 
 	 protected:
-         EngineSettings mSettings;
-		 Engine* mEngine;
+         static EngineSettings mSettings;
+		 static Engine* mEngine;
 	 };
-
 }
 
 #endif

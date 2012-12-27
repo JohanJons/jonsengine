@@ -14,7 +14,6 @@ namespace JonsEngine
     typedef glm::vec2 Vec2;
     typedef glm::vec3 Vec3;
     typedef glm::vec4 Vec4;
-
     typedef glm::mat4 Mat4;
 
     const vector<float> _GetTypeValues(const float* valuePtr, size_t numValues);

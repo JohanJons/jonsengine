@@ -2,7 +2,7 @@
 
 #include "include/Video/RenderBackend.h"
 #include "include/Video/DummyRenderBackend.h"
-#include "include/Video/OpenGL/OpenGLRenderBackend.h"
+#include "include/Video/OpenGL3/OpenGLRenderBackend.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Memory/HeapAllocator.h"
 

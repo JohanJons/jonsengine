@@ -63,17 +63,23 @@
     <Filter Include="Source Files\Input">
       <UniqueIdentifier>{ae728930-1c33-4a76-b666-cfe6f16f8dac}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Video\OpenGL">
-      <UniqueIdentifier>{911dcb5c-05b8-4bfa-8f92-ae99563ab968}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Video\OpenGL">
-      <UniqueIdentifier>{b020985c-9da4-4ad3-979d-4cd16d0ceffd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Input\GLFW">
       <UniqueIdentifier>{1f6a127d-50a7-452e-b6c8-1497121840c4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Input\GLFW">
       <UniqueIdentifier>{813e16ef-5181-46af-9ce8-7afbc4401824}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Video\OpenGL3">
+      <UniqueIdentifier>{911dcb5c-05b8-4bfa-8f92-ae99563ab968}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Video\OpenGL3">
+      <UniqueIdentifier>{90cc873a-fe54-43f4-a22f-d5642bbcb654}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene">
+      <UniqueIdentifier>{fce2f44c-457e-40fe-bda8-094020b98983}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene">
+      <UniqueIdentifier>{e2cf9f2e-e660-493f-a134-7b8719c92e95}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -116,26 +122,38 @@
     <ClCompile Include="src\Input\InputManager.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
-    <ClCompile Include="src\Video\OpenGL\Shader.cpp">
-      <Filter>Source Files\Video\OpenGL</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Video\OpenGL\ShaderProgram.cpp">
-      <Filter>Source Files\Video\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="src\Input\GLFW\GLFWInputBackend.cpp">
       <Filter>Source Files\Input\GLFW</Filter>
     </ClCompile>
     <ClCompile Include="src\Video\Renderer.cpp">
       <Filter>Source Files\Video</Filter>
     </ClCompile>
-    <ClCompile Include="src\Video\OpenGL\OpenGLRenderBackend.cpp">
-      <Filter>Source Files\Video\OpenGL</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Utils\Math.cpp">
       <Filter>Source Files\Core\Utils</Filter>
     </ClCompile>
-    <ClCompile Include="src\Video\OpenGL\UniformBuffer.cpp">
-      <Filter>Source Files\Video\OpenGL</Filter>
+    <ClCompile Include="src\Video\OpenGL3\OpenGLRenderBackend.cpp">
+      <Filter>Source Files\Video\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Video\OpenGL3\Shader.cpp">
+      <Filter>Source Files\Video\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Video\OpenGL3\ShaderProgram.cpp">
+      <Filter>Source Files\Video\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Video\OpenGL3\UniformBuffer.cpp">
+      <Filter>Source Files\Video\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Camera.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Scene.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\SceneManager.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\SceneNode.cpp">
+      <Filter>Source Files\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -196,12 +214,6 @@
     <ClInclude Include="include\Input\InputManager.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="include\Video\OpenGL\Shader.h">
-      <Filter>Header Files\Video\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Video\OpenGL\ShaderProgram.h">
-      <Filter>Header Files\Video\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="include\Input\GLFW\GLFWInputBackend.h">
       <Filter>Header Files\Input\GLFW</Filter>
     </ClInclude>
@@ -220,9 +232,6 @@
     <ClInclude Include="include\Video\RenderBackend.h">
       <Filter>Header Files\Video</Filter>
     </ClInclude>
-    <ClInclude Include="include\Video\OpenGL\OpenGLRenderBackend.h">
-      <Filter>Header Files\Video\OpenGL</Filter>
-    </ClInclude>
     <ClInclude Include="include\Video\DummyRenderBackend.h">
       <Filter>Header Files\Video</Filter>
     </ClInclude>
@@ -232,8 +241,35 @@
     <ClInclude Include="include\Core\Utils\Math.h">
       <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="include\Video\OpenGL\UniformBuffer.h">
-      <Filter>Header Files\Video\OpenGL</Filter>
+    <ClInclude Include="include\Video\OpenGL3\OpenGLRenderBackend.h">
+      <Filter>Header Files\Video\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\OpenGL3\Shader.h">
+      <Filter>Header Files\Video\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\OpenGL3\ShaderProgram.h">
+      <Filter>Header Files\Video\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\OpenGL3\UniformBuffer.h">
+      <Filter>Header Files\Video\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\Camera.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\Scene.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\SceneManager.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\SceneNode.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\IMesh.h">
+      <Filter>Header Files\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Video\OpenGL3\OpenGLMesh.h">
+      <Filter>Header Files\Video\OpenGL3</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

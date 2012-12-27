@@ -1,4 +1,4 @@
-#include "include/Video/OpenGL/OpenGLRenderBackend.h"
+#include "include/Video/OpenGL3/OpenGLRenderBackend.h"
 
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Logging/Logger.h"
@@ -10,13 +10,15 @@
 
 namespace JonsEngine
 {
+    static OpenGLRenderBackend* gOpenGLRenderBackendInstance = NULL;
+
     OpenGLRenderBackend::OpenGLRenderBackend(const EngineSettings& engineSettings) : mLogger(Logger::GetVideoLogger()), mWindowTitle("JonsEngine Game"), mStartFrameTime(0), mLastFrameTime(0), mThisFrameTime(0)
     {
         GLenum glfwErr = glfwInit();
         if (glfwErr != GL_TRUE)
         {
             JONS_LOG_ERROR(mLogger, "OpenGLRenderBackend::OpenGLRenderBackend(): Unable to initialize GLFW!");
-            throw std::exception("OpenGLRenderBackend::OpenGLRenderBackend(): Unable to initialize GLFW!");
+            throw std::runtime_error("OpenGLRenderBackend::OpenGLRenderBackend(): Unable to initialize GLFW!");
         }
 
         // setup a forward-compatible context with openGL 3.3
@@ -36,17 +38,30 @@ namespace JonsEngine
         if (!GLEW_VERSION_3_3)
         {
             JONS_LOG_ERROR(mLogger, "OpenGLRenderBackend::OpenGLRenderBackend(): Minimum OpenGL driver (OpenGL 3.3) not supported!");
-            throw std::exception("OpenGLRenderBackend::OpenGLRenderBackend(): Minimum OpenGL driver (OpenGL 3.3) not supported!");
+            throw std::runtime_error("OpenGLRenderBackend::OpenGLRenderBackend(): Minimum OpenGL driver (OpenGL 3.3) not supported!");
         }
 
+        // face culling
         glEnable(GL_CULL_FACE);
 	    glCullFace(GL_BACK);
 	    glFrontFace(GL_CCW);
+
+        // z depth testing
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask(GL_TRUE);
+        glDepthFunc(GL_LEQUAL);
+        glDepthRange(0.0f, 1.0f);
 
         // openGL context should be ready now
         glGenBuffers(1, &mVBO_VertexShader);
         glGenBuffers(1, &mIndexBuffer);
         glGenVertexArrays(1, &mVAO);
+        glGenBuffers(1, &mVBO_VertexShader2);
+        glGenBuffers(1, &mIndexBuffer2);
+        glGenVertexArrays(1, &mVAO2);
+
+        gOpenGLRenderBackendInstance = this;
+        glfwSetWindowSizeCallback(glfwOnWindowChanged);
     }
         
     OpenGLRenderBackend::~OpenGLRenderBackend()
@@ -54,6 +69,8 @@ namespace JonsEngine
         CloseWindow();
 
         glfwTerminate();
+
+        gOpenGLRenderBackendInstance = NULL;
     }
 
     void OpenGLRenderBackend::StartFrame()
@@ -63,8 +80,9 @@ namespace JonsEngine
         if (mScreenMode.FrameLimitEnabled)
             mStartFrameTime = glfwGetTime();
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearDepth(1.0f);
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
         
     void OpenGLRenderBackend::EndFrame()
@@ -152,6 +170,10 @@ namespace JonsEngine
 
     void OpenGLRenderBackend::RenderVertexArrays()
     {
+        glBindVertexArray(mVAO2);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
+        glBindVertexArray(0);
+
         glBindVertexArray(mVAO);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
         glBindVertexArray(0);
@@ -159,7 +181,68 @@ namespace JonsEngine
 
     void OpenGLRenderBackend::DrawLine(const Vec3& pointA, const Vec3& pointB)
     {
+        const float vertexPositions2[] =
+        {
+            // front vertices
+            -1.0f, -1.5f, -4.0f,
+            -1.5f, -1.5f, -4.0f,
+            -1.5f, -1.0f, -4.0f,
+            -1.0f, -1.0f, -4.0f,
 
+            // back vertices
+            -1.0f, -1.5f, -4.5f,
+            -1.5f, -1.5f, -4.5f,
+            -1.5f, -1.0f, -4.5f,
+            -1.0f, -1.0f, -4.5f,
+        };
+
+        const GLshort indexData[] =
+        {
+            // back
+            5, 4, 7,
+            5, 7, 6,
+
+            // right
+            1, 5, 6,
+            1, 6, 2,
+
+            // left
+            0, 4, 7,
+            0, 7, 3,
+
+            // top
+            5, 4, 0,
+            5, 0, 1,
+
+            // bottom
+            6, 7, 3,
+            6, 3, 2,
+
+            // front
+            1, 0, 3,
+            1, 3, 2
+        };
+
+         // buffer data 2
+        glBindBuffer(GL_ARRAY_BUFFER, mVBO_VertexShader2);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions2), vertexPositions2, GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBuffer2);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexData), indexData, GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        
+        // setup VAO 2
+        glBindVertexArray(mVAO2);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mVBO_VertexShader2);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBuffer2);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
     }
         
     void OpenGLRenderBackend::DrawTriangle(const Vec3& pointA, const Vec3& pointB, const Vec3& pointC)
@@ -178,7 +261,6 @@ namespace JonsEngine
             -1.5f, -1.0f, -5.5f,
             -1.0f, -1.0f, -5.5f
         };
-
  
 
         const GLshort indexData[] =
@@ -208,7 +290,7 @@ namespace JonsEngine
             1, 3, 2
         };
 
-        // buffer data
+        // buffer data 1
         glBindBuffer(GL_ARRAY_BUFFER, mVBO_VertexShader);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -217,8 +299,7 @@ namespace JonsEngine
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexData), indexData, GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-
-        // setup VAO
+        // setup VAO 1
         glBindVertexArray(mVAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, mVBO_VertexShader);
@@ -240,6 +321,17 @@ namespace JonsEngine
         if (IsWindowOpened())
         {
             glViewport(0, 0, (GLsizei) mScreenMode.ScreenWidth, (GLsizei)mScreenMode.ScreenHeight);
+        }
+    }
+
+    void OpenGLRenderBackend::glfwOnWindowChanged(int width, int height)
+    {
+        if (gOpenGLRenderBackendInstance)
+        {
+            gOpenGLRenderBackendInstance->mScreenMode.ScreenWidth = width;
+            gOpenGLRenderBackendInstance->mScreenMode.ScreenHeight = height;
+
+            gOpenGLRenderBackendInstance->UpdateViewport();
         }
     }
 }

@@ -44,6 +44,7 @@ namespace JonsEngine
 
     private:
         void UpdateViewport();
+        static void glfwOnWindowChanged(int width, int height);
 
         Logger& mLogger;
         std::string mWindowTitle;
@@ -58,6 +59,9 @@ namespace JonsEngine
         GLuint mVBO_VertexShader;
         GLuint mIndexBuffer;
         GLuint mVAO;
+        GLuint mVBO_VertexShader2;
+        GLuint mIndexBuffer2;
+        GLuint mVAO2;
         vector<Vec3> mVertices;
     };
 

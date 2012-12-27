@@ -19,12 +19,17 @@
 
 using namespace JonsEngine;
 
+
+/*
+ * To perform simple test and verification of the modules of JonsEngine 
+ */
+
+
 int32_t _tmain(int32_t argc, _TCHAR* argv[])
 {
 	std::cout << "Press key to begin" << std::endl;
 	getchar();
 
-	// basic unit testing
 	if (JONSENGINE_RUN_UNIT_TEST)
 	{
 		::testing::AddGlobalTestEnvironment(new RunningEngineFixture());

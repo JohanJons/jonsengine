@@ -1,8 +1,8 @@
 #include "include/Game.h"
 #include "include/Shaders.h"
 
-#include "include/Video/OpenGL/Shader.h"
-#include "include/Video/OpenGL/ShaderProgram.h"
+#include "include/Video/OpenGL3/Shader.h"
+#include "include/Video/OpenGL3/ShaderProgram.h"
 #include "include/Core/Utils/Types.h"
 #include "include/Core/Utils/Math.h"
 #include "include/Input/InputManager.h"
@@ -99,6 +99,7 @@ namespace JonsGame
             shaderProgram.UseUniform(mUniBuffer, true);
 
             mEngine->GetRenderer().DrawTriangle(tri.vecA, tri.vecB, tri.vecC);
+            mEngine->GetRenderer().DrawLine(tri.vecA, tri.vecB);
         }
     }
 }

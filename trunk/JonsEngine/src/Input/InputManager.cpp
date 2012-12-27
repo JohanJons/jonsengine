@@ -59,21 +59,21 @@ namespace JonsEngine
     void InputManager::Poll()
     {
         // Dispatch waiting events for each event type to registered callbacks
-        BOOST_FOREACH(MouseButtonEvent ev, mMouseButtonEvents)
+        BOOST_FOREACH(MouseButtonEvent& ev, mMouseButtonEvents)
         {
-            BOOST_FOREACH(MouseButtonCallback callback, mMouseButtonCallbacks)
+            BOOST_FOREACH(MouseButtonCallback& callback, mMouseButtonCallbacks)
                 callback(ev);
         }
 
-        BOOST_FOREACH(MouseMotionEvent ev, mMouseMotionEvents)
+        BOOST_FOREACH(MouseMotionEvent& ev, mMouseMotionEvents)
         {
-            BOOST_FOREACH(MouseMotionCallback callback, mMouseMotionCallbacks)
+            BOOST_FOREACH(MouseMotionCallback& callback, mMouseMotionCallbacks)
                 callback(ev);
         }
 
-        BOOST_FOREACH(KeyEvent ev, mKeyEvents)
+        BOOST_FOREACH(KeyEvent& ev, mKeyEvents)
         {
-            BOOST_FOREACH(KeyCallback callback, mKeyCallbacks)
+            BOOST_FOREACH(KeyCallback& callback, mKeyCallbacks)
                 callback(ev);
         }
 

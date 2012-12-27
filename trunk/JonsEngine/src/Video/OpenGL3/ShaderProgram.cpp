@@ -1,7 +1,7 @@
-#include "include/Video/OpenGL/ShaderProgram.h"
+#include "include/Video/OpenGL3/ShaderProgram.h"
 
-#include "include/Video/OpenGL/Shader.h"
-#include "include/Video/OpenGL/UniformBuffer.h"
+#include "include/Video/OpenGL3/Shader.h"
+#include "include/Video/OpenGL3/UniformBuffer.h"
 #include "include/Core/Logging/Logger.h"
 
 #include "boost/bind.hpp"

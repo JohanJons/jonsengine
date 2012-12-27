@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/EngineSettings.h"
+#include "include/Scene/SceneManager.h"
 #include "include/Video/Renderer.h"
 #include "include/Input/InputManager.h"
 
@@ -23,6 +24,7 @@ namespace JonsEngine
 
         void Tick();
 
+        SceneManager& GetSceneManager();
         Renderer& GetRenderer();
         InputManager& GetInputManager();
 
@@ -32,12 +34,14 @@ namespace JonsEngine
         IMemoryAllocator& mMemoryAllocator;
 
         /* Modules */
+        SceneManager mSceneManager;
         Renderer mRenderer;
         InputManager mInputManager;
     };
 
 
     /* Engine inlines */
+    inline SceneManager& Engine::GetSceneManager()                      { return mSceneManager;     }
     inline Renderer& Engine::GetRenderer()                              { return mRenderer;         }
     inline InputManager& Engine::GetInputManager()                      { return mInputManager;     }
 

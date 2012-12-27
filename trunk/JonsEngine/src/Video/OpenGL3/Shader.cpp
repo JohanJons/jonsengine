@@ -1,4 +1,4 @@
-#include "include/Video/OpenGL/Shader.h"
+#include "include/Video/OpenGL3/Shader.h"
 
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/EngineDefs.h"

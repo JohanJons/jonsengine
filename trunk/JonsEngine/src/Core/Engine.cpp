@@ -2,9 +2,7 @@
 
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Memory/HeapAllocator.h"
-
-#include "include/Video/Renderer.h"
-#include "include/Input/InputManager.h"
+#include "include/Scene/Scene.h"
 
 
 namespace JonsEngine
@@ -25,6 +23,8 @@ namespace JonsEngine
         mRenderer.StartFrame();
 
         mInputManager.Poll();
+
+        //mSceneManager.GetActiveScene().Render(mRenderer);
 
         mRenderer.RenderVertexArrays();
 
