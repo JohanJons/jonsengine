@@ -3,7 +3,8 @@
 #include <string>
 
 #include "include/Core/EngineDefs.h"
-#include "include/Video/RenderBackend.h"
+#include "include/Window/IWindow.h"
+#include "include/Renderer/IRenderer.h"
 #include "include/Input/InputBackend.h"
 
 namespace JonsEngine
@@ -16,8 +17,11 @@ namespace JonsEngine
     /* EngineSettings definition */
     struct EngineSettings
     {
+        // Window
+        IWindow::WindowBackendType WindowBackend;
+
         // Video
-        RenderBackend::RenderBackendType RenderBackend;
+        IRenderer::RenderBackendType RenderBackend;
         ScreenMode ScreenMode;
         std::string WindowTitle;
 
@@ -31,7 +35,7 @@ namespace JonsEngine
 
 
     /* EngineSettings inlines */
-    inline EngineSettings::EngineSettings() : WindowTitle("JonsEngine Game"), RenderBackend(RenderBackend::OPENGL), InputBackend(InputBackend::GLFW)
+    inline EngineSettings::EngineSettings() : WindowBackend(IWindow::GLFW), WindowTitle("JonsEngine Game"), RenderBackend(IRenderer::OPENGL), InputBackend(InputBackend::GLFW)
     {
     }
 }

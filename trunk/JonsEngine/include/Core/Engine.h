@@ -2,12 +2,14 @@
 
 #include "include/Core/EngineSettings.h"
 #include "include/Scene/SceneManager.h"
-#include "include/Video/Renderer.h"
 #include "include/Input/InputManager.h"
 
 namespace JonsEngine
 {
+    class IWindow;
+    class IRenderer;
     class IMemoryAllocator;
+    class SceneNode;
     class Logger;
 
     /*
@@ -24,25 +26,31 @@ namespace JonsEngine
 
         void Tick();
 
+        IWindow& GetWindow();
         SceneManager& GetSceneManager();
-        Renderer& GetRenderer();
+        IRenderer& GetRenderer();
         InputManager& GetInputManager();
 
 
     private:
+        IWindow* bootCreateWindow(const EngineSettings& settings);
+        IRenderer* bootCreateRenderer(const EngineSettings& engineSettings);
+        void RenderSceneNode(SceneNode* node);
+
         Logger& mLog;
         IMemoryAllocator& mMemoryAllocator;
 
         /* Modules */
+        IWindow* mWindow;
         SceneManager mSceneManager;
-        Renderer mRenderer;
+        IRenderer* mRenderer;
         InputManager mInputManager;
     };
 
 
     /* Engine inlines */
+    inline IWindow& Engine::GetWindow()                                 { return *mWindow;          }
     inline SceneManager& Engine::GetSceneManager()                      { return mSceneManager;     }
-    inline Renderer& Engine::GetRenderer()                              { return mRenderer;         }
+    inline IRenderer& Engine::GetRenderer()                             { return *mRenderer;        }
     inline InputManager& Engine::GetInputManager()                      { return mInputManager;     }
-
 }

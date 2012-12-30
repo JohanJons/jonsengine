@@ -68,9 +68,9 @@ namespace JonsEngine
     }
 
         
-    Scene* SceneManager::GetActiveScene() const                 { return mActiveScene;  }  
-    const vector<Scene*>& SceneManager::GetAllScenes() const    { return mScenes;       }
-      
+    Scene* SceneManager::GetActiveScene() const                 { return mActiveScene;          }  
+    const vector<Scene*>& SceneManager::GetAllScenes() const    { return mScenes;               }
+    bool SceneManager::HasActiveScene() const                   { return mActiveScene != NULL;  }
 
     void SceneManager::SetActiveScene(const std::string& sceneName)
     {

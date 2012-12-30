@@ -1,11 +1,13 @@
 #include "include/Game.h"
 #include "include/Shaders.h"
 
-#include "include/Video/OpenGL3/Shader.h"
-#include "include/Video/OpenGL3/ShaderProgram.h"
+#include "include/Renderer/OpenGL3/Shader.h"
+#include "include/Renderer/OpenGL3/ShaderProgram.h"
 #include "include/Core/Utils/Types.h"
 #include "include/Core/Utils/Math.h"
 #include "include/Input/InputManager.h"
+#include "include/Scene/Mesh.h"
+#include "include/Scene/Scene.h"
 
 #include "boost/bind.hpp"
 #include <Windows.h>
@@ -32,6 +34,7 @@ namespace JonsGame
     {
         SetupInputCallbacks();
         TestRendering();
+        SetupScene();
 
         while (mRunning)
         {
@@ -63,11 +66,6 @@ namespace JonsGame
         
     void Game::TestRendering()
     {
-        Triangle tri;
-        tri.vecA.x = -0.5; tri.vecA.y = -0.5; tri.vecA.z = 0.0;
-        tri.vecB.x = 0.0; tri.vecB.y = 0.5; tri.vecB.z = 0.0;
-        tri.vecC.x = 0.5; tri.vecC.y = -0.5; tri.vecC.z = 0.0;
-
         Shader vertexShader("VertexShader", Shader::VERTEX_SHADER);
         Shader fragmentShader("FragmentShader", Shader::FRAGMENT_SHADER);
 
@@ -87,8 +85,9 @@ namespace JonsGame
             ShaderData shaderData;
             shaderData.mColor.x = 1.0f; shaderData.mColor.y = 0.5f; shaderData.mColor.z = 0.5f; shaderData.mColor.w = 1.0f;
 
-            uint16_t h = mEngine->GetRenderer().GetScreenMode().ScreenHeight;
-            uint16_t w = mEngine->GetRenderer().GetScreenMode().ScreenWidth;
+
+            uint16_t h = mEngine->GetWindow().GetScreenMode().ScreenHeight;
+            uint16_t w = mEngine->GetWindow().GetScreenMode().ScreenWidth;
             shaderData.mPerspMatrix = CreatePerspectiveMatrix(45.0f, w/(float) h, 0.5f, 10.0f);
 
             mUniBuffer.SetData(shaderData);
@@ -97,9 +96,59 @@ namespace JonsGame
                 shaderProgram.UseProgram(true);
 
             shaderProgram.UseUniform(mUniBuffer, true);
-
-            mEngine->GetRenderer().DrawTriangle(tri.vecA, tri.vecB, tri.vecC);
-            mEngine->GetRenderer().DrawLine(tri.vecA, tri.vecB);
         }
+    }
+
+    void Game::SetupScene()
+    {
+        const float vertexPositions1[] =
+        {
+            // front vertices
+            -1.0f, -1.5f, -5.0f,
+            -1.5f, -1.5f, -5.0f,
+            -1.5f, -1.0f, -5.0f,
+            -1.0f, -1.0f, -5.0f,
+
+            // back vertices
+            -1.0f, -1.5f, -5.5f,
+            -1.5f, -1.5f, -5.5f,
+            -1.5f, -1.0f, -5.5f,
+            -1.0f, -1.0f, -5.5f
+        };
+ 
+
+        const uint16_t indexData1[] =
+        {
+            // back
+            5, 4, 7,
+            5, 7, 6,
+
+            // right
+            1, 5, 6,
+            1, 6, 2,
+
+            // left
+            0, 4, 7,
+            0, 7, 3,
+
+            // top
+            5, 4, 0,
+            5, 0, 1,
+
+            // bottom
+            6, 7, 3,
+            6, 3, 2,
+
+            // front
+            1, 0, 3,
+            1, 3, 2
+        };
+
+
+        Scene* myScene = mEngine->GetSceneManager().CreateScene("MyScene");
+        mEngine->GetSceneManager().SetActiveScene("MyScene");
+
+        SceneNode* cube1 = myScene->GetRootNode().CreateChildNode("Cube1");
+        cube1->SetMesh(Mesh::CreateMesh("Cube1Mesh", mEngine->GetRenderer().CreateVertexBuffer(vertexPositions1, sizeof(vertexPositions1)/sizeof(float), indexData1, sizeof(indexData1)/sizeof(uint16_t))));
     }
 }

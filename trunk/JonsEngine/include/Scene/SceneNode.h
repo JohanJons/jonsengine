@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Scene/Mesh.h"
 #include "include/Core/Containers/Vector.h"
 #include "include/Core/Utils/Types.h"
 
@@ -8,8 +9,8 @@
 namespace JonsEngine
 {
     class IMemoryAllocator;
-    class Mesh;
 
+    /* SceneNode definition */
     class SceneNode
     {
     public:
@@ -25,12 +26,14 @@ namespace JonsEngine
         void Translate(Vec3 translateVec);
         void Rotate(Vec3 rotateVec, const float angle);
 
-         
+        void SetMesh();
+        void SetMesh(MeshPtr mesh);
+        MeshPtr GetMesh();
 
         const std::string& GetNodeName() const;
         const vector<SceneNode*>& GetChildNodes() const;
 
-        bool operator==(SceneNode& s1);
+        bool operator==(const SceneNode& s1);
         bool operator==(const std::string& nodeName);
 
 
@@ -43,6 +46,6 @@ namespace JonsEngine
         IMemoryAllocator& mMemoryAllocator;
 
         // components
-        Mesh* mNodeMesh;
+        MeshPtr mNodeMesh;
     };
 }

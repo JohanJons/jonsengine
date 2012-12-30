@@ -113,15 +113,19 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Core\Utils\Math.cpp" />
     <ClCompile Include="src\Input\GLFW\GLFWInputBackend.cpp" />
     <ClCompile Include="src\Input\InputManager.cpp" />
+    <ClCompile Include="src\Renderer\DummyRenderer.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\OpenGLRenderer.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\OpenGLVertexBuffer.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\Shader.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\ShaderProgram.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\UniformBuffer.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
+    <ClCompile Include="src\Scene\Mesh.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneManager.cpp" />
     <ClCompile Include="src\Scene\SceneNode.cpp" />
-    <ClCompile Include="src\Video\OpenGL3\OpenGLRenderBackend.cpp" />
-    <ClCompile Include="src\Video\OpenGL3\Shader.cpp" />
-    <ClCompile Include="src\Video\OpenGL3\ShaderProgram.cpp" />
-    <ClCompile Include="src\Video\OpenGL3\UniformBuffer.cpp" />
-    <ClCompile Include="src\Video\Renderer.cpp" />
+    <ClCompile Include="src\Window\DummyWindow.cpp" />
+    <ClCompile Include="src\Window\GLFW\GLFWWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
@@ -149,19 +153,22 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Input\InputManager.h" />
     <ClInclude Include="include\Input\KeyCallback.h" />
     <ClInclude Include="include\Input\MouseCallback.h" />
+    <ClInclude Include="include\Renderer\DummyRenderer.h" />
+    <ClInclude Include="include\Renderer\IRenderer.h" />
+    <ClInclude Include="include\Renderer\IVertexBuffer.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLRenderer.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLVertexBuffer.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.h" />
     <ClInclude Include="include\Scene\Camera.h" />
+    <ClInclude Include="include\Scene\Mesh.h" />
     <ClInclude Include="include\Scene\Scene.h" />
     <ClInclude Include="include\Scene\SceneManager.h" />
     <ClInclude Include="include\Scene\SceneNode.h" />
-    <ClInclude Include="include\Video\DummyRenderBackend.h" />
-    <ClInclude Include="include\Video\IMesh.h" />
-    <ClInclude Include="include\Video\OpenGL3\OpenGLMesh.h" />
-    <ClInclude Include="include\Video\OpenGL3\OpenGLRenderBackend.h" />
-    <ClInclude Include="include\Video\OpenGL3\Shader.h" />
-    <ClInclude Include="include\Video\OpenGL3\ShaderProgram.h" />
-    <ClInclude Include="include\Video\OpenGL3\UniformBuffer.h" />
-    <ClInclude Include="include\Video\RenderBackend.h" />
-    <ClInclude Include="include\Video\Renderer.h" />
+    <ClInclude Include="include\Window\DummyWindow.h" />
+    <ClInclude Include="include\Window\GLFW\GLFWWindow.h" />
+    <ClInclude Include="include\Window\IWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

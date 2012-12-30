@@ -3,7 +3,7 @@
 #include "include/Core/Engine.h"
 #include "include/Input/MouseCallback.h"
 #include "include/Input/KeyCallback.h"
-#include "include/Video/OpenGL3/UniformBuffer.h"
+#include "include/Renderer/OpenGL3/UniformBuffer.h"
 
 namespace JonsGame
 {
@@ -23,6 +23,7 @@ namespace JonsGame
     private:
         void SetupInputCallbacks();
         void TestRendering();
+        void SetupScene();
 
         JonsEngine::EngineSettings mSettings;
         JonsEngine::Engine* mEngine;

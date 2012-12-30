@@ -7,6 +7,7 @@ namespace JonsEngine
     class Scene;
     class IMemoryAllocator;
 
+    /* SceneManager definition */
     class SceneManager
     {
     public:
@@ -20,6 +21,7 @@ namespace JonsEngine
 
         Scene* GetActiveScene() const;
         const vector<Scene*>& GetAllScenes() const;
+        bool HasActiveScene() const;
         void SetActiveScene(const std::string& sceneName);
 
 

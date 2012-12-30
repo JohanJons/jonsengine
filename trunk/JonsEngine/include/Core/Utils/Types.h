@@ -22,19 +22,6 @@ namespace JonsEngine
     inline const vector<float> GetTypeValues(const Vec4& vec)        { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float)); }
     inline const vector<float> GetTypeValues(const Mat4& mat)        { return _GetTypeValues(glm::value_ptr(mat), sizeof(mat)/sizeof(float)); }
 
-    struct Line
-    {
-        Vec3 vecA;
-        Vec3 vecB;
-    };
-
-    struct Triangle
-    {
-        Vec3 vecA;
-        Vec3 vecB;
-        Vec3 vecC;
-    };
-
     inline const vector<float> _GetTypeValues(const float* valuePtr, size_t numValues)
     {
         vector<float> ret; 

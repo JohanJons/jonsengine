@@ -8,7 +8,7 @@
 
 namespace JonsEngine
 {
-    SceneNode::SceneNode(const std::string& nodeName) : mName(nodeName), mHashedID(boost::hash_value(nodeName)), mTransform(1.0f), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mNodeMesh(NULL)
+    SceneNode::SceneNode(const std::string& nodeName) : mName(nodeName), mHashedID(boost::hash_value(nodeName)), mTransform(1.0f), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator())
     {
     }
         
@@ -107,11 +107,16 @@ namespace JonsEngine
     }
 
 
+    void SceneNode::SetMesh()                                       { mNodeMesh.reset();    }
+    void SceneNode::SetMesh(MeshPtr mesh)                           { mNodeMesh = mesh;     }
+    MeshPtr SceneNode::GetMesh()                                    { return mNodeMesh;     }
+
+
     const std::string& SceneNode::GetNodeName() const               { return mName;         }
     const vector<SceneNode*>& SceneNode::GetChildNodes() const      { return mChildNodes;   }
 
 
-    bool SceneNode::operator==(SceneNode& s1)
+    bool SceneNode::operator==(const SceneNode& s1)
     {
         return mHashedID == s1.mHashedID;
     }

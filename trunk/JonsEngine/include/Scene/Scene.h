@@ -11,6 +11,7 @@ namespace JonsEngine
 {
     class Renderer;
 
+    /* Scene definition */
     class Scene
     {
     public:
