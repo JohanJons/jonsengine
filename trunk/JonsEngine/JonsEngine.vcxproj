@@ -160,6 +160,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLVertexBuffer.h" />
     <ClInclude Include="include\Renderer\OpenGL3\Shader.h" />
     <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders.h" />
     <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.h" />
     <ClInclude Include="include\Scene\Camera.h" />
     <ClInclude Include="include\Scene\Mesh.h" />

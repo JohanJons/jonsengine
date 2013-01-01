@@ -1,6 +1,9 @@
 #pragma once
 
 #include "include/Renderer/IRenderer.h"
+#include "include/Renderer/OpenGL3/Shaders.h"
+#include "include/Renderer/OpenGL3/ShaderProgram.h"
+#include "include/Renderer/OpenGL3/UniformBuffer.h"
 #include "include/Scene/Mesh.h"
 
 #include <string>
@@ -30,8 +33,12 @@ namespace JonsEngine
 
 
     private:
+        void SetupShaders();
+
         Logger& mLogger;
         IMemoryAllocator& mMemoryAllocator;
+        ShaderProgram mDefaultProgram;
+        UniformBuffer mUniBuffer;
     };
 
 

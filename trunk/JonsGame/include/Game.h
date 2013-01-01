@@ -22,13 +22,10 @@ namespace JonsGame
 
     private:
         void SetupInputCallbacks();
-        void TestRendering();
         void SetupScene();
 
         JonsEngine::EngineSettings mSettings;
         JonsEngine::Engine* mEngine;
         bool mRunning;
-
-        JonsEngine::UniformBuffer mUniBuffer;
     };
 }

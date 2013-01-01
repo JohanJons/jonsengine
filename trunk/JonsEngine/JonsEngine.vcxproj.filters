@@ -304,5 +304,8 @@
     <ClInclude Include="include\Window\GLFW\GLFWWindow.h">
       <Filter>Header Files\Window\GLFW</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

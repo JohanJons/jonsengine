@@ -3,13 +3,11 @@
 #include "include/Core/Utils/Types.h"
 #include "include/Core/Containers/Vector.h"
 
-using namespace JonsEngine;
-
-namespace JonsGame
+namespace JonsEngine
 {
     const std::string gVertexShader =	"#version 330								\n	\
                                                                                     \n  \
-                                        layout(std140) uniform Uni                  \n  \
+                                        layout(std140) uniform DefaultUniform       \n  \
                                         {                                           \n  \
                                             vec4 mColor;                            \n  \
                                             mat4 mPerspMatrix;                      \n  \
@@ -48,4 +46,6 @@ namespace JonsGame
             buffer.insert(buffer.end(), perspMatrixValues.begin(), perspMatrixValues.end());
         }
     };
+
+
 }
