@@ -119,7 +119,6 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Renderer\OpenGL3\Shader.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\ShaderProgram.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\UniformBuffer.cpp" />
-    <ClCompile Include="src\Scene\Camera.cpp" />
     <ClCompile Include="src\Scene\Mesh.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneManager.cpp" />
@@ -152,6 +151,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Input\InputBackend.h" />
     <ClInclude Include="include\Input\InputManager.h" />
     <ClInclude Include="include\Input\KeyCallback.h" />
+    <ClInclude Include="include\Input\KeyDefinition.h" />
     <ClInclude Include="include\Input\MouseCallback.h" />
     <ClInclude Include="include\Renderer\DummyRenderer.h" />
     <ClInclude Include="include\Renderer\IRenderer.h" />

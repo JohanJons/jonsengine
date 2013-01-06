@@ -2,12 +2,13 @@
 
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Memory/HeapAllocator.h"
+#include "include/Core/Containers/Vector.h"
+#include "include/Core/Utils/Math.h"
 #include "include/Scene/Scene.h"
 #include "include/Window/GLFW/GLFWWindow.h"
 #include "include/Window/DummyWindow.h"
 #include "include/Renderer/OpenGL3/OpenGLRenderer.h"
 #include "include/Renderer/DummyRenderer.h"
-#include "include/Core/Containers/Vector.h"
 
 #include "boost/foreach.hpp"
 
@@ -41,7 +42,14 @@ namespace JonsEngine
 
         // render the root node and recursively all underlying nodes
         if (mSceneManager.HasActiveScene())
-            RenderSceneNode(&mSceneManager.GetActiveScene()->GetRootNode());
+        {
+            // create view+perspective matrices for the renderer.
+            Scene* activeScene = mSceneManager.GetActiveScene();
+            const Mat4 viewMatrix = CreateViewMatrix(activeScene->GetSceneCamera());
+            const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow->GetScreenMode().FOV, mWindow->GetScreenMode().ScreenWidth / (float)mWindow->GetScreenMode().ScreenHeight, 0.5f, 100.0f);
+
+            RenderSceneNode(&activeScene->GetRootNode(), viewMatrix, perspectiveMatrix);
+        }
 
         mRenderer->EndRendering();
 
@@ -80,12 +88,12 @@ namespace JonsEngine
         }
     }
 
-    void Engine::RenderSceneNode(SceneNode* node)
+    void Engine::RenderSceneNode(SceneNode* node, const Mat4& viewMatrix, const Mat4& projectionMatrix)
     {
         if (MeshPtr mesh = (node->GetMesh()))
-            mRenderer->RenderMesh(mesh);
+            mRenderer->RenderMesh(mesh, node->GetTransform(), viewMatrix, projectionMatrix);
 
         BOOST_FOREACH(SceneNode* childNode, node->GetChildNodes())
-            RenderSceneNode(childNode);
+            RenderSceneNode(childNode, viewMatrix, projectionMatrix);
     }
 }

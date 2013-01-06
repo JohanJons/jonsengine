@@ -112,6 +112,7 @@ namespace JonsEngine
     MeshPtr SceneNode::GetMesh()                                    { return mNodeMesh;     }
 
 
+    Mat4& SceneNode::GetTransform()                                 { return mTransform;    }                                         
     const std::string& SceneNode::GetNodeName() const               { return mName;         }
     const vector<SceneNode*>& SceneNode::GetChildNodes() const      { return mChildNodes;   }
 

@@ -23,7 +23,7 @@ namespace JonsEngine
         VertexBufferPtr CreateVertexBuffer(const float vertexData[], const size_t vertexDataSize, const uint16_t indexData[], const size_t indexDataSize);
 
         void BeginRendering();
-        void RenderMesh(MeshPtr mesh);
+        void RenderMesh(MeshPtr mesh, const Mat4& modelMatrix, const Mat4& viewMatrix, const Mat4& projectionMatrix);
         void EndRendering();
 
 

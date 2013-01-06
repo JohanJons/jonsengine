@@ -12,7 +12,7 @@ namespace JonsEngine
         uint16_t FrameLimit;
         bool FrameLimitEnabled;
         bool Fullscreen;
-
+        float FOV;
 
         ScreenMode();
     };
@@ -50,7 +50,7 @@ namespace JonsEngine
 
 
      /* ScreenMode inlines */
-    inline ScreenMode::ScreenMode() : ScreenWidth(800), ScreenHeight(600), FrameLimit(60), FrameLimitEnabled(true), Fullscreen(false)
+    inline ScreenMode::ScreenMode() : ScreenWidth(800), ScreenHeight(600), FrameLimit(60), FrameLimitEnabled(true), Fullscreen(false), FOV(45.0f)
     {
     }
 }

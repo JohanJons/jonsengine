@@ -28,10 +28,10 @@ namespace JonsEngine
             throw std::runtime_error("OpenGLRenderer::OpenGLRenderer(): Minimum OpenGL driver (OpenGL 3.3) not supported!");
         }
 
-        // face culling
-        glEnable(GL_CULL_FACE);
-	    glCullFace(GL_BACK);
-	    glFrontFace(GL_CCW);
+        // face culling - TODO
+        //glEnable(GL_CULL_FACE);
+	    //glCullFace(GL_BACK);
+	    //glFrontFace(GL_CCW);
 
         // z depth testing
         glEnable(GL_DEPTH_TEST);
@@ -64,10 +64,20 @@ namespace JonsEngine
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void OpenGLRenderer::RenderMesh(MeshPtr mesh)
+    void OpenGLRenderer::RenderMesh(MeshPtr mesh, const Mat4& modelMatrix, const Mat4& viewMatrix, const Mat4& projectionMatrix)
     {
-        if (mesh && mesh->GetVertexBuffer())
+        if (mesh)
+        {
+            // upload MVP matrix
+            Mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
+            ShaderData shaderData;
+            shaderData.Color.x = 1.0f; shaderData.Color.y = 0.5f; shaderData.Color.z = 0.5f; shaderData.Color.w = 1.0f;
+            shaderData.MVPMatrix = MVP;
+            mUniBuffer.SetData(shaderData);
+
+            // render
             mesh->GetVertexBuffer()->Render();
+        }
     }
 
     void OpenGLRenderer::EndRendering()
@@ -91,16 +101,6 @@ namespace JonsEngine
             mDefaultProgram.BindAttribLocation(0, "in_position");
 
             mDefaultProgram.LinkProgram();
-
-            ShaderData shaderData;
-            shaderData.mColor.x = 1.0f; shaderData.mColor.y = 0.5f; shaderData.mColor.z = 0.5f; shaderData.mColor.w = 1.0f;
-
-
-            uint16_t h = 600;//mEngine->GetWindow().GetScreenMode().ScreenHeight;
-            uint16_t w = 800;//mEngine->GetWindow().GetScreenMode().ScreenWidth;
-            shaderData.mPerspMatrix = CreatePerspectiveMatrix(45.0f, w/(float) h, 0.5f, 10.0f);
-
-            mUniBuffer.SetData(shaderData);
 
             if (mDefaultProgram.IsLinked())
                 mDefaultProgram.UseProgram(true);

@@ -11,13 +11,18 @@ namespace JonsEngine
 {
     MeshPtr Mesh::CreateMesh(const std::string& name, VertexBufferPtr vertexBuffer)
     {
-        MeshPtr ptr((Mesh*)HeapAllocator::GetDefaultHeapAllocator().Allocate(sizeof(Mesh)), boost::bind(&HeapAllocator::DeallocateObject<Mesh>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
+        if (vertexBuffer)
+        {
+            MeshPtr ptr((Mesh*)HeapAllocator::GetDefaultHeapAllocator().Allocate(sizeof(Mesh)), boost::bind(&HeapAllocator::DeallocateObject<Mesh>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
         
-        ptr->mName = name;
-        ptr->mHashedID = boost::hash_value(name);
-        ptr->mVertexBuffer = vertexBuffer;
+            ptr->mName = name;
+            ptr->mHashedID = boost::hash_value(name);
+            ptr->mVertexBuffer = vertexBuffer;
 
-        return ptr;
+            return ptr;
+        }
+        else
+            return MeshPtr();
     }
         
     Mesh::~Mesh()

@@ -1,15 +1,22 @@
 #pragma once
 
+#include "include/Core/Types.h"
+
 namespace JonsEngine
 {
-    class Camera
+    /* Camera definition */
+    struct Camera
     {
-    public:
+        Vec3 CameraPosition;
+        Vec3 TargetVector;
+        Vec3 UpVector;
+
         Camera();
-        ~Camera();
-
-
-    private:
-
     };
+
+
+    /* Camera inlines */
+    inline Camera::Camera() : CameraPosition(0.0f), TargetVector(0.0f, 0.0f, -1.0f), UpVector(0.0f, 1.0f, 0.0f)
+    {
+    }
 }

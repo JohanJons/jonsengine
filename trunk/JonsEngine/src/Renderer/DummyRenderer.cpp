@@ -29,7 +29,7 @@ namespace JonsEngine
     {
     }
 
-    void DummyRenderer::RenderMesh(MeshPtr mesh)
+    void DummyRenderer::RenderMesh(MeshPtr mesh, const Mat4& modelMatrix, const Mat4& viewMatrix, const Mat4& projectionMatrix)
     {
     }
 

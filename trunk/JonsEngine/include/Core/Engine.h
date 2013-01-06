@@ -3,6 +3,7 @@
 #include "include/Core/EngineSettings.h"
 #include "include/Scene/SceneManager.h"
 #include "include/Input/InputManager.h"
+#include "include/Core/Types.h"
 
 namespace JonsEngine
 {
@@ -35,7 +36,7 @@ namespace JonsEngine
     private:
         IWindow* bootCreateWindow(const EngineSettings& settings);
         IRenderer* bootCreateRenderer(const EngineSettings& engineSettings);
-        void RenderSceneNode(SceneNode* node);
+        void RenderSceneNode(SceneNode* node, const Mat4& viewMatrix, const Mat4& projectionMatrix);
 
         Logger& mLog;
         IMemoryAllocator& mMemoryAllocator;

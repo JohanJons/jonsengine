@@ -40,7 +40,7 @@ namespace JonsEngine
         mBufferSize = buffer.size() * sizeof(float);
 
         glBindBuffer(GL_UNIFORM_BUFFER, mBuffer);
-        glBufferData(GL_UNIFORM_BUFFER, mBufferSize, buffer.begin(), GL_STATIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, mBufferSize, buffer.begin(), GL_DYNAMIC_DRAW);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
         glBindBufferRange(GL_UNIFORM_BUFFER, mBindingIndex, mBuffer, 0, mBufferSize);

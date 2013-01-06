@@ -2,7 +2,7 @@
 
 #include "include/Scene/Mesh.h"
 #include "include/Core/Containers/Vector.h"
-#include "include/Core/Utils/Types.h"
+#include "include/Core/Types.h"
 
 #include <string>
 
@@ -30,6 +30,7 @@ namespace JonsEngine
         void SetMesh(MeshPtr mesh);
         MeshPtr GetMesh();
 
+        Mat4& GetTransform();
         const std::string& GetNodeName() const;
         const vector<SceneNode*>& GetChildNodes() const;
 

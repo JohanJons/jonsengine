@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/EngineDefs.h"
+#include "include/Input/KeyDefinition.h"
 
 #include "boost/function.hpp"
 
@@ -22,15 +23,15 @@ namespace JonsEngine
             RELEASED
         };
 
-        uint16_t KeyCode;       /* Unicode for the key pressed */
+        Key KeySymbol;          /* Unicode for the key pressed */
         KeyState State;         /* State of the key */
 
 
-        KeyEvent(uint16_t keyCode, KeyState state);
+        KeyEvent(Key keySymbol, KeyState state);
     };
 
 
     /* KeyEvent inlines */
-    inline KeyEvent::KeyEvent(uint16_t keyCode, KeyState state) : KeyCode(keyCode), State(state) { }
+    inline KeyEvent::KeyEvent(Key keySymbol, KeyState state) : KeySymbol(keySymbol), State(state) { }
 
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/Core/Utils/Types.h"
+#include "include/Core/Types.h"
 #include "include/Core/Containers/Vector.h"
 
 namespace JonsEngine
@@ -9,8 +9,8 @@ namespace JonsEngine
                                                                                     \n  \
                                         layout(std140) uniform DefaultUniform       \n  \
                                         {                                           \n  \
-                                            vec4 mColor;                            \n  \
-                                            mat4 mPerspMatrix;                      \n  \
+                                            vec4 Color;                             \n  \
+                                            mat4 MVPMatrix;                         \n  \
                                         };                                          \n  \
                                                                                     \n	\
                                         in vec3 in_position;						\n	\
@@ -18,8 +18,8 @@ namespace JonsEngine
                                         void main()									\n	\
                                         {											\n	\
                                             vec4 camPos = vec4(in_position, 1.0f);	\n	\
-                                            ex_color = mColor.xyz;                  \n  \
-                                            gl_Position = mPerspMatrix * camPos;    \n  \
+                                            ex_color = Color.xyz;                   \n  \
+                                            gl_Position = MVPMatrix * camPos;       \n  \
                                         }											\n";
 
 
@@ -34,16 +34,16 @@ namespace JonsEngine
 
     struct ShaderData
     {
-        Vec4 mColor;
-        Mat4 mPerspMatrix;
+        Vec4 Color;
+        Mat4 MVPMatrix;
 
         void CopyUniformData(vector<float>& buffer) const
         {
-            vector<float> colorValues = GetTypeValues(mColor);
-            vector<float> perspMatrixValues = GetTypeValues(mPerspMatrix);
+            vector<float> colorValues = GetTypeValues(Color);
+            vector<float> mvpMatrixValues = GetTypeValues(MVPMatrix);
 
             buffer.insert(buffer.end(), colorValues.begin(), colorValues.end());
-            buffer.insert(buffer.end(), perspMatrixValues.begin(), perspMatrixValues.end());
+            buffer.insert(buffer.end(), mvpMatrixValues.begin(), mvpMatrixValues.end());
         }
     };
 

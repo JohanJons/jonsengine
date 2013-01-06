@@ -1,4 +1,5 @@
 #include "include/Core/Utils/Math.h"
+#include "include/Scene/Camera.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -25,6 +26,16 @@ namespace JonsEngine
     Mat4 CreatePerspectiveMatrix(const float fov, const float aspect, const float zNear, const float zFar)
     {
         return glm::perspective(fov, aspect, zNear, zFar);
+    }
+
+    Mat4 CreateViewMatrix(const Camera& camera)
+    {
+        return glm::lookAt(camera.CameraPosition, camera.TargetVector, camera.UpVector);
+    }
+
+    Mat4 CreateViewMatrix(const Vec3& CameraPosition, const Vec3& TargetVector, const Vec3& UpVector)
+    {
+        return glm::lookAt(CameraPosition, TargetVector, UpVector);
     }
 
 }

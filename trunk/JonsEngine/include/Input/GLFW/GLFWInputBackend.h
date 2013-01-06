@@ -29,6 +29,7 @@ namespace JonsEngine
         static void glfwOnMouseButton(int button, int action);
         static void glfwOnMouseMotion(int posX, int posY );
         static void glfwOnKey(int key, int action);
+        static Key ParseGLFWKey(int key);
 
         MouseButtonCallback mOnMouseButton;
         MouseMotionCallback mOnMouseMotion;
