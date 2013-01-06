@@ -15,6 +15,7 @@ namespace JonsEngine
     typedef glm::vec3 Vec3;
     typedef glm::vec4 Vec4;
     typedef glm::mat4 Mat4;
+    typedef glm::fquat Quaternion;
 
     const vector<float> _GetTypeValues(const float* valuePtr, size_t numValues);
     inline const vector<float> GetTypeValues(const Vec2& vec)        { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float)); }        

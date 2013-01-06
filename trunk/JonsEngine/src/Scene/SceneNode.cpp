@@ -5,10 +5,12 @@
 #include "boost/functional/hash.hpp"
 #include "boost/lambda/lambda.hpp"
 #include <algorithm>
+#include "glm/gtx/quaternion.hpp"
 
 namespace JonsEngine
 {
-    SceneNode::SceneNode(const std::string& nodeName) : mName(nodeName), mHashedID(boost::hash_value(nodeName)), mTransform(1.0f), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator())
+    SceneNode::SceneNode(const std::string& nodeName) : mName(nodeName), mHashedID(boost::hash_value(nodeName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()),
+                                                        mOrientation(1.0f, 0.0f, 0.0f, 0.0f), mScale(1.0f, 1.0f, 1.0f), mTranslation(0.0f, 0.0f, 0.0f)
     {
     }
         
@@ -91,19 +93,20 @@ namespace JonsEngine
     }
 
         
-    void SceneNode::Scale(Vec3 scaleVec)
-    {
-        mTransform = ScaleTransform(mTransform, scaleVec);
+    void SceneNode::Scale(const Vec3& scaleVec)                                
+    { 
+        mScale *= scaleVec;            
     }
 
-    void SceneNode::Translate(Vec3 translateVec)
-    {
-        mTransform = TranslateTransform(mTransform, translateVec);
+    void SceneNode::Translate(const Vec3& translateVec)
+    { 
+        mTranslation += translateVec;
     }
-        
-    void SceneNode::Rotate(Vec3 rotateVec, const float angle)
-    {
-        mTransform = RotateTransform(mTransform, angle, rotateVec);
+
+    void SceneNode::Rotate(const float angle, const Vec3& rotateVec)       
+    { 
+        Quaternion rotation = AngleAxisToQuaternion(angle, rotateVec);
+        mOrientation = mOrientation * rotation;
     }
 
 
@@ -112,7 +115,17 @@ namespace JonsEngine
     MeshPtr SceneNode::GetMesh()                                    { return mNodeMesh;     }
 
 
-    Mat4& SceneNode::GetTransform()                                 { return mTransform;    }                                         
+    Mat4 SceneNode::GetModelMatrix() const                           
+    { 
+        Mat4 ret(1.0f);
+
+        ret = TranslateTransform(ret, mTranslation);
+        ret *= QuaternionToMat4(mOrientation);
+        ret = ScaleTransform(ret, mScale);
+
+        return ret;
+    }            
+
     const std::string& SceneNode::GetNodeName() const               { return mName;         }
     const vector<SceneNode*>& SceneNode::GetChildNodes() const      { return mChildNodes;   }
 

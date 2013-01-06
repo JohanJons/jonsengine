@@ -47,8 +47,9 @@ namespace JonsEngine
             Scene* activeScene = mSceneManager.GetActiveScene();
             const Mat4 viewMatrix = CreateViewMatrix(activeScene->GetSceneCamera());
             const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow->GetScreenMode().FOV, mWindow->GetScreenMode().ScreenWidth / (float)mWindow->GetScreenMode().ScreenHeight, 0.5f, 100.0f);
+            const Mat4 originalModelMatrix(1.0f);
 
-            RenderSceneNode(&activeScene->GetRootNode(), viewMatrix, perspectiveMatrix);
+            RenderSceneNode(&activeScene->GetRootNode(), originalModelMatrix, viewMatrix, perspectiveMatrix);
         }
 
         mRenderer->EndRendering();
@@ -88,12 +89,14 @@ namespace JonsEngine
         }
     }
 
-    void Engine::RenderSceneNode(SceneNode* node, const Mat4& viewMatrix, const Mat4& projectionMatrix)
+    void Engine::RenderSceneNode(SceneNode* node, const Mat4& parentModelMatrix, const Mat4& viewMatrix, const Mat4& projectionMatrix)
     {
+        const Mat4& modelMatrix = parentModelMatrix * node->GetModelMatrix();
+
         if (MeshPtr mesh = (node->GetMesh()))
-            mRenderer->RenderMesh(mesh, node->GetTransform(), viewMatrix, projectionMatrix);
+            mRenderer->RenderMesh(mesh, modelMatrix, viewMatrix, projectionMatrix);
 
         BOOST_FOREACH(SceneNode* childNode, node->GetChildNodes())
-            RenderSceneNode(childNode, viewMatrix, projectionMatrix);
+            RenderSceneNode(childNode, modelMatrix, viewMatrix, projectionMatrix);
     }
 }

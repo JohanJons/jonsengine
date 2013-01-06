@@ -36,7 +36,7 @@ namespace JonsEngine
     private:
         IWindow* bootCreateWindow(const EngineSettings& settings);
         IRenderer* bootCreateRenderer(const EngineSettings& engineSettings);
-        void RenderSceneNode(SceneNode* node, const Mat4& viewMatrix, const Mat4& projectionMatrix);
+        void RenderSceneNode(SceneNode* node, const Mat4& parentModelMatrix, const Mat4& viewMatrix, const Mat4& projectionMatrix);
 
         Logger& mLog;
         IMemoryAllocator& mMemoryAllocator;

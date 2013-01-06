@@ -65,10 +65,10 @@ namespace JonsGame
                 cube->Scale(Vec3(0.5f, 1.0f, 1.0f));
 
             if (evnt.KeySymbol == R)
-                cube->Rotate(Vec3(1.0f, 0.0f, 0.0f), 45);
+                cube->Rotate(25.0f, Vec3(1.0f, 0.0f, 0.0f));
 
             if (evnt.KeySymbol == T)
-                cube->Rotate(Vec3(0.0f, 1.0f, 0.0f), 45);
+                cube->Rotate(25.0f, Vec3(0.0f, 1.0f, 0.0f));
         }
     }
 
@@ -139,7 +139,11 @@ namespace JonsGame
 
         SceneNode* cube1 = myScene->GetRootNode().CreateChildNode("Cube1");
         cube1->SetMesh(Mesh::CreateMesh("Cube1Mesh", mEngine->GetRenderer().CreateVertexBuffer(vertexPositions1, sizeof(vertexPositions1)/sizeof(float), indexData1, sizeof(indexData1)/sizeof(uint16_t))));
+        SceneNode* cube2 = cube1->CreateChildNode("Cube2");
+        cube2->SetMesh(Mesh::CreateMesh("Cube2Mesh", mEngine->GetRenderer().CreateVertexBuffer(vertexPositions1, sizeof(vertexPositions1)/sizeof(float), indexData1, sizeof(indexData1)/sizeof(uint16_t))));
 
         cube1->Translate(Vec3(5.0f, 0.0f, -15.0f));
+        cube2->Translate(Vec3(0.0f, 2.0f, 0.0f));
+        cube2->Scale(Vec3(2.0f, 1.0f, 1.0f));
     }
 }

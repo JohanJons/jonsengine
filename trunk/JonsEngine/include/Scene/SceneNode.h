@@ -22,15 +22,15 @@ namespace JonsEngine
         bool DeleteChildNode(const std::string& nodeName);
         bool DeleteChildNode(SceneNode* node);
 
-        void Scale(Vec3 scaleVec);
-        void Translate(Vec3 translateVec);
-        void Rotate(Vec3 rotateVec, const float angle);
+        void Scale(const Vec3& scaleVec);
+        void Translate(const Vec3& translateVec);
+        void Rotate(const float angle, const Vec3& rotateVec);
 
         void SetMesh();
         void SetMesh(MeshPtr mesh);
         MeshPtr GetMesh();
 
-        Mat4& GetTransform();
+        Mat4 GetModelMatrix() const;
         const std::string& GetNodeName() const;
         const vector<SceneNode*>& GetChildNodes() const;
 
@@ -42,11 +42,13 @@ namespace JonsEngine
         // scene-specific data
         const std::string mName;
         size_t mHashedID;
-        Mat4 mTransform;
         vector<SceneNode*> mChildNodes;
         IMemoryAllocator& mMemoryAllocator;
 
         // components
         MeshPtr mNodeMesh;
+        Quaternion mOrientation;
+        Vec3 mScale;
+        Vec3 mTranslation;
     };
 }

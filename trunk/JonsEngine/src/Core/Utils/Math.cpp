@@ -3,6 +3,7 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/quaternion.hpp"
 
 
 namespace JonsEngine
@@ -20,6 +21,17 @@ namespace JonsEngine
     Mat4 TranslateTransform(Mat4& transform, const Vec3& translateVec)
     {
         return glm::translate(transform, translateVec);
+    }
+
+
+    Quaternion AngleAxisToQuaternion(const float angle, const Vec3& axis)
+    {
+        return glm::angleAxis(angle, axis);
+    }
+
+    Mat4 QuaternionToMat4(const Quaternion& quat)
+    {
+        return glm::toMat4(quat);
     }
 
 
