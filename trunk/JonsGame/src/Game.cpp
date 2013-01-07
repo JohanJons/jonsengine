@@ -43,9 +43,11 @@ namespace JonsGame
     void Game::OnKeyEvent(const KeyEvent& evnt)
     {
         SceneNode* cube = NULL;
+        Scene* activeScene = mEngine->GetSceneManager().GetActiveScene();
 
-        if (evnt.State == KeyEvent::PRESSED && (cube = mEngine->GetSceneManager().GetActiveScene()->GetRootNode().FindChildNode("Cube1")))
+        if (evnt.State == KeyEvent::PRESSED && (cube = activeScene->GetRootNode().FindChildNode("Cube1")))
         {
+            // transforming object
             if (evnt.KeySymbol == A)
                 cube->Translate(Vec3(-0.1f, 0.0f, 0.0f));
 
@@ -69,6 +71,32 @@ namespace JonsGame
 
             if (evnt.KeySymbol == T)
                 cube->Rotate(25.0f, Vec3(0.0f, 1.0f, 0.0f));
+
+
+            // move camera
+            if (evnt.KeySymbol == LEFT)
+            {
+                activeScene->GetSceneCamera().CameraPosition -= Vec3(0.1f, 0.0f, 0.0f);
+                activeScene->GetSceneCamera().TargetVector -= Vec3(0.1f, 0.0f, 0.0f);
+            }
+
+            if (evnt.KeySymbol == RIGHT)
+            {
+                activeScene->GetSceneCamera().CameraPosition += Vec3(0.1f, 0.0f, 0.0f);
+                activeScene->GetSceneCamera().TargetVector += Vec3(0.1f, 0.0f, 0.0f);
+            }
+
+            if (evnt.KeySymbol == UP)
+            {
+                activeScene->GetSceneCamera().CameraPosition -= Vec3(0.0f, 0.0f, 0.1f);
+                activeScene->GetSceneCamera().TargetVector -= Vec3(0.0f, 0.0f, 0.1f);
+            }
+
+            if (evnt.KeySymbol == DOWN)
+            {
+                activeScene->GetSceneCamera().CameraPosition += Vec3(0.0f, 0.0f, 0.1f);
+                activeScene->GetSceneCamera().TargetVector += Vec3(0.0f, 0.0f, 0.1f);
+            }
         }
     }
 
