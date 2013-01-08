@@ -10,7 +10,7 @@
 namespace JonsEngine
 {
     SceneNode::SceneNode(const std::string& nodeName) : mName(nodeName), mHashedID(boost::hash_value(nodeName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()),
-                                                        mOrientation(1.0f, 0.0f, 0.0f, 0.0f), mScale(1.0f, 1.0f, 1.0f), mTranslation(0.0f, 0.0f, 0.0f)
+                                                        mModelMatrix(1.0f), mOrientation(1.0f, 0.0f, 0.0f, 0.0f), mScale(1.0f, 1.0f, 1.0f), mTranslation(0.0f, 0.0f, 0.0f)
     {
     }
         
@@ -110,22 +110,27 @@ namespace JonsEngine
     }
 
 
+    void SceneNode::UpdateModelMatrix(const Mat4& parentModelMatrix)
+    {
+        Mat4 modelMatrix(1.0f);
+
+        modelMatrix = TranslateTransform(modelMatrix, mTranslation);
+        modelMatrix *= QuaternionToMat4(mOrientation);
+        modelMatrix = ScaleTransform(modelMatrix, mScale);
+
+        mModelMatrix = parentModelMatrix *modelMatrix;
+
+        BOOST_FOREACH(SceneNode* childNode, mChildNodes)
+            childNode->UpdateModelMatrix(mModelMatrix);
+    }
+
+
     void SceneNode::SetMesh()                                       { mNodeMesh.reset();    }
     void SceneNode::SetMesh(MeshPtr mesh)                           { mNodeMesh = mesh;     }
     MeshPtr SceneNode::GetMesh()                                    { return mNodeMesh;     }
 
 
-    Mat4 SceneNode::GetModelMatrix() const                           
-    { 
-        Mat4 ret(1.0f);
-
-        ret = TranslateTransform(ret, mTranslation);
-        ret *= QuaternionToMat4(mOrientation);
-        ret = ScaleTransform(ret, mScale);
-
-        return ret;
-    }            
-
+    const Mat4& SceneNode::GetModelMatrix() const                   { return mModelMatrix;  } 
     const std::string& SceneNode::GetNodeName() const               { return mName;         }
     const vector<SceneNode*>& SceneNode::GetChildNodes() const      { return mChildNodes;   }
 

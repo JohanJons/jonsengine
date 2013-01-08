@@ -26,11 +26,13 @@ namespace JonsEngine
         void Translate(const Vec3& translateVec);
         void Rotate(const float angle, const Vec3& rotateVec);
 
+        void UpdateModelMatrix(const Mat4& parentModelMatrix);
+
         void SetMesh();
         void SetMesh(MeshPtr mesh);
         MeshPtr GetMesh();
 
-        Mat4 GetModelMatrix() const;
+        const Mat4& GetModelMatrix() const;
         const std::string& GetNodeName() const;
         const vector<SceneNode*>& GetChildNodes() const;
 
@@ -47,6 +49,7 @@ namespace JonsEngine
 
         // components
         MeshPtr mNodeMesh;
+        Mat4 mModelMatrix;
         Quaternion mOrientation;
         Vec3 mScale;
         Vec3 mTranslation;

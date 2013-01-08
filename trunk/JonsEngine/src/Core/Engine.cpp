@@ -38,21 +38,23 @@ namespace JonsEngine
 
         mInputManager.Poll();
 
-        mRenderer->BeginRendering();
-
-        // render the root node and recursively all underlying nodes
         if (mSceneManager.HasActiveScene())
         {
-            // create view+perspective matrices for the renderer.
             Scene* activeScene = mSceneManager.GetActiveScene();
+            // create view+perspective matrices for the renderer.
             const Mat4 viewMatrix = CreateViewMatrix(activeScene->GetSceneCamera());
-            const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow->GetScreenMode().FOV, mWindow->GetScreenMode().ScreenWidth / (float)mWindow->GetScreenMode().ScreenHeight, 0.5f, 100.0f);
-            const Mat4 originalModelMatrix(1.0f);
+            const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow->GetScreenMode().FOV, mWindow->GetScreenMode().ScreenWidth / (float)mWindow->GetScreenMode().ScreenHeight, 0.5f, 1000.0f);
 
-            RenderSceneNode(&activeScene->GetRootNode(), originalModelMatrix, viewMatrix, perspectiveMatrix);
+            // update model matrix of all nodes in active scene
+            activeScene->GetRootNode().UpdateModelMatrix(Mat4(1.0f));
+
+            mRenderer->BeginRendering();
+
+            // render the root node and recursively all underlying nodes
+            RenderSceneNode(&activeScene->GetRootNode(), viewMatrix, perspectiveMatrix);
+
+            mRenderer->EndRendering();
         }
-
-        mRenderer->EndRendering();
 
         mWindow->EndFrame();
     }
@@ -89,14 +91,12 @@ namespace JonsEngine
         }
     }
 
-    void Engine::RenderSceneNode(SceneNode* node, const Mat4& parentModelMatrix, const Mat4& viewMatrix, const Mat4& projectionMatrix)
+    void Engine::RenderSceneNode(SceneNode* node, const Mat4& viewMatrix, const Mat4& projectionMatrix)
     {
-        const Mat4& modelMatrix = parentModelMatrix * node->GetModelMatrix();
-
         if (MeshPtr mesh = (node->GetMesh()))
-            mRenderer->RenderMesh(mesh, modelMatrix, viewMatrix, projectionMatrix);
+            mRenderer->RenderMesh(mesh, node->GetModelMatrix(), viewMatrix, projectionMatrix);
 
         BOOST_FOREACH(SceneNode* childNode, node->GetChildNodes())
-            RenderSceneNode(childNode, modelMatrix, viewMatrix, projectionMatrix);
+            RenderSceneNode(childNode, viewMatrix, projectionMatrix);
     }
 }
