@@ -30,4 +30,10 @@ namespace JonsEngine
         Scene* mActiveScene;
         IMemoryAllocator& mMemoryAllocator;
     };
+
+
+    /* SceneManager inlines */
+    inline Scene* SceneManager::GetActiveScene() const                 { return mActiveScene;          }  
+    inline const vector<Scene*>& SceneManager::GetAllScenes() const    { return mScenes;               }
+    inline bool SceneManager::HasActiveScene() const                   { return mActiveScene != NULL;  }
 }

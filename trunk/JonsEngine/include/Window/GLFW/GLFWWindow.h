@@ -51,5 +51,7 @@ namespace JonsEngine
 
 
     /* GLFWWindow inlines */
+    inline const ScreenMode& GLFWWindow::GetScreenMode() const                            { return mScreenMode;    }
+    inline const std::string& GLFWWindow::GetWindowTitle() const                          { return mWindowTitle;   }
     inline GLFWWindow::WindowBackendType GLFWWindow::GetWindowBackendType() const         { return IWindow::GLFW;  }
 }

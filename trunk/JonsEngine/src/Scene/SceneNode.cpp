@@ -125,14 +125,15 @@ namespace JonsEngine
     }
 
 
-    void SceneNode::SetMesh()                                       { mNodeMesh.reset();    }
-    void SceneNode::SetMesh(MeshPtr mesh)                           { mNodeMesh = mesh;     }
-    MeshPtr SceneNode::GetMesh()                                    { return mNodeMesh;     }
+    void SceneNode::SetMesh()                                       
+    { 
+        mNodeMesh.reset(); 
+    }
 
-
-    const Mat4& SceneNode::GetModelMatrix() const                   { return mModelMatrix;  } 
-    const std::string& SceneNode::GetNodeName() const               { return mName;         }
-    const vector<SceneNode*>& SceneNode::GetChildNodes() const      { return mChildNodes;   }
+    void SceneNode::SetMesh(MeshPtr mesh)                           
+    {
+        mNodeMesh = mesh;
+    }
 
 
     bool SceneNode::operator==(const SceneNode& s1)

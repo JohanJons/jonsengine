@@ -33,4 +33,10 @@ namespace JonsEngine
         Camera mSceneCamera;
         SceneNode mRootNode;
     };
+
+
+    /* Scene inlines */
+    inline Camera& Scene::GetSceneCamera()                     { return mSceneCamera;  }
+    inline SceneNode& Scene::GetRootNode()                     { return mRootNode;     }
+    inline const std::string& Scene::GetSceneName() const      { return mName;         }
 }

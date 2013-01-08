@@ -148,10 +148,6 @@ namespace JonsEngine
     }
 
         
-    const ScreenMode& GLFWWindow::GetScreenMode() const          { return mScreenMode;   }
-    const std::string& GLFWWindow::GetWindowTitle() const        { return mWindowTitle;  }
-
-        
     void GLFWWindow::UpdateViewport()
     {
         if (IsWindowOpened())

@@ -13,11 +13,6 @@ namespace JonsEngine
     }
 
 
-    Camera& Scene::GetSceneCamera()                     { return mSceneCamera;  }
-    SceneNode& Scene::GetRootNode()                     { return mRootNode;     }
-    const std::string& Scene::GetSceneName() const      { return mName;         }
-
-
     bool Scene::operator==(const Scene& s1)
     {
         return mHashedID == s1.mHashedID;

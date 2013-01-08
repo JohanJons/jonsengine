@@ -30,8 +30,8 @@ namespace JonsEngine
 
         void SetMesh();
         void SetMesh(MeshPtr mesh);
-        MeshPtr GetMesh();
-
+        
+        const MeshPtr GetMesh() const;
         const Mat4& GetModelMatrix() const;
         const std::string& GetNodeName() const;
         const vector<SceneNode*>& GetChildNodes() const;
@@ -54,4 +54,11 @@ namespace JonsEngine
         Vec3 mScale;
         Vec3 mTranslation;
     };
+
+
+    /* SceneNode inlines */
+    inline const MeshPtr SceneNode::GetMesh() const                        { return mNodeMesh;     }
+    inline const Mat4& SceneNode::GetModelMatrix() const                   { return mModelMatrix;  } 
+    inline const std::string& SceneNode::GetNodeName() const               { return mName;         }
+    inline const vector<SceneNode*>& SceneNode::GetChildNodes() const      { return mChildNodes;   }
 }
