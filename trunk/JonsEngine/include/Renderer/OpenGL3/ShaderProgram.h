@@ -1,9 +1,8 @@
 #pragma once
 
-#include "include/Core/Containers/vector.h"
-
 #include "GL/glew.h"
 #include <string>
+#include <vector>
 
 namespace JonsEngine
 {
@@ -41,6 +40,6 @@ namespace JonsEngine
         const std::string mName;
         GLuint mProgramHandle;
         GLuint mUniformBuffer;
-        vector<Shader*> mAddedShaders;
+        std::vector<Shader*> mAddedShaders;
     };
 }

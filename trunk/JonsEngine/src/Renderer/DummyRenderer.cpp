@@ -1,7 +1,8 @@
 #include "include/Renderer/DummyRenderer.h"
 
 #include "include/Core/EngineDefs.h"
-#include "include/Core/Containers/Vector.h"
+
+#include <vector>
 
 namespace JonsEngine
 {
@@ -14,12 +15,12 @@ namespace JonsEngine
     }
 
         
-    VertexBufferPtr DummyRenderer::CreateVertexBuffer(const vector<float>& vertexData, const vector<uint16_t>& indexData)
+    VertexBufferPtr DummyRenderer::CreateVertexBuffer(const std::vector<float>& vertexData, const std::vector<uint32_t>& indexData)
     {
         return VertexBufferPtr();
     }
 
-    VertexBufferPtr DummyRenderer::CreateVertexBuffer(const float vertexData[], const size_t vertexDataSize, const uint16_t indexData[], const size_t indexDataSize)
+    VertexBufferPtr DummyRenderer::CreateVertexBuffer(const float vertexData[], const size_t vertexDataSize, const uint32_t indexData[], const size_t indexDataSize)
     {
         return VertexBufferPtr();
     }
@@ -29,7 +30,7 @@ namespace JonsEngine
     {
     }
 
-    void DummyRenderer::RenderMesh(MeshPtr mesh, const Mat4& modelMatrix, const Mat4& viewMatrix, const Mat4& projectionMatrix)
+    void DummyRenderer::DrawRenderables(const std::vector<RenderItem>& renderQueue)
     {
     }
 

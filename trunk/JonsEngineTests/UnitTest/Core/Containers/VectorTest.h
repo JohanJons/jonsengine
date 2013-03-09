@@ -3,11 +3,10 @@
 
 #include "gtest/gtest.h"
 
-#include "include/Core/Containers/vector.h"
 #include "include/Core/Memory/HeapAllocator.h"
+#include "include/Core/Containers/Vector.h"
 
 #include "../../TestFixtures/RunningEngineFixture.h"
-
 
 namespace JonsEngine
 {

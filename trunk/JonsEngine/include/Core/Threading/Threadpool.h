@@ -4,7 +4,7 @@
 #include "include/Core/Threading/Thread.h"
 #include "include/Core/Threading/Mutex.h"
 #include "include/Core/Threading/ConditionVariable.h"
-#include "include/Core/Containers/vector.h"
+#include "include/Core/Containers/Vector.h"
 
 namespace JonsEngine
 {

@@ -87,6 +87,12 @@
     <Filter Include="Header Files\Renderer\OpenGL3">
       <UniqueIdentifier>{90cc873a-fe54-43f4-a22f-d5642bbcb654}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Resources">
+      <UniqueIdentifier>{b836645f-6919-4b76-b7de-d4d337b4676e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Resources">
+      <UniqueIdentifier>{d1471368-acd6-4fac-ba6e-3f44c7798ad4}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files\Renderer">
       <UniqueIdentifier>{a3d5ad5b-531b-4acc-884f-cf6a512e7c46}</UniqueIdentifier>
     </Filter>
@@ -167,14 +173,23 @@
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLVertexBuffer.cpp">
       <Filter>Source Files\Renderer\OpenGL3</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Mesh.cpp">
-      <Filter>Source Files\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="src\Window\GLFW\GLFWWindow.cpp">
       <Filter>Source Files\Window\GLFW</Filter>
     </ClCompile>
     <ClCompile Include="src\Window\DummyWindow.cpp">
       <Filter>Source Files\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\ResourceManifest.cpp">
+      <Filter>Source Files\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\JonsPackage.cpp">
+      <Filter>Source Files\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Model.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Entity.cpp">
+      <Filter>Source Files\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -277,9 +292,6 @@
     <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\IRenderer.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\IVertexBuffer.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
@@ -301,11 +313,29 @@
     <ClInclude Include="include\Renderer\OpenGL3\Shaders.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Utils\Types.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
     <ClInclude Include="include\Input\KeyDefinition.h">
       <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Types.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resources\ResourceManifest.h">
+      <Filter>Header Files\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resources\JonsPackage.h">
+      <Filter>Header Files\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\IRenderer.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\Model.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\Entity.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\RenderItem.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

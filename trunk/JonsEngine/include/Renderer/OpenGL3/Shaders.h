@@ -1,7 +1,8 @@
 #pragma once
 
 #include "include/Core/Types.h"
-#include "include/Core/Containers/Vector.h"
+
+#include <vector>
 
 namespace JonsEngine
 {
@@ -37,10 +38,10 @@ namespace JonsEngine
         Vec4 Color;
         Mat4 MVPMatrix;
 
-        void CopyUniformData(vector<float>& buffer) const
+        void CopyUniformData(std::vector<float>& buffer) const
         {
-            vector<float> colorValues = GetTypeValues(Color);
-            vector<float> mvpMatrixValues = GetTypeValues(MVPMatrix);
+            std::vector<float> colorValues = GetTypeValues(Color);
+            std::vector<float> mvpMatrixValues = GetTypeValues(MVPMatrix);
 
             buffer.insert(buffer.end(), colorValues.begin(), colorValues.end());
             buffer.insert(buffer.end(), mvpMatrixValues.begin(), mvpMatrixValues.end());

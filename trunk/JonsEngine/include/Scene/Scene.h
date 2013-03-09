@@ -3,13 +3,14 @@
 #include "include/Core/EngineDefs.h"
 #include "include/Scene/SceneNode.h"
 #include "include/Scene/Camera.h"
-#include "include/Core/Containers/Vector.h"
+#include "include/Scene/Entity.h"
 
 #include <string>
+#include <vector>
 
 namespace JonsEngine
 {
-    class Renderer;
+    class IMemoryAllocator;
 
     /* Scene definition */
     class Scene
@@ -18,8 +19,11 @@ namespace JonsEngine
         Scene(const std::string& sceneName);
         ~Scene();
 
-        void Render(Renderer& renderer);
-       
+        EntityPtr CreateEntity(const std::string& entityName);
+        EntityPtr GetEntity(const std::string& entityName);
+        const std::vector<EntityPtr>& GetAllEntities() const;
+        void DeleteEntity(const std::string& entityName);
+
         Camera& GetSceneCamera();
         SceneNode& GetRootNode();
         const std::string& GetSceneName() const;
@@ -27,11 +31,15 @@ namespace JonsEngine
         bool operator==(const Scene& s1);
         bool operator==(const std::string& sceneName);
 
+
     private:
         const std::string mName;
         size_t mHashedID;
         Camera mSceneCamera;
         SceneNode mRootNode;
+        IMemoryAllocator& mMemoryAllocator;
+
+        std::vector<EntityPtr> mEntities;
     };
 
 

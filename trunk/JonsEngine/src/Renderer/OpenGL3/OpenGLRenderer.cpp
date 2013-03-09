@@ -8,6 +8,7 @@
 #include "include/Core/Utils/Math.h"
 
 #include "boost/bind.hpp"
+#include "boost/foreach.hpp"
 #include "GL/glew.h"
 #include "GL/glfw.h"
 #include <glm/gtc/type_ptr.hpp>
@@ -31,7 +32,7 @@ namespace JonsEngine
         // face culling - TODO
         //glEnable(GL_CULL_FACE);
 	    //glCullFace(GL_BACK);
-	    //glFrontFace(GL_CCW);
+	    glFrontFace(GL_CCW);
 
         // z depth testing
         glEnable(GL_DEPTH_TEST);
@@ -46,12 +47,12 @@ namespace JonsEngine
     {
     }
 
-    VertexBufferPtr OpenGLRenderer::CreateVertexBuffer(const vector<float>& vertexData, const vector<uint16_t>& indexData)
+    VertexBufferPtr OpenGLRenderer::CreateVertexBuffer(const std::vector<float>& vertexData, const std::vector<uint32_t>& indexData)
     {
         return CreateVertexBuffer(&vertexData[0], vertexData.size(), &indexData[0], indexData.size());
     }
 
-    VertexBufferPtr OpenGLRenderer::CreateVertexBuffer(const float vertexData[], const size_t vertexDataSize, const uint16_t indexData[], const size_t indexDataSize)
+    VertexBufferPtr OpenGLRenderer::CreateVertexBuffer(const float vertexData[], const size_t vertexDataSize, const uint32_t indexData[], const size_t indexDataSize)
     {
         return VertexBufferPtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<OpenGLVertexBuffer>(vertexData, vertexDataSize, indexData, indexDataSize), boost::bind(&HeapAllocator::DeallocateObject<OpenGLVertexBuffer>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
     }
@@ -64,19 +65,16 @@ namespace JonsEngine
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void OpenGLRenderer::RenderMesh(MeshPtr mesh, const Mat4& modelMatrix, const Mat4& viewMatrix, const Mat4& projectionMatrix)
+    void OpenGLRenderer::DrawRenderables(const std::vector<RenderItem>& renderQueue)
     {
-        if (mesh)
+        BOOST_FOREACH(const RenderItem& renderItem, renderQueue)
         {
-            // upload MVP matrix
-            Mat4 MVP = projectionMatrix * viewMatrix * modelMatrix;
             ShaderData shaderData;
             shaderData.Color.x = 1.0f; shaderData.Color.y = 0.5f; shaderData.Color.z = 0.5f; shaderData.Color.w = 1.0f;
-            shaderData.MVPMatrix = MVP;
+            shaderData.MVPMatrix = renderItem.mMVP;
             mUniBuffer.SetData(shaderData);
 
-            // render
-            mesh->GetVertexBuffer()->Render();
+            renderItem.mVertexBuffer->Render();
         }
     }
 

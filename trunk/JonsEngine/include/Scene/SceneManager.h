@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/Core/Containers/Vector.h"
+#include <vector>
 
 namespace JonsEngine
 {
@@ -20,20 +20,20 @@ namespace JonsEngine
         Scene* FindScene(const std::string& sceneName);
 
         Scene* GetActiveScene() const;
-        const vector<Scene*>& GetAllScenes() const;
+        const std::vector<Scene*>& GetAllScenes() const;
         bool HasActiveScene() const;
         void SetActiveScene(const std::string& sceneName);
 
 
     private:
-        vector<Scene*> mScenes;
+        std::vector<Scene*> mScenes;
         Scene* mActiveScene;
         IMemoryAllocator& mMemoryAllocator;
     };
 
 
     /* SceneManager inlines */
-    inline Scene* SceneManager::GetActiveScene() const                 { return mActiveScene;          }  
-    inline const vector<Scene*>& SceneManager::GetAllScenes() const    { return mScenes;               }
-    inline bool SceneManager::HasActiveScene() const                   { return mActiveScene != NULL;  }
+    inline Scene* SceneManager::GetActiveScene() const                      { return mActiveScene;          }  
+    inline const std::vector<Scene*>& SceneManager::GetAllScenes() const    { return mScenes;               }
+    inline bool SceneManager::HasActiveScene() const                        { return mActiveScene != NULL;  }
 }

@@ -2,7 +2,6 @@
 
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Memory/HeapAllocator.h"
-#include "include/Core/Containers/Vector.h"
 #include "include/Core/Utils/Math.h"
 #include "include/Scene/Scene.h"
 #include "include/Window/GLFW/GLFWWindow.h"
@@ -17,7 +16,8 @@ namespace JonsEngine
 {
 
     Engine::Engine(const EngineSettings& settings) : mLog(Logger::GetCoreLogger()), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), 
-                                                    mWindow(bootCreateWindow(settings)), mRenderer(bootCreateRenderer(settings)), mInputManager(settings)
+                                                    mWindow(bootCreateWindow(settings)), mRenderer(bootCreateRenderer(settings)), mInputManager(settings),
+                                                    mResourceManifest(bootCreateResourceManifest())
     {
         JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
     }
@@ -26,6 +26,7 @@ namespace JonsEngine
     {
         JONS_LOG_INFO(mLog, "-------- DESTROYING ENGINE --------")
 
+        mMemoryAllocator.DeallocateObject(mResourceManifest);
         mMemoryAllocator.DeallocateObject(mRenderer);
         mMemoryAllocator.DeallocateObject(mWindow);
 
@@ -41,17 +42,20 @@ namespace JonsEngine
         if (mSceneManager.HasActiveScene())
         {
             Scene* activeScene = mSceneManager.GetActiveScene();
-            // create view+perspective matrices for the renderer.
             const Mat4 viewMatrix = CreateViewMatrix(activeScene->GetSceneCamera());
             const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow->GetScreenMode().FOV, mWindow->GetScreenMode().ScreenWidth / (float)mWindow->GetScreenMode().ScreenHeight, 0.5f, 1000.0f);
 
             // update model matrix of all nodes in active scene
             activeScene->GetRootNode().UpdateModelMatrix(Mat4(1.0f));
 
+            // create the rendering queue
+            std::vector<RenderItem> renderQueue;
+            CreateRenderQueue(activeScene, viewMatrix, perspectiveMatrix, renderQueue);
+
             mRenderer->BeginRendering();
 
-            // render the root node and recursively all underlying nodes
-            RenderSceneNode(&activeScene->GetRootNode(), viewMatrix, perspectiveMatrix);
+            // render the scene
+            mRenderer->DrawRenderables(renderQueue);
 
             mRenderer->EndRendering();
         }
@@ -91,12 +95,31 @@ namespace JonsEngine
         }
     }
 
-    void Engine::RenderSceneNode(SceneNode* node, const Mat4& viewMatrix, const Mat4& projectionMatrix)
+    ResourceManifest* Engine::bootCreateResourceManifest()
     {
-        if (MeshPtr mesh = (node->GetMesh()))
-            mRenderer->RenderMesh(mesh, node->GetModelMatrix(), viewMatrix, projectionMatrix);
+        return mMemoryAllocator.AllocateObject<ResourceManifest>(GetRenderer());
+    }
 
-        BOOST_FOREACH(SceneNode* childNode, node->GetChildNodes())
-            RenderSceneNode(childNode, viewMatrix, projectionMatrix);
+
+    void Engine::CreateRenderQueue(const Scene* scene, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, std::vector<RenderItem>& renderQueue)
+    {
+        const std::vector<EntityPtr>& entities = scene->GetAllEntities();
+
+        BOOST_FOREACH(EntityPtr entity, entities)
+        {
+            if (entity->mRender && entity->mModel && entity->mNode)
+                CreateModelRenderables(entity->mModel.get(), viewMatrix, perspectiveMatrix, entity->mNode->GetNodeTransform(), renderQueue);
+        }
+    }
+
+    void Engine::CreateModelRenderables(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, std::vector<RenderItem>& renderQueue)
+    {
+        Mat4 modelMatrix = nodeTransform * model->mTransform;
+
+        BOOST_FOREACH(const Mesh& mesh, model->mMeshes)
+            renderQueue.push_back(RenderItem(mesh.mVertexBuffer, perspectiveMatrix * viewMatrix * modelMatrix));
+
+        BOOST_FOREACH(const Model& childModel, model->mChildren)
+            CreateModelRenderables(&childModel, viewMatrix, perspectiveMatrix, modelMatrix, renderQueue);
     }
 }

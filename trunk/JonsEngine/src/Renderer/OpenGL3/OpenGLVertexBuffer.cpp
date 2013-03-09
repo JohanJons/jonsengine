@@ -2,12 +2,12 @@
 
 namespace JonsEngine
 {
-    OpenGLVertexBuffer::OpenGLVertexBuffer(const vector<float>& vertexData, const vector<uint16_t>& indexData) : mIndices(vertexData.size())
+    OpenGLVertexBuffer::OpenGLVertexBuffer(const std::vector<float>& vertexData, const std::vector<uint32_t>& indexData) : mIndices(vertexData.size())
     {
         InitBuffers(&vertexData[0], vertexData.size(), &indexData[0], indexData.size());
     }
 
-    OpenGLVertexBuffer::OpenGLVertexBuffer(const float vertexData[], const size_t vertexDataSize, const uint16_t indexData[], const size_t indexDataSize) : mIndices(indexDataSize)
+    OpenGLVertexBuffer::OpenGLVertexBuffer(const float vertexData[], const size_t vertexDataSize, const uint32_t indexData[], const size_t indexDataSize) : mIndices(indexDataSize)
     {
         InitBuffers(vertexData, vertexDataSize, indexData, indexDataSize);
     }
@@ -23,12 +23,12 @@ namespace JonsEngine
     void OpenGLVertexBuffer::Render()
     {
         glBindVertexArray(mVAO);
-        glDrawElements(GL_TRIANGLES, mIndices, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(GL_TRIANGLES, mIndices, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 
 
-    void OpenGLVertexBuffer::InitBuffers(const float vertexData[], const size_t vertexDataSize, const uint16_t indexData[], const size_t indexDataSize)
+    void OpenGLVertexBuffer::InitBuffers(const float vertexData[], const size_t vertexDataSize, const uint32_t indexData[], const size_t indexDataSize)
     {
         glGenBuffers(1, &mVBO);
         glGenBuffers(1, &mIndexBuffer);
@@ -39,7 +39,7 @@ namespace JonsEngine
         glBindBuffer(GL_ARRAY_BUFFER, mVBO);
         glBufferData(GL_ARRAY_BUFFER, vertexDataSize * sizeof(float), vertexData, GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexDataSize * sizeof(uint16_t), indexData, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexDataSize * sizeof(uint32_t), indexData, GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "include/Core/Containers/vector.h"
-
+#include <vector>
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
@@ -17,15 +16,17 @@ namespace JonsEngine
     typedef glm::mat4 Mat4;
     typedef glm::fquat Quaternion;
 
-    const vector<float> _GetTypeValues(const float* valuePtr, size_t numValues);
-    inline const vector<float> GetTypeValues(const Vec2& vec)        { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float)); }        
-    inline const vector<float> GetTypeValues(const Vec3& vec)        { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float)); }
-    inline const vector<float> GetTypeValues(const Vec4& vec)        { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float)); }
-    inline const vector<float> GetTypeValues(const Mat4& mat)        { return _GetTypeValues(glm::value_ptr(mat), sizeof(mat)/sizeof(float)); }
+    const std::vector<float> _GetTypeValues(const float* valuePtr, size_t numValues);
+    inline const std::vector<float> GetTypeValues(const Vec2& vec)               { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float));    }        
+    inline const std::vector<float> GetTypeValues(const Vec3& vec)               { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float));    }
+    inline const std::vector<float> GetTypeValues(const Vec4& vec)               { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float));    }
+    inline const std::vector<float> GetTypeValues(const Mat4& mat)               { return _GetTypeValues(glm::value_ptr(mat), sizeof(mat)/sizeof(float));    }
+    inline const std::vector<float> GetTypeValues(const Quaternion& quat)        { return _GetTypeValues(glm::value_ptr(quat), sizeof(quat)/sizeof(float));  }
 
-    inline const vector<float> _GetTypeValues(const float* valuePtr, size_t numValues)
+
+    inline const std::vector<float> _GetTypeValues(const float* valuePtr, size_t numValues)
     {
-        vector<float> ret; 
+        std::vector<float> ret; 
         for(size_t i = 0; i < numValues; i++)
             ret.push_back(*(valuePtr + i));
 

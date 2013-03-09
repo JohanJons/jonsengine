@@ -42,7 +42,7 @@ namespace JonsEngine
 
     Mat4 CreateViewMatrix(const Camera& camera)
     {
-        return glm::lookAt(camera.CameraPosition, camera.TargetVector, camera.UpVector);
+        return glm::lookAt(camera.mCameraPosition, camera.mTargetVector, camera.mUpVector);
     }
 
     Mat4 CreateViewMatrix(const Vec3& CameraPosition, const Vec3& TargetVector, const Vec3& UpVector)

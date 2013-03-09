@@ -8,8 +8,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>GLEW_STATIC;GLFW_NO_GLU;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\glew-1.9.0\include;$(SolutionDir)\..\Thirdparty\glm-0.9.3.4;$(SolutionDir)\..\Thirdparty\boost_1_49_0;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>GLEW_STATIC;GLFW_NO_GLU;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\glew-1.9.0\include;$(SolutionDir)\..\Thirdparty\glm-0.9.3.4;$(SolutionDir)\..\Thirdparty\boost_1_53_0;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>

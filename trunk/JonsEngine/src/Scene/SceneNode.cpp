@@ -31,7 +31,7 @@ namespace JonsEngine
     SceneNode* SceneNode::FindChildNode(const std::string& nodeName)
     {
         SceneNode* ret = NULL;
-        vector<SceneNode*>::iterator iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), *boost::lambda::_1 == nodeName);
+        std::vector<SceneNode*>::iterator iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), *boost::lambda::_1 == nodeName);
 
         if (iter == mChildNodes.end())
         {
@@ -51,7 +51,7 @@ namespace JonsEngine
     bool SceneNode::DeleteChildNode(const std::string& nodeName)
     {
         bool isFound = false;
-        vector<SceneNode*>::iterator iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), *boost::lambda::_1 == nodeName);
+        std::vector<SceneNode*>::iterator iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), *boost::lambda::_1 == nodeName);
 
         if (iter != mChildNodes.end())
         {
@@ -73,7 +73,7 @@ namespace JonsEngine
     bool SceneNode::DeleteChildNode(SceneNode* node)
     {
         bool isFound = false;
-        vector<SceneNode*>::iterator iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), boost::lambda::_1 == node);
+        std::vector<SceneNode*>::iterator iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), boost::lambda::_1 == node);
 
         if (iter != mChildNodes.end())
         {
@@ -118,21 +118,10 @@ namespace JonsEngine
         modelMatrix *= QuaternionToMat4(mOrientation);
         modelMatrix = ScaleTransform(modelMatrix, mScale);
 
-        mModelMatrix = parentModelMatrix *modelMatrix;
+        mModelMatrix = parentModelMatrix * modelMatrix;
 
         BOOST_FOREACH(SceneNode* childNode, mChildNodes)
             childNode->UpdateModelMatrix(mModelMatrix);
-    }
-
-
-    void SceneNode::SetMesh()                                       
-    { 
-        mNodeMesh.reset(); 
-    }
-
-    void SceneNode::SetMesh(MeshPtr mesh)                           
-    {
-        mNodeMesh = mesh;
     }
 
 

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <string>
-
 #include "include/Core/EngineDefs.h"
 #include "include/Window/IWindow.h"
 #include "include/Renderer/IRenderer.h"
 #include "include/Input/InputBackend.h"
+
+#include <string>
 
 namespace JonsEngine
 {
@@ -19,12 +19,11 @@ namespace JonsEngine
     {
         // Window
         IWindow::WindowBackendType WindowBackend;
-
-        // Video
-        IRenderer::RenderBackendType RenderBackend;
         ScreenMode ScreenMode;
         std::string WindowTitle;
 
+        // Renderer
+        IRenderer::RenderBackendType RenderBackend;
 
         // Input
         InputBackend::InputBackendType InputBackend;

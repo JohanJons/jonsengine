@@ -7,6 +7,7 @@
 #include "include/Input/InputManager.h"
 #include "include/Scene/Mesh.h"
 #include "include/Scene/Scene.h"
+#include "include/Resources/ResourceManifest.h"
 
 #include "boost/bind.hpp"
 #include <Windows.h>
@@ -45,7 +46,7 @@ namespace JonsGame
         SceneNode* cube = NULL;
         Scene* activeScene = mEngine->GetSceneManager().GetActiveScene();
 
-        if (evnt.State == KeyEvent::PRESSED && (cube = activeScene->GetRootNode().FindChildNode("Cube1")))
+        if (evnt.State == KeyEvent::PRESSED && (cube = activeScene->GetRootNode().FindChildNode("Node1")))
         {
             // transforming object
             if (evnt.KeySymbol == A)
@@ -76,26 +77,26 @@ namespace JonsGame
             // move camera
             if (evnt.KeySymbol == LEFT)
             {
-                activeScene->GetSceneCamera().CameraPosition -= Vec3(0.1f, 0.0f, 0.0f);
-                activeScene->GetSceneCamera().TargetVector -= Vec3(0.1f, 0.0f, 0.0f);
+                activeScene->GetSceneCamera().mCameraPosition -= Vec3(0.1f, 0.0f, 0.0f);
+                activeScene->GetSceneCamera().mTargetVector -= Vec3(0.1f, 0.0f, 0.0f);
             }
 
             if (evnt.KeySymbol == RIGHT)
             {
-                activeScene->GetSceneCamera().CameraPosition += Vec3(0.1f, 0.0f, 0.0f);
-                activeScene->GetSceneCamera().TargetVector += Vec3(0.1f, 0.0f, 0.0f);
+                activeScene->GetSceneCamera().mCameraPosition += Vec3(0.1f, 0.0f, 0.0f);
+                activeScene->GetSceneCamera().mTargetVector += Vec3(0.1f, 0.0f, 0.0f);
             }
 
             if (evnt.KeySymbol == UP)
             {
-                activeScene->GetSceneCamera().CameraPosition -= Vec3(0.0f, 0.0f, 0.1f);
-                activeScene->GetSceneCamera().TargetVector -= Vec3(0.0f, 0.0f, 0.1f);
+                activeScene->GetSceneCamera().mCameraPosition -= Vec3(0.0f, 0.0f, 0.1f);
+                activeScene->GetSceneCamera().mTargetVector -= Vec3(0.0f, 0.0f, 0.1f);
             }
 
             if (evnt.KeySymbol == DOWN)
             {
-                activeScene->GetSceneCamera().CameraPosition += Vec3(0.0f, 0.0f, 0.1f);
-                activeScene->GetSceneCamera().TargetVector += Vec3(0.0f, 0.0f, 0.1f);
+                activeScene->GetSceneCamera().mCameraPosition += Vec3(0.0f, 0.0f, 0.1f);
+                activeScene->GetSceneCamera().mTargetVector += Vec3(0.0f, 0.0f, 0.1f);
             }
         }
     }
@@ -119,59 +120,22 @@ namespace JonsGame
 
     void Game::SetupScene()
     {
-        const float vertexPositions1[] =
-        {
-            // front vertices
-            1.0f, -1.0f, 1.0f,           // bottom right
-            -1.0f, -1.0f, 1.0f,          // bottom left
-            -1.0f, 1.0f, 1.0f,          // top left
-            1.0f, 1.0f, 1.0f,            // top right
- 
-            // back vertices
-            1.0f, -1.0f, -1.0f,           // bottom right
-            -1.0f, -1.0f, -1.0f,          // bottom left
-            -1.0f, 1.0f, -1.0f,          // top left
-            1.0f, 1.0f, -1.0f,            // top right
-        };
-
-        const uint16_t indexData1[] =
-        {
-            // back
-            5, 4, 7,
-            5, 7, 6,
-
-            // right
-            1, 5, 6,
-            1, 6, 2,
-
-            // left
-            0, 4, 7,
-            0, 7, 3,
-
-            // top
-            5, 4, 0,
-            5, 0, 1,
-
-            // bottom
-            6, 7, 3,
-            6, 3, 2,
-
-            // front
-            1, 0, 3,
-            1, 3, 2
-        };
-
-
         Scene* myScene = mEngine->GetSceneManager().CreateScene("MyScene");
         mEngine->GetSceneManager().SetActiveScene("MyScene");
 
-        SceneNode* cube1 = myScene->GetRootNode().CreateChildNode("Cube1");
-        cube1->SetMesh(Mesh::CreateMesh("Cube1Mesh", mEngine->GetRenderer().CreateVertexBuffer(vertexPositions1, sizeof(vertexPositions1)/sizeof(float), indexData1, sizeof(indexData1)/sizeof(uint16_t))));
-        SceneNode* cube2 = cube1->CreateChildNode("Cube2");
-        cube2->SetMesh(Mesh::CreateMesh("Cube2Mesh", mEngine->GetRenderer().CreateVertexBuffer(vertexPositions1, sizeof(vertexPositions1)/sizeof(float), indexData1, sizeof(indexData1)/sizeof(uint16_t))));
+        JonsPackagePtr package = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/keke.jons");
+        ModelPtr cubeModel = mEngine->GetResourceManifest().LoadModel("Cube", package);
+        SceneNode* cubeNode = myScene->GetRootNode().CreateChildNode("Node1");
+        SceneNode* cubeNode2 = myScene->GetRootNode().CreateChildNode("Node2");
+        EntityPtr cubeEntity = myScene->CreateEntity("DasCube");
+        EntityPtr cubeEntity2 = myScene->CreateEntity("DasCube2");
 
-        cube1->Translate(Vec3(5.0f, 0.0f, -15.0f));
-        cube2->Translate(Vec3(0.0f, 2.0f, 0.0f));
-        cube2->Scale(Vec3(2.0f, 1.0f, 1.0f));
+        cubeEntity->mModel = cubeModel;
+        cubeEntity->mNode = cubeNode;
+        cubeEntity2->mModel = cubeModel;
+        cubeEntity2->mNode = cubeNode2;
+
+        cubeNode->Translate(Vec3(5.0f, 0.0f, -10.0f));
+        cubeNode2->Translate(Vec3(0.0f, 0.0f, -4.0f));
     }
 }

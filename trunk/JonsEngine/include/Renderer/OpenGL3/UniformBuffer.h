@@ -1,9 +1,9 @@
 #pragma once
 
 #include "include/Core/EngineDefs.h"
-#include "include/Core/Containers/vector.h"
 
 #include "GL/glew.h"
+#include <vector>
 #include <string>
 #include <algorithm>
 
@@ -34,13 +34,13 @@ namespace JonsEngine
     template<typename T>
     inline void UniformBuffer::SetData(const T& data)
     {
-        vector<float> buffer;
+        std::vector<float> buffer;
         data.CopyUniformData(buffer);
 
         mBufferSize = buffer.size() * sizeof(float);
 
         glBindBuffer(GL_UNIFORM_BUFFER, mBuffer);
-        glBufferData(GL_UNIFORM_BUFFER, mBufferSize, buffer.begin(), GL_DYNAMIC_DRAW);
+        glBufferData(GL_UNIFORM_BUFFER, mBufferSize, &buffer[0], GL_DYNAMIC_DRAW);
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
         glBindBufferRange(GL_UNIFORM_BUFFER, mBindingIndex, mBuffer, 0, mBufferSize);

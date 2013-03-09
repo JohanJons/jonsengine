@@ -20,7 +20,7 @@ namespace JonsEngine
 
     Scene* SceneManager::CreateScene(const std::string& sceneName)
     {
-        vector<Scene*>::iterator iter = std::find_if(mScenes.begin(), mScenes.end(), *boost::lambda::_1 == sceneName);
+        std::vector<Scene*>::iterator iter = std::find_if(mScenes.begin(), mScenes.end(), *boost::lambda::_1 == sceneName);
         
         if (iter == mScenes.end())
         {
@@ -34,7 +34,7 @@ namespace JonsEngine
 
     void SceneManager::DeleteScene(const std::string& sceneName)
     {
-        vector<Scene*>::iterator iter = std::find_if(mScenes.begin(), mScenes.end(), *boost::lambda::_1 == sceneName);
+        std::vector<Scene*>::iterator iter = std::find_if(mScenes.begin(), mScenes.end(), *boost::lambda::_1 == sceneName);
 
         if (iter != mScenes.end())
         {
@@ -48,7 +48,7 @@ namespace JonsEngine
 
     void SceneManager::DeleteScene(Scene* scene)
     {
-        vector<Scene*>::iterator iter = std::find_if(mScenes.begin(), mScenes.end(), boost::lambda::_1 == scene);
+        std::vector<Scene*>::iterator iter = std::find_if(mScenes.begin(), mScenes.end(), boost::lambda::_1 == scene);
 
         if (iter != mScenes.end())
         {
@@ -62,7 +62,7 @@ namespace JonsEngine
         
     Scene* SceneManager::FindScene(const std::string& sceneName)
     {
-        vector<Scene*>::iterator iter = std::find_if(mScenes.begin(), mScenes.end(), *boost::lambda::_1 == sceneName);
+        std::vector<Scene*>::iterator iter = std::find_if(mScenes.begin(), mScenes.end(), *boost::lambda::_1 == sceneName);
         
         return iter != mScenes.end() ? *iter : NULL;
     }

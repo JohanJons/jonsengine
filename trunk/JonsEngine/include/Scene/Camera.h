@@ -7,16 +7,16 @@ namespace JonsEngine
     /* Camera definition */
     struct Camera
     {
-        Vec3 CameraPosition;
-        Vec3 TargetVector;
-        Vec3 UpVector;
+        Vec3 mCameraPosition;
+        Vec3 mTargetVector;
+        Vec3 mUpVector;
 
         Camera();
     };
 
 
     /* Camera inlines */
-    inline Camera::Camera() : CameraPosition(0.0f), TargetVector(0.0f, 0.0f, -1.0f), UpVector(0.0f, 1.0f, 0.0f)
+    inline Camera::Camera() : mCameraPosition(0.0f), mTargetVector(0.0f, 0.0f, -1.0f), mUpVector(0.0f, 1.0f, 0.0f)
     {
     }
 }

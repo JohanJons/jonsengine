@@ -3,7 +3,9 @@
 #include "include/Core/EngineSettings.h"
 #include "include/Scene/SceneManager.h"
 #include "include/Input/InputManager.h"
+#include "include/Resources/ResourceManifest.h"
 #include "include/Core/Types.h"
+#include "include/Renderer/RenderItem.h"
 
 namespace JonsEngine
 {
@@ -31,12 +33,16 @@ namespace JonsEngine
         SceneManager& GetSceneManager();
         IRenderer& GetRenderer();
         InputManager& GetInputManager();
+        ResourceManifest& GetResourceManifest();
 
 
     private:
         IWindow* bootCreateWindow(const EngineSettings& settings);
         IRenderer* bootCreateRenderer(const EngineSettings& engineSettings);
-        void RenderSceneNode(SceneNode* node, const Mat4& viewMatrix, const Mat4& projectionMatrix);
+        ResourceManifest* bootCreateResourceManifest();
+
+        void CreateRenderQueue(const Scene* scene, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, std::vector<RenderItem>& renderQueue);
+        void CreateModelRenderables(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, std::vector<RenderItem>& renderQueue);
 
         Logger& mLog;
         IMemoryAllocator& mMemoryAllocator;
@@ -46,12 +52,14 @@ namespace JonsEngine
         SceneManager mSceneManager;
         IRenderer* mRenderer;
         InputManager mInputManager;
+        ResourceManifest* mResourceManifest;
     };
 
 
     /* Engine inlines */
-    inline IWindow& Engine::GetWindow()                                 { return *mWindow;          }
-    inline SceneManager& Engine::GetSceneManager()                      { return mSceneManager;     }
-    inline IRenderer& Engine::GetRenderer()                             { return *mRenderer;        }
-    inline InputManager& Engine::GetInputManager()                      { return mInputManager;     }
+    inline IWindow& Engine::GetWindow()                                 { return *mWindow;           }
+    inline SceneManager& Engine::GetSceneManager()                      { return mSceneManager;      }
+    inline IRenderer& Engine::GetRenderer()                             { return *mRenderer;         }
+    inline InputManager& Engine::GetInputManager()                      { return mInputManager;      }
+    inline ResourceManifest& Engine::GetResourceManifest()              { return *mResourceManifest; }
 }

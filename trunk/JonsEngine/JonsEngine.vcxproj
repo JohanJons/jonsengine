@@ -45,6 +45,7 @@
     <SourcePath>$(SourcePath)</SourcePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)/bin/$(Configuration)/$(Platform)/</OutDir>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -56,22 +57,27 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\glfw-2.7.6\include;$(SolutionDir)\..\Thirdparty\glew-1.9.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>winmm.lib;OpenGL32.lib;glew32.lib;GLFW.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;OpenGL32.lib;glew32.lib;GLFW.lib;libboost_serialization-vc100-mt-sgd-1_53.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(SolutionDir)/../Thirdparty/boost_1_53_0/bin.v2/libs/serialization/build/msvc-10.0/debug/link-static/runtime-link-static/threading-multi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>
       </Command>
     </PostBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -119,7 +125,10 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Renderer\OpenGL3\Shader.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\ShaderProgram.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\UniformBuffer.cpp" />
-    <ClCompile Include="src\Scene\Mesh.cpp" />
+    <ClCompile Include="src\Resources\JonsPackage.cpp" />
+    <ClCompile Include="src\Resources\ResourceManifest.cpp" />
+    <ClCompile Include="src\Scene\Entity.cpp" />
+    <ClCompile Include="src\Scene\Model.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneManager.cpp" />
     <ClCompile Include="src\Scene\SceneNode.cpp" />
@@ -143,9 +152,9 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Core\Threading\ScopedLock.h" />
     <ClInclude Include="include\Core\Threading\Thread.h" />
     <ClInclude Include="include\Core\Threading\ThreadPool.h" />
+    <ClInclude Include="include\Core\Types.h" />
     <ClInclude Include="include\Core\Utils\JonsTime.h" />
     <ClInclude Include="include\Core\Utils\Math.h" />
-    <ClInclude Include="include\Core\Utils\Types.h" />
     <ClInclude Include="include\Input\DummyInputBackend.h" />
     <ClInclude Include="include\Input\GLFW\GLFWInputBackend.h" />
     <ClInclude Include="include\Input\InputBackend.h" />
@@ -162,8 +171,13 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.h" />
     <ClInclude Include="include\Renderer\OpenGL3\Shaders.h" />
     <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.h" />
+    <ClInclude Include="include\Renderer\RenderItem.h" />
+    <ClInclude Include="include\Resources\JonsPackage.h" />
+    <ClInclude Include="include\Resources\ResourceManifest.h" />
     <ClInclude Include="include\Scene\Camera.h" />
+    <ClInclude Include="include\Scene\Entity.h" />
     <ClInclude Include="include\Scene\Mesh.h" />
+    <ClInclude Include="include\Scene\Model.h" />
     <ClInclude Include="include\Scene\Scene.h" />
     <ClInclude Include="include\Scene\SceneManager.h" />
     <ClInclude Include="include\Scene\SceneNode.h" />

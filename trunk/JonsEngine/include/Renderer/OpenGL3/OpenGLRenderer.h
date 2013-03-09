@@ -1,12 +1,14 @@
 #pragma once
 
 #include "include/Renderer/IRenderer.h"
+#include "include/Renderer/RenderItem.h"
 #include "include/Renderer/OpenGL3/Shaders.h"
 #include "include/Renderer/OpenGL3/ShaderProgram.h"
 #include "include/Renderer/OpenGL3/UniformBuffer.h"
 #include "include/Scene/Mesh.h"
 
 #include <string>
+#include <vector>
 
 namespace JonsEngine
 {
@@ -22,11 +24,11 @@ namespace JonsEngine
         OpenGLRenderer(const EngineSettings& engineSettings);
         ~OpenGLRenderer();
 
-        VertexBufferPtr CreateVertexBuffer(const vector<float>& vertexData, const vector<uint16_t>& indexData);
-        VertexBufferPtr CreateVertexBuffer(const float vertexData[], const size_t vertexDataSize, const uint16_t indexData[], const size_t indexDataSize);
+        VertexBufferPtr CreateVertexBuffer(const std::vector<float>& vertexData, const std::vector<uint32_t>& indexData);
+        VertexBufferPtr CreateVertexBuffer(const float vertexData[], const size_t vertexDataSize, const uint32_t indexData[], const size_t indexDataSize);
 
         void BeginRendering();
-        void RenderMesh(MeshPtr mesh, const Mat4& modelMatrix, const Mat4& viewMatrix, const Mat4& projectionMatrix);
+        void DrawRenderables(const std::vector<RenderItem>& renderQueue);
         void EndRendering();
         
         RenderBackendType GetRenderBackendType() const;
@@ -37,6 +39,7 @@ namespace JonsEngine
 
         Logger& mLogger;
         IMemoryAllocator& mMemoryAllocator;
+        std::vector<RenderItem> mRenderQueue;
         ShaderProgram mDefaultProgram;
         UniformBuffer mUniBuffer;
     };
