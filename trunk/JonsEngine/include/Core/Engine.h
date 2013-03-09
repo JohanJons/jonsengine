@@ -41,7 +41,7 @@ namespace JonsEngine
         IRenderer* bootCreateRenderer(const EngineSettings& engineSettings);
         ResourceManifest* bootCreateResourceManifest();
 
-        void CreateRenderQueue(const Scene* scene, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, std::vector<RenderItem>& renderQueue);
+        void CreateRenderQueue(Scene* scene, std::vector<RenderItem>& renderQueue);
         void CreateModelRenderables(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, std::vector<RenderItem>& renderQueue);
 
         Logger& mLog;

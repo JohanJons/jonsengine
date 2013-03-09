@@ -42,15 +42,13 @@ namespace JonsEngine
         if (mSceneManager.HasActiveScene())
         {
             Scene* activeScene = mSceneManager.GetActiveScene();
-            const Mat4 viewMatrix = CreateViewMatrix(activeScene->GetSceneCamera());
-            const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow->GetScreenMode().FOV, mWindow->GetScreenMode().ScreenWidth / (float)mWindow->GetScreenMode().ScreenHeight, 0.5f, 1000.0f);
-
+            
             // update model matrix of all nodes in active scene
             activeScene->GetRootNode().UpdateModelMatrix(Mat4(1.0f));
 
             // create the rendering queue
             std::vector<RenderItem> renderQueue;
-            CreateRenderQueue(activeScene, viewMatrix, perspectiveMatrix, renderQueue);
+            CreateRenderQueue(activeScene, renderQueue);
 
             mRenderer->BeginRendering();
 
@@ -101,9 +99,11 @@ namespace JonsEngine
     }
 
 
-    void Engine::CreateRenderQueue(const Scene* scene, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, std::vector<RenderItem>& renderQueue)
+    void Engine::CreateRenderQueue(Scene* scene, std::vector<RenderItem>& renderQueue)
     {
         const std::vector<EntityPtr>& entities = scene->GetAllEntities();
+        const Mat4 viewMatrix = CreateViewMatrix(scene->GetSceneCamera());
+        const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow->GetScreenMode().FOV, mWindow->GetScreenMode().ScreenWidth / (float)mWindow->GetScreenMode().ScreenHeight, 0.5f, 1000.0f);
 
         BOOST_FOREACH(EntityPtr entity, entities)
         {
