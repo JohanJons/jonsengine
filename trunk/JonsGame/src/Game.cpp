@@ -43,7 +43,7 @@ namespace JonsGame
 
     void Game::OnKeyEvent(const KeyEvent& evnt)
     {
-        SceneNode* cube = NULL;
+        SceneNodePtr cube;
         Scene* activeScene = mEngine->GetSceneManager().GetActiveScene();
 
         if (evnt.State == KeyEvent::PRESSED && (cube = activeScene->GetRootNode().FindChildNode("Node1")))
@@ -122,20 +122,32 @@ namespace JonsGame
     {
         Scene* myScene = mEngine->GetSceneManager().CreateScene("MyScene");
         mEngine->GetSceneManager().SetActiveScene("MyScene");
-
         JonsPackagePtr package = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/keke.jons");
-        ModelPtr cubeModel = mEngine->GetResourceManifest().LoadModel("Cube", package);
-        SceneNode* cubeNode = myScene->GetRootNode().CreateChildNode("Node1");
-        SceneNode* cubeNode2 = myScene->GetRootNode().CreateChildNode("Node2");
-        EntityPtr cubeEntity = myScene->CreateEntity("DasCube");
-        EntityPtr cubeEntity2 = myScene->CreateEntity("DasCube2");
 
-        cubeEntity->mModel = cubeModel;
-        cubeEntity->mNode = cubeNode;
-        cubeEntity2->mModel = cubeModel;
-        cubeEntity2->mNode = cubeNode2;
+        ModelPtr modelCube = mEngine->GetResourceManifest().LoadModel("cube", package);
+        ModelPtr modelChair = mEngine->GetResourceManifest().LoadModel("chair", package);
+        ModelPtr modelShotgun = mEngine->GetResourceManifest().LoadModel("shotgun", package);
 
-        cubeNode->Translate(Vec3(5.0f, 0.0f, -10.0f));
-        cubeNode2->Translate(Vec3(0.0f, 0.0f, -4.0f));
+        SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("Node1");
+        SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("Node2");
+        SceneNodePtr nodeShotgun = myScene->GetRootNode().CreateChildNode("Node3");
+
+        EntityPtr entityCube = myScene->CreateEntity("DasCube");
+        EntityPtr entityChair = myScene->CreateEntity("DasChair");
+        EntityPtr entityShotgun = myScene->CreateEntity("DasShotgun");
+
+        entityCube->mModel  = modelCube;
+        entityCube->mNode   = nodeCube;
+        entityChair->mModel = modelChair;
+        entityChair->mNode  = nodeChair;
+        entityShotgun->mModel  = modelShotgun;
+        entityShotgun->mNode   = nodeShotgun;
+
+        nodeCube->Translate(Vec3(7.0f, 0.0f, -15.0f));
+        nodeChair->Translate(Vec3(0.0f, 0.0f, -8.0f));
+        nodeShotgun->Translate(Vec3(0.0f, 0.0f, -4.0f));
+        nodeShotgun->Scale(Vec3(0.1f, 0.1f, 0.1f));
+        nodeShotgun->Rotate(90.0f, Vec3(0.0f, 0.0f, -1.0f));
+        nodeShotgun->Rotate(270.0f, Vec3(0.0f, 1.0f, 0.0f));
     }
 }

@@ -4,6 +4,7 @@
 #include "boost/foreach.hpp"
 #include "boost/functional/hash.hpp"
 #include "boost/lambda/lambda.hpp"
+#include "boost/bind.hpp"
 #include <algorithm>
 #include "glm/gtx/quaternion.hpp"
 
@@ -16,26 +17,24 @@ namespace JonsEngine
         
     SceneNode::~SceneNode()
     {
-        BOOST_FOREACH(SceneNode* childNode, mChildNodes)
-            mMemoryAllocator.DeallocateObject(childNode);
     }
 
 
-    SceneNode* SceneNode::CreateChildNode(const std::string& nodeName)
+    SceneNodePtr SceneNode::CreateChildNode(const std::string& nodeName)
     {
-        mChildNodes.push_back(mMemoryAllocator.AllocateObject<SceneNode>(nodeName));
+        mChildNodes.push_back(SceneNodePtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<SceneNode>(nodeName), boost::bind(&HeapAllocator::DeallocateObject<SceneNode>, &HeapAllocator::GetDefaultHeapAllocator(), _1)));
 
         return mChildNodes.back();
     }
         
-    SceneNode* SceneNode::FindChildNode(const std::string& nodeName)
+    SceneNodePtr SceneNode::FindChildNode(const std::string& nodeName)
     {
-        SceneNode* ret = NULL;
-        std::vector<SceneNode*>::iterator iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), *boost::lambda::_1 == nodeName);
+        SceneNodePtr ret;
+        std::vector<SceneNodePtr>::iterator iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), *boost::lambda::_1 == nodeName);
 
         if (iter == mChildNodes.end())
         {
-            BOOST_FOREACH(SceneNode* node, mChildNodes)
+            BOOST_FOREACH(SceneNodePtr node, mChildNodes)
             {
                 ret = node->FindChildNode(nodeName);
                 if (ret && *ret == nodeName)
@@ -48,21 +47,20 @@ namespace JonsEngine
         return ret;
     }
         
-    bool SceneNode::DeleteChildNode(const std::string& nodeName)
+    bool SceneNode::RemoveChildNode(const std::string& nodeName)
     {
         bool isFound = false;
-        std::vector<SceneNode*>::iterator iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), *boost::lambda::_1 == nodeName);
+        std::vector<SceneNodePtr>::iterator iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), *boost::lambda::_1 == nodeName);
 
         if (iter != mChildNodes.end())
         {
-            mMemoryAllocator.DeallocateObject(*iter);
             mChildNodes.erase(iter);
             isFound = true;
         }
         else
-            BOOST_FOREACH(SceneNode* childNode, mChildNodes)
+            BOOST_FOREACH(SceneNodePtr childNode, mChildNodes)
             {
-                isFound = childNode->DeleteChildNode(nodeName);
+                isFound = childNode->RemoveChildNode(nodeName);
                 if (isFound)
                     break;
             }
@@ -70,21 +68,20 @@ namespace JonsEngine
         return isFound;
     }
         
-    bool SceneNode::DeleteChildNode(SceneNode* node)
+    bool SceneNode::RemoveChildNode(SceneNodePtr node)
     {
         bool isFound = false;
-        std::vector<SceneNode*>::iterator iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), boost::lambda::_1 == node);
+        std::vector<SceneNodePtr>::iterator iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), boost::lambda::_1 == node);
 
         if (iter != mChildNodes.end())
         {
-            mMemoryAllocator.DeallocateObject(*iter);
             mChildNodes.erase(iter);
             isFound = true;
         }
         else
-            BOOST_FOREACH(SceneNode* childNode, mChildNodes)
+            BOOST_FOREACH(SceneNodePtr childNode, mChildNodes)
             {
-                isFound = childNode->DeleteChildNode(node);
+                isFound = childNode->RemoveChildNode(node);
                 if (isFound)
                     break;
             }
@@ -120,7 +117,7 @@ namespace JonsEngine
 
         mModelMatrix = parentModelMatrix * modelMatrix;
 
-        BOOST_FOREACH(SceneNode* childNode, mChildNodes)
+        BOOST_FOREACH(SceneNodePtr childNode, mChildNodes)
             childNode->UpdateModelMatrix(mModelMatrix);
     }
 

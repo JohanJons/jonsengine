@@ -9,13 +9,24 @@
 
 namespace JonsAssetImporter
 {
+    enum ImportFlag
+    {
+        NONE = 0,
+        ASSET,
+        ASSET_NAME,
+        PACKAGE,
+    };
+
     /*
-     * Commands: 'import' : <name_of_jons_pkg> <asset_1>, ..., <asset_n>
+     * Commands: 'import' : <name_of_jons_pkg> [OPTIONS]
+     * -a <asset_1>, ..., <asset_n> 
+     * -n <asset_1_name>, ..., <asset_name_n>
+     * -p <package_name>
      */
     std::string ParseCommands(const std::vector<std::string>& cmds);
-    bool Import(const std::string& jonsPkgName, const std::vector<std::string>::const_iterator assetsCurrent, const std::vector<std::string>::const_iterator assetsEnd, Assimp::Importer importer);
+    bool Import(const std::string& packageName, const std::vector<std::string>& assets, const std::vector<std::string>& assetNames, Assimp::Importer importer);
 
-    void ProcessScene(const aiScene* scene, JonsEngine::JonsPackagePtr pkg);
+    void ProcessScene(const aiScene* scene, const std::string& modelName, JonsEngine::JonsPackagePtr pkg);
     void ProcessMeshes(const aiScene* scene, JonsEngine::JonsPackagePtr pkg);
     JonsEngine::PackageModel ProcessModel(const aiScene* scene, const aiNode* node);
     JonsEngine::Mat4 aiMat4ToJonsMat4(aiMatrix4x4 mat);

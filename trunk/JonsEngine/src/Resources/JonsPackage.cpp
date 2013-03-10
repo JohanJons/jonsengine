@@ -1,23 +1,17 @@
 #include "include/Resources/JonsPackage.h"
+#include "include/Core/Memory/HeapAllocator.h"
 
+#include "boost/bind.hpp"
 #include <string>
 #include <iostream>
 #include <fstream>
-
-// disable untill boost::serialization fixes it
-#pragma warning(disable : 4244 4308)
-
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/archive/binary_oarchive.hpp>
-#include <boost/archive/binary_iarchive.hpp>
 
 namespace JonsEngine
 {
     JonsPackagePtr ReadJonsPkg(const std::string& jonsPkgName)
     {
-        std::ifstream jonsPkgStream(jonsPkgName.c_str(), std::fstream::binary || std::fstream::in);
-        JonsPackagePtr pkg(new JonsPackage);
+        std::ifstream jonsPkgStream(jonsPkgName.c_str(), std::fstream::binary | std::fstream::in);
+        JonsPackagePtr pkg(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<JonsPackage>(), boost::bind(&HeapAllocator::DeallocateObject<JonsPackage>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
 
         if (jonsPkgStream && jonsPkgStream.good() && jonsPkgStream.is_open())
         {
@@ -31,16 +25,17 @@ namespace JonsEngine
 
     bool WriteJonsPkg(const std::string& jonsPkgName, const JonsPackagePtr pkg)
     {
-        std::ofstream outStream(jonsPkgName.c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
+        std::ofstream outStream(jonsPkgName.c_str(), std::fstream::out | std::fstream::binary);
+        bool ret = false;
 
         if (outStream.is_open())
         {
             boost::archive::binary_oarchive oar(outStream);
             oar << (*pkg.get());
 
-            return true;
+            ret = true;
         }
-        else
-            return false;
+        
+        return ret;
     }
 }

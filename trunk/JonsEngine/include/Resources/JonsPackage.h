@@ -6,6 +6,15 @@
 #include <vector>
 #include "boost/smart_ptr.hpp"
 
+// disable untill boost::serialization fixes it
+#pragma warning(disable : 4244 4308)
+
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+
 namespace JonsEngine
 {
     const uint8_t LatestMajorVersion = 0;
@@ -48,7 +57,6 @@ namespace JonsEngine
     struct JonsPackage
     {
         PackageHeader mHeader;
-        std::vector<PackageMesh> mMeshes;
         std::vector<PackageModel> mModels;
 
 
@@ -57,6 +65,10 @@ namespace JonsEngine
 
 
     typedef boost::shared_ptr<JonsPackage> JonsPackagePtr;
+
+    /*
+     * Reading/writing JonsPackage files
+     */
     JonsPackagePtr ReadJonsPkg(const std::string& jonsPkgName);
     bool WriteJonsPkg(const std::string& jonsPkgName, const JonsPackagePtr pkg);
 
@@ -70,7 +82,7 @@ namespace JonsEngine
     inline PackageModel::PackageModel() : mName(""), mTransform(1.0f)
     {
     }
-    
+
     /* PackageMesh inlines */
     inline PackageMesh::PackageMesh()
     {

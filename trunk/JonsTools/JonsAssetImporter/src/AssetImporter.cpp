@@ -2,6 +2,7 @@
 
 #include "include/Resources/JonsPackage.h"
 
+#include "boost/foreach.hpp"
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <assimp/mesh.h>
@@ -10,83 +11,107 @@ namespace JonsAssetImporter
 {
     std::string ParseCommands(const std::vector<std::string>& cmds)
     {
+        std::string ret;
+
         if (cmds.size() > 0)
         {
-            if (!cmds.front().compare("import") && cmds.size() >= 3)
+            // command == IMPORT
+            if (cmds.front().compare("import") == 0 && cmds.size() >= 2) 
             {
+                ImportFlag flag(NONE);
                 Assimp::Importer importer;
+                bool flagSet = false;
+                std::vector<std::string> assets;
+                std::vector<std::string> assetNames;
+                std::string package;
 
-                if (Import(*(cmds.cbegin()+1), cmds.cbegin()+2, cmds.cend(), importer))
-                    return "-JonsAssetImporter: Import succesfull";
-                else {
-                    std::string error = "-JonsAssetImporter: Import failed: ";
-                    error.append(importer.GetErrorString());
+                BOOST_FOREACH(const std::string& cmd, cmds)
+                {
+                    if (cmd.compare("-a") == 0) 
+                    {
+                        flag = ASSET;
+                        flagSet = true;
+                    }
+                    if (cmd.compare("-n") == 0)
+                    {
+                        flag = ASSET_NAME;
+                        flagSet = true;
+                    }
+                    if (cmd.compare("-p") == 0)
+                    {
+                        flag = PACKAGE;
+                        flagSet = true;
+                    }
 
-                    return error;
+                    if (!flagSet)
+                    {
+                        switch (flag)
+                        {
+                            case ASSET:         assets.push_back(cmd); break;
+                            case ASSET_NAME:    assetNames.push_back(cmd); break;
+                            case PACKAGE:       package = cmd; break;
+                            default:            break;
+                        }
+                    }
+
+                    flagSet = false;
                 }
-            }
-        }
 
-        return "-JonsAssetImporter: ERROR: No commands given";
+                if (assets.size() > 0 && !package.empty())
+                    if (Import(package, assets, assetNames, importer))
+                        ret = "-JonsAssetImporter: Import succesfull";
+                    else 
+                    {
+                        ret = "-JonsAssetImporter: Import failed: ";
+                        ret.append(importer.GetErrorString());
+                    }
+                else
+                    ret = "-JonsAssetImporter: No package name supplied";
+            }
+            else
+                ret = "-JonsAssetImporter: ERROR: Unknown command";
+        }
+        else 
+            ret = "-JonsAssetImporter: ERROR: No commands given";
+        
+        return ret;
     }
 
-    bool Import(const std::string& jonsPkgName, std::vector<std::string>::const_iterator assetsCurrent, std::vector<std::string>::const_iterator assetsEnd, Assimp::Importer importer)
+
+    bool Import(const std::string& packageName, const std::vector<std::string>& assets, const std::vector<std::string>& assetNames, Assimp::Importer importer)
     {
-        JonsEngine::JonsPackagePtr pkg = JonsEngine::ReadJonsPkg(jonsPkgName);
+        JonsEngine::JonsPackagePtr pkg = JonsEngine::ReadJonsPkg(packageName);
         if (!pkg)
-            pkg = JonsEngine::JonsPackagePtr(new JonsEngine::JonsPackage);
+            pkg = JonsEngine::JonsPackagePtr(new JonsEngine::JonsPackage());
          
-        while (assetsCurrent != assetsEnd)
+        std::vector<std::string>::const_iterator assetName = assetNames.begin();
+        BOOST_FOREACH(const std::string& asset, assets)
         {
-            const aiScene* scene = importer.ReadFile(*assetsCurrent, aiProcess_CalcTangentSpace      | 
-                                                                     aiProcess_Triangulate           |
-                                                                     aiProcess_JoinIdenticalVertices |
-                                                                     aiProcess_SortByPType);
+            const aiScene* scene = importer.ReadFile(asset, aiProcess_CalcTangentSpace      | 
+                                                            aiProcess_Triangulate           |
+                                                            aiProcess_JoinIdenticalVertices |
+                                                            aiProcess_SortByPType);
             if(!scene)
                 return false;
 
-            ProcessScene(scene, pkg);
+            ProcessScene(scene, assetName != assetNames.end() ? *assetName : std::string(scene->mRootNode->mName.C_Str()), pkg);
 
-            assetsCurrent++;
+            if (assetName != assetNames.end())
+                assetName++;
         }
 
-        JonsEngine::WriteJonsPkg(jonsPkgName, pkg);
+        JonsEngine::WriteJonsPkg(packageName, pkg);
 
         return true;
     }
 
-    void ProcessScene(const aiScene* scene, JonsEngine::JonsPackagePtr pkg)
+    void ProcessScene(const aiScene* scene, const std::string& modelName, JonsEngine::JonsPackagePtr pkg)
     {
-        for(unsigned int i = 0; i < scene->mRootNode->mNumChildren; i++)
-        {
-            JonsEngine::PackageModel model = ProcessModel(scene, scene->mRootNode->mChildren[i]);
+        JonsEngine::PackageModel rootModel(ProcessModel(scene, scene->mRootNode));
+        rootModel.mName = modelName;
 
-            pkg->mModels.push_back(model);
-        }
-
+        pkg->mModels.push_back(rootModel);
     }
-
-    /*void ProcessMeshes(const aiScene* scene, JonsEngine::JonsPackagePtr pkg)
-    {
-        for(unsigned int i = 0; i < scene->mNumMeshes; i++)
-        {
-            JonsEngine::PackageMesh mesh;
-            aiMesh* m = scene->mMeshes[i];
-            
-            for (unsigned int j = 0; j < m->mNumFaces; j++)
-                mesh.mIndiceData.insert(mesh.mIndiceData.end(), m->mFaces[j].mIndices, m->mFaces[j].mIndices + m->mFaces[j].mNumIndices);
-            
-            mesh.mVertexData.resize(m->mNumVertices * sizeof(float));
-            for (unsigned int j = 0; j < m->mNumVertices; j++)
-            {
-                mesh.mVertexData.push_back(m->mVertices[j].x);
-                mesh.mVertexData.push_back(m->mVertices[j].y);
-                mesh.mVertexData.push_back(m->mVertices[j].z);
-            }
-
-            pkg->mMeshes.push_back(mesh);
-        }
-    }*/
 
     JonsEngine::PackageModel ProcessModel(const aiScene* scene, const aiNode* node)
     {

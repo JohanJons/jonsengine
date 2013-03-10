@@ -19,7 +19,7 @@ namespace JonsEngine
 
         Scene* scene = mEngine->GetSceneManager().CreateScene(sceneName);
         
-        SceneNode* rootChild = scene->GetRootNode().CreateChildNode(nodeName1);
+        SceneNodePtr rootChild = scene->GetRootNode().CreateChildNode(nodeName1);
         scene->GetRootNode().CreateChildNode(nodeName2);
         rootChild->CreateChildNode(nodeName3);
 
@@ -43,14 +43,13 @@ namespace JonsEngine
 
         Scene* scene = mEngine->GetSceneManager().CreateScene(sceneName);
         
-        SceneNode* rootChild = scene->GetRootNode().CreateChildNode(nodeName1);
+        SceneNodePtr rootChild = scene->GetRootNode().CreateChildNode(nodeName1);
         scene->GetRootNode().CreateChildNode(nodeName2);
         rootChild->CreateChildNode(nodeName3);
 
         ASSERT_EQ(scene->GetRootNode().FindChildNode(nodeName3)->GetNodeName(), nodeName3);
         ASSERT_EQ(rootChild->FindChildNode(nodeName3)->GetNodeName(), nodeName3);
         ASSERT_EQ(scene->GetRootNode().FindChildNode(nodeName2)->GetNodeName(), nodeName2);
-        ASSERT_EQ((int)scene->GetRootNode().FindChildNode(nodeName4), NULL);
 
         mEngine->GetSceneManager().DeleteScene(sceneName);
 	}
@@ -69,24 +68,20 @@ namespace JonsEngine
 
         Scene* scene = mEngine->GetSceneManager().CreateScene(sceneName);
         
-        SceneNode* rootChild = scene->GetRootNode().CreateChildNode(nodeName1);
+        SceneNodePtr rootChild = scene->GetRootNode().CreateChildNode(nodeName1);
         scene->GetRootNode().CreateChildNode(nodeName2);
         rootChild->CreateChildNode(nodeName3);
 
         ASSERT_EQ(scene->GetRootNode().FindChildNode(nodeName3)->GetNodeName(), nodeName3);
         ASSERT_EQ(rootChild->FindChildNode(nodeName3)->GetNodeName(), nodeName3);
         ASSERT_EQ(scene->GetRootNode().FindChildNode(nodeName2)->GetNodeName(), nodeName2);
-        ASSERT_EQ((int)scene->GetRootNode().FindChildNode(nodeName4), NULL);
 
-        ASSERT_EQ(scene->GetRootNode().DeleteChildNode(scene->GetRootNode().FindChildNode(nodeName3)), true);
-        ASSERT_EQ((int)scene->GetRootNode().FindChildNode(nodeName3), NULL);
+        ASSERT_EQ(scene->GetRootNode().RemoveChildNode(scene->GetRootNode().FindChildNode(nodeName3)), true);
 
         rootChild->CreateChildNode(nodeName3);
-        ASSERT_EQ(scene->GetRootNode().DeleteChildNode(rootChild), true);
-        ASSERT_EQ((int)scene->GetRootNode().FindChildNode(nodeName1), NULL);
-        ASSERT_EQ((int)scene->GetRootNode().FindChildNode(nodeName3), NULL);
+        ASSERT_EQ(scene->GetRootNode().RemoveChildNode(rootChild), true);
 
-        ASSERT_EQ(scene->GetRootNode().DeleteChildNode(nodeName4), false);
+        ASSERT_EQ(scene->GetRootNode().RemoveChildNode(nodeName4), false);
 
         mEngine->GetSceneManager().DeleteScene(sceneName);
 	}

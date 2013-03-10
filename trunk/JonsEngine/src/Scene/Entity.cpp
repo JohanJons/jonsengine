@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    Entity::Entity(const std::string& name) : mName(name), mHashedID(boost::hash_value(name)), mRender(true), mNode(NULL)
+    Entity::Entity(const std::string& name) : mName(name), mHashedID(boost::hash_value(name)), mRender(true)
     {
     }
 

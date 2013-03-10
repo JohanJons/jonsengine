@@ -20,7 +20,7 @@ namespace JonsEngine
         bool mRender;
 
         ModelPtr mModel;
-        SceneNode* mNode;
+        SceneNodePtr mNode;
 
         Entity(const std::string& name);
 

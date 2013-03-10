@@ -34,7 +34,11 @@ namespace JonsEngine
         
     ModelPtr ResourceManifest::GetModel(const std::string& modelname)
     {
+        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), boost::bind(&Model::mName, _1) == modelname);
         ModelPtr ptr;
+
+        if (iter != mModels.end())
+            ptr = *iter;
 
         return ptr;
     }
@@ -45,10 +49,7 @@ namespace JonsEngine
         model.mTransform = pkgModel.mTransform;
             
         BOOST_FOREACH(PackageMesh& mesh, pkgModel.mMeshes)
-        {
             model.mMeshes.push_back(Mesh(mRenderer.CreateVertexBuffer(mesh.mVertexData, mesh.mIndiceData)));
-
-        }
 
         BOOST_FOREACH(PackageModel& m, pkgModel.mChildren)
             model.mChildren.push_back(ProcessModel(m));

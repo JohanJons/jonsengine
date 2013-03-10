@@ -4,12 +4,17 @@
 #include "include/Core/Types.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
+#include "boost/smart_ptr.hpp"
 #include <string>
 #include <vector>
 
 namespace JonsEngine
 {
     class IMemoryAllocator;
+    class SceneNode;
+
+    /* SceneNodePtr definition */
+    typedef boost::shared_ptr<SceneNode> SceneNodePtr;
 
     /* SceneNode definition */
     class SceneNode
@@ -18,10 +23,10 @@ namespace JonsEngine
         SceneNode(const std::string& nodeName);
         ~SceneNode();
 
-        SceneNode* CreateChildNode(const std::string& nodeName);
-        SceneNode* FindChildNode(const std::string& nodeName);
-        bool DeleteChildNode(const std::string& nodeName);
-        bool DeleteChildNode(SceneNode* node);
+        SceneNodePtr CreateChildNode(const std::string& nodeName);
+        SceneNodePtr FindChildNode(const std::string& nodeName);
+        bool RemoveChildNode(const std::string& nodeName);
+        bool RemoveChildNode(SceneNodePtr node);
 
         void Scale(const Vec3& scaleVec);
         void Translate(const Vec3& translateVec);
@@ -31,7 +36,7 @@ namespace JonsEngine
 
         const Mat4& GetNodeTransform() const;
         const std::string& GetNodeName() const;
-        const std::vector<SceneNode*>& GetChildNodes() const;
+        const std::vector<SceneNodePtr>& GetChildNodes() const;
 
         bool operator==(const SceneNode& s1);
         bool operator==(const std::string& nodeName);
@@ -41,7 +46,7 @@ namespace JonsEngine
         // scene-specific data
         const std::string mName;
         size_t mHashedID;
-        std::vector<SceneNode*> mChildNodes;
+        std::vector<SceneNodePtr> mChildNodes;
         IMemoryAllocator& mMemoryAllocator;
 
         // components
@@ -55,5 +60,5 @@ namespace JonsEngine
     /* SceneNode inlines */
     inline const Mat4& SceneNode::GetNodeTransform() const                      { return mModelMatrix;  } 
     inline const std::string& SceneNode::GetNodeName() const                    { return mName;         }
-    inline const std::vector<SceneNode*>& SceneNode::GetChildNodes() const      { return mChildNodes;   }
+    inline const std::vector<SceneNodePtr>& SceneNode::GetChildNodes() const    { return mChildNodes;   }
 }
