@@ -2,25 +2,31 @@
 #include "include/Scene/Camera.h"
 
 #include "glm/glm.hpp"
+#include "glm/gtx/rotate_vector.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/quaternion.hpp"
 
 
 namespace JonsEngine
 {
-    Mat4 ScaleTransform(Mat4& transform, const Vec3& scaleVec)
+    Mat4 Scale(const Mat4& matrix, const Vec3& scaleVec)
     {
-        return glm::scale(transform, scaleVec);
+        return glm::scale(matrix, scaleVec);
     }
 
-    Mat4 RotateTransform(Mat4& transform, const float angle, const Vec3& rotateVec)
+    Mat4 Rotate(const Mat4& matrix, const float angle, const Vec3& rotateVec)
     {
-        return glm::rotate(transform, angle, rotateVec);
+        return glm::rotate(matrix, angle, rotateVec);
     }
 
-    Mat4 TranslateTransform(Mat4& transform, const Vec3& translateVec)
+    Mat4 Translate(const Mat4& matrix, const Vec3& translateVec)
     {
-        return glm::translate(transform, translateVec);
+        return glm::translate(matrix, translateVec);
+    }
+
+    Mat4 Inverse(const Mat4& matrix)
+    {
+        return glm::inverse(matrix);
     }
 
 
@@ -40,7 +46,7 @@ namespace JonsEngine
         return glm::perspective(fov, aspect, zNear, zFar);
     }
 
-    Mat4 CreateViewMatrix(const Camera& camera)
+    /*Mat4 CreateViewMatrix(const Camera& camera)
     {
         return glm::lookAt(camera.mCameraPosition, camera.mTargetVector, camera.mUpVector);
     }
@@ -48,6 +54,6 @@ namespace JonsEngine
     Mat4 CreateViewMatrix(const Vec3& CameraPosition, const Vec3& TargetVector, const Vec3& UpVector)
     {
         return glm::lookAt(CameraPosition, TargetVector, UpVector);
-    }
+    }*/
 
 }

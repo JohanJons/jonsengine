@@ -29,9 +29,9 @@ namespace JonsEngine
             throw std::runtime_error("OpenGLRenderer::OpenGLRenderer(): Minimum OpenGL driver (OpenGL 3.3) not supported!");
         }
 
-        // face culling - TODO
-        //glEnable(GL_CULL_FACE);
-	    //glCullFace(GL_BACK);
+        // face culling
+        glEnable(GL_CULL_FACE);
+	    glCullFace(GL_BACK);
 	    glFrontFace(GL_CCW);
 
         // z depth testing

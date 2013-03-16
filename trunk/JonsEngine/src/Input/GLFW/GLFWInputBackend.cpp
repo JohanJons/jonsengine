@@ -27,6 +27,7 @@ namespace JonsEngine
         glfwSetKeyCallback(NULL);
         glfwSetMouseButtonCallback(NULL);
         glfwSetMousePosCallback(NULL);
+        glfwEnable(GLFW_MOUSE_CURSOR);
 
         gGLFWInputBackendInstance = NULL;
     }
@@ -52,6 +53,18 @@ namespace JonsEngine
     bool GLFWInputBackend::IsMouseButtonCallbackSet() const                               { return mOnMouseButton != NULL;    }
     bool GLFWInputBackend::IsMouseMotionCallbackSet() const                               { return mOnMouseMotion != NULL;    }
     bool GLFWInputBackend::IsKeyCallbackSet() const                                       { return mOnKey != NULL;            }
+
+
+    void GLFWInputBackend::ShowMouseCursor(bool show)
+    {
+        glfwDisable(GLFW_MOUSE_CURSOR);
+    }
+        
+    void GLFWInputBackend::SetMousePosition(uint32_t x, uint32_t y)
+    {
+        glfwSetMousePos(x, y);
+    }
+
 
     void GLFWInputBackend::glfwOnMouseButton(int button, int action)
     {

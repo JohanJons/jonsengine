@@ -127,6 +127,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Renderer\OpenGL3\UniformBuffer.cpp" />
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
+    <ClCompile Include="src\Scene\Camera.cpp" />
     <ClCompile Include="src\Scene\Entity.cpp" />
     <ClCompile Include="src\Scene\Model.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />

@@ -4,19 +4,29 @@
 
 namespace JonsEngine
 {
-    /* Camera definition */
-    struct Camera
+    /*
+     * Camera
+     */
+    class Camera
     {
-        Vec3 mCameraPosition;
-        Vec3 mTargetVector;
-        Vec3 mUpVector;
-
+    public:
         Camera();
+        ~Camera();
+
+        void SetPosition(const Vec3& position);
+        void TranslateCamera(const Vec3& translateVec);
+        void RotateCamera(const float offsetHorizontalAngle, const float offsetVerticalAngle);
+
+        Vec3 Forward() const;
+        Vec3 Right() const;
+        Mat4 Orientation() const;
+
+        Mat4 GetCameraTransform() const;
+
+
+    public:
+        Vec3 mTranslation;
+        float mHorizontalAngle;
+        float mVerticalAngle;
     };
-
-
-    /* Camera inlines */
-    inline Camera::Camera() : mCameraPosition(0.0f), mTargetVector(0.0f, 0.0f, -1.0f), mUpVector(0.0f, 1.0f, 0.0f)
-    {
-    }
 }

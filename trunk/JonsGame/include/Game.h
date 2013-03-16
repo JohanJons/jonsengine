@@ -27,5 +27,8 @@ namespace JonsGame
         JonsEngine::EngineSettings mSettings;
         JonsEngine::Engine* mEngine;
         bool mRunning;
+        uint32_t mCenterXPos;
+        uint32_t mCenterYPos;
+        const float mMoveSpeed;
     };
 }

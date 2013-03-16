@@ -56,6 +56,18 @@ namespace JonsEngine
         mKeyCallbacks.clear();
     }
 
+
+    void InputManager::ShowMouseCursor(bool show)
+    {
+        mInputBackend->ShowMouseCursor(show);
+    }
+        
+    void InputManager::SetMousePosition(uint32_t x, uint32_t y)
+    {
+        mInputBackend->SetMousePosition(x, y);
+    }
+
+
     void InputManager::Poll()
     {
         // Dispatch waiting events for each event type to registered callbacks

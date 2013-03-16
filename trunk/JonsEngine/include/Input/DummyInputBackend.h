@@ -20,6 +20,9 @@ namespace JonsEngine
         bool IsMouseMotionCallbackSet() const;
         bool IsKeyCallbackSet() const;
 
+        void ShowMouseCursor(bool show);
+        void SetMousePosition(uint32_t x, uint32_t y);
+
         InputBackendType GetInputBackendType() const;
     };
 
@@ -32,6 +35,9 @@ namespace JonsEngine
     inline bool DummyInputBackend::IsMouseButtonCallbackSet() const                                     { return false; }
     inline bool DummyInputBackend::IsMouseMotionCallbackSet() const                                     { return false; }
     inline bool DummyInputBackend::IsKeyCallbackSet() const                                             { return false; }
+
+    inline void DummyInputBackend::ShowMouseCursor(bool show)                                           { }
+    inline void DummyInputBackend::SetMousePosition(uint32_t x, uint32_t y)                             { }
 
     inline InputBackend::InputBackendType DummyInputBackend::GetInputBackendType() const                { return NONE; }
 

@@ -102,7 +102,7 @@ namespace JonsEngine
     void Engine::CreateRenderQueue(Scene* scene, std::vector<RenderItem>& renderQueue)
     {
         const std::vector<EntityPtr>& entities = scene->GetAllEntities();
-        const Mat4 viewMatrix = CreateViewMatrix(scene->GetSceneCamera());
+        const Mat4 viewMatrix = scene->GetSceneCamera().GetCameraTransform();//CreateViewMatrix(scene->GetSceneCamera());
         const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow->GetScreenMode().FOV, mWindow->GetScreenMode().ScreenWidth / (float)mWindow->GetScreenMode().ScreenHeight, 0.5f, 1000.0f);
 
         BOOST_FOREACH(EntityPtr entity, entities)

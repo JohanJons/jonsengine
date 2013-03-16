@@ -22,6 +22,9 @@ namespace JonsEngine
         bool IsMouseMotionCallbackSet() const;
         bool IsKeyCallbackSet() const;
 
+        void ShowMouseCursor(bool show);
+        void SetMousePosition(uint32_t x, uint32_t y);
+
         InputBackendType GetInputBackendType() const;
 
 

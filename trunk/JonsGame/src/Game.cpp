@@ -20,7 +20,7 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true)
+    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mCenterYPos(mEngine->GetWindow().GetScreenMode().ScreenHeight/2), mCenterXPos(mEngine->GetWindow().GetScreenMode().ScreenWidth/2), mMoveSpeed(0.1f)
     {
     }
         
@@ -35,69 +35,49 @@ namespace JonsGame
         SetupInputCallbacks();
         SetupScene();
 
+        mEngine->GetInputManager().ShowMouseCursor(false);
+
         while (mRunning)
         {
+            mEngine->GetInputManager().SetMousePosition(mCenterXPos,mCenterYPos);
+
             mEngine->Tick();
         }
     }
 
     void Game::OnKeyEvent(const KeyEvent& evnt)
     {
-        SceneNodePtr cube;
         Scene* activeScene = mEngine->GetSceneManager().GetActiveScene();
+        Camera& camera = activeScene->GetSceneCamera();
 
-        if (evnt.State == KeyEvent::PRESSED && (cube = activeScene->GetRootNode().FindChildNode("Node1")))
+        if (evnt.State == KeyEvent::PRESSED)
         {
-            // transforming object
+            // camera position
             if (evnt.KeySymbol == A)
-                cube->Translate(Vec3(-0.1f, 0.0f, 0.0f));
+                camera.TranslateCamera(-camera.Right() * mMoveSpeed);
 
-            if (evnt.KeySymbol == W)
-                cube->Translate(Vec3(0.0f, 0.1f, 0.0f));
+            else if (evnt.KeySymbol == W)
+                camera.TranslateCamera(camera.Forward() * mMoveSpeed);
 
-            if (evnt.KeySymbol == S)
-                cube->Translate(Vec3(0.0f, -0.1f, 0.0f));
+            else if (evnt.KeySymbol == S)
+                camera.TranslateCamera(-camera.Forward() * mMoveSpeed);
 
-            if (evnt.KeySymbol == D)
-                cube->Translate(Vec3(0.1f, 0.0f, 0.0f));
-
-            if (evnt.KeySymbol == Q)
-                cube->Scale(Vec3(2.0f, 1.0f, 1.0f));
-
-            if (evnt.KeySymbol == E)
-                cube->Scale(Vec3(0.5f, 1.0f, 1.0f));
-
-            if (evnt.KeySymbol == R)
-                cube->Rotate(25.0f, Vec3(1.0f, 0.0f, 0.0f));
-
-            if (evnt.KeySymbol == T)
-                cube->Rotate(25.0f, Vec3(0.0f, 1.0f, 0.0f));
+            else if (evnt.KeySymbol == D)
+                camera.TranslateCamera(camera.Right() * mMoveSpeed);
 
 
-            // move camera
-            if (evnt.KeySymbol == LEFT)
-            {
-                activeScene->GetSceneCamera().mCameraPosition -= Vec3(0.1f, 0.0f, 0.0f);
-                activeScene->GetSceneCamera().mTargetVector -= Vec3(0.1f, 0.0f, 0.0f);
-            }
+            // camera orientation
+            else if (evnt.KeySymbol == Q)
+                camera.RotateCamera(-1.0f, 0.0f);
 
-            if (evnt.KeySymbol == RIGHT)
-            {
-                activeScene->GetSceneCamera().mCameraPosition += Vec3(0.1f, 0.0f, 0.0f);
-                activeScene->GetSceneCamera().mTargetVector += Vec3(0.1f, 0.0f, 0.0f);
-            }
+            else if (evnt.KeySymbol == E)
+                camera.RotateCamera(1.0f, 0.0f);
 
-            if (evnt.KeySymbol == UP)
-            {
-                activeScene->GetSceneCamera().mCameraPosition -= Vec3(0.0f, 0.0f, 0.1f);
-                activeScene->GetSceneCamera().mTargetVector -= Vec3(0.0f, 0.0f, 0.1f);
-            }
+            else if (evnt.KeySymbol == R)
+                camera.RotateCamera(0.0f, -1.0f);
 
-            if (evnt.KeySymbol == DOWN)
-            {
-                activeScene->GetSceneCamera().mCameraPosition += Vec3(0.0f, 0.0f, 0.1f);
-                activeScene->GetSceneCamera().mTargetVector += Vec3(0.0f, 0.0f, 0.1f);
-            }
+            else if (evnt.KeySymbol == T)
+                camera.RotateCamera(0.0f, 1.0f);
         }
     }
 
@@ -108,7 +88,13 @@ namespace JonsGame
         
     void Game::OnMouseMotionEvent(const JonsEngine::MouseMotionEvent& evnt)
     {
+        Scene* activeScene = mEngine->GetSceneManager().GetActiveScene();
+        Camera& camera = activeScene->GetSceneCamera();
 
+        const float sens = 0.1f;
+        float newXPos = -((float)mCenterXPos - (float)evnt.PosX) * sens;
+        float newYPos = -((float)mCenterYPos - (float)evnt.PosY) * sens;
+        camera.RotateCamera(newXPos, newYPos);
     }
 
     void Game::SetupInputCallbacks()
@@ -143,11 +129,11 @@ namespace JonsGame
         entityShotgun->mModel  = modelShotgun;
         entityShotgun->mNode   = nodeShotgun;
 
-        nodeCube->Translate(Vec3(7.0f, 0.0f, -15.0f));
-        nodeChair->Translate(Vec3(0.0f, 0.0f, -8.0f));
-        nodeShotgun->Translate(Vec3(0.0f, 0.0f, -4.0f));
-        nodeShotgun->Scale(Vec3(0.1f, 0.1f, 0.1f));
-        nodeShotgun->Rotate(90.0f, Vec3(0.0f, 0.0f, -1.0f));
-        nodeShotgun->Rotate(270.0f, Vec3(0.0f, 1.0f, 0.0f));
+        nodeCube->TranslateNode(Vec3(7.0f, 0.0f, -15.0f));
+        nodeChair->TranslateNode(Vec3(0.0f, 0.0f, -8.0f));
+        nodeShotgun->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));
+        nodeShotgun->ScaleNode(Vec3(0.1f, 0.1f, 0.1f));
+        nodeShotgun->RotateNode(90.0f, Vec3(0.0f, 0.0f, -1.0f));
+        nodeShotgun->RotateNode(270.0f, Vec3(0.0f, 1.0f, 0.0f));
     }
 }

@@ -39,6 +39,9 @@ namespace JonsEngine
                                                         
         void ClearAllCallbacks();
 
+        void ShowMouseCursor(bool show);
+        void SetMousePosition(uint32_t x, uint32_t y);
+
         /*
          * Dispatches queued input events to all registered callbacks.
          * Is called by the Engine once per frame.

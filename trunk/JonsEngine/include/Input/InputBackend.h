@@ -25,6 +25,9 @@ namespace JonsEngine
         virtual bool IsMouseMotionCallbackSet() const = 0;
         virtual bool IsKeyCallbackSet() const = 0;
 
+        virtual void ShowMouseCursor(bool show) = 0;
+        virtual void SetMousePosition(uint32_t x, uint32_t y) = 0;
+
         virtual InputBackendType GetInputBackendType() const = 0;
     };
 }

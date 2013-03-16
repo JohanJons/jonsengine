@@ -28,9 +28,9 @@ namespace JonsEngine
         bool RemoveChildNode(const std::string& nodeName);
         bool RemoveChildNode(SceneNodePtr node);
 
-        void Scale(const Vec3& scaleVec);
-        void Translate(const Vec3& translateVec);
-        void Rotate(const float angle, const Vec3& rotateVec);
+        void ScaleNode(const Vec3& scaleVec);
+        void TranslateNode(const Vec3& translateVec);
+        void RotateNode(const float angle, const Vec3& rotateVec);
 
         void UpdateModelMatrix(const Mat4& parentModelMatrix);
 

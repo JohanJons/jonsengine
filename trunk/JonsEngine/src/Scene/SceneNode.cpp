@@ -90,17 +90,17 @@ namespace JonsEngine
     }
 
         
-    void SceneNode::Scale(const Vec3& scaleVec)                                
+    void SceneNode::ScaleNode(const Vec3& scaleVec)                                
     { 
         mScale *= scaleVec;            
     }
 
-    void SceneNode::Translate(const Vec3& translateVec)
+    void SceneNode::TranslateNode(const Vec3& translateVec)
     { 
         mTranslation += translateVec;
     }
 
-    void SceneNode::Rotate(const float angle, const Vec3& rotateVec)       
+    void SceneNode::RotateNode(const float angle, const Vec3& rotateVec)       
     { 
         Quaternion rotation = AngleAxisToQuaternion(angle, rotateVec);
         mOrientation = mOrientation * rotation;
@@ -111,9 +111,9 @@ namespace JonsEngine
     {
         Mat4 modelMatrix(1.0f);
 
-        modelMatrix = TranslateTransform(modelMatrix, mTranslation);
+        modelMatrix = Translate(modelMatrix, mTranslation);
         modelMatrix *= QuaternionToMat4(mOrientation);
-        modelMatrix = ScaleTransform(modelMatrix, mScale);
+        modelMatrix = Scale(modelMatrix, mScale);
 
         mModelMatrix = parentModelMatrix * modelMatrix;
 
