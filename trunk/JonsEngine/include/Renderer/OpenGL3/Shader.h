@@ -41,7 +41,5 @@ namespace JonsEngine
         const ShaderType mShaderType;
         GLuint mShaderHandle;
         bool mIsCompiled;
-
     };
-
 }

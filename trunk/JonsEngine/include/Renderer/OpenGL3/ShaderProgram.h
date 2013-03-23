@@ -23,6 +23,7 @@ namespace JonsEngine
 
         void AddShader(Shader* shader);
         void RemoveShader(Shader* shader);
+        Shader* GetShader(const std::string& name);
         void ClearShaders();
 
         bool LinkProgram();

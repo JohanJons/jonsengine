@@ -4,6 +4,7 @@
 #include "include/Scene/SceneNode.h"
 #include "include/Scene/Camera.h"
 #include "include/Scene/Entity.h"
+#include "include/Scene/Light.h"
 
 #include <string>
 #include <vector>
@@ -16,6 +17,8 @@ namespace JonsEngine
     class Scene
     {
     public:
+        typedef Vec4 LightColor;
+        
         Scene(const std::string& sceneName);
         ~Scene();
 
@@ -23,6 +26,14 @@ namespace JonsEngine
         EntityPtr GetEntity(const std::string& entityName);
         const std::vector<EntityPtr>& GetAllEntities() const;
         void DeleteEntity(const std::string& entityName);
+
+        LightPtr CreateLight(const std::string& lightName);
+        LightPtr GetLight(const std::string& lightName);
+        const std::vector<LightPtr>& GetAllLights() const;
+        void DeleteLight(const std::string& lightName);
+
+        void SetAmbientLight(const LightColor& ambientLight);
+        const LightColor& GetAmbientLight() const;
 
         Camera& GetSceneCamera();
         SceneNode& GetRootNode();
@@ -38,8 +49,10 @@ namespace JonsEngine
         Camera mSceneCamera;
         SceneNode mRootNode;
         IMemoryAllocator& mMemoryAllocator;
+        LightColor mAmbientLight;
 
         std::vector<EntityPtr> mEntities;
+        std::vector<LightPtr>  mLights;
     };
 
 

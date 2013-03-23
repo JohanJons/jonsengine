@@ -2,6 +2,7 @@
 
 #include "include/Scene/Model.h"
 #include "include/Scene/SceneNode.h"
+#include "include/Scene/Light.h"
 
 #include <string>
 
@@ -20,6 +21,7 @@ namespace JonsEngine
         bool mRender;
 
         ModelPtr mModel;
+        LightPtr mLight;
         SceneNodePtr mNode;
 
         Entity(const std::string& name);

@@ -24,9 +24,8 @@ namespace JonsEngine
 
         virtual ~IRenderer() { }
 
-        virtual VertexBufferPtr CreateVertexBuffer(const std::vector<float>& vertexData, const std::vector<uint32_t>& indexData) = 0;
-        virtual VertexBufferPtr CreateVertexBuffer(const float vertexData[], const size_t vertexDataSize, const uint32_t indexData[], const size_t indexDataSize) = 0;
-        
+        virtual VertexBufferPtr CreateVertexBuffer(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<uint32_t>& indexData) = 0;
+         
         virtual void BeginRendering() = 0;
         virtual void DrawRenderables(const std::vector<RenderItem>& renderQueue) = 0;
         virtual void EndRendering() = 0;

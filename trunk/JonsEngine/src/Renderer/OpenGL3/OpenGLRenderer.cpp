@@ -47,14 +47,9 @@ namespace JonsEngine
     {
     }
 
-    VertexBufferPtr OpenGLRenderer::CreateVertexBuffer(const std::vector<float>& vertexData, const std::vector<uint32_t>& indexData)
+    VertexBufferPtr OpenGLRenderer::CreateVertexBuffer(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<uint32_t>& indexData)
     {
-        return CreateVertexBuffer(&vertexData[0], vertexData.size(), &indexData[0], indexData.size());
-    }
-
-    VertexBufferPtr OpenGLRenderer::CreateVertexBuffer(const float vertexData[], const size_t vertexDataSize, const uint32_t indexData[], const size_t indexDataSize)
-    {
-        return VertexBufferPtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<OpenGLVertexBuffer>(vertexData, vertexDataSize, indexData, indexDataSize), boost::bind(&HeapAllocator::DeallocateObject<OpenGLVertexBuffer>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
+        return VertexBufferPtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<OpenGLVertexBuffer>(vertexData, normalData, indexData), boost::bind(&HeapAllocator::DeallocateObject<OpenGLVertexBuffer>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
     }
 
 
@@ -69,10 +64,7 @@ namespace JonsEngine
     {
         BOOST_FOREACH(const RenderItem& renderItem, renderQueue)
         {
-            ShaderData shaderData;
-            shaderData.Color.x = 1.0f; shaderData.Color.y = 0.5f; shaderData.Color.z = 0.5f; shaderData.Color.w = 1.0f;
-            shaderData.MVPMatrix = renderItem.mMVP;
-            mUniBuffer.SetData(shaderData);
+            mUniBuffer.SetData(renderItem);
 
             renderItem.mVertexBuffer->Render();
         }
@@ -105,6 +97,10 @@ namespace JonsEngine
 
             mDefaultProgram.UseUniform(mUniBuffer, true);
         }
-      
+        else
+        {
+            JONS_LOG_ERROR(mLogger, "OpenGLRenderer::SetupShaders(): Failed to compile shaders!");
+            throw std::runtime_error("OpenGLRenderer::SetupShaders(): Failed to compile shaders!");
+        }
     }
 }

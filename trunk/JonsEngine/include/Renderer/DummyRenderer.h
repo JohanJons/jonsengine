@@ -19,9 +19,8 @@ namespace JonsEngine
         DummyRenderer(const EngineSettings& engineSettings);
         ~DummyRenderer();
 
-        VertexBufferPtr CreateVertexBuffer(const std::vector<float>& vertexData, const std::vector<uint32_t>& indexData);
-        VertexBufferPtr CreateVertexBuffer(const float vertexData[], const size_t vertexDataSize, const uint32_t indexData[], const size_t indexDataSize);
-
+        VertexBufferPtr CreateVertexBuffer(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<uint32_t>& indexData);
+ 
         void BeginRendering();
         void DrawRenderables(const std::vector<RenderItem>& renderQueue);
         void EndRendering();

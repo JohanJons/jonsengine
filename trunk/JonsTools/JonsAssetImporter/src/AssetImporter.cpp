@@ -87,7 +87,8 @@ namespace JonsAssetImporter
         std::vector<std::string>::const_iterator assetName = assetNames.begin();
         BOOST_FOREACH(const std::string& asset, assets)
         {
-            const aiScene* scene = importer.ReadFile(asset, aiProcess_CalcTangentSpace      | 
+            const aiScene* scene = importer.ReadFile(asset, aiProcess_CalcTangentSpace      |
+                                                            aiProcess_GenNormals            |
                                                             aiProcess_Triangulate           |
                                                             aiProcess_JoinIdenticalVertices |
                                                             aiProcess_SortByPType);
@@ -124,15 +125,23 @@ namespace JonsAssetImporter
             JonsEngine::PackageMesh mesh;
             aiMesh* m = scene->mMeshes[node->mMeshes[i]];
             
-            for (unsigned int j = 0; j < m->mNumFaces; j++)
-                mesh.mIndiceData.insert(mesh.mIndiceData.end(), m->mFaces[j].mIndices, m->mFaces[j].mIndices + m->mFaces[j].mNumIndices);
-            
             for (unsigned int j = 0; j < m->mNumVertices; j++)
             {
                 mesh.mVertexData.push_back(m->mVertices[j].x);
                 mesh.mVertexData.push_back(m->mVertices[j].y);
                 mesh.mVertexData.push_back(m->mVertices[j].z);
             }
+
+            for (unsigned int j = 0; j < m->mNumVertices; j++)
+            {
+                mesh.mNormalData.push_back(m->mNormals[j].x);
+                mesh.mNormalData.push_back(m->mNormals[j].y);
+                mesh.mNormalData.push_back(m->mNormals[j].z);
+            }
+            
+            for (unsigned int j = 0; j < m->mNumFaces; j++)
+                mesh.mIndiceData.insert(mesh.mIndiceData.end(), m->mFaces[j].mIndices, m->mFaces[j].mIndices + m->mFaces[j].mNumIndices);
+
 
             model.mMeshes.push_back(mesh);
         }

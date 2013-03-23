@@ -129,6 +129,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
     <ClCompile Include="src\Scene\Entity.cpp" />
+    <ClCompile Include="src\Scene\Light.cpp" />
     <ClCompile Include="src\Scene\Model.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneManager.cpp" />
@@ -177,6 +178,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Resources\ResourceManifest.h" />
     <ClInclude Include="include\Scene\Camera.h" />
     <ClInclude Include="include\Scene\Entity.h" />
+    <ClInclude Include="include\Scene\Light.h" />
     <ClInclude Include="include\Scene\Mesh.h" />
     <ClInclude Include="include\Scene\Model.h" />
     <ClInclude Include="include\Scene\Scene.h" />

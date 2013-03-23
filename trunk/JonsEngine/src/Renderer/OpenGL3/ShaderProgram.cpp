@@ -45,6 +45,17 @@ namespace JonsEngine
         glDetachShader(mProgramHandle, shader->mShaderHandle);
     }
 
+    Shader* ShaderProgram::GetShader(const std::string& name)
+    {
+        Shader* ret = NULL;
+        std::vector<Shader*>::iterator iter = std::find_if(mAddedShaders.begin(), mAddedShaders.end(), boost::bind(&Shader::mName, _1) == name);
+
+        if (iter != mAddedShaders.end())
+            ret = *iter;
+
+        return ret;
+    }
+
     void ShaderProgram::ClearShaders()
     {
         BOOST_FOREACH(Shader* shader, mAddedShaders)

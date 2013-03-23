@@ -8,7 +8,7 @@
 
 namespace JonsEngine
 {
-    Scene::Scene(const std::string& sceneName) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mRootNode("Root"), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator())
+    Scene::Scene(const std::string& sceneName) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mRootNode("Root"), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mAmbientLight(1.0f)
     {
     }
 
@@ -29,7 +29,13 @@ namespace JonsEngine
         
     EntityPtr Scene::GetEntity(const std::string& entityName)
     {
-        return *std::find_if(mEntities.begin(), mEntities.end(), boost::bind(&Entity::mName, _1) == entityName);
+        EntityPtr ret;
+        std::vector<EntityPtr>::iterator iter = std::find_if(mEntities.begin(), mEntities.end(), boost::bind(&Entity::mName, _1) == entityName);
+
+        if (iter != mEntities.end())
+            ret = * iter;
+
+        return ret;
     }
 
     const std::vector<EntityPtr>& Scene::GetAllEntities() const
@@ -39,10 +45,56 @@ namespace JonsEngine
         
     void Scene::DeleteEntity(const std::string& entityName)
     {
-         std::vector<EntityPtr>::iterator iter = std::find_if(mEntities.begin(), mEntities.end(), boost::bind(&Entity::mName, _1) == entityName);
+        std::vector<EntityPtr>::iterator iter = std::find_if(mEntities.begin(), mEntities.end(), boost::bind(&Entity::mName, _1) == entityName);
 
         if (iter != mEntities.end())
             mEntities.erase(iter);
+    }
+
+
+    LightPtr Scene::CreateLight(const std::string& lightName)
+    {
+        LightPtr light(mMemoryAllocator.AllocateObject<Light>(lightName),
+                           boost::bind(&HeapAllocator::DeallocateObject<Light>, &mMemoryAllocator, _1));
+
+        mLights.push_back(light);
+
+        return light;
+    }
+        
+    LightPtr Scene::GetLight(const std::string& lightName)
+    {
+        LightPtr ret;
+        std::vector<LightPtr>::iterator iter = std::find_if(mLights.begin(), mLights.end(), boost::bind(&Light::mName, _1) == lightName);
+
+        if (iter != mLights.end())
+            ret = * iter;
+
+        return ret;
+    }
+
+    const std::vector<LightPtr>& Scene::GetAllLights() const
+    {
+        return mLights;
+    }
+        
+    void Scene::DeleteLight(const std::string& lightName)
+    {
+        std::vector<LightPtr>::iterator iter = std::find_if(mLights.begin(), mLights.end(), boost::bind(&Light::mName, _1) == lightName);
+
+        if (iter != mLights.end())
+            mLights.erase(iter);
+    }
+
+
+    void Scene::SetAmbientLight(const LightColor& ambientLight)
+    {
+        mAmbientLight = ambientLight;
+    }
+
+    const Scene::LightColor& Scene::GetAmbientLight() const
+    {
+        return mAmbientLight;
     }
 
 

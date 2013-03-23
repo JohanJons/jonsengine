@@ -49,7 +49,7 @@ namespace JonsEngine
         model.mTransform = pkgModel.mTransform;
             
         BOOST_FOREACH(PackageMesh& mesh, pkgModel.mMeshes)
-            model.mMeshes.push_back(Mesh(mRenderer.CreateVertexBuffer(mesh.mVertexData, mesh.mIndiceData)));
+            model.mMeshes.push_back(Mesh(mRenderer.CreateVertexBuffer(mesh.mVertexData, mesh.mNormalData, mesh.mIndiceData)));
 
         BOOST_FOREACH(PackageModel& m, pkgModel.mChildren)
             model.mChildren.push_back(ProcessModel(m));

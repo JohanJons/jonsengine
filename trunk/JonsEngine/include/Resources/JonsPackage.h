@@ -35,6 +35,7 @@ namespace JonsEngine
     struct PackageMesh
     {
         std::vector<float> mVertexData;
+        std::vector<float> mNormalData;
         std::vector<uint32_t> mIndiceData;
 
         
@@ -119,6 +120,7 @@ namespace boost
         void serialize(Archive & ar, JonsEngine::PackageMesh& mesh, const unsigned int version)
         {
             ar & mesh.mVertexData;
+            ar & mesh.mNormalData;
             ar & mesh.mIndiceData;
         }
 

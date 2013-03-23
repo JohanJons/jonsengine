@@ -36,6 +36,7 @@ namespace JonsGame
         SetupScene();
 
         mEngine->GetInputManager().ShowMouseCursor(false);
+        mEngine->GetWindow().SetScreenResolution(1280, 720);
 
         while (mRunning)
         {
@@ -66,18 +67,24 @@ namespace JonsGame
                 camera.TranslateCamera(camera.Right() * mMoveSpeed);
 
 
-            // camera orientation
+            // light direction 
             else if (evnt.KeySymbol == Q)
-                camera.RotateCamera(-1.0f, 0.0f);
+                activeScene->GetLight("light1")->mLightDirection += Vec3(-0.05, 0.0f, 0.0f);
 
             else if (evnt.KeySymbol == E)
-                camera.RotateCamera(1.0f, 0.0f);
+                activeScene->GetLight("light1")->mLightDirection += Vec3(0.05, 0.0f, 0.0f);
 
             else if (evnt.KeySymbol == R)
-                camera.RotateCamera(0.0f, -1.0f);
+                activeScene->GetLight("light1")->mLightDirection += Vec3(0.00, -0.05f, 0.0f);
 
             else if (evnt.KeySymbol == T)
-                camera.RotateCamera(0.0f, 1.0f);
+                activeScene->GetLight("light1")->mLightDirection += Vec3(0.0, 0.05f, 0.0f);
+
+            else if (evnt.KeySymbol == F)
+                activeScene->GetLight("light1")->mLightDirection += Vec3(0.0, 0.0f, -0.05f);
+
+            else if (evnt.KeySymbol == G)
+                activeScene->GetLight("light1")->mLightDirection += Vec3(0.0, 0.0f, 0.05f);
         }
     }
 
@@ -110,30 +117,30 @@ namespace JonsGame
         mEngine->GetSceneManager().SetActiveScene("MyScene");
         JonsPackagePtr package = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/keke.jons");
 
-        ModelPtr modelCube = mEngine->GetResourceManifest().LoadModel("cube", package);
-        ModelPtr modelChair = mEngine->GetResourceManifest().LoadModel("chair", package);
-        ModelPtr modelShotgun = mEngine->GetResourceManifest().LoadModel("shotgun", package);
-
-        SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("Node1");
-        SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("Node2");
+        SceneNodePtr nodeCube    = myScene->GetRootNode().CreateChildNode("Node1");
+        SceneNodePtr nodeChair   = myScene->GetRootNode().CreateChildNode("Node2");
         SceneNodePtr nodeShotgun = myScene->GetRootNode().CreateChildNode("Node3");
-
-        EntityPtr entityCube = myScene->CreateEntity("DasCube");
-        EntityPtr entityChair = myScene->CreateEntity("DasChair");
+        SceneNodePtr nodeLight   = myScene->GetRootNode().CreateChildNode("Node4");
+ 
+        EntityPtr entityCube    = myScene->CreateEntity("DasCube");
+        EntityPtr entityChair   = myScene->CreateEntity("DasChair");
         EntityPtr entityShotgun = myScene->CreateEntity("DasShotgun");
-
-        entityCube->mModel  = modelCube;
-        entityCube->mNode   = nodeCube;
-        entityChair->mModel = modelChair;
-        entityChair->mNode  = nodeChair;
-        entityShotgun->mModel  = modelShotgun;
-        entityShotgun->mNode   = nodeShotgun;
+        EntityPtr entityLight   = myScene->CreateEntity("DasLight");
+ 
+        entityCube->mModel    = mEngine->GetResourceManifest().LoadModel("cube", package);
+        entityCube->mNode     = nodeCube;
+        entityChair->mModel   = mEngine->GetResourceManifest().LoadModel("chair", package);
+        entityChair->mNode    = nodeChair;
+        entityShotgun->mModel = mEngine->GetResourceManifest().LoadModel("shotgun", package);
+        entityShotgun->mNode  = nodeShotgun;
+        entityLight->mNode    = nodeLight;
+        entityLight->mLight   = myScene->CreateLight("light1");
+ 
+        entityLight->mLight->mLightDirection = Vec3(-0.8f, 0.0f, -1.0f);
+        myScene->SetAmbientLight(Vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
         nodeCube->TranslateNode(Vec3(7.0f, 0.0f, -15.0f));
         nodeChair->TranslateNode(Vec3(0.0f, 0.0f, -8.0f));
         nodeShotgun->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));
-        nodeShotgun->ScaleNode(Vec3(0.1f, 0.1f, 0.1f));
-        nodeShotgun->RotateNode(90.0f, Vec3(0.0f, 0.0f, -1.0f));
-        nodeShotgun->RotateNode(270.0f, Vec3(0.0f, 1.0f, 0.0f));
     }
 }

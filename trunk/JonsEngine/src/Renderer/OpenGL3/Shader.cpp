@@ -3,7 +3,7 @@
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/EngineDefs.h"
 
-#include <array>
+#include <vector>
 
 namespace JonsEngine
 {
@@ -37,10 +37,9 @@ namespace JonsEngine
         glGetShaderiv(mShaderHandle, GL_COMPILE_STATUS, &status);
         if (status == GL_FALSE)
         {
-            GLint errorLogSize = 250;
-            std::array<GLchar, 250> errorLog;
-
+            GLint errorLogSize = 0;
             glGetShaderiv(mShaderHandle, GL_INFO_LOG_LENGTH, &errorLogSize);
+            std::vector<GLchar> errorLog(errorLogSize);
  
 	        glGetShaderInfoLog(mShaderHandle, errorLogSize, &errorLogSize, &errorLog[0]);
 
