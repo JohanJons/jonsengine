@@ -133,8 +133,8 @@ namespace JonsGame
         entityChair->mNode    = nodeChair;
         entityShotgun->mModel = mEngine->GetResourceManifest().LoadModel("shotgun", package);
         entityShotgun->mNode  = nodeShotgun;
-        entityLight->mNode    = nodeLight;
         entityLight->mLight   = myScene->CreateLight("light1");
+        entityLight->mNode    = nodeLight;
  
         entityLight->mLight->mLightDirection = Vec3(-0.8f, 0.0f, -1.0f);
         myScene->SetAmbientLight(Vec4(0.0f, 0.0f, 0.0f, 1.0f));

@@ -125,18 +125,18 @@ namespace JonsEngine
 
     void Engine::CreateModelRenderables(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights, const Vec4& ambientLight)
     {
-        const Mat4 modelMatrix = nodeTransform * model->mTransform;
-        const Mat4 modelViewMatrix = viewMatrix * modelMatrix;
-        const Mat4 modelViewProjMatrix = perspectiveMatrix * modelViewMatrix;
+        const Mat4 worldMatrix = nodeTransform * model->mTransform;
+        const Mat4 worldViewMatrix = viewMatrix * worldMatrix;
+        const Mat4 worldViewProjMatrix = perspectiveMatrix * worldViewMatrix;
 
         // TODO: handle multiple lights
         BOOST_FOREACH(const Mesh& mesh, model->mMeshes)
             if (activeLights.size() >= 1)
-                renderQueue.push_back(RenderItem(mesh.mVertexBuffer, Vec4(1.0f, 1.0f, 1.0f, 1.0f), modelViewProjMatrix, modelMatrix, activeLights.front()->mLightIntensity, activeLights.front()->mLightDirection, ambientLight));
+                renderQueue.push_back(RenderItem(mesh.mVertexBuffer, Vec4(1.0f, 1.0f, 1.0f, 1.0f), worldViewProjMatrix, worldMatrix, activeLights.front()->mLightIntensity, activeLights.front()->mLightDirection, ambientLight));
             else
-                renderQueue.push_back(RenderItem(mesh.mVertexBuffer, Vec4(1.0f, 1.0f, 1.0f, 1.0f), modelViewProjMatrix, modelMatrix, Vec4(0.0f), Vec3(0.0f), ambientLight));
+                renderQueue.push_back(RenderItem(mesh.mVertexBuffer, Vec4(1.0f, 1.0f, 1.0f, 1.0f), worldViewProjMatrix, worldMatrix, Vec4(0.0f), Vec3(0.0f), ambientLight));
 
         BOOST_FOREACH(const Model& childModel, model->mChildren)
-            CreateModelRenderables(&childModel, viewMatrix, perspectiveMatrix, modelMatrix, renderQueue, activeLights, ambientLight);
+            CreateModelRenderables(&childModel, viewMatrix, perspectiveMatrix, worldMatrix, renderQueue, activeLights, ambientLight);
     }
 }
