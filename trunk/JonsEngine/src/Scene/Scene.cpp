@@ -1,5 +1,6 @@
 #include "include/Scene/Scene.h"
 #include "include/Core/Memory/HeapAllocator.h"
+#include "include/Resources/ResourceManifest.h"
 
 #include "boost/functional/hash.hpp"
 #include "boost/lambda/lambda.hpp"
@@ -8,7 +9,8 @@
 
 namespace JonsEngine
 {
-    Scene::Scene(const std::string& sceneName) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mRootNode("Root"), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mAmbientLight(1.0f)
+    Scene::Scene(const std::string& sceneName, ResourceManifest& resManifest) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mRootNode("Root"), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mAmbientLight(1.0f),
+                                                                                mResourceManifest(resManifest)
     {
     }
 
@@ -17,38 +19,38 @@ namespace JonsEngine
     }
 
 
-    EntityPtr Scene::CreateEntity(const std::string& entityName)
+    ModelPtr Scene::CreateModel(const std::string& modelName, const std::string& assetName, JonsPackagePtr jonsPkg)
     {
-        EntityPtr entity(mMemoryAllocator.AllocateObject<Entity>(entityName),
-                           boost::bind(&HeapAllocator::DeallocateObject<Entity>, &mMemoryAllocator, _1));
+        ModelPtr model = mResourceManifest.LoadModel(modelName, assetName, jonsPkg);
 
-        mEntities.push_back(entity);
+        if (model)
+            mModels.push_back(model);
 
-        return entity;
+        return model;
     }
         
-    EntityPtr Scene::GetEntity(const std::string& entityName)
+    ModelPtr Scene::GetModel(const std::string& modelName)
     {
-        EntityPtr ret;
-        std::vector<EntityPtr>::iterator iter = std::find_if(mEntities.begin(), mEntities.end(), boost::bind(&Entity::mName, _1) == entityName);
+        ModelPtr ret;
+        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), boost::bind(&Model::mName, _1) == modelName);
 
-        if (iter != mEntities.end())
+        if (iter != mModels.end())
             ret = * iter;
 
         return ret;
     }
-
-    const std::vector<EntityPtr>& Scene::GetAllEntities() const
+        
+    const std::vector<ModelPtr>& Scene::GetAllModels() const
     {
-        return mEntities;
+        return mModels;
     }
         
-    void Scene::DeleteEntity(const std::string& entityName)
+    void Scene::DeleteModel(const std::string& modelName)
     {
-        std::vector<EntityPtr>::iterator iter = std::find_if(mEntities.begin(), mEntities.end(), boost::bind(&Entity::mName, _1) == entityName);
+        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), boost::bind(&Model::mName, _1) == modelName);
 
-        if (iter != mEntities.end())
-            mEntities.erase(iter);
+        if (iter != mModels.end())
+            mModels.erase(iter);
     }
 
 

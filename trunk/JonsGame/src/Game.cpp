@@ -69,22 +69,22 @@ namespace JonsGame
 
             // light direction 
             else if (evnt.KeySymbol == Q)
-                activeScene->GetLight("light1")->mLightDirection += Vec3(-0.05, 0.0f, 0.0f);
+                activeScene->GetLight("Light")->mLightDirection += Vec3(-0.05, 0.0f, 0.0f);
 
             else if (evnt.KeySymbol == E)
-                activeScene->GetLight("light1")->mLightDirection += Vec3(0.05, 0.0f, 0.0f);
+                activeScene->GetLight("Light")->mLightDirection += Vec3(0.05, 0.0f, 0.0f);
 
             else if (evnt.KeySymbol == R)
-                activeScene->GetLight("light1")->mLightDirection += Vec3(0.00, -0.05f, 0.0f);
+                activeScene->GetLight("Light")->mLightDirection += Vec3(0.00, -0.05f, 0.0f);
 
             else if (evnt.KeySymbol == T)
-                activeScene->GetLight("light1")->mLightDirection += Vec3(0.0, 0.05f, 0.0f);
+                activeScene->GetLight("Light")->mLightDirection += Vec3(0.0, 0.05f, 0.0f);
 
             else if (evnt.KeySymbol == F)
-                activeScene->GetLight("light1")->mLightDirection += Vec3(0.0, 0.0f, -0.05f);
+                activeScene->GetLight("Light")->mLightDirection += Vec3(0.0, 0.0f, -0.05f);
 
             else if (evnt.KeySymbol == G)
-                activeScene->GetLight("light1")->mLightDirection += Vec3(0.0, 0.0f, 0.05f);
+                activeScene->GetLight("Light")->mLightDirection += Vec3(0.0, 0.0f, 0.05f);
         }
     }
 
@@ -117,30 +117,30 @@ namespace JonsGame
         mEngine->GetSceneManager().SetActiveScene("MyScene");
         JonsPackagePtr package = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/keke.jons");
 
-        SceneNodePtr nodeCube    = myScene->GetRootNode().CreateChildNode("Node1");
-        SceneNodePtr nodeChair   = myScene->GetRootNode().CreateChildNode("Node2");
-        SceneNodePtr nodeShotgun = myScene->GetRootNode().CreateChildNode("Node3");
-        SceneNodePtr nodeLight   = myScene->GetRootNode().CreateChildNode("Node4");
- 
-        EntityPtr entityCube    = myScene->CreateEntity("DasCube");
-        EntityPtr entityChair   = myScene->CreateEntity("DasChair");
-        EntityPtr entityShotgun = myScene->CreateEntity("DasShotgun");
-        EntityPtr entityLight   = myScene->CreateEntity("DasLight");
- 
-        entityCube->mModel    = mEngine->GetResourceManifest().LoadModel("cube", package);
-        entityCube->mNode     = nodeCube;
-        entityChair->mModel   = mEngine->GetResourceManifest().LoadModel("chair", package);
-        entityChair->mNode    = nodeChair;
-        entityShotgun->mModel = mEngine->GetResourceManifest().LoadModel("shotgun", package);
-        entityShotgun->mNode  = nodeShotgun;
-        entityLight->mLight   = myScene->CreateLight("light1");
-        entityLight->mNode    = nodeLight;
- 
-        entityLight->mLight->mLightDirection = Vec3(-0.8f, 0.0f, -1.0f);
-        myScene->SetAmbientLight(Vec4(0.0f, 0.0f, 0.0f, 1.0f));
-
+        // cube
+        ModelPtr modelCube    = myScene->CreateModel("Cube", "cube", package);
+        SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
+        modelCube->mSceneNode = nodeCube;
         nodeCube->TranslateNode(Vec3(7.0f, 0.0f, -15.0f));
+
+        // chair
+        ModelPtr modelChair    = myScene->CreateModel("Chair", "chair", package);
+        SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("nodeChair");
+        modelChair->mSceneNode = nodeChair;
         nodeChair->TranslateNode(Vec3(0.0f, 0.0f, -8.0f));
+
+        // shotgun
+        ModelPtr modelShotgun    = myScene->CreateModel("Shotgun", "shotgun", package);
+        SceneNodePtr nodeShotgun = myScene->GetRootNode().CreateChildNode("nodeShotgun");
+        modelShotgun->mSceneNode = nodeShotgun;
         nodeShotgun->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));
+
+        // light
+        LightPtr light         = myScene->CreateLight("Light");
+        SceneNodePtr nodeLight = myScene->GetRootNode().CreateChildNode("nodeLight");
+        light->mSceneNode      = nodeLight;
+
+        // ambient
+        myScene->SetAmbientLight(Vec4(0.1f, 0.1f, 0.1f, 1.0f));
     }
 }

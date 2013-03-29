@@ -17,7 +17,7 @@ namespace JonsEngine
 
     Engine::Engine(const EngineSettings& settings) : mLog(Logger::GetCoreLogger()), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), 
                                                     mWindow(bootCreateWindow(settings)), mRenderer(bootCreateRenderer(settings)), mInputManager(settings),
-                                                    mResourceManifest(bootCreateResourceManifest())
+                                                    mResourceManifest(bootCreateResourceManifest()), mSceneManager(*mResourceManifest)
     {
         JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
     }
@@ -47,9 +47,8 @@ namespace JonsEngine
             activeScene->GetRootNode().UpdateModelMatrix(Mat4(1.0f));
 
             // create the rendering queue and active lights
-            std::vector<LightPtr> activeLights;
+            std::vector<LightPtr> activeLights = GetActiveLights(activeScene);
             std::vector<RenderItem> renderQueue;
-            GetActiveLights(activeScene, activeLights);
             CreateRenderQueue(activeScene, renderQueue, activeLights);
 
             mRenderer->BeginRendering();
@@ -103,24 +102,21 @@ namespace JonsEngine
 
     void Engine::CreateRenderQueue(Scene* scene, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights)
     {
-        const std::vector<EntityPtr>& entities = scene->GetAllEntities();
+        const std::vector<ModelPtr>& models = scene->GetAllModels();
         const Mat4 viewMatrix = scene->GetSceneCamera().GetCameraTransform();
         const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow->GetScreenMode().FOV, mWindow->GetScreenMode().ScreenWidth / (float)mWindow->GetScreenMode().ScreenHeight, 0.5f, 1000.0f);
 
-        BOOST_FOREACH(EntityPtr entity, entities)
+        BOOST_FOREACH(ModelPtr model, models)
         {
-            if (entity->mRender && entity->mModel && entity->mNode)
-                CreateModelRenderables(entity->mModel.get(), viewMatrix, perspectiveMatrix, entity->mNode->GetNodeTransform(), renderQueue, activeLights, scene->GetAmbientLight());
+            if (model && model->mSceneNode)
+                CreateModelRenderables(model.get(), viewMatrix, perspectiveMatrix, model->mSceneNode->GetNodeTransform(), renderQueue, activeLights, scene->GetAmbientLight());
         }
     }
 
-    void Engine::GetActiveLights(const Scene* scene, std::vector<LightPtr>& activeLights)
+    std::vector<LightPtr> Engine::GetActiveLights(const Scene* scene)
     {
-        const std::vector<EntityPtr>& entities = scene->GetAllEntities();
-        
-        BOOST_FOREACH(EntityPtr entity, entities)
-            if (entity && entity->mLight)
-                activeLights.push_back(entity->mLight);
+        // TODO: cull lights, ...
+        return std::vector<LightPtr>(scene->GetAllLights());
     }
 
     void Engine::CreateModelRenderables(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights, const Vec4& ambientLight)

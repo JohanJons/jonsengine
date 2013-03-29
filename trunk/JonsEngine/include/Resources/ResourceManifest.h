@@ -16,12 +16,12 @@ namespace JonsEngine
         ResourceManifest(IRenderer& renderer);
         ~ResourceManifest();
 
-        ModelPtr LoadModel(const std::string& modelname, JonsPackagePtr jonsPkg);
-        ModelPtr GetModel(const std::string& modelname);
+        ModelPtr LoadModel(const std::string& modelName, const std::string& assetName, JonsPackagePtr jonsPkg);
+        ModelPtr GetModel(const std::string& modelName);
 
 
     private:
-        Model ProcessModel(PackageModel& pkgModel);
+        Model ProcessModel(PackageModel& pkgModel, const std::string& modelName);
 
         IRenderer& mRenderer;
         std::vector<ModelPtr> mModels;

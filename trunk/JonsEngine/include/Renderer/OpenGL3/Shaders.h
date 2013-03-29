@@ -59,7 +59,7 @@ namespace JonsEngine
                                         void main()										                        \n \
                                         {												                        \n \
                                             float angIncidence = dot(frag_normal, frag_dirToLight);             \n  \
-                                            angIncidence = clamp(angIncidence, 0, 1);                           \n  \
+                                            angIncidence       = clamp(angIncidence, 0, 1);                     \n  \
                                                                                                                 \n  \
                                             finalColor = (frag_lightIntensity * frag_color * angIncidence) +    \n  \
                                                          (frag_color * frag_ambientLight);                      \n  \

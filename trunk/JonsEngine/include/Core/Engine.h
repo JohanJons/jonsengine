@@ -31,10 +31,10 @@ namespace JonsEngine
         void Tick();
 
         IWindow& GetWindow();
-        SceneManager& GetSceneManager();
         IRenderer& GetRenderer();
         InputManager& GetInputManager();
         ResourceManifest& GetResourceManifest();
+        SceneManager& GetSceneManager();
 
 
     private:
@@ -43,7 +43,7 @@ namespace JonsEngine
         ResourceManifest* bootCreateResourceManifest();
 
         void CreateRenderQueue(Scene* scene, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights);
-        void GetActiveLights(const Scene* scene, std::vector<LightPtr>& activeLights);
+        std::vector<LightPtr> GetActiveLights(const Scene* scene);
         void CreateModelRenderables(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights, const Vec4& ambientLight);
  
         Logger& mLog;
@@ -51,17 +51,17 @@ namespace JonsEngine
 
         /* Modules */
         IWindow* mWindow;
-        SceneManager mSceneManager;
         IRenderer* mRenderer;
         InputManager mInputManager;
         ResourceManifest* mResourceManifest;
+        SceneManager mSceneManager;
     };
 
 
     /* Engine inlines */
     inline IWindow& Engine::GetWindow()                                 { return *mWindow;           }
-    inline SceneManager& Engine::GetSceneManager()                      { return mSceneManager;      }
     inline IRenderer& Engine::GetRenderer()                             { return *mRenderer;         }
     inline InputManager& Engine::GetInputManager()                      { return mInputManager;      }
     inline ResourceManifest& Engine::GetResourceManifest()              { return *mResourceManifest; }
+    inline SceneManager& Engine::GetSceneManager()                      { return mSceneManager;      }
 }

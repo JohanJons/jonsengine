@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Scene/Mesh.h"
+#include "include/Scene/SceneNode.h"
 #include "include/Core/Types.h"
 
 #include <string>
@@ -18,9 +19,13 @@ namespace JonsEngine
     {
         const std::string mName;
         const size_t mHashedID;
+
         std::vector<Model> mChildren;
         std::vector<Mesh> mMeshes;
         Mat4 mTransform;
+
+        SceneNodePtr mSceneNode;
+
 
         Model(const std::string& name);
 

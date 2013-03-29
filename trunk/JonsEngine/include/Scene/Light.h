@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/Types.h"
+#include "include/Scene/SceneNode.h"
 
 #include "boost/smart_ptr.hpp"
 #include <string>
@@ -9,7 +10,7 @@ namespace JonsEngine
 {
     struct Light;
 
-    /* EntityPtr definition */
+    /* LightPtr definition */
     typedef boost::shared_ptr<Light> LightPtr;
 
     struct Light
@@ -19,6 +20,9 @@ namespace JonsEngine
 
         Vec4 mLightIntensity;
         Vec3 mLightDirection;
+
+        SceneNodePtr mSceneNode;
+
 
         Light(const std::string& name);
 

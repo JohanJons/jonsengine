@@ -3,14 +3,16 @@
 #include "include/Core/EngineDefs.h"
 #include "include/Scene/SceneNode.h"
 #include "include/Scene/Camera.h"
-#include "include/Scene/Entity.h"
 #include "include/Scene/Light.h"
+#include "include/Scene/Model.h"
+#include "include/Resources/JonsPackage.h"
 
 #include <string>
 #include <vector>
 
 namespace JonsEngine
 {
+    class ResourceManifest;
     class IMemoryAllocator;
 
     /* Scene definition */
@@ -19,13 +21,13 @@ namespace JonsEngine
     public:
         typedef Vec4 LightColor;
         
-        Scene(const std::string& sceneName);
+        Scene(const std::string& sceneName, ResourceManifest& resManifest);
         ~Scene();
 
-        EntityPtr CreateEntity(const std::string& entityName);
-        EntityPtr GetEntity(const std::string& entityName);
-        const std::vector<EntityPtr>& GetAllEntities() const;
-        void DeleteEntity(const std::string& entityName);
+        ModelPtr CreateModel(const std::string& modelName, const std::string& assetName, JonsPackagePtr jonsPkg);
+        ModelPtr GetModel(const std::string& modelName);
+        const std::vector<ModelPtr>& GetAllModels() const;
+        void DeleteModel(const std::string& modelName);
 
         LightPtr CreateLight(const std::string& lightName);
         LightPtr GetLight(const std::string& lightName);
@@ -48,11 +50,13 @@ namespace JonsEngine
         size_t mHashedID;
         Camera mSceneCamera;
         SceneNode mRootNode;
-        IMemoryAllocator& mMemoryAllocator;
         LightColor mAmbientLight;
 
-        std::vector<EntityPtr> mEntities;
-        std::vector<LightPtr>  mLights;
+        std::vector<ModelPtr> mModels;
+        std::vector<LightPtr> mLights;
+
+        ResourceManifest& mResourceManifest;
+        IMemoryAllocator& mMemoryAllocator;
     };
 
 

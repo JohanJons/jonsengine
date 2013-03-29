@@ -188,9 +188,6 @@
     <ClCompile Include="src\Scene\Model.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Entity.cpp">
-      <Filter>Source Files\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scene\Camera.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
@@ -332,9 +329,6 @@
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="include\Scene\Model.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scene\Entity.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\RenderItem.h">
