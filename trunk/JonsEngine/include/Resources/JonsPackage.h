@@ -36,7 +36,7 @@ namespace JonsEngine
     {
         std::vector<float> mVertexData;
         std::vector<float> mNormalData;
-        std::vector<uint32_t> mIndiceData;
+        std::vector<uint32_t> mIndiceData;     // TODO: evaluate if uint32_t byte is really needed, otherwise go with uint16_t to reduce size...
 
         
         PackageMesh();
