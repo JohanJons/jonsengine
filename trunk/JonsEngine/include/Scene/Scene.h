@@ -29,7 +29,7 @@ namespace JonsEngine
         const std::vector<ModelPtr>& GetAllModels() const;
         void DeleteModel(const std::string& modelName);
 
-        LightPtr CreateLight(const std::string& lightName);
+        LightPtr CreateLight(const std::string& lightName, Light::LightType type);
         LightPtr GetLight(const std::string& lightName);
         const std::vector<LightPtr>& GetAllLights() const;
         void DeleteLight(const std::string& lightName);

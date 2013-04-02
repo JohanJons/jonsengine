@@ -15,16 +15,24 @@ namespace JonsEngine
 
     struct Light
     {
+        enum LightType
+        {
+            POSITIONAL = 0,
+            DIRECTIONAL
+        };
+
         const std::string mName;
         const size_t mHashedID;
 
         Vec4 mLightIntensity;
         Vec3 mLightDirection;
+        float mLightAttenuation;
+        LightType mLightType;
 
         SceneNodePtr mSceneNode;
 
 
-        Light(const std::string& name);
+        Light(const std::string& name, LightType type);
 
         bool operator==(const Light& light);
         bool operator==(const std::string& lightName);

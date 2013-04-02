@@ -19,9 +19,9 @@ namespace JonsEngine
  
      const std::vector<float> _GetTypeValues(const float* valuePtr, size_t numValues, size_t numPadding = 0);
      inline const std::vector<float> GetTypeValues(const Vec2& vec)               { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float));      }        
-     inline const std::vector<float> GetTypeValues(const Vec3& vec)               { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float), 1);   }
+     inline const std::vector<float> GetTypeValues(const Vec3& vec)               { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float));      }
      inline const std::vector<float> GetTypeValues(const Vec4& vec)               { return _GetTypeValues(glm::value_ptr(vec), sizeof(vec)/sizeof(float));      }
-     inline const std::vector<float> GetTypeValues(const Mat3& mat)               { return _GetTypeValues(glm::value_ptr(mat), sizeof(mat)/sizeof(float), 3);   }
+     inline const std::vector<float> GetTypeValues(const Mat3& mat)               { return _GetTypeValues(glm::value_ptr(mat), sizeof(mat)/sizeof(float));      }
      inline const std::vector<float> GetTypeValues(const Mat4& mat)               { return _GetTypeValues(glm::value_ptr(mat), sizeof(mat)/sizeof(float));      }
      inline const std::vector<float> GetTypeValues(const Quaternion& quat)        { return _GetTypeValues(glm::value_ptr(quat), sizeof(quat)/sizeof(float));    }
  
@@ -31,8 +31,7 @@ namespace JonsEngine
          for(size_t i = 0; i < numValues; i++)
              ret.push_back(*(valuePtr + i));
  
-        for(size_t i = 0; i < numPadding; i++)
-             ret.push_back(0.0f); 
+         // TODO: find a good system to match the potential padding required by GLSL
 
          return ret;
      }

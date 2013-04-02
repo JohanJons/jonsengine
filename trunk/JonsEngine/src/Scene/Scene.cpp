@@ -54,9 +54,9 @@ namespace JonsEngine
     }
 
 
-    LightPtr Scene::CreateLight(const std::string& lightName)
+    LightPtr Scene::CreateLight(const std::string& lightName, Light::LightType type)
     {
-        LightPtr light(mMemoryAllocator.AllocateObject<Light>(lightName),
+        LightPtr light(mMemoryAllocator.AllocateObject<Light>(lightName, type),
                            boost::bind(&HeapAllocator::DeallocateObject<Light>, &mMemoryAllocator, _1));
 
         mLights.push_back(light);

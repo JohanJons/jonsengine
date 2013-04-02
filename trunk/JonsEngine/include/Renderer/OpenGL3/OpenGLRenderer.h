@@ -36,11 +36,13 @@ namespace JonsEngine
     private:
         void SetupShaders();
 
-        Logger& mLogger;
-        IMemoryAllocator& mMemoryAllocator;
         std::vector<RenderItem> mRenderQueue;
         ShaderProgram mDefaultProgram;
-        UniformBuffer mUniBuffer;
+        UniformBuffer mUniBufferTransform;
+        UniformBuffer mUniBufferLight;
+
+        Logger& mLogger;
+        IMemoryAllocator& mMemoryAllocator;
     };
 
 

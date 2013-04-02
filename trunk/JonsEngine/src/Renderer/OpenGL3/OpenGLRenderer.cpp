@@ -17,7 +17,8 @@
 
 namespace JonsEngine
 {
-    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings) : mLogger(Logger::GetRendererLogger()), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mDefaultProgram("DefaultProgram"), mUniBuffer("DefaultUniform")
+    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings) : mLogger(Logger::GetRendererLogger()), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()),
+                                                                            mDefaultProgram("DefaultProgram"), mUniBufferTransform("Transform"), mUniBufferLight("Light")
     {
         // 'glewExperimental = GL_TRUE' needed to initialize openGL core profile; see GLEW doc
         glewExperimental = GL_TRUE;
@@ -64,7 +65,11 @@ namespace JonsEngine
     {
         BOOST_FOREACH(const RenderItem& renderItem, renderQueue)
         {
-            mUniBuffer.SetData(renderItem);
+            std::vector<float> transformData(renderItem.CopyTransformData());
+            std::vector<float> lightData(renderItem.CopyLightData());
+
+            mUniBufferTransform.SetData(transformData);
+            mUniBufferLight.SetData(lightData);
 
             renderItem.mVertexBuffer->Render();
         }
@@ -95,7 +100,8 @@ namespace JonsEngine
             if (mDefaultProgram.IsLinked())
                 mDefaultProgram.UseProgram(true);
 
-            mDefaultProgram.UseUniform(mUniBuffer, true);
+            mDefaultProgram.UseUniform(mUniBufferTransform, true);
+            mDefaultProgram.UseUniform(mUniBufferLight, true);
         }
         else
         {

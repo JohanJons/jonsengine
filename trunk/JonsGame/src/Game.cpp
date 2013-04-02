@@ -69,22 +69,22 @@ namespace JonsGame
 
             // light direction 
             else if (evnt.KeySymbol == Q)
-                activeScene->GetLight("Light")->mLightDirection += Vec3(-0.05, 0.0f, 0.0f);
+                activeScene->GetLight("PositionalLight")->mSceneNode->TranslateNode(Vec3(-0.05, 0.0f, 0.0f));
 
             else if (evnt.KeySymbol == E)
-                activeScene->GetLight("Light")->mLightDirection += Vec3(0.05, 0.0f, 0.0f);
+                activeScene->GetLight("PositionalLight")->mSceneNode->TranslateNode(Vec3(0.05, 0.0f, 0.0f));
 
             else if (evnt.KeySymbol == R)
-                activeScene->GetLight("Light")->mLightDirection += Vec3(0.00, -0.05f, 0.0f);
+                activeScene->GetLight("PositionalLight")->mSceneNode->TranslateNode(Vec3(0.00, -0.05f, 0.0f));
 
             else if (evnt.KeySymbol == T)
-                activeScene->GetLight("Light")->mLightDirection += Vec3(0.0, 0.05f, 0.0f);
+                activeScene->GetLight("PositionalLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.05f, 0.0f));
 
             else if (evnt.KeySymbol == F)
-                activeScene->GetLight("Light")->mLightDirection += Vec3(0.0, 0.0f, -0.05f);
+                activeScene->GetLight("PositionalLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, -0.05f));
 
             else if (evnt.KeySymbol == G)
-                activeScene->GetLight("Light")->mLightDirection += Vec3(0.0, 0.0f, 0.05f);
+                activeScene->GetLight("PositionalLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, 0.05f));
         }
     }
 
@@ -136,9 +136,10 @@ namespace JonsGame
         nodeShotgun->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));
 
         // light
-        LightPtr light         = myScene->CreateLight("Light");
+        LightPtr light         = myScene->CreateLight("PositionalLight", Light::POSITIONAL);
         SceneNodePtr nodeLight = myScene->GetRootNode().CreateChildNode("nodeLight");
         light->mSceneNode      = nodeLight;
+        nodeLight->TranslateNode(Vec3(7.0f, 0.0f, -15.0f));
 
         // ambient
         myScene->SetAmbientLight(Vec4(0.1f, 0.1f, 0.1f, 1.0f));

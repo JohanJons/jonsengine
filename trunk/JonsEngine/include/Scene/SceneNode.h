@@ -34,6 +34,8 @@ namespace JonsEngine
 
         void UpdateModelMatrix(const Mat4& parentModelMatrix);
 
+        Vec3 Position() const;
+
         const Mat4& GetNodeTransform() const;
         const std::string& GetNodeName() const;
         const std::vector<SceneNodePtr>& GetChildNodes() const;

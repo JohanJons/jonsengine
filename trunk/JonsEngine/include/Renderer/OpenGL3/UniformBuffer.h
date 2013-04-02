@@ -18,8 +18,7 @@ namespace JonsEngine
         UniformBuffer(const std::string& name);
         ~UniformBuffer();
 
-        template<typename T>
-        void SetData(const T& data);
+        void SetData(const std::vector<float>& buffer);
 
 
     private:
@@ -28,21 +27,4 @@ namespace JonsEngine
         GLuint mBuffer;
         size_t mBufferSize;
     };
-
-
-    /* UniformBuffer inlines */
-    template<typename T>
-    inline void UniformBuffer::SetData(const T& data)
-    {
-        std::vector<float> buffer;
-        data.CopyUniformData(buffer);
-
-        mBufferSize = buffer.size() * sizeof(float);
-
-        glBindBuffer(GL_UNIFORM_BUFFER, mBuffer);
-        glBufferData(GL_UNIFORM_BUFFER, mBufferSize, &buffer[0], GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-        glBindBufferRange(GL_UNIFORM_BUFFER, mBindingIndex, mBuffer, 0, mBufferSize);
-    }
 }

@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    Light::Light(const std::string& name) : mName(name), mHashedID(boost::hash_value(name)), mLightIntensity(1.0f, 1.0f, 1.0f, 1.0f), mLightDirection(1.0f, 1.0f, 1.0f)
+    Light::Light(const std::string& name, LightType type) : mName(name), mHashedID(boost::hash_value(name)), mLightIntensity(1.0f, 1.0f, 1.0f, 1.0f), mLightDirection(1.0f, 1.0f, 1.0f), mLightAttenuation(1.0f), mLightType(type)
     {
     }
 

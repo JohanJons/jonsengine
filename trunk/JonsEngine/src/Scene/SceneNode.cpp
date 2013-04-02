@@ -122,6 +122,15 @@ namespace JonsEngine
     }
 
 
+    Vec3 SceneNode::Position() const
+    {
+        Vec3 position(0.0f);
+        position += mTranslation;
+
+        return position;
+    }
+
+
     bool SceneNode::operator==(const SceneNode& s1)
     {
         return mHashedID == s1.mHashedID;

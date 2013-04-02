@@ -13,34 +13,55 @@ namespace JonsEngine
         const Mat4 mWVP;
         const Mat4 mWorldMatrix;
 
-        const Vec4 mAmbientLight;
-        const Vec4 mLightIntensity;
-        const Vec3 mDirToLight;
+        const Vec4  mAmbientLight;
+        const Vec4  mLightIntensity;
+        const Vec3  mLightPosition;
+        const float mLightAttenuation;
 
-        void CopyUniformData(std::vector<float>& buffer) const
+
+        // TODO: something other than several vectors...
+        std::vector<float> CopyTransformData() const
         {
+            std::vector<float> ret;
+
             std::vector<float> colorValues = GetTypeValues(mColor);
             std::vector<float> wvpMatrixValues = GetTypeValues(mWVP);
             std::vector<float> worldMatrixValues = GetTypeValues(mWorldMatrix);
-            std::vector<float> ambinetLightMatrixValues = GetTypeValues(mAmbientLight);
-            std::vector<float> lightIntensityMatrixValues = GetTypeValues(mLightIntensity);
-            std::vector<float> dirToLightMatrixValues = GetTypeValues(mDirToLight);
 
-            buffer.insert(buffer.end(), colorValues.begin(), colorValues.end());
-            buffer.insert(buffer.end(), wvpMatrixValues.begin(), wvpMatrixValues.end());
-            buffer.insert(buffer.end(), worldMatrixValues.begin(), worldMatrixValues.end());
-            buffer.insert(buffer.end(), ambinetLightMatrixValues.begin(), ambinetLightMatrixValues.end());
-            buffer.insert(buffer.end(), lightIntensityMatrixValues.begin(), lightIntensityMatrixValues.end());
-            buffer.insert(buffer.end(), dirToLightMatrixValues.begin(), dirToLightMatrixValues.end());
+            ret.insert(ret.end(), colorValues.begin(), colorValues.end());
+            ret.insert(ret.end(), wvpMatrixValues.begin(), wvpMatrixValues.end());
+            ret.insert(ret.end(), worldMatrixValues.begin(), worldMatrixValues.end());
+
+            return ret;
         }
 
-        RenderItem(VertexBufferPtr vertexBuffer, const Vec4& color, const Mat4& wvp, const Mat4& worldMatrix, const Vec4& lightIntensity, const Vec3& dirToLight, const Vec4& ambientLight);
+        std::vector<float> CopyLightData() const
+        {
+            std::vector<float> ret;
+
+            std::vector<float> ambientLightMatrixValues = GetTypeValues(mAmbientLight);
+            std::vector<float> lightIntensityMatrixValues = GetTypeValues(mLightIntensity);
+            std::vector<float> lightPositionMatrixValues = GetTypeValues(mLightPosition);
+
+            ret.insert(ret.end(), ambientLightMatrixValues.begin(), ambientLightMatrixValues.end());
+            ret.insert(ret.end(), lightIntensityMatrixValues.begin(), lightIntensityMatrixValues.end());
+            ret.insert(ret.end(), lightPositionMatrixValues.begin(), lightPositionMatrixValues.end());
+            ret.push_back(mLightAttenuation);
+
+            return ret;
+        }
+
+        RenderItem(VertexBufferPtr vertexBuffer, const Vec4& color, const Mat4& wvp, const Mat4& worldMatrix, 
+                    const Vec4& lightIntensity, const Vec3& lightPosition, const Vec4& ambientLight, const float lightAttenuation);
     };
 
 
     /* RenderItem inlines */
-    inline RenderItem::RenderItem(VertexBufferPtr vertexBuffer, const Vec4& color, const Mat4& wvp, const Mat4& worldMatrix, const Vec4& lightIntensity, const Vec3& dirToLight, const Vec4& ambientLight) : 
-                                    mVertexBuffer(vertexBuffer), mColor(color), mWVP(wvp), mWorldMatrix(worldMatrix), mLightIntensity(lightIntensity), mDirToLight(dirToLight), mAmbientLight(ambientLight)
+    inline RenderItem::RenderItem(VertexBufferPtr vertexBuffer, const Vec4& color, const Mat4& wvp, const Mat4& worldMatrix, 
+                                    const Vec4& lightIntensity, const Vec3& lightPosition, const Vec4& ambientLight, const float lightAttenuation) 
+                                    : 
+                                    mVertexBuffer(vertexBuffer), mColor(color), mWVP(wvp), mWorldMatrix(worldMatrix),
+                                    mLightIntensity(lightIntensity), mLightPosition(lightPosition), mAmbientLight(ambientLight), mLightAttenuation(lightAttenuation)
     {
     }
 }
