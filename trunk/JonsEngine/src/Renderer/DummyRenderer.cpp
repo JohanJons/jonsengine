@@ -1,9 +1,5 @@
 #include "include/Renderer/DummyRenderer.h"
 
-#include "include/Core/EngineDefs.h"
-
-#include <vector>
-
 namespace JonsEngine
 {
     DummyRenderer::DummyRenderer(const EngineSettings& engineSettings)

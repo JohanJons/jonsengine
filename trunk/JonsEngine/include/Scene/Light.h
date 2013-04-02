@@ -13,6 +13,7 @@ namespace JonsEngine
     /* LightPtr definition */
     typedef boost::shared_ptr<Light> LightPtr;
 
+    /* Light definition */
     struct Light
     {
         enum LightType

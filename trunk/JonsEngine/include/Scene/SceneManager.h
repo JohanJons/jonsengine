@@ -4,9 +4,9 @@
 
 namespace JonsEngine
 {
-    class Scene;
     class ResourceManifest;
     class IMemoryAllocator;
+    class Scene;
 
     /* SceneManager definition */
     class SceneManager

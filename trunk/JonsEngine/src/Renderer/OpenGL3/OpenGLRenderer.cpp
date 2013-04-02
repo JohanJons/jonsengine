@@ -2,23 +2,20 @@
 
 #include "include/Renderer/OpenGL3/OpenGLVertexBuffer.h"
 #include "include/Renderer/OpenGL3/Shader.h"
+#include "include/Renderer/OpenGL3/Shaders.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Memory/HeapAllocator.h"
-#include "include/Core/Utils/Math.h"
 
 #include "boost/bind.hpp"
 #include "boost/foreach.hpp"
 #include "GL/glew.h"
-#include "GL/glfw.h"
-#include <glm/gtc/type_ptr.hpp>
 #include <exception>
 
 
 namespace JonsEngine
 {
-    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings) : mLogger(Logger::GetRendererLogger()), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()),
-                                                                            mDefaultProgram("DefaultProgram"), mUniBufferTransform("Transform"), mUniBufferLight("Light")
+    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings) : mLogger(Logger::GetRendererLogger()), mDefaultProgram("DefaultProgram"), mUniBufferTransform("Transform"), mUniBufferLight("Light")
     {
         // 'glewExperimental = GL_TRUE' needed to initialize openGL core profile; see GLEW doc
         glewExperimental = GL_TRUE;

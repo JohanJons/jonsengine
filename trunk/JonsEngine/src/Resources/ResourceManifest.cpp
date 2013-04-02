@@ -1,5 +1,7 @@
 #include "include/Resources/ResourceManifest.h"
 #include "include/Scene/Model.h"
+#include "include/Renderer/IRenderer.h"
+#include "include/Core/Memory/HeapAllocator.h"
 
 #include "boost/bind.hpp"
 #include "boost/foreach.hpp"

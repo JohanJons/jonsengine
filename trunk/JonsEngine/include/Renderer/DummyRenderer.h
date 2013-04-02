@@ -1,7 +1,6 @@
 #pragma once
 
 #include "include/Renderer/IRenderer.h"
-#include "include/Scene/Mesh.h"
 
 namespace JonsEngine
 {

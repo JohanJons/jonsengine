@@ -1,8 +1,6 @@
 #pragma once
 
-#include "include/Scene/Mesh.h"
 #include "include/Core/Types.h"
-#include "include/Core/Memory/HeapAllocator.h"
 
 #include "boost/smart_ptr.hpp"
 #include <string>

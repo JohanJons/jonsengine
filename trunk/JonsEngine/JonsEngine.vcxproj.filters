@@ -241,9 +241,6 @@
     <ClInclude Include="include\Core\Logging\Logger.h">
       <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Memory\IMemoryAllocator.h">
-      <Filter>Header Files\Core\Memory</Filter>
-    </ClInclude>
     <ClInclude Include="include\Input\InputManager.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
@@ -339,6 +336,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\EngineDefs.h">
       <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Memory\IMemoryAllocator.h">
+      <Filter>Header Files\Core\Memory</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

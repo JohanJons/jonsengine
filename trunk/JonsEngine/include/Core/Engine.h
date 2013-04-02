@@ -1,20 +1,21 @@
 #pragma once
 
-#include "include/Core/EngineSettings.h"
+#include "include/Core/Types.h"
 #include "include/Scene/SceneManager.h"
 #include "include/Scene/Light.h"
 #include "include/Input/InputManager.h"
-#include "include/Resources/ResourceManifest.h"
-#include "include/Core/Types.h"
 #include "include/Renderer/RenderItem.h"
 
 namespace JonsEngine
 {
+    struct EngineSettings;
+    struct Model;
+    class IMemoryAllocator;
+    class Logger;
     class IWindow;
     class IRenderer;
-    class IMemoryAllocator;
+    class ResourceManifest;
     class SceneNode;
-    class Logger;
 
     /*
      * Engine is the central controller object.

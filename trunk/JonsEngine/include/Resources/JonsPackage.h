@@ -64,8 +64,9 @@ namespace JonsEngine
         JonsPackage();
     };
 
-
+    /* JonsPackagePtr definition */
     typedef boost::shared_ptr<JonsPackage> JonsPackagePtr;
+
 
     /*
      * Reading/writing JonsPackage files
@@ -95,10 +96,12 @@ namespace JonsEngine
     }
 }
 
+
 namespace boost
 {
     namespace serialization
     {
+        /* Defines how to serialize JonsPackage */
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageHeader& header, const unsigned int version)
         {

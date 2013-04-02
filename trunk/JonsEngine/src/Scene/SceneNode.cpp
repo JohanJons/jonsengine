@@ -1,12 +1,12 @@
 #include "include/Scene/SceneNode.h"
 #include "include/Core/Utils/Math.h"
+#include "include/Core/Memory/HeapAllocator.h"
 
 #include "boost/foreach.hpp"
 #include "boost/functional/hash.hpp"
 #include "boost/lambda/lambda.hpp"
 #include "boost/bind.hpp"
 #include <algorithm>
-#include "glm/gtx/quaternion.hpp"
 
 namespace JonsEngine
 {

@@ -4,6 +4,7 @@
 #include "gtest/gtest.h"
 
 #include "include/Core/Engine.h"
+#include "include/Core/EngineSettings.h"
 
 namespace JonsEngine
 {

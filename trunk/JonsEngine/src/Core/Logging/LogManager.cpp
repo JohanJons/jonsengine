@@ -1,4 +1,5 @@
 #include "include/Core/Logging/LogManager.h"
+#include "include/Core/Threading/ScopedLock.h"
 
 namespace JonsEngine
 {

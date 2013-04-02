@@ -2,13 +2,14 @@
 
 #include "include/Resources/JonsPackage.h"
 #include "include/Scene/Model.h"
-#include "include/Renderer/IRenderer.h"
-#include "include/Core/Memory/HeapAllocator.h"
 
 #include <vector>
 
 namespace JonsEngine
 {
+    class IMemoryAllocator;
+    class IRenderer;
+
     /* ResourceManifest definition */
     class ResourceManifest
     {

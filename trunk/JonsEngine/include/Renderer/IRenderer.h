@@ -2,8 +2,6 @@
 
 #include "include/Renderer/IVertexBuffer.h"
 #include "include/Renderer/RenderItem.h"
-#include "include/Scene/Mesh.h"
-#include "include/Core/Types.h"
 #include "include/Core/EngineDefs.h"
 
 #include <vector>

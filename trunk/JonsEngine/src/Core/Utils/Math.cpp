@@ -1,5 +1,4 @@
 #include "include/Core/Utils/Math.h"
-#include "include/Scene/Camera.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtx/rotate_vector.hpp"
@@ -45,15 +44,4 @@ namespace JonsEngine
     {
         return glm::perspective(fov, aspect, zNear, zFar);
     }
-
-    /*Mat4 CreateViewMatrix(const Camera& camera)
-    {
-        return glm::lookAt(camera.mCameraPosition, camera.mTargetVector, camera.mUpVector);
-    }
-
-    Mat4 CreateViewMatrix(const Vec3& CameraPosition, const Vec3& TargetVector, const Vec3& UpVector)
-    {
-        return glm::lookAt(CameraPosition, TargetVector, UpVector);
-    }*/
-
 }

@@ -1,6 +1,9 @@
 #pragma once
 
 #include "include/Input/InputBackend.h"
+#include "include/Input/KeyCallback.h"
+#include "include/Input/MouseCallback.h"
+#include "include/Core/EngineDefs.h"
 
 namespace JonsEngine
 {

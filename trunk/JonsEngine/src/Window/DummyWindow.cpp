@@ -1,7 +1,5 @@
 #include "include/Window/DummyWindow.h"
 
-#include "include/Core/EngineSettings.h"
-
 namespace JonsEngine
 {
     DummyWindow::DummyWindow(const EngineSettings& engineSettings)

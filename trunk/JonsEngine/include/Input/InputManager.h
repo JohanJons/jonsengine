@@ -3,7 +3,7 @@
 #include "include/Input/KeyCallback.h"
 #include "include/Input/MouseCallback.h"
 #include "include/Core/EngineSettings.h"
-#include "include/Core/Memory/HeapAllocator.h"
+#include "include/Core/EngineDefs.h"
 
 #include <vector>
 
@@ -12,6 +12,7 @@ namespace JonsEngine
     struct MouseButtonEvent;
     struct MouseMotionEvent;
     struct KeyEvent;
+    class IMemoryAllocator;
     class Logger;
     class InputBackend;
 

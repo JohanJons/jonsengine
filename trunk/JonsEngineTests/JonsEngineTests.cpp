@@ -1,4 +1,5 @@
 #include "include/Core/Engine.h"
+#include "include/Core/EngineSettings.h"
 
 // memory leak detector
 #include <vld.h>

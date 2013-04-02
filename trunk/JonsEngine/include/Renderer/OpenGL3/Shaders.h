@@ -1,8 +1,6 @@
 #pragma once
 
-#include "include/Core/Types.h"
-
-#include <vector>
+#include <string>
 
 namespace JonsEngine
 {

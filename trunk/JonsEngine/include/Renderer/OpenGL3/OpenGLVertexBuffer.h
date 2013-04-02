@@ -3,8 +3,8 @@
 #include "include/Renderer/IVertexBuffer.h"
 #include "include/Core/EngineDefs.h"
 
-#include <vector>
 #include "GL/glew.h"
+#include <vector>
 
 namespace JonsEngine
 {

@@ -4,6 +4,7 @@
 #include "include/Scene/SceneNode.h"
 #include "include/Core/Types.h"
 
+#include "boost/smart_ptr.hpp"
 #include <string>
 #include <vector>
 

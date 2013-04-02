@@ -3,7 +3,7 @@
 #include "include/Core/EngineDefs.h"
 #include "include/Core/Logging/JonsStreamBuf.h"
 #include "include/Core/Logging/JonsOutputStream.h"
-#include "include/Core/Threading/ScopedLock.h"
+#include "include/Core/Threading/Mutex.h"
 
 #include <iostream>
 #include <fstream>

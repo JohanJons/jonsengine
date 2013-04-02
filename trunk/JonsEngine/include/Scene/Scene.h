@@ -1,6 +1,5 @@
 #pragma once
 
-#include "include/Core/EngineDefs.h"
 #include "include/Scene/SceneNode.h"
 #include "include/Scene/Camera.h"
 #include "include/Scene/Light.h"
@@ -12,8 +11,8 @@
 
 namespace JonsEngine
 {
-    class ResourceManifest;
     class IMemoryAllocator;
+    class ResourceManifest;
 
     /* Scene definition */
     class Scene

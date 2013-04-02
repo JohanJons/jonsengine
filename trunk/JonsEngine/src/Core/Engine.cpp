@@ -3,11 +3,13 @@
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/Utils/Math.h"
+#include "include/Core/EngineSettings.h"
 #include "include/Scene/Scene.h"
 #include "include/Window/GLFW/GLFWWindow.h"
 #include "include/Window/DummyWindow.h"
 #include "include/Renderer/OpenGL3/OpenGLRenderer.h"
 #include "include/Renderer/DummyRenderer.h"
+#include "include/Resources/ResourceManifest.h"
 
 #include "boost/foreach.hpp"
 

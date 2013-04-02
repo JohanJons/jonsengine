@@ -1,9 +1,9 @@
 #include "include/Scene/Scene.h"
 #include "include/Core/Memory/HeapAllocator.h"
+#include "include/Core/EngineDefs.h"
 #include "include/Resources/ResourceManifest.h"
 
 #include "boost/functional/hash.hpp"
-#include "boost/lambda/lambda.hpp"
 #include "boost/bind.hpp"
 #include <algorithm>
 
