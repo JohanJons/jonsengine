@@ -9,9 +9,9 @@
 
 namespace JonsAssetImporter
 {
-    std::string ParseCommands(const std::vector<std::string>& cmds)
+    ParseCmdResult ParseCommands(const std::vector<std::string>& cmds, std::string& errorString)
     {
-        std::string ret;
+        ParseCmdResult ret = FAIL;
 
         if (cmds.size() > 0)
         {
@@ -49,7 +49,7 @@ namespace JonsAssetImporter
                         {
                             case ASSET:         assets.push_back(cmd); break;
                             case ASSET_NAME:    assetNames.push_back(cmd); break;
-                            case PACKAGE:       package = cmd; break;
+                            case PACKAGE:       package = cmd;  if ((package.compare(package.size() - 5, 5, ".jons") != 0)) package.append(".jons");  break;
                             default:            break;
                         }
                     }
@@ -57,22 +57,23 @@ namespace JonsAssetImporter
                     flagSet = false;
                 }
 
-                if (assets.size() > 0 && !package.empty())
-                    if (Import(package, assets, assetNames, importer))
-                        ret = "-JonsAssetImporter: Import succesfull";
-                    else 
-                    {
-                        ret = "-JonsAssetImporter: Import failed: ";
-                        ret.append(importer.GetErrorString());
-                    }
-                else
-                    ret = "-JonsAssetImporter: No package name supplied";
+                if (assets.size() <= 0)
+                    errorString.append("-JonsAssetImporter: No assets supplied");
+                else if (package.empty())
+                    errorString.append("-JonsAssetImporter: No package name given");
+                else if (Import(package, assets, assetNames, importer))
+                    ret = SUCCESS;
+                else {
+                    errorString.append("-JonsAssetImporter: Parsing error: ");
+                    errorString.append(importer.GetErrorString());
+                }
+
             }
             else
-                ret = "-JonsAssetImporter: ERROR: Unknown command";
+                errorString.append("-JonsAssetImporter: ERROR: Unknown command");
         }
         else 
-            ret = "-JonsAssetImporter: ERROR: No commands given";
+            errorString.append("-JonsAssetImporter: ERROR: No commands given");
         
         return ret;
     }

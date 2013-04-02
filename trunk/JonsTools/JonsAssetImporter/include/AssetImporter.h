@@ -17,13 +17,20 @@ namespace JonsAssetImporter
         PACKAGE,
     };
 
+    enum ParseCmdResult
+    {
+        SUCCESS = 0,
+        FAIL
+    };
+
+
     /*
      * Commands: 'import' : <name_of_jons_pkg> [OPTIONS]
      * -a <asset_1>, ..., <asset_n> 
      * -n <asset_1_name>, ..., <asset_name_n>
      * -p <package_name>
      */
-    std::string ParseCommands(const std::vector<std::string>& cmds);
+    ParseCmdResult ParseCommands(const std::vector<std::string>& cmds, std::string& errorString);
     bool Import(const std::string& packageName, const std::vector<std::string>& assets, const std::vector<std::string>& assetNames, Assimp::Importer importer);
 
     void ProcessScene(const aiScene* scene, const std::string& modelName, JonsEngine::JonsPackagePtr pkg);
