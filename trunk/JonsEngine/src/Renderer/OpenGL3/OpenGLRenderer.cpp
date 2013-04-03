@@ -90,8 +90,6 @@ namespace JonsEngine
             mDefaultProgram.AddShader(&vertexShader);
             mDefaultProgram.AddShader(&fragmentShader);
 
-            mDefaultProgram.BindAttribLocation(0, "in_position");
-
             mDefaultProgram.LinkProgram();
 
             if (mDefaultProgram.IsLinked())
