@@ -19,18 +19,13 @@ namespace JonsEngine
         const float mLightAttenuation;
 
 
-        // TODO: something other than several vectors...
         std::vector<float> CopyTransformData() const
         {
             std::vector<float> ret;
 
-            std::vector<float> colorValues = GetTypeValues(mColor);
-            std::vector<float> wvpMatrixValues = GetTypeValues(mWVP);
-            std::vector<float> worldMatrixValues = GetTypeValues(mWorldMatrix);
-
-            ret.insert(ret.end(), colorValues.begin(), colorValues.end());
-            ret.insert(ret.end(), wvpMatrixValues.begin(), wvpMatrixValues.end());
-            ret.insert(ret.end(), worldMatrixValues.begin(), worldMatrixValues.end());
+            GetTypeValues(mColor, ret);
+            GetTypeValues(mWVP, ret);
+            GetTypeValues(mWorldMatrix, ret);
 
             return ret;
         }
@@ -39,13 +34,9 @@ namespace JonsEngine
         {
             std::vector<float> ret;
 
-            std::vector<float> ambientLightMatrixValues = GetTypeValues(mAmbientLight);
-            std::vector<float> lightIntensityMatrixValues = GetTypeValues(mLightIntensity);
-            std::vector<float> lightPositionMatrixValues = GetTypeValues(mLightPosition);
-
-            ret.insert(ret.end(), ambientLightMatrixValues.begin(), ambientLightMatrixValues.end());
-            ret.insert(ret.end(), lightIntensityMatrixValues.begin(), lightIntensityMatrixValues.end());
-            ret.insert(ret.end(), lightPositionMatrixValues.begin(), lightPositionMatrixValues.end());
+            GetTypeValues(mAmbientLight, ret);
+            GetTypeValues(mLightIntensity, ret);
+            GetTypeValues(mLightPosition, ret);
             ret.push_back(mLightAttenuation);
 
             return ret;
