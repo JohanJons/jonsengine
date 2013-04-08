@@ -8,7 +8,6 @@
 
 namespace JonsEngine
 {
-    struct Mesh;
 
     /* IRenderer definition */
     class IRenderer
@@ -23,10 +22,7 @@ namespace JonsEngine
         virtual ~IRenderer() { }
 
         virtual VertexBufferPtr CreateVertexBuffer(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<uint32_t>& indexData) = 0;
-         
-        virtual void BeginRendering() = 0;
         virtual void DrawRenderables(const std::vector<RenderItem>& renderQueue) = 0;
-        virtual void EndRendering() = 0;
         
         virtual RenderBackendType GetRenderBackendType() const = 0;
     };

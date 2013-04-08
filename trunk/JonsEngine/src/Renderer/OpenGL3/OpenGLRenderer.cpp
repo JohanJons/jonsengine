@@ -51,15 +51,12 @@ namespace JonsEngine
     }
 
 
-    void OpenGLRenderer::BeginRendering()
+    void OpenGLRenderer::DrawRenderables(const std::vector<RenderItem>& renderQueue)
     {
         glClearDepth(1.0f);
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
-
-    void OpenGLRenderer::DrawRenderables(const std::vector<RenderItem>& renderQueue)
-    {
+        
         BOOST_FOREACH(const RenderItem& renderItem, renderQueue)
         {
             std::vector<float> transformData(renderItem.CopyTransformData());
@@ -70,10 +67,6 @@ namespace JonsEngine
 
             renderItem.mVertexBuffer->Render();
         }
-    }
-
-    void OpenGLRenderer::EndRendering()
-    {
     }
 
 

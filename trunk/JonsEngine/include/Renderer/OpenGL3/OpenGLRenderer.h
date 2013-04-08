@@ -22,10 +22,7 @@ namespace JonsEngine
         ~OpenGLRenderer();
 
         VertexBufferPtr CreateVertexBuffer(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<uint32_t>& indexData);
- 
-        void BeginRendering();
         void DrawRenderables(const std::vector<RenderItem>& renderQueue);
-        void EndRendering();
         
         RenderBackendType GetRenderBackendType() const;
 

@@ -53,12 +53,8 @@ namespace JonsEngine
             std::vector<RenderItem> renderQueue;
             CreateRenderQueue(activeScene, renderQueue, activeLights);
 
-            mRenderer->BeginRendering();
-
             // render the scene
             mRenderer->DrawRenderables(renderQueue);
-
-            mRenderer->EndRendering();
         }
 
         mWindow->EndFrame();
