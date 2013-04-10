@@ -118,30 +118,28 @@ namespace JonsGame
         JonsPackagePtr package = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/keke.jons");
 
         // cube
-        ModelPtr modelCube    = myScene->CreateModel("Cube", "cube", package);
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
-        modelCube->mSceneNode = nodeCube;
+        ModelPtr modelCube    = myScene->CreateModel("Cube", "cube", package, nodeCube);
         nodeCube->TranslateNode(Vec3(7.0f, 0.0f, -15.0f));
 
         // chair
-        ModelPtr modelChair    = myScene->CreateModel("Chair", "chair", package);
         SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("nodeChair");
-        modelChair->mSceneNode = nodeChair;
+        ModelPtr modelChair    = myScene->CreateModel("Chair", "chair", package, nodeChair);
         nodeChair->TranslateNode(Vec3(0.0f, 0.0f, -8.0f));
 
         // shotgun
-        ModelPtr modelShotgun    = myScene->CreateModel("Shotgun", "shotgun", package);
         SceneNodePtr nodeShotgun = myScene->GetRootNode().CreateChildNode("nodeShotgun");
+        ModelPtr modelShotgun    = myScene->CreateModel("Shotgun", "shotgun", package, nodeShotgun);
         modelShotgun->mSceneNode = nodeShotgun;
         nodeShotgun->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));
 
         // light
-        LightPtr light         = myScene->CreateLight("PositionalLight", Light::POSITIONAL);
         SceneNodePtr nodeLight = myScene->GetRootNode().CreateChildNode("nodeLight");
-        light->mSceneNode      = nodeLight;
+        LightPtr light         = myScene->CreateLight("PositionalLight", Light::POSITIONAL, nodeLight);
+        light->mLightIntensity = Vec4(2.0f, 2.0f, 2.0f, 1.0f);
         nodeLight->TranslateNode(Vec3(7.0f, 0.0f, -15.0f));
 
         // ambient
-        myScene->SetAmbientLight(Vec4(0.1f, 0.1f, 0.1f, 1.0f));
+        myScene->SetAmbientLight(Vec4(0.05f, 0.05f, 0.05f, 1.0f));
     }
 }

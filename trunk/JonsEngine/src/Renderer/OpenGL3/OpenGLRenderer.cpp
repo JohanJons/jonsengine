@@ -15,7 +15,7 @@
 
 namespace JonsEngine
 {
-    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings) : mLogger(Logger::GetRendererLogger()), mDefaultProgram("DefaultProgram"), mUniBufferTransform("Transform"), mUniBufferLight("Light")
+    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings) : mLogger(Logger::GetRendererLogger()), mDefaultProgram("DefaultProgram"), mUniBufferTransform("UniTransform"), mUniBufferLight("UniLight")
     {
         // 'glewExperimental = GL_TRUE' needed to initialize openGL core profile; see GLEW doc
         glewExperimental = GL_TRUE;

@@ -16,7 +16,9 @@ namespace JonsEngine
         const Vec4  mAmbientLight;
         const Vec4  mLightIntensity;
         const Vec3  mLightPosition;
+        const Vec3  mViewDirection;
         const float mLightAttenuation;
+        const float mShininessFactor;
 
 
         std::vector<float> CopyTransformData() const
@@ -37,22 +39,25 @@ namespace JonsEngine
             GetTypeValues(mAmbientLight, ret);
             GetTypeValues(mLightIntensity, ret);
             GetTypeValues(mLightPosition, ret);
+            ret.push_back(0.0f);                    // TODO: find better way to automate padding
+            GetTypeValues(mViewDirection, ret);
             ret.push_back(mLightAttenuation);
+            ret.push_back(mShininessFactor);
 
             return ret;
         }
 
-        RenderItem(VertexBufferPtr vertexBuffer, const Vec4& color, const Mat4& wvp, const Mat4& worldMatrix, 
-                    const Vec4& lightIntensity, const Vec3& lightPosition, const Vec4& ambientLight, const float lightAttenuation);
+        RenderItem(VertexBufferPtr vertexBuffer, const Vec4& color, const Mat4& wvp, const Mat4& worldMatrix, const Vec4& lightIntensity, 
+                   const Vec3& lightPosition, const Vec4& ambientLight, const Vec3 viewDirection, const float lightAttenuation, const float shininessFactor);
     };
 
 
     /* RenderItem inlines */
-    inline RenderItem::RenderItem(VertexBufferPtr vertexBuffer, const Vec4& color, const Mat4& wvp, const Mat4& worldMatrix, 
-                                    const Vec4& lightIntensity, const Vec3& lightPosition, const Vec4& ambientLight, const float lightAttenuation) 
+    inline RenderItem::RenderItem(VertexBufferPtr vertexBuffer, const Vec4& color, const Mat4& wvp, const Mat4& worldMatrix, const Vec4& lightIntensity, 
+                                    const Vec3& lightPosition, const Vec4& ambientLight, const Vec3 viewDirection, const float lightAttenuation, const float shininessFactor) 
                                     : 
-                                    mVertexBuffer(vertexBuffer), mColor(color), mWVP(wvp), mWorldMatrix(worldMatrix),
-                                    mLightIntensity(lightIntensity), mLightPosition(lightPosition), mAmbientLight(ambientLight), mLightAttenuation(lightAttenuation)
+                                    mVertexBuffer(vertexBuffer), mColor(color), mWVP(wvp), mWorldMatrix(worldMatrix), mLightIntensity(lightIntensity), 
+                                        mLightPosition(lightPosition), mAmbientLight(ambientLight), mViewDirection(viewDirection), mLightAttenuation(lightAttenuation), mShininessFactor(shininessFactor)
     {
     }
 }

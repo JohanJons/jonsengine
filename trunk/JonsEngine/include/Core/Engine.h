@@ -34,7 +34,6 @@ namespace JonsEngine
         IWindow& GetWindow();
         IRenderer& GetRenderer();
         InputManager& GetInputManager();
-        ResourceManifest& GetResourceManifest();
         SceneManager& GetSceneManager();
 
 
@@ -45,7 +44,7 @@ namespace JonsEngine
 
         void CreateRenderQueue(Scene* scene, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights);
         std::vector<LightPtr> GetActiveLights(const Scene* scene);
-        void CreateModelRenderables(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights, const Vec4& ambientLight);
+        void CreateModelRenderables(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights, const Vec3& viewDirection, const Vec4& ambientLight);
  
         Logger& mLog;
         IMemoryAllocator& mMemoryAllocator;
@@ -63,6 +62,5 @@ namespace JonsEngine
     inline IWindow& Engine::GetWindow()                                 { return *mWindow;           }
     inline IRenderer& Engine::GetRenderer()                             { return *mRenderer;         }
     inline InputManager& Engine::GetInputManager()                      { return mInputManager;      }
-    inline ResourceManifest& Engine::GetResourceManifest()              { return *mResourceManifest; }
     inline SceneManager& Engine::GetSceneManager()                      { return mSceneManager;      }
 }

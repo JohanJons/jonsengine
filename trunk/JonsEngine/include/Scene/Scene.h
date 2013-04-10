@@ -18,17 +18,17 @@ namespace JonsEngine
     class Scene
     {
     public:
-        typedef Vec4 LightColor;
-        
         Scene(const std::string& sceneName, ResourceManifest& resManifest);
         ~Scene();
 
         ModelPtr CreateModel(const std::string& modelName, const std::string& assetName, JonsPackagePtr jonsPkg);
+        ModelPtr CreateModel(const std::string& modelName, const std::string& assetName, JonsPackagePtr jonsPkg, const SceneNodePtr node);
         ModelPtr GetModel(const std::string& modelName);
         const std::vector<ModelPtr>& GetAllModels() const;
         void DeleteModel(const std::string& modelName);
 
         LightPtr CreateLight(const std::string& lightName, Light::LightType type);
+        LightPtr CreateLight(const std::string& lightName, Light::LightType type, const SceneNodePtr node);
         LightPtr GetLight(const std::string& lightName);
         const std::vector<LightPtr>& GetAllLights() const;
         void DeleteLight(const std::string& lightName);

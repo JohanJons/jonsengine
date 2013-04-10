@@ -107,7 +107,7 @@ namespace JonsEngine
         BOOST_FOREACH(ModelPtr model, models)
         {
             if (model && model->mSceneNode)
-                CreateModelRenderables(model.get(), viewMatrix, perspectiveMatrix, model->mSceneNode->GetNodeTransform(), renderQueue, activeLights, scene->GetAmbientLight());
+                CreateModelRenderables(model.get(), viewMatrix, perspectiveMatrix, model->mSceneNode->GetNodeTransform(), renderQueue, activeLights, scene->GetSceneCamera().Forward(), scene->GetAmbientLight());
         }
     }
 
@@ -117,7 +117,7 @@ namespace JonsEngine
         return std::vector<LightPtr>(scene->GetAllLights());
     }
 
-    void Engine::CreateModelRenderables(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights, const Vec4& ambientLight)
+    void Engine::CreateModelRenderables(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights, const Vec3& viewDirection, const Vec4& ambientLight)
     {
         const Mat4 worldMatrix         = nodeTransform * model->mTransform;
         const Mat4 worldViewMatrix     = viewMatrix * worldMatrix;
@@ -126,11 +126,14 @@ namespace JonsEngine
         // TODO: handle multiple lights
         BOOST_FOREACH(const Mesh& mesh, model->mMeshes)
             if (activeLights.size() >= 1)
-                renderQueue.push_back(RenderItem(mesh.mVertexBuffer, Vec4(1.0f, 1.0f, 1.0f, 1.0f), worldViewProjMatrix, worldMatrix, activeLights.front()->mLightIntensity, activeLights.front()->mSceneNode->Position(), ambientLight, activeLights.front()->mLightAttenuation));
+            {
+                const LightPtr activeLight = activeLights.front();
+                renderQueue.push_back(RenderItem(mesh.mVertexBuffer, Vec4(1.0f, 1.0f, 1.0f, 1.0f), worldViewProjMatrix, worldMatrix, activeLight->mLightIntensity, activeLight->mSceneNode->Position(), ambientLight, viewDirection, activeLight->mLightAttenuation, activeLight->mShininessFactor));
+            }
             else
-                renderQueue.push_back(RenderItem(mesh.mVertexBuffer, Vec4(1.0f, 1.0f, 1.0f, 1.0f), worldViewProjMatrix, worldMatrix, Vec4(0.0f), Vec3(0.0f), ambientLight, activeLights.front()->mLightAttenuation));
+                renderQueue.push_back(RenderItem(mesh.mVertexBuffer, Vec4(1.0f, 1.0f, 1.0f, 1.0f), worldViewProjMatrix, worldMatrix, Vec4(0.0f), Vec3(0.0f), ambientLight, viewDirection, 0.0f, 0.0f));
 
         BOOST_FOREACH(const Model& childModel, model->mChildren)
-            CreateModelRenderables(&childModel, viewMatrix, perspectiveMatrix, worldMatrix, renderQueue, activeLights, ambientLight);
+            CreateModelRenderables(&childModel, viewMatrix, perspectiveMatrix, worldMatrix, renderQueue, activeLights, viewDirection, ambientLight);
     }
 }

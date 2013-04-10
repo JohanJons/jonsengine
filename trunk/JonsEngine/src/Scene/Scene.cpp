@@ -28,6 +28,14 @@ namespace JonsEngine
 
         return model;
     }
+
+    ModelPtr Scene::CreateModel(const std::string& modelName, const std::string& assetName, JonsPackagePtr jonsPkg, const SceneNodePtr node)
+    {
+        ModelPtr model    = CreateModel(modelName, assetName, jonsPkg);
+        model->mSceneNode = node;
+
+        return model;
+    }
         
     ModelPtr Scene::GetModel(const std::string& modelName)
     {
@@ -63,6 +71,14 @@ namespace JonsEngine
 
         return light;
     }
+
+    LightPtr Scene::CreateLight(const std::string& lightName, Light::LightType type, const SceneNodePtr node)
+    {
+        LightPtr light    = CreateLight(lightName, type);
+        light->mSceneNode = node;
+
+        return light;
+    }
         
     LightPtr Scene::GetLight(const std::string& lightName)
     {
@@ -94,7 +110,7 @@ namespace JonsEngine
         mAmbientLight = ambientLight;
     }
 
-    const Scene::LightColor& Scene::GetAmbientLight() const
+    const LightColor& Scene::GetAmbientLight() const
     {
         return mAmbientLight;
     }
