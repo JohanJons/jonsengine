@@ -19,6 +19,7 @@ namespace JonsEngine
         const Vec3  mViewDirection;
         const float mLightAttenuation;
         const float mShininessFactor;
+        const float mGamma;
 
 
         std::vector<float> CopyTransformData() const
@@ -43,21 +44,22 @@ namespace JonsEngine
             GetTypeValues(mViewDirection, ret);
             ret.push_back(mLightAttenuation);
             ret.push_back(mShininessFactor);
+            ret.push_back(mGamma);
 
             return ret;
         }
 
         RenderItem(VertexBufferPtr vertexBuffer, const Vec4& color, const Mat4& wvp, const Mat4& worldMatrix, const Vec4& lightIntensity, 
-                   const Vec3& lightPosition, const Vec4& ambientLight, const Vec3 viewDirection, const float lightAttenuation, const float shininessFactor);
+                   const Vec3& lightPosition, const Vec4& ambientLight, const Vec3 viewDirection, const float lightAttenuation, const float shininessFactor, const float gamma);
     };
 
 
     /* RenderItem inlines */
     inline RenderItem::RenderItem(VertexBufferPtr vertexBuffer, const Vec4& color, const Mat4& wvp, const Mat4& worldMatrix, const Vec4& lightIntensity, 
-                                    const Vec3& lightPosition, const Vec4& ambientLight, const Vec3 viewDirection, const float lightAttenuation, const float shininessFactor) 
+                                    const Vec3& lightPosition, const Vec4& ambientLight, const Vec3 viewDirection, const float lightAttenuation, const float shininessFactor, const float gamma) 
                                     : 
                                     mVertexBuffer(vertexBuffer), mColor(color), mWVP(wvp), mWorldMatrix(worldMatrix), mLightIntensity(lightIntensity), 
-                                        mLightPosition(lightPosition), mAmbientLight(ambientLight), mViewDirection(viewDirection), mLightAttenuation(lightAttenuation), mShininessFactor(shininessFactor)
+                                        mLightPosition(lightPosition), mAmbientLight(ambientLight), mViewDirection(viewDirection), mLightAttenuation(lightAttenuation), mShininessFactor(shininessFactor), mGamma(gamma)
     {
     }
 }

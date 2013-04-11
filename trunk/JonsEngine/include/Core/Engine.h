@@ -44,7 +44,8 @@ namespace JonsEngine
 
         void CreateRenderQueue(Scene* scene, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights);
         std::vector<LightPtr> GetActiveLights(const Scene* scene);
-        void CreateModelRenderables(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights, const Vec3& viewDirection, const Vec4& ambientLight);
+        void CreateModelRenderables(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights, const Vec3& viewDirection,
+                                    const Vec4& ambientLight, const float gamma);
  
         Logger& mLog;
         IMemoryAllocator& mMemoryAllocator;

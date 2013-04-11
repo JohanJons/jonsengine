@@ -130,14 +130,13 @@ namespace JonsGame
         // shotgun
         SceneNodePtr nodeShotgun = myScene->GetRootNode().CreateChildNode("nodeShotgun");
         ModelPtr modelShotgun    = myScene->CreateModel("Shotgun", "shotgun", package, nodeShotgun);
-        modelShotgun->mSceneNode = nodeShotgun;
         nodeShotgun->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));
 
         // light
         SceneNodePtr nodeLight = myScene->GetRootNode().CreateChildNode("nodeLight");
         LightPtr light         = myScene->CreateLight("PositionalLight", Light::POSITIONAL, nodeLight);
-        light->mLightIntensity = Vec4(2.0f, 2.0f, 2.0f, 1.0f);
-        nodeLight->TranslateNode(Vec3(7.0f, 0.0f, -15.0f));
+        light->mLightIntensity = Vec4(5.0f, 5.0f, 5.0f, 1.0f);
+        nodeLight->TranslateNode(Vec3(4.0f, 0.0f, -10.0f));
 
         // ambient
         myScene->SetAmbientLight(Vec4(0.05f, 0.05f, 0.05f, 1.0f));

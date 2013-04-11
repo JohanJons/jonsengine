@@ -43,6 +43,7 @@ namespace JonsEngine
                                             vec3  ViewDirection;                                                                        \n \
                                             float LightAttenuation;                                                                     \n \
                                             float ShininessFactor;                                                                      \n \
+                                            float Gamma;                                                                                \n \
                                         } Light;                                                                                        \n \
                                                                                                                                         \n \
                                         in vec4 frag_color;                                                                             \n \
@@ -86,8 +87,13 @@ namespace JonsEngine
                                             float gaussianTerm = 0.0;                                                                   \n \
                                             CalcGaussianSpecular(dirToLight, specularColor, angIncidence, gaussianTerm);                \n \
                                                                                                                                         \n \
-                                            finalColor = (frag_color * attenIntensity * angIncidence) +                                 \n \
-                                                         (specularColor * attenIntensity * gaussianTerm) +                              \n \
-                                                         (frag_color * Light.AmbientLight);                                             \n \
+                                            vec4 accumLighting = (frag_color * attenIntensity * angIncidence) +                         \n \
+                                                                 (specularColor * attenIntensity * gaussianTerm) +                      \n \
+                                                                 (frag_color * Light.AmbientLight);                                     \n \
+                                                                                                                                        \n \
+                                            vec4 gamma = vec4(1.0 / Light.Gamma);                                                       \n \
+                                            gamma.w    = 1.0;                                                                           \n \
+                                                                                                                                        \n \
+                                            finalColor = pow(accumLighting, gamma);                                                     \n \
                                         }												                                                \n";
 }

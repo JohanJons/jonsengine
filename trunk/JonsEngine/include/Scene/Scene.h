@@ -35,6 +35,8 @@ namespace JonsEngine
 
         void SetAmbientLight(const LightColor& ambientLight);
         const LightColor& GetAmbientLight() const;
+        void SetGamma(const float gamma);
+        float GetGamma() const;
 
         Camera& GetSceneCamera();
         SceneNode& GetRootNode();
@@ -49,7 +51,9 @@ namespace JonsEngine
         size_t mHashedID;
         Camera mSceneCamera;
         SceneNode mRootNode;
+
         LightColor mAmbientLight;
+        float mGamma;
 
         std::vector<ModelPtr> mModels;
         std::vector<LightPtr> mLights;

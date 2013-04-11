@@ -9,8 +9,8 @@
 
 namespace JonsEngine
 {
-    Scene::Scene(const std::string& sceneName, ResourceManifest& resManifest) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mRootNode("Root"), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mAmbientLight(1.0f),
-                                                                                mResourceManifest(resManifest)
+    Scene::Scene(const std::string& sceneName, ResourceManifest& resManifest) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mRootNode("Root"), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), 
+                                                                                mAmbientLight(1.0f), mGamma(2.2f), mResourceManifest(resManifest)
     {
     }
 
@@ -113,6 +113,16 @@ namespace JonsEngine
     const LightColor& Scene::GetAmbientLight() const
     {
         return mAmbientLight;
+    }
+
+    void Scene::SetGamma(const float gamma)
+    {
+        mGamma = gamma;
+    }
+        
+    float Scene::GetGamma() const
+    {
+        return mGamma;
     }
 
 
