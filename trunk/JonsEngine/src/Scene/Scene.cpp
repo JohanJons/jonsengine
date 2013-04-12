@@ -115,14 +115,22 @@ namespace JonsEngine
         return mAmbientLight;
     }
 
-    void Scene::SetGamma(const float gamma)
+    void Scene::SetGammaFactor(const float gamma)
     {
         mGamma = gamma;
     }
         
-    float Scene::GetGamma() const
+    float Scene::GetGammaFactor() const
     {
         return mGamma;
+    }
+
+    Vec4 Scene::GetGamma() const
+    {
+        Vec4 gamma(1.0f / mGamma);
+        gamma.w = 1.0f;
+
+        return gamma;
     }
 
 

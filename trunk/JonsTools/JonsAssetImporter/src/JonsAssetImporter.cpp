@@ -20,7 +20,7 @@ int _tmain(int argc, _TCHAR* cmds[])
         commands.push_back(std::string(cmds[i]));
 
     std::string errorString;
-    if (JonsAssetImporter::ParseCommands(commands, errorString) != JonsAssetImporter::ParseCmdResult::SUCCESS)
+    if (JonsAssetImporter::ParseCommands(commands, errorString) != JonsAssetImporter::SUCCESS)
         std::cout << errorString << std::endl;
 
 	return 0;
