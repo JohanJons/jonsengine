@@ -123,8 +123,14 @@ namespace JonsEngine
         BOOST_FOREACH(LightPtr light, scene->GetAllLights())
         {
             lighting.mLights[numLights].mLightIntensity   = light->mLightIntensity;
-            lighting.mLights[numLights].mLightPosition    = light->mSceneNode->Position();
+
+            if (light->mLightType == Light::POINT)
+                lighting.mLights[numLights].mLightPosition = Vec4(light->mSceneNode->Position(), 1.0f);
+            else if (light->mLightType == Light::DIRECTIONAL)
+                lighting.mLights[numLights].mLightPosition = Vec4(light->mLightDirection, 0.0f);
+
             lighting.mLights[numLights].mLightAttenuation = light->mLightAttenuation;
+            lighting.mLights[numLights].mMaxAttenuation   = light->mMaxAttenuation;
             numLights++;
         }
 

@@ -20,7 +20,7 @@ namespace JonsEngine
     {
         enum LightType
         {
-            POSITIONAL = 0,
+            POINT = 0,
             DIRECTIONAL
         };
 

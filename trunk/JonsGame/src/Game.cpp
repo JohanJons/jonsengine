@@ -134,16 +134,14 @@ namespace JonsGame
 
         // light
         SceneNodePtr nodeLight   = myScene->GetRootNode().CreateChildNode("nodeLight");
-        LightPtr light           = myScene->CreateLight("PositionalLight", Light::POSITIONAL, nodeLight);
-        light->mLightIntensity   = Vec4(4.0f, 4.0f, 4.0f, 1.0f);
-        light->mLightAttenuation = 2.0f;
+        LightPtr light           = myScene->CreateLight("PositionalLight", Light::POINT, nodeLight);
+        light->mLightIntensity   = Vec4(3.0f, 3.0f ,3.0f, 1.0f);
         nodeLight->TranslateNode(Vec3(4.0f, 0.0f, -13.0f));
 
         // light2
         SceneNodePtr nodeLight2   = myScene->GetRootNode().CreateChildNode("nodeLight2");
-        LightPtr light2           = myScene->CreateLight("PositionalLight", Light::POSITIONAL, nodeLight2);
-        light2->mLightIntensity   = Vec4(4.0f, 4.0f, 4.0f, 1.0f);
-        light2->mLightAttenuation = 2.0f;
+        LightPtr light2           = myScene->CreateLight("PositionalLight", Light::POINT, nodeLight2);
+        light2->mLightIntensity   = Vec4(2.0f, 2.0f, 2.0f, 1.0f);
         nodeLight2->TranslateNode(Vec3(0.0f, 3.0f, -8.0f));
 
         // ambient

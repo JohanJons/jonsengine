@@ -19,6 +19,7 @@ namespace JonsEngine
 
         ModelPtr LoadModel(const std::string& modelName, const std::string& assetName, JonsPackagePtr jonsPkg);
         ModelPtr GetModel(const std::string& modelName);
+        bool HasModel(const std::string& modelName);
 
 
     private:

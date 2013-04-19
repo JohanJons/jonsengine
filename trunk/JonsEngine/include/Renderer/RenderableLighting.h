@@ -30,7 +30,7 @@ namespace JonsEngine
         /* Light definition */
         struct Light
         {
-            Light(const Vec4& lightIntensity, const Vec3& lightPosition, const float lightAttenuation, const float maxAttenuation) : mLightIntensity(lightIntensity), mLightPosition(lightPosition), mLightAttenuation(lightAttenuation),
+            Light(const Vec4& lightIntensity, const Vec4& lightPosition, const float lightAttenuation, const float maxAttenuation) : mLightIntensity(lightIntensity), mLightPosition(lightPosition), mLightAttenuation(lightAttenuation),
                                                                                                                                      mMaxAttenuation(maxAttenuation)
             {
             }
@@ -40,10 +40,10 @@ namespace JonsEngine
             }
 
             Vec4 mLightIntensity;
-            Vec3 mLightPosition;
+            Vec4 mLightPosition;
             float mLightAttenuation;
             float mMaxAttenuation;
-            float padding[3];
+            float padding[2];
         };
 
         /* Lights definition */

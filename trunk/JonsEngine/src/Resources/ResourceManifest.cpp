@@ -45,6 +45,16 @@ namespace JonsEngine
         return ptr;
     }
 
+    bool ResourceManifest::HasModel(const std::string& modelName)
+    {
+        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), boost::bind(&Model::mName, _1) == modelName);
+
+        if (iter != mModels.end())
+            return true;
+        else
+            return false;
+    }
+
     Model ResourceManifest::ProcessModel(PackageModel& pkgModel, const std::string& modelName)
     {
         Model model(modelName);
