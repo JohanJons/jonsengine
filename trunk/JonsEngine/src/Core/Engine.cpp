@@ -100,10 +100,11 @@ namespace JonsEngine
     RenderQueue Engine::CreateRenderQueue(const Scene* scene)
     {
         RenderQueue renderQueue;
+        const ScreenMode& screenMode = mWindow->GetScreenMode();
 
         const std::vector<ModelPtr>& models = scene->GetAllModels();
         const Mat4 viewMatrix = scene->GetSceneCamera().GetCameraTransform();
-        const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow->GetScreenMode().FOV, mWindow->GetScreenMode().ScreenWidth / (float)mWindow->GetScreenMode().ScreenHeight, 0.5f, 1000.0f);  // TODO: move into consts
+        const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(screenMode.FOV, screenMode.ScreenWidth / (float)screenMode.ScreenHeight, screenMode.zNear, screenMode.zFar);
 
         BOOST_FOREACH(ModelPtr model, models)
         {
@@ -122,15 +123,17 @@ namespace JonsEngine
         size_t numLights = 0;
         BOOST_FOREACH(LightPtr light, scene->GetAllLights())
         {
-            lighting.mLights[numLights].mLightIntensity   = light->mLightIntensity;
+            lighting.mLights[numLights].mLightIntensity = light->mLightIntensity;
 
             if (light->mLightType == Light::POINT)
-                lighting.mLights[numLights].mLightPosition = Vec4(light->mSceneNode->Position(), 1.0f);
+            {
+                lighting.mLights[numLights].mLightPosition    = Vec4(light->mSceneNode->Position(), 1.0f);
+                lighting.mLights[numLights].mLightAttenuation = light->mLightAttenuation;
+                lighting.mLights[numLights].mMaxAttenuation   = light->mMaxAttenuation;
+            }
             else if (light->mLightType == Light::DIRECTIONAL)
                 lighting.mLights[numLights].mLightPosition = Vec4(light->mLightDirection, 0.0f);
 
-            lighting.mLights[numLights].mLightAttenuation = light->mLightAttenuation;
-            lighting.mLights[numLights].mMaxAttenuation   = light->mMaxAttenuation;
             numLights++;
         }
 
