@@ -8,7 +8,6 @@ namespace JonsEngine
 {
     class Logger;
     class Shader;
-    class UniformBuffer;
 
     /*
      * C++ wrapper around GLSL shaderprograms
@@ -28,11 +27,10 @@ namespace JonsEngine
 
         bool LinkProgram();
         void UseProgram(bool use);
-
         void BindAttribLocation(GLuint index, const std::string& name);
-        void UseUniform(UniformBuffer& buffer, bool use);
 
         const std::string& GetName() const;
+        GLuint GetHandle() const;
         bool IsLinked() const;
 
 
@@ -40,7 +38,6 @@ namespace JonsEngine
         Logger& mLogger;
         const std::string mName;
         GLuint mProgramHandle;
-        GLuint mUniformBuffer;
         std::vector<Shader*> mAddedShaders;
     };
 }

@@ -10,7 +10,7 @@
 namespace JonsEngine
 {
     Scene::Scene(const std::string& sceneName, ResourceManifest& resManifest) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mRootNode("Root"), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), 
-                                                                                mAmbientLight(1.0f), mGamma(2.2f), mResourceManifest(resManifest)
+                                                                                mAmbientLight(1.0f), mGamma(2.1f), mResourceManifest(resManifest)
     {
     }
 

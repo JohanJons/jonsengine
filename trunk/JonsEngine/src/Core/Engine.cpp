@@ -49,12 +49,11 @@ namespace JonsEngine
             activeScene->GetRootNode().UpdateModelMatrix(Mat4(1.0f));
 
             // create the rendering queue and active lights
-            std::vector<LightPtr> activeLights = GetActiveLights(activeScene);
-            std::vector<RenderItem> renderQueue;
-            CreateRenderQueue(activeScene, renderQueue, activeLights);
+            const RenderQueue renderQueue(CreateRenderQueue(activeScene));
+            const RenderableLighting lighting(CreateRenderableLighting(activeScene));
 
             // render the scene
-            mRenderer->DrawRenderables(renderQueue);
+            mRenderer->DrawRenderables(renderQueue, lighting);
         }
 
         mWindow->EndFrame();
@@ -97,44 +96,53 @@ namespace JonsEngine
         return mMemoryAllocator.AllocateObject<ResourceManifest>(GetRenderer());
     }
 
-
-    void Engine::CreateRenderQueue(Scene* scene, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights)
+    
+    RenderQueue Engine::CreateRenderQueue(const Scene* scene)
     {
+        RenderQueue renderQueue;
+
         const std::vector<ModelPtr>& models = scene->GetAllModels();
         const Mat4 viewMatrix = scene->GetSceneCamera().GetCameraTransform();
-        const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow->GetScreenMode().FOV, mWindow->GetScreenMode().ScreenWidth / (float)mWindow->GetScreenMode().ScreenHeight, 0.5f, 1000.0f);
+        const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow->GetScreenMode().FOV, mWindow->GetScreenMode().ScreenWidth / (float)mWindow->GetScreenMode().ScreenHeight, 0.5f, 1000.0f);  // TODO: move into consts
 
         BOOST_FOREACH(ModelPtr model, models)
         {
             if (model && model->mSceneNode)
-                CreateModelRenderables(model.get(), viewMatrix, perspectiveMatrix, model->mSceneNode->GetNodeTransform(), renderQueue, activeLights, scene->GetSceneCamera().Forward(), scene->GetAmbientLight(), scene->GetGamma());
+                CreateModelRenderable(model.get(), viewMatrix, perspectiveMatrix, model->mSceneNode->GetNodeTransform(), renderQueue);
         }
-    }
 
-    std::vector<LightPtr> Engine::GetActiveLights(const Scene* scene)
+        return renderQueue;
+    }
+     
+    // TODO: Cull lights
+    RenderableLighting Engine::CreateRenderableLighting(const Scene* scene)
     {
-        // TODO: cull lights, ...
-        return std::vector<LightPtr>(scene->GetAllLights());
+        RenderableLighting lighting(scene->GetAmbientLight(), scene->GetSceneCamera().Forward(), scene->GetGamma());
+
+        size_t numLights = 0;
+        BOOST_FOREACH(LightPtr light, scene->GetAllLights())
+        {
+            lighting.mLights[numLights].mLightIntensity   = light->mLightIntensity;
+            lighting.mLights[numLights].mLightPosition    = light->mSceneNode->Position();
+            lighting.mLights[numLights].mLightAttenuation = light->mLightAttenuation;
+            numLights++;
+        }
+
+        lighting.mLightingInfo.mUsedLights = numLights;
+
+        return lighting;
     }
 
-    void Engine::CreateModelRenderables(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights, const Vec3& viewDirection, 
-                                        const Vec4& ambientLight, const Vec4 gamma)
+    void Engine::CreateModelRenderable(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, RenderQueue& renderQueue)
     {
         const Mat4 worldMatrix         = nodeTransform * model->mTransform;
         const Mat4 worldViewMatrix     = viewMatrix * worldMatrix;
         const Mat4 worldViewProjMatrix = perspectiveMatrix * worldViewMatrix;
 
-        // TODO: handle multiple lights
         BOOST_FOREACH(const Mesh& mesh, model->mMeshes)
-            if (activeLights.size() >= 1)
-            {
-                const LightPtr activeLight = activeLights.front();
-                renderQueue.push_back(RenderItem(mesh.mVertexBuffer, Vec4(1.0f, 1.0f, 1.0f, 1.0f), worldViewProjMatrix, worldMatrix, activeLight->mLightIntensity, gamma, activeLight->mSceneNode->Position(), ambientLight, viewDirection, activeLight->mLightAttenuation, activeLight->mShininessFactor));
-            }
-            else
-                renderQueue.push_back(RenderItem(mesh.mVertexBuffer, Vec4(1.0f, 1.0f, 1.0f, 1.0f), worldViewProjMatrix, worldMatrix, Vec4(0.0f), gamma, Vec3(0.0f), ambientLight, viewDirection, 0.0f, 0.0f));
+            renderQueue.push_back(Renderable(mesh.mVertexBuffer, worldViewProjMatrix, worldMatrix, Vec4(1.0f), 0.02f));     // TODO: Add color, specularfactor to model/mesh
 
         BOOST_FOREACH(const Model& childModel, model->mChildren)
-            CreateModelRenderables(&childModel, viewMatrix, perspectiveMatrix, worldMatrix, renderQueue, activeLights, viewDirection, ambientLight, gamma);
+            CreateModelRenderable(&childModel, viewMatrix, perspectiveMatrix, worldMatrix, renderQueue);
     }
 }

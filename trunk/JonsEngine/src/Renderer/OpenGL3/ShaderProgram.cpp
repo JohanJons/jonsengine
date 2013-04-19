@@ -1,7 +1,7 @@
 #include "include/Renderer/OpenGL3/ShaderProgram.h"
 
 #include "include/Renderer/OpenGL3/Shader.h"
-#include "include/Renderer/OpenGL3/UniformBuffer.h"
+#include "include/Renderer/OpenGL3/UniformBuffer.hpp"
 #include "include/Core/Logging/Logger.h"
 
 #include "boost/bind.hpp"
@@ -14,7 +14,6 @@ namespace JonsEngine
 
     ShaderProgram::ShaderProgram(const std::string& name) : mLogger(Logger::GetRendererLogger()), mName(name), mProgramHandle(glCreateProgram())
     {
-        glGenBuffers(1, &mUniformBuffer);
     }
         
     ShaderProgram::~ShaderProgram()
@@ -22,8 +21,6 @@ namespace JonsEngine
         ClearShaders();
 
         glDeleteProgram(mProgramHandle);
-        glDeleteBuffers(1, &mUniformBuffer);
-        mProgramHandle = 0;
     }
 
         
@@ -96,18 +93,9 @@ namespace JonsEngine
         glBindAttribLocation(mProgramHandle, index, name.c_str());
     }
 
-    void ShaderProgram::UseUniform(UniformBuffer& buffer, bool use)
-    {
-        GLuint blockIndex = glGetUniformBlockIndex(mProgramHandle, buffer.mName.c_str());
 
-        glUniformBlockBinding(mProgramHandle, blockIndex, use ? buffer.mBindingIndex : 0);
-        glBindBufferRange(GL_UNIFORM_BUFFER, buffer.mBindingIndex, buffer.mBuffer, 0, buffer.mBufferSize);
-    }
-
-    const std::string& ShaderProgram::GetName() const
-    {
-        return mName;
-    }
+    const std::string& ShaderProgram::GetName() const       { return mName;          }
+    GLuint ShaderProgram::GetHandle() const                 { return mProgramHandle; }
 
     bool ShaderProgram::IsLinked() const
     {

@@ -40,6 +40,7 @@ namespace JonsEngine
         Vec4 GetGamma() const;
 
         Camera& GetSceneCamera();
+        const Camera& GetSceneCamera() const;
         SceneNode& GetRootNode();
         const std::string& GetSceneName() const;
 
@@ -66,6 +67,7 @@ namespace JonsEngine
 
     /* Scene inlines */
     inline Camera& Scene::GetSceneCamera()                     { return mSceneCamera;  }
+    inline const Camera& Scene::GetSceneCamera() const         { return mSceneCamera;  }
     inline SceneNode& Scene::GetRootNode()                     { return mRootNode;     }
     inline const std::string& Scene::GetSceneName() const      { return mName;         }
 }

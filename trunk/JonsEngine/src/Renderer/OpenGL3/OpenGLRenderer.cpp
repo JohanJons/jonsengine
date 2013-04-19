@@ -15,7 +15,9 @@
 
 namespace JonsEngine
 {
-    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings) : mLogger(Logger::GetRendererLogger()), mDefaultProgram("DefaultProgram"), mUniBufferTransform("UniTransform"), mUniBufferLight("UniLight")
+    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings) : mLogger(Logger::GetRendererLogger()), mDefaultProgram(SetupShaderProgram("DefaultProgram")), 
+                                                                            mUniBufferTransform("UniTransform", mDefaultProgram), mUniBufferMaterial("UniMaterial", mDefaultProgram), 
+                                                                            mUniBufferLightingInfo("UniLightingInfo", mDefaultProgram),  mUniBufferLights("UniLights", mDefaultProgram)
     {
         // 'glewExperimental = GL_TRUE' needed to initialize openGL core profile; see GLEW doc
         glewExperimental = GL_TRUE;
@@ -37,8 +39,6 @@ namespace JonsEngine
         glDepthMask(GL_TRUE);
         glDepthFunc(GL_LEQUAL);
         glDepthRange(0.0f, 1.0f);
-
-        SetupShaders();
     }
         
     OpenGLRenderer::~OpenGLRenderer()
@@ -51,27 +51,44 @@ namespace JonsEngine
     }
 
 
-    void OpenGLRenderer::DrawRenderables(const std::vector<RenderItem>& renderQueue)
+    void OpenGLRenderer::DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting)
     {
         glClearDepth(1.0f);
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        BOOST_FOREACH(const RenderItem& renderItem, renderQueue)
+
+        // set active lights
+        mUniBufferLights.AddData(lighting.mLights);
+        mUniBufferLightingInfo.AddData(lighting.mLightingInfo);
+
+        mUniBufferLights.SetActiveIndex(0);
+        mUniBufferLightingInfo.SetActiveIndex(0);
+
+        int activeIndex = 0;
+        BOOST_FOREACH(const Renderable& renderable, renderQueue)
         {
-            std::vector<float> transformData(renderItem.CopyTransformData());
-            std::vector<float> lightData(renderItem.CopyLightData());
+            mUniBufferTransform.AddData(renderable.mTransform);
+            mUniBufferMaterial.AddData(renderable.mMaterial);
 
-            mUniBufferTransform.SetData(transformData);
-            mUniBufferLight.SetData(lightData);
+            mUniBufferTransform.SetActiveIndex(activeIndex);
+            mUniBufferMaterial.SetActiveIndex(activeIndex);
 
-            renderItem.mVertexBuffer->Render();
+            renderable.mVertexBuffer->Render();
+
+            activeIndex++;
         }
+
+        mUniBufferLights.ClearData();
+        mUniBufferLightingInfo.ClearData();
+        mUniBufferTransform.ClearData();
+        mUniBufferMaterial.ClearData();
     }
 
 
-    void OpenGLRenderer::SetupShaders()
+    ShaderProgram OpenGLRenderer::SetupShaderProgram(const std::string& programName)
     {
+        ShaderProgram ret(programName);
+        
         Shader vertexShader("VertexShader", Shader::VERTEX_SHADER);
         Shader fragmentShader("FragmentShader", Shader::FRAGMENT_SHADER);
 
@@ -80,21 +97,25 @@ namespace JonsEngine
 
         if (vertexShader.IsCompiled() && fragmentShader.IsCompiled())
         {
-            mDefaultProgram.AddShader(&vertexShader);
-            mDefaultProgram.AddShader(&fragmentShader);
+            ret.AddShader(&vertexShader);
+            ret.AddShader(&fragmentShader);
 
-            mDefaultProgram.LinkProgram();
+            ret.LinkProgram();
 
-            if (mDefaultProgram.IsLinked())
-                mDefaultProgram.UseProgram(true);
-
-            mDefaultProgram.UseUniform(mUniBufferTransform, true);
-            mDefaultProgram.UseUniform(mUniBufferLight, true);
+            if (ret.IsLinked())
+                ret.UseProgram(true);
+            else
+            {
+                JONS_LOG_ERROR(mLogger, "OpenGLRenderer::SetupShaders(): Failed to link program!");
+                throw std::runtime_error("OpenGLRenderer::SetupShaders(): Failed to link program!");
+            }
         }
         else
         {
             JONS_LOG_ERROR(mLogger, "OpenGLRenderer::SetupShaders(): Failed to compile shaders!");
             throw std::runtime_error("OpenGLRenderer::SetupShaders(): Failed to compile shaders!");
         }
+
+        return ret;
     }
 }

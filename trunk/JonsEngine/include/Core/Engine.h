@@ -4,7 +4,8 @@
 #include "include/Scene/SceneManager.h"
 #include "include/Scene/Light.h"
 #include "include/Input/InputManager.h"
-#include "include/Renderer/RenderItem.h"
+#include "include/Renderer/Renderable.h"
+#include "include/Renderer/RenderableLighting.h"
 
 namespace JonsEngine
 {
@@ -42,10 +43,10 @@ namespace JonsEngine
         IRenderer* bootCreateRenderer(const EngineSettings& engineSettings);
         ResourceManifest* bootCreateResourceManifest();
 
-        void CreateRenderQueue(Scene* scene, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights);
-        std::vector<LightPtr> GetActiveLights(const Scene* scene);
-        void CreateModelRenderables(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, std::vector<RenderItem>& renderQueue, const std::vector<LightPtr>& activeLights, const Vec3& viewDirection,
-                                    const Vec4& ambientLight, const Vec4 gamma);
+        RenderQueue CreateRenderQueue(const Scene* scene);
+        RenderableLighting CreateRenderableLighting(const Scene* scene);
+
+        void CreateModelRenderable(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, RenderQueue& renderQueue);
  
         Logger& mLog;
         IMemoryAllocator& mMemoryAllocator;

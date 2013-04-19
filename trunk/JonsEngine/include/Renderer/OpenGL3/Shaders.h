@@ -6,9 +6,10 @@ namespace JonsEngine
 {
     const std::string gVertexShader =	"#version 330								                            \n \
                                                                                                                 \n \
-                                        layout(std140) uniform UniTransform                                     \n \
+                                        layout(std140) uniform;                                                 \n \
+                                                                                                                \n \
+                                        uniform UniTransform                                                    \n \
                                         {                                                                       \n \
-                                            vec4 Color;                                                         \n \
                                             mat4 WVPMatrix;                                                     \n \
                                             mat4 WorldMatrix;                                                   \n \
                                         } Transform;                                                            \n \
@@ -16,7 +17,6 @@ namespace JonsEngine
                                         layout(location = 0) in vec3 vert_position;				                \n \
                                         layout(location = 1) in vec3 vert_normal;					            \n \
                                                                                                                 \n \
-                                        out vec4 frag_color;                                                    \n \
                                         out vec3 frag_position;                                                 \n \
                                         out vec3 frag_normal;                                                   \n \
                                                                                                                 \n \
@@ -27,7 +27,6 @@ namespace JonsEngine
                                             vec4 position = Transform.WorldMatrix * vec4(vert_position, 1.0);   \n \
                                             vec4 normal   = Transform.WorldMatrix * vec4(vert_normal, 0.0);     \n \
                                                                                                                 \n \
-                                            frag_color    = Transform.Color;                                    \n \
                                             frag_position = position.xyz;                                       \n \
                                             frag_normal   = normal.xyz;                                         \n \
                                         }											                            \n";
@@ -35,49 +34,70 @@ namespace JonsEngine
 
     const std::string gFragmentShader =	"#version 330									                                                \n \
                                                                                                                                         \n \
-                                        layout(std140) uniform UniLight                                                                 \n \
-                                        {                                                                                               \n \
-                                            vec4  AmbientLight;                                                                         \n \
-                                            vec4  LightIntensity;                                                                       \n \
-                                            vec4  Gamma;                                                                                 \n \
-                                            vec3  LightPosition;                                                                        \n \
-                                            vec3  ViewDirection;                                                                        \n \
-                                            float LightAttenuation;                                                                     \n \
-                                            float ShininessFactor;                                                                      \n \
-                                        } Light;                                                                                        \n \
+                                        layout(std140) uniform;                                                                         \n \
                                                                                                                                         \n \
-                                        in vec4 frag_color;                                                                             \n \
+                                        const int MAX_LIGHTS = 8;                                                                       \n \
+                                                                                                                                        \n \
+                                        uniform UniLightingInfo                                                                         \n \
+                                        {                                                                                               \n \
+                                            vec4  mAmbientLight;                                                                        \n \
+                                            vec4  mGamma;                                                                               \n \
+                                            vec3  mViewDirection;                                                                       \n \
+                                            int   mNumLights;                                                                           \n \
+                                        } LightingInfo;                                                                                 \n \
+                                                                                                                                        \n \
+                                        struct Light                                                                                    \n \
+                                        {                                                                                               \n \
+                                            vec4  mLightIntensity;                                                                      \n \
+                                            vec3  mLightPosition;                                                                       \n \
+                                            float mLightAttenuation;                                                                    \n \
+                                            float mMaxAttenuation;                                                                      \n \
+                                        };                                                                                              \n \
+                                                                                                                                        \n \
+                                        uniform UniLights                                                                               \n \
+                                        {                                                                                               \n \
+                                            Light mLights[MAX_LIGHTS];                                                                  \n \
+                                        } Lights;                                                                                       \n \
+                                                                                                                                        \n \
+                                        uniform UniMaterial                                                                             \n \
+                                        {                                                                                               \n \
+                                            vec4  mDiffuseColor;                                                                        \n \
+                                            float mSpecularFactor;                                                                      \n \
+                                        } Material;                                                                                     \n \
+                                                                                                                                        \n \
                                         in vec3 frag_position;                                                                          \n \
                                         in vec3 frag_normal;                                                                            \n \
                                                                                                                                         \n \
                                         out vec4 finalColor;						                                                    \n \
                                                                                                                                         \n \
-                                        void CalcLightIntensity(out vec3 positionDiff, out vec4 attenIntensity)                         \n \
+                                                                                                                                        \n \
+                                        void CalcLightIntensity(in Light light, out vec3 positionDiff, out vec4 attenIntensity)         \n \
                                         {                                                                                               \n \
-                                            positionDiff   = Light.LightPosition - frag_position;                                       \n \
-                                            float distance = length(positionDiff);                                                      \n \
-                                            attenIntensity = Light.LightIntensity * (1 / (1.0 + (distance * Light.LightAttenuation)));  \n \
+                                            positionDiff      = light.mLightPosition - frag_position;                                      \n \
+                                            float distance    = length(positionDiff);                                                      \n \
+                                            float attenuation = 1 / (1.0 + (distance * light.mLightAttenuation * light.mLightAttenuation)); \n \
+                                            attenIntensity    = light.mLightIntensity * (attenuation < light.mMaxAttenuation ? 0.0 : attenuation); \n \
                                         }                                                                                               \n \
                                                                                                                                         \n \
                                         void CalcGaussianSpecular(in vec3 dirToLight, in vec4 specularColor, in float angIncidence,     \n \
                                                                     out float gaussianTerm)                                             \n \
                                         {                                                                                               \n \
-                                            vec3 viewDirection = normalize(Light.ViewDirection);                                        \n \
+                                            vec3 viewDirection = normalize(LightingInfo.mViewDirection);                                \n \
                                             vec3 halfAngle     = normalize(dirToLight + viewDirection);                                 \n \
                                                                                                                                         \n \
                                             float angleNormalHalf = acos(dot(halfAngle, normalize(frag_normal)));                       \n \
-                                            float exponent        = angleNormalHalf / Light.ShininessFactor;                            \n \
+                                            float exponent        = angleNormalHalf / Material.mSpecularFactor;                         \n \
                                             exponent              = -(exponent * exponent);                                             \n \
                                                                                                                                         \n \
                                             gaussianTerm = exp(exponent);                                                               \n \
                                             gaussianTerm = angIncidence != 0.0 ? gaussianTerm : 0.0;                                    \n \
                                         }                                                                                               \n \
                                                                                                                                         \n \
-                                        void main()										                                                \n \
-                                        {												                                                \n \
+                                        vec4 CalculateLighting(in Light light)                                                          \n \
+                                        {                                                                                               \n \
                                             vec3 positionDiff   = vec3(0.0);                                                            \n \
                                             vec4 attenIntensity = vec4(0.0);                                                            \n \
-                                            CalcLightIntensity(positionDiff, attenIntensity);                                           \n \
+                                            CalcLightIntensity(light, positionDiff, attenIntensity);                                    \n \
                                                                                                                                         \n \
                                             vec3 dirToLight    = normalize(positionDiff);                                               \n \
                                             float angIncidence = dot(normalize(frag_normal), dirToLight);                               \n \
@@ -87,10 +107,20 @@ namespace JonsEngine
                                             float gaussianTerm = 0.0;                                                                   \n \
                                             CalcGaussianSpecular(dirToLight, specularColor, angIncidence, gaussianTerm);                \n \
                                                                                                                                         \n \
-                                            vec4 accumLighting = (frag_color * attenIntensity * angIncidence) +                         \n \
-                                                                 (specularColor * attenIntensity * gaussianTerm) +                      \n \
-                                                                 (frag_color * Light.AmbientLight);                                     \n \
+                                            vec4 lighting = (Material.mDiffuseColor * attenIntensity * angIncidence) +                  \n \
+                                                            (specularColor * attenIntensity * gaussianTerm);                            \n \
                                                                                                                                         \n \
-                                            finalColor = pow(accumLighting, Light.Gamma);                                               \n \
+                                            return lighting;                                                                            \n \
+                                        }                                                                                               \n \
+                                                                                                                                        \n \
+                                        void main()										                                                \n \
+                                        {												                                                \n \
+                                            vec4 accumLighting = Material.mDiffuseColor * LightingInfo.mAmbientLight;                   \n \
+                                            for (int lightIndex = 0; lightIndex < LightingInfo.mNumLights; lightIndex++)                \n \
+                                            {                                                                                           \n \
+                                                accumLighting += CalculateLighting(Lights.mLights[lightIndex]);                         \n \
+                                            }                                                                                           \n \
+                                                                                                                                        \n \
+                                            finalColor = pow(accumLighting, LightingInfo.mGamma);                                       \n \
                                         }												                                                \n";
 }

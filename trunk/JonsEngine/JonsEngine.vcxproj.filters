@@ -161,9 +161,6 @@
     <ClCompile Include="src\Renderer\OpenGL3\ShaderProgram.cpp">
       <Filter>Source Files\Renderer\OpenGL3</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL3\UniformBuffer.cpp">
-      <Filter>Source Files\Renderer\OpenGL3</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLRenderer.cpp">
       <Filter>Source Files\Renderer\OpenGL3</Filter>
     </ClCompile>
@@ -283,9 +280,6 @@
     <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.h">
-      <Filter>Header Files\Renderer\OpenGL3</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\IVertexBuffer.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
@@ -325,9 +319,6 @@
     <ClInclude Include="include\Scene\Model.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\RenderItem.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="include\Scene\Light.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
@@ -336,6 +327,15 @@
     </ClInclude>
     <ClInclude Include="include\Core\Memory\IMemoryAllocator.h">
       <Filter>Header Files\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.hpp">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\RenderableLighting.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\Renderable.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

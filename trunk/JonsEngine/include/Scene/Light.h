@@ -30,7 +30,7 @@ namespace JonsEngine
         Vec4 mLightIntensity;
         Vec3 mLightDirection;
         float mLightAttenuation;
-        float mShininessFactor;
+        float mMaxAttenuation;
         LightType mLightType;
 
         SceneNodePtr mSceneNode;

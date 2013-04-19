@@ -123,7 +123,6 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLVertexBuffer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\Shader.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\ShaderProgram.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL3\UniformBuffer.cpp" />
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
@@ -170,8 +169,9 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Renderer\OpenGL3\Shader.h" />
     <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.h" />
     <ClInclude Include="include\Renderer\OpenGL3\Shaders.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.h" />
-    <ClInclude Include="include\Renderer\RenderItem.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.hpp" />
+    <ClInclude Include="include\Renderer\Renderable.h" />
+    <ClInclude Include="include\Renderer\RenderableLighting.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />
     <ClInclude Include="include\Resources\ResourceManifest.h" />
     <ClInclude Include="include\Scene\Camera.h" />
