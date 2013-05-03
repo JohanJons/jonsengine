@@ -2,7 +2,7 @@
 
 namespace JonsEngine
 {
-     OpenGLVertexBuffer::OpenGLVertexBuffer(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<uint32_t>& indexData) : mIndices(indexData.size())
+     OpenGLVertexBuffer::OpenGLVertexBuffer(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData) : mIndices(indexData.size())
      {
         glGenBuffers(1, &mVBO);
         glGenBuffers(1, &mIndexBuffer);
@@ -11,16 +11,16 @@ namespace JonsEngine
         // buffer vertex, normals and index data
         glBindVertexArray(mVAO);
         glBindBuffer(GL_ARRAY_BUFFER, mVBO);
-        glBufferData(GL_ARRAY_BUFFER, (vertexData.size() + normalData.size()) * sizeof(float), NULL, GL_STATIC_DRAW);
-        glBufferSubData(GL_ARRAY_BUFFER, NULL, vertexData.size() * sizeof(float), &vertexData[0]);
-        glBufferSubData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(float), normalData.size() * sizeof(float), &normalData[0]);
+        glBufferData(GL_ARRAY_BUFFER, (vertexData.size() + normalData.size()) * sizeof(Vec3), NULL, GL_STATIC_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, NULL, vertexData.size() * sizeof(Vec3), &vertexData[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(Vec3), normalData.size() * sizeof(Vec3), &normalData[0]);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBuffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexData.size() * sizeof(uint32_t), &indexData[0], GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(vertexData.size() * sizeof(float)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(vertexData.size() * sizeof(Vec3)));
 
        // unbind array buffer and VAO
         glBindBuffer(GL_ARRAY_BUFFER, 0);

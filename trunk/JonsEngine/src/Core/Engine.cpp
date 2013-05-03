@@ -152,6 +152,6 @@ namespace JonsEngine
             renderQueue.push_back(Renderable(mesh.mVertexBuffer, worldViewProjMatrix, worldMatrix, Vec4(1.0f), 0.02f));     // TODO: Add color, specularfactor to model/mesh
 
         BOOST_FOREACH(const Model& childModel, model->mChildren)
-            CreateModelRenderable(&childModel, viewMatrix, perspectiveMatrix, worldMatrix, renderQueue);
+            CreateModelRenderable(&childModel, viewMatrix, perspectiveMatrix, nodeTransform, renderQueue);      // dont send worldMatrix, due to model transform hierarchy already done by assimp
     }
 }

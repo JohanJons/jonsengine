@@ -10,7 +10,7 @@ namespace JonsEngine
 {
     JonsPackagePtr ReadJonsPkg(const std::string& jonsPkgName)
     {
-        std::ifstream jonsPkgStream(jonsPkgName.c_str(), std::fstream::binary | std::fstream::in);
+        std::ifstream jonsPkgStream(jonsPkgName.c_str(), std::ios::in | std::ios::binary);        // TODO: support opening of older resource packages
         JonsPackagePtr pkg(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<JonsPackage>(), boost::bind(&HeapAllocator::DeallocateObject<JonsPackage>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
 
         if (jonsPkgStream && jonsPkgStream.good() && jonsPkgStream.is_open())
@@ -25,7 +25,7 @@ namespace JonsEngine
 
     bool WriteJonsPkg(const std::string& jonsPkgName, const JonsPackagePtr pkg)
     {
-        std::ofstream outStream(jonsPkgName.c_str(), std::fstream::out | std::fstream::binary);
+        std::ofstream outStream(jonsPkgName.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
         bool ret = false;
 
         if (outStream.is_open())

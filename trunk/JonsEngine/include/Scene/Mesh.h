@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Renderer/IVertexBuffer.h"
+#include "include/Renderer/IMaterial.h"
 
 namespace JonsEngine
 {
@@ -8,11 +9,12 @@ namespace JonsEngine
     struct Mesh
     {
         VertexBufferPtr mVertexBuffer;
+        MaterialPtr mMaterial;
 
-        Mesh(VertexBufferPtr vertexBuffer);
+        Mesh(VertexBufferPtr vertexBuffer, MaterialPtr material);
     };
 
-    inline Mesh::Mesh(VertexBufferPtr vertexBuffer) : mVertexBuffer(vertexBuffer)
+    inline Mesh::Mesh(VertexBufferPtr vertexBuffer, MaterialPtr material) : mVertexBuffer(vertexBuffer), mMaterial(material)
     {
     }
 }

@@ -119,6 +119,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Core\Utils\Math.cpp" />
     <ClCompile Include="src\Input\GLFW\GLFWInputBackend.cpp" />
     <ClCompile Include="src\Input\InputManager.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\OpenGLMaterial.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLRenderer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLVertexBuffer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\Shader.cpp" />
@@ -162,8 +163,10 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Input\KeyDefinition.h" />
     <ClInclude Include="include\Input\MouseCallback.h" />
     <ClInclude Include="include\Renderer\DummyRenderer.h" />
+    <ClInclude Include="include\Renderer\IMaterial.h" />
     <ClInclude Include="include\Renderer\IRenderer.h" />
     <ClInclude Include="include\Renderer\IVertexBuffer.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLMaterial.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLRenderer.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLVertexBuffer.h" />
     <ClInclude Include="include\Renderer\OpenGL3\Shader.h" />

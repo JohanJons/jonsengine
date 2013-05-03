@@ -34,12 +34,35 @@ namespace JonsEngine
     /* PackageMesh definition */
     struct PackageMesh
     {
-        std::vector<float> mVertexData;
-        std::vector<float> mNormalData;
-        std::vector<uint32_t> mIndiceData;     // TODO: evaluate if uint32_t byte is really needed, otherwise go with uint16_t to reduce size...
-
+        std::vector<Vec3> mVertexData;
+        std::vector<Vec3> mNormalData;
+        std::vector<Vec2> mTexCoordsData;
+        std::vector<uint32_t> mIndiceData;
+        uint16_t mMaterialIndex;
         
+
         PackageMesh();
+    };
+
+    /* PackageMaterial definition */
+    struct PackageMaterial
+    {
+        enum TextureColorType
+        {
+            RGB = 0,
+            RGBA,
+            UNKNOWN
+        };
+
+        std::string mName;
+        std::vector<uint8_t> mTextureData;
+        uint32_t mTextureWidth;         // width/height in pixels
+        uint32_t mTextureHeight;
+        uint8_t mBitsPerPixel;
+        TextureColorType mTextureColorType;
+
+
+        PackageMaterial();
     };
 
     /* PackageModel definition */
@@ -59,6 +82,7 @@ namespace JonsEngine
     {
         PackageHeader mHeader;
         std::vector<PackageModel> mModels;
+        std::vector<PackageMaterial> mMaterials;
 
 
         JonsPackage();
@@ -86,7 +110,12 @@ namespace JonsEngine
     }
 
     /* PackageMesh inlines */
-    inline PackageMesh::PackageMesh()
+    inline PackageMesh::PackageMesh() : mMaterialIndex(0)
+    {
+    }
+
+    /* PackageMaterial inlines */
+    inline PackageMaterial::PackageMaterial()
     {
     }
 
@@ -124,7 +153,20 @@ namespace boost
         {
             ar & mesh.mVertexData;
             ar & mesh.mNormalData;
+            ar & mesh.mTexCoordsData;
             ar & mesh.mIndiceData;
+            ar & mesh.mMaterialIndex;
+        }
+
+        template<class Archive>
+        void serialize(Archive & ar, JonsEngine::PackageMaterial& material, const unsigned int version)
+        {
+            ar & material.mName;
+            ar & material.mTextureData;
+            ar & material.mTextureWidth;
+            ar & material.mTextureHeight;
+            ar & material.mBitsPerPixel;
+            ar & material.mTextureColorType;
         }
 
         template<class Archive>
@@ -132,10 +174,11 @@ namespace boost
         {
             ar & pkg.mHeader;
             ar & pkg.mModels;
+            ar & pkg.mMaterials;
         }
 
         template<class Archive>
-        void serialize(Archive & ar, glm::detail::tmat4x4<glm::mediump_float> transform, const unsigned int version)
+        void serialize(Archive & ar, glm::detail::tmat4x4<glm::mediump_float>& transform, const unsigned int version)
         {
             ar & transform[0];
             ar & transform[1];
@@ -144,12 +187,27 @@ namespace boost
         }
 
         template<class Archive>
-        void serialize(Archive & ar, glm::detail::tvec4<glm::mediump_float> vec, const unsigned int version)
+        void serialize(Archive & ar, glm::detail::tvec4<glm::mediump_float>& vec, const unsigned int version)
         {
             ar & vec.x;
             ar & vec.y;
             ar & vec.z;
             ar & vec.w;
+        }
+
+        template<class Archive>
+        void serialize(Archive & ar, glm::detail::tvec3<glm::mediump_float>& vec, const unsigned int version)
+        {
+            ar & vec.x;
+            ar & vec.y;
+            ar & vec.z;
+        }
+
+        template<class Archive>
+        void serialize(Archive & ar, glm::detail::tvec2<glm::mediump_float>& vec, const unsigned int version)
+        {
+            ar & vec.x;
+            ar & vec.y;
         }
     } // namespace serialization
 } // namespace boost

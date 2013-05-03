@@ -115,7 +115,7 @@ namespace JonsGame
     {
         Scene* myScene = mEngine->GetSceneManager().CreateScene("MyScene");
         mEngine->GetSceneManager().SetActiveScene("MyScene");
-        JonsPackagePtr package = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/keke.jons");
+        JonsPackagePtr package = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
 
         // cube
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
@@ -127,10 +127,11 @@ namespace JonsGame
         ModelPtr modelChair    = myScene->CreateModel("Chair", "chair", package, nodeChair);
         nodeChair->TranslateNode(Vec3(0.0f, 0.0f, -8.0f));
 
-        // shotgun
-        SceneNodePtr nodeShotgun = myScene->GetRootNode().CreateChildNode("nodeShotgun");
-        ModelPtr modelShotgun    = myScene->CreateModel("Shotgun", "shotgun", package, nodeShotgun);
-        nodeShotgun->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));
+        // uhura
+        SceneNodePtr nodeUhura = myScene->GetRootNode().CreateChildNode("nodeUhura");
+        ModelPtr modelUhura    = myScene->CreateModel("Uhura", "uhura", package, nodeUhura);
+        nodeUhura->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));
+        nodeUhura->RotateNode(270, Vec3(1.0f, 0.0f, 0.0f));
 
         // light
         SceneNodePtr nodeLight   = myScene->GetRootNode().CreateChildNode("nodeLight");

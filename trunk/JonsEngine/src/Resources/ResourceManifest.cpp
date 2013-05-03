@@ -5,6 +5,7 @@
 
 #include "boost/bind.hpp"
 #include "boost/foreach.hpp"
+#include "boost/algorithm/string.hpp"
 #include <algorithm>
 
 namespace JonsEngine
@@ -20,23 +21,18 @@ namespace JonsEngine
     
     ModelPtr ResourceManifest::LoadModel(const std::string& modelName, const std::string& assetName, JonsPackagePtr jonsPkg)
     {
-        std::vector<PackageModel>::iterator iter = std::find_if(jonsPkg->mModels.begin(), jonsPkg->mModels.end(), boost::bind(&PackageModel::mName, _1) == assetName);
+        std::vector<PackageModel>::iterator iter = std::find_if(jonsPkg->mModels.begin(), jonsPkg->mModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&PackageModel::mName, _1), assetName, std::locale()));
         ModelPtr ptr;
 
         if (iter != jonsPkg->mModels.end())
-        {
-            ptr = ModelPtr(mMemoryAllocator.AllocateObject<Model>(ProcessModel(*iter, modelName)),
-                           boost::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, _1));
-
-            mModels.push_back(ptr);
-        }
+            ptr = *mModels.insert(mModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(ProcessModel(*iter, modelName)), boost::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, _1)));
 
         return ptr;
     }
         
     ModelPtr ResourceManifest::GetModel(const std::string& modelName)
     {
-        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), boost::bind(&Model::mName, _1) == modelName);
+        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&Model::mName, _1), modelName, std::locale()));
         ModelPtr ptr;
 
         if (iter != mModels.end())
@@ -47,12 +43,9 @@ namespace JonsEngine
 
     bool ResourceManifest::HasModel(const std::string& modelName)
     {
-        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), boost::bind(&Model::mName, _1) == modelName);
+        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&Model::mName, _1), modelName, std::locale()));
 
-        if (iter != mModels.end())
-            return true;
-        else
-            return false;
+        return iter != mModels.end();
     }
 
     Model ResourceManifest::ProcessModel(PackageModel& pkgModel, const std::string& modelName)
@@ -61,7 +54,7 @@ namespace JonsEngine
         model.mTransform = pkgModel.mTransform;
             
         BOOST_FOREACH(PackageMesh& mesh, pkgModel.mMeshes)
-            model.mMeshes.push_back(Mesh(mRenderer.CreateVertexBuffer(mesh.mVertexData, mesh.mNormalData, mesh.mIndiceData)));
+            model.mMeshes.push_back(Mesh(mRenderer.CreateVertexBuffer(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mIndiceData), mRenderer.CreateMaterial()));
 
         BOOST_FOREACH(PackageModel& m, pkgModel.mChildren)
             model.mChildren.push_back(ProcessModel(m, m.mName));

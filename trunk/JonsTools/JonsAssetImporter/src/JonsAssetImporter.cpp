@@ -19,9 +19,10 @@ int _tmain(int argc, _TCHAR* cmds[])
     while (++i < argc)
         commands.push_back(std::string(cmds[i]));
 
-    std::string errorString;
-    if (JonsAssetImporter::ParseCommands(commands, errorString) != JonsAssetImporter::SUCCESS)
-        std::cout << errorString << std::endl;
+    JonsAssetImporter::AssetImporter assetImporter;
+    assetImporter.ParseCommands(commands);
+        
+    std::cout << assetImporter.GetErrorLog() << std::endl;
 
 	return 0;
 }

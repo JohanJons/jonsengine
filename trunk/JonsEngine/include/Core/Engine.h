@@ -23,6 +23,11 @@ namespace JonsEngine
      * It creates all subsystems and is responsible for advancing the engine state.
      */
 
+    /*
+     * TODO:
+     * Integrate building with boost
+     */
+
     /* Engine definition */
     class Engine
     {
