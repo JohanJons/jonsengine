@@ -26,20 +26,23 @@ namespace JonsEngine
     void Camera::RotateCamera(const float offsetHorizontalAngle, const float offsetVerticalAngle)
     {
         mHorizontalAngle += offsetHorizontalAngle;
-        mVerticalAngle   += offsetVerticalAngle;
+        mHorizontalAngle = fmod(mHorizontalAngle, 360.0f);
+
+        mVerticalAngle += offsetVerticalAngle;
+        mVerticalAngle = fmod(mVerticalAngle, 360.0f);
     }
 
 
     Vec3 Camera::Forward() const
     {
-        Vec4 forward = Inverse(Orientation()) * Vec4(0, 0, 1, 1);
+        Vec4 forward = Inverse(Orientation()) * Vec4(0.0f, 0.0f, 1.0f, 0.0f);
 
         return Vec3(forward);
     }
 
     Vec3 Camera::Right() const
     {
-        Vec4 right = Inverse(Orientation()) * Vec4(-1, 0, 0, 1);
+        Vec4 right = Inverse(Orientation()) * Vec4(-1.0f, 0.0f, 0.0f, 0.0f);
 
         return Vec3(right);
     }

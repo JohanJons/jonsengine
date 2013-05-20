@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/Types.h"
+#include <math.h>
 
 
 namespace JonsEngine

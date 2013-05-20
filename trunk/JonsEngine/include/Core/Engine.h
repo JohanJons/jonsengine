@@ -25,10 +25,9 @@ namespace JonsEngine
 
     /*
      * TODO:
-     * Revert JonsPackage files from vector<vec> to vector<float> due to serialization constructor overhead
      * Fix assimp and ambient/diffuse colors..
      * Add http://imdoingitwrong.wordpress.com/tag/glsl/ lighting attenuation
-     * Check camera at extreme angles
+     * Check camera upside down?
      * Integrate building with boost
      * Generalize  common scene/resource/.. code
      */
