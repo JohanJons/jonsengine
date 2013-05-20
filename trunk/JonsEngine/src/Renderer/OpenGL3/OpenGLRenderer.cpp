@@ -1,6 +1,7 @@
 #include "include/Renderer/OpenGL3/OpenGLRenderer.h"
 
 #include "include/Renderer/OpenGL3/OpenGLVertexBuffer.h"
+#include "include/Renderer/OpenGL3/OpenGLTexture.h"
 #include "include/Renderer/OpenGL3/Shader.h"
 #include "include/Renderer/OpenGL3/Shaders.h"
 #include "include/Core/EngineSettings.h"
@@ -16,8 +17,8 @@
 namespace JonsEngine
 {
     OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings) : mLogger(Logger::GetRendererLogger()), mDefaultProgram(SetupShaderProgram("DefaultProgram")), 
-                                                                            mUniBufferTransform("UniTransform", mDefaultProgram), mUniBufferMaterial("UniMaterial", mDefaultProgram), 
-                                                                            mUniBufferLightingInfo("UniLightingInfo", mDefaultProgram),  mUniBufferLights("UniLights", mDefaultProgram)
+                                                                           mUniBufferTransform("UnifTransform", mDefaultProgram), mUniBufferMaterial("UnifMaterial", mDefaultProgram), 
+                                                                           mUniBufferLightingInfo("UnifLighting", mDefaultProgram)
     {
         // 'glewExperimental = GL_TRUE' needed to initialize openGL core profile; see GLEW doc
         glewExperimental = GL_TRUE;
@@ -39,10 +40,20 @@ namespace JonsEngine
         glDepthMask(GL_TRUE);
         glDepthFunc(GL_LEQUAL);
         glDepthRange(0.0f, 1.0f);
+
+        // texture sampler setup
+        glGenSamplers(1, &mTextureSampler);
+        glSamplerParameteri(mTextureSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glSamplerParameteri(mTextureSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glUniform1i(glGetUniformLocation(mDefaultProgram.GetHandle(), "unifDiffuseTexture"), OpenGLTexture::TEXTURE_UNIT_DIFFUSE);
+        glBindSampler(OpenGLTexture::TEXTURE_UNIT_DIFFUSE, mTextureSampler);
     }
         
     OpenGLRenderer::~OpenGLRenderer()
     {
+        glDeleteSamplers(1, &mTextureSampler);
     }
 
     VertexBufferPtr OpenGLRenderer::CreateVertexBuffer(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData)
@@ -50,9 +61,10 @@ namespace JonsEngine
         return VertexBufferPtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<OpenGLVertexBuffer>(vertexData, normalData, texCoords, indexData), boost::bind(&HeapAllocator::DeallocateObject<OpenGLVertexBuffer>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
     }
 
-    MaterialPtr OpenGLRenderer::CreateMaterial()
+    TexturePtr OpenGLRenderer::CreateTexture(ITexture::TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ITexture::TextureFormat textureFormat)
     {
-        return MaterialPtr();
+        return TexturePtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<OpenGLTexture>(textureData, textureWidth, textureHeight, textureFormat), 
+                          boost::bind(&HeapAllocator::DeallocateObject<OpenGLTexture>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
     }
 
 
@@ -63,30 +75,27 @@ namespace JonsEngine
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // set active lights
-        mUniBufferLights.AddData(lighting.mLights);
-        mUniBufferLightingInfo.AddData(lighting.mLightingInfo);
-
-        mUniBufferLights.SetActiveIndex(0);
-        mUniBufferLightingInfo.SetActiveIndex(0);
+        mUniBufferLightingInfo.SetData(lighting);
 
         int activeIndex = 0;
         BOOST_FOREACH(const Renderable& renderable, renderQueue)
         {
-            mUniBufferTransform.AddData(renderable.mTransform);
-            mUniBufferMaterial.AddData(renderable.mMaterial);
+            mUniBufferTransform.SetData(Transform(renderable.mWVPMatrix, renderable.mWorldMatrix));
+            mUniBufferMaterial.SetData(Material(renderable.mDiffuseColor, renderable.mAmbientColor, renderable.mSpecularColor, renderable.mEmissiveColor, renderable.mDiffuseTexture != NULL, renderable.mSpecularFactor));
 
-            mUniBufferTransform.SetActiveIndex(activeIndex);
-            mUniBufferMaterial.SetActiveIndex(activeIndex);
-
+            if (renderable.mDiffuseTexture)
+            {
+                glActiveTexture(OpenGLTexture::TEXTURE_UNIT_DIFFUSE);
+                OpenGLTexture* diffuseTexture = static_cast<OpenGLTexture*>(renderable.mDiffuseTexture.get());
+                glBindTexture(GL_TEXTURE_2D, diffuseTexture->mTexture);
+            }
+            
             renderable.mVertexBuffer->Render();
 
             activeIndex++;
         }
 
-        mUniBufferLights.ClearData();
-        mUniBufferLightingInfo.ClearData();
-        mUniBufferTransform.ClearData();
-        mUniBufferMaterial.ClearData();
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
 

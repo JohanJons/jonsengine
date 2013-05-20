@@ -20,6 +20,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -67,9 +68,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>winmm.lib;OpenGL32.lib;glew32.lib;GLFW.lib;libboost_serialization-vc100-mt-sgd-1_53.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;OpenGL32.lib;glew32.lib;GLFW.lib;libboost_serialization-vc110-mt-sgd-1_53.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)/../Thirdparty/boost_1_53_0/bin.v2/libs/serialization/build/msvc-10.0/debug/link-static/runtime-link-static/threading-multi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)/../Thirdparty/boost_1_53_0/bin.v2/libs/serialization/build/msvc-11.0/debug/link-static/runtime-link-static/threading-multi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -119,8 +120,8 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Core\Utils\Math.cpp" />
     <ClCompile Include="src\Input\GLFW\GLFWInputBackend.cpp" />
     <ClCompile Include="src\Input\InputManager.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL3\OpenGLMaterial.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLRenderer.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\OpenGLTexture.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLVertexBuffer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\Shader.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\ShaderProgram.cpp" />
@@ -128,6 +129,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
     <ClCompile Include="src\Scene\Light.cpp" />
+    <ClCompile Include="src\Scene\Material.cpp" />
     <ClCompile Include="src\Scene\Model.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneManager.cpp" />
@@ -163,11 +165,11 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Input\KeyDefinition.h" />
     <ClInclude Include="include\Input\MouseCallback.h" />
     <ClInclude Include="include\Renderer\DummyRenderer.h" />
-    <ClInclude Include="include\Renderer\IMaterial.h" />
     <ClInclude Include="include\Renderer\IRenderer.h" />
+    <ClInclude Include="include\Renderer\ITexture.h" />
     <ClInclude Include="include\Renderer\IVertexBuffer.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\OpenGLMaterial.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLRenderer.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLTexture.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLVertexBuffer.h" />
     <ClInclude Include="include\Renderer\OpenGL3\Shader.h" />
     <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.h" />
@@ -179,6 +181,7 @@ xcopy /y /d "$(TargetPath)" "$(SolutionDir)libs\win32"</Command>
     <ClInclude Include="include\Resources\ResourceManifest.h" />
     <ClInclude Include="include\Scene\Camera.h" />
     <ClInclude Include="include\Scene\Light.h" />
+    <ClInclude Include="include\Scene\Material.h" />
     <ClInclude Include="include\Scene\Mesh.h" />
     <ClInclude Include="include\Scene\Model.h" />
     <ClInclude Include="include\Scene\Scene.h" />

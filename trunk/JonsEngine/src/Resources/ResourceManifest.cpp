@@ -1,5 +1,4 @@
 #include "include/Resources/ResourceManifest.h"
-#include "include/Scene/Model.h"
 #include "include/Renderer/IRenderer.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
@@ -19,13 +18,16 @@ namespace JonsEngine
     }
 
     
-    ModelPtr ResourceManifest::LoadModel(const std::string& modelName, const std::string& assetName, JonsPackagePtr jonsPkg)
+    ModelPtr ResourceManifest::LoadModel(const std::string& modelName, const std::string& assetName, const JonsPackagePtr jonsPkg)
     {
+        if (HasModel(modelName)) 
+            return GetModel(modelName);
+
         std::vector<PackageModel>::iterator iter = std::find_if(jonsPkg->mModels.begin(), jonsPkg->mModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&PackageModel::mName, _1), assetName, std::locale()));
         ModelPtr ptr;
 
         if (iter != jonsPkg->mModels.end())
-            ptr = *mModels.insert(mModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(ProcessModel(*iter, modelName)), boost::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, _1)));
+            ptr = *mModels.insert(mModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(ProcessModel(*iter, modelName, jonsPkg)), boost::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, _1)));
 
         return ptr;
     }
@@ -48,17 +50,69 @@ namespace JonsEngine
         return iter != mModels.end();
     }
 
-    Model ResourceManifest::ProcessModel(PackageModel& pkgModel, const std::string& modelName)
+
+    MaterialPtr ResourceManifest::LoadMaterial(const std::string& materialName, const std::string& assetName, const JonsPackagePtr jonsPkg)
+    {
+        if (HasMaterial(materialName))
+            return GetMaterial(materialName);
+        
+        std::vector<PackageMaterial>::iterator iter = std::find_if(jonsPkg->mMaterials.begin(), jonsPkg->mMaterials.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&PackageMaterial::mName, _1), assetName, std::locale()));
+        MaterialPtr ptr;
+
+        if (iter != jonsPkg->mMaterials.end())
+            ptr = *mMaterials.insert(mMaterials.end(), MaterialPtr(mMemoryAllocator.AllocateObject<Material>(ProcessMaterial(*iter, materialName, jonsPkg)), boost::bind(&HeapAllocator::DeallocateObject<Material>, &mMemoryAllocator, _1)));
+
+        return ptr;
+    }
+        
+    MaterialPtr ResourceManifest::GetMaterial(const std::string& materialName)
+    {
+        std::vector<MaterialPtr>::iterator iter = std::find_if(mMaterials.begin(), mMaterials.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&Material::mName, _1), materialName, std::locale()));
+        MaterialPtr ptr;
+
+        if (iter != mMaterials.end())
+            ptr = *iter;
+
+        return ptr;
+    }
+        
+    bool ResourceManifest::HasMaterial(const std::string& materialName)
+    {
+        std::vector<MaterialPtr>::iterator iter = std::find_if(mMaterials.begin(), mMaterials.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&Material::mName, _1), materialName, std::locale()));
+
+        return iter != mMaterials.end();
+    }
+
+
+    Model ResourceManifest::ProcessModel(PackageModel& pkgModel, const std::string& modelName, const JonsPackagePtr jonsPkg)
     {
         Model model(modelName);
         model.mTransform = pkgModel.mTransform;
             
         BOOST_FOREACH(PackageMesh& mesh, pkgModel.mMeshes)
-            model.mMeshes.push_back(Mesh(mRenderer.CreateVertexBuffer(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mIndiceData), mRenderer.CreateMaterial()));
+        {
+            MaterialPtr material;
+
+            if (mesh.mHasMaterial)
+            {
+                PackageMaterial& pkgMaterial = jonsPkg->mMaterials.at(mesh.mMaterialIndex);
+                material = LoadMaterial(pkgMaterial.mName, pkgMaterial.mName, jonsPkg);
+            }
+
+            model.mMeshes.push_back(Mesh(mRenderer.CreateVertexBuffer(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mIndiceData), material));
+        }
 
         BOOST_FOREACH(PackageModel& m, pkgModel.mChildren)
-            model.mChildren.push_back(ProcessModel(m, m.mName));
+            model.mChildren.push_back(ProcessModel(m, m.mName, jonsPkg));
 
         return model;
+    }
+
+    Material ResourceManifest::ProcessMaterial(PackageMaterial& pkgMaterial, const std::string& materialName, const JonsPackagePtr jonsPkg)
+    {
+        TexturePtr diffuseTexture = mRenderer.CreateTexture(pkgMaterial.mDiffuseTexture.mTextureType, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth,
+                                                            pkgMaterial.mDiffuseTexture.mTextureHeight, pkgMaterial.mDiffuseTexture.mTextureFormat);
+
+        return Material(materialName, diffuseTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor);
     }
 }

@@ -58,7 +58,10 @@ namespace JonsAssetImporter
         void ProcessScene(const aiScene* scene, const boost::filesystem::path& modelPath, const std::string& modelName, JonsEngine::JonsPackagePtr pkg);
         void ProcessMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, JonsEngine::JonsPackagePtr pkg);
         JonsEngine::PackageModel ProcessModel(const aiScene* scene, const aiNode* node, const MaterialMap& materialMap);
-        JonsEngine::Mat4 aiMat4ToJonsMat4(aiMatrix4x4 mat);
+        JonsEngine::PackageTexture ProcessDiffuseTexture(const aiMaterial* material, const boost::filesystem::path& modelPath); 
+
+        JonsEngine::Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& mat);
+        JonsEngine::Vec3 aiColor3DToJonsVec3(const aiColor3D& color);
         void Log(const std::string& msg);
         static void FreeImageErrorHandler(FREE_IMAGE_FORMAT imageFormat, const char* message);
 

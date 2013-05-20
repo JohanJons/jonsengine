@@ -69,22 +69,22 @@ namespace JonsGame
 
             // light direction 
             else if (evnt.KeySymbol == Q)
-                activeScene->GetLight("PositionalLight")->mSceneNode->TranslateNode(Vec3(-0.05, 0.0f, 0.0f));
+                activeScene->GetLight("PointAmbientLight")->mSceneNode->TranslateNode(Vec3(-0.05, 0.0f, 0.0f));
 
             else if (evnt.KeySymbol == E)
-                activeScene->GetLight("PositionalLight")->mSceneNode->TranslateNode(Vec3(0.05, 0.0f, 0.0f));
+                activeScene->GetLight("PointAmbientLight")->mSceneNode->TranslateNode(Vec3(0.05, 0.0f, 0.0f));
 
             else if (evnt.KeySymbol == R)
-                activeScene->GetLight("PositionalLight")->mSceneNode->TranslateNode(Vec3(0.00, -0.05f, 0.0f));
+                activeScene->GetLight("PointAmbientLight")->mSceneNode->TranslateNode(Vec3(0.00, -0.05f, 0.0f));
 
             else if (evnt.KeySymbol == T)
-                activeScene->GetLight("PositionalLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.05f, 0.0f));
+                activeScene->GetLight("PointAmbientLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.05f, 0.0f));
 
             else if (evnt.KeySymbol == F)
-                activeScene->GetLight("PositionalLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, -0.05f));
+                activeScene->GetLight("PointAmbientLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, -0.05f));
 
             else if (evnt.KeySymbol == G)
-                activeScene->GetLight("PositionalLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, 0.05f));
+                activeScene->GetLight("PointAmbientLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, 0.05f));
         }
     }
 
@@ -131,21 +131,18 @@ namespace JonsGame
         SceneNodePtr nodeUhura = myScene->GetRootNode().CreateChildNode("nodeUhura");
         ModelPtr modelUhura    = myScene->CreateModel("Uhura", "uhura", package, nodeUhura);
         nodeUhura->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));
-        nodeUhura->RotateNode(270, Vec3(1.0f, 0.0f, 0.0f));
 
-        // light
-        SceneNodePtr nodeLight   = myScene->GetRootNode().CreateChildNode("nodeLight");
-        LightPtr light           = myScene->CreateLight("PositionalLight", Light::POINT, nodeLight);
-        light->mLightIntensity   = Vec4(3.0f, 3.0f ,3.0f, 1.0f);
+        // point and ambient light
+        SceneNodePtr nodeLight = myScene->GetRootNode().CreateChildNode("nodeLight");
+        LightPtr light         = myScene->CreateLight("PointAmbientLight", Light::POINT, nodeLight);
+        light->mDiffuseColor   = Vec4(1.0f, 1.0f ,1.0f, 1.0f);
+        light->mAmbientColor   = Vec4(0.1f, 0.1f ,0.1f, 1.0f);
         nodeLight->TranslateNode(Vec3(4.0f, 0.0f, -13.0f));
 
         // light2
-        SceneNodePtr nodeLight2   = myScene->GetRootNode().CreateChildNode("nodeLight2");
-        LightPtr light2           = myScene->CreateLight("PositionalLight", Light::POINT, nodeLight2);
-        light2->mLightIntensity   = Vec4(2.0f, 2.0f, 2.0f, 1.0f);
+        SceneNodePtr nodeLight2 = myScene->GetRootNode().CreateChildNode("nodeLight2");
+        LightPtr light2         = myScene->CreateLight("PointLight", Light::POINT, nodeLight2);
+        light2->mDiffuseColor   = Vec4(0.4f, 0.4f, 0.0f, 1.0f);
         nodeLight2->TranslateNode(Vec3(0.0f, 3.0f, -8.0f));
-
-        // ambient
-        myScene->SetAmbientLight(Vec4(0.01f, 0.01f, 0.01f, 1.0f));
     }
 }

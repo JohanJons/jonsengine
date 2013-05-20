@@ -93,7 +93,7 @@ namespace JonsEngine
 
     ResourceManifest* Engine::bootCreateResourceManifest()
     {
-        return mMemoryAllocator.AllocateObject<ResourceManifest>(GetRenderer());
+        return mMemoryAllocator.AllocateObject<ResourceManifest, IRenderer&>(GetRenderer());
     }
 
     
@@ -118,26 +118,40 @@ namespace JonsEngine
     // TODO: Cull lights
     RenderableLighting Engine::CreateRenderableLighting(const Scene* scene)
     {
-        RenderableLighting lighting(scene->GetAmbientLight(), scene->GetSceneCamera().Forward(), scene->GetGamma());
+        const std::vector<LightPtr>& sceneLights = scene->GetAllLights();
 
-        size_t numLights = 0;
-        BOOST_FOREACH(LightPtr light, scene->GetAllLights())
+        RenderableLighting lighting(scene->GetGamma(), scene->GetSceneCamera().Forward(), sceneLights.size());
+
+        int lightIndex = 0;
+        BOOST_FOREACH(LightPtr light, sceneLights)
         {
-            lighting.mLights[numLights].mLightIntensity = light->mLightIntensity;
+            lighting.mLights[lightIndex].mDiffuseColor  = light->mDiffuseColor;
+            lighting.mLights[lightIndex].mAmbientColor  = light->mAmbientColor;
+            lighting.mLights[lightIndex].mSpecularColor = light->mSpecularColor;
 
             if (light->mLightType == Light::POINT)
             {
-                lighting.mLights[numLights].mLightPosition    = Vec4(light->mSceneNode->Position(), 1.0f);
-                lighting.mLights[numLights].mLightAttenuation = light->mLightAttenuation;
-                lighting.mLights[numLights].mMaxAttenuation   = light->mMaxAttenuation;
+                lighting.mLights[lightIndex].mLightType            = Light::POINT;
+                lighting.mLights[lightIndex].mLightPosition        = Vec4(light->mSceneNode->Position(), 1.0f);
+                lighting.mLights[lightIndex].mLightDirection       = Vec4(0.0f);
+                lighting.mLights[lightIndex].mConstantAttenutation = light->mConstantAttenutation;
+                lighting.mLights[lightIndex].mLinearAttenuation    = light->mLinearAttenuation;
+                lighting.mLights[lightIndex].mQuadraticAttenuation = light->mQuadraticAttenuation;
+                lighting.mLights[lightIndex].mMaxDistance          = light->mMaxDistance;
             }
             else if (light->mLightType == Light::DIRECTIONAL)
-                lighting.mLights[numLights].mLightPosition = Vec4(light->mLightDirection, 0.0f);
+            {
+                lighting.mLights[lightIndex].mLightType            = Light::DIRECTIONAL;
+                lighting.mLights[lightIndex].mLightPosition        = Vec4(0.0f);
+                lighting.mLights[lightIndex].mLightDirection       = Vec4(light->mLightDirection, 0.0f);
+                lighting.mLights[lightIndex].mConstantAttenutation = 0.0f;
+                lighting.mLights[lightIndex].mLinearAttenuation    = 0.0f;
+                lighting.mLights[lightIndex].mQuadraticAttenuation = 0.0f;
+                lighting.mLights[lightIndex].mMaxDistance          = 0.0f;
+            }
 
-            numLights++;
+            lightIndex++;
         }
-
-        lighting.mLightingInfo.mUsedLights = numLights;
 
         return lighting;
     }
@@ -149,9 +163,10 @@ namespace JonsEngine
         const Mat4 worldViewProjMatrix = perspectiveMatrix * worldViewMatrix;
 
         BOOST_FOREACH(const Mesh& mesh, model->mMeshes)
-            renderQueue.push_back(Renderable(mesh.mVertexBuffer, worldViewProjMatrix, worldMatrix, Vec4(1.0f), 0.02f));     // TODO: Add color, specularfactor to model/mesh
+            renderQueue.push_back(Renderable(mesh.mVertexBuffer, worldViewProjMatrix, worldMatrix, mesh.mMaterial->mDiffuseTexture, Vec4(mesh.mMaterial->mDiffuseColor, 1.0f), Vec4(mesh.mMaterial->mAmbientColor, 1.0f),
+                                             Vec4(mesh.mMaterial->mSpecularColor, 1.0f), Vec4(mesh.mMaterial->mEmissiveColor, 1.0f), 0.02f));     // TODO: Add specularfactor to model/mesh
 
         BOOST_FOREACH(const Model& childModel, model->mChildren)
-            CreateModelRenderable(&childModel, viewMatrix, perspectiveMatrix, nodeTransform, renderQueue);      // dont send worldMatrix, due to model transform hierarchy already done by assimp
+            CreateModelRenderable(&childModel, viewMatrix, perspectiveMatrix, worldMatrix, renderQueue);
     }
 }

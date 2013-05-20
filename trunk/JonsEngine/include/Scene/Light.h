@@ -13,8 +13,6 @@ namespace JonsEngine
     /* LightPtr definition */
     typedef boost::shared_ptr<Light> LightPtr;
 
-    typedef Vec4 LightColor;
-
     /* Light definition */
     struct Light
     {
@@ -27,13 +25,19 @@ namespace JonsEngine
         const std::string mName;
         const size_t mHashedID;
 
-        Vec4 mLightIntensity;
-        Vec3 mLightDirection;
-        float mLightAttenuation;
-        float mMaxAttenuation;
-        LightType mLightType;
+        Vec4 mDiffuseColor;
+        Vec4 mAmbientColor;
+        Vec4 mSpecularColor;
 
         SceneNodePtr mSceneNode;
+        Vec3 mLightDirection;
+        LightType mLightType;
+
+        float mConstantAttenutation;
+        float mLinearAttenuation;
+        float mQuadraticAttenuation;
+        float mMaxDistance;
+
 
 
         Light(const std::string& name, LightType type);

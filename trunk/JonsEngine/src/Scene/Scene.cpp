@@ -10,7 +10,7 @@
 namespace JonsEngine
 {
     Scene::Scene(const std::string& sceneName, ResourceManifest& resManifest) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mRootNode("Root"), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), 
-                                                                                mAmbientLight(1.0f), mGamma(2.1f), mResourceManifest(resManifest)
+                                                                                mGamma(2.1f), mResourceManifest(resManifest)
     {
     }
 
@@ -104,16 +104,6 @@ namespace JonsEngine
             mLights.erase(iter);
     }
 
-
-    void Scene::SetAmbientLight(const LightColor& ambientLight)
-    {
-        mAmbientLight = ambientLight;
-    }
-
-    const LightColor& Scene::GetAmbientLight() const
-    {
-        return mAmbientLight;
-    }
 
     void Scene::SetGammaFactor(const float gamma)
     {

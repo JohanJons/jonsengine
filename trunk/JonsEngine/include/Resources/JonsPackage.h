@@ -2,6 +2,7 @@
 
 #include "include/Core/Types.h"
 #include "include/Core/EngineDefs.h"
+#include "include/Renderer/ITexture.h"
 
 #include <vector>
 #include "boost/smart_ptr.hpp"
@@ -39,28 +40,35 @@ namespace JonsEngine
         std::vector<Vec2> mTexCoordsData;
         std::vector<uint32_t> mIndiceData;
         uint16_t mMaterialIndex;
-        
+        bool mHasMaterial;
+
 
         PackageMesh();
+    };
+
+    /* PackageTexture definition */
+    struct PackageTexture
+    {
+        std::string mName;
+        std::vector<uint8_t> mTextureData;
+        uint32_t mTextureWidth;         // width/height in pixels
+        uint32_t mTextureHeight;
+        ITexture::TextureFormat mTextureFormat;
+        ITexture::TextureType mTextureType;
+
+
+        PackageTexture();
     };
 
     /* PackageMaterial definition */
     struct PackageMaterial
     {
-        enum TextureColorType
-        {
-            RGB = 0,
-            RGBA,
-            UNKNOWN
-        };
-
         std::string mName;
-        std::vector<uint8_t> mTextureData;
-        uint32_t mTextureWidth;         // width/height in pixels
-        uint32_t mTextureHeight;
-        uint8_t mBitsPerPixel;
-        TextureColorType mTextureColorType;
-
+        PackageTexture mDiffuseTexture;
+        Vec3 mDiffuseColor;
+        Vec3 mAmbientColor;
+        Vec3 mSpecularColor;
+        Vec3 mEmissiveColor;
 
         PackageMaterial();
     };
@@ -110,12 +118,17 @@ namespace JonsEngine
     }
 
     /* PackageMesh inlines */
-    inline PackageMesh::PackageMesh() : mMaterialIndex(0)
+    inline PackageMesh::PackageMesh() : mMaterialIndex(0), mHasMaterial(false)
+    {
+    }
+
+    /* PackageTexture inlines */
+    inline PackageTexture::PackageTexture() : mName(""), mTextureWidth(0), mTextureHeight(0), mTextureFormat(ITexture::UNKNOWN_FORMAT), mTextureType(ITexture::UNKNOWN_TYPE)
     {
     }
 
     /* PackageMaterial inlines */
-    inline PackageMaterial::PackageMaterial()
+    inline PackageMaterial::PackageMaterial() : mName(""), mDiffuseColor(0.0f), mAmbientColor(0.0f), mSpecularColor(0.0f), mEmissiveColor(0.0f)
     {
     }
 
@@ -156,17 +169,28 @@ namespace boost
             ar & mesh.mTexCoordsData;
             ar & mesh.mIndiceData;
             ar & mesh.mMaterialIndex;
+            ar & mesh.mHasMaterial;
+        }
+
+        template<class Archive>
+        void serialize(Archive & ar, JonsEngine::PackageTexture& texture, const unsigned int version)
+        {
+            ar & texture.mName;
+            ar & texture.mTextureData;
+            ar & texture.mTextureWidth;
+            ar & texture.mTextureHeight;
+            ar & texture.mTextureFormat;
+            ar & texture.mTextureType;
         }
 
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageMaterial& material, const unsigned int version)
         {
             ar & material.mName;
-            ar & material.mTextureData;
-            ar & material.mTextureWidth;
-            ar & material.mTextureHeight;
-            ar & material.mBitsPerPixel;
-            ar & material.mTextureColorType;
+            ar & material.mDiffuseTexture;
+            ar & material.mDiffuseColor;
+            ar & material.mAmbientColor;
+            ar & material.mSpecularColor;
         }
 
         template<class Archive>

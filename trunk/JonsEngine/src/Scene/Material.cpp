@@ -1,0 +1,21 @@
+#include "include/Scene/Model.h"
+
+#include "boost/functional/hash.hpp"
+
+namespace JonsEngine
+{
+    Material::Material(const std::string& name, const TexturePtr& diffuseTexture, const Vec3& diffuseColor, const Vec3& ambientColor, const Vec3& specularColor, const Vec3& emissiveColor) : mName(name), mHashedID(boost::hash_value(name)), mDiffuseTexture(diffuseTexture), mDiffuseColor(diffuseColor), mAmbientColor(ambientColor), mSpecularColor(specularColor), mEmissiveColor(emissiveColor)
+    {
+    }
+
+
+    bool Material::operator==(const Material& m1)
+    {
+        return mHashedID == m1.mHashedID;
+    }
+        
+    bool Material::operator==(const std::string& materialName)
+    {
+        return mHashedID == boost::hash_value(materialName);
+    }
+}

@@ -22,7 +22,7 @@ namespace JonsEngine
 
     SceneNodePtr SceneNode::CreateChildNode(const std::string& nodeName)
     {
-        mChildNodes.push_back(SceneNodePtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<SceneNode>(nodeName), boost::bind(&HeapAllocator::DeallocateObject<SceneNode>, &HeapAllocator::GetDefaultHeapAllocator(), _1)));
+        mChildNodes.push_back(SceneNodePtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<SceneNode, const std::string&>(nodeName), boost::bind(&HeapAllocator::DeallocateObject<SceneNode>, &HeapAllocator::GetDefaultHeapAllocator(), _1)));
 
         return mChildNodes.back();
     }

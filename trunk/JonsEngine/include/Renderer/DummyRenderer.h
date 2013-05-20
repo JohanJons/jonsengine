@@ -1,7 +1,6 @@
 #pragma once
 
 #include "include/Renderer/IRenderer.h"
-#include "include/Renderer/IMaterial.h"
 #include "include/Renderer/IVertexBuffer.h"
 
 namespace JonsEngine
@@ -21,18 +20,20 @@ namespace JonsEngine
         ~DummyRenderer();
 
         VertexBufferPtr CreateVertexBuffer(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData);
-        MaterialPtr CreateMaterial();
-        void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting);
+        TexturePtr CreateTexture(ITexture::TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ITexture::TextureFormat textureFormat);
 
+        void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting);
         RenderBackendType GetRenderBackendType() const;
     };
 
 
     /* DummyRenderBackend inlines */
-    inline DummyRenderer::DummyRenderer(const EngineSettings& engineSettings)                                                                                                                                               { }
-    inline DummyRenderer::~DummyRenderer()                                                                                                                                                                                  { }
-    inline void DummyRenderer::DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting)                                                                                                          { }
-    inline VertexBufferPtr DummyRenderer::CreateVertexBuffer(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData)          { return VertexBufferPtr(); }
-    inline MaterialPtr DummyRenderer::CreateMaterial()                                                                                                                                                                      { return MaterialPtr(); }
-    inline IRenderer::RenderBackendType DummyRenderer::GetRenderBackendType() const                                                                                                                                         { return NONE; }
+    inline DummyRenderer::DummyRenderer(const EngineSettings& engineSettings)                                                                                                                                                                  { }
+    inline DummyRenderer::~DummyRenderer()                                                                                                                                                                                                     { }
+   
+    inline VertexBufferPtr DummyRenderer::CreateVertexBuffer(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData)                             { return VertexBufferPtr(); }
+    inline TexturePtr DummyRenderer::CreateTexture(ITexture::TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ITexture::TextureFormat textureFormat)     { return TexturePtr(); }
+
+    inline void DummyRenderer::DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting)                                                                                                                             { }
+    inline IRenderer::RenderBackendType DummyRenderer::GetRenderBackendType() const                                                                                                                                                            { return NONE; }
 }

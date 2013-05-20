@@ -27,7 +27,6 @@ namespace JonsEngine
 
         SceneNodePtr mSceneNode;
 
-
         Model(const std::string& name);
 
         bool operator==(const Model& m);

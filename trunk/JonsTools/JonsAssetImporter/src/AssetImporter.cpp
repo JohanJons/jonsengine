@@ -152,47 +152,31 @@ namespace JonsAssetImporter
             for (unsigned int i = 0; i < scene->mNumMaterials; i++)
             {
                 const aiMaterial* material = scene->mMaterials[i];
-                aiString texturePath;
+                PackageTexture diffuseTexture(ProcessDiffuseTexture(material, modelPath));
+                aiString materialName;
+                aiColor3D diffuseColor;
+                aiColor3D ambientColor(0.1f);
+                aiColor3D specularColor;
+                aiColor3D emissiveColor;
 
-                if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0 && material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS) 
-                {
-                    const char* textureName = texturePath.C_Str();
+                material->Get(AI_MATKEY_NAME, materialName);
+                material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
+                //if (material->Get(AI_MATKEY_COLOR_AMBIENT, ambientColor) == aiReturn_SUCCESS)     TODO
+                //    ambientColor = aiColor3D(1.0f);
+                material->Get(AI_MATKEY_COLOR_SPECULAR, specularColor);
+                material->Get(AI_MATKEY_COLOR_EMISSIVE, emissiveColor);
 
-                    FREE_IMAGE_FORMAT imageFormat = FreeImage_GetFileType(textureName);
-                    if (imageFormat == FIF_UNKNOWN) 
-                        imageFormat = FreeImage_GetFIFFromFilename(textureName);
+                PackageMaterial pkgMaterial;
+                pkgMaterial.mName           = materialName.C_Str();
+                pkgMaterial.mDiffuseTexture = diffuseTexture;
+                pkgMaterial.mDiffuseColor   = aiColor3DToJonsVec3(diffuseColor);
+                pkgMaterial.mAmbientColor   = aiColor3DToJonsVec3(ambientColor);
+                pkgMaterial.mSpecularColor  = aiColor3DToJonsVec3(specularColor);
+                pkgMaterial.mEmissiveColor  = aiColor3DToJonsVec3(emissiveColor);
 
-                    if (imageFormat == FIF_UNKNOWN || !FreeImage_FIFSupportsReading(imageFormat))     // if still unknown or unsupported, move on
-                        continue;
+                std::vector<PackageMaterial>::iterator iter = pkg->mMaterials.insert(pkg->mMaterials.end(), pkgMaterial);
 
-                    std::string filePath = modelPath.parent_path().string();
-                    if (modelPath.has_parent_path())
-                        filePath.append("/");
-                    filePath.append(textureName);
-                    FIBITMAP* bitmap = FreeImage_Load(imageFormat, filePath.c_str());
-
-                    if (!bitmap || !FreeImage_GetBits(bitmap) || !FreeImage_GetWidth(bitmap) || !FreeImage_GetHeight(bitmap))
-                        continue;
-
-                    FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(bitmap);
-                    uint32_t bitsPerPixel           = FreeImage_GetBPP(bitmap);
-                    uint32_t widthInPixels          = FreeImage_GetWidth(bitmap);
-                    uint32_t heightInPixels         = FreeImage_GetHeight(bitmap);
-
-                    // should be OK now
-                    PackageMaterial pkgMaterial;
-                    pkgMaterial.mName             = textureName;
-                    pkgMaterial.mBitsPerPixel     = bitsPerPixel;
-                    pkgMaterial.mTextureWidth     = widthInPixels;
-                    pkgMaterial.mTextureHeight    = heightInPixels;
-                    pkgMaterial.mTextureColorType = colorType == FIC_RGB ? PackageMaterial::RGB : colorType == FIC_RGBALPHA ? PackageMaterial::RGBA : PackageMaterial::UNKNOWN;
-                    pkgMaterial.mTextureData.insert(pkgMaterial.mTextureData.begin(), FreeImage_GetBits(bitmap), FreeImage_GetBits(bitmap) + ((bitsPerPixel/8) * widthInPixels * heightInPixels));
-                    std::vector<PackageMaterial>::iterator iter = pkg->mMaterials.insert(pkg->mMaterials.end(), pkgMaterial);
-
-                    materialMap.insert(MaterialPair(i, std::distance(pkg->mMaterials.begin(), iter)));
-
-                    FreeImage_Unload(bitmap);
-                }
+                materialMap.insert(MaterialPair(i, std::distance(pkg->mMaterials.begin(), iter)));
             }
         }
     }
@@ -224,8 +208,11 @@ namespace JonsAssetImporter
             for (unsigned int j = 0; j < m->mNumFaces; j++)
                 mesh.mIndiceData.insert(mesh.mIndiceData.end(), m->mFaces[j].mIndices, m->mFaces[j].mIndices + m->mFaces[j].mNumIndices);
 
-            if (materialMap.find(m->mMaterialIndex) != materialMap.end())
+            if (materialMap.find(m->mMaterialIndex) != materialMap.end()) 
+            {
                 mesh.mMaterialIndex = materialMap.at(m->mMaterialIndex);
+                mesh.mHasMaterial   = true;
+            }
 
             // add mesh to collection
             model.mMeshes.push_back(mesh);
@@ -237,17 +224,71 @@ namespace JonsAssetImporter
         return model;
     }
 
+    PackageTexture AssetImporter::ProcessDiffuseTexture(const aiMaterial* material, const boost::filesystem::path& modelPath)
+    {
+        PackageTexture diffuseTexture;
+        aiString texturePath;
 
-    Mat4 AssetImporter::aiMat4ToJonsMat4(aiMatrix4x4 aiMat)
+        if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0 && material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == aiReturn_SUCCESS) 
+        {
+            const char* textureName = texturePath.C_Str();
+
+            FREE_IMAGE_FORMAT imageFormat = FreeImage_GetFileType(textureName);
+            if (imageFormat == FIF_UNKNOWN) 
+                imageFormat = FreeImage_GetFIFFromFilename(textureName);
+
+            if (imageFormat != FIF_UNKNOWN || !FreeImage_FIFSupportsReading(imageFormat))
+            {
+                std::string filePath = modelPath.parent_path().string();
+                if (modelPath.has_parent_path())
+                    filePath.append("/");
+                filePath.append(textureName);
+                FIBITMAP* bitmap = FreeImage_Load(imageFormat, filePath.c_str());
+
+                if (bitmap && FreeImage_GetBits(bitmap) && FreeImage_GetWidth(bitmap) && FreeImage_GetHeight(bitmap))
+                {
+                    FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(bitmap);
+                    uint32_t bitsPerPixel           = FreeImage_GetBPP(bitmap);
+                    uint32_t widthInPixels          = FreeImage_GetWidth(bitmap);
+                    uint32_t heightInPixels         = FreeImage_GetHeight(bitmap);
+
+                    // should be OK now
+                    diffuseTexture.mName          = textureName;
+                    diffuseTexture.mTextureWidth  = widthInPixels;
+                    diffuseTexture.mTextureHeight = heightInPixels;
+                    diffuseTexture.mTextureType   = ITexture::DIFFUSE;
+                    diffuseTexture.mTextureFormat = colorType == FIC_RGB ? ITexture::RGB : colorType == FIC_RGBALPHA ? ITexture::RGBA : ITexture::UNKNOWN_FORMAT;
+                    diffuseTexture.mTextureData.insert(diffuseTexture.mTextureData.begin(), FreeImage_GetBits(bitmap), FreeImage_GetBits(bitmap) + ((bitsPerPixel/8) * widthInPixels * heightInPixels));
+
+                    FreeImage_Unload(bitmap);
+                }
+            }
+        }
+
+        return diffuseTexture;
+    }
+
+    Mat4 AssetImporter::aiMat4ToJonsMat4(const aiMatrix4x4& aiMat)
     {
         Mat4 jMat;
 
-        jMat[0].x = aiMat.a1; jMat[0].y = aiMat.a2; jMat[0].z = aiMat.a3; jMat[0].w = aiMat.a4;
-        jMat[1].x = aiMat.b1; jMat[1].y = aiMat.b2; jMat[1].z = aiMat.b3; jMat[1].w = aiMat.b4;
-        jMat[2].x = aiMat.c1; jMat[2].y = aiMat.c2; jMat[2].z = aiMat.c3; jMat[2].w = aiMat.c4;
-        jMat[3].x = aiMat.d1; jMat[3].y = aiMat.d2; jMat[3].z = aiMat.d3; jMat[3].w = aiMat.d4;
+        jMat[0].x = aiMat.a1; jMat[0].y = aiMat.b1; jMat[0].z = aiMat.c1; jMat[0].w = aiMat.d1;
+        jMat[1].x = aiMat.a2; jMat[1].y = aiMat.b2; jMat[1].z = aiMat.c2; jMat[1].w = aiMat.d2;
+        jMat[2].x = aiMat.a3; jMat[2].y = aiMat.b3; jMat[2].z = aiMat.c3; jMat[2].w = aiMat.d3;
+        jMat[3].x = aiMat.a4; jMat[3].y = aiMat.b4; jMat[3].z = aiMat.c4; jMat[3].w = aiMat.d4;
 
         return jMat;
+    }
+
+    Vec3 AssetImporter::aiColor3DToJonsVec3(const aiColor3D& color)
+    {
+        Vec3 vec;
+
+        vec.r = color.r;
+        vec.g = color.g;
+        vec.b = color.b;
+
+        return vec;
     }
 
     void AssetImporter::Log(const std::string& msg)

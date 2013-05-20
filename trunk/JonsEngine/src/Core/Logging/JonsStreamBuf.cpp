@@ -1,6 +1,7 @@
 #include "include/Core/Logging/JonsStreamBuf.h"
 
 #include <algorithm>
+#include <functional>
 
 using namespace std;
 
@@ -58,7 +59,7 @@ namespace JonsEngine
     {
         int32_t res = 0;
 
-        for_each(mStreamBufs.begin(), mStreamBufs.end(), bind1st(mem_fun(&JonsStreamBuf::SyncCharacter), this));
+        for_each(mStreamBufs.begin(), mStreamBufs.end(), std::bind1st(std::mem_fun(&JonsStreamBuf::SyncCharacter), this));
 
         mLine.clear();
 

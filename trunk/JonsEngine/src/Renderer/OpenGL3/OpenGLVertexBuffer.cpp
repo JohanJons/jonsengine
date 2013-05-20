@@ -9,18 +9,26 @@ namespace JonsEngine
         glGenVertexArrays(1, &mVAO);
  
         // buffer vertex, normals and index data
+        size_t vertexDataSize   = vertexData.size() * sizeof(Vec3);
+        size_t normalDataSize   = normalData.size() * sizeof(Vec3);
+        size_t texCoordDataSize = texCoords.size() * sizeof(Vec2);
+        size_t indexDataSize    = indexData.size() * sizeof(uint32_t);
+
         glBindVertexArray(mVAO);
         glBindBuffer(GL_ARRAY_BUFFER, mVBO);
-        glBufferData(GL_ARRAY_BUFFER, (vertexData.size() + normalData.size()) * sizeof(Vec3), NULL, GL_STATIC_DRAW);
-        glBufferSubData(GL_ARRAY_BUFFER, NULL, vertexData.size() * sizeof(Vec3), &vertexData[0]);
-        glBufferSubData(GL_ARRAY_BUFFER, vertexData.size() * sizeof(Vec3), normalData.size() * sizeof(Vec3), &normalData[0]);
+        glBufferData(GL_ARRAY_BUFFER, vertexDataSize + normalDataSize + texCoordDataSize, NULL, GL_STATIC_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, NULL, vertexDataSize, &vertexData[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, vertexDataSize, normalDataSize, &normalData[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, vertexDataSize + normalDataSize, texCoordDataSize, &texCoords[0]);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexData.size() * sizeof(uint32_t), &indexData[0], GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexDataSize, &indexData[0], GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(vertexData.size() * sizeof(Vec3)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(vertexDataSize));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(vertexDataSize + normalDataSize));
 
        // unbind array buffer and VAO
         glBindBuffer(GL_ARRAY_BUFFER, 0);

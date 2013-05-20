@@ -4,7 +4,8 @@
 
 namespace JonsEngine
 {
-    Light::Light(const std::string& name, LightType type) : mName(name), mHashedID(boost::hash_value(name)), mLightIntensity(1.0f, 1.0f, 1.0f, 1.0f), mLightDirection(1.0f, 1.0f, 1.0f), mLightAttenuation(1.0f), mMaxAttenuation(0.001f), mLightType(type)
+    Light::Light(const std::string& name, LightType type) : mName(name), mHashedID(boost::hash_value(name)), mDiffuseColor(1.0f), mAmbientColor(0.0f), mSpecularColor(0.0f), mLightDirection(1.0f), mLightType(type),
+                                                            mConstantAttenutation(0.0f), mLinearAttenuation(1.0f), mQuadraticAttenuation(0.0f), mMaxDistance(50.0f)
     {
     }
 

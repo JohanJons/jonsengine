@@ -33,8 +33,6 @@ namespace JonsEngine
         const std::vector<LightPtr>& GetAllLights() const;
         void DeleteLight(const std::string& lightName);
 
-        void SetAmbientLight(const LightColor& ambientLight);
-        const LightColor& GetAmbientLight() const;
         void SetGammaFactor(const float gamma);
         float GetGammaFactor() const;
         Vec4 GetGamma() const;
@@ -54,7 +52,6 @@ namespace JonsEngine
         Camera mSceneCamera;
         SceneNode mRootNode;
 
-        LightColor mAmbientLight;
         float mGamma;
 
         std::vector<ModelPtr> mModels;

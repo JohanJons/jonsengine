@@ -1,5 +1,7 @@
 #pragma once
 
+#include "include/Renderer/ITexture.h"
+
 #include "GL/glew.h"
 #include <string>
 #include <vector>
@@ -28,6 +30,7 @@ namespace JonsEngine
         bool LinkProgram();
         void UseProgram(bool use);
         void BindAttribLocation(GLuint index, const std::string& name);
+        void BindTextureUnit(ITexture::TextureType textureType, GLuint textureUnit);
 
         const std::string& GetName() const;
         GLuint GetHandle() const;

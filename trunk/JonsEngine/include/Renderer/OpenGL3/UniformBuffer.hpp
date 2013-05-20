@@ -61,6 +61,13 @@ namespace JonsEngine
             mCurrentSize++;
         }
 
+        void SetData(const ContentType& data)
+        {
+            ClearData();
+            AddData(data);
+            SetActiveIndex(0);
+        }
+
 
         size_t Size() const     { return mMaxSize; }
 

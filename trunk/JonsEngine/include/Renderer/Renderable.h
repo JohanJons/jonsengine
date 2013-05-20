@@ -3,6 +3,7 @@
 #include "include/Core/Types.h"
 #include "include/Renderer/IVertexBuffer.h"
 
+#include "GL/glew.h"
 #include <vector>
 
 namespace JonsEngine
@@ -10,37 +11,24 @@ namespace JonsEngine
     /* Renderable definition */
     struct Renderable
     {
-        Renderable(VertexBufferPtr vertexBuffer, const Mat4& wvpMatrix, const Mat4& worldMatrix, const Vec4& diffuseColor, const float specularFactor) : 
-                    mVertexBuffer(vertexBuffer), mTransform(wvpMatrix, worldMatrix), mMaterial(diffuseColor, specularFactor)
+        Renderable(const VertexBufferPtr vertexBuffer, const Mat4& wvpMatrix, const Mat4& worldMatrix, const TexturePtr diffuseTexture, const Vec4& diffuseColor, const Vec4& ambientColor, const Vec4& specularColor,
+                   const Vec4& emissiveColor, const float specularFactor)
+                   :
+            mVertexBuffer(vertexBuffer), mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix), mDiffuseTexture(diffuseTexture), mDiffuseColor(diffuseColor), mAmbientColor(ambientColor), mSpecularColor(specularColor), 
+            mEmissiveColor(emissiveColor), mSpecularFactor(specularFactor)
         {
         }
-        
-        /* Transform definition */
-        struct Transform
-        {
-            Transform(const Mat4& wvpMatrix, const Mat4& worldMatrix) : mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix)
-            {
-            }
-
-            Mat4 mWVPMatrix;
-            Mat4 mWorldMatrix; 
-        };
-    
-        /* Material definition */
-        struct Material
-        {
-            Material(const Vec4& diffuseColor, const float specularFactor) : mDiffuseColor(diffuseColor), mSpecularFactor(specularFactor)
-            {
-            }
-
-            Vec4 mDiffuseColor;
-            float mSpecularFactor;
-        };
-
 
         VertexBufferPtr mVertexBuffer;
-        Transform mTransform;
-        Material mMaterial;
+        Mat4 mWVPMatrix;
+        Mat4 mWorldMatrix; 
+
+        TexturePtr mDiffuseTexture;
+        Vec4 mDiffuseColor;
+        Vec4 mAmbientColor;
+        Vec4 mSpecularColor;
+        Vec4 mEmissiveColor;
+        float mSpecularFactor;
     };
     
     /* RenderQueue definition */
