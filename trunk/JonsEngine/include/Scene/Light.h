@@ -18,26 +18,24 @@ namespace JonsEngine
     {
         enum LightType
         {
-            POINT = 0,
-            DIRECTIONAL
+            UNKNOWN = 0,
+            POINT,
+            DIRECTIONAL,
+            SPOTLIGHT,
+            AMBIENT,
         };
 
         const std::string mName;
         const size_t mHashedID;
 
-        Vec4 mDiffuseColor;
-        Vec4 mAmbientColor;
-        Vec4 mSpecularColor;
-
+        Vec4 mLightColor;
         SceneNodePtr mSceneNode;
         Vec3 mLightDirection;
         LightType mLightType;
 
-        float mConstantAttenutation;
-        float mLinearAttenuation;
-        float mQuadraticAttenuation;
+        float mIntensity;
+        float mRadius;
         float mMaxDistance;
-
 
 
         Light(const std::string& name, LightType type);

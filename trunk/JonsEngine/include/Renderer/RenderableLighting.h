@@ -17,20 +17,18 @@ namespace JonsEngine
         /* Light definition */
         struct Light
         {
-            Vec4 mDiffuseColor;
-            Vec4 mAmbientColor;
-            Vec4 mSpecularColor;
+            Light() : mLightColor(1.0f), mLightPosition(0.0f), mLightDirection(0.0f), mLightType(0), mIntensity(1.0f), mRadius(0.0f), mMaxDistance(0.0f)
+            {
+            }
 
+            Vec4 mLightColor;
             Vec4 mLightPosition;
             Vec4 mLightDirection;
+
             uint32_t mLightType;
-
-            float mConstantAttenutation;
-            float mLinearAttenuation;
-            float mQuadraticAttenuation;
+            float mIntensity;
+            float mRadius;
             float mMaxDistance;
-
-            float padding[3];
         };
 
         /* Lights definition */

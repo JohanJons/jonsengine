@@ -18,8 +18,8 @@ namespace JonsEngine
 {
 
     Engine::Engine(const EngineSettings& settings) : mLog(Logger::GetCoreLogger()), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), 
-                                                    mWindow(bootCreateWindow(settings)), mRenderer(bootCreateRenderer(settings)), mInputManager(settings),
-                                                    mResourceManifest(bootCreateResourceManifest()), mSceneManager(*mResourceManifest)
+                                                     mWindow(bootCreateWindow(settings)), mRenderer(bootCreateRenderer(settings)), mInputManager(settings),
+                                                     mResourceManifest(bootCreateResourceManifest()), mSceneManager(*mResourceManifest)
     {
         JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
     }
@@ -66,12 +66,10 @@ namespace JonsEngine
         {
             case IWindow::GLFW:
                 return mMemoryAllocator.AllocateObject<GLFWWindow>(settings);
-                break;
 
             case IWindow::NONE:
             default:
                 return mMemoryAllocator.AllocateObject<DummyWindow>(settings);
-                break;
         }
     }
 
@@ -81,13 +79,10 @@ namespace JonsEngine
         {
             case IRenderer::OPENGL:
                 return mMemoryAllocator.AllocateObject<OpenGLRenderer>(engineSettings);
-                break;
 
             case IRenderer::NONE:
             default:
                 return mMemoryAllocator.AllocateObject<DummyRenderer>(engineSettings);
-                break;
-
         }
     }
 
@@ -125,30 +120,13 @@ namespace JonsEngine
         int lightIndex = 0;
         BOOST_FOREACH(LightPtr light, sceneLights)
         {
-            lighting.mLights[lightIndex].mDiffuseColor  = light->mDiffuseColor;
-            lighting.mLights[lightIndex].mAmbientColor  = light->mAmbientColor;
-            lighting.mLights[lightIndex].mSpecularColor = light->mSpecularColor;
-
-            if (light->mLightType == Light::POINT)
-            {
-                lighting.mLights[lightIndex].mLightType            = Light::POINT;
-                lighting.mLights[lightIndex].mLightPosition        = Vec4(light->mSceneNode->Position(), 1.0f);
-                lighting.mLights[lightIndex].mLightDirection       = Vec4(0.0f);
-                lighting.mLights[lightIndex].mConstantAttenutation = light->mConstantAttenutation;
-                lighting.mLights[lightIndex].mLinearAttenuation    = light->mLinearAttenuation;
-                lighting.mLights[lightIndex].mQuadraticAttenuation = light->mQuadraticAttenuation;
-                lighting.mLights[lightIndex].mMaxDistance          = light->mMaxDistance;
-            }
-            else if (light->mLightType == Light::DIRECTIONAL)
-            {
-                lighting.mLights[lightIndex].mLightType            = Light::DIRECTIONAL;
-                lighting.mLights[lightIndex].mLightPosition        = Vec4(0.0f);
-                lighting.mLights[lightIndex].mLightDirection       = Vec4(light->mLightDirection, 0.0f);
-                lighting.mLights[lightIndex].mConstantAttenutation = 0.0f;
-                lighting.mLights[lightIndex].mLinearAttenuation    = 0.0f;
-                lighting.mLights[lightIndex].mQuadraticAttenuation = 0.0f;
-                lighting.mLights[lightIndex].mMaxDistance          = 0.0f;
-            }
+            lighting.mLights[lightIndex].mLightColor     = light->mLightColor;
+            lighting.mLights[lightIndex].mLightPosition  = Vec4(light->mSceneNode->Position(), 1.0f);
+            lighting.mLights[lightIndex].mLightDirection = Vec4(light->mLightDirection, 0.0f);
+            lighting.mLights[lightIndex].mLightType      = light->mLightType;
+            lighting.mLights[lightIndex].mIntensity      = light->mIntensity;
+            lighting.mLights[lightIndex].mRadius         = light->mRadius;
+            lighting.mLights[lightIndex].mMaxDistance    = light->mMaxDistance;
 
             lightIndex++;
         }
