@@ -12,10 +12,10 @@ namespace JonsEngine
     struct Renderable
     {
         Renderable(const VertexBufferPtr vertexBuffer, const Mat4& wvpMatrix, const Mat4& worldMatrix, const TexturePtr diffuseTexture, const Vec4& diffuseColor, const Vec4& ambientColor, const Vec4& specularColor,
-                   const Vec4& emissiveColor, const float specularFactor)
+                   const Vec4& emissiveColor, const bool lightingEnabled, const float specularFactor)
                    :
             mVertexBuffer(vertexBuffer), mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix), mDiffuseTexture(diffuseTexture), mDiffuseColor(diffuseColor), mAmbientColor(ambientColor), mSpecularColor(specularColor), 
-            mEmissiveColor(emissiveColor), mSpecularFactor(specularFactor)
+            mEmissiveColor(emissiveColor), mLightingEnabled(lightingEnabled), mSpecularFactor(specularFactor)
         {
         }
 
@@ -28,6 +28,7 @@ namespace JonsEngine
         Vec4 mAmbientColor;
         Vec4 mSpecularColor;
         Vec4 mEmissiveColor;
+        bool mLightingEnabled;
         float mSpecularFactor;
     };
     

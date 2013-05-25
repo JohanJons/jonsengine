@@ -70,6 +70,7 @@ namespace JonsEngine
                                             vec4  mEmissiveColor;                                                                                           \n \
                                                                                                                                                             \n \
                                             int   mHasDiffuseTexture;                                                                                       \n \
+                                            int   mLightingEnabled;                                                                                         \n \
                                             float mSpecularShininess;                                                                                       \n \
                                         } Material;                                                                                                         \n \
                                                                                                                                                             \n \
@@ -154,13 +155,16 @@ namespace JonsEngine
                                             if (Material.mHasDiffuseTexture == 1)                                                                           \n \
                                                 diffuseTexture = texture(unifDiffuseTexture, frag_texcoord);                                                \n \
                                                                                                                                                             \n \
-                                            vec4 accumLighting = vec4(0.0); //Material.mEmissiveColor;                                                      \n \
+                                            if (Material.mLightingEnabled == 1)                                                                             \n \
+                                            {                                                                                                               \n \
+                                                vec4 accumLighting = vec4(0.0); //Material.mEmissiveColor;                                                  \n \
                                                                                                                                                             \n \
-                                            for (int lightIndex = 0; lightIndex < Lighting.mNumLights; lightIndex++)                                        \n \
-                                                accumLighting += CalculateLighting(Lighting.mLights[lightIndex],diffuseTexture);                            \n \
+                                                for (int lightIndex = 0; lightIndex < Lighting.mNumLights; lightIndex++)                                    \n \
+                                                    accumLighting += CalculateLighting(Lighting.mLights[lightIndex],diffuseTexture);                        \n \
                                                                                                                                                             \n \
-                                            accumLighting = diffuseTexture * accumLighting;                                                                 \n \
+                                                diffuseTexture *= accumLighting;                                                                            \n \
+                                            }                                                                                                               \n \
                                                                                                                                                             \n \
-                                            finalColor = pow(accumLighting, Lighting.mGamma);                                                               \n \
+                                            finalColor = pow(diffuseTexture, Lighting.mGamma);                                                              \n \
                                         }												                                                                    \n";
 }

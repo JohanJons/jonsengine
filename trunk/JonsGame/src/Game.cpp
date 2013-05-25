@@ -123,8 +123,9 @@ namespace JonsGame
         nodeCube->TranslateNode(Vec3(7.0f, 0.0f, -15.0f));
 
         // chair
-        SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("nodeChair");
-        ModelPtr modelChair    = myScene->CreateModel("Chair", "chair", package, nodeChair);
+        SceneNodePtr nodeChair       = myScene->GetRootNode().CreateChildNode("nodeChair");
+        ModelPtr modelChair          = myScene->CreateModel("Chair", "chair", package, nodeChair);
+        modelChair->mLightingEnabled = false;
         nodeChair->TranslateNode(Vec3(0.0f, 0.0f, -8.0f));
 
         // uhura

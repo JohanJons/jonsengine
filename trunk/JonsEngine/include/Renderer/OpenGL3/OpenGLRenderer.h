@@ -47,11 +47,12 @@ namespace JonsEngine
             Vec4 mSpecularColor;
             Vec4 mEmissiveColor;
             int32_t mHasDiffuseTexture;
+            int32_t mLightingEnabled;
             float mSpecularFactor;
 
-            Material(const Vec4& diffuseColor, const Vec4& ambientColor, const Vec4& specularColor, const Vec4& emissiveColor, const int32_t hasDiffuseTexture, const float specularFactor) 
+            Material(const Vec4& diffuseColor, const Vec4& ambientColor, const Vec4& specularColor, const Vec4& emissiveColor, const int32_t hasDiffuseTexture, const int32_t lightingEnabled, const float specularFactor) 
                 : 
-                mDiffuseColor(diffuseColor), mAmbientColor(ambientColor), mSpecularColor(specularColor),  mEmissiveColor(emissiveColor), mHasDiffuseTexture(hasDiffuseTexture), mSpecularFactor(specularFactor)
+                mDiffuseColor(diffuseColor), mAmbientColor(ambientColor), mSpecularColor(specularColor),  mEmissiveColor(emissiveColor), mHasDiffuseTexture(hasDiffuseTexture), mLightingEnabled(lightingEnabled), mSpecularFactor(specularFactor)
             {
             }
         };

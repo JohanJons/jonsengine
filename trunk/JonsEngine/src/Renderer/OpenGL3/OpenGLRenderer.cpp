@@ -81,7 +81,7 @@ namespace JonsEngine
         BOOST_FOREACH(const Renderable& renderable, renderQueue)
         {
             mUniBufferTransform.SetData(Transform(renderable.mWVPMatrix, renderable.mWorldMatrix));
-            mUniBufferMaterial.SetData(Material(renderable.mDiffuseColor, renderable.mAmbientColor, renderable.mSpecularColor, renderable.mEmissiveColor, renderable.mDiffuseTexture != NULL, renderable.mSpecularFactor));
+            mUniBufferMaterial.SetData(Material(renderable.mDiffuseColor, renderable.mAmbientColor, renderable.mSpecularColor, renderable.mEmissiveColor, renderable.mDiffuseTexture != NULL, renderable.mLightingEnabled, renderable.mSpecularFactor));
 
             if (renderable.mDiffuseTexture)
             {

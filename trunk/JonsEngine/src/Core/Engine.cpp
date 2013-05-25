@@ -104,7 +104,7 @@ namespace JonsEngine
         BOOST_FOREACH(ModelPtr model, models)
         {
             if (model && model->mSceneNode)
-                CreateModelRenderable(model.get(), viewMatrix, perspectiveMatrix, model->mSceneNode->GetNodeTransform(), renderQueue);
+                CreateModelRenderable(model.get(), viewMatrix, perspectiveMatrix, model->mSceneNode->GetNodeTransform(), model->mLightingEnabled, renderQueue);
         }
 
         return renderQueue;
@@ -134,7 +134,7 @@ namespace JonsEngine
         return lighting;
     }
 
-    void Engine::CreateModelRenderable(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, RenderQueue& renderQueue)
+    void Engine::CreateModelRenderable(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, const bool lightingEnabled, RenderQueue& renderQueue)
     {
         const Mat4 worldMatrix         = nodeTransform * model->mTransform;
         const Mat4 worldViewMatrix     = viewMatrix * worldMatrix;
@@ -142,9 +142,9 @@ namespace JonsEngine
 
         BOOST_FOREACH(const Mesh& mesh, model->mMeshes)
             renderQueue.push_back(Renderable(mesh.mVertexBuffer, worldViewProjMatrix, worldMatrix, mesh.mMaterial->mDiffuseTexture, Vec4(mesh.mMaterial->mDiffuseColor, 1.0f), Vec4(mesh.mMaterial->mAmbientColor, 1.0f),
-                                             Vec4(mesh.mMaterial->mSpecularColor, 1.0f), Vec4(mesh.mMaterial->mEmissiveColor, 1.0f), 0.02f));     // TODO: Add specularfactor to model/mesh
+                                  Vec4(mesh.mMaterial->mSpecularColor, 1.0f), Vec4(mesh.mMaterial->mEmissiveColor, 1.0f), lightingEnabled, 0.02f));     // TODO: Add specularfactor to model/mesh
 
         BOOST_FOREACH(const Model& childModel, model->mChildren)
-            CreateModelRenderable(&childModel, viewMatrix, perspectiveMatrix, worldMatrix, renderQueue);
+            CreateModelRenderable(&childModel, viewMatrix, perspectiveMatrix, worldMatrix, lightingEnabled, renderQueue);
     }
 }

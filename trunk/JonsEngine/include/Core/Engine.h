@@ -55,7 +55,7 @@ namespace JonsEngine
         RenderQueue CreateRenderQueue(const Scene* scene);
         RenderableLighting CreateRenderableLighting(const Scene* scene);
 
-        void CreateModelRenderable(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, RenderQueue& renderQueue);
+        void CreateModelRenderable(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, const bool lightingEnabled, RenderQueue& renderQueue);
  
         Logger& mLog;
         IMemoryAllocator& mMemoryAllocator;

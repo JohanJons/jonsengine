@@ -24,6 +24,7 @@ namespace JonsEngine
         std::vector<Model> mChildren;
         std::vector<Mesh> mMeshes;
         Mat4 mTransform;
+        bool mLightingEnabled;
 
         SceneNodePtr mSceneNode;
 
