@@ -5,6 +5,7 @@
   <PropertyGroup>
     <OutDir>$(SolutionDir)/bin/$(Configuration)/$(Platform)/</OutDir>
     <LibraryPath>$(SolutionDir)/bin/$(Configuration)/$(Platform)/;$(LibraryPath)</LibraryPath>
+    <IntDir>$(SolutionDir)/bin/$(Configuration)/$(Platform)/Temp/$(MSBuildProjectName)/</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>

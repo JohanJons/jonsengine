@@ -51,7 +51,6 @@ namespace JonsEngine
         size_t mHashedID;
         Camera mSceneCamera;
         SceneNode mRootNode;
-
         float mGamma;
 
         std::vector<ModelPtr> mModels;

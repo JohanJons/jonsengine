@@ -31,8 +31,13 @@ namespace JonsEngine
 
     ModelPtr Scene::CreateModel(const std::string& modelName, const std::string& assetName, JonsPackagePtr jonsPkg, const SceneNodePtr node)
     {
-        ModelPtr model    = CreateModel(modelName, assetName, jonsPkg);
-        model->mSceneNode = node;
+        ModelPtr model = CreateModel(modelName, assetName, jonsPkg);
+
+        if (model)
+        {
+            model->mSceneNode = node;
+            mModels.push_back(model);
+        }
 
         return model;
     }
@@ -74,8 +79,13 @@ namespace JonsEngine
 
     LightPtr Scene::CreateLight(const std::string& lightName, Light::LightType type, const SceneNodePtr node)
     {
-        LightPtr light    = CreateLight(lightName, type);
-        light->mSceneNode = node;
+        LightPtr light = CreateLight(lightName, type);
+
+        if (light)
+        {
+            light->mSceneNode = node;
+            mLights.push_back(light);
+        }
 
         return light;
     }

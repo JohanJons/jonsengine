@@ -70,6 +70,7 @@ namespace JonsEngine
         Vec3 mSpecularColor;
         Vec3 mEmissiveColor;
 
+
         PackageMaterial();
     };
 
