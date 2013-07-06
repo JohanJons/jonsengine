@@ -18,7 +18,7 @@ namespace JonsEngine
         DummyRenderer(const EngineSettings& engineSettings);
         ~DummyRenderer();
 
-        MeshPtr CreateMesh(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData);
+        MeshPtr CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData);
         TexturePtr CreateTexture(ITexture::TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ITexture::TextureFormat textureFormat);
 
         void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting);
@@ -30,7 +30,7 @@ namespace JonsEngine
     inline DummyRenderer::DummyRenderer(const EngineSettings& engineSettings)                                                                                                                                            { }
     inline DummyRenderer::~DummyRenderer()                                                                                                                                                                               { }
    
-    inline MeshPtr DummyRenderer::CreateMesh(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData)                       { return MeshPtr(); }
+    inline MeshPtr DummyRenderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData)                    { return MeshPtr(); }
     inline TexturePtr DummyRenderer::CreateTexture(ITexture::TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ITexture::TextureFormat textureFormat)     { return TexturePtr(); }
 
     inline void DummyRenderer::DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting)                                                                                                       { }

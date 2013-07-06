@@ -195,13 +195,22 @@ namespace JonsAssetImporter
             // vertice, normal and texcoord data
             for (unsigned int j = 0; j < m->mNumVertices; j++)
             {
-                mesh.mVertexData.push_back(Vec3(m->mVertices[j].x, m->mVertices[j].y, m->mVertices[j].z));
-                
+                mesh.mVertexData.push_back(m->mVertices[j].x);
+                mesh.mVertexData.push_back(m->mVertices[j].y);
+                mesh.mVertexData.push_back(m->mVertices[j].z);
+
                 if (m->HasNormals())
-                    mesh.mNormalData.push_back(Vec3(m->mNormals[j].x, m->mNormals[j].y, m->mNormals[j].z));
+                {
+                    mesh.mNormalData.push_back(m->mNormals[j].x);
+                    mesh.mNormalData.push_back(m->mNormals[j].y);
+                    mesh.mNormalData.push_back(m->mNormals[j].z);
+                }
 
                 if (m->HasTextureCoords(0))
-                    mesh.mTexCoordsData.push_back(Vec2(m->mTextureCoords[0][j].x, m->mTextureCoords[0][j].y));
+                {
+                    mesh.mTexCoordsData.push_back(m->mTextureCoords[0][j].x);
+                    mesh.mTexCoordsData.push_back(m->mTextureCoords[0][j].y);
+                }
             }
             
             // index data

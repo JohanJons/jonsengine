@@ -2,16 +2,16 @@
 
 namespace JonsEngine
 {
-     OpenGLMesh::OpenGLMesh(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData) : mIndices(indexData.size())
+     OpenGLMesh::OpenGLMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData) : mIndices(indexData.size())
      {
         glGenBuffers(1, &mVBO);
         glGenBuffers(1, &mIndexBuffer);
         glGenVertexArrays(1, &mVAO);
  
         // buffer vertex, normals and index data
-        size_t vertexDataSize   = vertexData.size() * sizeof(Vec3);
-        size_t normalDataSize   = normalData.size() * sizeof(Vec3);
-        size_t texCoordDataSize = texCoords.size() * sizeof(Vec2);
+        size_t vertexDataSize   = vertexData.size() * sizeof(float);
+        size_t normalDataSize   = normalData.size() * sizeof(float);
+        size_t texCoordDataSize = texCoords.size() * sizeof(float);
         size_t indexDataSize    = indexData.size() * sizeof(uint32_t);
 
         glBindVertexArray(mVAO);

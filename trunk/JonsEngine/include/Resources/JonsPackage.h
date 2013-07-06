@@ -35,9 +35,9 @@ namespace JonsEngine
     /* PackageMesh definition */
     struct PackageMesh
     {
-        std::vector<Vec3> mVertexData;
-        std::vector<Vec3> mNormalData;
-        std::vector<Vec2> mTexCoordsData;
+        std::vector<float> mVertexData;
+        std::vector<float> mNormalData;
+        std::vector<float> mTexCoordsData;
         std::vector<uint32_t> mIndiceData;
         uint16_t mMaterialIndex;
         bool mHasMaterial;

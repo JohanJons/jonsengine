@@ -12,7 +12,7 @@ namespace JonsEngine
     class OpenGLMesh : public IMesh
     {
     public:
-         OpenGLMesh(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData);
+         OpenGLMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData);
          ~OpenGLMesh();
  
         void Render();

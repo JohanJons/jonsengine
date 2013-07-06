@@ -21,7 +21,7 @@ namespace JonsEngine
         OpenGLRenderer(const EngineSettings& engineSettings);
         ~OpenGLRenderer();
 
-        MeshPtr CreateMesh(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData);
+        MeshPtr CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData);
         TexturePtr CreateTexture(ITexture::TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ITexture::TextureFormat textureFormat);
 
         void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting);

@@ -56,7 +56,7 @@ namespace JonsEngine
         glDeleteSamplers(1, &mTextureSampler);
     }
 
-    MeshPtr OpenGLRenderer::CreateMesh(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData)
+    MeshPtr OpenGLRenderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData)
     {
         return MeshPtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<OpenGLMesh>(vertexData, normalData, texCoords, indexData), boost::bind(&HeapAllocator::DeallocateObject<OpenGLMesh>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
     }
