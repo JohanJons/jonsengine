@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/Renderer/IVertexBuffer.h"
+#include "include/Renderer/IMesh.h"
 #include "include/Core/EngineDefs.h"
 #include "include/Core/Types.h"
 
@@ -9,11 +9,11 @@
 
 namespace JonsEngine
 {
-    class OpenGLVertexBuffer : public IVertexBuffer
+    class OpenGLMesh : public IMesh
     {
     public:
-         OpenGLVertexBuffer(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData);
-         ~OpenGLVertexBuffer();
+         OpenGLMesh(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData);
+         ~OpenGLMesh();
  
         void Render();
 

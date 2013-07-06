@@ -1,8 +1,8 @@
-#include "include/Renderer/OpenGL3/OpenGLVertexBuffer.h"
+#include "include/Renderer/OpenGL3/OpenGLMesh.h"
 
 namespace JonsEngine
 {
-     OpenGLVertexBuffer::OpenGLVertexBuffer(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData) : mIndices(indexData.size())
+     OpenGLMesh::OpenGLMesh(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData) : mIndices(indexData.size())
      {
         glGenBuffers(1, &mVBO);
         glGenBuffers(1, &mIndexBuffer);
@@ -35,7 +35,7 @@ namespace JonsEngine
         glBindVertexArray(0);
      }
         
-    OpenGLVertexBuffer::~OpenGLVertexBuffer()
+    OpenGLMesh::~OpenGLMesh()
     {
         glDeleteBuffers(1, &mVBO);
         glDeleteBuffers(1, &mIndexBuffer);
@@ -43,7 +43,7 @@ namespace JonsEngine
     }
 
         
-    void OpenGLVertexBuffer::Render()
+    void OpenGLMesh::Render()
     {
         glBindVertexArray(mVAO);
         glDrawElements(GL_TRIANGLES, mIndices, GL_UNSIGNED_INT, 0);

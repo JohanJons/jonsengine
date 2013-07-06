@@ -1,7 +1,7 @@
 #pragma once
 
 #include "include/Core/Types.h"
-#include "include/Renderer/IVertexBuffer.h"
+#include "include/Renderer/IMesh.h"
 
 #include "GL/glew.h"
 #include <vector>
@@ -11,15 +11,13 @@ namespace JonsEngine
     /* Renderable definition */
     struct Renderable
     {
-        Renderable(const VertexBufferPtr vertexBuffer, const Mat4& wvpMatrix, const Mat4& worldMatrix, const TexturePtr diffuseTexture, const Vec4& diffuseColor, const Vec4& ambientColor, const Vec4& specularColor,
-                   const Vec4& emissiveColor, const bool lightingEnabled, const float specularFactor)
+        Renderable(const MeshPtr mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix, const bool lightingEnabled, const float specularFactor)
                    :
-            mVertexBuffer(vertexBuffer), mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix), mDiffuseTexture(diffuseTexture), mDiffuseColor(diffuseColor), mAmbientColor(ambientColor), mSpecularColor(specularColor), 
-            mEmissiveColor(emissiveColor), mLightingEnabled(lightingEnabled), mSpecularFactor(specularFactor)
+            mMesh(mesh), mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix), mLightingEnabled(lightingEnabled), mSpecularFactor(specularFactor)
         {
         }
 
-        VertexBufferPtr mVertexBuffer;
+        MeshPtr mMesh;
         Mat4 mWVPMatrix;
         Mat4 mWorldMatrix; 
 

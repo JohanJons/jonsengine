@@ -1,8 +1,10 @@
 #pragma once
 
-#include "include/Scene/Mesh.h"
 #include "include/Scene/SceneNode.h"
+#include "include/Scene/Material.h"
 #include "include/Core/Types.h"
+#include "include/Renderer/IMesh.h"
+#include "include/Renderer/ITexture.h"
 
 #include "boost/smart_ptr.hpp"
 #include <string>
@@ -22,7 +24,8 @@ namespace JonsEngine
         const size_t mHashedID;
 
         std::vector<Model> mChildren;
-        std::vector<Mesh> mMeshes;
+        MeshPtr mMesh;
+        MaterialPtr mMaterial;
         Mat4 mTransform;
         bool mLightingEnabled;
 

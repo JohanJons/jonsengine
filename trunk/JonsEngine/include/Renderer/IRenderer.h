@@ -1,7 +1,7 @@
 #pragma once
 
 #include "include/Renderer/ITexture.h"
-#include "include/Renderer/IVertexBuffer.h"
+#include "include/Renderer/IMesh.h"
 #include "include/Renderer/Renderable.h"
 #include "include/Renderer/RenderableLighting.h"
 #include "include/Core/EngineDefs.h"
@@ -23,7 +23,7 @@ namespace JonsEngine
 
         virtual ~IRenderer() { }
 
-        virtual VertexBufferPtr CreateVertexBuffer(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData) = 0;
+        virtual MeshPtr CreateMesh(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData) = 0;
         virtual TexturePtr CreateTexture(ITexture::TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ITexture::TextureFormat textureFormat) = 0;
 
         virtual void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting) = 0;

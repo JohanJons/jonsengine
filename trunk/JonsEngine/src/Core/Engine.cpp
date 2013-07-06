@@ -140,9 +140,22 @@ namespace JonsEngine
         const Mat4 worldViewMatrix     = viewMatrix * worldMatrix;
         const Mat4 worldViewProjMatrix = perspectiveMatrix * worldViewMatrix;
 
-        BOOST_FOREACH(const Mesh& mesh, model->mMeshes)
-            renderQueue.push_back(Renderable(mesh.mVertexBuffer, worldViewProjMatrix, worldMatrix, mesh.mMaterial->mDiffuseTexture, Vec4(mesh.mMaterial->mDiffuseColor, 1.0f), Vec4(mesh.mMaterial->mAmbientColor, 1.0f),
-                                  Vec4(mesh.mMaterial->mSpecularColor, 1.0f), Vec4(mesh.mMaterial->mEmissiveColor, 1.0f), lightingEnabled, 0.02f));     // TODO: Add specularfactor to model/mesh
+        if (model->mMesh)
+        {
+            Renderable renderable(model->mMesh, worldViewProjMatrix, worldMatrix, lightingEnabled, 0.02f);
+            const MaterialPtr material(model->mMaterial);
+
+            if (material)
+            {
+                renderable.mDiffuseTexture = material->mDiffuseTexture;
+                renderable.mDiffuseColor   = Vec4(material->mDiffuseColor, 1.0f);
+                renderable.mAmbientColor   = Vec4(material->mAmbientColor, 1.0f);
+                renderable.mSpecularColor  = Vec4(material->mSpecularColor, 1.0f);
+                renderable.mEmissiveColor  = Vec4(material->mEmissiveColor, 1.0f);
+            }
+
+            renderQueue.push_back(renderable);     // TODO: Add specularfactor to model/mesh
+        }
 
         BOOST_FOREACH(const Model& childModel, model->mChildren)
             CreateModelRenderable(&childModel, viewMatrix, perspectiveMatrix, worldMatrix, lightingEnabled, renderQueue);

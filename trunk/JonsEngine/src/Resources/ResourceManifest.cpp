@@ -1,11 +1,14 @@
 #include "include/Resources/ResourceManifest.h"
 #include "include/Renderer/IRenderer.h"
+#include "include/Renderer/Shapes.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
 #include "boost/bind.hpp"
 #include "boost/foreach.hpp"
+#include "boost/assign.hpp"
 #include "boost/algorithm/string.hpp"
 #include <algorithm>
+#include <sstream>
 
 namespace JonsEngine
 {
@@ -17,47 +20,63 @@ namespace JonsEngine
     {
     }
 
+
+    ModelPtr ResourceManifest::CreateRectangle(const double sizeX, const double sizeY, const double sizeZ)
+    {
+        if (sizeX <= 0 || sizeY <= 0 || sizeZ <= 0)
+            return ModelPtr();
+
+        std::stringstream ssInternalName;
+        ssInternalName << "rect_" << sizeX << "_" << sizeY << "_" << sizeZ;
+        const std::string internalName = ssInternalName.str();
+        
+        std::vector<ModelPtr>::iterator iter = std::find_if(mGeneratedModels.begin(), mGeneratedModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&Model::mName, _1), internalName, std::locale()));
+        if (iter != mGeneratedModels.end())
+            return *iter;
+
+        std::vector<Vec3> vertexData;
+        std::vector<Vec3> normalData;
+        std::vector<uint32_t> indiceData;
+        if (!CreateRectangleData(sizeX, sizeY, sizeZ, vertexData, normalData, indiceData))
+            return ModelPtr();
+
+
+    }
+
     
     ModelPtr ResourceManifest::LoadModel(const std::string& modelName, const std::string& assetName, const JonsPackagePtr jonsPkg)
     {
-        if (HasModel(modelName)) 
-            return GetModel(modelName);
+        ModelPtr ptr = GetModel(modelName);
+        if (ptr) 
+            return ptr;
 
         std::vector<PackageModel>::iterator iter = std::find_if(jonsPkg->mModels.begin(), jonsPkg->mModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&PackageModel::mName, _1), assetName, std::locale()));
-        ModelPtr ptr;
 
         if (iter != jonsPkg->mModels.end())
-            ptr = *mModels.insert(mModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(ProcessModel(*iter, modelName, jonsPkg)), boost::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, _1)));
+            ptr = *mImportedModels.insert(mImportedModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(ProcessModel(*iter, modelName, jonsPkg)), boost::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, _1)));
 
         return ptr;
     }
         
     ModelPtr ResourceManifest::GetModel(const std::string& modelName)
     {
-        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&Model::mName, _1), modelName, std::locale()));
+        std::vector<ModelPtr>::iterator iter = std::find_if(mImportedModels.begin(), mImportedModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&Model::mName, _1), modelName, std::locale()));
         ModelPtr ptr;
 
-        if (iter != mModels.end())
+        if (iter != mImportedModels.end())
             ptr = *iter;
 
         return ptr;
     }
 
-    bool ResourceManifest::HasModel(const std::string& modelName)
-    {
-        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&Model::mName, _1), modelName, std::locale()));
-
-        return iter != mModels.end();
-    }
-
 
     MaterialPtr ResourceManifest::LoadMaterial(const std::string& materialName, const std::string& assetName, const JonsPackagePtr jonsPkg)
     {
-        if (HasMaterial(materialName))
-            return GetMaterial(materialName);
+        MaterialPtr ptr = GetMaterial(materialName);
+        if (ptr)
+            return ptr;
         
         std::vector<PackageMaterial>::iterator iter = std::find_if(jonsPkg->mMaterials.begin(), jonsPkg->mMaterials.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&PackageMaterial::mName, _1), assetName, std::locale()));
-        MaterialPtr ptr;
 
         if (iter != jonsPkg->mMaterials.end())
             ptr = *mMaterials.insert(mMaterials.end(), MaterialPtr(mMemoryAllocator.AllocateObject<Material>(ProcessMaterial(*iter, materialName, jonsPkg)), boost::bind(&HeapAllocator::DeallocateObject<Material>, &mMemoryAllocator, _1)));
@@ -74,13 +93,6 @@ namespace JonsEngine
             ptr = *iter;
 
         return ptr;
-    }
-        
-    bool ResourceManifest::HasMaterial(const std::string& materialName)
-    {
-        std::vector<MaterialPtr>::iterator iter = std::find_if(mMaterials.begin(), mMaterials.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&Material::mName, _1), materialName, std::locale()));
-
-        return iter != mMaterials.end();
     }
 
 
@@ -99,7 +111,8 @@ namespace JonsEngine
                 material = LoadMaterial(pkgMaterial.mName, pkgMaterial.mName, jonsPkg);
             }
 
-            model.mMeshes.push_back(Mesh(mRenderer.CreateVertexBuffer(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mIndiceData), material));
+            model.mMesh     = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mIndiceData);
+            model.mMaterial = material;
         }
 
         BOOST_FOREACH(PackageModel& m, pkgModel.mChildren)

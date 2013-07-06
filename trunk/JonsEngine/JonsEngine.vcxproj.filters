@@ -164,9 +164,6 @@
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLRenderer.cpp">
       <Filter>Source Files\Renderer\OpenGL3</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL3\OpenGLVertexBuffer.cpp">
-      <Filter>Source Files\Renderer\OpenGL3</Filter>
-    </ClCompile>
     <ClCompile Include="src\Window\GLFW\GLFWWindow.cpp">
       <Filter>Source Files\Window\GLFW</Filter>
     </ClCompile>
@@ -193,6 +190,12 @@
     </ClCompile>
     <ClCompile Include="src\Scene\Material.cpp">
       <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Shapes.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\OpenGLMesh.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -274,20 +277,11 @@
     <ClInclude Include="include\Scene\SceneNode.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="include\Scene\Mesh.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderer\OpenGL3\OpenGLVertexBuffer.h">
-      <Filter>Header Files\Renderer\OpenGL3</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\Shader.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderer\IVertexBuffer.h">
-      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\DummyRenderer.h">
       <Filter>Header Files\Renderer</Filter>
@@ -351,6 +345,15 @@
     </ClInclude>
     <ClInclude Include="include\Scene\Material.h">
       <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\Shapes.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\IMesh.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLMesh.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

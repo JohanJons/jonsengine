@@ -25,6 +25,7 @@ namespace JonsEngine
 
     /*
      * TODO:
+     * Merge EngineDefs.h types into types.h
      * Fix assimp and ambient/diffuse colors..
      * Add http://imdoingitwrong.wordpress.com/tag/glsl/ lighting attenuation
      * Check camera upside down?

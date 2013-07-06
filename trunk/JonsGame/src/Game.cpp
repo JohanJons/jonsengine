@@ -5,7 +5,6 @@
 #include "include/Core/Types.h"
 #include "include/Core/Utils/Math.h"
 #include "include/Input/InputManager.h"
-#include "include/Scene/Mesh.h"
 #include "include/Scene/Scene.h"
 #include "include/Resources/ResourceManifest.h"
 

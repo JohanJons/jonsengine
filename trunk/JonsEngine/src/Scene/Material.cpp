@@ -1,4 +1,4 @@
-#include "include/Scene/Model.h"
+#include "include/Scene/Material.h"
 
 #include "boost/functional/hash.hpp"
 

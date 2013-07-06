@@ -1,6 +1,6 @@
 #include "include/Renderer/OpenGL3/OpenGLRenderer.h"
 
-#include "include/Renderer/OpenGL3/OpenGLVertexBuffer.h"
+#include "include/Renderer/OpenGL3/OpenGLMesh.h"
 #include "include/Renderer/OpenGL3/OpenGLTexture.h"
 #include "include/Renderer/OpenGL3/Shader.h"
 #include "include/Renderer/OpenGL3/Shaders.h"
@@ -56,9 +56,9 @@ namespace JonsEngine
         glDeleteSamplers(1, &mTextureSampler);
     }
 
-    VertexBufferPtr OpenGLRenderer::CreateVertexBuffer(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData)
+    MeshPtr OpenGLRenderer::CreateMesh(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData)
     {
-        return VertexBufferPtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<OpenGLVertexBuffer>(vertexData, normalData, texCoords, indexData), boost::bind(&HeapAllocator::DeallocateObject<OpenGLVertexBuffer>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
+        return MeshPtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<OpenGLMesh>(vertexData, normalData, texCoords, indexData), boost::bind(&HeapAllocator::DeallocateObject<OpenGLMesh>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
     }
 
     TexturePtr OpenGLRenderer::CreateTexture(ITexture::TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ITexture::TextureFormat textureFormat)
@@ -80,17 +80,21 @@ namespace JonsEngine
         int activeIndex = 0;
         BOOST_FOREACH(const Renderable& renderable, renderQueue)
         {
-            mUniBufferTransform.SetData(Transform(renderable.mWVPMatrix, renderable.mWorldMatrix));
-            mUniBufferMaterial.SetData(Material(renderable.mDiffuseColor, renderable.mAmbientColor, renderable.mSpecularColor, renderable.mEmissiveColor, renderable.mDiffuseTexture != NULL, renderable.mLightingEnabled, renderable.mSpecularFactor));
-
-            if (renderable.mDiffuseTexture)
+            if (renderable.mMesh)
             {
-                glActiveTexture(OpenGLTexture::TEXTURE_UNIT_DIFFUSE);
-                OpenGLTexture* diffuseTexture = static_cast<OpenGLTexture*>(renderable.mDiffuseTexture.get());
-                glBindTexture(GL_TEXTURE_2D, diffuseTexture->mTexture);
+                mUniBufferTransform.SetData(Transform(renderable.mWVPMatrix, renderable.mWorldMatrix));
+                mUniBufferMaterial.SetData(Material(renderable.mDiffuseColor, renderable.mAmbientColor, renderable.mSpecularColor, renderable.mEmissiveColor,
+                                                    renderable.mDiffuseTexture != NULL, renderable.mLightingEnabled, renderable.mSpecularFactor));
+
+                if (renderable.mDiffuseTexture)
+                {
+                    glActiveTexture(OpenGLTexture::TEXTURE_UNIT_DIFFUSE);
+                    OpenGLTexture* diffuseTexture = static_cast<OpenGLTexture*>(renderable.mDiffuseTexture.get());
+                    glBindTexture(GL_TEXTURE_2D, diffuseTexture->mTexture);
+                }
+
+                renderable.mMesh->Render();
             }
-            
-            renderable.mVertexBuffer->Render();
 
             activeIndex++;
         }

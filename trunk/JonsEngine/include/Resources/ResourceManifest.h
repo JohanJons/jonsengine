@@ -18,13 +18,13 @@ namespace JonsEngine
         ResourceManifest(IRenderer& renderer);
         ~ResourceManifest();
 
+        ModelPtr CreateRectangle(const double sizeX, const double sizeY, const double sizeZ);
+
         ModelPtr LoadModel(const std::string& modelName, const std::string& assetName, const JonsPackagePtr jonsPkg);
         ModelPtr GetModel(const std::string& modelName);
-        bool HasModel(const std::string& modelName);
 
         MaterialPtr LoadMaterial(const std::string& materialName, const std::string& assetName, const JonsPackagePtr jonsPkg);
         MaterialPtr GetMaterial(const std::string& materialName);
-        bool HasMaterial(const std::string& materialName);
 
 
     private:
@@ -32,7 +32,8 @@ namespace JonsEngine
         Material ProcessMaterial(PackageMaterial& pkgMaterial, const std::string& materialName, const JonsPackagePtr jonsPkg);
 
         IRenderer& mRenderer;
-        std::vector<ModelPtr> mModels;
+        std::vector<ModelPtr> mImportedModels;
+        std::vector<ModelPtr> mGeneratedModels;
         std::vector<MaterialPtr> mMaterials;
         IMemoryAllocator& mMemoryAllocator;
     };

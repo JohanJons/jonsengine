@@ -1,7 +1,6 @@
 #pragma once
 
 #include "include/Renderer/IRenderer.h"
-#include "include/Renderer/IVertexBuffer.h"
 #include "include/Renderer/Renderable.h"
 #include "include/Renderer/RenderableLighting.h"
 #include "include/Renderer/OpenGL3/ShaderProgram.h"
@@ -22,7 +21,7 @@ namespace JonsEngine
         OpenGLRenderer(const EngineSettings& engineSettings);
         ~OpenGLRenderer();
 
-        VertexBufferPtr CreateVertexBuffer(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData);
+        MeshPtr CreateMesh(const std::vector<Vec3>& vertexData, const std::vector<Vec3>& normalData, const std::vector<Vec2>& texCoords, const std::vector<uint32_t>& indexData);
         TexturePtr CreateTexture(ITexture::TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ITexture::TextureFormat textureFormat);
 
         void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting);
