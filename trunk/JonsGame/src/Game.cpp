@@ -114,29 +114,29 @@ namespace JonsGame
     {
         Scene* myScene = mEngine->GetSceneManager().CreateScene("MyScene");
         mEngine->GetSceneManager().SetActiveScene("MyScene");
-        JonsPackagePtr package = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
+        JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
 
         // cube
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
-        ModelPtr modelCube    = myScene->CreateModel("Cube", "cube", package, nodeCube);
-        nodeCube->TranslateNode(Vec3(7.0f, 0.0f, -15.0f));
+        ModelPtr modelCube    = myScene->GetResourceManifest().LoadModel("Cube", "cube", jonsPackage);
+        modelCube->mSceneNode = nodeCube;
+        nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
 
         // chair
-        SceneNodePtr nodeChair       = myScene->GetRootNode().CreateChildNode("nodeChair");
-        ModelPtr modelChair          = myScene->CreateModel("Chair", "chair", package, nodeChair);
+        SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("nodeChair");
+        ModelPtr modelChair    = myScene->GetResourceManifest().LoadModel("Chair", "chair", jonsPackage);
+        modelChair->mSceneNode = nodeChair;
         nodeChair->TranslateNode(Vec3(0.0f, 0.0f, -8.0f));
 
         // uhura
         SceneNodePtr nodeUhura = myScene->GetRootNode().CreateChildNode("nodeUhura");
-        ModelPtr modelUhura    = myScene->CreateModel("Uhura", "uhura", package, nodeUhura);
+        ModelPtr modelUhura    = myScene->GetResourceManifest().LoadModel("Uhura", "uhura", jonsPackage);
+        modelUhura->mSceneNode = nodeUhura;
         nodeUhura->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));
 
         // point light
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
         LightPtr movingLight         = myScene->CreateLight("MovingPointLight", Light::POINT, nodeMovingLight);
-        movingLight->mLightColor     = Vec4(1.0f);
-        movingLight->mIntensity      = 1.0f;
-        movingLight->mRadius         = 1.0f;
         movingLight->mMaxDistance    = 0.02f;
         nodeMovingLight->TranslateNode(Vec3(4.0f, 0.0f, -13.0f));
 
@@ -144,14 +144,23 @@ namespace JonsGame
         SceneNodePtr nodeMovingLight2 = myScene->GetRootNode().CreateChildNode("nodeStaticLight");
         LightPtr staticLight          = myScene->CreateLight("StaticPointLight", Light::POINT, nodeMovingLight2);
         staticLight->mLightColor      = Vec4(0.4f, 0.4f, 0.0f, 1.0f);
-        staticLight->mIntensity       = 1.0f;
         staticLight->mRadius          = 5.0f;
         nodeMovingLight2->TranslateNode(Vec3(0.0f, 3.0f, -8.0f));
 
         // ambient light
         SceneNodePtr nodeAmbientLight = myScene->GetRootNode().CreateChildNode("nodeAmbientLight");
         LightPtr ambientLight         = myScene->CreateLight("ambientLight", Light::AMBIENT, nodeAmbientLight);
-        ambientLight->mLightColor     = Vec4(1.0f);
         ambientLight->mIntensity      = 0.1f;
+
+        // create a ground plane
+        SceneNodePtr nodePlane       = myScene->GetRootNode().CreateChildNode("nodePlane");
+        ModelPtr plane               = myScene->GetResourceManifest().CreateShape("GroundPlane", Scene::Shape::RECTANGLE, 32, 0.5, 32);
+        plane->mMaterial             = myScene->GetResourceManifest().LoadMaterial("Checker", "checker", jonsPackage);
+        plane->mSceneNode            = nodePlane;
+        plane->mMaterialTilingFactor = 4.0f;
+        nodePlane->TranslateNode(Vec3(0.0f, -0.5f, 0.0f));
+
+        // move up camera
+        myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
     }
 }

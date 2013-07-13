@@ -50,7 +50,7 @@ namespace JonsEngine
 
             // create the rendering queue and active lights
             const RenderQueue renderQueue(CreateRenderQueue(activeScene));
-            const RenderableLighting lighting(CreateRenderableLighting(activeScene));
+            const RenderableLighting lighting(GetLightingInfo(activeScene));
 
             // render the scene
             mRenderer->DrawRenderables(renderQueue, lighting);
@@ -97,7 +97,7 @@ namespace JonsEngine
         RenderQueue renderQueue;
         const ScreenMode& screenMode = mWindow->GetScreenMode();
 
-        const std::vector<ModelPtr>& models = scene->GetAllModels();
+        const std::vector<ModelPtr>& models = scene->GetResourceManifest().GetAllModels();
         const Mat4 viewMatrix = scene->GetSceneCamera().GetCameraTransform();
         const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(screenMode.FOV, screenMode.ScreenWidth / (float)screenMode.ScreenHeight, screenMode.zNear, screenMode.zFar);
 
@@ -111,7 +111,7 @@ namespace JonsEngine
     }
      
     // TODO: Cull lights
-    RenderableLighting Engine::CreateRenderableLighting(const Scene* scene)
+    RenderableLighting Engine::GetLightingInfo(const Scene* scene)
     {
         const std::vector<LightPtr>& sceneLights = scene->GetAllLights();
 
@@ -134,6 +134,9 @@ namespace JonsEngine
         return lighting;
     }
 
+    /*
+     * Creates a render unit for model 'model' and all its children.
+     */
     void Engine::CreateModelRenderable(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, const bool lightingEnabled, RenderQueue& renderQueue)
     {
         const Mat4 worldMatrix         = nodeTransform * model->mTransform;
@@ -142,7 +145,7 @@ namespace JonsEngine
 
         if (model->mMesh)
         {
-            Renderable renderable(model->mMesh, worldViewProjMatrix, worldMatrix, lightingEnabled, 0.02f);
+            Renderable renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor, lightingEnabled, 0.02f);
             const MaterialPtr material(model->mMaterial);
 
             if (material)
@@ -158,6 +161,7 @@ namespace JonsEngine
         }
 
         BOOST_FOREACH(const Model& childModel, model->mChildren)
+            // 'lightingEnabled' is passed on since it applies recursively on all children aswell
             CreateModelRenderable(&childModel, viewMatrix, perspectiveMatrix, worldMatrix, lightingEnabled, renderQueue);
     }
 }

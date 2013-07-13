@@ -45,8 +45,8 @@ namespace JonsEngine
         glGenSamplers(1, &mTextureSampler);
         glSamplerParameteri(mTextureSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glSamplerParameteri(mTextureSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glUniform1i(glGetUniformLocation(mDefaultProgram.GetHandle(), "unifDiffuseTexture"), OpenGLTexture::TEXTURE_UNIT_DIFFUSE);
         glBindSampler(OpenGLTexture::TEXTURE_UNIT_DIFFUSE, mTextureSampler);
     }
@@ -82,7 +82,7 @@ namespace JonsEngine
         {
             if (renderable.mMesh)
             {
-                mUniBufferTransform.SetData(Transform(renderable.mWVPMatrix, renderable.mWorldMatrix));
+                mUniBufferTransform.SetData(Transform(renderable.mWVPMatrix, renderable.mWorldMatrix, renderable.mTextureTilingFactor));
                 mUniBufferMaterial.SetData(Material(renderable.mDiffuseColor, renderable.mAmbientColor, renderable.mSpecularColor, renderable.mEmissiveColor,
                                                     renderable.mDiffuseTexture != NULL, renderable.mLightingEnabled, renderable.mSpecularFactor));
 
@@ -113,26 +113,24 @@ namespace JonsEngine
         vertexShader.Compile(gVertexShader);
         fragmentShader.Compile(gFragmentShader);
 
-        if (vertexShader.IsCompiled() && fragmentShader.IsCompiled())
-        {
-            ret.AddShader(&vertexShader);
-            ret.AddShader(&fragmentShader);
-
-            ret.LinkProgram();
-
-            if (ret.IsLinked())
-                ret.UseProgram(true);
-            else
-            {
-                JONS_LOG_ERROR(mLogger, "OpenGLRenderer::SetupShaders(): Failed to link program!");
-                throw std::runtime_error("OpenGLRenderer::SetupShaders(): Failed to link program!");
-            }
-        }
-        else
+        if (!vertexShader.IsCompiled() || !fragmentShader.IsCompiled())
         {
             JONS_LOG_ERROR(mLogger, "OpenGLRenderer::SetupShaders(): Failed to compile shaders!");
             throw std::runtime_error("OpenGLRenderer::SetupShaders(): Failed to compile shaders!");
         }
+
+        ret.AddShader(&vertexShader);
+        ret.AddShader(&fragmentShader);
+
+        ret.LinkProgram();
+
+        if (!ret.IsLinked())
+        {
+            JONS_LOG_ERROR(mLogger, "OpenGLRenderer::SetupShaders(): Failed to link program!");
+            throw std::runtime_error("OpenGLRenderer::SetupShaders(): Failed to link program!");
+        }
+
+        ret.UseProgram(true);
 
         return ret;
     }

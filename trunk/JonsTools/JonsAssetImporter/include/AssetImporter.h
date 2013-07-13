@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Resources/JonsPackage.h"
+#include "include/Core/EngineDefs.h"
 
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 #include "boost/filesystem.hpp"
@@ -16,13 +17,11 @@ namespace JonsAssetImporter
     class AssetImporter
     {
     public:
-        /* ParseCmdResult definition */
-        enum ParseCmdResult
+        enum Command
         {
-            SUCCESS = 0,
-            FAIL
+            UNKNOWN_COMMAND = 0,
+            IMPORT,
         };
-
 
         AssetImporter();
         ~AssetImporter();
@@ -33,7 +32,7 @@ namespace JonsAssetImporter
          * -n <asset_1_name>, ..., <asset_name_n>
          * -p <package_name>
          */
-        ParseCmdResult ParseCommands(const std::vector<std::string>& cmds);
+        bool ParseCommands(const Command command,  std::vector<std::string>& parameters);
 
         const std::string& GetErrorLog() const;
 
@@ -42,10 +41,17 @@ namespace JonsAssetImporter
         /* ImportFlag definition */
         enum ImportFlag
         {
-            NONE = 0,
+            UNKNOWN_FLAG = 0,
             ASSET,
             ASSET_NAME,
             PACKAGE,
+        };
+
+        enum AssetType
+        {
+            UNKNOWN_TYPE = 0,
+            MODEL,
+            MATERIAL,
         };
 
         /* MeshMaterialMap definition */
@@ -56,15 +62,16 @@ namespace JonsAssetImporter
         bool Import(const std::string& packageName, const std::vector<boost::filesystem::path>& assets, const std::vector<std::string>& assetNames, Assimp::Importer importer);
 
         void ProcessScene(const aiScene* scene, const boost::filesystem::path& modelPath, const std::string& modelName, JonsEngine::JonsPackagePtr pkg);
-        void ProcessMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, JonsEngine::JonsPackagePtr pkg);
-        JonsEngine::PackageModel ProcessModel(const aiScene* scene, const aiNode* node, const MaterialMap& materialMap);
-        JonsEngine::PackageTexture ProcessDiffuseTexture(const aiMaterial* material, const boost::filesystem::path& modelPath); 
+        void ProcessAssimpMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, JonsEngine::JonsPackagePtr pkg);
+        JonsEngine::PackageModel ProcessAssimpModelGeometry(const aiScene* scene, const aiNode* node, const MaterialMap& materialMap);
+        JonsEngine::PackageTexture ProcessDiffuseTexture(const boost::filesystem::path& assetPath); 
 
-        JonsEngine::Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& mat);
-        JonsEngine::Vec3 aiColor3DToJonsVec3(const aiColor3D& color);
+        AssetType GetAssetType(const char* textureName) const;
+        std::string GetDefaultAssetName(AssetType assetType, uint32_t assetTypeNumber) const;
+        JonsEngine::Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& mat) const;
+        JonsEngine::Vec3 aiColor3DToJonsVec3(const aiColor3D& color) const;
         void Log(const std::string& msg);
         static void FreeImageErrorHandler(FREE_IMAGE_FORMAT imageFormat, const char* message);
-
 
         std::string mErrorLog;
     };

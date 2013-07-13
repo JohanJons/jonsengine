@@ -6,5 +6,5 @@
 
 namespace JonsEngine
 {
-    bool CreateRectangleData(const double sizeX, const double sizeY, const double sizeZ, std::vector<Vec3>& vertexData, std::vector<Vec3>& normalData, std::vector<uint32_t>& indiceData);
+    bool CreateRectangleData(const float sizeX, const float sizeY, const float sizeZ, std::vector<float>& vertexData, std::vector<float>& normalData, std::vector<float>& texcoordData, std::vector<uint32_t>& indiceData);
 }

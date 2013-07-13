@@ -27,9 +27,12 @@ namespace JonsEngine
         MeshPtr mMesh;
         MaterialPtr mMaterial;
         Mat4 mTransform;
+
         bool mLightingEnabled;
+        float mMaterialTilingFactor;
 
         SceneNodePtr mSceneNode;
+
 
         Model(const std::string& name);
 

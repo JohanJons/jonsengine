@@ -33,8 +33,9 @@ namespace JonsEngine
         {
             Mat4 mWVPMatrix;
             Mat4 mWorldMatrix;
+            float mTextureTilingFactor;
 
-            Transform(const Mat4& WVPMatrix, const Mat4& WorldMatrix) : mWVPMatrix(WVPMatrix), mWorldMatrix(WorldMatrix)
+            Transform(const Mat4& WVPMatrix, const Mat4& WorldMatrix, const float textureTilingFactor) : mWVPMatrix(WVPMatrix), mWorldMatrix(WorldMatrix), mTextureTilingFactor(textureTilingFactor)
             {
             }
         };

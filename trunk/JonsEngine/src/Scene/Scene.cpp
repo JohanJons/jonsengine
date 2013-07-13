@@ -19,54 +19,6 @@ namespace JonsEngine
     }
 
 
-    ModelPtr Scene::CreateModel(const std::string& modelName, const std::string& assetName, JonsPackagePtr jonsPkg)
-    {
-        ModelPtr model = mResourceManifest.LoadModel(modelName, assetName, jonsPkg);
-
-        if (model)
-            mModels.push_back(model);
-
-        return model;
-    }
-
-    ModelPtr Scene::CreateModel(const std::string& modelName, const std::string& assetName, JonsPackagePtr jonsPkg, const SceneNodePtr node)
-    {
-        ModelPtr model = CreateModel(modelName, assetName, jonsPkg);
-
-        if (model)
-        {
-            model->mSceneNode = node;
-            mModels.push_back(model);
-        }
-
-        return model;
-    }
-        
-    ModelPtr Scene::GetModel(const std::string& modelName)
-    {
-        ModelPtr ret;
-        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), boost::bind(&Model::mName, _1) == modelName);
-
-        if (iter != mModels.end())
-            ret = * iter;
-
-        return ret;
-    }
-        
-    const std::vector<ModelPtr>& Scene::GetAllModels() const
-    {
-        return mModels;
-    }
-        
-    void Scene::DeleteModel(const std::string& modelName)
-    {
-        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), boost::bind(&Model::mName, _1) == modelName);
-
-        if (iter != mModels.end())
-            mModels.erase(iter);
-    }
-
-
     LightPtr Scene::CreateLight(const std::string& lightName, Light::LightType type)
     {
         LightPtr light(mMemoryAllocator.AllocateObject<Light>(lightName, type),

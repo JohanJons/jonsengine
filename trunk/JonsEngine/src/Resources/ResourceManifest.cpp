@@ -21,26 +21,26 @@ namespace JonsEngine
     }
 
 
-    ModelPtr ResourceManifest::CreateRectangle(const double sizeX, const double sizeY, const double sizeZ)
+    ModelPtr ResourceManifest::CreateShape(const std::string& modelName, const ShapeType shapeType, const double sizeX, const double sizeY, const double sizeZ)
     {
+        ModelPtr ptr = GetModel(modelName);
+        if (ptr) 
+            return ptr;
+
         if (sizeX <= 0 || sizeY <= 0 || sizeZ <= 0)
-            return ModelPtr();
+            return ptr;
 
-        std::stringstream ssInternalName;
-        ssInternalName << "rect_" << sizeX << "_" << sizeY << "_" << sizeZ;
-        const std::string internalName = ssInternalName.str();
-        
-        std::vector<ModelPtr>::iterator iter = std::find_if(mGeneratedModels.begin(), mGeneratedModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&Model::mName, _1), internalName, std::locale()));
-        if (iter != mGeneratedModels.end())
-            return *iter;
-
-        std::vector<Vec3> vertexData;
-        std::vector<Vec3> normalData;
+        std::vector<float> vertexData;
+        std::vector<float> normalData;
+        std::vector<float> texcoordData;
         std::vector<uint32_t> indiceData;
-        if (!CreateRectangleData(sizeX, sizeY, sizeZ, vertexData, normalData, indiceData))
-            return ModelPtr();
+        if (!CreateRectangleData(sizeX, sizeY, sizeZ, vertexData, normalData, texcoordData, indiceData))
+            return ptr;
 
+        ptr        = *mModels.insert(mModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(modelName), boost::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, _1)));
+        ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, indiceData);
 
+        return ptr;
     }
 
     
@@ -53,17 +53,17 @@ namespace JonsEngine
         std::vector<PackageModel>::iterator iter = std::find_if(jonsPkg->mModels.begin(), jonsPkg->mModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&PackageModel::mName, _1), assetName, std::locale()));
 
         if (iter != jonsPkg->mModels.end())
-            ptr = *mImportedModels.insert(mImportedModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(ProcessModel(*iter, modelName, jonsPkg)), boost::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, _1)));
+            ptr = *mModels.insert(mModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(ProcessModel(*iter, modelName, jonsPkg)), boost::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, _1)));
 
         return ptr;
     }
         
     ModelPtr ResourceManifest::GetModel(const std::string& modelName)
     {
-        std::vector<ModelPtr>::iterator iter = std::find_if(mImportedModels.begin(), mImportedModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&Model::mName, _1), modelName, std::locale()));
+        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&Model::mName, _1), modelName, std::locale()));
         ModelPtr ptr;
 
-        if (iter != mImportedModels.end())
+        if (iter != mModels.end())
             ptr = *iter;
 
         return ptr;

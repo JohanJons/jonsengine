@@ -129,7 +129,7 @@ namespace JonsEngine
     }
 
     /* PackageMaterial inlines */
-    inline PackageMaterial::PackageMaterial() : mName(""), mDiffuseColor(0.0f), mAmbientColor(0.0f), mSpecularColor(0.0f), mEmissiveColor(0.0f)
+    inline PackageMaterial::PackageMaterial() : mName(""), mDiffuseColor(1.0f), mAmbientColor(1.0f), mSpecularColor(1.0f), mEmissiveColor(0.0f)
     {
     }
 

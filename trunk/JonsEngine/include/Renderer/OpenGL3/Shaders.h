@@ -10,8 +10,9 @@ namespace JonsEngine
                                                                                                                 \n \
                                         uniform UnifTransform                                                   \n \
                                         {                                                                       \n \
-                                            mat4 WVPMatrix;                                                     \n \
-                                            mat4 WorldMatrix;                                                   \n \
+                                            mat4 mWVPMatrix;                                                    \n \
+                                            mat4 mWorldMatrix;                                                  \n \
+                                            float mTextureTilingFactor;                                         \n \
                                         } Transform;                                                            \n \
                                                                                                                 \n \
                                         layout(location = 0) in vec3 vert_position;				                \n \
@@ -24,14 +25,14 @@ namespace JonsEngine
                                                                                                                 \n \
                                         void main()									                            \n \
                                         {											                            \n \
-                                            gl_Position   = Transform.WVPMatrix * vec4(vert_position, 1.0);     \n \
+                                            gl_Position   = Transform.mWVPMatrix * vec4(vert_position, 1.0);    \n \
                                                                                                                 \n \
-                                            vec4 position = Transform.WorldMatrix * vec4(vert_position, 1.0);   \n \
-                                            vec4 normal   = Transform.WorldMatrix * vec4(vert_normal, 0.0);     \n \
+                                            vec4 position = Transform.mWorldMatrix * vec4(vert_position, 1.0);  \n \
+                                            vec4 normal   = Transform.mWorldMatrix * vec4(vert_normal, 0.0);    \n \
                                                                                                                 \n \
                                             frag_position = position.xyz;                                       \n \
                                             frag_normal   = normal.xyz;                                         \n \
-                                            frag_texcoord = vert_texcoord;                                      \n \
+                                            frag_texcoord = Transform.mTextureTilingFactor * vert_texcoord;     \n \
                                         }											                            \n";
 
 

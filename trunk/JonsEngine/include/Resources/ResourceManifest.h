@@ -3,6 +3,7 @@
 #include "include/Resources/JonsPackage.h"
 #include "include/Scene/Model.h"
 #include "include/Scene/Material.h"
+#include "include/Renderer/Shapes.h"
 
 #include <vector>
 
@@ -15,16 +16,24 @@ namespace JonsEngine
     class ResourceManifest
     {
     public:
+        enum ShapeType
+        {
+            UNKNOWN_SHAPE = 0,
+            RECTANGLE
+        };
+
         ResourceManifest(IRenderer& renderer);
         ~ResourceManifest();
 
-        ModelPtr CreateRectangle(const double sizeX, const double sizeY, const double sizeZ);
-
+        ModelPtr CreateShape(const std::string& modelName, const ShapeType shapeType, const double sizeX, const double sizeY, const double sizeZ);
         ModelPtr LoadModel(const std::string& modelName, const std::string& assetName, const JonsPackagePtr jonsPkg);
         ModelPtr GetModel(const std::string& modelName);
 
         MaterialPtr LoadMaterial(const std::string& materialName, const std::string& assetName, const JonsPackagePtr jonsPkg);
         MaterialPtr GetMaterial(const std::string& materialName);
+
+        const std::vector<ModelPtr>& GetAllModels() const;
+        std::vector<ModelPtr>& GetAllModels();
 
 
     private:
@@ -32,9 +41,13 @@ namespace JonsEngine
         Material ProcessMaterial(PackageMaterial& pkgMaterial, const std::string& materialName, const JonsPackagePtr jonsPkg);
 
         IRenderer& mRenderer;
-        std::vector<ModelPtr> mImportedModels;
-        std::vector<ModelPtr> mGeneratedModels;
+        std::vector<ModelPtr> mModels;
         std::vector<MaterialPtr> mMaterials;
         IMemoryAllocator& mMemoryAllocator;
     };
+
+
+    /* ResourceManifest inlines */
+    inline const std::vector<ModelPtr>& ResourceManifest::GetAllModels() const      { return mModels; }
+    inline std::vector<ModelPtr>& ResourceManifest::GetAllModels()                  { return mModels; }
 }

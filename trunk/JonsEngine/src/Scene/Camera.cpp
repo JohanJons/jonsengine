@@ -35,14 +35,14 @@ namespace JonsEngine
 
     Vec3 Camera::Forward() const
     {
-        Vec4 forward = Inverse(Orientation()) * Vec4(0.0f, 0.0f, 1.0f, 0.0f);
+        Vec4 forward = Inverse(Orientation()) * Vec4(0.0f, 0.0f, -1.0f, 0.0f);
 
         return Vec3(forward);
     }
 
     Vec3 Camera::Right() const
     {
-        Vec4 right = Inverse(Orientation()) * Vec4(-1.0f, 0.0f, 0.0f, 0.0f);
+        Vec4 right = Inverse(Orientation()) * Vec4(1.0f, 0.0f, 0.0f, 0.0f);
 
         return Vec3(right);
     }
@@ -60,7 +60,7 @@ namespace JonsEngine
     Mat4 Camera::GetCameraTransform() const
     {
         Mat4 viewMatrix(1.0f);
-        viewMatrix = Orientation() * Translate(viewMatrix, mTranslation);
+        viewMatrix = Orientation() * Translate(viewMatrix, -mTranslation);
 
         return viewMatrix;
     }
