@@ -18,15 +18,15 @@ namespace JonsEngine
     struct EngineSettings
     {
         // Window
-        IWindow::WindowBackendType WindowBackend;
-        ScreenMode ScreenMode;
-        std::string WindowTitle;
+        IWindow::WindowBackendType mWindowBackend;
+        ScreenMode mScreenMode;
+        std::string mWindowTitle;
 
         // Renderer
-        IRenderer::RenderBackendType RenderBackend;
+        IRenderer::RenderBackendType mRenderBackend;
 
         // Input
-        InputBackend::InputBackendType InputBackend;
+        InputBackend::InputBackendType mInputBackend;
 
 
         EngineSettings();
@@ -34,7 +34,7 @@ namespace JonsEngine
 
 
     /* EngineSettings inlines */
-    inline EngineSettings::EngineSettings() : WindowBackend(IWindow::GLFW), WindowTitle("JonsEngine Game"), RenderBackend(IRenderer::OPENGL), InputBackend(InputBackend::GLFW)
+    inline EngineSettings::EngineSettings() : mWindowBackend(IWindow::GLFW), mWindowTitle("JonsEngine Game"), mRenderBackend(IRenderer::OPENGL), mInputBackend(InputBackend::GLFW)
     {
     }
 }

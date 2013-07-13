@@ -9,8 +9,7 @@ namespace JonsEngine
 
         GLint glTextureFormat = ParseTextureFormat(textureFormat);
         glTexImage2D(GL_TEXTURE_2D, 0, glTextureFormat, textureWidth, textureHeight, 0, glTextureFormat, GL_UNSIGNED_BYTE, &textureData[0]);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+        glGenerateMipmap(GL_TEXTURE_2D);
     }
         
     OpenGLTexture::~OpenGLTexture()

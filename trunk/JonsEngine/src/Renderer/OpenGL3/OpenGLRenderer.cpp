@@ -18,7 +18,7 @@ namespace JonsEngine
 {
     OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings) : mLogger(Logger::GetRendererLogger()), mDefaultProgram(SetupShaderProgram("DefaultProgram")), 
                                                                            mUniBufferTransform("UnifTransform", mDefaultProgram), mUniBufferMaterial("UnifMaterial", mDefaultProgram), 
-                                                                           mUniBufferLightingInfo("UnifLighting", mDefaultProgram)
+                                                                           mUniBufferLightingInfo("UnifLighting", mDefaultProgram), mCurrentAnisotropy(2.0f)
     {
         // 'glewExperimental = GL_TRUE' needed to initialize openGL core profile; see GLEW doc
         glewExperimental = GL_TRUE;
@@ -44,9 +44,10 @@ namespace JonsEngine
         // texture sampler setup
         glGenSamplers(1, &mTextureSampler);
         glSamplerParameteri(mTextureSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glSamplerParameteri(mTextureSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glSamplerParameteri(mTextureSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
         glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glSamplerParameterf(mTextureSampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, mCurrentAnisotropy);
         glUniform1i(glGetUniformLocation(mDefaultProgram.GetHandle(), "unifDiffuseTexture"), OpenGLTexture::TEXTURE_UNIT_DIFFUSE);
         glBindSampler(OpenGLTexture::TEXTURE_UNIT_DIFFUSE, mTextureSampler);
     }
@@ -103,6 +104,31 @@ namespace JonsEngine
     }
 
 
+    float OpenGLRenderer::GetMaxAnisotropyLevel() const
+    {
+        float maxAniso = 0.0f;
+        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAniso);
+
+        return maxAniso;
+    }
+
+    float OpenGLRenderer::GetCurrentAnisotropyLevel() const
+    {
+        return mCurrentAnisotropy;
+    }
+        
+    bool OpenGLRenderer::SetAnisotropyLevel(const float newAnisoLevel)
+    {
+        if (newAnisoLevel <= 0.0f || newAnisoLevel > GetMaxAnisotropyLevel())
+            return false;
+
+        mCurrentAnisotropy = newAnisoLevel;
+        glSamplerParameterf(mTextureSampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, mCurrentAnisotropy);
+        
+        return true;
+    }
+
+
     ShaderProgram OpenGLRenderer::SetupShaderProgram(const std::string& programName)
     {
         ShaderProgram ret(programName);
@@ -121,7 +147,6 @@ namespace JonsEngine
 
         ret.AddShader(&vertexShader);
         ret.AddShader(&fragmentShader);
-
         ret.LinkProgram();
 
         if (!ret.IsLinked())

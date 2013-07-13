@@ -25,9 +25,9 @@ namespace JonsEngine
         glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
         glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-        mScreenMode = engineSettings.ScreenMode;
+        mScreenMode = engineSettings.mScreenMode;
         SetupWindow();
-        SetWindowTitle(engineSettings.WindowTitle);
+        SetWindowTitle(engineSettings.mWindowTitle);
 
         // Initialize GLEW for fetching openGL
         // 'glewExperimental = GL_TRUE' needed to initialize openGL core profile; see GLEW doc
@@ -58,18 +58,18 @@ namespace JonsEngine
     {
         mLastFrameTime = mThisFrameTime;
 
-        if (mScreenMode.FrameLimitEnabled)
+        if (mScreenMode.mFrameLimitEnabled)
             mStartFrameTime = glfwGetTime();
     }
         
     void GLFWWindow::EndFrame()
     {
-        if (mScreenMode.FrameLimitEnabled)
+        if (mScreenMode.mFrameLimitEnabled)
         {
             mThisFrameTime = glfwGetTime();
 
             const double endFrameTime = glfwGetTime() - mStartFrameTime;
-            const double frameTime = 1.0f / mScreenMode.FrameLimit;
+            const double frameTime = 1.0f / mScreenMode.mFrameLimit;
 
             if (endFrameTime < frameTime)
                 glfwSleep(frameTime - endFrameTime);
@@ -84,7 +84,7 @@ namespace JonsEngine
         if (IsWindowOpened())
             CloseWindow();
 
-        if (!glfwOpenWindow(mScreenMode.ScreenWidth, mScreenMode.ScreenHeight, 0, 0 , 0, 0, 0, 0, mScreenMode.Fullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW) != GL_TRUE)
+        if (!glfwOpenWindow(mScreenMode.mScreenWidth, mScreenMode.mScreenHeight, 0, 0 , 0, 0, 0, 0, mScreenMode.mFullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW) != GL_TRUE)
         {
             SetWindowTitle(mWindowTitle);
             UpdateViewport();
@@ -119,22 +119,22 @@ namespace JonsEngine
         
     void GLFWWindow::SetFullscreen(bool fullscreen)
     {
-        if (mScreenMode.Fullscreen != fullscreen && IsWindowOpened())
+        if (mScreenMode.mFullscreen != fullscreen && IsWindowOpened())
         {
             // need to tear down window and reset opengl context with GLFW..
             SetupWindow();
         }
 
-        mScreenMode.Fullscreen = fullscreen;
+        mScreenMode.mFullscreen = fullscreen;
     }
         
     void GLFWWindow::SetScreenResolution(const uint16_t width, const uint16_t height)
     {
-        if (IsWindowOpened() && (mScreenMode.ScreenWidth != width || mScreenMode.ScreenHeight != height))
+        if (IsWindowOpened() && (mScreenMode.mScreenWidth != width || mScreenMode.mScreenHeight != height))
             glfwSetWindowSize(width, height);
 
-        mScreenMode.ScreenWidth = width;
-        mScreenMode.ScreenHeight = height;
+        mScreenMode.mScreenWidth = width;
+        mScreenMode.mScreenHeight = height;
 
         UpdateViewport();
     }
@@ -152,7 +152,7 @@ namespace JonsEngine
     {
         if (IsWindowOpened())
         {
-            glViewport(0, 0, (GLsizei) mScreenMode.ScreenWidth, (GLsizei)mScreenMode.ScreenHeight);
+            glViewport(0, 0, (GLsizei) mScreenMode.mScreenWidth, (GLsizei)mScreenMode.mScreenHeight);
         }
     }
         
@@ -160,8 +160,8 @@ namespace JonsEngine
     {
         if (gGLFWWindowInstance)
         {
-            gGLFWWindowInstance->mScreenMode.ScreenWidth = width;
-            gGLFWWindowInstance->mScreenMode.ScreenHeight = height;
+            gGLFWWindowInstance->mScreenMode.mScreenWidth = width;
+            gGLFWWindowInstance->mScreenMode.mScreenHeight = height;
 
             gGLFWWindowInstance->UpdateViewport();
         }

@@ -6,6 +6,7 @@
 #include "include/Renderer/Shapes.h"
 
 #include <vector>
+#include <map>
 
 namespace JonsEngine
 {
@@ -43,6 +44,7 @@ namespace JonsEngine
         IRenderer& mRenderer;
         std::vector<ModelPtr> mModels;
         std::vector<MaterialPtr> mMaterials;
+        std::multimap<std::string, std::string> mAssetFileModelMap;
         IMemoryAllocator& mMemoryAllocator;
     };
 

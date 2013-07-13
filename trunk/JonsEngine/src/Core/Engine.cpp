@@ -62,7 +62,7 @@ namespace JonsEngine
 
     IWindow* Engine::bootCreateWindow(const EngineSettings& settings)
     {
-        switch (settings.WindowBackend)
+        switch (settings.mWindowBackend)
         {
             case IWindow::GLFW:
                 return mMemoryAllocator.AllocateObject<GLFWWindow>(settings);
@@ -75,7 +75,7 @@ namespace JonsEngine
 
     IRenderer* Engine::bootCreateRenderer(const EngineSettings& engineSettings)
     {
-        switch (engineSettings.RenderBackend)
+        switch (engineSettings.mRenderBackend)
         {
             case IRenderer::OPENGL:
                 return mMemoryAllocator.AllocateObject<OpenGLRenderer>(engineSettings);
@@ -99,7 +99,7 @@ namespace JonsEngine
 
         const std::vector<ModelPtr>& models = scene->GetResourceManifest().GetAllModels();
         const Mat4 viewMatrix = scene->GetSceneCamera().GetCameraTransform();
-        const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(screenMode.FOV, screenMode.ScreenWidth / (float)screenMode.ScreenHeight, screenMode.zNear, screenMode.zFar);
+        const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(screenMode.mFOV, screenMode.mScreenWidth / (float)screenMode.mScreenHeight, screenMode.mZNear, screenMode.mZFar);
 
         BOOST_FOREACH(ModelPtr model, models)
         {

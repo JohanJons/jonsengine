@@ -13,7 +13,7 @@
 
 namespace JonsEngine
 {
-    InputManager::InputManager(const EngineSettings& engineSettings) : mLogger(Logger::GetInputLogger()), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mInputBackend(CreateBackend(engineSettings.InputBackend))
+    InputManager::InputManager(const EngineSettings& engineSettings) : mLogger(Logger::GetInputLogger()), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mInputBackend(CreateBackend(engineSettings.mInputBackend))
     {
     }
         

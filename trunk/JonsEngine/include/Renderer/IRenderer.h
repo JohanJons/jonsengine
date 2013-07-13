@@ -28,5 +28,9 @@ namespace JonsEngine
 
         virtual void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting) = 0;
         virtual RenderBackendType GetRenderBackendType() const = 0;
+
+        virtual float GetMaxAnisotropyLevel() const = 0;
+        virtual float GetCurrentAnisotropyLevel() const = 0;
+        virtual bool SetAnisotropyLevel(const float newAnisoLevel) = 0;
     };
 }

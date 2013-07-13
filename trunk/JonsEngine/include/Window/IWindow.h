@@ -7,14 +7,14 @@ namespace JonsEngine
     /* ScreenMode definition */
     struct ScreenMode
     {
-        uint16_t ScreenWidth;
-        uint16_t ScreenHeight;
-        uint16_t FrameLimit;
-        bool FrameLimitEnabled;
-        bool Fullscreen;
-        float FOV;
-        float zNear;
-        float zFar;
+        uint16_t mScreenWidth;
+        uint16_t mScreenHeight;
+        uint16_t mFrameLimit;
+        bool mFrameLimitEnabled;
+        bool mFullscreen;
+        float mFOV;
+        float mZNear;
+        float mZFar;
 
         ScreenMode();
     };
@@ -52,7 +52,7 @@ namespace JonsEngine
 
 
      /* ScreenMode inlines */
-    inline ScreenMode::ScreenMode() : ScreenWidth(800), ScreenHeight(600), FrameLimit(60), FrameLimitEnabled(true), Fullscreen(false), FOV(45.0f), zNear(0.5f), zFar(1000.0f)
+    inline ScreenMode::ScreenMode() : mScreenWidth(800), mScreenHeight(600), mFrameLimit(60), mFrameLimitEnabled(true), mFullscreen(false), mFOV(45.0f), mZNear(0.5f), mZFar(1000.0f)
     {
     }
 }

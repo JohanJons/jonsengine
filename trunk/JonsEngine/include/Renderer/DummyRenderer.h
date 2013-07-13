@@ -23,6 +23,10 @@ namespace JonsEngine
 
         void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting);
         RenderBackendType GetRenderBackendType() const;
+
+        float GetMaxAnisotropyLevel() const;
+        float GetCurrentAnisotropyLevel() const;
+        bool SetAnisotropyLevel(const float newAnisoLevel);
     };
 
 
@@ -35,4 +39,8 @@ namespace JonsEngine
 
     inline void DummyRenderer::DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting)                                                                                                       { }
     inline IRenderer::RenderBackendType DummyRenderer::GetRenderBackendType() const                                                                                                                                      { return NONE; }
+
+    inline float DummyRenderer::GetMaxAnisotropyLevel() const                                                                                                                                                            { return 0.0f; }
+    inline float DummyRenderer::GetCurrentAnisotropyLevel() const                                                                                                                                                        { return 0.0f; }
+    inline bool DummyRenderer::SetAnisotropyLevel(const float newAnisoLevel)                                                                                                                                             { return false; }
 }

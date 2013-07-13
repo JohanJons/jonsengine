@@ -141,7 +141,10 @@ namespace JonsAssetImporter
         BOOST_FOREACH(const boost::filesystem::path& asset, assets)
         {
             if (!boost::filesystem::exists(asset) || !boost::filesystem::is_regular_file(asset))
+            {
+                Log("-JonsAssetImporter: No such file: " + asset.string());
                 continue;
+            }
 
             switch (GetAssetType(asset.string().c_str()))
             {
@@ -316,12 +319,18 @@ namespace JonsAssetImporter
             imageFormat = FreeImage_GetFIFFromFilename(filename.c_str());
 
         if (imageFormat == FIF_UNKNOWN || !FreeImage_FIFSupportsReading(imageFormat))
+        {
+            Log("-JonsAssetImporter: Unable to open file: " + filename);
             return diffuseTexture;
+        }
 
         FIBITMAP* bitmap = FreeImage_Load(imageFormat, assetPath.string().c_str());
 
         if (!bitmap || !FreeImage_GetBits(bitmap) || !FreeImage_GetWidth(bitmap) || !FreeImage_GetHeight(bitmap))
+        {
+            Log("-JonsAssetImporter: Invalid image data: " + filename);
             return diffuseTexture;
+        }
 
         FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(bitmap);
         uint32_t bitsPerPixel           = FreeImage_GetBPP(bitmap);

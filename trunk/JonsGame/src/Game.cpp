@@ -19,7 +19,7 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mCenterYPos(mEngine->GetWindow().GetScreenMode().ScreenHeight/2), mCenterXPos(mEngine->GetWindow().GetScreenMode().ScreenWidth/2), mMoveSpeed(0.1f)
+    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mCenterYPos(mEngine->GetWindow().GetScreenMode().mScreenHeight/2), mCenterXPos(mEngine->GetWindow().GetScreenMode().mScreenWidth/2), mMoveSpeed(0.1f)
     {
     }
         
@@ -35,7 +35,7 @@ namespace JonsGame
         SetupScene();
 
         mEngine->GetInputManager().ShowMouseCursor(false);
-        mEngine->GetWindow().SetScreenResolution(1280, 720);
+        mEngine->GetWindow().SetScreenResolution(1920, 1080);
 
         while (mRunning)
         {
@@ -55,13 +55,10 @@ namespace JonsGame
             // camera position
             if (evnt.KeySymbol == A)
                 camera.TranslateCamera(-camera.Right() * mMoveSpeed);
-
             else if (evnt.KeySymbol == W)
                 camera.TranslateCamera(camera.Forward() * mMoveSpeed);
-
             else if (evnt.KeySymbol == S)
                 camera.TranslateCamera(-camera.Forward() * mMoveSpeed);
-
             else if (evnt.KeySymbol == D)
                 camera.TranslateCamera(camera.Right() * mMoveSpeed);
 
@@ -69,19 +66,14 @@ namespace JonsGame
             // light direction 
             else if (evnt.KeySymbol == Q)
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(-0.05, 0.0f, 0.0f));
-
             else if (evnt.KeySymbol == E)
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.05, 0.0f, 0.0f));
-
             else if (evnt.KeySymbol == R)
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.00, -0.05f, 0.0f));
-
             else if (evnt.KeySymbol == T)
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.05f, 0.0f));
-
             else if (evnt.KeySymbol == F)
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, -0.05f));
-
             else if (evnt.KeySymbol == G)
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, 0.05f));
         }
@@ -154,13 +146,20 @@ namespace JonsGame
 
         // create a ground plane
         SceneNodePtr nodePlane       = myScene->GetRootNode().CreateChildNode("nodePlane");
-        ModelPtr plane               = myScene->GetResourceManifest().CreateShape("GroundPlane", Scene::Shape::RECTANGLE, 32, 0.5, 32);
+        ModelPtr plane               = myScene->GetResourceManifest().CreateShape("GroundPlane", Scene::Shape::RECTANGLE, 64, 0.5, 64);
         plane->mMaterial             = myScene->GetResourceManifest().LoadMaterial("Checker", "checker", jonsPackage);
         plane->mSceneNode            = nodePlane;
-        plane->mMaterialTilingFactor = 4.0f;
+        plane->mMaterialTilingFactor = 64.0f;
         nodePlane->TranslateNode(Vec3(0.0f, -0.5f, 0.0f));
 
         // move up camera
         myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
+
+        // set anisotropic filter to max
+        float maxAnisoLevel = mEngine->GetRenderer().GetMaxAnisotropyLevel();
+        mEngine->GetRenderer().SetAnisotropyLevel(maxAnisoLevel);
+
+        //mEngine->GetWindow().SetFullscreen(true);
+        //mEngine->GetWindow().SetScreenResolution(800, 600);
     }
 }

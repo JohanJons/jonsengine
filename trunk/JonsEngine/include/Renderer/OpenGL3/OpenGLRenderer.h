@@ -27,6 +27,10 @@ namespace JonsEngine
         void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting);
         RenderBackendType GetRenderBackendType() const;
 
+        float GetMaxAnisotropyLevel() const;
+        float GetCurrentAnisotropyLevel() const;
+        bool SetAnisotropyLevel(const float newAnisoLevel);
+
 
     private:
         struct Transform
@@ -64,6 +68,7 @@ namespace JonsEngine
         UniformBuffer<OpenGLRenderer::Material> mUniBufferMaterial;
         UniformBuffer<RenderableLighting> mUniBufferLightingInfo;
         GLuint mTextureSampler;
+        float mCurrentAnisotropy;
 
         Logger& mLogger;
     };
