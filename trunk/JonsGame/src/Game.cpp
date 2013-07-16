@@ -19,7 +19,7 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mCenterYPos(mEngine->GetWindow().GetScreenMode().mScreenHeight/2), mCenterXPos(mEngine->GetWindow().GetScreenMode().mScreenWidth/2), mMoveSpeed(0.1f)
+    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mCenterYPos(mEngine->GetWindow().GetScreenHeight()/2), mCenterXPos(mEngine->GetWindow().GetScreenWidth()/2), mMoveSpeed(0.1f)
     {
     }
         
@@ -110,19 +110,19 @@ namespace JonsGame
 
         // cube
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
-        ModelPtr modelCube    = myScene->GetResourceManifest().LoadModel("Cube", "cube", jonsPackage);
+        ModelPtr modelCube    = myScene->GetResourceManifest().LoadModel("cube", jonsPackage);
         modelCube->mSceneNode = nodeCube;
         nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
 
         // chair
         SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("nodeChair");
-        ModelPtr modelChair    = myScene->GetResourceManifest().LoadModel("Chair", "chair", jonsPackage);
+        ModelPtr modelChair    = myScene->GetResourceManifest().LoadModel("chair", jonsPackage);
         modelChair->mSceneNode = nodeChair;
         nodeChair->TranslateNode(Vec3(0.0f, 0.0f, -8.0f));
 
         // uhura
         SceneNodePtr nodeUhura = myScene->GetRootNode().CreateChildNode("nodeUhura");
-        ModelPtr modelUhura    = myScene->GetResourceManifest().LoadModel("Uhura", "uhura", jonsPackage);
+        ModelPtr modelUhura    = myScene->GetResourceManifest().LoadModel("uhura", jonsPackage);
         modelUhura->mSceneNode = nodeUhura;
         nodeUhura->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));
 
@@ -147,7 +147,7 @@ namespace JonsGame
         // create a ground plane
         SceneNodePtr nodePlane       = myScene->GetRootNode().CreateChildNode("nodePlane");
         ModelPtr plane               = myScene->GetResourceManifest().CreateShape("GroundPlane", Scene::Shape::RECTANGLE, 64, 0.5, 64);
-        plane->mMaterial             = myScene->GetResourceManifest().LoadMaterial("Checker", "checker", jonsPackage);
+        plane->mMaterial             = myScene->GetResourceManifest().LoadMaterial("checker", jonsPackage);
         plane->mSceneNode            = nodePlane;
         plane->mMaterialTilingFactor = 64.0f;
         nodePlane->TranslateNode(Vec3(0.0f, -0.5f, 0.0f));
@@ -159,6 +159,7 @@ namespace JonsGame
         float maxAnisoLevel = mEngine->GetRenderer().GetMaxAnisotropyLevel();
         mEngine->GetRenderer().SetAnisotropyLevel(maxAnisoLevel);
 
+       // myScene->GetResourceManifest().ReloadAllResources();
         //mEngine->GetWindow().SetFullscreen(true);
         //mEngine->GetWindow().SetScreenResolution(800, 600);
     }

@@ -18,28 +18,30 @@ namespace JonsEngine
         void StartFrame();
         void EndFrame();
 
-        bool SetupWindow();
-        void CloseWindow();
-        bool IsWindowOpened() const;
+        void SetFrameLimit(const uint16_t newFrameLimit);
+        uint16_t GetFrameLimit() const;
         uint16_t GetCurrentFPS() const;
 
         void SetFullscreen(bool fullscreen);
-        void SetScreenResolution(const uint16_t width, const uint16_t height);
+        void SetScreenResolution(const uint32_t width, const uint32_t height);
         void SetWindowTitle(const std::string& windowTitle);
+        void SetFOV(const float FOV);
 
-        const ScreenMode& GetScreenMode() const;
+        bool GetFullscreen() const;
+        uint32_t GetScreenWidth() const;
+        uint32_t GetScreenHeight() const;
         const std::string& GetWindowTitle() const;
+        float GetFOV() const;
 
-        WindowBackendType GetWindowBackendType() const;
+        WindowBackend GetWindowBackendType() const;
     
 
     private:
         std::string mWindowTitle;
-        ScreenMode mScreenMode;
     };
 
 
     /* DummyWindow inlines */
-    inline DummyWindow::WindowBackendType DummyWindow::GetWindowBackendType() const         { return IWindow::NONE;  }
+    inline DummyWindow::WindowBackend DummyWindow::GetWindowBackendType() const         { return IWindow::NONE;  }
 
 }

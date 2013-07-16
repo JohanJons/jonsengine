@@ -93,50 +93,22 @@ namespace JonsEngine
         std::vector<PackageModel> mModels;
         std::vector<PackageMaterial> mMaterials;
 
+        const uint32_t mInternalID;
+
 
         JonsPackage();
     };
 
-    /* JonsPackagePtr definition */
-    typedef boost::shared_ptr<JonsPackage> JonsPackagePtr;
 
+     /* JonsPackagePtr definition */
+    typedef boost::shared_ptr<JonsPackage> JonsPackagePtr;
 
     /*
      * Reading/writing JonsPackage files
      */
     JonsPackagePtr ReadJonsPkg(const std::string& jonsPkgName);
-    bool WriteJonsPkg(const std::string& jonsPkgName, const JonsPackagePtr pkg);
-
-
-    /* PackageHeader inlines */
-    inline PackageHeader::PackageHeader() : mSignature("jons"), mMajorVersion(LatestMajorVersion), mMinorVersion(LatestMinorVersion)
-    {
-    }
-
-    /* PackageModel inlines */
-    inline PackageModel::PackageModel() : mName(""), mTransform(1.0f)
-    {
-    }
-
-    /* PackageMesh inlines */
-    inline PackageMesh::PackageMesh() : mMaterialIndex(0), mHasMaterial(false)
-    {
-    }
-
-    /* PackageTexture inlines */
-    inline PackageTexture::PackageTexture() : mName(""), mTextureWidth(0), mTextureHeight(0), mTextureFormat(ITexture::UNKNOWN_FORMAT), mTextureType(ITexture::UNKNOWN_TYPE)
-    {
-    }
-
-    /* PackageMaterial inlines */
-    inline PackageMaterial::PackageMaterial() : mName(""), mDiffuseColor(1.0f), mAmbientColor(1.0f), mSpecularColor(1.0f), mEmissiveColor(0.0f)
-    {
-    }
-
-    /* JonsPackage inlines */
-    inline JonsPackage::JonsPackage()
-    {
-    }
+    bool WriteJonsPkg(const std::string& jonsPkgName, const JonsPackagePtr jonsPkg);
+    std::string GetJonsPkgPath(const uint32_t internalPackageID);
 }
 
 

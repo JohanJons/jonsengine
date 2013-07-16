@@ -20,23 +20,18 @@ namespace JonsEngine
     }
 
         
-    bool DummyWindow::SetupWindow()
+    void DummyWindow::SetFrameLimit(const uint16_t newFrameLimit)
     {
-        return false;
     }
         
-    void DummyWindow::CloseWindow()
-    { 
-    }
-        
-    bool DummyWindow::IsWindowOpened() const
+    uint16_t DummyWindow::GetFrameLimit() const
     {
-        return false;
+        return 0;
     }
         
     uint16_t DummyWindow::GetCurrentFPS() const
     {
-        return 0;    
+        return 0;
     }
 
         
@@ -44,15 +39,41 @@ namespace JonsEngine
     {
     }
         
-    void DummyWindow::SetScreenResolution(const uint16_t width, const uint16_t height)
+    void DummyWindow::SetScreenResolution(const uint32_t width, const uint32_t height)
     {
     }
         
     void DummyWindow::SetWindowTitle(const std::string& windowTitle)
     {
     }
+        
+    void DummyWindow::SetFOV(const float FOV)
+    {
+    }
 
         
-    const ScreenMode& DummyWindow::GetScreenMode() const          { return mScreenMode;   }
-    const std::string& DummyWindow::GetWindowTitle() const        { return mWindowTitle;  }
+    bool DummyWindow::GetFullscreen() const
+    {
+        return false;
+    }
+        
+    uint32_t DummyWindow::GetScreenWidth() const
+    {
+        return 0;
+    }
+        
+    uint32_t DummyWindow::GetScreenHeight() const
+    {
+        return 0;
+    }
+        
+    const std::string& DummyWindow::GetWindowTitle() const
+    {
+        return mWindowTitle;
+    }
+        
+    float DummyWindow::GetFOV() const
+    {
+        return 0;
+    }
 }

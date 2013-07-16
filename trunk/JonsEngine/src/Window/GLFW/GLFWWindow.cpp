@@ -11,7 +11,8 @@ namespace JonsEngine
 {
     static GLFWWindow* gGLFWWindowInstance = NULL;
 
-    GLFWWindow::GLFWWindow(const EngineSettings& engineSettings) : mLogger(Logger::GetWindowLogger())
+    GLFWWindow::GLFWWindow(const EngineSettings& engineSettings) : mLogger(Logger::GetWindowLogger()), mFrameLimit(engineSettings.mFrameLimit), mStartFrameTime(0.0f), mLastFrameTime(0.0f), mThisFrameTime(0.0f),
+                                                                   mFullscreen(engineSettings.mFullscreen), mFOV(engineSettings.mFOV), mWindowTitle("Game"), mMSAA(engineSettings.mMSAA)
     {
         GLenum glfwErr = glfwInit();
         if (glfwErr != GL_TRUE)
@@ -19,14 +20,13 @@ namespace JonsEngine
             JONS_LOG_ERROR(mLogger, "GLFWWindow::GLFWWindow(): Unable to initialize GLFW!");
             throw std::runtime_error("GLFWWindow::GLFWWindow(): Unable to initialize GLFW!");
         }
-
+        
         // setup a forward-compatible context with openGL 3.3
         glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
         glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
         glfwOpenWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-        mScreenMode = engineSettings.mScreenMode;
-        SetupWindow();
+        SetupWindow(engineSettings.mWindowWidth, engineSettings.mWindowHeight);
         SetWindowTitle(engineSettings.mWindowTitle);
 
         // Initialize GLEW for fetching openGL
@@ -46,8 +46,7 @@ namespace JonsEngine
         
     GLFWWindow::~GLFWWindow()
     {
-        CloseWindow();
-
+        glfwCloseWindow();
         glfwTerminate();
 
         gGLFWWindowInstance = NULL;
@@ -58,18 +57,18 @@ namespace JonsEngine
     {
         mLastFrameTime = mThisFrameTime;
 
-        if (mScreenMode.mFrameLimitEnabled)
+        if (mFrameLimit)
             mStartFrameTime = glfwGetTime();
     }
         
     void GLFWWindow::EndFrame()
     {
-        if (mScreenMode.mFrameLimitEnabled)
+        if (mFrameLimit)
         {
             mThisFrameTime = glfwGetTime();
 
             const double endFrameTime = glfwGetTime() - mStartFrameTime;
-            const double frameTime = 1.0f / mScreenMode.mFrameLimit;
+            const double frameTime = 1.0f / mFrameLimit;
 
             if (endFrameTime < frameTime)
                 glfwSleep(frameTime - endFrameTime);
@@ -78,37 +77,10 @@ namespace JonsEngine
         glfwSwapBuffers();
     }
 
-        
-    bool GLFWWindow::SetupWindow()
+    
+    void GLFWWindow::SetFrameLimit(const uint16_t frameLimit)
     {
-        if (IsWindowOpened())
-            CloseWindow();
-
-        if (!glfwOpenWindow(mScreenMode.mScreenWidth, mScreenMode.mScreenHeight, 0, 0 , 0, 0, 0, 0, mScreenMode.mFullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW) != GL_TRUE)
-        {
-            SetWindowTitle(mWindowTitle);
-            UpdateViewport();
-
-            return true;
-        }
-        else 
-        {
-            JONS_LOG_ERROR(mLogger, "GLFWWindow::SetupWindow(): Failed to create main window!")
-            return false;
-        }
-    }
-        
-    void GLFWWindow::CloseWindow()
-    {
-         if (IsWindowOpened())
-            glfwCloseWindow();
-        else
-            JONS_LOG_WARNING(mLogger, "GLFWWindow::CloseWindow(): Window not opened.");
-    }
-        
-    bool GLFWWindow::IsWindowOpened() const
-    {
-         return (glfwGetWindowParam(GLFW_OPENED) == GL_TRUE);
+        mFrameLimit = frameLimit;
     }
         
     uint16_t GLFWWindow::GetCurrentFPS() const
@@ -119,51 +91,76 @@ namespace JonsEngine
         
     void GLFWWindow::SetFullscreen(bool fullscreen)
     {
-        if (mScreenMode.mFullscreen != fullscreen && IsWindowOpened())
-        {
-            // need to tear down window and reset opengl context with GLFW..
-            SetupWindow();
-        }
+        uint32_t screenWidth  = GetScreenWidth();
+        uint32_t screenHeight = GetScreenWidth();
 
-        mScreenMode.mFullscreen = fullscreen;
+        if (mFullscreen != fullscreen)
+            SetupWindow(screenWidth, screenHeight); // need to tear down window and reset opengl context with GLFW..
+
+        mFullscreen = fullscreen;
     }
         
-    void GLFWWindow::SetScreenResolution(const uint16_t width, const uint16_t height)
+    void GLFWWindow::SetScreenResolution(const uint32_t width, const uint32_t height)
     {
-        if (IsWindowOpened() && (mScreenMode.mScreenWidth != width || mScreenMode.mScreenHeight != height))
+        if (mFullscreen)
+            return;
+
+        uint32_t screenWidth  = GetScreenWidth();
+        uint32_t screenHeight = GetScreenWidth();
+
+        if (screenWidth != width || screenHeight != height)
             glfwSetWindowSize(width, height);
-
-        mScreenMode.mScreenWidth = width;
-        mScreenMode.mScreenHeight = height;
-
-        UpdateViewport();
     }
         
     void GLFWWindow::SetWindowTitle(const std::string& windowTitle)
     {
-        if (IsWindowOpened() && mWindowTitle.compare(windowTitle) != 0)
+        if (mWindowTitle.compare(windowTitle) != 0)
             glfwSetWindowTitle(windowTitle.c_str());
 
         mWindowTitle = windowTitle;
     }
 
-        
-    void GLFWWindow::UpdateViewport()
+    void GLFWWindow::SetFOV(const float FOV)
     {
-        if (IsWindowOpened())
+        mFOV = FOV;
+    }
+
+
+    uint32_t GLFWWindow::GetScreenWidth() const
+    {
+        int width = 0, height = 0;
+        glfwGetWindowSize(&width, &height);
+
+        return width;
+    }
+        
+    uint32_t GLFWWindow::GetScreenHeight() const
+    {
+        int width = 0, height = 0;
+        glfwGetWindowSize(&width, &height);
+
+        return height;
+    }
+
+        
+    bool GLFWWindow::SetupWindow(const uint32_t width, const uint32_t height)
+    {
+        glfwOpenWindowHint(GLFW_FSAA_SAMPLES, mMSAA);
+        if (glfwOpenWindow(width, height, 0, 0 , 0, 8, 24, 8, mFullscreen ? GLFW_FULLSCREEN : GLFW_WINDOW) != GL_TRUE)
         {
-            glViewport(0, 0, (GLsizei) mScreenMode.mScreenWidth, (GLsizei)mScreenMode.mScreenHeight);
+            JONS_LOG_ERROR(mLogger, "GLFWWindow::SetupWindow(): Failed to create main window!")
+            return false;
         }
+
+        SetWindowTitle(mWindowTitle);
+        glViewport(0, 0, (GLsizei) width, (GLsizei)height);
+
+        return true;
     }
         
     void GLFWWindow::glfwOnWindowChanged(int width, int height)
     {
         if (gGLFWWindowInstance)
-        {
-            gGLFWWindowInstance->mScreenMode.mScreenWidth = width;
-            gGLFWWindowInstance->mScreenMode.mScreenHeight = height;
-
-            gGLFWWindowInstance->UpdateViewport();
-        }
+            glViewport(0, 0, (GLsizei) width, (GLsizei)height);
     }
 }

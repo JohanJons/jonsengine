@@ -60,27 +60,25 @@ namespace JonsEngine
     }
 
 
-    IWindow* Engine::bootCreateWindow(const EngineSettings& settings)
+    IWindow* Engine::bootCreateWindow(const EngineSettings& engineSettings)
     {
-        switch (settings.mWindowBackend)
+        switch (engineSettings.mVideoBackend)
         {
-            case IWindow::GLFW:
-                return mMemoryAllocator.AllocateObject<GLFWWindow>(settings);
+            case EngineSettings::VideoBackend::OPENGL:
+                return mMemoryAllocator.AllocateObject<GLFWWindow>(engineSettings);
 
-            case IWindow::NONE:
             default:
-                return mMemoryAllocator.AllocateObject<DummyWindow>(settings);
+                return mMemoryAllocator.AllocateObject<DummyWindow>(engineSettings);
         }
     }
 
     IRenderer* Engine::bootCreateRenderer(const EngineSettings& engineSettings)
     {
-        switch (engineSettings.mRenderBackend)
+        switch (engineSettings.mVideoBackend)
         {
-            case IRenderer::OPENGL:
+            case EngineSettings::VideoBackend::OPENGL:
                 return mMemoryAllocator.AllocateObject<OpenGLRenderer>(engineSettings);
 
-            case IRenderer::NONE:
             default:
                 return mMemoryAllocator.AllocateObject<DummyRenderer>(engineSettings);
         }
@@ -88,18 +86,17 @@ namespace JonsEngine
 
     ResourceManifest* Engine::bootCreateResourceManifest()
     {
-        return mMemoryAllocator.AllocateObject<ResourceManifest, IRenderer&>(GetRenderer());
+        return mMemoryAllocator.AllocateObject<ResourceManifest, IRenderer&>(*mRenderer);
     }
 
     
     RenderQueue Engine::CreateRenderQueue(const Scene* scene)
     {
         RenderQueue renderQueue;
-        const ScreenMode& screenMode = mWindow->GetScreenMode();
 
         const std::vector<ModelPtr>& models = scene->GetResourceManifest().GetAllModels();
         const Mat4 viewMatrix = scene->GetSceneCamera().GetCameraTransform();
-        const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(screenMode.mFOV, screenMode.mScreenWidth / (float)screenMode.mScreenHeight, screenMode.mZNear, screenMode.mZFar);
+        const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow->GetFOV(), mWindow->GetScreenWidth() / (float)mWindow->GetScreenHeight(), mRenderer->GetZNear(), mRenderer->GetZFar());
 
         BOOST_FOREACH(ModelPtr model, models)
         {

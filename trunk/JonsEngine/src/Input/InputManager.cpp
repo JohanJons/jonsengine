@@ -13,7 +13,7 @@
 
 namespace JonsEngine
 {
-    InputManager::InputManager(const EngineSettings& engineSettings) : mLogger(Logger::GetInputLogger()), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mInputBackend(CreateBackend(engineSettings.mInputBackend))
+    InputManager::InputManager(const EngineSettings& engineSettings) : mLogger(Logger::GetInputLogger()), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mInputBackend(CreateBackend(engineSettings.mVideoBackend))
     {
     }
         
@@ -99,11 +99,11 @@ namespace JonsEngine
         mKeyEvents.clear();
     }
 
-    InputBackend* InputManager::CreateBackend(InputBackend::InputBackendType backend)
+    InputBackend* InputManager::CreateBackend(EngineSettings::VideoBackend videoBackend)
     {
-        switch (backend)
+        switch (videoBackend)
         {
-            case InputBackend::GLFW:
+            case EngineSettings::VideoBackend::OPENGL:
                 return mMemoryAllocator.AllocateObject<GLFWInputBackend>();
                 break;
 

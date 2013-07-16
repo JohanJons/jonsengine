@@ -43,13 +43,13 @@ namespace JonsEngine
         void Tick();
 
         IWindow& GetWindow();
-        IRenderer& GetRenderer();
         InputManager& GetInputManager();
         SceneManager& GetSceneManager();
+        IRenderer& GetRenderer();
 
 
     private:
-        IWindow* bootCreateWindow(const EngineSettings& settings);
+        IWindow* bootCreateWindow(const EngineSettings& engineSettings);
         IRenderer* bootCreateRenderer(const EngineSettings& engineSettings);
         ResourceManifest* bootCreateResourceManifest();
 
@@ -58,6 +58,7 @@ namespace JonsEngine
 
         void CreateModelRenderable(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, const bool lightingEnabled, RenderQueue& renderQueue);
  
+
         Logger& mLog;
         IMemoryAllocator& mMemoryAllocator;
 
@@ -72,7 +73,7 @@ namespace JonsEngine
 
     /* Engine inlines */
     inline IWindow& Engine::GetWindow()                                 { return *mWindow;           }
-    inline IRenderer& Engine::GetRenderer()                             { return *mRenderer;         }
     inline InputManager& Engine::GetInputManager()                      { return mInputManager;      }
     inline SceneManager& Engine::GetSceneManager()                      { return mSceneManager;      }
+    inline IRenderer& Engine::GetRenderer()                             { return *mRenderer;         }
 }

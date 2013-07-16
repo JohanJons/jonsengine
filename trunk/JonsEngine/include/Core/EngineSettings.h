@@ -17,24 +17,34 @@ namespace JonsEngine
     /* EngineSettings definition */
     struct EngineSettings
     {
-        // Window
-        IWindow::WindowBackendType mWindowBackend;
-        ScreenMode mScreenMode;
+        enum VideoBackend
+        {
+            NONE = 0,
+            OPENGL
+        };
+
+        VideoBackend mVideoBackend;
+
+        // render settings
+        float mAnisotropicFiltering;
+
+        // window settings
         std::string mWindowTitle;
-
-        // Renderer
-        IRenderer::RenderBackendType mRenderBackend;
-
-        // Input
-        InputBackend::InputBackendType mInputBackend;
-
+        uint32_t mWindowWidth;
+        uint32_t mWindowHeight;
+        bool mFullscreen;
+        float mFOV;
+        uint16_t mFrameLimit;
+        uint16_t mMSAA;
 
         EngineSettings();
     };
 
 
     /* EngineSettings inlines */
-    inline EngineSettings::EngineSettings() : mWindowBackend(IWindow::GLFW), mWindowTitle("JonsEngine Game"), mRenderBackend(IRenderer::OPENGL), mInputBackend(InputBackend::GLFW)
+    inline EngineSettings::EngineSettings() : mVideoBackend(VideoBackend::OPENGL), 
+                                              mAnisotropicFiltering(0.0f),
+                                              mWindowTitle("JonsEngine Game"), mWindowWidth(800), mWindowHeight(600), mFullscreen(false), mFOV(45.0f), mFrameLimit(0), mMSAA(0)
     {
     }
 }

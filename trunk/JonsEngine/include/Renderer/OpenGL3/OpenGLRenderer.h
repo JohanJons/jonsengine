@@ -31,6 +31,9 @@ namespace JonsEngine
         float GetCurrentAnisotropyLevel() const;
         bool SetAnisotropyLevel(const float newAnisoLevel);
 
+        float GetZNear() const;
+        float GetZFar() const;
+
 
     private:
         struct Transform
@@ -76,4 +79,6 @@ namespace JonsEngine
 
     /* OpenGLRenderBackend inlines */
     inline IRenderer::RenderBackendType OpenGLRenderer::GetRenderBackendType() const       { return OPENGL; }
+    inline float OpenGLRenderer::GetZNear() const                                          { return 0.5f; }
+    inline float OpenGLRenderer::GetZFar() const                                           { return 1000.0f; }
 }

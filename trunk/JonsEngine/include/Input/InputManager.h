@@ -52,7 +52,7 @@ namespace JonsEngine
 
     private:
         void ClearAllEvents();
-        InputBackend* CreateBackend(InputBackend::InputBackendType backend);
+        InputBackend* CreateBackend(EngineSettings::VideoBackend videoBackend);
 
         void OnMouseButton(const MouseButtonEvent& ev);
         void OnMouseMotion(const MouseMotionEvent& ev);

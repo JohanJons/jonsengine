@@ -27,6 +27,9 @@ namespace JonsEngine
         float GetMaxAnisotropyLevel() const;
         float GetCurrentAnisotropyLevel() const;
         bool SetAnisotropyLevel(const float newAnisoLevel);
+
+        float GetZNear() const;
+        float GetZFar() const;
     };
 
 
@@ -43,4 +46,7 @@ namespace JonsEngine
     inline float DummyRenderer::GetMaxAnisotropyLevel() const                                                                                                                                                            { return 0.0f; }
     inline float DummyRenderer::GetCurrentAnisotropyLevel() const                                                                                                                                                        { return 0.0f; }
     inline bool DummyRenderer::SetAnisotropyLevel(const float newAnisoLevel)                                                                                                                                             { return false; }
+
+    inline float DummyRenderer::GetZNear() const                                                                                                                                                                         { return 0.0f; }
+    inline float DummyRenderer::GetZFar() const                                                                                                                                                                          { return 0.0f; }
 }

@@ -32,5 +32,8 @@ namespace JonsEngine
         virtual float GetMaxAnisotropyLevel() const = 0;
         virtual float GetCurrentAnisotropyLevel() const = 0;
         virtual bool SetAnisotropyLevel(const float newAnisoLevel) = 0;
+
+        virtual float GetZNear() const = 0;
+        virtual float GetZFar() const = 0;
     };
 }

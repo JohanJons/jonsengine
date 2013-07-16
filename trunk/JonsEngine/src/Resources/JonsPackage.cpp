@@ -5,13 +5,45 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <map>
 
 namespace JonsEngine
 {
+    uint32_t gCurrentJonsPackageID = 0;
+    std::map<uint32_t, std::string> gJonsPackageIDFileMap;
+
+
+    PackageHeader::PackageHeader() : mSignature("jons"), mMajorVersion(LatestMajorVersion), mMinorVersion(LatestMinorVersion)
+    {
+    }
+
+    PackageModel::PackageModel() : mName(""), mTransform(1.0f)
+    {
+    }
+
+    PackageMesh::PackageMesh() : mMaterialIndex(0), mHasMaterial(false)
+    {
+    }
+
+    PackageTexture::PackageTexture() : mName(""), mTextureWidth(0), mTextureHeight(0), mTextureFormat(ITexture::UNKNOWN_FORMAT), mTextureType(ITexture::UNKNOWN_TYPE)
+    {
+    }
+
+    PackageMaterial::PackageMaterial() : mName(""), mDiffuseColor(1.0f), mAmbientColor(1.0f), mSpecularColor(1.0f), mEmissiveColor(0.0f)
+    {
+    }
+
+    JonsPackage::JonsPackage() : mInternalID(gCurrentJonsPackageID++)
+    {
+    }
+
+
     JonsPackagePtr ReadJonsPkg(const std::string& jonsPkgName)
     {
         std::ifstream jonsPkgStream(jonsPkgName.c_str(), std::ios::in | std::ios::binary);        // TODO: support opening of older resource packages
         JonsPackagePtr pkg(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<JonsPackage>(), boost::bind(&HeapAllocator::DeallocateObject<JonsPackage>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
+
+        gJonsPackageIDFileMap.insert(std::make_pair(pkg->mInternalID, jonsPkgName));
 
         if (jonsPkgStream && jonsPkgStream.good() && jonsPkgStream.is_open())
         {
@@ -37,5 +69,15 @@ namespace JonsEngine
         }
         
         return ret;
+    }
+
+    std::string GetJonsPkgPath(const uint32_t internalPackageID)
+    {
+        auto iter = std::find_if(gJonsPackageIDFileMap.begin(), gJonsPackageIDFileMap.end(), [internalPackageID] (std::pair<uint32_t, std::string> entry) { return entry.first == internalPackageID; });
+
+        if (iter != gJonsPackageIDFileMap.end())
+            return iter->second;
+        else
+            return std::string();
     }
 }
