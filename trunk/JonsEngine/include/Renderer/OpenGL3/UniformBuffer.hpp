@@ -18,18 +18,28 @@ namespace JonsEngine
     public:
         UniformBuffer(const std::string& name, const ShaderProgram& program, size_t defaultSize = 5) : mName(name), mBindingIndex(++gNextUniformBindingIndex), mBlockOffset(0), mMaxSize(defaultSize), mCurrentSize(0)
         {
+            GLenum err = glGetError();
+
             glGenBuffers(1, &mBuffer);
             glGenBuffers(1, &mCopyBuffer);
 
+            err = glGetError();
+
             GLint uniformBufferAlignSize;
             glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &uniformBufferAlignSize);
+
+            err = glGetError();
 
             mBlockOffset = sizeof(ContentType);
 			mBlockOffset += uniformBufferAlignSize - (mBlockOffset % uniformBufferAlignSize);
             Resize(defaultSize);
 
+            err = glGetError();
+
             GLuint blockIndex = glGetUniformBlockIndex(program.GetHandle(), mName.c_str());
             glUniformBlockBinding(program.GetHandle(), blockIndex, mBindingIndex);
+
+            err = glGetError();
         }
 
         ~UniformBuffer()
@@ -51,6 +61,8 @@ namespace JonsEngine
 
         void AddData(const ContentType& data)
         {
+            GLenum err = glGetError();
+
             if (mCurrentSize >= mMaxSize)
                 Resize(mMaxSize * 2);
 
@@ -59,6 +71,7 @@ namespace JonsEngine
             glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
             mCurrentSize++;
+            err = glGetError();
         }
 
         void SetData(const ContentType& data)

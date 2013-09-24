@@ -8,17 +8,24 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace JonsEngine
 {
-    struct EngineSettings;
     class Logger;
+    class OpenGLRenderer;
+    struct EngineSettings;
+
+    /* OpenGLRendererPtr definition */
+    typedef std::unique_ptr<OpenGLRenderer, void(*)(OpenGLRenderer* backend)> ManagedOpenGLRenderer;
+    typedef ManagedOpenGLRenderer& OpenGLRendererPtr;
 
     /* OpenGLRenderer definition */
     class OpenGLRenderer : public IRenderer
     {
     public:
         OpenGLRenderer(const EngineSettings& engineSettings);
+        OpenGLRenderer(const float anisotropicLevel);
         ~OpenGLRenderer();
 
         MeshPtr CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData);
@@ -27,9 +34,9 @@ namespace JonsEngine
         void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting);
         RenderBackendType GetRenderBackendType() const;
 
-        float GetMaxAnisotropyLevel() const;
-        float GetCurrentAnisotropyLevel() const;
-        bool SetAnisotropyLevel(const float newAnisoLevel);
+        float GetMaxAnisotropicFiltering() const;
+        float GetCurrentAnisotropicFiltering() const;
+        bool SetAnisotropicFiltering(const float newAnisoLevel);
 
         float GetZNear() const;
         float GetZFar() const;
@@ -64,7 +71,6 @@ namespace JonsEngine
             }
         };
 
-        ShaderProgram SetupShaderProgram(const std::string& programName);
 
         ShaderProgram mDefaultProgram;
         UniformBuffer<OpenGLRenderer::Transform> mUniBufferTransform;
@@ -72,7 +78,7 @@ namespace JonsEngine
         UniformBuffer<RenderableLighting> mUniBufferLightingInfo;
         GLuint mTextureSampler;
         float mCurrentAnisotropy;
-
+        bool mFirstPass;
         Logger& mLogger;
     };
 

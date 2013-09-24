@@ -5,21 +5,38 @@
 #include "include/Core/Utils/Math.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Scene/Scene.h"
-#include "include/Window/GLFW/GLFWWindow.h"
-#include "include/Window/DummyWindow.h"
+#include "include/Window/GLFW/GLFWWindowManager.h"
 #include "include/Renderer/OpenGL3/OpenGLRenderer.h"
-#include "include/Renderer/DummyRenderer.h"
 #include "include/Resources/ResourceManifest.h"
 
 #include "boost/foreach.hpp"
+#include <exception>
+#include <functional>
 
 
 namespace JonsEngine
 {
 
     Engine::Engine(const EngineSettings& settings) : mLog(Logger::GetCoreLogger()), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), 
-                                                     mWindow(bootCreateWindow(settings)), mRenderer(bootCreateRenderer(settings)), mInputManager(settings),
-                                                     mResourceManifest(bootCreateResourceManifest()), mSceneManager(*mResourceManifest)
+                                                     mWindow([&]()
+                                                     { 
+                                                        switch (settings.mVideoBackend) 
+                                                        { 
+                                                            case EngineSettings::VideoBackend::OPENGL: return mMemoryAllocator.AllocateObject<GLFWWindowManager, EngineSettings, GLFWWindowManager::OnContextCreatedCallback>(settings, std::bind(&Engine::OnContextCreated, this));
+                                                            default:                                   JONS_LOG_ERROR(mLog, "Engine::Engine(): Invalid VideoBackend!"); throw std::runtime_error("Engine::Engine(): Invalid VideoBackend!");
+                                                        }
+                                                     }()), 
+                                                     mRenderer([&]()
+                                                     { 
+                                                        switch (settings.mVideoBackend) 
+                                                        { 
+                                                            case EngineSettings::VideoBackend::OPENGL: return ManagedRenderer(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<OpenGLRenderer>(settings),
+                                                                                                                              [](IRenderer* renderer) { HeapAllocator::GetDefaultHeapAllocator().DeallocateObject<IRenderer>(renderer); });
+                                                            default:                                   JONS_LOG_ERROR(mLog, "Engine::Engine(): Invalid VideoBackend!"); throw std::runtime_error("Engine::Engine(): Invalid VideoBackend!");
+                                                        }
+                                                     }()), 
+                                                     mResourceManifest(mMemoryAllocator.AllocateObject<ResourceManifest, RendererRefPtr>(GetRenderer())), 
+                                                     mSceneManager(*mResourceManifest)
     {
         JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
     }
@@ -29,7 +46,6 @@ namespace JonsEngine
         JONS_LOG_INFO(mLog, "-------- DESTROYING ENGINE --------")
 
         mMemoryAllocator.DeallocateObject(mResourceManifest);
-        mMemoryAllocator.DeallocateObject(mRenderer);
         mMemoryAllocator.DeallocateObject(mWindow);
 
         JONS_LOG_INFO(mLog, "-------- ENGINE DESTROYED --------")
@@ -39,7 +55,7 @@ namespace JonsEngine
     {
         mWindow->StartFrame();
 
-        mInputManager.Poll();
+        mWindow->Poll();
 
         if (mSceneManager.HasActiveScene())
         {
@@ -57,36 +73,6 @@ namespace JonsEngine
         }
 
         mWindow->EndFrame();
-    }
-
-
-    IWindow* Engine::bootCreateWindow(const EngineSettings& engineSettings)
-    {
-        switch (engineSettings.mVideoBackend)
-        {
-            case EngineSettings::VideoBackend::OPENGL:
-                return mMemoryAllocator.AllocateObject<GLFWWindow>(engineSettings);
-
-            default:
-                return mMemoryAllocator.AllocateObject<DummyWindow>(engineSettings);
-        }
-    }
-
-    IRenderer* Engine::bootCreateRenderer(const EngineSettings& engineSettings)
-    {
-        switch (engineSettings.mVideoBackend)
-        {
-            case EngineSettings::VideoBackend::OPENGL:
-                return mMemoryAllocator.AllocateObject<OpenGLRenderer>(engineSettings);
-
-            default:
-                return mMemoryAllocator.AllocateObject<DummyRenderer>(engineSettings);
-        }
-    }
-
-    ResourceManifest* Engine::bootCreateResourceManifest()
-    {
-        return mMemoryAllocator.AllocateObject<ResourceManifest, IRenderer&>(*mRenderer);
     }
 
     
@@ -160,5 +146,15 @@ namespace JonsEngine
         BOOST_FOREACH(const Model& childModel, model->mChildren)
             // 'lightingEnabled' is passed on since it applies recursively on all children aswell
             CreateModelRenderable(&childModel, viewMatrix, perspectiveMatrix, worldMatrix, lightingEnabled, renderQueue);
+    }
+
+
+    void Engine::OnContextCreated()
+    {
+        switch (mRenderer->GetRenderBackendType())
+        {
+            case IRenderer::OPENGL:     mRenderer.reset(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<OpenGLRenderer>(mRenderer->GetCurrentAnisotropicFiltering())); break;
+            default:                    JONS_LOG_ERROR(mLog, "Engine::OnContextCreated(): Invalid VideoBackend!"); throw std::runtime_error("Engine::OnContextCreated(): Invalid VideoBackend!");
+        }
     }
 }

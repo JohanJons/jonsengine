@@ -1,36 +1,24 @@
 #include "include/Renderer/OpenGL3/Shader.h"
 
+#include "include/Renderer/OpenGL3/OpenGLUtils.hpp"
 #include "include/Core/Logging/Logger.h"
 
 #include <vector>
+#include <exception>
 
 namespace JonsEngine
 {
 
-    Shader::Shader(const std::string& name, ShaderType type) : mLogger(Logger::GetRendererLogger()), mName(name), mShaderHandle(0), mShaderType(type), mIsCompiled(false)
+    Shader::Shader(const std::string& name, const std::string& shaderSource, ShaderType type) : mLogger(Logger::GetRendererLogger()), mName(name), mShaderHandle(0), mShaderType(type)
     {
-    }
-        
-    Shader::~Shader()
-    {
-        glDeleteShader(mShaderHandle);
-        mShaderHandle = 0;
-        mIsCompiled = false;
-    }
-        
-    bool Shader::Compile(const std::string& shaderSource)
-    {
-        if (mIsCompiled)
-        {
-            JONS_LOG_ERROR(mLogger, "Shader::Compile(): Shader already compiled with a shaderprogram");
-            return false;
-        }
-
         mShaderHandle = glCreateShader(mShaderType);
         const char* shaderCSTR = shaderSource.c_str();
+
         glShaderSource(mShaderHandle, 1, &shaderCSTR, NULL);
+        CHECK_GL_ERROR(mLogger);
 
         glCompileShader(mShaderHandle);
+        CHECK_GL_ERROR(mLogger);
 
         GLint status;
         glGetShaderiv(mShaderHandle, GL_COMPILE_STATUS, &status);
@@ -46,20 +34,24 @@ namespace JonsEngine
             msg.append(&errorLog[0]);
 
             JONS_LOG_ERROR(mLogger, msg);
-            return false;
+            throw std::runtime_error(msg);
         }
-        
-        mIsCompiled = true;
-        return true;
     }
+        
+    Shader::~Shader()
+    {
+        glDeleteShader(mShaderHandle);
+        CHECK_GL_ERROR(mLogger);
+    }
+        
 
     const std::string& Shader::GetName() const
     {
         return mName;
     }
 
-    bool Shader::IsCompiled() const
+    Shader::ShaderType Shader::GetShaderType() const
     {
-        return mIsCompiled;
+        return mShaderType;
     }
 }

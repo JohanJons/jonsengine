@@ -166,6 +166,6 @@ namespace JonsEngine
                                                 diffuseTexture *= accumLighting;                                                                            \n \
                                             }                                                                                                               \n \
                                                                                                                                                             \n \
-                                            finalColor = pow(diffuseTexture, Lighting.mGamma);                                                              \n \
+                                            finalColor = vec4(1.0); //pow(diffuseTexture, Lighting.mGamma);                                                              \n \
                                         }												                                                                    \n";
 }

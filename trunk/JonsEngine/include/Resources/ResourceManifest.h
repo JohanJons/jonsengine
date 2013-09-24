@@ -4,6 +4,7 @@
 #include "include/Scene/Model.h"
 #include "include/Scene/Material.h"
 #include "include/Renderer/Shapes.h"
+#include "include/Renderer/IRenderer.h"
 
 #include <vector>
 #include <map>
@@ -11,22 +12,15 @@
 namespace JonsEngine
 {
     class IMemoryAllocator;
-    class IRenderer;
 
     /* ResourceManifest definition */
     class ResourceManifest
     {
     public:
-        enum ShapeType
-        {
-            UNKNOWN_SHAPE = 0,
-            RECTANGLE
-        };
-
-        ResourceManifest(IRenderer& renderer);
+        ResourceManifest(RendererRefPtr renderer);
         ~ResourceManifest();
 
-        ModelPtr CreateShape(const std::string& modelName, const ShapeType shapeType, const double sizeX, const double sizeY, const double sizeZ);
+        ModelPtr CreateRectangle(const std::string& modelName, const double sizeX, const double sizeY, const double sizeZ);
         ModelPtr LoadModel(const std::string& assetName, const JonsPackagePtr jonsPkg);
         ModelPtr GetModel(const std::string& modelName);
 
@@ -43,7 +37,7 @@ namespace JonsEngine
         Model ProcessModel(PackageModel& pkgModel, const JonsPackagePtr jonsPkg);
         Material ProcessMaterial(PackageMaterial& pkgMaterial, const JonsPackagePtr jonsPkg);
 
-        IRenderer& mRenderer;
+        RendererRefPtr mRenderer;
         std::vector<ModelPtr> mModels;
         std::vector<MaterialPtr> mMaterials;
         std::multimap<uint32_t, std::string> mPackageAssetMap;

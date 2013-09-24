@@ -1,8 +1,9 @@
 #pragma once
 
 #include "include/Core/Engine.h"
-#include "include/Input/MouseCallback.h"
-#include "include/Input/KeyCallback.h"
+#include "include/Core/EngineSettings.h"
+#include "include/Window/MouseCallback.h"
+#include "include/Window/KeyCallback.h"
 
 namespace JonsGame
 {

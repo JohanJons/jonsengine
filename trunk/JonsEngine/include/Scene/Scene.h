@@ -18,8 +18,6 @@ namespace JonsEngine
     class Scene
     {
     public:
-        typedef ResourceManifest::ShapeType Shape;
-
         Scene(const std::string& sceneName, ResourceManifest& resManifest);
         ~Scene();
 

@@ -9,6 +9,8 @@
 
 namespace JonsEngine
 {
+    class Logger;
+
     class OpenGLMesh : public IMesh
     {
     public:
@@ -19,9 +21,16 @@ namespace JonsEngine
 
 
     private:
+        void SetupVAO();
+
+        Logger& mLogger;
+
         GLsizei mIndices;
         GLuint mVBO;
         GLuint mIndexBuffer;
         GLuint mVAO;
+
+        size_t vertexDataSize;
+        size_t normalDataSize;
     };
 }

@@ -47,9 +47,9 @@ namespace JonsEngine
     {
         if (memblock)
         {
-            if (mBackend == HeapAllocator::DLMALLOC && memblock)
+            if (mBackend == HeapAllocator::DLMALLOC)
                 dlfree(memblock);
-            else if (mBackend == HeapAllocator::SYSTEM_DEFAULT && memblock)
+            else if (mBackend == HeapAllocator::SYSTEM_DEFAULT)
                 free(memblock);
         }
     }

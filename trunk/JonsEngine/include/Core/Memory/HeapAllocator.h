@@ -10,10 +10,9 @@
 namespace JonsEngine
 {
     /*
+     * HeapAllocator definition
      * Allocates memory on the heap using either system default or DLMALLOC allocation strategy
      */
-
-    /* HeapAllocator definition */
     class HeapAllocator : public IMemoryAllocator
     {
     public:

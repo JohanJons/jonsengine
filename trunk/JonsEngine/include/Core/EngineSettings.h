@@ -1,9 +1,8 @@
 #pragma once
 
 #include "include/Core/EngineDefs.h"
-#include "include/Window/IWindow.h"
+#include "include/Window/IWindowManager.h"
 #include "include/Renderer/IRenderer.h"
-#include "include/Input/InputBackend.h"
 
 #include <string>
 
@@ -19,8 +18,7 @@ namespace JonsEngine
     {
         enum VideoBackend
         {
-            NONE = 0,
-            OPENGL
+            OPENGL = 0
         };
 
         VideoBackend mVideoBackend;

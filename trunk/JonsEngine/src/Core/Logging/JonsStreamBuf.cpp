@@ -51,7 +51,7 @@ namespace JonsEngine
         else
         {
             mLine += c;
-            return r1 == EOF || r2 == EOF ? EOF : c;
+            return c;
         }
     }
 

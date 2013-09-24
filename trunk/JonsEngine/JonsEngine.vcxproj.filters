@@ -51,18 +51,6 @@
     <Filter Include="Source Files\Core\Threading">
       <UniqueIdentifier>{11337b56-64ba-402e-8f60-0787d4a83572}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Input">
-      <UniqueIdentifier>{0589469a-d5b2-4b4f-a1d1-78d13b8ec233}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Input">
-      <UniqueIdentifier>{ae728930-1c33-4a76-b666-cfe6f16f8dac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Input\GLFW">
-      <UniqueIdentifier>{1f6a127d-50a7-452e-b6c8-1497121840c4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Input\GLFW">
-      <UniqueIdentifier>{813e16ef-5181-46af-9ce8-7afbc4401824}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Scene">
       <UniqueIdentifier>{fce2f44c-457e-40fe-bda8-094020b98983}</UniqueIdentifier>
     </Filter>
@@ -137,12 +125,6 @@
     <ClCompile Include="src\Core\Logging\Logger.cpp">
       <Filter>Source Files\Core\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="src\Input\InputManager.cpp">
-      <Filter>Source Files\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Input\GLFW\GLFWInputBackend.cpp">
-      <Filter>Source Files\Input\GLFW</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Utils\Math.cpp">
       <Filter>Source Files\Core\Utils</Filter>
     </ClCompile>
@@ -163,12 +145,6 @@
     </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLRenderer.cpp">
       <Filter>Source Files\Renderer\OpenGL3</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Window\GLFW\GLFWWindow.cpp">
-      <Filter>Source Files\Window\GLFW</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Window\DummyWindow.cpp">
-      <Filter>Source Files\Window</Filter>
     </ClCompile>
     <ClCompile Include="src\Resources\ResourceManifest.cpp">
       <Filter>Source Files\Resources</Filter>
@@ -196,6 +172,9 @@
     </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLMesh.cpp">
       <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window\GLFW\GLFWWindowManager.cpp">
+      <Filter>Source Files\Window\GLFW</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -244,24 +223,6 @@
     <ClInclude Include="include\Core\Logging\Logger.h">
       <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="include\Input\InputManager.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Input\GLFW\GLFWInputBackend.h">
-      <Filter>Header Files\Input\GLFW</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Input\KeyCallback.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Input\MouseCallback.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Input\InputBackend.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Input\DummyInputBackend.h">
-      <Filter>Header Files\Input</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Utils\Math.h">
       <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
@@ -283,26 +244,11 @@
     <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\DummyRenderer.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLRenderer.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
-    <ClInclude Include="include\Window\IWindow.h">
-      <Filter>Header Files\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Window\DummyWindow.h">
-      <Filter>Header Files\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Window\GLFW\GLFWWindow.h">
-      <Filter>Header Files\Window\GLFW</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\Shaders.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Input\KeyDefinition.h">
-      <Filter>Header Files\Input</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Types.h">
       <Filter>Header Files\Core</Filter>
@@ -353,6 +299,24 @@
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLMesh.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Window\GLFW\GLFWWindowManager.h">
+      <Filter>Header Files\Window\GLFW</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Window\IWindowManager.h">
+      <Filter>Header Files\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Window\KeyCallback.h">
+      <Filter>Header Files\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Window\KeyDefinition.h">
+      <Filter>Header Files\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Window\MouseCallback.h">
+      <Filter>Header Files\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLUtils.hpp">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
   </ItemGroup>

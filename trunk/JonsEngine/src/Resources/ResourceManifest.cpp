@@ -12,7 +12,7 @@
 
 namespace JonsEngine
 {
-    ResourceManifest::ResourceManifest(IRenderer& renderer) : mRenderer(renderer), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator())
+    ResourceManifest::ResourceManifest(RendererRefPtr renderer) : mRenderer(renderer), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator())
     {
     }
        
@@ -21,7 +21,7 @@ namespace JonsEngine
     }
 
 
-    ModelPtr ResourceManifest::CreateShape(const std::string& modelName, const ShapeType shapeType, const double sizeX, const double sizeY, const double sizeZ)
+    ModelPtr ResourceManifest::CreateRectangle(const std::string& modelName, const double sizeX, const double sizeY, const double sizeZ)
     {
         ModelPtr ptr = GetModel(modelName);
         if (ptr) 
@@ -38,7 +38,7 @@ namespace JonsEngine
             return ptr;
 
         ptr        = *mModels.insert(mModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(modelName), boost::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, _1)));
-        ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, indiceData);
+        ptr->mMesh = mRenderer->CreateMesh(vertexData, normalData, texcoordData, indiceData);
 
         return ptr;
     }
@@ -117,7 +117,7 @@ namespace JonsEngine
                 material = LoadMaterial(pkgMaterial.mName, jonsPkg);
             }
 
-            model.mMesh     = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mIndiceData);
+            model.mMesh     = mRenderer->CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mIndiceData);
             model.mMaterial = material;
         }
 
@@ -129,7 +129,7 @@ namespace JonsEngine
 
     Material ResourceManifest::ProcessMaterial(PackageMaterial& pkgMaterial, const JonsPackagePtr jonsPkg)
     {
-        TexturePtr diffuseTexture = mRenderer.CreateTexture(pkgMaterial.mDiffuseTexture.mTextureType, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth,
+        TexturePtr diffuseTexture = mRenderer->CreateTexture(pkgMaterial.mDiffuseTexture.mTextureType, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth,
                                                             pkgMaterial.mDiffuseTexture.mTextureHeight, pkgMaterial.mDiffuseTexture.mTextureFormat);
 
         return Material(pkgMaterial.mName, diffuseTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor);

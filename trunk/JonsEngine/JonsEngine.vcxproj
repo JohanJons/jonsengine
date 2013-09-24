@@ -63,7 +63,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\glfw-2.7.6\include;$(SolutionDir)\..\Thirdparty\glew-1.9.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\glfw-3.0.1\include;$(SolutionDir)\..\Thirdparty\glew-1.10.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -129,8 +129,6 @@
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
     <ClCompile Include="src\Core\Utils\JonsTime.cpp" />
     <ClCompile Include="src\Core\Utils\Math.cpp" />
-    <ClCompile Include="src\Input\GLFW\GLFWInputBackend.cpp" />
-    <ClCompile Include="src\Input\InputManager.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLMesh.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLRenderer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLTexture.cpp" />
@@ -146,8 +144,7 @@
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneManager.cpp" />
     <ClCompile Include="src\Scene\SceneNode.cpp" />
-    <ClCompile Include="src\Window\DummyWindow.cpp" />
-    <ClCompile Include="src\Window\GLFW\GLFWWindow.cpp" />
+    <ClCompile Include="src\Window\GLFW\GLFWWindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
@@ -169,20 +166,13 @@
     <ClInclude Include="include\Core\Types.h" />
     <ClInclude Include="include\Core\Utils\JonsTime.h" />
     <ClInclude Include="include\Core\Utils\Math.h" />
-    <ClInclude Include="include\Input\DummyInputBackend.h" />
-    <ClInclude Include="include\Input\GLFW\GLFWInputBackend.h" />
-    <ClInclude Include="include\Input\InputBackend.h" />
-    <ClInclude Include="include\Input\InputManager.h" />
-    <ClInclude Include="include\Input\KeyCallback.h" />
-    <ClInclude Include="include\Input\KeyDefinition.h" />
-    <ClInclude Include="include\Input\MouseCallback.h" />
-    <ClInclude Include="include\Renderer\DummyRenderer.h" />
     <ClInclude Include="include\Renderer\IMesh.h" />
     <ClInclude Include="include\Renderer\IRenderer.h" />
     <ClInclude Include="include\Renderer\ITexture.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLMesh.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLRenderer.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLTexture.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLUtils.hpp" />
     <ClInclude Include="include\Renderer\OpenGL3\Shader.h" />
     <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.h" />
     <ClInclude Include="include\Renderer\OpenGL3\Shaders.h" />
@@ -199,9 +189,11 @@
     <ClInclude Include="include\Scene\Scene.h" />
     <ClInclude Include="include\Scene\SceneManager.h" />
     <ClInclude Include="include\Scene\SceneNode.h" />
-    <ClInclude Include="include\Window\DummyWindow.h" />
-    <ClInclude Include="include\Window\GLFW\GLFWWindow.h" />
-    <ClInclude Include="include\Window\IWindow.h" />
+    <ClInclude Include="include\Window\GLFW\GLFWWindowManager.h" />
+    <ClInclude Include="include\Window\IWindowManager.h" />
+    <ClInclude Include="include\Window\KeyCallback.h" />
+    <ClInclude Include="include\Window\KeyDefinition.h" />
+    <ClInclude Include="include\Window\MouseCallback.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

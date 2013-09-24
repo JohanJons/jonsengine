@@ -11,5 +11,11 @@ namespace JonsEngine
      * Logging
      */
 
+    #ifdef _DEBUG
+        const bool is_debug = true;
+    #else
+        const bool is_debug = false;
+    #endif
+
     const std::string GameEngineTag = "JonsEngine";
 }

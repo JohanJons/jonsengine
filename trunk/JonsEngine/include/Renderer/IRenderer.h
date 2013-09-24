@@ -7,9 +7,16 @@
 #include "include/Core/EngineDefs.h"
 
 #include <vector>
+#include <memory>
 
 namespace JonsEngine
 {
+    class IRenderer;
+    class IMemoryAllocator;
+
+    /* RendererRefPtr definition */
+    typedef std::unique_ptr<IRenderer, void(*)(IRenderer* renderer)> ManagedRenderer;
+    typedef ManagedRenderer& RendererRefPtr;
 
     /* IRenderer definition */
     class IRenderer
@@ -29,9 +36,9 @@ namespace JonsEngine
         virtual void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting) = 0;
         virtual RenderBackendType GetRenderBackendType() const = 0;
 
-        virtual float GetMaxAnisotropyLevel() const = 0;
-        virtual float GetCurrentAnisotropyLevel() const = 0;
-        virtual bool SetAnisotropyLevel(const float newAnisoLevel) = 0;
+        virtual float GetMaxAnisotropicFiltering() const = 0;
+        virtual float GetCurrentAnisotropicFiltering() const = 0;
+        virtual bool SetAnisotropicFiltering(const float newAnisoLevel) = 0;
 
         virtual float GetZNear() const = 0;
         virtual float GetZFar() const = 0;

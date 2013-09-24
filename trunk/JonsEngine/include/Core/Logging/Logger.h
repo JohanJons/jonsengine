@@ -26,7 +26,6 @@ namespace JonsEngine
         ~Logger();
         static Logger& GetCoreLogger();
         static Logger& GetWindowLogger();
-        static Logger& GetInputLogger();
         static Logger& GetRendererLogger();
 
         void Log(LogManager::LogLevel level, const std::string& logMsg);

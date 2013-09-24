@@ -8,6 +8,8 @@
 
 namespace JonsEngine
 {
+    class Logger;
+
     /*
      * OpenGLTexture definition
      */
@@ -26,6 +28,7 @@ namespace JonsEngine
         GLuint mTexture;
 
     private:
+        Logger& mLogger;
         GLint ParseTextureFormat(ITexture::TextureFormat textureFormat);
     };
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "GL/glew.h"
-
 #include <string>
 
 namespace JonsEngine
@@ -25,14 +24,11 @@ namespace JonsEngine
             UNKNOWN
         };
 
-        Shader(const std::string& name, ShaderType type);
+        Shader(const std::string& name, const std::string& shaderSource, ShaderType type);
         ~Shader();
 
-        bool Compile(const std::string& shader);
-
         const std::string& GetName() const;
-        bool GetShaderType() const;
-        bool IsCompiled() const;
+        ShaderType GetShaderType() const;
 
         
     protected:
@@ -40,6 +36,5 @@ namespace JonsEngine
         const std::string mName;
         const ShaderType mShaderType;
         GLuint mShaderHandle;
-        bool mIsCompiled;
     };
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Renderer/ITexture.h"
+#include "include/Renderer/OpenGL3/Shader.h"
 
 #include "GL/glew.h"
 #include <string>
@@ -19,28 +20,22 @@ namespace JonsEngine
     class ShaderProgram
     {
     public:
-        ShaderProgram(const std::string& name);
+        ShaderProgram(const std::string& name, const std::string& vertexShaderSource, const std::string& fragmentShaderSource);
         ~ShaderProgram();
 
-        void AddShader(Shader* shader);
-        void RemoveShader(Shader* shader);
-        Shader* GetShader(const std::string& name);
-        void ClearShaders();
-
-        bool LinkProgram();
         void UseProgram(bool use);
         void BindAttribLocation(GLuint index, const std::string& name);
         void BindTextureUnit(ITexture::TextureType textureType, GLuint textureUnit);
 
         const std::string& GetName() const;
         GLuint GetHandle() const;
-        bool IsLinked() const;
 
 
     private:
         Logger& mLogger;
         const std::string mName;
         GLuint mProgramHandle;
-        std::vector<Shader*> mAddedShaders;
+        Shader mVertexShader;
+        Shader mFragmentShader;
     };
 }

@@ -4,7 +4,7 @@
 #include "include/Renderer/OpenGL3/ShaderProgram.h"
 #include "include/Core/Types.h"
 #include "include/Core/Utils/Math.h"
-#include "include/Input/InputManager.h"
+#include "include/Window/IWindowManager.h"
 #include "include/Scene/Scene.h"
 #include "include/Resources/ResourceManifest.h"
 
@@ -34,12 +34,12 @@ namespace JonsGame
         SetupInputCallbacks();
         SetupScene();
 
-        mEngine->GetInputManager().ShowMouseCursor(false);
+        mEngine->GetWindow().ShowMouseCursor(false);
         mEngine->GetWindow().SetScreenResolution(1920, 1080);
 
         while (mRunning)
         {
-            mEngine->GetInputManager().SetMousePosition(mCenterXPos,mCenterYPos);
+            mEngine->GetWindow().SetMousePosition(mCenterXPos,mCenterYPos);
 
             mEngine->Tick();
         }
@@ -50,32 +50,37 @@ namespace JonsGame
         Scene* activeScene = mEngine->GetSceneManager().GetActiveScene();
         Camera& camera = activeScene->GetSceneCamera();
 
-        if (evnt.State == KeyEvent::PRESSED)
+        if (evnt.mState == KeyEvent::STATE_PRESSED || evnt.mState == KeyEvent::STATE_REPEAT)
         {
             // camera position
-            if (evnt.KeySymbol == A)
+            if (evnt.mKey == A)
                 camera.TranslateCamera(-camera.Right() * mMoveSpeed);
-            else if (evnt.KeySymbol == W)
+            else if (evnt.mKey == W)
                 camera.TranslateCamera(camera.Forward() * mMoveSpeed);
-            else if (evnt.KeySymbol == S)
+            else if (evnt.mKey == S)
                 camera.TranslateCamera(-camera.Forward() * mMoveSpeed);
-            else if (evnt.KeySymbol == D)
+            else if (evnt.mKey == D)
                 camera.TranslateCamera(camera.Right() * mMoveSpeed);
 
-
             // light direction 
-            else if (evnt.KeySymbol == Q)
+            else if (evnt.mKey == Q)
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(-0.05, 0.0f, 0.0f));
-            else if (evnt.KeySymbol == E)
+            else if (evnt.mKey == E)
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.05, 0.0f, 0.0f));
-            else if (evnt.KeySymbol == R)
+            else if (evnt.mKey == R)
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.00, -0.05f, 0.0f));
-            else if (evnt.KeySymbol == T)
+            else if (evnt.mKey == T)
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.05f, 0.0f));
-            else if (evnt.KeySymbol == F)
+            else if (evnt.mKey == F)
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, -0.05f));
-            else if (evnt.KeySymbol == G)
+            else if (evnt.mKey == G)
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, 0.05f));
+
+            // misc
+            else if (evnt.mKey == O)
+                mEngine->GetWindow().SetFullscreen(false);
+            else if (evnt.mKey == P)
+                mEngine->GetWindow().SetFullscreen(false);
         }
     }
 
@@ -90,23 +95,23 @@ namespace JonsGame
         Camera& camera = activeScene->GetSceneCamera();
 
         const float sens = 0.1f;
-        float newXPos = -((float)mCenterXPos - (float)evnt.PosX) * sens;
-        float newYPos = -((float)mCenterYPos - (float)evnt.PosY) * sens;
+        float newXPos = -((float)mCenterXPos - (float)evnt.mPosX) * sens;
+        float newYPos = -((float)mCenterYPos - (float)evnt.mPosY) * sens;
         camera.RotateCamera(newXPos, newYPos);
     }
 
     void Game::SetupInputCallbacks()
     {
-        mEngine->GetInputManager().RegisterMouseButtonCallback(boost::bind(&Game::OnMouseButtonEvent, this, _1));
-        mEngine->GetInputManager().RegisterMouseMotionCallback(boost::bind(&Game::OnMouseMotionEvent, this, _1));
-        mEngine->GetInputManager().RegisterKeyCallback(boost::bind(&Game::OnKeyEvent, this, _1));
+        mEngine->GetWindow().SetMouseButtonCallback(boost::bind(&Game::OnMouseButtonEvent, this, _1));
+        mEngine->GetWindow().SetMouseMotionCallback(boost::bind(&Game::OnMouseMotionEvent, this, _1));
+        mEngine->GetWindow().SetKeyCallback(boost::bind(&Game::OnKeyEvent, this, _1));
     }
 
     void Game::SetupScene()
     {
         Scene* myScene = mEngine->GetSceneManager().CreateScene("MyScene");
         mEngine->GetSceneManager().SetActiveScene("MyScene");
-        JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
+       /* JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
 
         // cube
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
@@ -143,24 +148,25 @@ namespace JonsGame
         SceneNodePtr nodeAmbientLight = myScene->GetRootNode().CreateChildNode("nodeAmbientLight");
         LightPtr ambientLight         = myScene->CreateLight("ambientLight", Light::AMBIENT, nodeAmbientLight);
         ambientLight->mIntensity      = 0.1f;
-
+        */
         // create a ground plane
         SceneNodePtr nodePlane       = myScene->GetRootNode().CreateChildNode("nodePlane");
-        ModelPtr plane               = myScene->GetResourceManifest().CreateShape("GroundPlane", Scene::Shape::RECTANGLE, 64, 0.5, 64);
-        plane->mMaterial             = myScene->GetResourceManifest().LoadMaterial("checker", jonsPackage);
+        ModelPtr plane               = myScene->GetResourceManifest().CreateRectangle("GroundPlane", 64, 0.5, 64);
+       // plane->mMaterial             = myScene->GetResourceManifest().LoadMaterial("checker", jonsPackage);
         plane->mSceneNode            = nodePlane;
-        plane->mMaterialTilingFactor = 64.0f;
+    //    plane->mMaterialTilingFactor = 64.0f;
         nodePlane->TranslateNode(Vec3(0.0f, -0.5f, 0.0f));
-
+        
         // move up camera
         myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
 
         // set anisotropic filter to max
-        float maxAnisoLevel = mEngine->GetRenderer().GetMaxAnisotropyLevel();
-        mEngine->GetRenderer().SetAnisotropyLevel(maxAnisoLevel);
+        float maxAnisoLevel = mEngine->GetRenderer()->GetMaxAnisotropicFiltering();
+        mEngine->GetRenderer()->SetAnisotropicFiltering(maxAnisoLevel);
 
        // myScene->GetResourceManifest().ReloadAllResources();
         //mEngine->GetWindow().SetFullscreen(true);
         //mEngine->GetWindow().SetScreenResolution(800, 600);
+
     }
 }
