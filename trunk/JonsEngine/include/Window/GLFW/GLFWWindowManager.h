@@ -1,9 +1,11 @@
 #pragma once
 
-#include "include/Window/IWindowManager.h"
-#include "include/Renderer/OpenGL3/OpenGLRenderer.h"
+#include "include/Window/KeyCallback.h"
+#include "include/Window/KeyDefinition.h"
+#include "include/Window/MouseCallback.h"
 
 #include <string>
+#include <vector>
 
 struct GLFWwindow;
 
@@ -13,7 +15,7 @@ namespace JonsEngine
     class Logger;
 
     /* GLFWWindow definition */
-    class GLFWWindowManager : public IWindowManager
+    class GLFWWindowManager
     {
     public:
         typedef std::function<void (void)> OnContextCreatedCallback;
@@ -56,8 +58,6 @@ namespace JonsEngine
         const std::string& GetWindowTitle() const;
         float GetFOV() const;
         uint16_t GetMSAA() const;
-
-        WindowBackend GetWindowBackendType() const;
     
 
     private:
@@ -105,6 +105,4 @@ namespace JonsEngine
     inline float GLFWWindowManager::GetFOV() const                                           { return mFOV;                 }
     inline const std::string& GLFWWindowManager::GetWindowTitle() const                      { return mWindowTitle;         }
     inline uint16_t GLFWWindowManager::GetMSAA() const                                       { return mMSAA;                }
-
-    inline GLFWWindowManager::WindowBackend GLFWWindowManager::GetWindowBackendType() const  { return IWindowManager::GLFW; }
 }

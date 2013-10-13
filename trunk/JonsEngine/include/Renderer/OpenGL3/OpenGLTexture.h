@@ -1,7 +1,7 @@
 #pragma once
 
 #include "include/Core/EngineDefs.h"
-#include "include/Renderer/ITexture.h"
+#include "include/Core/Types.h"
 
 #include "GL/glew.h"
 #include <vector>
@@ -13,22 +13,21 @@ namespace JonsEngine
     /*
      * OpenGLTexture definition
      */
-    class OpenGLTexture : public ITexture
+    struct OpenGLTexture
     {
-    public:
         enum TextureUnit
         {
-            TEXTURE_UNIT_DIFFUSE = 0,
-            TEXTURE_UNIT_UNKNOWN
+            TEXTURE_UNIT_UNKNOWN = -1,
+            TEXTURE_UNIT_DIFFUSE = 0
         };
 
-        OpenGLTexture(const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ITexture::TextureFormat textureFormat);
+        OpenGLTexture(const TextureID textureID, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureFormat textureFormat, TextureType textureType);
         ~OpenGLTexture();
 
-        GLuint mTexture;
-
-    private:
+        TextureID mTextureID;
         Logger& mLogger;
-        GLint ParseTextureFormat(ITexture::TextureFormat textureFormat);
+
+        TextureType mTextureType;
+        GLuint mTexture;
     };
 }

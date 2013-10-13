@@ -61,7 +61,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_VARIADIC_MAX=6;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\glfw-3.0.1\include;$(SolutionDir)\..\Thirdparty\glew-1.10.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
@@ -166,9 +166,6 @@
     <ClInclude Include="include\Core\Types.h" />
     <ClInclude Include="include\Core\Utils\JonsTime.h" />
     <ClInclude Include="include\Core\Utils\Math.h" />
-    <ClInclude Include="include\Renderer\IMesh.h" />
-    <ClInclude Include="include\Renderer\IRenderer.h" />
-    <ClInclude Include="include\Renderer\ITexture.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLMesh.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLRenderer.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLTexture.h" />
@@ -177,8 +174,7 @@
     <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.h" />
     <ClInclude Include="include\Renderer\OpenGL3\Shaders.h" />
     <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.hpp" />
-    <ClInclude Include="include\Renderer\Renderable.h" />
-    <ClInclude Include="include\Renderer\RenderableLighting.h" />
+    <ClInclude Include="include\Renderer\RenderCommands.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />
     <ClInclude Include="include\Resources\ResourceManifest.h" />
@@ -190,7 +186,6 @@
     <ClInclude Include="include\Scene\SceneManager.h" />
     <ClInclude Include="include\Scene\SceneNode.h" />
     <ClInclude Include="include\Window\GLFW\GLFWWindowManager.h" />
-    <ClInclude Include="include\Window\IWindowManager.h" />
     <ClInclude Include="include\Window\KeyCallback.h" />
     <ClInclude Include="include\Window\KeyDefinition.h" />
     <ClInclude Include="include\Window\MouseCallback.h" />

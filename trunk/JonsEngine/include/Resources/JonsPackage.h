@@ -2,7 +2,6 @@
 
 #include "include/Core/Types.h"
 #include "include/Core/EngineDefs.h"
-#include "include/Renderer/ITexture.h"
 
 #include <vector>
 #include "boost/smart_ptr.hpp"
@@ -53,8 +52,8 @@ namespace JonsEngine
         std::vector<uint8_t> mTextureData;
         uint32_t mTextureWidth;         // width/height in pixels
         uint32_t mTextureHeight;
-        ITexture::TextureFormat mTextureFormat;
-        ITexture::TextureType mTextureType;
+        TextureFormat mTextureFormat;
+        TextureType mTextureType;
 
 
         PackageTexture();

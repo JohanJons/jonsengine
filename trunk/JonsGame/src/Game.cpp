@@ -1,10 +1,7 @@
 #include "include/Game.h"
 
-#include "include/Renderer/OpenGL3/Shader.h"
-#include "include/Renderer/OpenGL3/ShaderProgram.h"
 #include "include/Core/Types.h"
 #include "include/Core/Utils/Math.h"
-#include "include/Window/IWindowManager.h"
 #include "include/Scene/Scene.h"
 #include "include/Resources/ResourceManifest.h"
 
@@ -35,7 +32,7 @@ namespace JonsGame
         SetupScene();
 
         mEngine->GetWindow().ShowMouseCursor(false);
-        mEngine->GetWindow().SetScreenResolution(1920, 1080);
+        mEngine->GetWindow().SetScreenResolution(1280, 800);
 
         while (mRunning)
         {
@@ -78,9 +75,11 @@ namespace JonsGame
 
             // misc
             else if (evnt.mKey == O)
-                mEngine->GetWindow().SetFullscreen(false);
+                mEngine->GetWindow().SetFullscreen(true);
             else if (evnt.mKey == P)
                 mEngine->GetWindow().SetFullscreen(false);
+            else if (evnt.mKey == ESC)
+                mRunning = false;
         }
     }
 

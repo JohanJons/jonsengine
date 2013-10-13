@@ -1,11 +1,13 @@
 #pragma once
 
 #include "include/Core/Types.h"
+#include "include/Core/Memory/HeapAllocator.h"
 #include "include/Scene/SceneManager.h"
 #include "include/Scene/Light.h"
-#include "include/Renderer/IRenderer.h"
-#include "include/Renderer/Renderable.h"
-#include "include/Renderer/RenderableLighting.h"
+#include "include/Resources/ResourceManifest.h"
+#include "include/Window/GLFW/GLFWWindowManager.h"
+#include "include/Renderer/OpenGL3/OpenGLRenderer.h"
+#include "include/Renderer/RenderCommands.h"
 
 namespace JonsEngine
 {
@@ -13,9 +15,6 @@ namespace JonsEngine
     struct Model;
     class IMemoryAllocator;
     class Logger;
-    class IWindowManager;
-    class IRenderer;
-    class ResourceManifest;
     class SceneNode;
 
     /*
@@ -25,6 +24,7 @@ namespace JonsEngine
 
     /*
      * TODO:
+     * replace push_back with emplace_back once boost is compatible with MSVC12
      * Merge EngineDefs.h types into types.h
      * Fix assimp and ambient/diffuse colors..
      * Check camera upside down?
@@ -41,8 +41,8 @@ namespace JonsEngine
 
         void Tick();
 
-        IWindowManager& GetWindow();
-        RendererRefPtr GetRenderer();
+        GLFWWindowManager& GetWindow();
+        OpenGLRendererPtr GetRenderer();
         SceneManager& GetSceneManager();
 
 
@@ -55,18 +55,18 @@ namespace JonsEngine
 
 
         Logger& mLog;
-        IMemoryAllocator& mMemoryAllocator;
+        HeapAllocator mMemoryAllocator;
 
         /* Modules */
-        IWindowManager* mWindow;
-        ManagedRenderer mRenderer;
-        ResourceManifest* mResourceManifest;
+        GLFWWindowManager mWindow;
+        ManagedOpenGLRenderer mRenderer;
+        ResourceManifest mResourceManifest;
         SceneManager mSceneManager;
     };
 
 
     /* Engine inlines */
-    inline IWindowManager& Engine::GetWindow()          { return *mWindow;      }
-    inline RendererRefPtr Engine::GetRenderer()         { return mRenderer;     }
-    inline SceneManager& Engine::GetSceneManager()      { return mSceneManager; }
+    inline GLFWWindowManager& Engine::GetWindow()     { return mWindow;       }
+    inline OpenGLRendererPtr Engine::GetRenderer()    { return mRenderer;     }
+    inline SceneManager& Engine::GetSceneManager()    { return mSceneManager; }
 }

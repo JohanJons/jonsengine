@@ -341,8 +341,8 @@ namespace JonsAssetImporter
         diffuseTexture.mName          = assetPath.filename().string();
         diffuseTexture.mTextureWidth  = widthInPixels;
         diffuseTexture.mTextureHeight = heightInPixels;
-        diffuseTexture.mTextureType   = ITexture::DIFFUSE;
-        diffuseTexture.mTextureFormat = colorType == FIC_RGB ? ITexture::RGB : colorType == FIC_RGBALPHA ? ITexture::RGBA : ITexture::UNKNOWN_FORMAT;
+        diffuseTexture.mTextureType   = TextureType::TEXTURE_TYPE_DIFFUSE;
+        diffuseTexture.mTextureFormat = colorType == FIC_RGB ? TextureFormat::TEXTURE_FORMAT_RGB : colorType == FIC_RGBALPHA ? TextureFormat::TEXTURE_FORMAT_RGBA : TextureFormat::TEXTURE_FORMAT_UNKNOWN;
         diffuseTexture.mTextureData.insert(diffuseTexture.mTextureData.begin(), FreeImage_GetBits(bitmap), FreeImage_GetBits(bitmap) + ((bitsPerPixel/8) * widthInPixels * heightInPixels));
 
         FreeImage_Unload(bitmap);

@@ -259,9 +259,6 @@
     <ClInclude Include="include\Resources\JonsPackage.h">
       <Filter>Header Files\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\IRenderer.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="include\Scene\Model.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
@@ -277,15 +274,6 @@
     <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.hpp">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\RenderableLighting.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderer\Renderable.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderer\ITexture.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLTexture.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
@@ -295,17 +283,11 @@
     <ClInclude Include="include\Renderer\Shapes.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\IMesh.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLMesh.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
     <ClInclude Include="include\Window\GLFW\GLFWWindowManager.h">
       <Filter>Header Files\Window\GLFW</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Window\IWindowManager.h">
-      <Filter>Header Files\Window</Filter>
     </ClInclude>
     <ClInclude Include="include\Window\KeyCallback.h">
       <Filter>Header Files\Window</Filter>
@@ -318,6 +300,9 @@
     </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLUtils.hpp">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\RenderCommands.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

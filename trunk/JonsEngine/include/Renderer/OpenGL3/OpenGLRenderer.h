@@ -1,14 +1,17 @@
 #pragma once
 
-#include "include/Renderer/IRenderer.h"
-#include "include/Renderer/Renderable.h"
-#include "include/Renderer/RenderableLighting.h"
+#include "include/Renderer/OpenGL3/OpenGLMesh.h"
+#include "include/Renderer/OpenGL3/OpenGLTexture.h"
 #include "include/Renderer/OpenGL3/ShaderProgram.h"
 #include "include/Renderer/OpenGL3/UniformBuffer.hpp"
+#include "include/Renderer/RenderCommands.h"
+#include "include/Core/Types.h"
+#include "include/Core/Memory/HeapAllocator.h"
 
 #include <string>
 #include <vector>
 #include <memory>
+#include <functional>
 
 namespace JonsEngine
 {
@@ -17,22 +20,25 @@ namespace JonsEngine
     struct EngineSettings;
 
     /* OpenGLRendererPtr definition */
-    typedef std::unique_ptr<OpenGLRenderer, void(*)(OpenGLRenderer* backend)> ManagedOpenGLRenderer;
+    typedef std::unique_ptr<OpenGLRenderer, std::function<void(OpenGLRenderer*)>> ManagedOpenGLRenderer;
     typedef ManagedOpenGLRenderer& OpenGLRendererPtr;
 
     /* OpenGLRenderer definition */
-    class OpenGLRenderer : public IRenderer
+    class OpenGLRenderer
     {
     public:
-        OpenGLRenderer(const EngineSettings& engineSettings);
-        OpenGLRenderer(const float anisotropicLevel);
+        typedef std::shared_ptr<std::vector<OpenGLMesh>> MeshContainerPtr;
+        typedef std::shared_ptr<std::vector<OpenGLTexture>> TextureContainerPtr;
+
+        OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocator& memoryAllocator);
+        OpenGLRenderer(const OpenGLRenderer& renderer);
+        OpenGLRenderer(const float anisotropy, IMemoryAllocator& memoryAllocator);
         ~OpenGLRenderer();
 
-        MeshPtr CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData);
-        TexturePtr CreateTexture(ITexture::TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ITexture::TextureFormat textureFormat);
+        MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData);
+        TextureID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureFormat textureFormat);
 
         void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting);
-        RenderBackendType GetRenderBackendType() const;
 
         float GetMaxAnisotropicFiltering() const;
         float GetCurrentAnisotropicFiltering() const;
@@ -71,20 +77,22 @@ namespace JonsEngine
             }
         };
 
+        void SetupVAO(OpenGLMesh& mesh);
 
+        IMemoryAllocator& mMemoryAllocator;
+        MeshContainerPtr mMeshes;
+        TextureContainerPtr mTextures;
         ShaderProgram mDefaultProgram;
         UniformBuffer<OpenGLRenderer::Transform> mUniBufferTransform;
         UniformBuffer<OpenGLRenderer::Material> mUniBufferMaterial;
         UniformBuffer<RenderableLighting> mUniBufferLightingInfo;
         GLuint mTextureSampler;
         float mCurrentAnisotropy;
-        bool mFirstPass;
         Logger& mLogger;
     };
 
 
     /* OpenGLRenderBackend inlines */
-    inline IRenderer::RenderBackendType OpenGLRenderer::GetRenderBackendType() const       { return OPENGL; }
     inline float OpenGLRenderer::GetZNear() const                                          { return 0.5f; }
     inline float OpenGLRenderer::GetZFar() const                                           { return 1000.0f; }
 }

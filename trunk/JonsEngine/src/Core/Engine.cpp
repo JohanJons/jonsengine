@@ -17,26 +17,12 @@
 namespace JonsEngine
 {
 
-    Engine::Engine(const EngineSettings& settings) : mLog(Logger::GetCoreLogger()), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), 
-                                                     mWindow([&]()
-                                                     { 
-                                                        switch (settings.mVideoBackend) 
-                                                        { 
-                                                            case EngineSettings::VideoBackend::OPENGL: return mMemoryAllocator.AllocateObject<GLFWWindowManager, EngineSettings, GLFWWindowManager::OnContextCreatedCallback>(settings, std::bind(&Engine::OnContextCreated, this));
-                                                            default:                                   JONS_LOG_ERROR(mLog, "Engine::Engine(): Invalid VideoBackend!"); throw std::runtime_error("Engine::Engine(): Invalid VideoBackend!");
-                                                        }
-                                                     }()), 
-                                                     mRenderer([&]()
-                                                     { 
-                                                        switch (settings.mVideoBackend) 
-                                                        { 
-                                                            case EngineSettings::VideoBackend::OPENGL: return ManagedRenderer(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<OpenGLRenderer>(settings),
-                                                                                                                              [](IRenderer* renderer) { HeapAllocator::GetDefaultHeapAllocator().DeallocateObject<IRenderer>(renderer); });
-                                                            default:                                   JONS_LOG_ERROR(mLog, "Engine::Engine(): Invalid VideoBackend!"); throw std::runtime_error("Engine::Engine(): Invalid VideoBackend!");
-                                                        }
-                                                     }()), 
-                                                     mResourceManifest(mMemoryAllocator.AllocateObject<ResourceManifest, RendererRefPtr>(GetRenderer())), 
-                                                     mSceneManager(*mResourceManifest)
+    Engine::Engine(const EngineSettings& settings) : mLog(Logger::GetCoreLogger()), mMemoryAllocator("DefaultHeapAllocator", HeapAllocator::DLMALLOC),
+                                                     mWindow(settings, std::bind(&Engine::OnContextCreated, this)), 
+                                                     mRenderer(mMemoryAllocator.AllocateObject<OpenGLRenderer>(settings, mMemoryAllocator),
+                                                        std::bind(&HeapAllocator::DeallocateObject<OpenGLRenderer>, &mMemoryAllocator, std::placeholders::_1)),
+                                                     mResourceManifest(mRenderer, mMemoryAllocator), 
+                                                     mSceneManager(mResourceManifest)
     {
         JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
     }
@@ -44,18 +30,13 @@ namespace JonsEngine
     Engine::~Engine()
     {
         JONS_LOG_INFO(mLog, "-------- DESTROYING ENGINE --------")
-
-        mMemoryAllocator.DeallocateObject(mResourceManifest);
-        mMemoryAllocator.DeallocateObject(mWindow);
-
-        JONS_LOG_INFO(mLog, "-------- ENGINE DESTROYED --------")
     }
 
     void Engine::Tick()
     {
-        mWindow->StartFrame();
+        mWindow.StartFrame();
 
-        mWindow->Poll();
+        mWindow.Poll();
 
         if (mSceneManager.HasActiveScene())
         {
@@ -72,7 +53,7 @@ namespace JonsEngine
             mRenderer->DrawRenderables(renderQueue, lighting);
         }
 
-        mWindow->EndFrame();
+        mWindow.EndFrame();
     }
 
     
@@ -82,13 +63,15 @@ namespace JonsEngine
 
         const std::vector<ModelPtr>& models = scene->GetResourceManifest().GetAllModels();
         const Mat4 viewMatrix = scene->GetSceneCamera().GetCameraTransform();
-        const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow->GetFOV(), mWindow->GetScreenWidth() / (float)mWindow->GetScreenHeight(), mRenderer->GetZNear(), mRenderer->GetZFar());
+        const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer->GetZNear(), mRenderer->GetZFar());
 
         BOOST_FOREACH(ModelPtr model, models)
         {
             if (model && model->mSceneNode)
                 CreateModelRenderable(model.get(), viewMatrix, perspectiveMatrix, model->mSceneNode->GetNodeTransform(), model->mLightingEnabled, renderQueue);
         }
+
+        std::sort(renderQueue.begin(), renderQueue.end(), [](const Renderable& smaller, const Renderable& larger) { return smaller.mMesh < larger.mMesh; });
 
         return renderQueue;
     }
@@ -126,21 +109,15 @@ namespace JonsEngine
         const Mat4 worldViewMatrix     = viewMatrix * worldMatrix;
         const Mat4 worldViewProjMatrix = perspectiveMatrix * worldViewMatrix;
 
-        if (model->mMesh)
+        if (model->mMesh != INVALID_MESH_ID)
         {
-            Renderable renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor, lightingEnabled, 0.02f);
+            // TODO: replace push_back with emplace_back once boost is compatible with MSVC12
             const MaterialPtr material(model->mMaterial);
-
             if (material)
-            {
-                renderable.mDiffuseTexture = material->mDiffuseTexture;
-                renderable.mDiffuseColor   = Vec4(material->mDiffuseColor, 1.0f);
-                renderable.mAmbientColor   = Vec4(material->mAmbientColor, 1.0f);
-                renderable.mSpecularColor  = Vec4(material->mSpecularColor, 1.0f);
-                renderable.mEmissiveColor  = Vec4(material->mEmissiveColor, 1.0f);
-            }
-
-            renderQueue.push_back(renderable);     // TODO: Add specularfactor to model/mesh
+                renderQueue.push_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor, lightingEnabled, 0.02f, material->mDiffuseTexture, Vec4(material->mDiffuseColor, 1.0f),
+                                         Vec4(material->mAmbientColor, 1.0f), Vec4(material->mSpecularColor, 1.0f), Vec4(material->mEmissiveColor, 1.0f)));
+            else
+                renderQueue.push_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor, lightingEnabled, 0.02f));
         }
 
         BOOST_FOREACH(const Model& childModel, model->mChildren)
@@ -151,10 +128,6 @@ namespace JonsEngine
 
     void Engine::OnContextCreated()
     {
-        switch (mRenderer->GetRenderBackendType())
-        {
-            case IRenderer::OPENGL:     mRenderer.reset(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<OpenGLRenderer>(mRenderer->GetCurrentAnisotropicFiltering())); break;
-            default:                    JONS_LOG_ERROR(mLog, "Engine::OnContextCreated(): Invalid VideoBackend!"); throw std::runtime_error("Engine::OnContextCreated(): Invalid VideoBackend!");
-        }
+        mRenderer.reset(mMemoryAllocator.AllocateObject<OpenGLRenderer>(*mRenderer));
     }
 }

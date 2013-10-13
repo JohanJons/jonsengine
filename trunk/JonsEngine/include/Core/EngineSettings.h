@@ -1,8 +1,6 @@
 #pragma once
 
 #include "include/Core/EngineDefs.h"
-#include "include/Window/IWindowManager.h"
-#include "include/Renderer/IRenderer.h"
 
 #include <string>
 
@@ -16,13 +14,6 @@ namespace JonsEngine
     /* EngineSettings definition */
     struct EngineSettings
     {
-        enum VideoBackend
-        {
-            OPENGL = 0
-        };
-
-        VideoBackend mVideoBackend;
-
         // render settings
         float mAnisotropicFiltering;
 
@@ -40,9 +31,7 @@ namespace JonsEngine
 
 
     /* EngineSettings inlines */
-    inline EngineSettings::EngineSettings() : mVideoBackend(VideoBackend::OPENGL), 
-                                              mAnisotropicFiltering(0.0f),
-                                              mWindowTitle("JonsEngine Game"), mWindowWidth(800), mWindowHeight(600), mFullscreen(false), mFOV(45.0f), mFrameLimit(0), mMSAA(0)
+    inline EngineSettings::EngineSettings() : mAnisotropicFiltering(0.0f),mWindowTitle("JonsEngine Game"), mWindowWidth(800), mWindowHeight(600), mFullscreen(false), mFOV(45.0f), mFrameLimit(0), mMSAA(0)
     {
     }
 }

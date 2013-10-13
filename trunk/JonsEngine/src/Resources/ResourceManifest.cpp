@@ -1,6 +1,6 @@
 #include "include/Resources/ResourceManifest.h"
-#include "include/Renderer/IRenderer.h"
 #include "include/Renderer/Shapes.h"
+#include "include/Renderer/OpenGL3/OpenGLRenderer.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
 #include "boost/bind.hpp"
@@ -12,7 +12,7 @@
 
 namespace JonsEngine
 {
-    ResourceManifest::ResourceManifest(RendererRefPtr renderer) : mRenderer(renderer), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator())
+    ResourceManifest::ResourceManifest(OpenGLRendererPtr renderer, IMemoryAllocator& memoryAllocator) : mRenderer(renderer), mMemoryAllocator(memoryAllocator)
     {
     }
        
@@ -129,7 +129,7 @@ namespace JonsEngine
 
     Material ResourceManifest::ProcessMaterial(PackageMaterial& pkgMaterial, const JonsPackagePtr jonsPkg)
     {
-        TexturePtr diffuseTexture = mRenderer->CreateTexture(pkgMaterial.mDiffuseTexture.mTextureType, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth,
+        TextureID diffuseTexture = mRenderer->CreateTexture(pkgMaterial.mDiffuseTexture.mTextureType, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth,
                                                             pkgMaterial.mDiffuseTexture.mTextureHeight, pkgMaterial.mDiffuseTexture.mTextureFormat);
 
         return Material(pkgMaterial.mName, diffuseTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor);

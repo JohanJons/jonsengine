@@ -1,7 +1,7 @@
 #pragma once
 
-#include "include/Renderer/ITexture.h"
 #include "include/Renderer/OpenGL3/Shader.h"
+#include "include/Core/Types.h"
 
 #include "GL/glew.h"
 #include <string>
@@ -25,7 +25,6 @@ namespace JonsEngine
 
         void UseProgram(bool use);
         void BindAttribLocation(GLuint index, const std::string& name);
-        void BindTextureUnit(ITexture::TextureType textureType, GLuint textureUnit);
 
         const std::string& GetName() const;
         GLuint GetHandle() const;

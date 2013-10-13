@@ -25,7 +25,7 @@ namespace JonsEngine
     {
     }
 
-    PackageTexture::PackageTexture() : mName(""), mTextureWidth(0), mTextureHeight(0), mTextureFormat(ITexture::UNKNOWN_FORMAT), mTextureType(ITexture::UNKNOWN_TYPE)
+    PackageTexture::PackageTexture() : mName(""), mTextureWidth(0), mTextureHeight(0), mTextureFormat(TextureFormat::TEXTURE_FORMAT_UNKNOWN), mTextureType(TextureType::TEXTURE_TYPE_UNKNOWN)
     {
     }
 

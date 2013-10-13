@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    Material::Material(const std::string& name, const TexturePtr& diffuseTexture, const Vec3& diffuseColor, const Vec3& ambientColor, const Vec3& specularColor, const Vec3& emissiveColor) : mName(name), mHashedID(boost::hash_value(name)), mDiffuseTexture(diffuseTexture), mDiffuseColor(diffuseColor), mAmbientColor(ambientColor), mSpecularColor(specularColor), mEmissiveColor(emissiveColor)
+    Material::Material(const std::string& name, const TextureID diffuseTexture, const Vec3& diffuseColor, const Vec3& ambientColor, const Vec3& specularColor, const Vec3& emissiveColor) : mName(name), mHashedID(boost::hash_value(name)), mDiffuseTexture(diffuseTexture), mDiffuseColor(diffuseColor), mAmbientColor(ambientColor), mSpecularColor(specularColor), mEmissiveColor(emissiveColor)
     {
     }
 

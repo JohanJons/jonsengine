@@ -33,11 +33,6 @@ namespace JonsEngine
         SetupWindow();
 
         gGLFWWindowInstance = this;
-
-        glfwSetMouseButtonCallback(mWindow, glfwOnMouseButton);
-        glfwSetCursorPosCallback(mWindow, glfwOnMouseMotion);
-        glfwSetKeyCallback(mWindow, glfwOnKey);
-        glfwSetFramebufferSizeCallback(mWindow, glfwOnWindowChanged);
     }
         
     GLFWWindowManager::~GLFWWindowManager()
@@ -158,10 +153,11 @@ namespace JonsEngine
         
     void GLFWWindowManager::SetFullscreen(bool fullscreen)
     {
-       // if (mFullscreen != fullscreen)
-            SetupWindow(); // need to tear down window and reset opengl context with GLFW..
-
-        mFullscreen = fullscreen;
+        if (mFullscreen != fullscreen)
+        {
+            mFullscreen = fullscreen;
+            SetupWindow();
+        }
     }
         
     void GLFWWindowManager::SetScreenResolution(const uint32_t width, const uint32_t height)
@@ -175,6 +171,8 @@ namespace JonsEngine
 
             mScreenWidth  = width;
             mScreenHeight = height;
+
+            SetupWindow();
         }
     }
         
@@ -229,7 +227,14 @@ namespace JonsEngine
         }
         mWindow = newWindow;
 
+        // listen to input callbacks
+        glfwSetMouseButtonCallback(mWindow, glfwOnMouseButton);
+        glfwSetCursorPosCallback(mWindow, glfwOnMouseMotion);
+        glfwSetKeyCallback(mWindow, glfwOnKey);
+        glfwSetFramebufferSizeCallback(mWindow, glfwOnWindowChanged);
+
         ShowMouseCursor(mShowMouseCursor);
+        glfwSetWindowPos(mWindow, 0, 0);
         glViewport(0, 0, (GLsizei) mScreenWidth, (GLsizei)mScreenHeight);
 
         return true;

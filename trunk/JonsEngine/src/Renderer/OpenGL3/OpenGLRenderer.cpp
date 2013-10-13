@@ -9,22 +9,37 @@
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
-#include "boost/bind.hpp"
-#include "boost/foreach.hpp"
 #include "GL/glew.h"
 #include <exception>
+#include <functional>
 
 
 namespace JonsEngine
 {
-    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings) : OpenGLRenderer(engineSettings.mAnisotropicFiltering)
-    {
+    MeshID gNextMeshID       = 0;
+    TextureID gNextTextureID = 0;
 
+
+    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocator& memoryAllocator) : OpenGLRenderer(engineSettings.mAnisotropicFiltering, memoryAllocator)
+    {
     }
 
-    OpenGLRenderer::OpenGLRenderer(const float anisotropicLevel) : mLogger(Logger::GetRendererLogger()), mDefaultProgram("DefaultProgram", gVertexShader, gFragmentShader), 
-                                                                           mUniBufferTransform("UnifTransform", mDefaultProgram), mUniBufferMaterial("UnifMaterial", mDefaultProgram), 
-                                                                           mUniBufferLightingInfo("UnifLighting", mDefaultProgram), mCurrentAnisotropy(anisotropicLevel), mFirstPass(true)
+    OpenGLRenderer::OpenGLRenderer(const OpenGLRenderer& renderer) : OpenGLRenderer(renderer.mCurrentAnisotropy, renderer.mMemoryAllocator)
+    {
+        mMeshes   = renderer.mMeshes;
+        mTextures = renderer.mTextures;
+
+        for (OpenGLMesh& mesh : *mMeshes)
+            SetupVAO(mesh);
+    }
+
+    OpenGLRenderer::OpenGLRenderer(const float anisotropy, IMemoryAllocator& memoryAllocator) : 
+        mMemoryAllocator(memoryAllocator),
+        mMeshes(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<std::vector<OpenGLMesh>>(), std::bind(&HeapAllocator::DeallocateObject<std::vector<OpenGLMesh>>, &HeapAllocator::GetDefaultHeapAllocator(), std::placeholders::_1)),
+        mTextures(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<std::vector<OpenGLTexture>>(), std::bind(&HeapAllocator::DeallocateObject<std::vector<OpenGLTexture>>, &HeapAllocator::GetDefaultHeapAllocator(), std::placeholders::_1)),
+        mLogger(Logger::GetRendererLogger()),
+        mDefaultProgram("DefaultProgram", gVertexShader, gFragmentShader), mUniBufferTransform("UnifTransform", mDefaultProgram), mUniBufferMaterial("UnifMaterial", mDefaultProgram), 
+        mUniBufferLightingInfo("UnifLighting", mDefaultProgram), mCurrentAnisotropy(anisotropy)
     {
         // face culling
         glEnable(GL_CULL_FACE);
@@ -65,22 +80,27 @@ namespace JonsEngine
 
         SetAnisotropicFiltering(mCurrentAnisotropy);
     }
-        
+
     OpenGLRenderer::~OpenGLRenderer()
     {
         glDeleteSamplers(1, &mTextureSampler);
         CHECK_GL_ERROR(mLogger);
     }
 
-    MeshPtr OpenGLRenderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData)
+    MeshID OpenGLRenderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData)
     {
-        return MeshPtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<OpenGLMesh>(vertexData, normalData, texCoords, indexData), boost::bind(&HeapAllocator::DeallocateObject<OpenGLMesh>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
+        mMeshes->emplace_back(gNextMeshID, vertexData, normalData, texCoords, indexData);
+
+        SetupVAO(mMeshes->at(gNextMeshID));
+        
+        return gNextMeshID++;
     }
 
-    TexturePtr OpenGLRenderer::CreateTexture(ITexture::TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ITexture::TextureFormat textureFormat)
+    TextureID OpenGLRenderer::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureFormat textureFormat)
     {
-        return TexturePtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<OpenGLTexture>(textureData, textureWidth, textureHeight, textureFormat), 
-                          boost::bind(&HeapAllocator::DeallocateObject<OpenGLTexture>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
+        mTextures->emplace_back(gNextTextureID, textureData, textureWidth, textureHeight, textureFormat, textureType);  // TODO: remove _VARIADIC_MAX 6 in MSVC12 with compatible boost
+        
+        return gNextTextureID++;
     }
 
 
@@ -96,28 +116,34 @@ namespace JonsEngine
         // set active lights
         mUniBufferLightingInfo.SetData(lighting);
 
-        int activeIndex = 0;
-        BOOST_FOREACH(const Renderable& renderable, renderQueue)
+        for (const Renderable& renderable : renderQueue)
         {
-            if (renderable.mMesh)
+            if (renderable.mMesh != INVALID_MESH_ID)
             {
                 mUniBufferTransform.SetData(Transform(renderable.mWVPMatrix, renderable.mWorldMatrix, renderable.mTextureTilingFactor));
                 mUniBufferMaterial.SetData(Material(renderable.mDiffuseColor, renderable.mAmbientColor, renderable.mSpecularColor, renderable.mEmissiveColor,
                                                     renderable.mDiffuseTexture != NULL, renderable.mLightingEnabled, renderable.mSpecularFactor));
 
-                if (renderable.mDiffuseTexture)
+                if (renderable.mDiffuseTexture != INVALID_TEXTURE_ID)
                 {
                     glActiveTexture(OpenGLTexture::TEXTURE_UNIT_DIFFUSE);
                     CHECK_GL_ERROR(mLogger);
-                    OpenGLTexture* diffuseTexture = static_cast<OpenGLTexture*>(renderable.mDiffuseTexture.get());
-                    glBindTexture(GL_TEXTURE_2D, diffuseTexture->mTexture);
+
+                    glBindTexture(GL_TEXTURE_2D, mTextures->at(renderable.mDiffuseTexture).mTexture);
                     CHECK_GL_ERROR(mLogger);
                 }
 
-                renderable.mMesh->Render();
-            }
+                // TODO: bounds check
+                OpenGLMesh& mesh = mMeshes->at(renderable.mMesh);
+                glBindVertexArray(mesh.mVAO);
+                CHECK_GL_ERROR(mLogger);
 
-            activeIndex++;
+                glDrawElements(GL_TRIANGLES, mesh.mIndices, GL_UNSIGNED_INT, 0);
+                CHECK_GL_ERROR(mLogger);
+
+                glBindVertexArray(0);
+                CHECK_GL_ERROR(mLogger);
+            }
         }
 
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -149,5 +175,43 @@ namespace JonsEngine
         CHECK_GL_ERROR(mLogger);
         
         return true;
+    }
+
+
+    void OpenGLRenderer::SetupVAO(OpenGLMesh& mesh)
+    {
+        if (mesh.mVAO)
+        {
+            glDeleteVertexArrays(1, &mesh.mVAO);
+            CHECK_GL_ERROR(mLogger);
+        }
+
+        glGenVertexArrays(1, &mesh.mVAO);
+        CHECK_GL_ERROR(mLogger);
+
+        glBindVertexArray(mesh.mVAO);
+        CHECK_GL_ERROR(mLogger);
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.mVBO);
+        CHECK_GL_ERROR(mLogger);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.mIndexBuffer);
+        CHECK_GL_ERROR(mLogger);
+
+        glEnableVertexAttribArray(0);
+        CHECK_GL_ERROR(mLogger);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+        CHECK_GL_ERROR(mLogger);
+        glEnableVertexAttribArray(1);
+        CHECK_GL_ERROR(mLogger);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh.vertexDataSize));
+        CHECK_GL_ERROR(mLogger);
+        glEnableVertexAttribArray(2);
+        CHECK_GL_ERROR(mLogger);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh.vertexDataSize + mesh.normalDataSize));
+        CHECK_GL_ERROR(mLogger);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        CHECK_GL_ERROR(mLogger);
+        glBindVertexArray(0);
+        CHECK_GL_ERROR(mLogger);
     }
 }

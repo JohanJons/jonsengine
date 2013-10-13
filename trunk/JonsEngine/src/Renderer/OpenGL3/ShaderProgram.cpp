@@ -39,22 +39,6 @@ namespace JonsEngine
         CHECK_GL_ERROR(mLogger);
     }
 
-    void ShaderProgram::BindTextureUnit(ITexture::TextureType textureType, GLuint textureUnit)
-    {
-        switch (textureType)
-        {
-            case ITexture::DIFFUSE:
-            {
-                GLuint textureUnifLocation = glGetUniformLocation(mProgramHandle, "diffuseTexture");
-                glUniform1i(textureUnifLocation, textureUnit);
-                CHECK_GL_ERROR(mLogger);
-            }
-
-            default:
-                break;
-        }
-    }
-
 
     const std::string& ShaderProgram::GetName() const
     {
