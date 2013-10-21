@@ -32,7 +32,7 @@ namespace JonsGame
         SetupScene();
 
         mEngine->GetWindow().ShowMouseCursor(false);
-        mEngine->GetWindow().SetScreenResolution(1280, 800);
+      //  mEngine->GetWindow().SetScreenResolution(1920, 1080);
 
         while (mRunning)
         {
@@ -110,13 +110,7 @@ namespace JonsGame
     {
         Scene* myScene = mEngine->GetSceneManager().CreateScene("MyScene");
         mEngine->GetSceneManager().SetActiveScene("MyScene");
-       /* JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
-
-        // cube
-        SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
-        ModelPtr modelCube    = myScene->GetResourceManifest().LoadModel("cube", jonsPackage);
-        modelCube->mSceneNode = nodeCube;
-        nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
+        JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
 
         // chair
         SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("nodeChair");
@@ -124,12 +118,18 @@ namespace JonsGame
         modelChair->mSceneNode = nodeChair;
         nodeChair->TranslateNode(Vec3(0.0f, 0.0f, -8.0f));
 
+         // cube
+        SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
+        ModelPtr modelCube    = myScene->GetResourceManifest().LoadModel("cube", jonsPackage);
+        modelCube->mSceneNode = nodeCube;
+        nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
+        
         // uhura
         SceneNodePtr nodeUhura = myScene->GetRootNode().CreateChildNode("nodeUhura");
         ModelPtr modelUhura    = myScene->GetResourceManifest().LoadModel("uhura", jonsPackage);
         modelUhura->mSceneNode = nodeUhura;
         nodeUhura->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));
-
+        
         // point light
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
         LightPtr movingLight         = myScene->CreateLight("MovingPointLight", Light::POINT, nodeMovingLight);
@@ -147,13 +147,13 @@ namespace JonsGame
         SceneNodePtr nodeAmbientLight = myScene->GetRootNode().CreateChildNode("nodeAmbientLight");
         LightPtr ambientLight         = myScene->CreateLight("ambientLight", Light::AMBIENT, nodeAmbientLight);
         ambientLight->mIntensity      = 0.1f;
-        */
+        
         // create a ground plane
         SceneNodePtr nodePlane       = myScene->GetRootNode().CreateChildNode("nodePlane");
         ModelPtr plane               = myScene->GetResourceManifest().CreateRectangle("GroundPlane", 64, 0.5, 64);
-       // plane->mMaterial             = myScene->GetResourceManifest().LoadMaterial("checker", jonsPackage);
+        plane->mMaterial             = myScene->GetResourceManifest().LoadMaterial("checker", jonsPackage);
         plane->mSceneNode            = nodePlane;
-    //    plane->mMaterialTilingFactor = 64.0f;
+        plane->mMaterialTilingFactor = 64.0f;
         nodePlane->TranslateNode(Vec3(0.0f, -0.5f, 0.0f));
         
         // move up camera
@@ -162,10 +162,5 @@ namespace JonsGame
         // set anisotropic filter to max
         float maxAnisoLevel = mEngine->GetRenderer()->GetMaxAnisotropicFiltering();
         mEngine->GetRenderer()->SetAnisotropicFiltering(maxAnisoLevel);
-
-       // myScene->GetResourceManifest().ReloadAllResources();
-        //mEngine->GetWindow().SetFullscreen(true);
-        //mEngine->GetWindow().SetScreenResolution(800, 600);
-
     }
 }
