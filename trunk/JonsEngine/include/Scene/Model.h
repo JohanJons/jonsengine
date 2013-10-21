@@ -4,16 +4,16 @@
 #include "include/Scene/Material.h"
 #include "include/Core/Types.h"
 
-#include "boost/smart_ptr.hpp"
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace JonsEngine
 {
     struct Model;
 
     /* ModelPtr definition */
-    typedef boost::shared_ptr<Model> ModelPtr;
+    typedef std::shared_ptr<Model> ModelPtr;
 
     /* Model defintion */
     struct Model

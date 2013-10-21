@@ -3,15 +3,15 @@
 #include "include/Core/Types.h"
 #include "include/Scene/SceneNode.h"
 
-#include "boost/smart_ptr.hpp"
 #include <string>
+#include <memory>
 
 namespace JonsEngine
 {
     struct Light;
 
     /* LightPtr definition */
-    typedef boost::shared_ptr<Light> LightPtr;
+    typedef std::shared_ptr<Light> LightPtr;
 
     /* Light definition */
     struct Light

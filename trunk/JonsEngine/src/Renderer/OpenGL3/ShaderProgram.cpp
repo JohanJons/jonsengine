@@ -1,14 +1,8 @@
 #include "include/Renderer/OpenGL3/ShaderProgram.h"
 
 #include "include/Renderer/OpenGL3/Shader.h"
-#include "include/Renderer/OpenGL3/UniformBuffer.hpp"
 #include "include/Renderer/OpenGL3/OpenGLUtils.hpp"
 #include "include/Core/Logging/Logger.h"
-
-#include "boost/bind.hpp"
-#include "boost/foreach.hpp"
-
-#include <algorithm>
 
 namespace JonsEngine
 {

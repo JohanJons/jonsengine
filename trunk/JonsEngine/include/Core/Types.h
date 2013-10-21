@@ -25,11 +25,11 @@ namespace JonsEngine
         TEXTURE_TYPE_DIFFUSE
     };
 
-    typedef int32_t MeshID;
-    typedef int32_t TextureID;
+    typedef uint32_t MeshID;
+    typedef uint32_t TextureID;
 
-    const MeshID    INVALID_MESH_ID    = -1;
-    const TextureID INVALID_TEXTURE_ID = -1;
+    const MeshID    INVALID_MESH_ID    = 0;
+    const TextureID INVALID_TEXTURE_ID = 0;
 
     typedef glm::vec2  Vec2;
     typedef glm::vec3  Vec3;

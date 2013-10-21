@@ -1,14 +1,15 @@
 #pragma once
 
 #include "include/Core/Types.h"
-#include "boost/shared_ptr.hpp"
+
+#include <memory>
 
 namespace JonsEngine
 {
     struct Material;
 
     /* MaterialPtr definition */
-    typedef boost::shared_ptr<Material> MaterialPtr;
+    typedef std::shared_ptr<Material> MaterialPtr;
 
     /* Material defintion */
     struct Material
@@ -23,7 +24,7 @@ namespace JonsEngine
         Vec3 mEmissiveColor;
         float mSpecularFactor;
 
-        Material(const std::string& name, const TextureID diffuseTexture, const Vec3& diffuseColor, const Vec3& ambientColor, const Vec3& specularColor, const Vec3& emissiveColor);
+        Material(const std::string& name, const TextureID diffuseTexture, const Vec3& diffuseColor, const Vec3& ambientColor, const Vec3& specularColor, const Vec3& emissiveColor, const float specularFactor);
 
         bool operator==(const Material& material);
         bool operator==(const std::string& materialName);

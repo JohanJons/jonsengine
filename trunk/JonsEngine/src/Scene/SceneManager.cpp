@@ -2,8 +2,6 @@
 #include "include/Scene/Scene.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
-#include "boost/foreach.hpp"
-#include "boost/lambda/lambda.hpp"
 #include <algorithm>
 
 namespace JonsEngine
@@ -14,13 +12,13 @@ namespace JonsEngine
 
     SceneManager::~SceneManager()
     {
-        BOOST_FOREACH(Scene* scene, mScenes)
+        for(Scene* scene : mScenes)
             mMemoryAllocator.DeallocateObject(scene);
     }
 
     Scene* SceneManager::CreateScene(const std::string& sceneName)
     {
-        std::vector<Scene*>::iterator iter = std::find_if(mScenes.begin(), mScenes.end(), *boost::lambda::_1 == sceneName);
+        auto iter = std::find_if(mScenes.begin(), mScenes.end(), [sceneName](const Scene* scene) { return scene->GetSceneName() == sceneName; });
         
         if (iter == mScenes.end())
         {
@@ -34,7 +32,7 @@ namespace JonsEngine
 
     void SceneManager::DeleteScene(const std::string& sceneName)
     {
-        std::vector<Scene*>::iterator iter = std::find_if(mScenes.begin(), mScenes.end(), *boost::lambda::_1 == sceneName);
+        auto iter = std::find_if(mScenes.begin(), mScenes.end(), [sceneName](const Scene* scene) { return scene->GetSceneName() == sceneName; });
 
         if (iter != mScenes.end())
         {
@@ -48,7 +46,7 @@ namespace JonsEngine
 
     void SceneManager::DeleteScene(Scene* scene)
     {
-        std::vector<Scene*>::iterator iter = std::find_if(mScenes.begin(), mScenes.end(), boost::lambda::_1 == scene);
+        auto iter = std::find(mScenes.begin(), mScenes.end(), scene);
 
         if (iter != mScenes.end())
         {
@@ -62,7 +60,7 @@ namespace JonsEngine
         
     Scene* SceneManager::FindScene(const std::string& sceneName)
     {
-        std::vector<Scene*>::iterator iter = std::find_if(mScenes.begin(), mScenes.end(), *boost::lambda::_1 == sceneName);
+        auto iter = std::find_if(mScenes.begin(), mScenes.end(), [sceneName](const Scene* scene) { return scene->GetSceneName() == sceneName; });
         
         return iter != mScenes.end() ? *iter : NULL;
     }

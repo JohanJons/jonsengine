@@ -4,7 +4,7 @@
 #include "include/Core/EngineDefs.h"
 
 #include <vector>
-#include "boost/smart_ptr.hpp"
+#include <memory>
 
 // disable untill boost::serialization fixes it
 #pragma warning(disable : 4244 4308)
@@ -100,7 +100,7 @@ namespace JonsEngine
 
 
      /* JonsPackagePtr definition */
-    typedef boost::shared_ptr<JonsPackage> JonsPackagePtr;
+    typedef std::shared_ptr<JonsPackage> JonsPackagePtr;
 
     /*
      * Reading/writing JonsPackage files

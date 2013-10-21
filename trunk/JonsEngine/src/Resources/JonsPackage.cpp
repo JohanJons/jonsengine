@@ -1,7 +1,6 @@
 #include "include/Resources/JonsPackage.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
-#include "boost/bind.hpp"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -41,7 +40,7 @@ namespace JonsEngine
     JonsPackagePtr ReadJonsPkg(const std::string& jonsPkgName)
     {
         std::ifstream jonsPkgStream(jonsPkgName.c_str(), std::ios::in | std::ios::binary);        // TODO: support opening of older resource packages
-        JonsPackagePtr pkg(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<JonsPackage>(), boost::bind(&HeapAllocator::DeallocateObject<JonsPackage>, &HeapAllocator::GetDefaultHeapAllocator(), _1));
+        JonsPackagePtr pkg(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<JonsPackage>(), std::bind(&HeapAllocator::DeallocateObject<JonsPackage>, &HeapAllocator::GetDefaultHeapAllocator(), std::placeholders::_1));
 
         gJonsPackageIDFileMap.insert(std::make_pair(pkg->mInternalID, jonsPkgName));
 
@@ -73,7 +72,7 @@ namespace JonsEngine
 
     std::string GetJonsPkgPath(const uint32_t internalPackageID)
     {
-        auto iter = std::find_if(gJonsPackageIDFileMap.begin(), gJonsPackageIDFileMap.end(), [internalPackageID] (std::pair<uint32_t, std::string> entry) { return entry.first == internalPackageID; });
+        auto iter = std::find_if(gJonsPackageIDFileMap.begin(), gJonsPackageIDFileMap.end(), [internalPackageID](std::pair<uint32_t, std::string> entry) { return entry.first == internalPackageID; });
 
         if (iter != gJonsPackageIDFileMap.end())
             return iter->second;

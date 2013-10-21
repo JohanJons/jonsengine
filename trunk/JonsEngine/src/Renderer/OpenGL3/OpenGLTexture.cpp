@@ -3,10 +3,11 @@
 #include "include/Renderer/OpenGL3/OpenGLUtils.hpp"
 #include "include/Core/Logging/Logger.h"
 
-
 namespace JonsEngine
 {
-    OpenGLTexture::OpenGLTexture(const TextureID textureID, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureFormat textureFormat, TextureType textureType) : mTextureID(textureID), mLogger(Logger::GetRendererLogger()), mTextureType(textureType)
+    TextureID gNextTextureID = 1;
+
+    OpenGLTexture::OpenGLTexture(const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureFormat textureFormat, TextureType textureType, Logger& logger) : mLogger(logger), mTextureID(gNextTextureID++), mTextureType(textureType)
     {
         glGenTextures(1, &mTexture);
         CHECK_GL_ERROR(mLogger);

@@ -6,7 +6,6 @@
 
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
-#include "boost/foreach.hpp"
 #include <exception>
 #include <thread>
 
@@ -73,7 +72,7 @@ namespace JonsEngine
 
     void GLFWWindowManager::SetMouseButtonCallback()
     {
-        mMouseButtonCallback = NULL;
+        mMouseButtonCallback = nullptr;
     }
 
     void GLFWWindowManager::SetMouseButtonCallback(const MouseButtonCallback& callback)
@@ -83,7 +82,7 @@ namespace JonsEngine
 
     void GLFWWindowManager::SetMouseMotionCallback()
     {
-        mMouseMotionCallback = NULL;
+        mMouseMotionCallback = nullptr;
     }
         
     void GLFWWindowManager::SetMouseMotionCallback(const MouseMotionCallback& callback)
@@ -93,7 +92,7 @@ namespace JonsEngine
 
     void GLFWWindowManager::SetKeyCallback()
     {
-        mKeyCallback = NULL;
+        mKeyCallback = nullptr;
     }
         
     void GLFWWindowManager::SetKeyCallback(const KeyCallback& callback)
@@ -120,13 +119,13 @@ namespace JonsEngine
     void GLFWWindowManager::Poll()
     {
         // Dispatch waiting events for each event type to registered callbacks
-        BOOST_FOREACH(MouseButtonEvent& ev, mMouseButtonEvents)
+        for(MouseButtonEvent& ev : mMouseButtonEvents)
             mMouseButtonCallback(ev);
 
-        BOOST_FOREACH(MouseMotionEvent& ev, mMouseMotionEvents)
+        for(MouseMotionEvent& ev : mMouseMotionEvents)
             mMouseMotionCallback(ev);
 
-        BOOST_FOREACH(KeyEvent& ev, mKeyEvents)
+        for(KeyEvent& ev : mKeyEvents)
             mKeyCallback(ev);
 
         ClearAllEvents();

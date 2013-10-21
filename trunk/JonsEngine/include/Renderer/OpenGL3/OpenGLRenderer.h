@@ -27,12 +27,9 @@ namespace JonsEngine
     class OpenGLRenderer
     {
     public:
-        typedef std::shared_ptr<std::vector<OpenGLMesh>> MeshContainerPtr;
-        typedef std::shared_ptr<std::vector<OpenGLTexture>> TextureContainerPtr;
-
-        OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocator& memoryAllocator);
-        OpenGLRenderer(const OpenGLRenderer& renderer);
-        OpenGLRenderer(const float anisotropy, IMemoryAllocator& memoryAllocator);
+        OpenGLRenderer(const EngineSettings& engineSettings, HeapAllocator& memoryAllocator);
+        OpenGLRenderer(const OpenGLRenderer& renderer, HeapAllocator& memoryAllocator);
+        OpenGLRenderer(const float anisotropy, HeapAllocator& memoryAllocator);
         ~OpenGLRenderer();
 
         MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData);
@@ -49,6 +46,11 @@ namespace JonsEngine
 
 
     private:
+        typedef std::shared_ptr<OpenGLMesh> OpenGLMeshPtr;
+        typedef std::shared_ptr<OpenGLTexture> OpenGLTexturePtr;
+        typedef GLuint VAO;
+        typedef std::pair<OpenGLMeshPtr, VAO> OpenGLMeshPair;
+
         struct Transform
         {
             Mat4 mWVPMatrix;
@@ -77,18 +79,19 @@ namespace JonsEngine
             }
         };
 
-        void SetupVAO(OpenGLMesh& mesh);
+        VAO SetupVAO(OpenGLMeshPtr mesh);
 
         IMemoryAllocator& mMemoryAllocator;
-        MeshContainerPtr mMeshes;
-        TextureContainerPtr mTextures;
+        Logger& mLogger;
+
+        std::vector<OpenGLMeshPair> mMeshes;
+        std::vector<OpenGLTexturePtr> mTextures;
         ShaderProgram mDefaultProgram;
         UniformBuffer<OpenGLRenderer::Transform> mUniBufferTransform;
         UniformBuffer<OpenGLRenderer::Material> mUniBufferMaterial;
         UniformBuffer<RenderableLighting> mUniBufferLightingInfo;
         GLuint mTextureSampler;
         float mCurrentAnisotropy;
-        Logger& mLogger;
     };
 
 

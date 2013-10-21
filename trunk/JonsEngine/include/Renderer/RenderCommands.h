@@ -10,7 +10,7 @@ namespace JonsEngine
     {
         Renderable(const MeshID mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool lightingEnabled, const float specularFactor)
             :
-                    Renderable(mesh, wvpMatrix, worldMatrix, textureTilingFactor, lightingEnabled, specularFactor, INVALID_TEXTURE_ID, Vec4(1.0f), Vec4(1.0f), Vec4(1.0f), Vec4(1.0f))
+                    Renderable(mesh, wvpMatrix, worldMatrix, textureTilingFactor, lightingEnabled, specularFactor, INVALID_TEXTURE_ID, Vec4(1.0f), Vec4(1.0f), Vec4(1.0f), Vec4(0.0f))
         {
 
         }

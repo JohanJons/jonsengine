@@ -3,10 +3,7 @@
 #include "include/Renderer/OpenGL3/OpenGLRenderer.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
-#include "boost/bind.hpp"
-#include "boost/foreach.hpp"
-#include "boost/assign.hpp"
-#include "boost/algorithm/string.hpp"
+#include "boost/functional/hash.hpp"
 #include <algorithm>
 #include <sstream>
 
@@ -37,7 +34,7 @@ namespace JonsEngine
         if (!CreateRectangleData(sizeX, sizeY, sizeZ, vertexData, normalData, texcoordData, indiceData))
             return ptr;
 
-        ptr        = *mModels.insert(mModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(modelName), boost::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, _1)));
+        ptr        = *mModels.insert(mModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(modelName), std::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, std::placeholders::_1)));
         ptr->mMesh = mRenderer->CreateMesh(vertexData, normalData, texcoordData, indiceData);
 
         return ptr;
@@ -50,11 +47,12 @@ namespace JonsEngine
         if (ptr) 
             return ptr;
 
-        std::vector<PackageModel>::iterator iter = std::find_if(jonsPkg->mModels.begin(), jonsPkg->mModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&PackageModel::mName, _1), assetName, std::locale()));
+        size_t hashedName = boost::hash_value(assetName);
+        std::vector<PackageModel>::iterator iter = std::find_if(jonsPkg->mModels.begin(), jonsPkg->mModels.end(), [hashedName](const PackageModel model) { return boost::hash_value(model.mName) == hashedName; });
 
         if (iter != jonsPkg->mModels.end())
         {
-            ptr = *mModels.insert(mModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(ProcessModel(*iter, jonsPkg)), boost::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, _1)));
+            ptr = *mModels.insert(mModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(ProcessModel(*iter, jonsPkg)), std::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, std::placeholders::_1)));
             mPackageAssetMap.insert(std::make_pair(jonsPkg->mInternalID , ptr->mName));
         }
 
@@ -63,8 +61,9 @@ namespace JonsEngine
         
     ModelPtr ResourceManifest::GetModel(const std::string& modelName)
     {
-        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&Model::mName, _1), modelName, std::locale()));
         ModelPtr ptr;
+        size_t hashedName = boost::hash_value(modelName);
+        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), [hashedName](const ModelPtr model) { return model->mHashedID == hashedName; });
 
         if (iter != mModels.end())
             ptr = *iter;
@@ -79,11 +78,12 @@ namespace JonsEngine
         if (ptr)
             return ptr;
 
-        auto iter = std::find_if(jonsPkg->mMaterials.begin(), jonsPkg->mMaterials.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&PackageMaterial::mName, _1), assetName, std::locale()));
+        size_t hashedName = boost::hash_value(assetName);
+        auto iter = std::find_if(jonsPkg->mMaterials.begin(), jonsPkg->mMaterials.end(), [hashedName](const PackageMaterial model) { return boost::hash_value(model.mName) == hashedName; });
 
         if (iter != jonsPkg->mMaterials.end())
         {
-            ptr = *mMaterials.insert(mMaterials.end(), MaterialPtr(mMemoryAllocator.AllocateObject<Material>(ProcessMaterial(*iter, jonsPkg)), boost::bind(&HeapAllocator::DeallocateObject<Material>, &mMemoryAllocator, _1)));
+            ptr = *mMaterials.insert(mMaterials.end(), MaterialPtr(mMemoryAllocator.AllocateObject<Material>(ProcessMaterial(*iter, jonsPkg)), std::bind(&HeapAllocator::DeallocateObject<Material>, &mMemoryAllocator, std::placeholders::_1)));
             mPackageAssetMap.insert(std::make_pair(jonsPkg->mInternalID, ptr->mName));
         }
 
@@ -92,8 +92,9 @@ namespace JonsEngine
         
     MaterialPtr ResourceManifest::GetMaterial(const std::string& materialName)
     {
-        std::vector<MaterialPtr>::iterator iter = std::find_if(mMaterials.begin(), mMaterials.end(), boost::bind(&boost::iequals<std::string, std::string>, boost::bind(&Material::mName, _1), materialName, std::locale()));
         MaterialPtr ptr;
+        size_t hashedName = boost::hash_value(materialName);
+        auto iter = std::find_if(mMaterials.begin(), mMaterials.end(), [hashedName](const MaterialPtr material) { return material->mHashedID == hashedName; });
 
         if (iter != mMaterials.end())
             ptr = *iter;
@@ -107,21 +108,18 @@ namespace JonsEngine
         Model model(pkgModel.mName);
         model.mTransform = pkgModel.mTransform;
             
-        BOOST_FOREACH(PackageMesh& mesh, pkgModel.mMeshes)
+        for(PackageMesh& mesh : pkgModel.mMeshes)
         {
-            MaterialPtr material;
-
             if (mesh.mHasMaterial)
             {
                 PackageMaterial& pkgMaterial = jonsPkg->mMaterials.at(mesh.mMaterialIndex);
-                material = LoadMaterial(pkgMaterial.mName, jonsPkg);
+                model.mMaterial = LoadMaterial(pkgMaterial.mName, jonsPkg);
             }
 
-            model.mMesh     = mRenderer->CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mIndiceData);
-            model.mMaterial = material;
+            model.mMesh = mRenderer->CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mIndiceData);
         }
 
-        BOOST_FOREACH(PackageModel& m, pkgModel.mChildren)
+        for(PackageModel& m : pkgModel.mChildren)
             model.mChildren.push_back(ProcessModel(m, jonsPkg));
 
         return model;
@@ -132,28 +130,6 @@ namespace JonsEngine
         TextureID diffuseTexture = mRenderer->CreateTexture(pkgMaterial.mDiffuseTexture.mTextureType, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth,
                                                             pkgMaterial.mDiffuseTexture.mTextureHeight, pkgMaterial.mDiffuseTexture.mTextureFormat);
 
-        return Material(pkgMaterial.mName, diffuseTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor);
-    }
-
-    bool ResourceManifest::ReloadAllResources()
-    {
-        // go through all asset files one at a time
-        for(auto jonsPackagePair = mPackageAssetMap.begin(); jonsPackagePair != mPackageAssetMap.end(); jonsPackagePair = mPackageAssetMap.upper_bound(jonsPackagePair->first))
-        {
-            const uint32_t jonsPackageID = jonsPackagePair->first;
-            const std::string& assetPath = GetJonsPkgPath(jonsPackageID);
-
-            for (auto assets = mPackageAssetMap.begin(); assets != mPackageAssetMap.end(); [jonsPackageID] (std::pair<uint32_t, std::string> entry) { return entry.first == jonsPackageID; })
-            {
-                auto keke = GetModel(assets->second);
-                Model* m = mMemoryAllocator.AllocateObject<Model>("asd");
-                if (keke)
-                    memcpy(keke.get(), m, sizeof(Model));
-
-                assets++;
-            }
-        }
-
-        return true;
+        return Material(pkgMaterial.mName, diffuseTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, 0.02f);
     }
 }

@@ -141,11 +141,11 @@ namespace JonsEngine
                                         vec4 CalculateLighting(in Light light, in vec4 diffuseTexture)                                                      \n \
                                         {                                                                                                                   \n \
                                             if (light.mLightType == 1)          // point light                                                              \n \
-                                                return CalcPointLight(light);                                                                               \n \
+                                                return diffuseTexture * CalcPointLight(light);                                                              \n \
                                             else if (light.mLightType == 2)     // directional light                                                        \n \
-                                                return CalcDirectionalLight(light);                                                                         \n \
+                                                return diffuseTexture * CalcDirectionalLight(light);                                                        \n \
                                             else if (light.mLightType == 4)     // ambient light                                                            \n \
-                                                return CalcAmbientLight(light);                                                                             \n \
+                                                return diffuseTexture * CalcAmbientLight(light);                                                            \n \
                                             else                                                                                                            \n \
                                                 return vec4(0.0);                                                                                           \n \
                                         }                                                                                                                   \n \
@@ -158,14 +158,16 @@ namespace JonsEngine
                                                                                                                                                             \n \
                                             if (Material.mLightingEnabled == 1)                                                                             \n \
                                             {                                                                                                               \n \
-                                                vec4 accumLighting = vec4(0.0); //Material.mEmissiveColor;                                                  \n \
+                                                vec4 accumLighting = vec4(0.0);                                                                             \n \
                                                                                                                                                             \n \
                                                 for (int lightIndex = 0; lightIndex < Lighting.mNumLights; lightIndex++)                                    \n \
-                                                    accumLighting += CalculateLighting(Lighting.mLights[lightIndex],diffuseTexture);                        \n \
+                                                    accumLighting += Material.mEmissiveColor * diffuseTexture +                                             \n \
+                                                                     CalculateLighting(Lighting.mLights[lightIndex], diffuseTexture);                       \n \
                                                                                                                                                             \n \
-                                                diffuseTexture *= accumLighting;                                                                            \n \
+                                                finalColor = pow(accumLighting, Lighting.mGamma);                                                           \n \
                                             }                                                                                                               \n \
-                                                                                                                                                            \n \
-                                            finalColor = vec4(1.0); //pow(diffuseTexture, Lighting.mGamma);                                                              \n \
+                                            else {                                                                                                          \n \
+                                                finalColor = pow(diffuseTexture, Lighting.mGamma);                                                          \n \
+                                            }                                                                                                               \n \
                                         }												                                                                    \n";
 }

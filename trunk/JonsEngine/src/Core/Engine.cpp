@@ -9,7 +9,6 @@
 #include "include/Renderer/OpenGL3/OpenGLRenderer.h"
 #include "include/Resources/ResourceManifest.h"
 
-#include "boost/foreach.hpp"
 #include <exception>
 #include <functional>
 
@@ -65,7 +64,7 @@ namespace JonsEngine
         const Mat4 viewMatrix = scene->GetSceneCamera().GetCameraTransform();
         const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer->GetZNear(), mRenderer->GetZFar());
 
-        BOOST_FOREACH(ModelPtr model, models)
+        for(ModelPtr model : models)
         {
             if (model && model->mSceneNode)
                 CreateModelRenderable(model.get(), viewMatrix, perspectiveMatrix, model->mSceneNode->GetNodeTransform(), model->mLightingEnabled, renderQueue);
@@ -84,7 +83,7 @@ namespace JonsEngine
         RenderableLighting lighting(scene->GetGamma(), scene->GetSceneCamera().Forward(), sceneLights.size());
 
         int lightIndex = 0;
-        BOOST_FOREACH(LightPtr light, sceneLights)
+        for(LightPtr light : sceneLights)
         {
             lighting.mLights[lightIndex].mLightColor     = light->mLightColor;
             lighting.mLights[lightIndex].mLightPosition  = Vec4(light->mSceneNode->Position(), 1.0f);
@@ -114,13 +113,13 @@ namespace JonsEngine
             // TODO: replace push_back with emplace_back once boost is compatible with MSVC12
             const MaterialPtr material(model->mMaterial);
             if (material)
-                renderQueue.push_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor, lightingEnabled, 0.02f, material->mDiffuseTexture, Vec4(material->mDiffuseColor, 1.0f),
+                renderQueue.push_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor, lightingEnabled, material->mSpecularFactor, material->mDiffuseTexture, Vec4(material->mDiffuseColor, 1.0f),
                                          Vec4(material->mAmbientColor, 1.0f), Vec4(material->mSpecularColor, 1.0f), Vec4(material->mEmissiveColor, 1.0f)));
             else
-                renderQueue.push_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor, lightingEnabled, 0.02f));
+                renderQueue.push_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor, lightingEnabled, material->mSpecularFactor));
         }
 
-        BOOST_FOREACH(const Model& childModel, model->mChildren)
+        for(const Model& childModel : model->mChildren)
             // 'lightingEnabled' is passed on since it applies recursively on all children aswell
             CreateModelRenderable(&childModel, viewMatrix, perspectiveMatrix, worldMatrix, lightingEnabled, renderQueue);
     }
@@ -128,6 +127,6 @@ namespace JonsEngine
 
     void Engine::OnContextCreated()
     {
-        mRenderer.reset(mMemoryAllocator.AllocateObject<OpenGLRenderer>(*mRenderer));
+        mRenderer.reset(mMemoryAllocator.AllocateObject<OpenGLRenderer>(*mRenderer, mMemoryAllocator));
     }
 }

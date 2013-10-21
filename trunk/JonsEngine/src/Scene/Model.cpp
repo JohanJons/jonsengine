@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    Model::Model(const std::string& name) : mName(name), mHashedID(boost::hash_value(name)), mLightingEnabled(true), mMaterialTilingFactor(1.0f)
+    Model::Model(const std::string& name) : mName(name), mHashedID(boost::hash_value(name)), mLightingEnabled(true), mMaterialTilingFactor(1.0f), mMesh(INVALID_MESH_ID)
     {
     }
 

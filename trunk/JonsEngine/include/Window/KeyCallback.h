@@ -3,7 +3,7 @@
 #include "include/Core/EngineDefs.h"
 #include "include/Window/KeyDefinition.h"
 
-#include "boost/function.hpp"
+#include <functional>
 
 namespace JonsEngine
 {
@@ -11,7 +11,7 @@ namespace JonsEngine
 
     /* KeyCallback definition */
     typedef void (*KeyCallbackSignature)(const KeyEvent&);
-    typedef boost::function<void (const KeyEvent&)> KeyCallback;
+    typedef std::function<void (const KeyEvent&)> KeyCallback;
 
 
     /* KeyEvent definition */

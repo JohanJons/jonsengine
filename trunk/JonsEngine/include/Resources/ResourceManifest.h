@@ -28,8 +28,6 @@ namespace JonsEngine
         MaterialPtr LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg);
         MaterialPtr GetMaterial(const std::string& materialName);
 
-        bool ReloadAllResources();
-
         const std::vector<ModelPtr>& GetAllModels() const;
         std::vector<ModelPtr>& GetAllModels();
 

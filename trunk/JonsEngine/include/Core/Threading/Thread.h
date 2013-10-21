@@ -4,7 +4,9 @@
 #include <pthread.h>
 #endif
 
-#include "boost/function.hpp"
+#include "include/Core/Types.h"
+
+#include <functional>
 
 namespace JonsEngine
 {
@@ -15,7 +17,7 @@ namespace JonsEngine
     void SleepCurrentThread(uint32_t milliseconds);
 
     /* Task definition */
-    typedef boost::function<void ()> Task;
+    typedef std::function<void ()> Task;
 
     /* Thread definition */
     class Thread
@@ -36,7 +38,7 @@ namespace JonsEngine
 
         struct ThreadInfo
         {
-            ThreadInfo() : mState(DETACHED), mTask(NULL)
+            ThreadInfo() : mState(DETACHED), mTask(nullptr)
             { }
 
             ThreadState mState;

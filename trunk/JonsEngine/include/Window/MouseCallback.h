@@ -2,7 +2,7 @@
 
 #include"include/Core/EngineDefs.h"
 
-#include "boost/function.hpp"
+#include <functional>
 
 namespace JonsEngine
 {
@@ -12,11 +12,11 @@ namespace JonsEngine
 
     /* MouseButtonCallback definition */
     typedef void (*MouseButtonCallbackSignature)(const MouseButtonEvent&);
-    typedef boost::function<void (const MouseButtonEvent&)> MouseButtonCallback;
+    typedef std::function<void (const MouseButtonEvent&)> MouseButtonCallback;
 
     /* MouseMotionCallback definition */
     typedef void (*MouseMotionCallbackSignature)(const MouseMotionEvent&);
-    typedef boost::function<void (const MouseMotionEvent&)> MouseMotionCallback;
+    typedef std::function<void (const MouseMotionEvent&)> MouseMotionCallback;
 
 
     /* MouseButtonEvent definition */

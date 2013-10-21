@@ -2,9 +2,9 @@
 
 #include "include/Core/Types.h"
 
-#include "boost/smart_ptr.hpp"
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace JonsEngine
 {
@@ -12,7 +12,7 @@ namespace JonsEngine
     class SceneNode;
 
     /* SceneNodePtr definition */
-    typedef boost::shared_ptr<SceneNode> SceneNodePtr;
+    typedef std::shared_ptr<SceneNode> SceneNodePtr;
 
     /* SceneNode definition */
     class SceneNode

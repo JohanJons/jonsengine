@@ -2,6 +2,8 @@
 
 #include "include/Core/EngineDefs.h"
 
+#include <utility>
+
 namespace JonsEngine
 {
     /*
@@ -44,7 +46,7 @@ namespace JonsEngine
          */
         // 0 args to constructor
         template <class T, typename... Arguments>
-        inline T* AllocateObject(Arguments... args) { return new (InternalAllocate(sizeof(T))) T(args...); }
+        inline T* AllocateObject(Arguments&&... args) { return new (InternalAllocate(sizeof(T))) T(std::forward<Arguments>(args)...); }
 
         /**
          * Calls the destructor and deallocates memory of a object

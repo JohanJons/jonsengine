@@ -6,8 +6,6 @@
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
-#include "boost/bind.hpp"
-
 namespace JonsEngine
 {
     ThreadPool::ThreadPool(uint32_t initialNumThreads) : mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mLogger(Logger::GetCoreLogger()),
@@ -96,7 +94,7 @@ namespace JonsEngine
         {
             while (mNumThreads < num)
             {
-                Thread* thread = mMemoryAllocator.AllocateObject<Thread>(boost::bind(&ThreadPool::Worker, this, (void*)NULL));
+                Thread* thread = nullptr;   // TODO: remove
                 mWorkerThreads.push_back(thread);
                 mNumThreads++;
             }
@@ -120,7 +118,7 @@ namespace JonsEngine
 
         while (running)
         {
-            Task task = NULL;
+            Task task = nullptr;
 
             {
                 ScopedLock lock(mMutex);

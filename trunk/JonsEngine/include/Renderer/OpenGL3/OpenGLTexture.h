@@ -21,11 +21,11 @@ namespace JonsEngine
             TEXTURE_UNIT_DIFFUSE = 0
         };
 
-        OpenGLTexture(const TextureID textureID, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureFormat textureFormat, TextureType textureType);
+        OpenGLTexture(const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureFormat textureFormat, TextureType textureType, Logger& logger);
         ~OpenGLTexture();
 
-        TextureID mTextureID;
         Logger& mLogger;
+        TextureID mTextureID;
 
         TextureType mTextureType;
         GLuint mTexture;

@@ -4,7 +4,6 @@
 #include "include/Resources/ResourceManifest.h"
 
 #include "boost/functional/hash.hpp"
-#include "boost/bind.hpp"
 #include <algorithm>
 
 namespace JonsEngine
@@ -21,12 +20,9 @@ namespace JonsEngine
 
     LightPtr Scene::CreateLight(const std::string& lightName, Light::LightType type)
     {
-        LightPtr light(mMemoryAllocator.AllocateObject<Light>(lightName, type),
-                           boost::bind(&HeapAllocator::DeallocateObject<Light>, &mMemoryAllocator, _1));
+        mLights.emplace_back(mMemoryAllocator.AllocateObject<Light>(lightName, type), std::bind(&HeapAllocator::DeallocateObject<Light>, &mMemoryAllocator, std::placeholders::_1));
 
-        mLights.push_back(light);
-
-        return light;
+        return mLights.back();
     }
 
     LightPtr Scene::CreateLight(const std::string& lightName, Light::LightType type, const SceneNodePtr node)
@@ -34,10 +30,7 @@ namespace JonsEngine
         LightPtr light = CreateLight(lightName, type);
 
         if (light)
-        {
             light->mSceneNode = node;
-            mLights.push_back(light);
-        }
 
         return light;
     }
@@ -45,7 +38,9 @@ namespace JonsEngine
     LightPtr Scene::GetLight(const std::string& lightName)
     {
         LightPtr ret;
-        std::vector<LightPtr>::iterator iter = std::find_if(mLights.begin(), mLights.end(), boost::bind(&Light::mName, _1) == lightName);
+        size_t hashedID = boost::hash_value(lightName);
+
+        std::vector<LightPtr>::iterator iter = std::find_if(mLights.begin(), mLights.end(), [hashedID](const LightPtr light) { return light->mHashedID == hashedID; });
 
         if (iter != mLights.end())
             ret = * iter;
@@ -60,7 +55,8 @@ namespace JonsEngine
         
     void Scene::DeleteLight(const std::string& lightName)
     {
-        std::vector<LightPtr>::iterator iter = std::find_if(mLights.begin(), mLights.end(), boost::bind(&Light::mName, _1) == lightName);
+        size_t hashedID = boost::hash_value(lightName);
+        std::vector<LightPtr>::iterator iter = std::find_if(mLights.begin(), mLights.end(), [hashedID](const LightPtr light) { return light->mHashedID == hashedID; });
 
         if (iter != mLights.end())
             mLights.erase(iter);
