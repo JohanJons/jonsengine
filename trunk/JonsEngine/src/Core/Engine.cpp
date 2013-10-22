@@ -16,10 +16,12 @@
 namespace JonsEngine
 {
 
-    Engine::Engine(const EngineSettings& settings) : mLog(Logger::GetCoreLogger()), mMemoryAllocator("DefaultHeapAllocator", HeapAllocator::DLMALLOC),
+    Engine::Engine(const EngineSettings& settings) : mLog(Logger::GetCoreLogger()), 
+                                                     mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<HeapAllocator>("DefaultHeapAllocator"), 
+                                                                      [](HeapAllocator* allocator) { HeapAllocator::GetDefaultHeapAllocator().DeallocateObject(allocator); }),
                                                      mWindow(settings, std::bind(&Engine::OnContextCreated, this)), 
-                                                     mRenderer(mMemoryAllocator.AllocateObject<OpenGLRenderer>(settings, mMemoryAllocator),
-                                                        std::bind(&HeapAllocator::DeallocateObject<OpenGLRenderer>, &mMemoryAllocator, std::placeholders::_1)),
+                                                     mRenderer(mMemoryAllocator->AllocateObject<OpenGLRenderer>(settings, mMemoryAllocator),
+                                                               [this](OpenGLRenderer* renderer) { mMemoryAllocator->DeallocateObject(renderer); }),
                                                      mResourceManifest(mRenderer, mMemoryAllocator), 
                                                      mSceneManager(mResourceManifest)
     {
@@ -127,6 +129,6 @@ namespace JonsEngine
 
     void Engine::OnContextCreated()
     {
-        mRenderer.reset(mMemoryAllocator.AllocateObject<OpenGLRenderer>(*mRenderer, mMemoryAllocator));
+        mRenderer.reset(mMemoryAllocator->AllocateObject<OpenGLRenderer>(*mRenderer, mMemoryAllocator));
     }
-}
+} 

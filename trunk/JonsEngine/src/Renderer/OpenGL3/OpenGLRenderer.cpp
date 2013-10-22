@@ -17,21 +17,28 @@
 
 namespace JonsEngine
 {
-    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings, HeapAllocator& memoryAllocator) : OpenGLRenderer(engineSettings.mAnisotropicFiltering, memoryAllocator)
+    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator) : OpenGLRenderer(engineSettings.mAnisotropicFiltering, memoryAllocator)
     {
     }
 
-    OpenGLRenderer::OpenGLRenderer(const OpenGLRenderer& renderer, HeapAllocator& memoryAllocator) : OpenGLRenderer(renderer.mCurrentAnisotropy, memoryAllocator)
+    OpenGLRenderer::OpenGLRenderer(OpenGLRenderer& renderer, IMemoryAllocatorPtr memoryAllocator) : OpenGLRenderer(renderer.mCurrentAnisotropy, memoryAllocator)
     {
+        // move the meshes, recreate the VAO
         for (const OpenGLMeshPair mesh : renderer.mMeshes)
+        {
+            glDeleteVertexArrays(1, &mesh.second);
+            CHECK_GL_ERROR(mLogger);
+
             mMeshes.emplace_back(mesh.first, SetupVAO(mesh.first));
+        }
+        renderer.mMeshes.clear();
 
         for (const OpenGLTexturePtr texture : renderer.mTextures)
             mTextures.push_back(texture);
     }
 
-    OpenGLRenderer::OpenGLRenderer(const float anisotropy, HeapAllocator& memoryAllocator) : 
-        mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mLogger(Logger::GetRendererLogger()),
+    OpenGLRenderer::OpenGLRenderer(const float anisotropy, IMemoryAllocatorPtr memoryAllocator) : 
+        mMemoryAllocator(memoryAllocator), mLogger(Logger::GetRendererLogger()),
         mDefaultProgram("DefaultProgram", gVertexShader, gFragmentShader), mUniBufferTransform("UnifTransform", mLogger, mDefaultProgram), mUniBufferMaterial("UnifMaterial", mLogger, mDefaultProgram), 
         mUniBufferLightingInfo("UnifLighting", mLogger, mDefaultProgram), mCurrentAnisotropy(anisotropy)
     {
@@ -89,7 +96,8 @@ namespace JonsEngine
 
     MeshID OpenGLRenderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData)
     {
-        OpenGLMeshPtr meshPtr(mMemoryAllocator.AllocateObject<OpenGLMesh>(vertexData, normalData, texCoords, indexData, mLogger), [=](OpenGLMesh* mesh) { mMemoryAllocator.DeallocateObject<OpenGLMesh>(mesh); });
+        auto allocator = mMemoryAllocator;
+        OpenGLMeshPtr meshPtr(allocator->AllocateObject<OpenGLMesh>(vertexData, normalData, texCoords, indexData, mLogger), [=](OpenGLMesh* mesh) { allocator->DeallocateObject<OpenGLMesh>(mesh); });
 
         mMeshes.emplace_back(meshPtr, SetupVAO(meshPtr));
 
@@ -98,7 +106,8 @@ namespace JonsEngine
 
     TextureID OpenGLRenderer::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureFormat textureFormat)
     {
-        mTextures.emplace_back(mMemoryAllocator.AllocateObject<OpenGLTexture>(textureData, textureWidth, textureHeight, textureFormat, textureType, mLogger), [=](OpenGLTexture* texture) { mMemoryAllocator.DeallocateObject<OpenGLTexture>(texture); });  // TODO: remove _VARIADIC_MAX 6 in MSVC12 with compatible boost
+        auto allocator = mMemoryAllocator;
+        mTextures.emplace_back(allocator->AllocateObject<OpenGLTexture>(textureData, textureWidth, textureHeight, textureFormat, textureType, mLogger), [=](OpenGLTexture* texture) { allocator->DeallocateObject<OpenGLTexture>(texture); });  // TODO: remove _VARIADIC_MAX 6 in MSVC12 with compatible boost
         
         return mTextures.back()->mTextureID;
     }
@@ -118,7 +127,6 @@ namespace JonsEngine
 
         // both containers are assumed to be sorted by MeshID ascending
         auto meshIterator = mMeshes.begin();
-        auto funcGetTexture = [this](const TextureID id) { return std::find_if(mTextures.begin(), mTextures.end(), [id](const OpenGLTexturePtr ptr) { return ptr->mTextureID = id; }); };
         for (const Renderable& renderable : renderQueue)
         {
             if (renderable.mMesh == INVALID_MESH_ID)

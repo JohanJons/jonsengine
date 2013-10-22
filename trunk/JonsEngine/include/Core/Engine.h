@@ -55,7 +55,7 @@ namespace JonsEngine
 
 
         Logger& mLog;
-        HeapAllocator mMemoryAllocator;
+        IMemoryAllocatorPtr mMemoryAllocator;
 
         /* Modules */
         GLFWWindowManager mWindow;

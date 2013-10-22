@@ -3,12 +3,20 @@
 #include "include/Core/EngineDefs.h"
 
 #include <utility>
+#include <memory>
 
 namespace JonsEngine
 {
+    class IMemoryAllocator;
+
     /*
      * Common interface for memory allocator schemes such as HeapAllocator
      */
+
+    /*
+     * IMemoryAllocatorPtr definition
+     */
+    typedef std::shared_ptr<IMemoryAllocator> IMemoryAllocatorPtr;
 
     /* IMemoryAllocator definition */
     class IMemoryAllocator
@@ -44,7 +52,6 @@ namespace JonsEngine
          * @param [...]: arguments that will be passed to the constructor of the object allocated.
          * @return: address of the constructed object if successfull, otherwise NULL.
          */
-        // 0 args to constructor
         template <class T, typename... Arguments>
         inline T* AllocateObject(Arguments&&... args) { return new (InternalAllocate(sizeof(T))) T(std::forward<Arguments>(args)...); }
 

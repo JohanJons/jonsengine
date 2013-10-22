@@ -27,9 +27,9 @@ namespace JonsEngine
     class OpenGLRenderer
     {
     public:
-        OpenGLRenderer(const EngineSettings& engineSettings, HeapAllocator& memoryAllocator);
-        OpenGLRenderer(const OpenGLRenderer& renderer, HeapAllocator& memoryAllocator);
-        OpenGLRenderer(const float anisotropy, HeapAllocator& memoryAllocator);
+        OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator);
+        OpenGLRenderer(OpenGLRenderer& renderer, IMemoryAllocatorPtr memoryAllocator);
+        OpenGLRenderer(const float anisotropy, IMemoryAllocatorPtr memoryAllocator);
         ~OpenGLRenderer();
 
         MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData);
@@ -81,7 +81,7 @@ namespace JonsEngine
 
         VAO SetupVAO(OpenGLMeshPtr mesh);
 
-        IMemoryAllocator& mMemoryAllocator;
+        IMemoryAllocatorPtr mMemoryAllocator;
         Logger& mLogger;
 
         std::vector<OpenGLMeshPair> mMeshes;

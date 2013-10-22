@@ -9,7 +9,7 @@
 
 namespace JonsEngine
 {
-    ResourceManifest::ResourceManifest(OpenGLRendererPtr renderer, IMemoryAllocator& memoryAllocator) : mRenderer(renderer), mMemoryAllocator(memoryAllocator)
+    ResourceManifest::ResourceManifest(OpenGLRendererPtr renderer, IMemoryAllocatorPtr memoryAllocator) : mMemoryAllocator(memoryAllocator), mRenderer(renderer)
     {
     }
        
@@ -34,8 +34,9 @@ namespace JonsEngine
         if (!CreateRectangleData(sizeX, sizeY, sizeZ, vertexData, normalData, texcoordData, indiceData))
             return ptr;
 
-        ptr        = *mModels.insert(mModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(modelName), std::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, std::placeholders::_1)));
-        ptr->mMesh = mRenderer->CreateMesh(vertexData, normalData, texcoordData, indiceData);
+        auto allocator = mMemoryAllocator;
+        ptr            = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName), [=](Model* model) { allocator->DeallocateObject(model); }));
+        ptr->mMesh     = mRenderer->CreateMesh(vertexData, normalData, texcoordData, indiceData);
 
         return ptr;
     }
@@ -52,7 +53,8 @@ namespace JonsEngine
 
         if (iter != jonsPkg->mModels.end())
         {
-            ptr = *mModels.insert(mModels.end(), ModelPtr(mMemoryAllocator.AllocateObject<Model>(ProcessModel(*iter, jonsPkg)), std::bind(&HeapAllocator::DeallocateObject<Model>, &mMemoryAllocator, std::placeholders::_1)));
+            auto allocator = mMemoryAllocator;
+            ptr            = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(ProcessModel(*iter, jonsPkg)), [=](Model* model) { allocator->DeallocateObject(model); }));
             mPackageAssetMap.insert(std::make_pair(jonsPkg->mInternalID , ptr->mName));
         }
 
@@ -83,7 +85,8 @@ namespace JonsEngine
 
         if (iter != jonsPkg->mMaterials.end())
         {
-            ptr = *mMaterials.insert(mMaterials.end(), MaterialPtr(mMemoryAllocator.AllocateObject<Material>(ProcessMaterial(*iter, jonsPkg)), std::bind(&HeapAllocator::DeallocateObject<Material>, &mMemoryAllocator, std::placeholders::_1)));
+            auto allocator = mMemoryAllocator;
+            ptr            = *mMaterials.insert(mMaterials.end(), MaterialPtr(allocator->AllocateObject<Material>(ProcessMaterial(*iter, jonsPkg)), [=](Material* material) { allocator->DeallocateObject(material); }));
             mPackageAssetMap.insert(std::make_pair(jonsPkg->mInternalID, ptr->mName));
         }
 

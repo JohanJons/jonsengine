@@ -6,7 +6,6 @@
 
 #include <string.h>
 
-
 namespace JonsEngine
 {
     /*
@@ -22,9 +21,10 @@ namespace JonsEngine
             DLMALLOC
         };
 
+        HeapAllocator(const std::string& allocatorName);
         HeapAllocator(const std::string& allocatorName, const HeapAllocatorBackend backend);
         ~HeapAllocator();
-        static HeapAllocator& GetDefaultHeapAllocator();
+        static IMemoryAllocator& GetDefaultHeapAllocator();
 
         void* Allocate(size_t size);
         void* Reallocate(void* memblock, size_t size);

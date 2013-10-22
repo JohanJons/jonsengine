@@ -84,7 +84,6 @@ namespace JonsEngine
                                         out vec4 finalColor;						                                                              "  
                                                                                                                                                   "         \n \
                                                                                                                                                             \n \
-                                                                                                                                                            \n \
                                         void CalcGaussianSpecular(in vec3 dirToLight, out float gaussianTerm)                                               \n \
                                         {                                                                                                                   \n \
                                             vec3 viewDirection = normalize(Lighting.mViewDirection);                                                        \n \
@@ -97,55 +96,40 @@ namespace JonsEngine
                                             gaussianTerm = exp(exponent);                                                                                   \n \
                                         }                                                                                                                   \n \
                                                                                                                                                             \n \
-                                        vec4 CalcPointLight(in Light light)                                                                                 \n \
-                                        {                                                                                                                   \n \
-                                            vec3 positionDiff = light.mLightPosition.xyz - frag_position;                                                   \n \
-                                            float dist        = length(positionDiff);                                                                       \n \
-                                            dist              = max(dist - light.mLightRadius, 0);                                                          \n \
-                                                                                                                                                            \n \
-                                            float attenuation = 1 / ((dist/light.mLightRadius + 1) * (dist/light.mLightRadius + 1));                        \n \
-                                            attenuation       = (attenuation - light.mMaxDistance) / (1 - light.mMaxDistance);                              \n \
-                                            attenuation       = max(attenuation, 0);                                                                        \n \
-                                                                                                                                                            \n \
-                                            vec3 dirToLight   = normalize(positionDiff);                                                                    \n \
-                                            float angleNormal = dot(normalize(frag_normal), dirToLight);                                                    \n \
-                                            angleNormal       = clamp(angleNormal, 0, 1);                                                                   \n \
-                                                                                                                                                            \n \
-                                            float gaussianTerm = 0.0;                                                                                       \n \
-                                            if (angleNormal > 0.0)                                                                                          \n \
-                                                CalcGaussianSpecular(dirToLight, gaussianTerm);                                                             \n \
-                                                                                                                                                            \n \
-                                           return (attenuation * angleNormal  * Material.mDiffuseColor  * light.mLightIntensity * light.mLightColor) +      \n \
-                                                  (attenuation * gaussianTerm * Material.mSpecularColor * light.mLightIntensity * light.mLightColor);       \n \
-                                        }                                                                                                                   \n \
-                                                                                                                                                            \n \
-                                        vec4 CalcDirectionalLight(in Light light)                                                                           \n \
-                                        {                                                                                                                   \n \
-                                            vec3 dirToLight   = normalize(light.mLightDirection.xyz);                                                       \n \
-                                            float angleNormal = dot(normalize(frag_normal), dirToLight);                                                    \n \
-                                            angleNormal       = clamp(angleNormal, 0, 1);                                                                   \n \
-                                                                                                                                                            \n \
-                                            float gaussianTerm = 0.0;                                                                                       \n \
-                                            if (angleNormal > 0.0)                                                                                          \n \
-                                                CalcGaussianSpecular(dirToLight, gaussianTerm);                                                             \n \
-                                                                                                                                                            \n \
-                                            return (angleNormal  * Material.mDiffuseColor  * light.mLightIntensity * light.mLightColor) +                   \n \
-                                                   (gaussianTerm * Material.mSpecularColor * light.mLightIntensity * light.mLightColor);                    \n \
-                                        }                                                                                                                   \n \
-                                                                                                                                                            \n \
-                                        vec4 CalcAmbientLight(in Light light)                                                                               \n \
-                                        {                                                                                                                   \n \
-                                            return (Material.mAmbientColor * light.mLightIntensity * light.mLightColor);                                    \n \
-                                        }                                                                                                                   \n \
-                                                                                                                                                            \n \
                                         vec4 CalculateLighting(in Light light, in vec4 diffuseTexture)                                                      \n \
                                         {                                                                                                                   \n \
                                             if (light.mLightType == 1)          // point light                                                              \n \
-                                                return diffuseTexture * CalcPointLight(light);                                                              \n \
-                                            else if (light.mLightType == 2)     // directional light                                                        \n \
-                                                return diffuseTexture * CalcDirectionalLight(light);                                                        \n \
+                                            {                                                                                                               \n \
+                                                vec3 positionDiff = light.mLightPosition.xyz - frag_position;                                                   \n \
+                                                float dist        = max(length(positionDiff) - light.mLightRadius, 0);                                          \n \
+                                                                                                                                                                \n \
+                                                float attenuation = 1 / ((dist/light.mLightRadius + 1) * (dist/light.mLightRadius + 1));                        \n \
+                                                attenuation       = max((attenuation - light.mMaxDistance) / (1 - light.mMaxDistance), 0);                      \n \
+                                                                                                                                                                \n \
+                                                vec3 dirToLight   = normalize(positionDiff);                                                                    \n \
+                                                float angleNormal = clamp(dot(normalize(frag_normal), dirToLight), 0, 1);                                       \n \
+                                                                                                                                                                \n \
+                                                float gaussianTerm = 0.0;                                                                                                         \n \
+                                                if (angleNormal > 0.0)                                                                                                            \n \
+                                                    CalcGaussianSpecular(dirToLight, gaussianTerm);                                                                               \n \
+                                                                                                                                                                                  \n \
+                                                return diffuseTexture * (attenuation * angleNormal  * Material.mDiffuseColor  * light.mLightIntensity * light.mLightColor) +      \n \
+                                                                        (attenuation * gaussianTerm * Material.mSpecularColor * light.mLightIntensity * light.mLightColor);       \n \
+                                            }                                                                                                                                     \n \
+                                            else if (light.mLightType == 2)     // directional light                                                                              \n \
+                                            {                                                                                                                                     \n \
+                                                vec3 dirToLight   = normalize(light.mLightDirection.xyz);                                                                         \n \
+                                                float angleNormal = clamp(dot(normalize(frag_normal), dirToLight), 0, 1);                                                         \n \
+                                                                                                                                                                \n \
+                                                float gaussianTerm = 0.0;                                                                                       \n \
+                                                if (angleNormal > 0.0)                                                                                          \n \
+                                                    CalcGaussianSpecular(dirToLight, gaussianTerm);                                                             \n \
+                                                                                                                                                                \n \
+                                                return diffuseTexture * (angleNormal  * Material.mDiffuseColor  * light.mLightIntensity * light.mLightColor) +  \n \
+                                                                        (gaussianTerm * Material.mSpecularColor * light.mLightIntensity * light.mLightColor);   \n \
+                                            }                                                                                                                   \n \
                                             else if (light.mLightType == 4)     // ambient light                                                            \n \
-                                                return diffuseTexture * CalcAmbientLight(light);                                                            \n \
+                                                return diffuseTexture * Material.mAmbientColor * light.mLightIntensity * light.mLightColor;                 \n \
                                             else                                                                                                            \n \
                                                 return vec4(0.0);                                                                                           \n \
                                         }                                                                                                                   \n \
