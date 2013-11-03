@@ -37,6 +37,8 @@ namespace JonsEngine
         std::vector<float> mVertexData;
         std::vector<float> mNormalData;
         std::vector<float> mTexCoordsData;
+        std::vector<float> mTangents;
+        std::vector<float> mBitangents;
         std::vector<uint32_t> mIndiceData;
         uint16_t mMaterialIndex;
         bool mHasMaterial;
@@ -63,7 +65,10 @@ namespace JonsEngine
     struct PackageMaterial
     {
         std::string mName;
+        bool mHasDiffuseTexture;
+        bool mHasNormalTexture;
         PackageTexture mDiffuseTexture;
+        PackageTexture mNormalTexture;
         Vec3 mDiffuseColor;
         Vec3 mAmbientColor;
         Vec3 mSpecularColor;
@@ -102,6 +107,7 @@ namespace JonsEngine
      /* JonsPackagePtr definition */
     typedef std::shared_ptr<JonsPackage> JonsPackagePtr;
 
+
     /*
      * Reading/writing JonsPackage files
      */
@@ -139,6 +145,8 @@ namespace boost
             ar & mesh.mVertexData;
             ar & mesh.mNormalData;
             ar & mesh.mTexCoordsData;
+            ar & mesh.mTangents;
+            ar & mesh.mBitangents;
             ar & mesh.mIndiceData;
             ar & mesh.mMaterialIndex;
             ar & mesh.mHasMaterial;
@@ -159,10 +167,14 @@ namespace boost
         void serialize(Archive & ar, JonsEngine::PackageMaterial& material, const unsigned int version)
         {
             ar & material.mName;
+            ar & material.mHasDiffuseTexture;
+            ar & material.mHasNormalTexture;
             ar & material.mDiffuseTexture;
+            ar & material.mNormalTexture;
             ar & material.mDiffuseColor;
             ar & material.mAmbientColor;
             ar & material.mSpecularColor;
+            ar & material.mEmissiveColor;
         }
 
         template<class Archive>

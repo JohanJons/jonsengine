@@ -28,7 +28,7 @@ namespace JonsEngine
     {
     }
 
-    PackageMaterial::PackageMaterial() : mName(""), mDiffuseColor(1.0f), mAmbientColor(1.0f), mSpecularColor(1.0f), mEmissiveColor(0.0f)
+    PackageMaterial::PackageMaterial() : mName(""), mHasDiffuseTexture(false), mHasNormalTexture(false), mDiffuseColor(1.0f), mAmbientColor(1.0f), mSpecularColor(1.0f), mEmissiveColor(0.0f)
     {
     }
 

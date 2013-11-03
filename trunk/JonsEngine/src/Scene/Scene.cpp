@@ -40,7 +40,7 @@ namespace JonsEngine
         LightPtr ret;
         size_t hashedID = boost::hash_value(lightName);
 
-        std::vector<LightPtr>::iterator iter = std::find_if(mLights.begin(), mLights.end(), [hashedID](const LightPtr light) { return light->mHashedID == hashedID; });
+        auto iter = std::find_if(mLights.begin(), mLights.end(), [hashedID](const LightPtr light) { return light->mHashedID == hashedID; });
 
         if (iter != mLights.end())
             ret = * iter;
@@ -56,7 +56,7 @@ namespace JonsEngine
     void Scene::DeleteLight(const std::string& lightName)
     {
         size_t hashedID = boost::hash_value(lightName);
-        std::vector<LightPtr>::iterator iter = std::find_if(mLights.begin(), mLights.end(), [hashedID](const LightPtr light) { return light->mHashedID == hashedID; });
+        auto iter = std::find_if(mLights.begin(), mLights.end(), [hashedID](const LightPtr light) { return light->mHashedID == hashedID; });
 
         if (iter != mLights.end())
             mLights.erase(iter);

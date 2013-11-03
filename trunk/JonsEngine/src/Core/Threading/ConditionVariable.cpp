@@ -10,7 +10,7 @@ namespace JonsEngine
         #if defined _WIN32 || _WIN64
             InitializeConditionVariable(&mCondVarHandle);
         #else
-            pthread_cond_init(&mCondVarHandle, NULL);
+            pthread_cond_init(&mCondVarHandle, nullptr);
         #endif
     }
 
@@ -48,7 +48,7 @@ namespace JonsEngine
             struct timespec ts;
             struct timeval tp;
 
-            gettimeofday(&tp, NULL);
+            gettimeofday(&tp, nullptr);
 
             ts.tv_sec  = tp.tv_sec;
             ts.tv_nsec = tp.tv_usec * 1000;

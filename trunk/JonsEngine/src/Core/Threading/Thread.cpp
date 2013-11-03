@@ -37,7 +37,7 @@ namespace JonsEngine
     /////               Thread implementation               /////
     /////////////////////////////////////////////////////////////
 
-    Thread::Thread() : mHandle(NULL), mAllocator(HeapAllocator::GetDefaultHeapAllocator()), mThreadInfo(NULL)
+    Thread::Thread() : mHandle(nullptr), mAllocator(HeapAllocator::GetDefaultHeapAllocator()), mThreadInfo(nullptr)
     {
     }
 
@@ -57,7 +57,7 @@ namespace JonsEngine
 
     Thread::~Thread()
     {
-        if (mThreadInfo != NULL && mThreadInfo->mState == Thread::RUNNING)
+        if (mThreadInfo != nullptr && mThreadInfo->mState == Thread::RUNNING)
             Join();
 
         Destroy();
@@ -79,7 +79,7 @@ namespace JonsEngine
 
     int32_t Thread::Join()
     {
-        if (mThreadInfo != NULL && mThreadInfo->mState == Thread::RUNNING)
+        if (mThreadInfo != nullptr && mThreadInfo->mState == Thread::RUNNING)
         {
             _JoinThread(mHandle);
             return 0;
@@ -90,7 +90,7 @@ namespace JonsEngine
 
     int32_t Thread::SetPriority(int32_t priority)
     {
-        if (mThreadInfo != NULL && mThreadInfo->mState == Thread::RUNNING && mHandle != NULL)
+        if (mThreadInfo != nullptr && mThreadInfo->mState == Thread::RUNNING && mHandle != nullptr)
             return jons_SetThreadPriority(mHandle, priority);
         else
             return -1;
@@ -107,12 +107,12 @@ namespace JonsEngine
             thread->mState = Thread::FINISHED;
         }
 
-        return NULL;
+        return nullptr;
     }
 
     Thread::ThreadState Thread::GetThreadState() const
     {
-        if (mThreadInfo != NULL)
+        if (mThreadInfo != nullptr)
             return mThreadInfo->mState;
         else
             return Thread::DETACHED;
@@ -137,11 +137,11 @@ namespace JonsEngine
 
     int32_t Thread::Destroy()
     {
-        if (mThreadInfo != NULL && mThreadInfo->mState == Thread::FINISHED)
+        if (mThreadInfo != nullptr && mThreadInfo->mState == Thread::FINISHED)
         {
             mAllocator.Deallocate(mThreadInfo);
 
-            mThreadInfo = NULL;
+            mThreadInfo = nullptr;
             Detach();
 
             return 0;
@@ -152,10 +152,10 @@ namespace JonsEngine
 
     int32_t Thread::Detach()
     {
-        if (mThreadInfo != NULL && (mThreadInfo->mState == Thread::RUNNING || mThreadInfo->mState == Thread::FINISHED))
+        if (mThreadInfo != nullptr && (mThreadInfo->mState == Thread::RUNNING || mThreadInfo->mState == Thread::FINISHED))
         {
-            mThreadInfo = NULL;
-            mHandle = NULL;
+            mThreadInfo = nullptr;
+            mHandle = nullptr;
 
             return 0;
         }
@@ -165,12 +165,12 @@ namespace JonsEngine
 
     Thread::ThreadHandle Thread::_CreateThread(void* (*start) (void*), void* arg)
     {
-        ThreadHandle handle = NULL;
+        ThreadHandle handle = nullptr;
 
         #if defined _WIN32 || _WIN64
-            handle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)start, arg, NULL, NULL);
+            handle = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)start, arg, NULL, nullptr);
         #elif defined ANDROID
-            pthread_create(&handle, NULL, start, arg);
+            pthread_create(&handle, nullptr, start, arg);
         #endif
 
         return handle;
@@ -182,10 +182,10 @@ namespace JonsEngine
             if  (WaitForSingleObject(handle, INFINITE) == WAIT_FAILED)
             {
                 CloseHandle(handle);
-                handle = NULL;
+                handle = nullptr;
             }
         #elif defined ANDROID
-            pthread_join(handle, NULL);
+            pthread_join(handle, nullptr);
         #endif
     }
 }

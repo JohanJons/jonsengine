@@ -52,7 +52,7 @@ namespace JonsEngine
         {
             glBindBuffer(GL_UNIFORM_BUFFER, mBuffer);
             CHECK_GL_ERROR(mLogger);
-            glBufferData(GL_UNIFORM_BUFFER, mMaxSize * mBlockOffset, NULL, GL_DYNAMIC_DRAW);
+            glBufferData(GL_UNIFORM_BUFFER, mMaxSize * mBlockOffset, 0, GL_DYNAMIC_DRAW);
             CHECK_GL_ERROR(mLogger);
             glBindBufferRange(GL_UNIFORM_BUFFER, mBindingIndex, mBuffer, 0, sizeof(ContentType));
             CHECK_GL_ERROR(mLogger);
@@ -95,12 +95,12 @@ namespace JonsEngine
             glBindBuffer(GL_COPY_WRITE_BUFFER, mCopyBuffer);
             CHECK_GL_ERROR(mLogger);
 
-            glBufferData(GL_COPY_WRITE_BUFFER, mCurrentSize * mBlockOffset, NULL, GL_DYNAMIC_COPY);
+            glBufferData(GL_COPY_WRITE_BUFFER, mCurrentSize * mBlockOffset, 0, GL_DYNAMIC_COPY);
             CHECK_GL_ERROR(mLogger);
             glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, mCurrentSize * mBlockOffset);
             CHECK_GL_ERROR(mLogger);
 
-            glBufferData(GL_COPY_READ_BUFFER, newSize * mBlockOffset, NULL, GL_DYNAMIC_DRAW);
+            glBufferData(GL_COPY_READ_BUFFER, newSize * mBlockOffset, 0, GL_DYNAMIC_DRAW);
             CHECK_GL_ERROR(mLogger);
             glCopyBufferSubData(GL_COPY_WRITE_BUFFER, GL_COPY_READ_BUFFER, 0, 0, (mCurrentSize <= newSize ? mCurrentSize : newSize) * mBlockOffset);
             CHECK_GL_ERROR(mLogger);

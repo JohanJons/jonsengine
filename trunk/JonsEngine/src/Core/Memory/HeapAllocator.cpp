@@ -25,7 +25,7 @@ namespace JonsEngine
 
     void* HeapAllocator::Allocate(size_t size)
     {
-        void* alloc = NULL;
+        void* alloc = nullptr;
 
         if (mBackend == HeapAllocator::DLMALLOC && size)
             alloc = dlmalloc(size);
@@ -37,7 +37,7 @@ namespace JonsEngine
 
     void* HeapAllocator::Reallocate(void* memblock, size_t size)
     {
-        void* alloc = NULL;
+        void* alloc = nullptr;
 
         if (mBackend == HeapAllocator::DLMALLOC && memblock && size)
             alloc = dlrealloc(memblock, size);

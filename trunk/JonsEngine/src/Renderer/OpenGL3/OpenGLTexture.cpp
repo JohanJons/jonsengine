@@ -15,7 +15,7 @@ namespace JonsEngine
         glBindTexture(GL_TEXTURE_2D, mTexture);
         CHECK_GL_ERROR(mLogger);
 
-        GLint glTextureFormat = textureFormat == TextureFormat::TEXTURE_FORMAT_RGB ? GL_RGB : TextureFormat::TEXTURE_FORMAT_RGBA ? GL_RGBA : GL_RED;
+        GLint glTextureFormat = (textureFormat == TextureFormat::TEXTURE_FORMAT_RGB ? GL_RGB : textureFormat == TextureFormat::TEXTURE_FORMAT_RGBA ? GL_RGBA : GL_RED);
         glTexImage2D(GL_TEXTURE_2D, 0, glTextureFormat, textureWidth, textureHeight, 0, glTextureFormat, GL_UNSIGNED_BYTE, &textureData[0]);
         CHECK_GL_ERROR(mLogger);
         

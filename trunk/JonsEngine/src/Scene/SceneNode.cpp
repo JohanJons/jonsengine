@@ -27,7 +27,7 @@ namespace JonsEngine
     SceneNodePtr SceneNode::FindChildNode(const std::string& nodeName)
     {
         SceneNodePtr ret;
-        std::vector<SceneNodePtr>::iterator iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), [nodeName](const SceneNodePtr node) { return node->GetNodeName() == nodeName; });
+        auto iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), [nodeName](const SceneNodePtr node) { return node->GetNodeName() == nodeName; });
 
         if (iter == mChildNodes.end())
         {
@@ -47,7 +47,7 @@ namespace JonsEngine
     bool SceneNode::RemoveChildNode(const std::string& nodeName)
     {
         bool isFound = false;
-        std::vector<SceneNodePtr>::iterator iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), [nodeName](const SceneNodePtr node) { return node->GetNodeName() == nodeName; });
+        auto iter = std::find_if(mChildNodes.begin(), mChildNodes.end(), [nodeName](const SceneNodePtr node) { return node->GetNodeName() == nodeName; });
 
         if (iter != mChildNodes.end())
         {
@@ -68,7 +68,7 @@ namespace JonsEngine
     bool SceneNode::RemoveChildNode(SceneNodePtr node)
     {
         bool isFound = false;
-        std::vector<SceneNodePtr>::iterator iter = std::find(mChildNodes.begin(), mChildNodes.end(), node);
+        auto iter = std::find(mChildNodes.begin(), mChildNodes.end(), node);
 
         if (iter != mChildNodes.end())
         {

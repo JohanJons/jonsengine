@@ -8,7 +8,7 @@ namespace JonsEngine
         #if defined _WIN32 || _WIN64
             InitializeCriticalSection(&mHandle);
         #elif ANDROID
-            pthread_mutex_init(&mHandle, NULL);
+            pthread_mutex_init(&mHandle, nullptr);
         #endif
     }
 

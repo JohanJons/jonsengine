@@ -32,7 +32,7 @@ namespace JonsEngine
         OpenGLRenderer(const float anisotropy, IMemoryAllocatorPtr memoryAllocator);
         ~OpenGLRenderer();
 
-        MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData);
+        MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData);
         TextureID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureFormat textureFormat);
 
         void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting);
@@ -46,8 +46,6 @@ namespace JonsEngine
 
 
     private:
-        typedef std::shared_ptr<OpenGLMesh> OpenGLMeshPtr;
-        typedef std::shared_ptr<OpenGLTexture> OpenGLTexturePtr;
         typedef GLuint VAO;
         typedef std::pair<OpenGLMeshPtr, VAO> OpenGLMeshPair;
 
@@ -68,13 +66,14 @@ namespace JonsEngine
             Vec4 mAmbientColor;
             Vec4 mSpecularColor;
             Vec4 mEmissiveColor;
-            int32_t mHasDiffuseTexture;
-            int32_t mLightingEnabled;
+            uint32_t mHasDiffuseTexture;
+            uint32_t mHasNormalTexture;
+            uint32_t mLightingEnabled;
             float mSpecularFactor;
 
-            Material(const Vec4& diffuseColor, const Vec4& ambientColor, const Vec4& specularColor, const Vec4& emissiveColor, const int32_t hasDiffuseTexture, const int32_t lightingEnabled, const float specularFactor) 
+            Material(const Vec4& diffuseColor, const Vec4& ambientColor, const Vec4& specularColor, const Vec4& emissiveColor, const bool hasDiffuseTexture, const bool hasNormalTexture, const bool lightingEnabled, const float specularFactor) 
                 : 
-                mDiffuseColor(diffuseColor), mAmbientColor(ambientColor), mSpecularColor(specularColor),  mEmissiveColor(emissiveColor), mHasDiffuseTexture(hasDiffuseTexture), mLightingEnabled(lightingEnabled), mSpecularFactor(specularFactor)
+                mDiffuseColor(diffuseColor), mAmbientColor(ambientColor), mSpecularColor(specularColor),  mEmissiveColor(emissiveColor), mHasDiffuseTexture(hasDiffuseTexture), mHasNormalTexture(hasNormalTexture), mLightingEnabled(lightingEnabled), mSpecularFactor(specularFactor)
             {
             }
         };

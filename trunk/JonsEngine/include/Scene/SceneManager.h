@@ -36,7 +36,7 @@ namespace JonsEngine
 
 
     /* SceneManager inlines */
-    inline Scene* SceneManager::GetActiveScene() const                      { return mActiveScene;          }  
-    inline const std::vector<Scene*>& SceneManager::GetAllScenes() const    { return mScenes;               }
-    inline bool SceneManager::HasActiveScene() const                        { return mActiveScene != NULL;  }
+    inline Scene* SceneManager::GetActiveScene() const                      { return mActiveScene;            }  
+    inline const std::vector<Scene*>& SceneManager::GetAllScenes() const    { return mScenes;                 }
+    inline bool SceneManager::HasActiveScene() const                        { return mActiveScene != nullptr; }
 }

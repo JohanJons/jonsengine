@@ -3,8 +3,6 @@
 #include "include/Resources/JonsPackage.h"
 #include "include/Core/EngineDefs.h"
 
-#include "boost/foreach.hpp"
-#include "boost/bind.hpp"
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include <assimp/mesh.h>
@@ -41,11 +39,12 @@ namespace JonsAssetImporter
 
         ImportFlag flag(UNKNOWN_FLAG);
         Assimp::Importer importer;
+        importer.SetExtraVerbose(true);
         std::vector<boost::filesystem::path> assets;
         std::vector<std::string> assetNames;
         std::string package;
 
-        BOOST_FOREACH(const std::string& parameter, parameters)
+        for(const std::string& parameter : parameters)
         {
             if (parameter.compare("-a") == 0)
             {
@@ -138,7 +137,7 @@ namespace JonsAssetImporter
             pkg = JonsPackagePtr(new JonsPackage());
          
         std::vector<std::string>::const_iterator assetName = assetNames.begin();
-        BOOST_FOREACH(const boost::filesystem::path& asset, assets)
+        for(const boost::filesystem::path& asset : assets)
         {
             if (!boost::filesystem::exists(asset) || !boost::filesystem::is_regular_file(asset))
             {
@@ -165,9 +164,11 @@ namespace JonsAssetImporter
 
                 case MATERIAL:
                     {
+                        // assume diffuse texture - could it be anything else?
                         PackageMaterial material;
-                        material.mName           = assetName != assetNames.end() ? *assetName : GetDefaultAssetName(MATERIAL, materialNum++);
-                        material.mDiffuseTexture = ProcessDiffuseTexture(asset);
+                        material.mName              = assetName != assetNames.end() ? *assetName : GetDefaultAssetName(MATERIAL, materialNum++);
+                        material.mDiffuseTexture    = ProcessTexture(asset, TEXTURE_TYPE_DIFFUSE);
+                        material.mHasDiffuseTexture = true;
                         pkg->mMaterials.push_back(material);
 
                         break;
@@ -222,8 +223,22 @@ namespace JonsAssetImporter
                     fullTexturePath.append("/");
                 fullTexturePath.append(texturePath.C_Str());
 
-                PackageTexture diffuseTexture(ProcessDiffuseTexture(fullTexturePath));
-                pkgMaterial.mDiffuseTexture = diffuseTexture;
+                PackageTexture diffuseTexture(ProcessTexture(fullTexturePath, TEXTURE_TYPE_DIFFUSE));
+                pkgMaterial.mDiffuseTexture    = diffuseTexture;
+                pkgMaterial.mHasDiffuseTexture = true;
+            }
+
+            if ((material->GetTextureCount(aiTextureType_NORMALS) > 0 && material->GetTexture(aiTextureType_NORMALS, 0, &texturePath) == aiReturn_SUCCESS) ||
+                (material->GetTextureCount(aiTextureType_HEIGHT) > 0 && material->GetTexture(aiTextureType_HEIGHT, 0, &texturePath) == aiReturn_SUCCESS)) 
+            {
+                std::string fullTexturePath = assetPath.parent_path().string();
+                if (assetPath.has_parent_path())
+                    fullTexturePath.append("/");
+                fullTexturePath.append(texturePath.C_Str());
+
+                PackageTexture normalTexture(ProcessTexture(fullTexturePath, TEXTURE_TYPE_NORMAL));
+                pkgMaterial.mNormalTexture    = normalTexture;
+                pkgMaterial.mHasNormalTexture = true;
             }
 
             aiString materialName;
@@ -265,7 +280,7 @@ namespace JonsAssetImporter
             PackageMesh mesh;
             const aiMesh* m = scene->mMeshes[node->mMeshes[i]];
             
-            // vertice, normal and texcoord data
+            // vertice, normal, texcoord, tangents and bitangents data
             for (unsigned int j = 0; j < m->mNumVertices; j++)
             {
                 mesh.mVertexData.push_back(m->mVertices[j].x);
@@ -283,6 +298,17 @@ namespace JonsAssetImporter
                 {
                     mesh.mTexCoordsData.push_back(m->mTextureCoords[0][j].x);
                     mesh.mTexCoordsData.push_back(m->mTextureCoords[0][j].y);
+                }
+
+                if (m->HasTangentsAndBitangents())
+                {
+                    mesh.mTangents.push_back(m->mTangents[j].x);
+                    mesh.mTangents.push_back(m->mTangents[j].y);
+                    mesh.mTangents.push_back(m->mTangents[j].z);
+
+                    mesh.mBitangents.push_back(m->mBitangents[j].x);
+                    mesh.mBitangents.push_back(m->mBitangents[j].y);
+                    mesh.mBitangents.push_back(m->mBitangents[j].z);
                 }
             }
             
@@ -309,9 +335,9 @@ namespace JonsAssetImporter
     /*
      * Parses a texture pointed by 'assetPath'
      */
-    PackageTexture AssetImporter::ProcessDiffuseTexture(const boost::filesystem::path& assetPath)
+    PackageTexture AssetImporter::ProcessTexture(const boost::filesystem::path& assetPath, const TextureType textureType)
     {
-        PackageTexture diffuseTexture;
+        PackageTexture texture;
         const std::string filename = assetPath.filename().string();
 
         FREE_IMAGE_FORMAT imageFormat = FreeImage_GetFileType(filename.c_str());
@@ -321,33 +347,45 @@ namespace JonsAssetImporter
         if (imageFormat == FIF_UNKNOWN || !FreeImage_FIFSupportsReading(imageFormat))
         {
             Log("-JonsAssetImporter: Unable to open file: " + filename);
-            return diffuseTexture;
+            return texture;
         }
 
         FIBITMAP* bitmap = FreeImage_Load(imageFormat, assetPath.string().c_str());
-
         if (!bitmap || !FreeImage_GetBits(bitmap) || !FreeImage_GetWidth(bitmap) || !FreeImage_GetHeight(bitmap))
         {
             Log("-JonsAssetImporter: Invalid image data: " + filename);
-            return diffuseTexture;
+            return texture;
         }
 
         FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(bitmap);
-        uint32_t bitsPerPixel           = FreeImage_GetBPP(bitmap);
+        uint32_t bytesPerPixel          = FreeImage_GetBPP(bitmap) / 8;
         uint32_t widthInPixels          = FreeImage_GetWidth(bitmap);
         uint32_t heightInPixels         = FreeImage_GetHeight(bitmap);
 
         // should be OK now
-        diffuseTexture.mName          = assetPath.filename().string();
-        diffuseTexture.mTextureWidth  = widthInPixels;
-        diffuseTexture.mTextureHeight = heightInPixels;
-        diffuseTexture.mTextureType   = TextureType::TEXTURE_TYPE_DIFFUSE;
-        diffuseTexture.mTextureFormat = colorType == FIC_RGB ? TextureFormat::TEXTURE_FORMAT_RGB : colorType == FIC_RGBALPHA ? TextureFormat::TEXTURE_FORMAT_RGBA : TextureFormat::TEXTURE_FORMAT_UNKNOWN;
-        diffuseTexture.mTextureData.insert(diffuseTexture.mTextureData.begin(), FreeImage_GetBits(bitmap), FreeImage_GetBits(bitmap) + ((bitsPerPixel/8) * widthInPixels * heightInPixels));
+        texture.mName          = assetPath.filename().string();
+        texture.mTextureWidth  = widthInPixels;
+        texture.mTextureHeight = heightInPixels;
+        texture.mTextureType   = textureType;
+        texture.mTextureFormat = colorType == FIC_RGB ? TextureFormat::TEXTURE_FORMAT_RGB : colorType == FIC_RGBALPHA ? TextureFormat::TEXTURE_FORMAT_RGBA : TextureFormat::TEXTURE_FORMAT_UNKNOWN;
+
+        for(unsigned y = 0; y < FreeImage_GetHeight(bitmap); y++) {
+            BYTE *bits = FreeImage_GetScanLine(bitmap, y);
+
+            for(unsigned x = 0; x < FreeImage_GetWidth(bitmap); x++) {
+                texture.mTextureData.push_back(bits[FI_RGBA_RED]);
+                texture.mTextureData.push_back(bits[FI_RGBA_GREEN]);
+                texture.mTextureData.push_back(bits[FI_RGBA_BLUE]);
+                if (colorType == FIC_RGBALPHA)
+                    texture.mTextureData.push_back(bits[FI_RGBA_ALPHA]);
+
+                bits += bytesPerPixel;
+            }
+        }
 
         FreeImage_Unload(bitmap);
         
-        return diffuseTexture;
+        return texture;
     }
 
 
@@ -368,7 +406,6 @@ namespace JonsAssetImporter
             // default: try as model
             // TODO: check if loadable by assimp
             return MODEL;
-            
     }
 
     /*
@@ -402,13 +439,7 @@ namespace JonsAssetImporter
 
     Vec3 AssetImporter::aiColor3DToJonsVec3(const aiColor3D& color) const
     {
-        Vec3 vec;
-
-        vec.r = color.r;
-        vec.g = color.g;
-        vec.b = color.b;
-
-        return vec;
+        return Vec3(color.r, color.g, color.b);
     }
 
     void AssetImporter::Log(const std::string& msg)

@@ -14,7 +14,7 @@ namespace JonsEngine
         mShaderHandle = glCreateShader(mShaderType);
         const char* shaderCSTR = shaderSource.c_str();
 
-        glShaderSource(mShaderHandle, 1, &shaderCSTR, NULL);
+        glShaderSource(mShaderHandle, 1, &shaderCSTR, 0);
         CHECK_GL_ERROR(mLogger);
 
         glCompileShader(mShaderHandle);

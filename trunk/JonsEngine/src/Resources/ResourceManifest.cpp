@@ -27,16 +27,14 @@ namespace JonsEngine
         if (sizeX <= 0 || sizeY <= 0 || sizeZ <= 0)
             return ptr;
 
-        std::vector<float> vertexData;
-        std::vector<float> normalData;
-        std::vector<float> texcoordData;
+        std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
         std::vector<uint32_t> indiceData;
         if (!CreateRectangleData(sizeX, sizeY, sizeZ, vertexData, normalData, texcoordData, indiceData))
             return ptr;
 
         auto allocator = mMemoryAllocator;
         ptr            = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName), [=](Model* model) { allocator->DeallocateObject(model); }));
-        ptr->mMesh     = mRenderer->CreateMesh(vertexData, normalData, texcoordData, indiceData);
+        ptr->mMesh     = mRenderer->CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData);
 
         return ptr;
     }
@@ -119,7 +117,7 @@ namespace JonsEngine
                 model.mMaterial = LoadMaterial(pkgMaterial.mName, jonsPkg);
             }
 
-            model.mMesh = mRenderer->CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mIndiceData);
+            model.mMesh = mRenderer->CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangents, mesh.mBitangents, mesh.mIndiceData);
         }
 
         for(PackageModel& m : pkgModel.mChildren)
@@ -130,9 +128,17 @@ namespace JonsEngine
 
     Material ResourceManifest::ProcessMaterial(PackageMaterial& pkgMaterial, const JonsPackagePtr jonsPkg)
     {
-        TextureID diffuseTexture = mRenderer->CreateTexture(pkgMaterial.mDiffuseTexture.mTextureType, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth,
-                                                            pkgMaterial.mDiffuseTexture.mTextureHeight, pkgMaterial.mDiffuseTexture.mTextureFormat);
+        TextureID diffuseTexture = INVALID_TEXTURE_ID;
+        TextureID normalTexture  = INVALID_TEXTURE_ID;
 
-        return Material(pkgMaterial.mName, diffuseTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, 0.02f);
+        if (pkgMaterial.mHasDiffuseTexture)
+            diffuseTexture = mRenderer->CreateTexture(pkgMaterial.mDiffuseTexture.mTextureType, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth,
+                                                                pkgMaterial.mDiffuseTexture.mTextureHeight, pkgMaterial.mDiffuseTexture.mTextureFormat);
+
+        if (pkgMaterial.mHasNormalTexture)
+            normalTexture = mRenderer->CreateTexture(pkgMaterial.mNormalTexture.mTextureType, pkgMaterial.mNormalTexture.mTextureData, pkgMaterial.mNormalTexture.mTextureWidth,
+                                                                pkgMaterial.mNormalTexture.mTextureHeight, pkgMaterial.mNormalTexture.mTextureFormat);
+
+        return Material(pkgMaterial.mName, diffuseTexture, normalTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, 0.02f);
     }
 }

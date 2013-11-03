@@ -64,7 +64,7 @@ namespace JonsAssetImporter
         void ProcessScene(const aiScene* scene, const boost::filesystem::path& modelPath, const std::string& modelName, JonsEngine::JonsPackagePtr pkg);
         void ProcessAssimpMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, JonsEngine::JonsPackagePtr pkg);
         JonsEngine::PackageModel ProcessAssimpModelGeometry(const aiScene* scene, const aiNode* node, const MaterialMap& materialMap);
-        JonsEngine::PackageTexture ProcessDiffuseTexture(const boost::filesystem::path& assetPath); 
+        JonsEngine::PackageTexture ProcessTexture(const boost::filesystem::path& assetPath, const JonsEngine::TextureType textureType); 
 
         AssetType GetAssetType(const char* textureName) const;
         std::string GetDefaultAssetName(AssetType assetType, uint32_t assetTypeNumber) const;

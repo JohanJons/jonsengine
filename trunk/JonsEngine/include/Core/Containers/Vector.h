@@ -77,12 +77,12 @@ namespace JonsEngine
     };
 
     template <class T>
-    inline vector<T>::vector() : mAllocator(HeapAllocator::GetDefaultHeapAllocator()), mCapacity(NULL), mBegin(NULL), mEnd(NULL), DefaultCapacityIncrease(2)
+    inline vector<T>::vector() : mAllocator(HeapAllocator::GetDefaultHeapAllocator()), mCapacity(nullptr), mBegin(nullptr), mEnd(nullptr), DefaultCapacityIncrease(2)
     {
     }
 
     template <class T>
-    inline vector<T>::vector(IMemoryAllocator& allocator) : mAllocator(allocator), mCapacity(NULL), mBegin(NULL), mEnd(NULL), DefaultCapacityIncrease(2)
+    inline vector<T>::vector(IMemoryAllocator& allocator) : mAllocator(allocator), mCapacity(nullptr), mBegin(nullptr), mEnd(nullptr), DefaultCapacityIncrease(2)
     {
     }
 
@@ -252,7 +252,7 @@ namespace JonsEngine
 
             mAllocator.Deallocate(mBegin);
 
-            mCapacity = mEnd = mBegin = NULL;
+            mCapacity = mEnd = mBegin = nullptr;
         }
     }
 

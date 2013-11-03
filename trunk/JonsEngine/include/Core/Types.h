@@ -22,7 +22,8 @@ namespace JonsEngine
     enum TextureType
     {
         TEXTURE_TYPE_UNKNOWN = 0,
-        TEXTURE_TYPE_DIFFUSE
+        TEXTURE_TYPE_DIFFUSE,
+        TEXTURE_TYPE_NORMAL
     };
 
     typedef uint32_t MeshID;

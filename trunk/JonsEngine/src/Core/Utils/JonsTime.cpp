@@ -19,7 +19,7 @@ namespace JonsEngine
         time_t t;
         tm* now;
 
-        t = time(NULL);
+        t = time(nullptr);
         now = localtime(&t);
 
         return now->tm_sec;
@@ -30,7 +30,7 @@ namespace JonsEngine
         time_t t;
         tm* now;
 
-        t = time(NULL);
+        t = time(nullptr);
         now = localtime(&t);
 
         return now->tm_min;
@@ -41,7 +41,7 @@ namespace JonsEngine
         time_t t;
         tm* now;
 
-        t = time(NULL);
+        t = time(nullptr);
         now = localtime(&t);
 
         return now->tm_hour;
@@ -52,7 +52,7 @@ namespace JonsEngine
         time_t t;
         tm* now;
 
-        t = time(NULL);
+        t = time(nullptr);
         now = localtime(&t);
 
         return now->tm_mday;
@@ -64,7 +64,7 @@ namespace JonsEngine
         time_t t;
         tm* now;
 
-        t = time(NULL);
+        t = time(nullptr);
         now = localtime(&t);
 
         return now->tm_mon+1;
@@ -76,7 +76,7 @@ namespace JonsEngine
         time_t t;
         tm* now;
 
-        t = time(NULL);
+        t = time(nullptr);
         now = localtime(&t);
 
         return now->tm_year+1900;

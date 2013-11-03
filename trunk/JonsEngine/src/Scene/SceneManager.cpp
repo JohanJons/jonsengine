@@ -6,7 +6,7 @@
 
 namespace JonsEngine
 {
-    SceneManager::SceneManager(ResourceManifest& resManifest) : mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mActiveScene(NULL), mResourceManifest(resManifest)
+    SceneManager::SceneManager(ResourceManifest& resManifest) : mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mActiveScene(nullptr), mResourceManifest(resManifest)
     {
     }
 
@@ -27,7 +27,7 @@ namespace JonsEngine
             return mScenes.back();
         }
         else
-            return NULL;
+            return nullptr;
     }
 
     void SceneManager::DeleteScene(const std::string& sceneName)
@@ -37,7 +37,7 @@ namespace JonsEngine
         if (iter != mScenes.end())
         {
             if (mActiveScene && *mActiveScene == sceneName)
-                mActiveScene = NULL;
+                mActiveScene = nullptr;
 
             mMemoryAllocator.DeallocateObject(*iter);
             mScenes.erase(iter);
@@ -51,7 +51,7 @@ namespace JonsEngine
         if (iter != mScenes.end())
         {
             if (mActiveScene && *scene == *mActiveScene)
-                mActiveScene = NULL;
+                mActiveScene = nullptr;
 
             mMemoryAllocator.DeallocateObject(*iter);
             mScenes.erase(iter);
@@ -62,7 +62,7 @@ namespace JonsEngine
     {
         auto iter = std::find_if(mScenes.begin(), mScenes.end(), [sceneName](const Scene* scene) { return scene->GetSceneName() == sceneName; });
         
-        return iter != mScenes.end() ? *iter : NULL;
+        return iter != mScenes.end() ? *iter : nullptr;
     }
 
 

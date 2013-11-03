@@ -11,10 +11,10 @@
 
 namespace JonsEngine
 {
-    static GLFWWindowManager* gGLFWWindowInstance = NULL;
+    static GLFWWindowManager* gGLFWWindowInstance = nullptr;
 
     GLFWWindowManager::GLFWWindowManager(const EngineSettings& engineSettings, OnContextCreatedCallback contextCreatedCallback) : mOnContextCreated(contextCreatedCallback), 
-                                                                                                                                  mLogger(Logger::GetWindowLogger()), mFrameLimit(engineSettings.mFrameLimit), mWindow(NULL),
+                                                                                                                                  mLogger(Logger::GetWindowLogger()), mFrameLimit(engineSettings.mFrameLimit), mWindow(nullptr),
                                                                                                                                   mScreenWidth(engineSettings.mWindowWidth), mScreenHeight(engineSettings.mWindowHeight), mShowMouseCursor(false), mFullscreen(engineSettings.mFullscreen), mFOV(engineSettings.mFOV),
                                                                                                                                   mWindowTitle(engineSettings.mWindowTitle), mMSAA(engineSettings.mMSAA)
     {
@@ -36,11 +36,11 @@ namespace JonsEngine
         
     GLFWWindowManager::~GLFWWindowManager()
     {
-        glfwSetKeyCallback(mWindow, NULL);
-        glfwSetMouseButtonCallback(mWindow, NULL);
-        glfwSetCursorPosCallback(mWindow, NULL);
+        glfwSetKeyCallback(mWindow, nullptr);
+        glfwSetMouseButtonCallback(mWindow, nullptr);
+        glfwSetCursorPosCallback(mWindow, nullptr);
         glfwTerminate();
-        gGLFWWindowInstance = NULL;
+        gGLFWWindowInstance = nullptr;
     }
 
         
@@ -209,7 +209,7 @@ namespace JonsEngine
     bool GLFWWindowManager::SetupWindow()
     {
         glfwWindowHint(GLFW_SAMPLES, mMSAA);
-        auto newWindow = glfwCreateWindow(mScreenWidth, mScreenHeight, mWindowTitle.c_str(), mFullscreen ? glfwGetPrimaryMonitor() : NULL, mWindow);
+        auto newWindow = glfwCreateWindow(mScreenWidth, mScreenHeight, mWindowTitle.c_str(), mFullscreen ? glfwGetPrimaryMonitor() : nullptr, mWindow);
 
         if (!newWindow) 
         {
@@ -258,7 +258,7 @@ namespace JonsEngine
         
     void GLFWWindowManager::glfwOnWindowChanged(::GLFWwindow* window, int width, int height)
     {
-        if (gGLFWWindowInstance == NULL || window != gGLFWWindowInstance->mWindow)
+        if (gGLFWWindowInstance == nullptr || window != gGLFWWindowInstance->mWindow)
             return;
 
         glViewport(0, 0, (GLsizei) width, (GLsizei)height);
@@ -267,7 +267,7 @@ namespace JonsEngine
 
     void GLFWWindowManager::glfwOnMouseButton(GLFWwindow* window, int button, int action, int mods)
     {
-        if (gGLFWWindowInstance == NULL || !gGLFWWindowInstance->mMouseButtonCallback || window != gGLFWWindowInstance->mWindow)
+        if (gGLFWWindowInstance == nullptr || !gGLFWWindowInstance->mMouseButtonCallback || window != gGLFWWindowInstance->mWindow)
             return;
 
         gGLFWWindowInstance->mMouseButtonEvents.push_back(MouseButtonEvent([&]()
@@ -303,7 +303,7 @@ namespace JonsEngine
     
     void GLFWWindowManager::glfwOnMouseMotion(GLFWwindow* window, double posX, double posY)
     {
-        if (gGLFWWindowInstance == NULL || !gGLFWWindowInstance->mMouseMotionCallback || window != gGLFWWindowInstance->mWindow)
+        if (gGLFWWindowInstance == nullptr || !gGLFWWindowInstance->mMouseMotionCallback || window != gGLFWWindowInstance->mWindow)
             return;
 
         gGLFWWindowInstance->mMouseMotionEvents.push_back(MouseMotionEvent(posX, posY));
@@ -311,7 +311,7 @@ namespace JonsEngine
    
     void GLFWWindowManager::glfwOnKey(GLFWwindow* window, int key, int scancode, int action, int mods)
     {
-        if (gGLFWWindowInstance == NULL || !gGLFWWindowInstance->mKeyCallback || window != gGLFWWindowInstance->mWindow)
+        if (gGLFWWindowInstance == nullptr || !gGLFWWindowInstance->mKeyCallback || window != gGLFWWindowInstance->mWindow)
             return;
 
         gGLFWWindowInstance->mKeyEvents.push_back(KeyEvent(

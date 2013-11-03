@@ -17,6 +17,32 @@
 
 namespace JonsEngine
 {
+    void BindTexture(const OpenGLTexture::TextureUnit textureUnit, const TextureID targetTexture, const std::vector<OpenGLTexturePtr>& textures, Logger& logger)
+    {
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
+        CHECK_GL_ERROR(logger);
+
+        // TODO: sort textures
+        auto texture = std::find_if(textures.begin(), textures.end(), [&](const OpenGLTexturePtr ptr) { return ptr->mTextureID == targetTexture; });
+        if (texture == textures.end())
+        {
+            JONS_LOG_ERROR(logger, "Renderable TextureID out of range");
+            throw std::runtime_error("Renderable TextureID out of range");
+        }
+
+        glBindTexture(GL_TEXTURE_2D, texture->get()->mTextureID);
+        CHECK_GL_ERROR(logger);
+    }
+
+    void UnbindTexture(const OpenGLTexture::TextureUnit textureUnit, Logger& logger)
+    {
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
+        CHECK_GL_ERROR(logger);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        CHECK_GL_ERROR(logger);
+    }
+
+
     OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator) : OpenGLRenderer(engineSettings.mAnisotropicFiltering, memoryAllocator)
     {
     }
@@ -40,7 +66,7 @@ namespace JonsEngine
     OpenGLRenderer::OpenGLRenderer(const float anisotropy, IMemoryAllocatorPtr memoryAllocator) : 
         mMemoryAllocator(memoryAllocator), mLogger(Logger::GetRendererLogger()),
         mDefaultProgram("DefaultProgram", gVertexShader, gFragmentShader), mUniBufferTransform("UnifTransform", mLogger, mDefaultProgram), mUniBufferMaterial("UnifMaterial", mLogger, mDefaultProgram), 
-        mUniBufferLightingInfo("UnifLighting", mLogger, mDefaultProgram), mCurrentAnisotropy(anisotropy)
+        mUniBufferLightingInfo("UnifLighting", mLogger, mDefaultProgram), mTextureSampler(0), mCurrentAnisotropy(anisotropy)
     {
         // face culling
         glEnable(GL_CULL_FACE);
@@ -71,12 +97,16 @@ namespace JonsEngine
         CHECK_GL_ERROR(mLogger);
         glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_T, GL_REPEAT);
         CHECK_GL_ERROR(mLogger);
-
         glSamplerParameterf(mTextureSampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, mCurrentAnisotropy);
         CHECK_GL_ERROR(mLogger);
+
         glUniform1i(glGetUniformLocation(mDefaultProgram.GetHandle(), "unifDiffuseTexture"), OpenGLTexture::TEXTURE_UNIT_DIFFUSE);
         CHECK_GL_ERROR(mLogger);
+        glUniform1i(glGetUniformLocation(mDefaultProgram.GetHandle(), "unifNormalTexture"), OpenGLTexture::TEXTURE_UNIT_NORMAL);
+        CHECK_GL_ERROR(mLogger);
         glBindSampler(OpenGLTexture::TEXTURE_UNIT_DIFFUSE, mTextureSampler);
+        CHECK_GL_ERROR(mLogger);
+        glBindSampler(OpenGLTexture::TEXTURE_UNIT_NORMAL, mTextureSampler);
         CHECK_GL_ERROR(mLogger);
 
         SetAnisotropicFiltering(mCurrentAnisotropy);
@@ -94,10 +124,11 @@ namespace JonsEngine
         CHECK_GL_ERROR(mLogger);
     }
 
-    MeshID OpenGLRenderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData)
+
+    MeshID OpenGLRenderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData)
     {
         auto allocator = mMemoryAllocator;
-        OpenGLMeshPtr meshPtr(allocator->AllocateObject<OpenGLMesh>(vertexData, normalData, texCoords, indexData, mLogger), [=](OpenGLMesh* mesh) { allocator->DeallocateObject<OpenGLMesh>(mesh); });
+        OpenGLMeshPtr meshPtr(allocator->AllocateObject<OpenGLMesh>(vertexData, normalData, texCoords, tangents, bitangents, indexData, mLogger), [=](OpenGLMesh* mesh) { allocator->DeallocateObject<OpenGLMesh>(mesh); });
 
         mMeshes.emplace_back(meshPtr, SetupVAO(meshPtr));
 
@@ -150,39 +181,26 @@ namespace JonsEngine
 
             mUniBufferTransform.SetData(Transform(renderable.mWVPMatrix, renderable.mWorldMatrix, renderable.mTextureTilingFactor));
             mUniBufferMaterial.SetData(Material(renderable.mDiffuseColor, renderable.mAmbientColor, renderable.mSpecularColor, renderable.mEmissiveColor,
-                                                renderable.mDiffuseTexture != INVALID_TEXTURE_ID, renderable.mLightingEnabled, renderable.mSpecularFactor));
+                                                renderable.mDiffuseTexture != INVALID_TEXTURE_ID, renderable.mNormalTexture != INVALID_TEXTURE_ID, renderable.mLightingEnabled, renderable.mSpecularFactor));
 
             if (renderable.mDiffuseTexture != INVALID_TEXTURE_ID)
-            {
-                glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_DIFFUSE);
-                CHECK_GL_ERROR(mLogger);
+                BindTexture(OpenGLTexture::TEXTURE_UNIT_DIFFUSE, renderable.mDiffuseTexture, mTextures, mLogger);
 
-                // TODO: sort textures
-                auto texture = std::find_if(mTextures.begin(), mTextures.end(), [&](const OpenGLTexturePtr ptr) { return ptr->mTextureID = renderable.mDiffuseTexture; });
-                if (texture == mTextures.end())
-                {
-                    JONS_LOG_ERROR(mLogger, "Renderable TextureID out of range");
-                    throw std::runtime_error("Renderable TextureID out of range");
-                }
-
-                glBindTexture(GL_TEXTURE_2D, texture->get()->mTextureID);
-                CHECK_GL_ERROR(mLogger);
-            }
+            if (renderable.mNormalTexture != INVALID_TEXTURE_ID)
+                BindTexture(OpenGLTexture::TEXTURE_UNIT_NORMAL, renderable.mNormalTexture, mTextures, mLogger);
 
             glBindVertexArray(meshIterator->second);
             CHECK_GL_ERROR(mLogger);
-
             glDrawElements(GL_TRIANGLES, meshIterator->first->mIndices, GL_UNSIGNED_INT, 0);
             CHECK_GL_ERROR(mLogger);
-
             glBindVertexArray(0);
             CHECK_GL_ERROR(mLogger);
 
             if (renderable.mDiffuseTexture != INVALID_TEXTURE_ID)
-            {
-                glBindTexture(GL_TEXTURE_2D, 0);
-                CHECK_GL_ERROR(mLogger);
-            }
+                UnbindTexture(OpenGLTexture::TEXTURE_UNIT_DIFFUSE, mLogger);
+
+            if (renderable.mNormalTexture != INVALID_TEXTURE_ID)
+                UnbindTexture(OpenGLTexture::TEXTURE_UNIT_NORMAL, mLogger);
         }
 
     }
@@ -239,6 +257,14 @@ namespace JonsEngine
         glEnableVertexAttribArray(2);
         CHECK_GL_ERROR(mLogger);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh->mVertexDataSize + mesh->mNormalDataSize));
+        CHECK_GL_ERROR(mLogger);
+        glEnableVertexAttribArray(3);
+        CHECK_GL_ERROR(mLogger);
+        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh->mVertexDataSize + mesh->mNormalDataSize + mesh->mTexCoordsSize));
+        CHECK_GL_ERROR(mLogger);
+        glEnableVertexAttribArray(4);
+        CHECK_GL_ERROR(mLogger);
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh->mVertexDataSize + mesh->mNormalDataSize + mesh->mTexCoordsSize + mesh->mTangentsSize));
         CHECK_GL_ERROR(mLogger);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -7,7 +7,7 @@ namespace JonsEngine
 {
     MeshID gNextMeshID = 1;
 
-    OpenGLMesh::OpenGLMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<uint32_t>& indexData, Logger& logger) : mLogger(logger), mMeshID(gNextMeshID++), mIndices(indexData.size())
+    OpenGLMesh::OpenGLMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData, Logger& logger) : mLogger(logger), mMeshID(gNextMeshID++), mIndices(indexData.size())
     {
         glGenBuffers(1, &mVBO);
         CHECK_GL_ERROR(mLogger);
@@ -15,20 +15,26 @@ namespace JonsEngine
         CHECK_GL_ERROR(mLogger);
  
         // buffer vertex, normals and index data
-        mVertexDataSize   = vertexData.size() * sizeof(float);
-        mNormalDataSize   = normalData.size() * sizeof(float);
-        size_t texCoordDataSize = texCoords.size() * sizeof(float);
-        size_t indexDataSize    = indexData.size() * sizeof(uint32_t);
+        mVertexDataSize = vertexData.size() * sizeof(float);
+        mNormalDataSize = normalData.size() * sizeof(float);
+        mTexCoordsSize  = texCoords.size() * sizeof(float);
+        mTangentsSize   = tangents.size() * sizeof(float);
+        mBitangentsSize = bitangents.size() * sizeof(float);
+        size_t indexDataSize = indexData.size() * sizeof(uint32_t);
 
         glBindBuffer(GL_ARRAY_BUFFER, mVBO);
         CHECK_GL_ERROR(mLogger);
-        glBufferData(GL_ARRAY_BUFFER, mVertexDataSize + mNormalDataSize + texCoordDataSize, NULL, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, mVertexDataSize + mNormalDataSize + mTexCoordsSize + mTangentsSize + mBitangentsSize, 0, GL_STATIC_DRAW);
         CHECK_GL_ERROR(mLogger);
-        glBufferSubData(GL_ARRAY_BUFFER, NULL, mVertexDataSize, &vertexData[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, mVertexDataSize, &vertexData[0]);
         CHECK_GL_ERROR(mLogger);
         glBufferSubData(GL_ARRAY_BUFFER, mVertexDataSize, mNormalDataSize, &normalData[0]);
         CHECK_GL_ERROR(mLogger);
-        glBufferSubData(GL_ARRAY_BUFFER, mVertexDataSize + mNormalDataSize, texCoordDataSize, &texCoords[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, mVertexDataSize + mNormalDataSize, mTexCoordsSize, &texCoords[0]);
+        CHECK_GL_ERROR(mLogger);
+        glBufferSubData(GL_ARRAY_BUFFER, mVertexDataSize + mNormalDataSize + mTexCoordsSize, mTangentsSize, &tangents[0]);
+        CHECK_GL_ERROR(mLogger);
+        glBufferSubData(GL_ARRAY_BUFFER, mVertexDataSize + mNormalDataSize + mTexCoordsSize + mTangentsSize, mBitangentsSize, &bitangents[0]);
         CHECK_GL_ERROR(mLogger);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIndexBuffer);
         CHECK_GL_ERROR(mLogger);
