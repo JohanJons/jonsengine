@@ -53,8 +53,8 @@ namespace JonsEngine
                                                                                             \n \
         if (Material.mHasNormalTexture)                                                     \n \
         {                                                                                   \n \
-            frag_tangent   = (Transform.mWorldMatrix * vec4(frag_tangent, 0.0)).xyz;        \n \
-            frag_bitangent = (Transform.mWorldMatrix * vec4(frag_bitangent, 0.0)).xyz;      \n \
+            frag_tangent   = (Transform.mWorldMatrix * vec4(vert_tangent, 0.0)).xyz;        \n \
+            frag_bitangent = (Transform.mWorldMatrix * vec4(vert_bitangent, 0.0)).xyz;      \n \
         }                                                                                   \n \
     }											                                            \n";
 
@@ -112,84 +112,83 @@ namespace JonsEngine
     out vec4 finalColor;						                                                              "  
                                                                                                               "         \n \
                                                                                                                         \n \
-    void CalcGaussianSpecular(in vec3 dirToLight, in vec3 normal, out float gaussianTerm)                                               \n \
+    void CalcGaussianSpecular(in vec3 dirToLight, in vec3 normal, out float gaussianTerm)                               \n \
     {                                                                                                                   \n \
         vec3 viewDirection = normalize(Lighting.mViewDirection);                                                        \n \
         vec3 halfAngle     = normalize(dirToLight + viewDirection);                                                     \n \
                                                                                                                         \n \
-        float angleNormalHalf = acos(dot(halfAngle, normalize(normal)));                                           \n \
+        float angleNormalHalf = acos(dot(halfAngle, normalize(normal)));                                                \n \
         float exponent        = angleNormalHalf / Material.mSpecularShininess;                                          \n \
         exponent              = -(exponent * exponent);                                                                 \n \
                                                                                                                         \n \
         gaussianTerm = exp(exponent);                                                                                   \n \
     }                                                                                                                   \n \
                                                                                                                         \n \
-    vec4 CalculateLighting(in Light light, in vec4 diffuseTexture, in vec3 normal)                                                      \n \
+    vec4 CalculateLighting(in Light light, in vec4 diffuseTexture, in vec3 normal)                                      \n \
     {                                                                                                                   \n \
         if (light.mLightType == 1)          // point light                                                              \n \
         {                                                                                                               \n \
-            vec3 positionDiff = light.mLightPosition.xyz - frag_position;                                                   \n \
-            float dist        = max(length(positionDiff) - light.mLightRadius, 0);                                          \n \
-                                                                                                                            \n \
-            float attenuation = 1 / ((dist/light.mLightRadius + 1) * (dist/light.mLightRadius + 1));                        \n \
-            attenuation       = max((attenuation - light.mMaxDistance) / (1 - light.mMaxDistance), 0);                      \n \
-                                                                                                                            \n \
-            vec3 dirToLight   = normalize(positionDiff);                                                                    \n \
-            float angleNormal = clamp(dot(normalize(normal), dirToLight), 0, 1);                                       \n \
-                                                                                                                            \n \
+            vec3 positionDiff = light.mLightPosition.xyz - frag_position;                                                                     \n \
+            float dist        = max(length(positionDiff) - light.mLightRadius, 0);                                                            \n \
+                                                                                                                                              \n \
+            float attenuation = 1 / ((dist/light.mLightRadius + 1) * (dist/light.mLightRadius + 1));                                          \n \
+            attenuation       = max((attenuation - light.mMaxDistance) / (1 - light.mMaxDistance), 0);                                        \n \
+                                                                                                                                              \n \
+            vec3 dirToLight   = normalize(positionDiff);                                                                                      \n \
+            float angleNormal = clamp(dot(normalize(normal), dirToLight), 0, 1);                                                              \n \
+                                                                                                                                              \n \
             float gaussianTerm = 0.0;                                                                                                         \n \
             if (angleNormal > 0.0)                                                                                                            \n \
-                CalcGaussianSpecular(dirToLight, normal, gaussianTerm);                                                                               \n \
-                                                                                                                                                \n \
+                CalcGaussianSpecular(dirToLight, normal, gaussianTerm);                                                                       \n \
+                                                                                                                                              \n \
             return diffuseTexture * (attenuation * angleNormal  * Material.mDiffuseColor  * light.mLightIntensity * light.mLightColor) +      \n \
                                     (attenuation * gaussianTerm * Material.mSpecularColor * light.mLightIntensity * light.mLightColor);       \n \
         }                                                                                                                                     \n \
         else if (light.mLightType == 2)     // directional light                                                                              \n \
         {                                                                                                                                     \n \
             vec3 dirToLight   = normalize(light.mLightDirection.xyz);                                                                         \n \
-            float angleNormal = clamp(dot(normalize(normal), dirToLight), 0, 1);                                                         \n \
+            float angleNormal = clamp(dot(normalize(normal), dirToLight), 0, 1);                                            \n \
                                                                                                                             \n \
             float gaussianTerm = 0.0;                                                                                       \n \
             if (angleNormal > 0.0)                                                                                          \n \
-                CalcGaussianSpecular(dirToLight, normal, gaussianTerm);                                                             \n \
+                CalcGaussianSpecular(dirToLight, normal, gaussianTerm);                                                     \n \
                                                                                                                             \n \
             return diffuseTexture * (angleNormal  * Material.mDiffuseColor  * light.mLightIntensity * light.mLightColor) +  \n \
                                     (gaussianTerm * Material.mSpecularColor * light.mLightIntensity * light.mLightColor);   \n \
         }                                                                                                                   \n \
-        else if (light.mLightType == 4)     // ambient light                                                            \n \
-            return diffuseTexture * Material.mAmbientColor * light.mLightIntensity * light.mLightColor;                 \n \
-        else                                                                                                            \n \
-            return vec4(0.0);                                                                                           \n \
-    }                                                                                                                   \n \
-                                                                                                                        \n \
-    void main()										                                                                    \n \
-    {												                                                                    \n \
-        vec4 diffuseTexture = vec4(1.0);                                                                                \n \
-        if (Material.mHasDiffuseTexture)                                                                                \n \
-            diffuseTexture = texture(unifDiffuseTexture, frag_texcoord);                                                \n \
-                                                                                                                        \n \
-        vec3 normal = frag_normal;                                                                                        \n \
-        if (Material.mHasNormalTexture)                                                                                 \n \
-        {                                                                                                               \n \
-           // diffuseTexture = vec4(normalize(texture(unifNormalTexture, frag_texcoord).xyz * 2.0 - 1.0), 1.0);  \n \
-           // vec3 normalTangentSpace  = normalize(texture(unifNormalTexture, frag_texcoord).xyz * 2.0 - 1.0);            \n \
-            //mat3 tangentToWorldSpace = mat3(normalize(frag_tangent), normalize(frag_bitangent), normalize(frag_normal)); \n \
+        else if (light.mLightType == 4)     // ambient light                                                                \n \
+            return diffuseTexture * Material.mAmbientColor * light.mLightIntensity * light.mLightColor;                     \n \
+        else                                                                                                                \n \
+            return vec4(0.0);                                                                                               \n \
+    }                                                                                                                       \n \
                                                                                                                             \n \
-           // normal = tangentToWorldSpace * normalTangentSpace;                                                              \n \
+    void main()										                                                                        \n \
+    {												                                                                        \n \
+        vec4 diffuseTexture = vec4(1.0);                                                                                    \n \
+        if (Material.mHasDiffuseTexture)                                                                                    \n \
+            diffuseTexture = texture(unifDiffuseTexture, frag_texcoord);                                                    \n \
+                                                                                                                            \n \
+        vec3 normal = frag_normal;                                                                                          \n \
+        if (Material.mHasNormalTexture)                                                                                     \n \
+        {                                                                                                                   \n \
+            vec3 normalTangentSpace  = normalize(texture(unifNormalTexture, frag_texcoord).xyz * 2.0 - 1.0);                \n \
+            mat3 tangentToWorldSpace = mat3(normalize(frag_tangent), normalize(frag_bitangent), normalize(frag_normal));    \n \
+                                                                                                                            \n \
+            normal = tangentToWorldSpace * normalTangentSpace;                                                              \n \
         }                                                                                                                   \n \
-                                                                                                                        \n \
-        if (Material.mLightingEnabled)                                                                                  \n \
-        {                                                                                                               \n \
-            vec4 accumLighting = vec4(0.0);                                                                             \n \
-                                                                                                                        \n \
-            for (int lightIndex = 0; lightIndex < Lighting.mNumLights; lightIndex++)                                    \n \
-                accumLighting += Material.mEmissiveColor * diffuseTexture +                                             \n \
-                                    CalculateLighting(Lighting.mLights[lightIndex], diffuseTexture, normal);                       \n \
-                                                                                                                        \n \
-            finalColor = pow(accumLighting, Lighting.mGamma);                                                           \n \
-        }                                                                                                               \n \
-        else {                                                                                                          \n \
-            finalColor = pow(diffuseTexture, Lighting.mGamma);                                                          \n \
-        }                                                                                                               \n \
-    }												                                                                    \n";
+                                                                                                                            \n \
+        if (Material.mLightingEnabled)                                                                                      \n \
+        {                                                                                                                   \n \
+            vec4 accumLighting = vec4(0.0);                                                                                 \n \
+                                                                                                                            \n \
+            for (int lightIndex = 0; lightIndex < Lighting.mNumLights; lightIndex++)                                        \n \
+                accumLighting += Material.mEmissiveColor * diffuseTexture +                                                 \n \
+                                    CalculateLighting(Lighting.mLights[lightIndex], diffuseTexture, normal);                \n \
+                                                                                                                            \n \
+            finalColor = pow(accumLighting, Lighting.mGamma);                                                               \n \
+        }                                                                                                                   \n \
+        else {                                                                                                              \n \
+            finalColor = pow(diffuseTexture, Lighting.mGamma);                                                              \n \
+        }                                                                                                                   \n \
+    }												                                                                        \n";
 }
