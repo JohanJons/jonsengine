@@ -107,7 +107,7 @@
     <ClInclude Include="UnitTest\TestFixtures\RunningEngineFixture.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="JonsEngineTests.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="UnitTest\Core\Containers\VectorTest.cpp" />
     <ClCompile Include="UnitTest\Core\Threading\ConditionVariableTest.cpp" />
     <ClCompile Include="UnitTest\Core\Threading\MutexTest.cpp" />

@@ -118,8 +118,8 @@
   <ItemGroup>
     <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c" />
     <ClCompile Include="src\Core\Engine.cpp" />
-    <ClCompile Include="src\Core\Logging\JonsOutputStream.cpp" />
-    <ClCompile Include="src\Core\Logging\JonsStreamBuf.cpp" />
+    <ClCompile Include="src\Core\Logging\OutputStream.cpp" />
+    <ClCompile Include="src\Core\Logging\StreamBuf.cpp" />
     <ClCompile Include="src\Core\Logging\Logger.cpp" />
     <ClCompile Include="src\Core\Memory\HeapAllocator.cpp" />
     <ClCompile Include="src\Core\Threading\ConditionVariable.cpp" />
@@ -127,7 +127,7 @@
     <ClCompile Include="src\Core\Threading\Thread.cpp" />
     <ClCompile Include="src\Core\Threading\ThreadPool.cpp" />
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
-    <ClCompile Include="src\Core\Utils\JonsTime.cpp" />
+    <ClCompile Include="src\Core\Utils\Time.cpp" />
     <ClCompile Include="src\Core\Utils\Math.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLMesh.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLRenderer.cpp" />
@@ -152,8 +152,8 @@
     <ClInclude Include="include\Core\Engine.h" />
     <ClInclude Include="include\Core\EngineDefs.h" />
     <ClInclude Include="include\Core\EngineSettings.h" />
-    <ClInclude Include="include\Core\Logging\JonsOutputStream.h" />
-    <ClInclude Include="include\Core\Logging\JonsStreamBuf.h" />
+    <ClInclude Include="include\Core\Logging\OutputStream.h" />
+    <ClInclude Include="include\Core\Logging\StreamBuf.h" />
     <ClInclude Include="include\Core\Logging\Logger.h" />
     <ClInclude Include="include\Core\Logging\LogManager.h" />
     <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
@@ -164,7 +164,7 @@
     <ClInclude Include="include\Core\Threading\Thread.h" />
     <ClInclude Include="include\Core\Threading\ThreadPool.h" />
     <ClInclude Include="include\Core\Types.h" />
-    <ClInclude Include="include\Core\Utils\JonsTime.h" />
+    <ClInclude Include="include\Core\Utils\Time.h" />
     <ClInclude Include="include\Core\Utils\Math.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLMesh.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLRenderer.h" />

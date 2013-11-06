@@ -8,11 +8,11 @@
 
 namespace JonsEngine
 {
-    class JonsStreamBuf : public std::streambuf
+    class StreamBuf : public std::streambuf
     {
     public:
-        JonsStreamBuf();
-        ~JonsStreamBuf();
+        StreamBuf();
+        ~StreamBuf();
 
         void AddStream(std::streambuf* sb);
         void RemoveStream(std::streambuf* sb);

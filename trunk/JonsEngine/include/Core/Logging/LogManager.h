@@ -1,8 +1,8 @@
 #pragma once
 
 #include "include/Core/EngineDefs.h"
-#include "include/Core/Logging/JonsStreamBuf.h"
-#include "include/Core/Logging/JonsOutputStream.h"
+#include "include/Core/Logging/StreamBuf.h"
+#include "include/Core/Logging/OutputStream.h"
 #include "include/Core/Threading/Mutex.h"
 
 #include <iostream>
@@ -53,7 +53,7 @@ namespace JonsEngine
         std::ostream mLogStream;
         std::string mLogPath;
         std::ofstream mFileStream;
-        JonsStreamBuf mStreamBuf;
+        StreamBuf mStreamBuf;
         LogLevel mLogFilter;
         Mutex mMutex;
 

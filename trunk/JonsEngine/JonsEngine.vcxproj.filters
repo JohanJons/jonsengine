@@ -92,15 +92,6 @@
     <ClCompile Include="src\Core\Engine.cpp">
       <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Logging\JonsOutputStream.cpp">
-      <Filter>Source Files\Core\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Logging\JonsStreamBuf.cpp">
-      <Filter>Source Files\Core\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Utils\JonsTime.cpp">
-      <Filter>Source Files\Core\Utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c">
       <Filter>Thirdparty\dlmalloc</Filter>
     </ClCompile>
@@ -176,19 +167,19 @@
     <ClCompile Include="src\Window\GLFW\GLFWWindowManager.cpp">
       <Filter>Source Files\Window\GLFW</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Logging\OutputStream.cpp">
+      <Filter>Source Files\Core\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Logging\StreamBuf.cpp">
+      <Filter>Source Files\Core\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Utils\Time.cpp">
+      <Filter>Source Files\Core\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
       <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Utils\JonsTime.h">
-      <Filter>Header Files\Core\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Logging\JonsOutputStream.h">
-      <Filter>Header Files\Core\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Logging\JonsStreamBuf.h">
-      <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h">
       <Filter>Thirdparty\dlmalloc</Filter>
@@ -303,6 +294,15 @@
     </ClInclude>
     <ClInclude Include="include\Renderer\RenderCommands.h">
       <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Logging\StreamBuf.h">
+      <Filter>Header Files\Core\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Logging\OutputStream.h">
+      <Filter>Header Files\Core\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\Time.h">
+      <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
