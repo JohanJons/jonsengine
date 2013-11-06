@@ -7,7 +7,7 @@
 // google unit test framework
 #include "gtest/gtest.h"
 
-#include "UnitTest/TestFixtures/RunningEngineFixture.h"
+#include "src/TestFixtures/RunningEngineFixture.h"
 
 #include <iostream>
 #include <fstream>
