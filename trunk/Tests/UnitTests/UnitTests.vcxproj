@@ -119,7 +119,7 @@
     <ClCompile Include="src\TestFixtures\RunningEngineFixture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JonsEngine\JonsEngine.vcxproj">
+    <ProjectReference Include="..\..\JonsEngine\JonsEngine.vcxproj">
       <Project>{96000f2e-1268-46db-ae59-2f0f4c3ebac9}</Project>
     </ProjectReference>
   </ItemGroup>
