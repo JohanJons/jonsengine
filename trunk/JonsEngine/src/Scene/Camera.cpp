@@ -26,25 +26,21 @@ namespace JonsEngine
     void Camera::RotateCamera(const float offsetHorizontalAngle, const float offsetVerticalAngle)
     {
         mHorizontalAngle += offsetHorizontalAngle;
-        mHorizontalAngle = fmod(mHorizontalAngle, 360.0f);
+        mHorizontalAngle = std::fmod(mHorizontalAngle, 360.0f);
 
         mVerticalAngle += offsetVerticalAngle;
-        mVerticalAngle = fmod(mVerticalAngle, 360.0f);
+        mVerticalAngle = std::fmod(mVerticalAngle, 360.0f);
     }
 
 
     Vec3 Camera::Forward() const
     {
-        Vec4 forward = Inverse(Orientation()) * Vec4(0.0f, 0.0f, -1.0f, 0.0f);
-
-        return Vec3(forward);
+        return Vec3(Inverse(Orientation()) * Vec4(0.0f, 0.0f, -1.0f, 0.0f));
     }
 
     Vec3 Camera::Right() const
     {
-        Vec4 right = Inverse(Orientation()) * Vec4(1.0f, 0.0f, 0.0f, 0.0f);
-
-        return Vec3(right);
+        return Vec3(Inverse(Orientation()) * Vec4(1.0f, 0.0f, 0.0f, 0.0f));
     }
 
     Mat4 Camera::Orientation() const
@@ -59,9 +55,6 @@ namespace JonsEngine
        
     Mat4 Camera::GetCameraTransform() const
     {
-        Mat4 viewMatrix(1.0f);
-        viewMatrix = Orientation() * Translate(viewMatrix, -mTranslation);
-
-        return viewMatrix;
+        return Orientation() * Translate(Mat4(1.0f), -mTranslation);    // TODO: gimbal lock?
     }
 }
