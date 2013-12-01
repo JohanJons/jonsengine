@@ -9,12 +9,14 @@ namespace JonsEngine
                                                                                             \n \
     layout(std140) uniform;                                                                 \n \
                                                                                             \n \
-    uniform UnifTransform                                                                   \n \
+    uniform UnifGeometry                                                                    \n \
     {                                                                                       \n \
         mat4 mWVPMatrix;                                                                    \n \
         mat4 mWorldMatrix;                                                                  \n \
+        bool mHasDiffuseTexture;                                                            \n \
+        bool mHasNormalTexture;                                                             \n \
         float mTextureTilingFactor;                                                         \n \
-    } Transform;                                                                            \n \
+    } UnifGeometryPass;                                                                     \n \
                                                                                             \n \
     layout(location = 0) in vec3 vert_position;                                             \n \
     layout(location = 1) in vec3 vert_normal;                                               \n \
@@ -30,12 +32,12 @@ namespace JonsEngine
                                                                                             \n \
     void main()                                                                             \n \
     {                                                                                       \n \
-        gl_Position   = Transform.mWVPMatrix * vec4(vert_position, 1.0);                    \n \
+        gl_Position   = UnifGeometryPass.mWVPMatrix * vec4(vert_position, 1.0);             \n \
                                                                                             \n \
-        frag_position  = (Transform.mWorldMatrix * vec4(vert_position, 1.0)).xyz;           \n \
-        frag_normal    = (Transform.mWorldMatrix * vec4(vert_normal, 0.0)).xyz;             \n \
-        frag_texcoord  = Transform.mTextureTilingFactor * vert_texcoord;                    \n \
-        frag_tangent   = (Transform.mWorldMatrix * vec4(vert_tangent, 0.0)).xyz;            \n \
-        frag_bitangent = (Transform.mWorldMatrix * vec4(vert_bitangent, 0.0)).xyz;          \n \
+        frag_position  = (UnifGeometryPass.mWorldMatrix * vec4(vert_position, 1.0)).xyz;    \n \
+        frag_normal    = (UnifGeometryPass.mWorldMatrix * vec4(vert_normal, 0.0)).xyz;      \n \
+        frag_texcoord  = UnifGeometryPass.mTextureTilingFactor * vert_texcoord;             \n \
+        frag_tangent   = (UnifGeometryPass.mWorldMatrix * vec4(vert_tangent, 0.0)).xyz;     \n \
+        frag_bitangent = (UnifGeometryPass.mWorldMatrix * vec4(vert_bitangent, 0.0)).xyz;   \n \
     }                                                                                       \n";
 }

@@ -96,11 +96,11 @@ namespace JonsEngine
         mGeometryProgram("GeometryProgram", ShaderPtr(new Shader("GeometryVertexShader", gGeometryVertexShader, Shader::VERTEX_SHADER)),  ShaderPtr(new Shader("GeometryFragmentShader", gGeometryFragmentShader, Shader::FRAGMENT_SHADER)), mLogger),
         mShadingProgram("ShadingProgram", ShaderPtr(new Shader("ShadingVertexShader", gGeometryVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("ShadingFragmentShader", gGeometryFragmentShader, Shader::FRAGMENT_SHADER)), mLogger),
         mDebugProgram("DebugProgram", ShaderPtr(new Shader("DebugVertexShader", gGeometryVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("DebugFragmentShader", gGeometryFragmentShader, Shader::FRAGMENT_SHADER)), mLogger),
-                                                            // VS2012 bug workaround. TODO: fixed in VS2013
+                                                            // VS2012 bug workaround. TODO: fixed in VS2013, when boost is rdy
         //mDefaultProgram("DefaultProgram", ShaderPtr(new Shader("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); }*/), 
         //                                 ShaderPtr(new Shader("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); })*/), mLogger),
         mGBuffer(mLogger, mGeometryProgram.mProgramHandle, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight),
-        mUniBufferTransform("UnifTransform", mLogger, mGeometryProgram.mProgramHandle), mUniBufferMaterial("UnifMaterial", mLogger, mGeometryProgram.mProgramHandle)
+        mUniBufferGeometryPass("UnifGeometry", mLogger, mGeometryProgram.mProgramHandle)
     {
         GLCALL(glClearDepth(1.0f));
         GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
@@ -243,9 +243,7 @@ namespace JonsEngine
             bool hasDiffuseTexture = renderable.mDiffuseTexture != INVALID_TEXTURE_ID;
             bool hasNormalTexture = renderable.mNormalTexture != INVALID_TEXTURE_ID;
 
-            mUniBufferTransform.SetData(UnifTransform(renderable.mWVPMatrix, renderable.mWorldMatrix, renderable.mTextureTilingFactor));
-            mUniBufferMaterial.SetData(UnifMaterial(renderable.mDiffuseColor, renderable.mAmbientColor, renderable.mSpecularColor, renderable.mEmissiveColor,
-                                                    hasDiffuseTexture, hasNormalTexture, renderable.mLightingEnabled, renderable.mSpecularFactor));
+            mUniBufferGeometryPass.SetData(UnifGeometry(renderable.mWVPMatrix, renderable.mWorldMatrix, hasDiffuseTexture, hasNormalTexture, renderable.mTextureTilingFactor));
 
             if (hasDiffuseTexture)
                 BindTexture2D(OpenGLTexture::TEXTURE_UNIT_DIFFUSE, renderable.mDiffuseTexture, mTextures, mLogger);

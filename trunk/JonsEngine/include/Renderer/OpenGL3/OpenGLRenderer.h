@@ -51,13 +51,17 @@ namespace JonsEngine
     private:
         typedef std::pair<OpenGLMeshPtr, GLuint> OpenGLMeshPair;
 
-        struct UnifTransform
+        struct UnifGeometry
         {
             Mat4 mWVPMatrix;
             Mat4 mWorldMatrix;
+            uint32_t mHasDiffuseTexture;
+            uint32_t mHasNormalTexture;
             float mTextureTilingFactor;
 
-            UnifTransform(const Mat4& WVPMatrix, const Mat4& WorldMatrix, const float textureTilingFactor) : mWVPMatrix(WVPMatrix), mWorldMatrix(WorldMatrix), mTextureTilingFactor(textureTilingFactor)
+            UnifGeometry(const Mat4& WVPMatrix, const Mat4& WorldMatrix, const uint32_t hasDiffuseTexture, const uint32_t hasNormalTexture, const float textureTilingFactor) 
+                : 
+                mWVPMatrix(WVPMatrix), mWorldMatrix(WorldMatrix), mHasDiffuseTexture(hasDiffuseTexture), mHasNormalTexture(hasNormalTexture), mTextureTilingFactor(textureTilingFactor)
             {
             }
         };
@@ -75,7 +79,7 @@ namespace JonsEngine
             }
         };*/
 
-        struct UnifMaterial
+        /*struct UnifMaterial
         {
             Vec4 mDiffuseColor;
             Vec4 mAmbientColor;
@@ -91,7 +95,7 @@ namespace JonsEngine
                 mDiffuseColor(diffuseColor), mAmbientColor(ambientColor), mSpecularColor(specularColor),  mEmissiveColor(emissiveColor), mHasDiffuseTexture(hasDiffuseTexture), mHasNormalTexture(hasNormalTexture), mLightingEnabled(lightingEnabled), mSpecularFactor(specularFactor)
             {
             }
-        };
+        };*/
 
         void GeometryPass(const RenderQueue& renderQueue);
         void ShadingPass();
@@ -111,7 +115,6 @@ namespace JonsEngine
 
         std::vector<OpenGLMeshPair> mMeshes;
         std::vector<OpenGLTexturePtr> mTextures;
-        UniformBuffer<OpenGLRenderer::UnifTransform> mUniBufferTransform;
-        UniformBuffer<OpenGLRenderer::UnifMaterial> mUniBufferMaterial;
+        UniformBuffer<OpenGLRenderer::UnifGeometry> mUniBufferGeometryPass;
     };
 }

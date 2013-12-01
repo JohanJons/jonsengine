@@ -89,9 +89,9 @@ namespace JonsGame
                 mEngine->GetRenderer()->SetAnisotropicFiltering(mEngine->GetRenderer()->GetMaxAnisotropicFiltering());
 
             // misc
-            else if (evnt.mKey == O)
+            else if (evnt.mKey == N)
                 mEngine->GetWindow().SetFullscreen(true);
-            else if (evnt.mKey == P)
+            else if (evnt.mKey == M)
                 mEngine->GetWindow().SetFullscreen(false);
             else if (evnt.mKey == ESC)
                 mRunning = false;
@@ -172,6 +172,13 @@ namespace JonsGame
         plane->mSceneNode            = nodePlane;
         plane->mMaterialTilingFactor = 64.0f;
         nodePlane->TranslateNode(Vec3(0.0f, -0.5f, 0.0f));
+
+        // create a random cube
+        SceneNodePtr nodeCube2 = myScene->GetRootNode().CreateChildNode("Cube2");
+        ModelPtr cube2 = myScene->GetResourceManifest().CreateRectangle("Cube2", 4, 4, 4);
+        cube2->mMaterial = myScene->GetResourceManifest().GetMaterial("checker");
+        cube2->mSceneNode = nodeCube2;
+        nodeCube2->TranslateNode(Vec3(3.0f, 5.5f, 10.0f));
         
         // move up camera
         myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
