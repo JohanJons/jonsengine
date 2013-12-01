@@ -2,6 +2,8 @@
 
 #include "GL/glew.h"
 #include <string>
+#include <memory>
+#include <functional>
 
 namespace JonsEngine
 {
@@ -11,11 +13,15 @@ namespace JonsEngine
      * C++ wrapper around GLSL shaders
      */
 
+    struct Shader;
+
     /* Shader definition */
-    class Shader
+    typedef std::unique_ptr<Shader> ShaderPtr;
+
+    /* Shader definition */
+    struct Shader
     {
-    public:
-        friend class ShaderProgram;
+        friend struct ShaderProgram;
 
         enum ShaderType
         {
@@ -23,15 +29,10 @@ namespace JonsEngine
             FRAGMENT_SHADER = GL_FRAGMENT_SHADER,
             UNKNOWN
         };
-
+        
         Shader(const std::string& name, const std::string& shaderSource, ShaderType type);
         ~Shader();
 
-        const std::string& GetName() const;
-        ShaderType GetShaderType() const;
-
-        
-    protected:
         Logger& mLogger;
         const std::string mName;
         const ShaderType mShaderType;

@@ -32,13 +32,12 @@ namespace JonsGame
         SetupScene();
 
         mEngine->GetWindow().ShowMouseCursor(false);
-      //  mEngine->GetWindow().SetScreenResolution(1920, 1080);
 
         while (mRunning)
         {
             mEngine->GetWindow().SetMousePosition(mCenterXPos,mCenterYPos);
 
-            mEngine->Tick();
+            mEngine->Tick(mDebugOptions);
         }
     }
 
@@ -59,7 +58,7 @@ namespace JonsGame
             else if (evnt.mKey == D)
                 camera.TranslateCamera(camera.Right() * mMoveSpeed);
 
-            // light direction 
+            // moving the point light 
             else if (evnt.mKey == Q)
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(-0.05, 0.0f, 0.0f));
             else if (evnt.mKey == E)
@@ -72,6 +71,22 @@ namespace JonsGame
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, -0.05f));
             else if (evnt.mKey == G)
                 activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, 0.05f));
+
+            //  renderering
+            else if (evnt.mKey == Y)
+                mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_NONE;
+            else if (evnt.mKey == U)
+                mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_POSITIONS;
+            else if (evnt.mKey == I)
+                mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_NORMALS;
+            else if (evnt.mKey == O)
+                mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_TEXCOORDS;
+            else if (evnt.mKey == P)
+                mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_COLOR;
+            else if (evnt.mKey == H)
+                mEngine->GetRenderer()->SetAnisotropicFiltering(0.0f);
+            else if (evnt.mKey == J)
+                mEngine->GetRenderer()->SetAnisotropicFiltering(mEngine->GetRenderer()->GetMaxAnisotropicFiltering());
 
             // misc
             else if (evnt.mKey == O)
@@ -132,7 +147,7 @@ namespace JonsGame
         
         // point light
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
-        LightPtr movingLight         = myScene->CreateLight("MovingPointLight", Light::POINT, nodeMovingLight);
+        LightPtr movingLight         = myScene->CreateLight("MovingPointLight", LightType::LIGHT_TYPE_POINT, nodeMovingLight);
         movingLight->mMaxDistance    = 0.02f;
         movingLight->mRadius         = 5.0f;
         movingLight->mIntensity      = 2.0f;
@@ -140,14 +155,14 @@ namespace JonsGame
 
         // point light 2
         SceneNodePtr nodeMovingLight2 = myScene->GetRootNode().CreateChildNode("nodeStaticLight");
-        LightPtr staticLight          = myScene->CreateLight("StaticPointLight", Light::POINT, nodeMovingLight2);
+        LightPtr staticLight          = myScene->CreateLight("StaticPointLight", LightType::LIGHT_TYPE_POINT, nodeMovingLight2);
         staticLight->mLightColor      = Vec4(0.4f, 0.4f, 0.0f, 1.0f);
         staticLight->mRadius          = 5.0f;
         nodeMovingLight2->TranslateNode(Vec3(0.0f, 3.0f, -8.0f));
 
         // ambient light
         SceneNodePtr nodeAmbientLight = myScene->GetRootNode().CreateChildNode("nodeAmbientLight");
-        LightPtr ambientLight         = myScene->CreateLight("ambientLight", Light::AMBIENT, nodeAmbientLight);
+        LightPtr ambientLight         = myScene->CreateLight("ambientLight", LightType::LIGHT_TYPE_AMBIENT, nodeAmbientLight);
         ambientLight->mIntensity      = 0.1f;
         
         // create a ground plane

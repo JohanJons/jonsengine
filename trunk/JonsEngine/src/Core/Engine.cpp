@@ -4,6 +4,7 @@
 #include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/Utils/Math.h"
 #include "include/Core/EngineSettings.h"
+#include "include/Core/DebugOptions.h"
 #include "include/Scene/Scene.h"
 #include "include/Window/GLFW/GLFWWindowManager.h"
 #include "include/Renderer/OpenGL3/OpenGLRenderer.h"
@@ -15,7 +16,6 @@
 
 namespace JonsEngine
 {
-
     Engine::Engine(const EngineSettings& settings) : mLog(Logger::GetCoreLogger()), 
                                                      mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<HeapAllocator>("DefaultHeapAllocator"), 
                                                                       [](HeapAllocator* allocator) { HeapAllocator::GetDefaultHeapAllocator().DeallocateObject(allocator); }),
@@ -33,7 +33,8 @@ namespace JonsEngine
         JONS_LOG_INFO(mLog, "-------- DESTROYING ENGINE --------")
     }
 
-    void Engine::Tick()
+
+    void Engine::Tick(const DebugOptions& debugOptions)
     {
         mWindow.StartFrame();
 
@@ -42,7 +43,7 @@ namespace JonsEngine
         if (mSceneManager.HasActiveScene())
         {
             Scene* activeScene = mSceneManager.GetActiveScene();
-            
+
             // update model matrix of all nodes in active scene
             activeScene->GetRootNode().UpdateModelMatrix(Mat4(1.0f));
 
@@ -51,7 +52,7 @@ namespace JonsEngine
             const RenderableLighting lighting(GetLightingInfo(activeScene));
 
             // render the scene
-            mRenderer->DrawRenderables(renderQueue, lighting);
+            mRenderer->DrawRenderables(renderQueue, lighting, debugOptions.mRenderingMode);
         }
 
         mWindow.EndFrame();
@@ -82,7 +83,7 @@ namespace JonsEngine
     {
         const std::vector<LightPtr>& sceneLights = scene->GetAllLights();
 
-        RenderableLighting lighting(scene->GetGamma(), scene->GetSceneCamera().Forward(), sceneLights.size());
+        RenderableLighting lighting(scene->GetSceneCamera().GetCameraTransform(), scene->GetGamma(), scene->GetSceneCamera().Forward(), sceneLights.size());
 
         int lightIndex = 0;
         for(LightPtr light : sceneLights)
@@ -107,8 +108,7 @@ namespace JonsEngine
     void Engine::CreateModelRenderable(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, const bool lightingEnabled, RenderQueue& renderQueue)
     {
         const Mat4 worldMatrix         = nodeTransform * model->mTransform;
-        const Mat4 worldViewMatrix     = viewMatrix * worldMatrix;
-        const Mat4 worldViewProjMatrix = perspectiveMatrix * worldViewMatrix;
+        const Mat4 worldViewProjMatrix = perspectiveMatrix * viewMatrix * worldMatrix;
 
         if (model->mMesh != INVALID_MESH_ID)
         {

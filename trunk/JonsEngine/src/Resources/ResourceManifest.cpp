@@ -133,11 +133,11 @@ namespace JonsEngine
 
         if (pkgMaterial.mHasDiffuseTexture)
             diffuseTexture = mRenderer->CreateTexture(pkgMaterial.mDiffuseTexture.mTextureType, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth,
-                                                                pkgMaterial.mDiffuseTexture.mTextureHeight, pkgMaterial.mDiffuseTexture.mTextureFormat);
+                                                                pkgMaterial.mDiffuseTexture.mTextureHeight, pkgMaterial.mDiffuseTexture.mColorFormat);
 
         if (pkgMaterial.mHasNormalTexture)
             normalTexture = mRenderer->CreateTexture(pkgMaterial.mNormalTexture.mTextureType, pkgMaterial.mNormalTexture.mTextureData, pkgMaterial.mNormalTexture.mTextureWidth,
-                                                                pkgMaterial.mNormalTexture.mTextureHeight, pkgMaterial.mNormalTexture.mTextureFormat);
+                                                                pkgMaterial.mNormalTexture.mTextureHeight, pkgMaterial.mNormalTexture.mColorFormat);
 
         return Material(pkgMaterial.mName, diffuseTexture, normalTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, 0.02f);
     }

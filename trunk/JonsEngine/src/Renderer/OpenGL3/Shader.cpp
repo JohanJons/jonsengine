@@ -14,23 +14,23 @@ namespace JonsEngine
         mShaderHandle = glCreateShader(mShaderType);
         const char* shaderCSTR = shaderSource.c_str();
 
-        glShaderSource(mShaderHandle, 1, &shaderCSTR, 0);
-        CHECK_GL_ERROR(mLogger);
+        GLCALL(glShaderSource(mShaderHandle, 1, &shaderCSTR, 0));
 
-        glCompileShader(mShaderHandle);
-        CHECK_GL_ERROR(mLogger);
+        GLCALL(glCompileShader(mShaderHandle));
 
         GLint status;
-        glGetShaderiv(mShaderHandle, GL_COMPILE_STATUS, &status);
+        GLCALL(glGetShaderiv(mShaderHandle, GL_COMPILE_STATUS, &status));
         if (status == GL_FALSE)
         {
             GLint errorLogSize = 0;
-            glGetShaderiv(mShaderHandle, GL_INFO_LOG_LENGTH, &errorLogSize);
+            GLCALL(glGetShaderiv(mShaderHandle, GL_INFO_LOG_LENGTH, &errorLogSize));
             std::vector<GLchar> errorLog(errorLogSize);
  
-	        glGetShaderInfoLog(mShaderHandle, errorLogSize, &errorLogSize, &errorLog[0]);
+	        GLCALL(glGetShaderInfoLog(mShaderHandle, errorLogSize, &errorLogSize, &errorLog[0]));
 
-            std::string msg = "Shader::Compile(): Failed to compile shader: "; 
+            std::string msg = "Shader::Compile(): Failed to compile shader ";
+            msg.append(mName);
+            msg.append(": ");
             msg.append(&errorLog[0]);
 
             JONS_LOG_ERROR(mLogger, msg);
@@ -40,18 +40,6 @@ namespace JonsEngine
         
     Shader::~Shader()
     {
-        glDeleteShader(mShaderHandle);
-        CHECK_GL_ERROR(mLogger);
-    }
-        
-
-    const std::string& Shader::GetName() const
-    {
-        return mName;
-    }
-
-    Shader::ShaderType Shader::GetShaderType() const
-    {
-        return mShaderType;
+        GLCALL(glDeleteShader(mShaderHandle));
     }
 }

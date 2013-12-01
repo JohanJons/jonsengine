@@ -129,6 +129,7 @@
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
     <ClCompile Include="src\Core\Utils\Time.cpp" />
     <ClCompile Include="src\Core\Utils\Math.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\GBuffer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLMesh.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLRenderer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLTexture.cpp" />
@@ -149,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
     <ClInclude Include="include\Core\Containers\Vector.h" />
+    <ClInclude Include="include\Core\DebugOptions.h" />
     <ClInclude Include="include\Core\Engine.h" />
     <ClInclude Include="include\Core\EngineDefs.h" />
     <ClInclude Include="include\Core\EngineSettings.h" />
@@ -166,13 +168,15 @@
     <ClInclude Include="include\Core\Types.h" />
     <ClInclude Include="include\Core\Utils\Time.h" />
     <ClInclude Include="include\Core\Utils\Math.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\GBuffer.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLMesh.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLRenderer.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLTexture.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLUtils.hpp" />
     <ClInclude Include="include\Renderer\OpenGL3\Shader.h" />
     <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\GeometryFragmentShader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\GeometryVertexShader.h" />
     <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.hpp" />
     <ClInclude Include="include\Renderer\RenderCommands.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />

@@ -25,6 +25,7 @@ namespace JonsGame
         void SetupScene();
 
         JonsEngine::EngineSettings mSettings;
+        JonsEngine::DebugOptions mDebugOptions;
         JonsEngine::Engine* mEngine;
         bool mRunning;
         uint32_t mCenterXPos;

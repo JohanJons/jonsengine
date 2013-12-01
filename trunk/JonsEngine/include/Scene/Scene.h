@@ -21,8 +21,8 @@ namespace JonsEngine
         Scene(const std::string& sceneName, ResourceManifest& resManifest);
         ~Scene();
 
-        LightPtr CreateLight(const std::string& lightName, Light::LightType type);
-        LightPtr CreateLight(const std::string& lightName, Light::LightType type, const SceneNodePtr node);
+        LightPtr CreateLight(const std::string& lightName, LightType type);
+        LightPtr CreateLight(const std::string& lightName, LightType type, const SceneNodePtr node);
         LightPtr GetLight(const std::string& lightName);
         const std::vector<LightPtr>& GetAllLights() const;
         void DeleteLight(const std::string& lightName);

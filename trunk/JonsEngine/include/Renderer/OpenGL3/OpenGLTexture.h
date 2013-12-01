@@ -26,10 +26,11 @@ namespace JonsEngine
         {
             TEXTURE_UNIT_UNKNOWN = -1,
             TEXTURE_UNIT_DIFFUSE = 0,
-            TEXTURE_UNIT_NORMAL = 1
+            TEXTURE_UNIT_NORMAL = 1,
+            TEXTURE_UNIT_SHADOW = 2
         };
 
-        OpenGLTexture(const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureFormat textureFormat, TextureType textureType, Logger& logger);
+        OpenGLTexture(const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat, TextureType textureType, Logger& logger);
         ~OpenGLTexture();
 
         Logger& mLogger;

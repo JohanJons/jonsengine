@@ -12,6 +12,7 @@
 namespace JonsEngine
 {
     struct EngineSettings;
+    struct DebugOptions;
     struct Model;
     class IMemoryAllocator;
     class Logger;
@@ -39,7 +40,7 @@ namespace JonsEngine
         Engine(const EngineSettings& settings);
         ~Engine();
 
-        void Tick();
+        void Tick(const DebugOptions& debugOtions);
 
         GLFWWindowManager& GetWindow();
         OpenGLRendererPtr GetRenderer();

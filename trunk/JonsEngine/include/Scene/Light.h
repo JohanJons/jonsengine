@@ -16,15 +16,6 @@ namespace JonsEngine
     /* Light definition */
     struct Light
     {
-        enum LightType
-        {
-            UNKNOWN = 0,
-            POINT,
-            DIRECTIONAL,
-            SPOTLIGHT,
-            AMBIENT,
-        };
-
         const std::string mName;
         const size_t mHashedID;
 

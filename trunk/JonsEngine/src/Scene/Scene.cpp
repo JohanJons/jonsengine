@@ -18,14 +18,14 @@ namespace JonsEngine
     }
 
 
-    LightPtr Scene::CreateLight(const std::string& lightName, Light::LightType type)
+    LightPtr Scene::CreateLight(const std::string& lightName, LightType type)
     {
         mLights.emplace_back(mMemoryAllocator.AllocateObject<Light>(lightName, type), std::bind(&HeapAllocator::DeallocateObject<Light>, &mMemoryAllocator, std::placeholders::_1));
 
         return mLights.back();
     }
 
-    LightPtr Scene::CreateLight(const std::string& lightName, Light::LightType type, const SceneNodePtr node)
+    LightPtr Scene::CreateLight(const std::string& lightName, LightType type, const SceneNodePtr node)
     {
         LightPtr light = CreateLight(lightName, type);
 

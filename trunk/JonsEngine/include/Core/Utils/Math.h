@@ -9,7 +9,6 @@ namespace JonsEngine
     /*
      * Contains various math utilities
      */
-    class Camera;
 
 
     Mat4 Scale(const Mat4& matrix, const Vec3& scaleVec);
@@ -21,4 +20,5 @@ namespace JonsEngine
     Mat4 QuaternionToMat4(const Quaternion& quat);
 
     Mat4 CreatePerspectiveMatrix(const float fov, const float aspect, const float zNear, const float zFar);
+    Mat4 LookAt(const Vec3& position, const Vec3& lookAtVec, const Vec3& upVector);
 }

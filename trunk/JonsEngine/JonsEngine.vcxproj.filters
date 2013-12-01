@@ -87,6 +87,9 @@
     <Filter Include="Source Files\Renderer\OpenGL3">
       <UniqueIdentifier>{911dcb5c-05b8-4bfa-8f92-ae99563ab968}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Renderer\OpenGL3\Shaders">
+      <UniqueIdentifier>{181a537f-a757-494e-af2f-ee41acccc8aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Engine.cpp">
@@ -176,6 +179,9 @@
     <ClCompile Include="src\Core\Utils\Time.cpp">
       <Filter>Source Files\Core\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\GBuffer.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -236,9 +242,6 @@
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLRenderer.h">
-      <Filter>Header Files\Renderer\OpenGL3</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Types.h">
@@ -303,6 +306,18 @@
     </ClInclude>
     <ClInclude Include="include\Core\Utils\Time.h">
       <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\GBuffer.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\GeometryFragmentShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\GeometryVertexShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\DebugOptions.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

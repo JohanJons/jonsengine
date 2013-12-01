@@ -234,6 +234,7 @@ namespace JonsEngine
 
         ShowMouseCursor(mShowMouseCursor);
         glfwSetWindowPos(mWindow, 0, 0);
+        // TODO: Move this into OpenGL somewhere
         glViewport(0, 0, (GLsizei) mScreenWidth, (GLsizei)mScreenHeight);
 
         return true;

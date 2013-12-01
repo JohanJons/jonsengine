@@ -18,46 +18,35 @@ namespace JonsEngine
     class UniformBuffer
     {
     public:
-        UniformBuffer(const std::string& name, Logger& logger, const ShaderProgram& program, size_t defaultSize = 5) : mName(name), mLogger(logger), mBindingIndex(++gNextUniformBindingIndex), mBlockOffset(0), mMaxSize(defaultSize), mCurrentSize(0)
+        UniformBuffer(const std::string& name, Logger& logger, const GLuint programID, size_t defaultSize = 5) : mName(name), mLogger(logger), mBindingIndex(++gNextUniformBindingIndex), mBlockOffset(0), mMaxSize(defaultSize), mCurrentSize(0)
         {
-            glGenBuffers(1, &mBuffer);
-            CHECK_GL_ERROR(mLogger);
-            glGenBuffers(1, &mCopyBuffer);
-            CHECK_GL_ERROR(mLogger);
+            GLCALL(glGenBuffers(1, &mBuffer));
+            GLCALL(glGenBuffers(1, &mCopyBuffer));
 
             GLint uniformBufferAlignSize;
-            glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &uniformBufferAlignSize);
-            CHECK_GL_ERROR(mLogger);
+            GLCALL(glGetIntegerv(GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &uniformBufferAlignSize));
 
             mBlockOffset = sizeof(ContentType);
 			mBlockOffset += uniformBufferAlignSize - (mBlockOffset % uniformBufferAlignSize);
             Resize(defaultSize);
 
-            GLuint blockIndex = glGetUniformBlockIndex(program.GetHandle(), mName.c_str());
-            CHECK_GL_ERROR(mLogger);
-            glUniformBlockBinding(program.GetHandle(), blockIndex, mBindingIndex);
-            CHECK_GL_ERROR(mLogger);
+            GLuint blockIndex = glGetUniformBlockIndex(programID, mName.c_str());
+            GLCALL(glUniformBlockBinding(programID, blockIndex, mBindingIndex));
         }
 
         ~UniformBuffer()
         {
-            glDeleteBuffers(1, &mBuffer);
-            CHECK_GL_ERROR(mLogger);
-            glDeleteBuffers(1, &mCopyBuffer);
-            CHECK_GL_ERROR(mLogger);
+            GLCALL(glDeleteBuffers(1, &mBuffer));
+            GLCALL(glDeleteBuffers(1, &mCopyBuffer));
         }
 
 
         void ClearData()
         {
-            glBindBuffer(GL_UNIFORM_BUFFER, mBuffer);
-            CHECK_GL_ERROR(mLogger);
-            glBufferData(GL_UNIFORM_BUFFER, mMaxSize * mBlockOffset, 0, GL_DYNAMIC_DRAW);
-            CHECK_GL_ERROR(mLogger);
-            glBindBufferRange(GL_UNIFORM_BUFFER, mBindingIndex, mBuffer, 0, sizeof(ContentType));
-            CHECK_GL_ERROR(mLogger);
-            glBindBuffer(GL_UNIFORM_BUFFER, 0);
-            CHECK_GL_ERROR(mLogger);
+            GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, mBuffer));
+            GLCALL(glBufferData(GL_UNIFORM_BUFFER, mMaxSize * mBlockOffset, 0, GL_DYNAMIC_DRAW));
+            GLCALL(glBindBufferRange(GL_UNIFORM_BUFFER, mBindingIndex, mBuffer, 0, sizeof(ContentType)));
+            GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, 0));
 
             mCurrentSize = 0;
         }
@@ -68,12 +57,9 @@ namespace JonsEngine
             if (mCurrentSize >= mMaxSize)
                 Resize(mMaxSize * 2);
 
-            glBindBuffer(GL_UNIFORM_BUFFER, mBuffer);
-            CHECK_GL_ERROR(mLogger);
-            glBufferSubData(GL_UNIFORM_BUFFER, mCurrentSize * mBlockOffset, sizeof(data), &data);
-            CHECK_GL_ERROR(mLogger);
-            glBindBuffer(GL_UNIFORM_BUFFER, 0);
-            CHECK_GL_ERROR(mLogger);
+            GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, mBuffer));
+            GLCALL(glBufferSubData(GL_UNIFORM_BUFFER, mCurrentSize * mBlockOffset, sizeof(data), &data));
+            GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, 0));
 
             mCurrentSize++;
         }
@@ -90,25 +76,17 @@ namespace JonsEngine
 
         void Resize(size_t newSize)
         {
-            glBindBuffer(GL_COPY_READ_BUFFER, mBuffer);
-            CHECK_GL_ERROR(mLogger);
-            glBindBuffer(GL_COPY_WRITE_BUFFER, mCopyBuffer);
-            CHECK_GL_ERROR(mLogger);
+            GLCALL(glBindBuffer(GL_COPY_READ_BUFFER, mBuffer));
+            GLCALL(glBindBuffer(GL_COPY_WRITE_BUFFER, mCopyBuffer));
 
-            glBufferData(GL_COPY_WRITE_BUFFER, mCurrentSize * mBlockOffset, 0, GL_DYNAMIC_COPY);
-            CHECK_GL_ERROR(mLogger);
-            glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, mCurrentSize * mBlockOffset);
-            CHECK_GL_ERROR(mLogger);
+            GLCALL(glBufferData(GL_COPY_WRITE_BUFFER, mCurrentSize * mBlockOffset, 0, GL_DYNAMIC_COPY));
+            GLCALL(glCopyBufferSubData(GL_COPY_READ_BUFFER, GL_COPY_WRITE_BUFFER, 0, 0, mCurrentSize * mBlockOffset));
 
-            glBufferData(GL_COPY_READ_BUFFER, newSize * mBlockOffset, 0, GL_DYNAMIC_DRAW);
-            CHECK_GL_ERROR(mLogger);
-            glCopyBufferSubData(GL_COPY_WRITE_BUFFER, GL_COPY_READ_BUFFER, 0, 0, (mCurrentSize <= newSize ? mCurrentSize : newSize) * mBlockOffset);
-            CHECK_GL_ERROR(mLogger);
+            GLCALL(glBufferData(GL_COPY_READ_BUFFER, newSize * mBlockOffset, 0, GL_DYNAMIC_DRAW));
+            GLCALL(glCopyBufferSubData(GL_COPY_WRITE_BUFFER, GL_COPY_READ_BUFFER, 0, 0, (mCurrentSize <= newSize ? mCurrentSize : newSize) * mBlockOffset));
 
-            glBindBuffer(GL_COPY_READ_BUFFER, 0);
-            CHECK_GL_ERROR(mLogger);
-            glBindBuffer(GL_COPY_WRITE_BUFFER, 0);
-            CHECK_GL_ERROR(mLogger);
+            GLCALL(glBindBuffer(GL_COPY_READ_BUFFER, 0));
+            GLCALL(glBindBuffer(GL_COPY_WRITE_BUFFER, 0));
 
             mMaxSize = newSize;
         }
@@ -118,12 +96,9 @@ namespace JonsEngine
         {
             if (index <= mCurrentSize) 
             {
-                glBindBuffer(GL_UNIFORM_BUFFER, mBuffer);
-                CHECK_GL_ERROR(mLogger);
-                glBindBufferRange(GL_UNIFORM_BUFFER, mBindingIndex, mBuffer, index * mBlockOffset, sizeof(ContentType));
-                CHECK_GL_ERROR(mLogger);
-                glBindBuffer(GL_UNIFORM_BUFFER, 0);
-                CHECK_GL_ERROR(mLogger);
+                GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, mBuffer));
+                GLCALL(glBindBufferRange(GL_UNIFORM_BUFFER, mBindingIndex, mBuffer, index * mBlockOffset, sizeof(ContentType)));
+                GLCALL(glBindBuffer(GL_UNIFORM_BUFFER, 0));
             }
         }
 

@@ -44,4 +44,9 @@ namespace JonsEngine
     {
         return glm::perspective(fov, aspect, zNear, zFar);
     }
+
+    Mat4 LookAt(const Vec3& position, const Vec3& lookAtVec, const Vec3& upVector)
+    {
+        return glm::lookAt(position, lookAtVec, upVector);
+    }
 }
