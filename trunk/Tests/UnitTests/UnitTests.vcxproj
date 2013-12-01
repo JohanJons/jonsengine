@@ -50,7 +50,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <LibraryPath>..\Thirdparty\Visual_Leak_Detector\lib\Win32\;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\..\Thirdparty\Visual_Leak_Detector\lib\Win32\;$(LibraryPath)</LibraryPath>
     <IncludePath>$(IncludePath)</IncludePath>
     <ReferencePath>$(ReferencePath)</ReferencePath>
     <IntDir>$(SolutionDir)/bin/$(Configuration)/$(Platform)/Temp/$(MSBuildProjectName)/</IntDir>
@@ -81,7 +81,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;JONSENGINE_RUN_UNIT_TEST;_VARIADIC_MAX=10;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\Visual_Leak_Detector\include;$(SolutionDir)\..\Thirdparty\gtest-1.6.0/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\Visual_Leak_Detector\include;$(ProjectDir);$(SolutionDir)\..\Thirdparty\gtest-1.6.0/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>

@@ -35,6 +35,6 @@ namespace JonsEngine
         }                                                                                                                                               \
     }
     #else
-    #define GLCALL(function, Logger) function;
+    #define GLCALL(function) function;
     #endif
 }
