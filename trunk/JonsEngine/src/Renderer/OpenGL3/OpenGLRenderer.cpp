@@ -295,7 +295,7 @@ namespace JonsEngine
             }
             case DebugOptions::RENDER_DEBUG_COLOR:
             {
-                GLCALL(glReadBuffer(GL_COLOR_ATTACHMENT0 + GBuffer::GBUFFER_TEXTURE_COLOR));
+                GLCALL(glReadBuffer(GL_COLOR_ATTACHMENT0 + GBuffer::GBUFFER_TEXTURE_DIFFUSE));
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
                 break;
             }

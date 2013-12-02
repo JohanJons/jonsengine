@@ -16,7 +16,7 @@ namespace JonsEngine
             GBUFFER_TEXTURE_POSITION = 0,
             GBUFFER_TEXTURE_NORMAL,
             GBUFFER_TEXTURE_TEXCOORD,
-            GBUFFER_TEXTURE_COLOR,
+            GBUFFER_TEXTURE_DIFFUSE,
             GBUFFER_NUM_TEXTURES
         };
 

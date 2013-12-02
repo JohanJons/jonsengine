@@ -30,7 +30,7 @@ namespace JonsEngine
     layout(location = 0) out vec3 outPosition;                                                                              \n \
     layout(location = 1) out vec3 outNormal;                                                                                \n \
     layout(location = 2) out vec3 outTexcoord;      // TODO                                                                 \n \
-    layout(location = 3) out vec3 outColor;                                                                                 \n \
+    layout(location = 3) out vec3 outDiffuse;                                                                               \n \
                                                                                                                             \n \
     void main()                                                                                                             \n \
     {                                                                                                                       \n \
@@ -49,8 +49,8 @@ namespace JonsEngine
         outTexcoord = vec3(frag_texcoord, 0.0);                                                                             \n \
                                                                                                                             \n \
         if (UnifGeometryPass.mHasDiffuseTexture)                                                                            \n \
-            outColor = texture(unifDiffuseTexture, frag_texcoord).xyz;                                                      \n \
+            outDiffuse = texture(unifDiffuseTexture, frag_texcoord).xyz;                                                    \n \
         else                                                                                                                \n \
-            outColor = vec3(1.0);                                                                                           \n \
+            outDiffuse = vec3(1.0);                                                                                         \n \
     }                                                                                                                       \n";
 }
