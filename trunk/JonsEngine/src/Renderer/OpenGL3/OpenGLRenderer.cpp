@@ -102,7 +102,6 @@ namespace JonsEngine
         mGBuffer(mLogger, mGeometryProgram.mProgramHandle, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight),
         mUniBufferGeometryPass("UnifGeometry", mLogger, mGeometryProgram.mProgramHandle)
     {
-        GLCALL(glClearDepth(1.0f));
         GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 
         // face culling
@@ -111,10 +110,9 @@ namespace JonsEngine
 	    GLCALL(glFrontFace(GL_CCW));
 
         // z depth testing
-        GLCALL(glEnable(GL_DEPTH_TEST));
-        GLCALL(glDepthMask(GL_TRUE));
         GLCALL(glDepthFunc(GL_LEQUAL));
         GLCALL(glDepthRange(0.0f, 1.0f));
+        GLCALL(glClearDepth(1.0f));
 
         // diffuse/normal texture sampler setup
         GLCALL(glUseProgram(mGeometryProgram.mProgramHandle));
@@ -170,7 +168,7 @@ namespace JonsEngine
         if (debugRenderering == DebugOptions::RENDER_DEBUG_NONE)
             ShadingPass();
         else
-            DrawGBufferToScreen(debugRenderering);
+            DebugPass(debugRenderering);
     }
 
 
@@ -214,6 +212,10 @@ namespace JonsEngine
     {
         GLCALL(glUseProgram(mGeometryProgram.mProgramHandle));
         GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFramebuffer));
+
+        GLCALL(glDepthMask(GL_TRUE));
+        GLCALL(glEnable(GL_DEPTH_TEST));
+
         // clear GBuffer fbo
         GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
@@ -262,15 +264,23 @@ namespace JonsEngine
                 UnbindTexture2D(OpenGLTexture::TEXTURE_UNIT_NORMAL, mLogger);
         }
 
+        GLCALL(glDisable(GL_DEPTH_TEST));
+        GLCALL(glDepthMask(GL_FALSE));
+
         GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
         GLCALL(glUseProgram(0));
     }
         
     void OpenGLRenderer::ShadingPass()
     {
+        GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer.mFramebuffer));
+
+
+
+        GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
     }
 
-    void OpenGLRenderer::DrawGBufferToScreen(const DebugOptions::RenderingMode debugOptions)
+    void OpenGLRenderer::DebugPass(const DebugOptions::RenderingMode debugOptions)
     {
         GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer.mFramebuffer));
         switch (debugOptions)

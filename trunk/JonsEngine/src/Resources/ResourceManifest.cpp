@@ -39,6 +39,32 @@ namespace JonsEngine
         return ptr;
     }
 
+    ModelPtr ResourceManifest::CreateCube(const std::string& modelName, const double size)
+    {
+        return CreateRectangle(modelName, size, size, size);
+    }
+
+    ModelPtr ResourceManifest::CreateSphere(const std::string& modelName, const float radius, const uint32_t rings, const uint32_t sectors)
+    {
+        ModelPtr ptr = GetModel(modelName);
+        if (ptr)
+            return ptr;
+
+        if (radius <= 0 || rings <= 0 || sectors <= 0)
+            return ptr;
+
+        std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
+        std::vector<uint32_t> indiceData;
+        if (!CreateSphereData(radius, rings, sectors, vertexData, normalData, texcoordData, indiceData))
+            return ptr;
+
+        auto allocator = mMemoryAllocator;
+        ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName), [=](Model* model) { allocator->DeallocateObject(model); }));
+        ptr->mMesh = mRenderer->CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData);
+
+        return ptr;
+    }
+
     
     ModelPtr ResourceManifest::LoadModel(const std::string& assetName, const JonsPackagePtr jonsPkg)
     {

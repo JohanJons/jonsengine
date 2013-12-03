@@ -99,7 +99,7 @@ namespace JonsEngine
 
         void GeometryPass(const RenderQueue& renderQueue);
         void ShadingPass();
-        void DrawGBufferToScreen(const DebugOptions::RenderingMode debugOptions);
+        void DebugPass(const DebugOptions::RenderingMode debugOptions);
 
         IMemoryAllocatorPtr mMemoryAllocator;
         Logger& mLogger;

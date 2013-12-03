@@ -173,12 +173,12 @@ namespace JonsGame
         plane->mMaterialTilingFactor = 64.0f;
         nodePlane->TranslateNode(Vec3(0.0f, -0.5f, 0.0f));
 
-        // create a random cube
-        SceneNodePtr nodeCube2 = myScene->GetRootNode().CreateChildNode("Cube2");
-        ModelPtr cube2 = myScene->GetResourceManifest().CreateRectangle("Cube2", 4, 4, 4);
-        cube2->mMaterial = myScene->GetResourceManifest().GetMaterial("checker");
-        cube2->mSceneNode = nodeCube2;
-        nodeCube2->TranslateNode(Vec3(3.0f, 5.5f, 10.0f));
+        // create a sphere
+        SceneNodePtr nodeSphere = myScene->GetRootNode().CreateChildNode("nodeSphere");
+        ModelPtr sphere = myScene->GetResourceManifest().CreateSphere("Sphere", 1.0f, 12, 24);
+        sphere->mMaterial = myScene->GetResourceManifest().GetMaterial("checker");
+        sphere->mSceneNode = nodeSphere;
+        nodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
         
         // move up camera
         myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));

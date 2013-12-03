@@ -23,16 +23,6 @@ namespace JonsEngine
      * It creates all subsystems and is responsible for advancing the engine state.
      */
 
-    /*
-     * TODO:
-     * replace push_back with emplace_back once boost is compatible with MSVC12
-     * Merge EngineDefs.h types into types.h
-     * Fix assimp and ambient/diffuse colors..
-     * Check camera upside down?
-     * Integrate building with boost
-     * Generalize  common scene/resource/.. code
-     */
-
     /* Engine definition */
     class Engine
     {
