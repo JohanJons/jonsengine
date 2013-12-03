@@ -27,7 +27,7 @@ namespace JonsEngine
 
         std::array<GLuint, GBUFFER_NUM_TEXTURES> mGBufferTextures;
         GLuint mFramebuffer;
-        GLuint mDepthTexture;
+        GLuint mDepthbuffer;
         GLuint mTextureSampler;
     };
 }
