@@ -157,16 +157,19 @@ namespace JonsEngine
         return mCurrentAnisotropy;
     }
         
-    bool OpenGLRenderer::SetAnisotropicFiltering(const float newAnisoLevel)
+    void OpenGLRenderer::SetAnisotropicFiltering(const float newAnisoLevel)
     {
-        if (newAnisoLevel < 1.0f || newAnisoLevel > GetMaxAnisotropicFiltering())
-            return false;
+        const float maxAnisoFiltering = GetMaxAnisotropicFiltering();
 
-        mCurrentAnisotropy = newAnisoLevel;
+        if (newAnisoLevel > maxAnisoFiltering)
+            mCurrentAnisotropy = maxAnisoFiltering;
+        else if (newAnisoLevel < 1.0f)
+            mCurrentAnisotropy = 1.0f;
+        else
+            mCurrentAnisotropy = newAnisoLevel;
+
         GLCALL(glSamplerParameterf(mTextureSampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, mCurrentAnisotropy));
         GLCALL(glSamplerParameterf(mGBuffer.mTextureSampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, mCurrentAnisotropy));
-
-        return true;
     }
 
 

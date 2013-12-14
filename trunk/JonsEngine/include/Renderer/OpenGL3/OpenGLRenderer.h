@@ -43,7 +43,7 @@ namespace JonsEngine
 
         float GetMaxAnisotropicFiltering() const;
         float GetCurrentAnisotropicFiltering() const;
-        bool SetAnisotropicFiltering(const float newAnisoLevel);
+        void SetAnisotropicFiltering(const float newAnisoLevel);
 
         float GetZNear() const;
         float GetZFar() const;
