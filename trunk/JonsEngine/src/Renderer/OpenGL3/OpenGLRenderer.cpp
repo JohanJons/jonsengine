@@ -146,7 +146,7 @@ namespace JonsEngine
 
     float OpenGLRenderer::GetMaxAnisotropicFiltering() const
     {
-        float maxAniso = 0.0f;
+        float maxAniso = 1.0f;
         GLCALL(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAniso));
 
         return maxAniso;
@@ -159,7 +159,7 @@ namespace JonsEngine
         
     bool OpenGLRenderer::SetAnisotropicFiltering(const float newAnisoLevel)
     {
-        if (newAnisoLevel < 0.0f || newAnisoLevel > GetMaxAnisotropicFiltering())
+        if (newAnisoLevel < 1.0f || newAnisoLevel > GetMaxAnisotropicFiltering())
             return false;
 
         mCurrentAnisotropy = newAnisoLevel;
@@ -250,9 +250,6 @@ namespace JonsEngine
         GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer.mFramebuffer));
         GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-  //      GLCALL(glDisable(GL_DEPTH_TEST));
-   //     GLCALL(glDepthMask(GL_FALSE));
-
         // activate all the gbuffer textures
         GLCALL(glActiveTexture(GL_TEXTURE0 + GBuffer::GBUFFER_TEXTURE_POSITION));
         GLCALL(glBindTexture(GL_TEXTURE_2D, mGBuffer.mGBufferTextures[GBuffer::GBUFFER_TEXTURE_POSITION]))
@@ -263,29 +260,25 @@ namespace JonsEngine
         GLCALL(glActiveTexture(GL_TEXTURE0 + GBuffer::GBUFFER_TEXTURE_DIFFUSE));
         GLCALL(glBindTexture(GL_TEXTURE_2D, mGBuffer.mGBufferTextures[GBuffer::GBUFFER_TEXTURE_DIFFUSE]));
         GLCALL(glGenerateMipmap(GL_TEXTURE_2D));
-       // GLCALL(glDepthMask(GL_TRUE));
-      //  GLCALL(glEnable(GL_DEPTH_TEST))
+
         // draw fullscreen rect for ambient light
         mUniBufferShadingPass.SetData(UnifShading(Mat4(1.0f), lighting.mAmbientLight, Vec4(0.0f), lighting.mGamma, lighting.mScreenSize, UnifShading::LIGHT_TYPE_AMBIENT, 0.0f, 0.0f));
         mShadingGeometry.DrawRectangle2D();
 
-        // enable blending
-       // GLCALL(glEnable(GL_BLEND));
-       // GLCALL(glBlendEquation(GL_FUNC_ADD));
-        //GLCALL(glBlendFunc(GL_ONE, GL_ONE));
+        // enable blending directional + point lights
+     /*   GLCALL(glEnable(GL_BLEND));
+        GLCALL(glBlendEquation(GL_FUNC_ADD));
+        GLCALL(glBlendFunc(GL_ONE, GL_ONE));
 
-        /*for (const RenderableLighting::Light& light : lighting.mLights)
+        // do all point lights
+        for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
-            mUniBufferShadingPass.SetData(UnifShading(light.mWVPMatrix, light.mLightColor, light.mLightPosition, light.mLightDirection, lighting.mGamma, lighting.mScreenSize, light.mLightType, light.mFalloffFactor, light.mMaxDistance));
-
+            mUniBufferShadingPass.SetData(UnifShading(pointLight.mWVPMatrix, pointLight.mLightColor, pointLight.mLightPosition, lighting.mGamma, lighting.mScreenSize, UnifShading::LIGHT_TYPE_POINT, pointLight.mFalloffFactor, pointLight.mMaxDistance));
             mShadingGeometry.DrawSphere();
-        }*/
-    //    GLCALL(glDisable(GL_DEPTH_TEST));
-    //    GLCALL(glDepthMask(GL_FALSE));
-     //   GLCALL(glDepthMask(GL_TRUE));
-    //    GLCALL(glEnable(GL_DEPTH_TEST));
-      //  GLCALL(glDisable(GL_BLEND));
+        }
 
+        // reset state
+        GLCALL(glDisable(GL_BLEND));*/
         GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
         GLCALL(glUseProgram(0));
     }

@@ -82,7 +82,7 @@ namespace JonsGame
             else if (evnt.mKey == P)
                 mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_DIFFUSE;
             else if (evnt.mKey == H)
-                mEngine->GetRenderer()->SetAnisotropicFiltering(0.0f);
+                mEngine->GetRenderer()->SetAnisotropicFiltering(1.0f);
             else if (evnt.mKey == J)
                 mEngine->GetRenderer()->SetAnisotropicFiltering(mEngine->GetRenderer()->GetMaxAnisotropicFiltering());
 

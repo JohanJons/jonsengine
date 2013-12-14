@@ -31,7 +31,7 @@ namespace JonsEngine
 
 
     /* EngineSettings inlines */
-    inline EngineSettings::EngineSettings() : mAnisotropicFiltering(0.0f),mWindowTitle("JonsEngine Game"), mWindowWidth(1920), mWindowHeight(1080), mFullscreen(false), mFOV(70.0f), mFrameLimit(0), mMSAA(0)
+    inline EngineSettings::EngineSettings() : mAnisotropicFiltering(1.0f),mWindowTitle("JonsEngine Game"), mWindowWidth(1920), mWindowHeight(1080), mFullscreen(false), mFOV(70.0f), mFrameLimit(0), mMSAA(0)
     {
     }
 }
