@@ -9,7 +9,7 @@
 namespace JonsEngine
 {
     Scene::Scene(const std::string& sceneName, ResourceManifest& resManifest) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mRootNode("Root"), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), 
-                                                                                mGamma(2.1f), mResourceManifest(resManifest)
+                                                                                mGamma(2.1f), mAmbientLight(0.2f), mResourceManifest(resManifest)
     {
     }
 
@@ -18,48 +18,75 @@ namespace JonsEngine
     }
 
 
-    LightPtr Scene::CreateLight(const std::string& lightName, LightType type)
-    {
-        mLights.emplace_back(mMemoryAllocator.AllocateObject<Light>(lightName, type), std::bind(&HeapAllocator::DeallocateObject<Light>, &mMemoryAllocator, std::placeholders::_1));
 
-        return mLights.back();
+    PointLightPtr Scene::CreatePointLight(const std::string& lightName, const SceneNodePtr node)
+    {
+        mPointLights.emplace_back(mMemoryAllocator.AllocateObject<PointLight>(lightName, node), std::bind(&HeapAllocator::DeallocateObject<PointLight>, &mMemoryAllocator, std::placeholders::_1));
+
+        return mPointLights.back();
     }
 
-    LightPtr Scene::CreateLight(const std::string& lightName, LightType type, const SceneNodePtr node)
+    DirectionalLightPtr Scene::CreateDirectionalLight(const std::string& lightName)
     {
-        LightPtr light = CreateLight(lightName, type);
+        mDirectionalLights.emplace_back(mMemoryAllocator.AllocateObject<DirectionalLight>(lightName), std::bind(&HeapAllocator::DeallocateObject<DirectionalLight>, &mMemoryAllocator, std::placeholders::_1));
 
-        if (light)
-            light->mSceneNode = node;
-
-        return light;
+        return mDirectionalLights.back();
     }
-        
-    LightPtr Scene::GetLight(const std::string& lightName)
+
+
+    PointLightPtr Scene::GetPointLight(const std::string& lightName)
     {
-        LightPtr ret;
+        PointLightPtr ret;
         size_t hashedID = boost::hash_value(lightName);
 
-        auto iter = std::find_if(mLights.begin(), mLights.end(), [hashedID](const LightPtr light) { return light->mHashedID == hashedID; });
+        auto iter = std::find_if(mPointLights.begin(), mPointLights.end(), [hashedID](const PointLightPtr light) { return light->mHashedID == hashedID; });
 
-        if (iter != mLights.end())
-            ret = * iter;
+        if (iter != mPointLights.end())
+            ret = *iter;
 
         return ret;
     }
 
-    const std::vector<LightPtr>& Scene::GetAllLights() const
+    DirectionalLightPtr Scene::GetDirectionalLight(const std::string& lightName)
     {
-        return mLights;
+        DirectionalLightPtr ret;
+        size_t hashedID = boost::hash_value(lightName);
+
+        auto iter = std::find_if(mDirectionalLights.begin(), mDirectionalLights.end(), [hashedID](const DirectionalLightPtr light) { return light->mHashedID == hashedID; });
+
+        if (iter != mDirectionalLights.end())
+            ret = *iter;
+
+        return ret;
     }
-        
-    void Scene::DeleteLight(const std::string& lightName)
+
+
+    const std::vector<PointLightPtr>& Scene::GetPointLights() const
+    {
+        return mPointLights;
+    }
+
+    const std::vector<DirectionalLightPtr>& Scene::GetDirectionalLights() const
+    {
+        return mDirectionalLights;
+    }
+
+    void Scene::DeletePointLight(const std::string& lightName)
     {
         size_t hashedID = boost::hash_value(lightName);
-        auto iter = std::find_if(mLights.begin(), mLights.end(), [hashedID](const LightPtr light) { return light->mHashedID == hashedID; });
+        auto iter = std::find_if(mPointLights.begin(), mPointLights.end(), [hashedID](const PointLightPtr light) { return light->mHashedID == hashedID; });
 
-        if (iter != mLights.end())
-            mLights.erase(iter);
+        if (iter != mPointLights.end())
+            mPointLights.erase(iter);
+    }
+
+    void Scene::DeleteDirectionalLight(const std::string& lightName)
+    {
+        size_t hashedID = boost::hash_value(lightName);
+        auto iter = std::find_if(mDirectionalLights.begin(), mDirectionalLights.end(), [hashedID](const DirectionalLightPtr light) { return light->mHashedID == hashedID; });
+
+        if (iter != mDirectionalLights.end())
+            mDirectionalLights.erase(iter);
     }
 
 
@@ -79,6 +106,17 @@ namespace JonsEngine
         gamma.w = 1.0f;
 
         return gamma;
+    }
+
+
+    void Scene::SetAmbientLight(const Vec4& ambientLight)
+    {
+        mAmbientLight = ambientLight;
+    }
+
+    const Vec4& Scene::GetAmbientLight() const
+    {
+        return mAmbientLight;
     }
 
 

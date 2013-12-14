@@ -29,8 +29,7 @@ namespace JonsEngine
                                                                                                                             \n \
     layout(location = 0) out vec3 outPosition;                                                                              \n \
     layout(location = 1) out vec3 outNormal;                                                                                \n \
-    layout(location = 2) out vec3 outTexcoord;      // TODO                                                                 \n \
-    layout(location = 3) out vec3 outDiffuse;                                                                               \n \
+    layout(location = 2) out vec3 outDiffuse;                                                                               \n \
                                                                                                                             \n \
     void main()                                                                                                             \n \
     {                                                                                                                       \n \
@@ -45,8 +44,6 @@ namespace JonsEngine
         }                                                                                                                   \n \
         else                                                                                                                \n \
             outNormal = normalize(frag_normal);                                                                             \n \
-                                                                                                                            \n \
-        outTexcoord = vec3(frag_texcoord, 0.0);                                                                             \n \
                                                                                                                             \n \
         if (UnifGeometryPass.mHasDiffuseTexture)                                                                            \n \
             outDiffuse = texture(unifDiffuseTexture, frag_texcoord).xyz;                                                    \n \

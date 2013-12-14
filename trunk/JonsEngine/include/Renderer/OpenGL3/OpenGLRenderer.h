@@ -5,6 +5,7 @@
 #include "include/Renderer/OpenGL3/ShaderProgram.h"
 #include "include/Renderer/OpenGL3/GBuffer.h"
 #include "include/Renderer/OpenGL3/UniformBuffer.hpp"
+#include "include/Renderer/OpenGL3/ShadingGeometry.h"
 #include "include/Renderer/RenderCommands.h"
 #include "include/Core/Types.h"
 #include "include/Core/Memory/HeapAllocator.h"
@@ -66,39 +67,33 @@ namespace JonsEngine
             }
         };
 
-        /*struct UnifLight
+        struct UnifShading
         {
-            Mat4  mViewMatrix;
-            Vec4  mGamma;
-            Vec3  mViewDirection;
-            int   mNumLights;
-            RenderableLighting::Light mLight;
+            enum LightType
+            {
+                LIGHT_TYPE_UNKNOWN = 0,
+                LIGHT_TYPE_POINT,
+                LIGHT_TYPE_DIRECTIONAL,
+                LIGHT_TYPE_AMBIENT
+            };
 
-            UnifLight(const Mat4& viewMatrix, const Vec4& gamma, const Vec3& viewDir, const int keke, const RenderableLighting::Light& light) : mViewMatrix(viewMatrix), mGamma(gamma), mViewDirection(viewDir), mNumLights(keke), mLight(light)
+            Mat4 mWVPMatrix;
+            Vec4 mLightColor;
+            Vec4 mLightPosOrDir;
+            Vec4 mGamma;
+            Vec2 mScreenSize;
+            uint32_t mLightType;
+            float mFalloffFactor;
+            float mMaxDistance;
+
+            UnifShading(const Mat4& vwpMatrix, const Vec4& lightColor, const Vec4& lightPosOrDir, const Vec4& gamma, const Vec2& screenSize, const uint32_t lightType, const float falloffFactor, const float maxDistance) :
+                mWVPMatrix(vwpMatrix), mLightColor(lightColor), mLightPosOrDir(lightPosOrDir), mGamma(gamma), mScreenSize(screenSize), mLightType(lightType), mFalloffFactor(falloffFactor), mMaxDistance(maxDistance)
             {
             }
-        };*/
-
-        /*struct UnifMaterial
-        {
-            Vec4 mDiffuseColor;
-            Vec4 mAmbientColor;
-            Vec4 mSpecularColor;
-            Vec4 mEmissiveColor;
-            uint32_t mHasDiffuseTexture;
-            uint32_t mHasNormalTexture;
-            uint32_t mLightingEnabled;
-            float mSpecularFactor;
-
-            UnifMaterial(const Vec4& diffuseColor, const Vec4& ambientColor, const Vec4& specularColor, const Vec4& emissiveColor, const bool hasDiffuseTexture, const bool hasNormalTexture, const bool lightingEnabled, const float specularFactor) 
-                : 
-                mDiffuseColor(diffuseColor), mAmbientColor(ambientColor), mSpecularColor(specularColor),  mEmissiveColor(emissiveColor), mHasDiffuseTexture(hasDiffuseTexture), mHasNormalTexture(hasNormalTexture), mLightingEnabled(lightingEnabled), mSpecularFactor(specularFactor)
-            {
-            }
-        };*/
+        };
 
         void GeometryPass(const RenderQueue& renderQueue);
-        void ShadingPass();
+        void ShadingPass(const RenderableLighting& lighting);
         void DebugPass(const DebugOptions::RenderingMode debugOptions);
 
         IMemoryAllocatorPtr mMemoryAllocator;
@@ -106,7 +101,6 @@ namespace JonsEngine
 
         ShaderProgram mGeometryProgram;
         ShaderProgram mShadingProgram;
-        ShaderProgram mDebugProgram;
         GBuffer mGBuffer;
         GLuint mTextureSampler;
         float mCurrentAnisotropy;
@@ -115,6 +109,8 @@ namespace JonsEngine
 
         std::vector<OpenGLMeshPair> mMeshes;
         std::vector<OpenGLTexturePtr> mTextures;
+        ShadingGeometry mShadingGeometry;
         UniformBuffer<OpenGLRenderer::UnifGeometry> mUniBufferGeometryPass;
+        UniformBuffer<OpenGLRenderer::UnifShading> mUniBufferShadingPass;
     };
 }

@@ -367,7 +367,7 @@ namespace JonsAssetImporter
         texture.mTextureWidth  = widthInPixels;
         texture.mTextureHeight = heightInPixels;
         texture.mTextureType   = textureType;
-        texture.mColorFormat   = colorType == FIC_RGB ? ColorFormat::COLOR_FORMAT_RGB : colorType == FIC_RGBALPHA ? ColorFormat::COLOR_FORMAT_RGBA : ColorFormat::COLOR_FORMAT_UNKNOWN;
+        texture.mColorFormat   = colorType == FIC_RGB ? ColorFormat::COLOR_FORMAT_RGB : colorType == FIC_RGBALPHA ? ColorFormat::COLOR_FORMAT_RGBA : ColorFormat::COLOR_FORMAT_RGB;
 
         for(unsigned y = 0; y < FreeImage_GetHeight(bitmap); y++) {
             BYTE *bits = FreeImage_GetScanLine(bitmap, y);

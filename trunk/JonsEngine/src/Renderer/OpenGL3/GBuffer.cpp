@@ -1,6 +1,6 @@
 #include "include/Renderer/OpenGL3/GBuffer.h"
 
-#include "include/Renderer/OpenGL3/OpenGLUtils.hpp"
+#include "include/Renderer/OpenGL3/OpenGLUtils.h"
 #include "include/Core/Logging/Logger.h"
 
 #include <exception>
@@ -19,12 +19,13 @@ namespace JonsEngine
         {
             GLCALL(glBindTexture(GL_TEXTURE_2D, mGBufferTextures[index]));
             GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, 0));
+            GLCALL(glGenerateMipmap(GL_TEXTURE_2D));
             GLCALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D, mGBufferTextures[index], 0));
         }
         GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
 
         // set attachment points
-        GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+        GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
         GLCALL(glDrawBuffers(GBUFFER_NUM_TEXTURES, drawBuffers));
 
         // depthbuffer
@@ -41,19 +42,19 @@ namespace JonsEngine
         }
 
         // color attachment texture sampler
+        GLCALL(glUseProgram(shadingProgramID));
         GLCALL(glGenSamplers(1, &mTextureSampler));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-/*        GLCALL(glUniform1i(glGetUniformLocation(shadingProgramID, "unifPositionTexture"), GBuffer::GBUFFER_TEXTURE_POSITION));
+        GLCALL(glUniform1i(glGetUniformLocation(shadingProgramID, "unifPositionTexture"), GBuffer::GBUFFER_TEXTURE_POSITION));
         GLCALL(glUniform1i(glGetUniformLocation(shadingProgramID, "unifNormalTexture"), GBuffer::GBUFFER_TEXTURE_NORMAL));
-        GLCALL(glUniform1i(glGetUniformLocation(shadingProgramID, "unifTexcoordTexture"), GBuffer::GBUFFER_TEXTURE_TEXCOORD));
-        GLCALL(glUniform1i(glGetUniformLocation(shadingProgramID, "unifColorTexture"), GBuffer::GBUFFER_TEXTURE_COLOR));
+        GLCALL(glUniform1i(glGetUniformLocation(shadingProgramID, "unifDiffuseTexture"), GBuffer::GBUFFER_TEXTURE_DIFFUSE));
         GLCALL(glBindSampler(GBuffer::GBUFFER_TEXTURE_POSITION, mTextureSampler));
         GLCALL(glBindSampler(GBuffer::GBUFFER_TEXTURE_NORMAL, mTextureSampler));
-        GLCALL(glBindSampler(GBuffer::GBUFFER_TEXTURE_TEXCOORD, mTextureSampler));
-        GLCALL(glBindSampler(GBuffer::GBUFFER_TEXTURE_COLOR, mTextureSampler));*/
+        GLCALL(glBindSampler(GBuffer::GBUFFER_TEXTURE_DIFFUSE, mTextureSampler));
+        GLCALL(glUseProgram(0));
 
         GLCALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     }

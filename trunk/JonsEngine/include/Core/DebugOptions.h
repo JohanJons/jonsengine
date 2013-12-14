@@ -14,8 +14,7 @@ namespace JonsEngine
             RENDER_DEBUG_NONE = 0,
             RENDER_DEBUG_POSITIONS,
             RENDER_DEBUG_NORMALS,
-            RENDER_DEBUG_TEXCOORDS,
-            RENDER_DEBUG_COLOR
+            RENDER_DEBUG_DIFFUSE
         };
 
         DebugOptions() : mRenderingMode(RENDER_DEBUG_NONE)

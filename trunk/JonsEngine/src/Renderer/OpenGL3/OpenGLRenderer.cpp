@@ -5,7 +5,10 @@
 #include "include/Renderer/OpenGL3/Shader.h"
 #include "include/Renderer/OpenGL3/Shaders/GeometryVertexShader.h"
 #include "include/Renderer/OpenGL3/Shaders/GeometryFragmentShader.h"
-#include "include/Renderer/OpenGL3/OpenGLUtils.hpp"
+#include "include/Renderer/OpenGL3/Shaders/ShadingVertexShader.h"
+#include "include/Renderer/OpenGL3/Shaders/ShadingFragmentShader.h"
+#include "include/Renderer/OpenGL3/OpenGLUtils.h"
+#include "include/Renderer/Shapes.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Memory/HeapAllocator.h"
@@ -44,33 +47,6 @@ namespace JonsEngine
         GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
     }
 
-    GLuint SetupVAO(OpenGLMeshPtr mesh)
-    {
-        GLuint vao;
-
-        GLCALL(glGenVertexArrays(1, &vao));
-
-        GLCALL(glBindVertexArray(vao));
-        GLCALL(glBindBuffer(GL_ARRAY_BUFFER, mesh->mVBO));
-        GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->mIndexBuffer));
-
-        GLCALL(glEnableVertexAttribArray(0));
-        GLCALL(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0));
-        GLCALL(glEnableVertexAttribArray(1));
-        GLCALL(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh->mVertexDataSize)));
-        GLCALL(glEnableVertexAttribArray(2));
-        GLCALL(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh->mVertexDataSize + mesh->mNormalDataSize)));
-        GLCALL(glEnableVertexAttribArray(3));
-        GLCALL(glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh->mVertexDataSize + mesh->mNormalDataSize + mesh->mTexCoordsSize)));
-        GLCALL(glEnableVertexAttribArray(4));
-        GLCALL(glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh->mVertexDataSize + mesh->mNormalDataSize + mesh->mTexCoordsSize + mesh->mTangentsSize)));
-
-        GLCALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
-        GLCALL(glBindVertexArray(0));
-        
-        return vao;
-    }
-
 
     OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator) : OpenGLRenderer(engineSettings.mWindowWidth, engineSettings.mWindowHeight, engineSettings.mAnisotropicFiltering, memoryAllocator)
     {
@@ -83,7 +59,7 @@ namespace JonsEngine
         {
             GLCALL(glDeleteVertexArrays(1, &mesh.second));
 
-            mMeshes.emplace_back(mesh.first, SetupVAO(mesh.first));
+            mMeshes.emplace_back(mesh.first, SetupVAO(*mesh.first));
         }
         renderer.mMeshes.clear();
 
@@ -94,15 +70,14 @@ namespace JonsEngine
     OpenGLRenderer::OpenGLRenderer(const uint32_t windowWidth, const uint32_t windowHeight, const float anisotropy, IMemoryAllocatorPtr memoryAllocator) :
         mMemoryAllocator(memoryAllocator), mLogger(Logger::GetRendererLogger()),
         mGeometryProgram("GeometryProgram", ShaderPtr(new Shader("GeometryVertexShader", gGeometryVertexShader, Shader::VERTEX_SHADER)),  ShaderPtr(new Shader("GeometryFragmentShader", gGeometryFragmentShader, Shader::FRAGMENT_SHADER)), mLogger),
-        mShadingProgram("ShadingProgram", ShaderPtr(new Shader("ShadingVertexShader", gGeometryVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("ShadingFragmentShader", gGeometryFragmentShader, Shader::FRAGMENT_SHADER)), mLogger),
-        mDebugProgram("DebugProgram", ShaderPtr(new Shader("DebugVertexShader", gGeometryVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("DebugFragmentShader", gGeometryFragmentShader, Shader::FRAGMENT_SHADER)), mLogger),
+        mShadingProgram("ShadingProgram", ShaderPtr(new Shader("ShadingVertexShader", gShadingVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("ShadingFragmentShader", gShadingFragmentShader, Shader::FRAGMENT_SHADER)), mLogger),
                                                             // VS2012 bug workaround. TODO: fixed in VS2013, when boost is rdy
         //mDefaultProgram("DefaultProgram", ShaderPtr(new Shader("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); }*/), 
         //                                 ShaderPtr(new Shader("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); })*/), mLogger),
-        mGBuffer(mLogger, mGeometryProgram.mProgramHandle, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight),
-        mUniBufferGeometryPass("UnifGeometry", mLogger, mGeometryProgram.mProgramHandle)
+        mGBuffer(mLogger, mShadingProgram.mProgramHandle, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight),
+        mShadingGeometry(mLogger), mUniBufferGeometryPass("UnifGeometry", mLogger, mGeometryProgram.mProgramHandle), mUniBufferShadingPass("UnifShading", mLogger, mShadingProgram.mProgramHandle)
     {
-        GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+        GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 
         // face culling
         GLCALL(glEnable(GL_CULL_FACE));
@@ -144,7 +119,7 @@ namespace JonsEngine
         auto allocator = mMemoryAllocator;
         OpenGLMeshPtr meshPtr(allocator->AllocateObject<OpenGLMesh>(vertexData, normalData, texCoords, tangents, bitangents, indexData, mLogger), [=](OpenGLMesh* mesh) { allocator->DeallocateObject<OpenGLMesh>(mesh); });
 
-        mMeshes.emplace_back(meshPtr, SetupVAO(meshPtr));
+        mMeshes.emplace_back(meshPtr, SetupVAO(*meshPtr));
 
         return mMeshes.back().first->mMeshID;
     }
@@ -160,13 +135,10 @@ namespace JonsEngine
 
     void OpenGLRenderer::DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugRenderering)
     {
-        // clear the default FBO
-        GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-
         GeometryPass(renderQueue);
 
         if (debugRenderering == DebugOptions::RENDER_DEBUG_NONE)
-            ShadingPass();
+            ShadingPass(lighting);
         else
             DebugPass(debugRenderering);
     }
@@ -192,6 +164,7 @@ namespace JonsEngine
 
         mCurrentAnisotropy = newAnisoLevel;
         GLCALL(glSamplerParameterf(mTextureSampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, mCurrentAnisotropy));
+        GLCALL(glSamplerParameterf(mGBuffer.mTextureSampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, mCurrentAnisotropy));
 
         return true;
     }
@@ -271,13 +244,50 @@ namespace JonsEngine
         GLCALL(glUseProgram(0));
     }
         
-    void OpenGLRenderer::ShadingPass()
+    void OpenGLRenderer::ShadingPass(const RenderableLighting& lighting)
     {
+        GLCALL(glUseProgram(mShadingProgram.mProgramHandle));
         GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer.mFramebuffer));
+        GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
+  //      GLCALL(glDisable(GL_DEPTH_TEST));
+   //     GLCALL(glDepthMask(GL_FALSE));
 
+        // activate all the gbuffer textures
+        GLCALL(glActiveTexture(GL_TEXTURE0 + GBuffer::GBUFFER_TEXTURE_POSITION));
+        GLCALL(glBindTexture(GL_TEXTURE_2D, mGBuffer.mGBufferTextures[GBuffer::GBUFFER_TEXTURE_POSITION]))
+        GLCALL(glGenerateMipmap(GL_TEXTURE_2D));
+        GLCALL(glActiveTexture(GL_TEXTURE0 + GBuffer::GBUFFER_TEXTURE_NORMAL));
+        GLCALL(glBindTexture(GL_TEXTURE_2D, mGBuffer.mGBufferTextures[GBuffer::GBUFFER_TEXTURE_NORMAL]));
+        GLCALL(glGenerateMipmap(GL_TEXTURE_2D));
+        GLCALL(glActiveTexture(GL_TEXTURE0 + GBuffer::GBUFFER_TEXTURE_DIFFUSE));
+        GLCALL(glBindTexture(GL_TEXTURE_2D, mGBuffer.mGBufferTextures[GBuffer::GBUFFER_TEXTURE_DIFFUSE]));
+        GLCALL(glGenerateMipmap(GL_TEXTURE_2D));
+       // GLCALL(glDepthMask(GL_TRUE));
+      //  GLCALL(glEnable(GL_DEPTH_TEST))
+        // draw fullscreen rect for ambient light
+        mUniBufferShadingPass.SetData(UnifShading(Mat4(1.0f), lighting.mAmbientLight, Vec4(0.0f), lighting.mGamma, lighting.mScreenSize, UnifShading::LIGHT_TYPE_AMBIENT, 0.0f, 0.0f));
+        mShadingGeometry.DrawRectangle2D();
+
+        // enable blending
+       // GLCALL(glEnable(GL_BLEND));
+       // GLCALL(glBlendEquation(GL_FUNC_ADD));
+        //GLCALL(glBlendFunc(GL_ONE, GL_ONE));
+
+        /*for (const RenderableLighting::Light& light : lighting.mLights)
+        {
+            mUniBufferShadingPass.SetData(UnifShading(light.mWVPMatrix, light.mLightColor, light.mLightPosition, light.mLightDirection, lighting.mGamma, lighting.mScreenSize, light.mLightType, light.mFalloffFactor, light.mMaxDistance));
+
+            mShadingGeometry.DrawSphere();
+        }*/
+    //    GLCALL(glDisable(GL_DEPTH_TEST));
+    //    GLCALL(glDepthMask(GL_FALSE));
+     //   GLCALL(glDepthMask(GL_TRUE));
+    //    GLCALL(glEnable(GL_DEPTH_TEST));
+      //  GLCALL(glDisable(GL_BLEND));
 
         GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
+        GLCALL(glUseProgram(0));
     }
 
     void OpenGLRenderer::DebugPass(const DebugOptions::RenderingMode debugOptions)
@@ -297,13 +307,7 @@ namespace JonsEngine
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
                 break;
             }
-            case DebugOptions::RENDER_DEBUG_TEXCOORDS:
-            {
-                GLCALL(glReadBuffer(GL_COLOR_ATTACHMENT0 + GBuffer::GBUFFER_TEXTURE_TEXCOORD));
-                GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
-                break;
-            }
-            case DebugOptions::RENDER_DEBUG_COLOR:
+            case DebugOptions::RENDER_DEBUG_DIFFUSE:
             {
                 GLCALL(glReadBuffer(GL_COLOR_ATTACHMENT0 + GBuffer::GBUFFER_TEXTURE_DIFFUSE));
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
@@ -313,6 +317,7 @@ namespace JonsEngine
                 break;
         }
 
+        GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
         GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
     }
 }

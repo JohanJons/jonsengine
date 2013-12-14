@@ -1,6 +1,6 @@
 #include "include/Renderer/OpenGL3/Shader.h"
 
-#include "include/Renderer/OpenGL3/OpenGLUtils.hpp"
+#include "include/Renderer/OpenGL3/OpenGLUtils.h"
 #include "include/Core/Logging/Logger.h"
 
 #include <vector>

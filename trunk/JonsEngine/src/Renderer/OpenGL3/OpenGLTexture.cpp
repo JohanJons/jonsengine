@@ -1,6 +1,6 @@
 #include "include/Renderer/OpenGL3/OpenGLTexture.h"
 
-#include "include/Renderer/OpenGL3/OpenGLUtils.hpp"
+#include "include/Renderer/OpenGL3/OpenGLUtils.h"
 #include "include/Core/Logging/Logger.h"
 
 namespace JonsEngine

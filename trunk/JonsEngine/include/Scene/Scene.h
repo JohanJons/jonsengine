@@ -2,7 +2,8 @@
 
 #include "include/Scene/SceneNode.h"
 #include "include/Scene/Camera.h"
-#include "include/Scene/Light.h"
+#include "include/Scene/PointLight.h"
+#include "include/Scene/DirectionalLight.h"
 #include "include/Scene/Model.h"
 #include "include/Resources/JonsPackage.h"
 #include "include/Resources/ResourceManifest.h"
@@ -21,15 +22,24 @@ namespace JonsEngine
         Scene(const std::string& sceneName, ResourceManifest& resManifest);
         ~Scene();
 
-        LightPtr CreateLight(const std::string& lightName, LightType type);
-        LightPtr CreateLight(const std::string& lightName, LightType type, const SceneNodePtr node);
-        LightPtr GetLight(const std::string& lightName);
-        const std::vector<LightPtr>& GetAllLights() const;
-        void DeleteLight(const std::string& lightName);
+        PointLightPtr CreatePointLight(const std::string& lightName, const SceneNodePtr node);
+        DirectionalLightPtr CreateDirectionalLight(const std::string& lightName);
+
+        PointLightPtr Scene::GetPointLight(const std::string& lightName);
+        DirectionalLightPtr Scene::GetDirectionalLight(const std::string& lightName);
+
+        const std::vector<PointLightPtr>& GetPointLights() const;
+        const std::vector<DirectionalLightPtr>& GetDirectionalLights() const;
+
+        void DeletePointLight(const std::string& lightName);
+        void DeleteDirectionalLight(const std::string& lightName);
 
         void SetGammaFactor(const float gamma);
         float GetGammaFactor() const;
         Vec4 GetGamma() const;
+
+        void SetAmbientLight(const Vec4& ambientLight);
+        const Vec4& GetAmbientLight() const;
 
         const ResourceManifest& GetResourceManifest() const;
         ResourceManifest& GetResourceManifest();
@@ -49,8 +59,10 @@ namespace JonsEngine
         Camera mSceneCamera;
         SceneNode mRootNode;
         float mGamma;
+        Vec4 mAmbientLight;
 
-        std::vector<LightPtr> mLights;
+        std::vector<PointLightPtr> mPointLights;
+        std::vector<DirectionalLightPtr> mDirectionalLights;
 
         ResourceManifest& mResourceManifest;
         IMemoryAllocator& mMemoryAllocator;

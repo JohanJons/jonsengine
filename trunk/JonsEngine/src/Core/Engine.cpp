@@ -47,9 +47,12 @@ namespace JonsEngine
             // update model matrix of all nodes in active scene
             activeScene->GetRootNode().UpdateModelMatrix(Mat4(1.0f));
 
+            const Mat4 viewMatrix = activeScene->GetSceneCamera().GetCameraTransform();
+            const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer->GetZNear(), mRenderer->GetZFar());
+
             // create the rendering queue and active lights
-            const RenderQueue renderQueue(CreateRenderQueue(activeScene));
-            const RenderableLighting lighting(GetLightingInfo(activeScene));
+            const RenderQueue renderQueue(CreateRenderQueue(activeScene, viewMatrix, perspectiveMatrix));
+            const RenderableLighting lighting(GetLightingInfo(activeScene, viewMatrix, perspectiveMatrix));
 
             // render the scene
             mRenderer->DrawRenderables(renderQueue, lighting, debugOptions.mRenderingMode);
@@ -59,13 +62,10 @@ namespace JonsEngine
     }
 
     
-    RenderQueue Engine::CreateRenderQueue(const Scene* scene)
+    RenderQueue Engine::CreateRenderQueue(const Scene* scene, const Mat4& viewMatrix, const Mat4& perspectiveMatrix)
     {
         RenderQueue renderQueue;
-
         const std::vector<ModelPtr>& models = scene->GetResourceManifest().GetAllModels();
-        const Mat4 viewMatrix = scene->GetSceneCamera().GetCameraTransform();
-        const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer->GetZNear(), mRenderer->GetZFar());
 
         for(ModelPtr model : models)
         {
@@ -79,25 +79,19 @@ namespace JonsEngine
     }
      
     // TODO: Cull lights
-    RenderableLighting Engine::GetLightingInfo(const Scene* scene)
+    RenderableLighting Engine::GetLightingInfo(const Scene* scene, const Mat4& viewMatrix, const Mat4& perspectiveMatrix)
     {
-        const std::vector<LightPtr>& sceneLights = scene->GetAllLights();
+        const std::vector<PointLightPtr>& pointLights = scene->GetPointLights();
+        const std::vector<DirectionalLightPtr>& directionalLights = scene->GetDirectionalLights();
 
-        RenderableLighting lighting(scene->GetSceneCamera().GetCameraTransform(), scene->GetGamma(), scene->GetSceneCamera().Forward(), sceneLights.size());
+        RenderableLighting lighting(scene->GetGamma(), Vec2(mWindow.GetScreenWidth(), mWindow.GetScreenHeight()), scene->GetAmbientLight());
 
-        int lightIndex = 0;
-        for(LightPtr light : sceneLights)
-        {
-            lighting.mLights[lightIndex].mLightColor     = light->mLightColor;
-            lighting.mLights[lightIndex].mLightPosition  = Vec4(light->mSceneNode->Position(), 1.0f);
-            lighting.mLights[lightIndex].mLightDirection = Vec4(light->mLightDirection, 0.0f);
-            lighting.mLights[lightIndex].mLightType      = light->mLightType;
-            lighting.mLights[lightIndex].mIntensity      = light->mIntensity;
-            lighting.mLights[lightIndex].mRadius         = light->mRadius;
-            lighting.mLights[lightIndex].mMaxDistance    = light->mMaxDistance;
+        for (PointLightPtr pointLight : pointLights)
+            lighting.mPointLights.emplace_back(RenderableLighting::PointLight(pointLight->mSceneNode->GetNodeTransform() * viewMatrix * perspectiveMatrix, pointLight->mLightColor, Vec4(pointLight->mSceneNode->Position(), 1.0f),
+                                                                              pointLight->mFalloffFactor, pointLight->mMaxDistance));
 
-            lightIndex++;
-        }
+        for (DirectionalLightPtr dirLight : directionalLights)
+            lighting.mDirectionalLights.emplace_back(RenderableLighting::DirectionalLight(dirLight->mLightColor, Vec4(dirLight->mLightDirection, 0.0f)));
 
         return lighting;
     }

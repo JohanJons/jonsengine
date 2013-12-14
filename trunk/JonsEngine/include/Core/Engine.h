@@ -3,7 +3,6 @@
 #include "include/Core/Types.h"
 #include "include/Core/Memory/HeapAllocator.h"
 #include "include/Scene/SceneManager.h"
-#include "include/Scene/Light.h"
 #include "include/Resources/ResourceManifest.h"
 #include "include/Window/GLFW/GLFWWindowManager.h"
 #include "include/Renderer/OpenGL3/OpenGLRenderer.h"
@@ -38,8 +37,8 @@ namespace JonsEngine
 
 
     private:
-        RenderQueue CreateRenderQueue(const Scene* scene);
-        RenderableLighting GetLightingInfo(const Scene* scene);
+        RenderQueue CreateRenderQueue(const Scene* scene, const Mat4& viewMatrix, const Mat4& perspectiveMatrix);
+        RenderableLighting GetLightingInfo(const Scene* scene, const Mat4& viewMatrix, const Mat4& perspectiveMatrix);
         void CreateModelRenderable(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, const bool lightingEnabled, RenderQueue& renderQueue);
  
         void OnContextCreated();

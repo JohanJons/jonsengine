@@ -6,9 +6,6 @@ namespace JonsEngine
 {
     bool CreateRectangleData(const float sizeX, const float sizeY, const float sizeZ, std::vector<float>& vertexData, std::vector<float>& normalData, std::vector<float>& texcoordData, std::vector<uint32_t>& indiceData)
     {
-        if (sizeX <= 0 || sizeY <= 0 || sizeZ <= 0)
-            return false;
-        
         const float X = sizeX / 2.0f;
         const float Y = sizeY / 2.0f;
         const float Z = sizeZ / 2.0f;

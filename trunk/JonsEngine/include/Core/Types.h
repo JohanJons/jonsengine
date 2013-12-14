@@ -14,25 +14,14 @@ namespace JonsEngine
 
     enum ColorFormat
     {
-        COLOR_FORMAT_UNKNOWN = 0,
-        COLOR_FORMAT_RGB,
+        COLOR_FORMAT_RGB = 0,
         COLOR_FORMAT_RGBA
     };
 
     enum TextureType
     {
-        TEXTURE_TYPE_UNKNOWN = 0,
-        TEXTURE_TYPE_DIFFUSE,
+        TEXTURE_TYPE_DIFFUSE = 0,
         TEXTURE_TYPE_NORMAL
-    };
-
-    enum LightType
-    {
-        LIGHT_TYPE_UNKNOWN = 0,
-        LIGHT_TYPE_POINT,
-        LIGHT_TYPE_DIRECTIONAL,
-        LIGHT_TYPE_SPOTLIGHT,
-        LIGHT_TYPE_AMBIENT,
     };
 
     typedef uint32_t MeshID;

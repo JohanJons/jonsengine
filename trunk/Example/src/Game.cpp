@@ -60,29 +60,27 @@ namespace JonsGame
 
             // moving the point light 
             else if (evnt.mKey == Q)
-                activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(-0.05, 0.0f, 0.0f));
+                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(-0.05, 0.0f, 0.0f));
             else if (evnt.mKey == E)
-                activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.05, 0.0f, 0.0f));
+                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.05, 0.0f, 0.0f));
             else if (evnt.mKey == R)
-                activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.00, -0.05f, 0.0f));
+                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.00, -0.05f, 0.0f));
             else if (evnt.mKey == T)
-                activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.05f, 0.0f));
+                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.05f, 0.0f));
             else if (evnt.mKey == F)
-                activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, -0.05f));
+                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, -0.05f));
             else if (evnt.mKey == G)
-                activeScene->GetLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, 0.05f));
+                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, 0.05f));
 
             //  renderering
-            else if (evnt.mKey == Y)
-                mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_NONE;
             else if (evnt.mKey == U)
-                mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_POSITIONS;
+                mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_NONE;
             else if (evnt.mKey == I)
-                mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_NORMALS;
+                mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_POSITIONS;
             else if (evnt.mKey == O)
-                mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_TEXCOORDS;
+                mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_NORMALS;
             else if (evnt.mKey == P)
-                mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_COLOR;
+                mDebugOptions.mRenderingMode = DebugOptions::RENDER_DEBUG_DIFFUSE;
             else if (evnt.mKey == H)
                 mEngine->GetRenderer()->SetAnisotropicFiltering(0.0f);
             else if (evnt.mKey == J)
@@ -134,7 +132,7 @@ namespace JonsGame
         nodeChair->TranslateNode(Vec3(0.0f, 0.0f, -8.0f));
 
          // cube
-        SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
+        /*SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
         ModelPtr modelCube    = myScene->GetResourceManifest().LoadModel("cube", jonsPackage);
         modelCube->mSceneNode = nodeCube;
         nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
@@ -147,23 +145,19 @@ namespace JonsGame
         
         // point light
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
-        LightPtr movingLight         = myScene->CreateLight("MovingPointLight", LightType::LIGHT_TYPE_POINT, nodeMovingLight);
-        movingLight->mMaxDistance    = 0.02f;
-        movingLight->mRadius         = 5.0f;
-        movingLight->mIntensity      = 2.0f;
-        nodeMovingLight->TranslateNode(Vec3(4.0f, 1.0f, -13.0f));
+        PointLightPtr movingLight    = myScene->CreatePointLight("MovingPointLight", nodeMovingLight);
+        movingLight->mMaxDistance    = 10.0f;
+        nodeMovingLight->TranslateNode(Vec3(4.0f, 1.0f, -13.0f));*/
 
         // point light 2
-        SceneNodePtr nodeMovingLight2 = myScene->GetRootNode().CreateChildNode("nodeStaticLight");
+       /* SceneNodePtr nodeMovingLight2 = myScene->GetRootNode().CreateChildNode("nodeStaticLight");
         LightPtr staticLight          = myScene->CreateLight("StaticPointLight", LightType::LIGHT_TYPE_POINT, nodeMovingLight2);
         staticLight->mLightColor      = Vec4(0.4f, 0.4f, 0.0f, 1.0f);
         staticLight->mRadius          = 5.0f;
-        nodeMovingLight2->TranslateNode(Vec3(0.0f, 3.0f, -8.0f));
+        nodeMovingLight2->TranslateNode(Vec3(0.0f, 3.0f, -8.0f));*/
 
         // ambient light
-        SceneNodePtr nodeAmbientLight = myScene->GetRootNode().CreateChildNode("nodeAmbientLight");
-        LightPtr ambientLight         = myScene->CreateLight("ambientLight", LightType::LIGHT_TYPE_AMBIENT, nodeAmbientLight);
-        ambientLight->mIntensity      = 0.1f;
+        myScene->SetAmbientLight(Vec4(0.1f));
         
         // create a ground plane
         SceneNodePtr nodePlane       = myScene->GetRootNode().CreateChildNode("nodePlane");
@@ -174,11 +168,11 @@ namespace JonsGame
         nodePlane->TranslateNode(Vec3(0.0f, -0.5f, 0.0f));
 
         // create a sphere
-        SceneNodePtr nodeSphere = myScene->GetRootNode().CreateChildNode("nodeSphere");
+    /*    SceneNodePtr nodeSphere = myScene->GetRootNode().CreateChildNode("nodeSphere");
         ModelPtr sphere = myScene->GetResourceManifest().CreateSphere("Sphere", 1.0f, 12, 24);
         sphere->mMaterial = myScene->GetResourceManifest().GetMaterial("checker");
         sphere->mSceneNode = nodeSphere;
-        nodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
+        nodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));*/
         
         // move up camera
         myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
