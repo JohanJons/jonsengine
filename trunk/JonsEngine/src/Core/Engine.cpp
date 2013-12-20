@@ -55,7 +55,7 @@ namespace JonsEngine
             const RenderableLighting lighting(GetLightingInfo(activeScene, viewMatrix, perspectiveMatrix));
 
             // render the scene
-            mRenderer->DrawRenderables(renderQueue, lighting, debugOptions.mRenderingMode);
+            mRenderer->DrawRenderables(renderQueue, lighting, debugOptions.mRenderingMode, debugOptions.mRenderingFlags);
         }
 
         mWindow.EndFrame();
@@ -87,8 +87,11 @@ namespace JonsEngine
         RenderableLighting lighting(scene->GetGamma(), Vec2(mWindow.GetScreenWidth(), mWindow.GetScreenHeight()), scene->GetAmbientLight());
 
         for (PointLightPtr pointLight : pointLights)
-            lighting.mPointLights.emplace_back(RenderableLighting::PointLight(pointLight->mSceneNode->GetNodeTransform() * viewMatrix * perspectiveMatrix, pointLight->mLightColor, Vec4(pointLight->mSceneNode->Position(), 1.0f),
+        {
+            const Mat4 scaledWorldMatrix = Scale(pointLight->mSceneNode->GetNodeTransform(), Vec3(pointLight->mMaxDistance));
+            lighting.mPointLights.emplace_back(RenderableLighting::PointLight(perspectiveMatrix * viewMatrix * scaledWorldMatrix, scaledWorldMatrix, pointLight->mLightColor, Vec4(pointLight->mSceneNode->Position(), 1.0f),
                                                                               pointLight->mFalloffFactor, pointLight->mMaxDistance));
+        }
 
         for (DirectionalLightPtr dirLight : directionalLights)
             lighting.mDirectionalLights.emplace_back(RenderableLighting::DirectionalLight(dirLight->mLightColor, Vec4(dirLight->mLightDirection, 0.0f)));

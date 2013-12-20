@@ -15,7 +15,7 @@ namespace JonsEngine
         ShadingGeometry(Logger& logger);
         ~ShadingGeometry();
 
-        void DrawRectangle2D();
+        void DrawRectangle();
         void DrawSphere();
 
 

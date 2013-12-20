@@ -133,14 +133,14 @@ namespace JonsEngine
     }
 
 
-    void OpenGLRenderer::DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugRenderering)
+    void OpenGLRenderer::DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
-        GeometryPass(renderQueue);
+        GeometryPass(renderQueue, lighting, debugExtra.test(DebugOptions::RENDER_FLAG_DRAW_LIGHTS));
 
-        if (debugRenderering == DebugOptions::RENDER_DEBUG_NONE)
+        if (debugMode == DebugOptions::RENDER_MODE_FULL)
             ShadingPass(lighting);
         else
-            DebugPass(debugRenderering);
+            DebugPass(debugMode);
     }
 
 
@@ -169,7 +169,6 @@ namespace JonsEngine
             mCurrentAnisotropy = newAnisoLevel;
 
         GLCALL(glSamplerParameterf(mTextureSampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, mCurrentAnisotropy));
-        GLCALL(glSamplerParameterf(mGBuffer.mTextureSampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, mCurrentAnisotropy));
     }
 
 
@@ -184,7 +183,7 @@ namespace JonsEngine
     }
 
 
-    void OpenGLRenderer::GeometryPass(const RenderQueue& renderQueue)
+    void OpenGLRenderer::GeometryPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights)
     {
         GLCALL(glUseProgram(mGeometryProgram.mProgramHandle));
         GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFramebuffer));
@@ -240,6 +239,16 @@ namespace JonsEngine
                 UnbindTexture2D(OpenGLTexture::TEXTURE_UNIT_NORMAL, mLogger);
         }
 
+        // debug: draw all lights
+        if (debugLights)
+        {
+            for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
+            {
+                mUniBufferGeometryPass.SetData(UnifGeometry(pointLight.mWVPMatrix, pointLight.mWorldMatrix, false, false, 1.0f));
+                mShadingGeometry.DrawSphere();
+            }
+        }
+
         GLCALL(glDisable(GL_DEPTH_TEST));
         GLCALL(glDepthMask(GL_FALSE));
 
@@ -266,10 +275,10 @@ namespace JonsEngine
 
         // draw fullscreen rect for ambient light
         mUniBufferShadingPass.SetData(UnifShading(Mat4(1.0f), lighting.mAmbientLight, Vec4(0.0f), lighting.mGamma, lighting.mScreenSize, UnifShading::LIGHT_TYPE_AMBIENT, 0.0f, 0.0f));
-        mShadingGeometry.DrawRectangle2D();
+        mShadingGeometry.DrawRectangle();
 
-        // enable blending directional + point lights
-     /*   GLCALL(glEnable(GL_BLEND));
+        // for directional and point lights
+        GLCALL(glEnable(GL_BLEND));
         GLCALL(glBlendEquation(GL_FUNC_ADD));
         GLCALL(glBlendFunc(GL_ONE, GL_ONE));
 
@@ -280,8 +289,15 @@ namespace JonsEngine
             mShadingGeometry.DrawSphere();
         }
 
+        // do all directional lights
+        for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
+        {
+            mUniBufferShadingPass.SetData(UnifShading(Mat4(1.0f), directionalLight.mLightColor, directionalLight.mLightDirection, lighting.mGamma, lighting.mScreenSize, UnifShading::LIGHT_TYPE_DIRECTIONAL, 0.0f, 0.0f));
+            mShadingGeometry.DrawRectangle();
+        }
+
         // reset state
-        GLCALL(glDisable(GL_BLEND));*/
+        GLCALL(glDisable(GL_BLEND));
         GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
         GLCALL(glUseProgram(0));
     }
@@ -291,19 +307,19 @@ namespace JonsEngine
         GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer.mFramebuffer));
         switch (debugOptions)
         {
-            case DebugOptions::RENDER_DEBUG_POSITIONS:
+            case DebugOptions::RENDER_MODE_POSITIONS:
             {
                 GLCALL(glReadBuffer(GL_COLOR_ATTACHMENT0 + GBuffer::GBUFFER_TEXTURE_POSITION));
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
                 break;
             }
-            case DebugOptions::RENDER_DEBUG_NORMALS:
+            case DebugOptions::RENDER_MODE_NORMALS:
             {
                 GLCALL(glReadBuffer(GL_COLOR_ATTACHMENT0 + GBuffer::GBUFFER_TEXTURE_NORMAL));
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
                 break;
             }
-            case DebugOptions::RENDER_DEBUG_DIFFUSE:
+            case DebugOptions::RENDER_MODE_DIFFUSE:
             {
                 GLCALL(glReadBuffer(GL_COLOR_ATTACHMENT0 + GBuffer::GBUFFER_TEXTURE_DIFFUSE));
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));

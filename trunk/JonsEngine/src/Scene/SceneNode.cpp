@@ -55,12 +55,14 @@ namespace JonsEngine
             isFound = true;
         }
         else
-            for(SceneNodePtr childNode : mChildNodes)
+        {
+            for (SceneNodePtr childNode : mChildNodes)
             {
                 isFound = childNode->RemoveChildNode(nodeName);
                 if (isFound)
                     break;
             }
+        }
 
         return isFound;
     }
@@ -76,12 +78,14 @@ namespace JonsEngine
             isFound = true;
         }
         else
-            for(SceneNodePtr childNode : mChildNodes)
+        {
+            for (SceneNodePtr childNode : mChildNodes)
             {
                 isFound = childNode->RemoveChildNode(node);
                 if (isFound)
                     break;
             }
+        }
 
         return isFound;
     }

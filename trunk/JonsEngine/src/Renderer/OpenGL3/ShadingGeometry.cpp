@@ -5,7 +5,7 @@
 
 namespace JonsEngine
 {
-    ShadingGeometry::ShadingGeometry(Logger& logger) : mSphereMesh(CreateSphereMesh(1, 12, 24, logger)), mRectangleMesh(CreateRectangleMesh (2.0f, 2.0f, 0.0f, logger)), mSphereVAO(SetupVAO(mSphereMesh)), mRectangleVAO(SetupVAO(mRectangleMesh))
+    ShadingGeometry::ShadingGeometry(Logger& logger) : mSphereMesh(CreateSphereMesh(1.0f, 12, 24, logger)), mRectangleMesh(CreateRectangleMesh (2.0f, 2.0f, 0.0f, logger)), mSphereVAO(SetupVAO(mSphereMesh)), mRectangleVAO(SetupVAO(mRectangleMesh))
     {
     }
 
@@ -16,7 +16,7 @@ namespace JonsEngine
     }
 
 
-    void ShadingGeometry::DrawRectangle2D()
+    void ShadingGeometry::DrawRectangle()
     {
         GLCALL(glBindVertexArray(mRectangleVAO));
         GLCALL(glDrawElements(GL_TRIANGLES, mRectangleMesh.mIndices, GL_UNSIGNED_INT, 0));

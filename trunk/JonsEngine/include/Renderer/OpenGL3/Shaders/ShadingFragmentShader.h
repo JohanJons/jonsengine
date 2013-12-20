@@ -30,12 +30,22 @@ namespace JonsEngine
                                                                                                                             \n \
     vec4 CalcPointLight(vec3 worldPos, vec3 normal)                                                                        \n \
     {                                                                                                                       \n \
-       return UnifShadingPass.mLightColor;                                                                                  \n \
+       vec3 positionDiff = (UnifShadingPass.mLightPosOrDir.xyz - worldPos);                                                   \n \
+                                                                                                                              \n \
+       float dist = length(positionDiff);                                                                                   \n \
+       float attenuation = clamp(1.0 - (dist / UnifShadingPass.mMaxDistance), 0.0, 1.0);                                    \n \
+                                                                                                                            \n \
+       vec3 lightDir = normalize(positionDiff);                                                                             \n \
+       float angleNormal = clamp(dot(normalize(normal), lightDir), 0, 1);                                                   \n \
+                                                                                                                            \n \
+       return angleNormal * attenuation * UnifShadingPass.mLightColor;                                                      \n \
     }                                                                                                                       \n \
                                                                                                                             \n \
     vec4 CalcDirectionalLight(vec3 worldPos, vec3 normal)                                                                  \n \
     {                                                                                                                       \n \
-        return UnifShadingPass.mLightColor;                                                                                 \n \
+        float angleNormal = clamp(dot(normalize(normal), UnifShadingPass.mLightPosOrDir.xyz), 0, 1);                        \n \
+                                                                                                                            \n \
+        return angleNormal * UnifShadingPass.mLightColor;                                                                   \n \
     }                                                                                                                       \n \
                                                                                                                             \n \
     vec4 CalcAmbientLight()                                                                                                 \n \
@@ -53,12 +63,24 @@ namespace JonsEngine
         normal        = normalize(normal);                                                                                  \n \
                                                                                                                             \n \
         if (UnifShadingPass.mLightType == 1)                                                                                \n \
-            fragColor = vec4(diffuse, 1.0) * CalcPointLight(worldPos, normal);                 \n \
+            fragColor = vec4(diffuse, 1.0) * CalcPointLight(worldPos, normal);                                              \n \
         else if (UnifShadingPass.mLightType == 2)                                                                           \n \
-            fragColor = vec4(diffuse, 1.0) * CalcDirectionalLight(worldPos, normal);           \n \
+            fragColor = vec4(diffuse, 1.0) * CalcDirectionalLight(worldPos, normal);                                        \n \
         else if (UnifShadingPass.mLightType == 3)                                                                           \n \
-            fragColor = vec4(diffuse, 1.0) * CalcAmbientLight();                                            \n \
+            fragColor = vec4(diffuse, 1.0) * CalcAmbientLight();                                                            \n \
         else                                                                                                                \n \
-            fragColor = vec4(diffuse, 0.0);                                                                                          \n \
+            fragColor = vec4(diffuse, 0.0);                                                                                 \n \
     }                                                                                                                       \n";
+
+
+    /*
+      vec3 distSquared = dist * dist; \n \
+       float attS = 15.0; \n \
+       float attenuation = distSquared / (UnifShadingPass.mMaxDistance * UnifShadingPass.mMaxDistance);                     \n \
+       attenuation = 1.0 / (attenuation * attS + 1.0); \n \
+        attS = 1.0 / (attS + 1.0); \n \
+         attenuation = attenuation - attS; \n \
+         attenuation = attenuation / (1.0 - attS); \n \
+    
+    */
 }

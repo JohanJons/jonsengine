@@ -39,7 +39,7 @@ namespace JonsEngine
         MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData);
         TextureID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat);
 
-        void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugOptions);
+        void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra);
 
         float GetMaxAnisotropicFiltering() const;
         float GetCurrentAnisotropicFiltering() const;
@@ -92,7 +92,7 @@ namespace JonsEngine
             }
         };
 
-        void GeometryPass(const RenderQueue& renderQueue);
+        void GeometryPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights);
         void ShadingPass(const RenderableLighting& lighting);
         void DebugPass(const DebugOptions::RenderingMode debugOptions);
 
