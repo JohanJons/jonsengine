@@ -140,15 +140,16 @@ namespace JonsGame
         nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
         
         // uhura
-        SceneNodePtr nodeUhura = myScene->GetRootNode().CreateChildNode("nodeUhura");
+        /*SceneNodePtr nodeUhura = myScene->GetRootNode().CreateChildNode("nodeUhura");
         ModelPtr modelUhura    = myScene->GetResourceManifest().LoadModel("uhura", jonsPackage);
         modelUhura->mSceneNode = nodeUhura;
-        nodeUhura->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));
+        nodeUhura->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));*/
         
         // point light
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
         PointLightPtr movingLight    = myScene->CreatePointLight("MovingPointLight", nodeMovingLight);
-        movingLight->mMaxDistance    = 1.0f;
+        movingLight->mMaxDistance    = 4.0f;
+        movingLight->mLightColor     = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
         nodeMovingLight->TranslateNode(Vec3(4.0f, 0.5f, -15.0f));
 
         // directional light

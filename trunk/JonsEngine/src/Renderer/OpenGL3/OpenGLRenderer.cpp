@@ -7,6 +7,8 @@
 #include "include/Renderer/OpenGL3/Shaders/GeometryFragmentShader.h"
 #include "include/Renderer/OpenGL3/Shaders/ShadingVertexShader.h"
 #include "include/Renderer/OpenGL3/Shaders/ShadingFragmentShader.h"
+#include "include/Renderer/OpenGL3/Shaders/StencilVertexShader.h"
+#include "include/Renderer/OpenGL3/Shaders/StencilFragmentShader.h"
 #include "include/Renderer/OpenGL3/OpenGLUtils.h"
 #include "include/Renderer/Shapes.h"
 #include "include/Core/EngineSettings.h"
@@ -24,6 +26,62 @@ namespace JonsEngine
 {
     const float Z_NEAR = 0.1f;
     const float Z_FAR  = 1000.0f;
+
+
+    struct OpenGLRenderer::UnifGeometry
+    {
+        Mat4 mWVPMatrix;
+        Mat4 mWorldMatrix;
+        uint32_t mHasDiffuseTexture;
+        uint32_t mHasNormalTexture;
+        float mTextureTilingFactor;
+
+        
+        UnifGeometry(const Mat4& WVPMatrix, const Mat4& WorldMatrix, const uint32_t hasDiffuseTexture, const uint32_t hasNormalTexture, const float textureTilingFactor)
+            :
+            mWVPMatrix(WVPMatrix), mWorldMatrix(WorldMatrix), mHasDiffuseTexture(hasDiffuseTexture), mHasNormalTexture(hasNormalTexture), mTextureTilingFactor(textureTilingFactor)
+        {
+        }
+    };
+    
+    struct OpenGLRenderer::UnifShading
+    {
+        enum LightType
+        {
+            LIGHT_TYPE_UNKNOWN = 0,
+            LIGHT_TYPE_POINT,
+            LIGHT_TYPE_DIRECTIONAL,
+            LIGHT_TYPE_AMBIENT
+        };
+        
+        Mat4 mWVPMatrix;
+        Vec4 mLightColor;
+        Vec4 mLightPosOrDir;
+        Vec4 mGamma;
+        Vec2 mScreenSize;
+        uint32_t mLightType;
+        float mFalloffFactor;
+        float mMaxDistance;
+        
+        
+        UnifShading(const Mat4& vwpMatrix, const Vec4& lightColor, const Vec4& lightPosOrDir, const Vec4& gamma, const Vec2& screenSize, const uint32_t lightType, const float falloffFactor, const float maxDistance)
+            :
+            mWVPMatrix(vwpMatrix), mLightColor(lightColor), mLightPosOrDir(lightPosOrDir), mGamma(gamma), mScreenSize(screenSize), mLightType(lightType), mFalloffFactor(falloffFactor), mMaxDistance(maxDistance)
+        {
+        }
+    };
+    
+    struct OpenGLRenderer::UnifStencil
+    {
+        Mat4 mWVPMatrix;
+        
+
+        UnifStencil(const Mat4& wvpMatrix)
+            : 
+            mWVPMatrix(wvpMatrix)
+        {
+        }
+    };
 
 
     void BindTexture2D(const OpenGLTexture::TextureUnit textureUnit, const TextureID targetTexture, const std::vector<OpenGLTexturePtr>& textures, Logger& logger)
@@ -71,11 +129,13 @@ namespace JonsEngine
         mMemoryAllocator(memoryAllocator), mLogger(Logger::GetRendererLogger()),
         mGeometryProgram("GeometryProgram", ShaderPtr(new Shader("GeometryVertexShader", gGeometryVertexShader, Shader::VERTEX_SHADER)),  ShaderPtr(new Shader("GeometryFragmentShader", gGeometryFragmentShader, Shader::FRAGMENT_SHADER)), mLogger),
         mShadingProgram("ShadingProgram", ShaderPtr(new Shader("ShadingVertexShader", gShadingVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("ShadingFragmentShader", gShadingFragmentShader, Shader::FRAGMENT_SHADER)), mLogger),
+        mStencilProgram("StencilProgram", ShaderPtr(new Shader("StencilVertexShader", gStencilVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("StencilFragmentShader", gStencilFragmentShader, Shader::FRAGMENT_SHADER)), mLogger),
                                                             // VS2012 bug workaround. TODO: fixed in VS2013, when boost is rdy
         //mDefaultProgram("DefaultProgram", ShaderPtr(new Shader("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); }*/), 
         //                                 ShaderPtr(new Shader("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); })*/), mLogger),
         mGBuffer(mLogger, mShadingProgram.mProgramHandle, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight),
-        mShadingGeometry(mLogger), mUniBufferGeometryPass("UnifGeometry", mLogger, mGeometryProgram.mProgramHandle), mUniBufferShadingPass("UnifShading", mLogger, mShadingProgram.mProgramHandle)
+        mShadingGeometry(mLogger), mUniBufferGeometryPass("UnifGeometry", mLogger, mGeometryProgram.mProgramHandle), mUniBufferShadingPass("UnifShading", mLogger, mShadingProgram.mProgramHandle),
+        mUniBufferStencilPass("UnifStencil", mLogger, mStencilProgram.mProgramHandle)
     {
         GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 
