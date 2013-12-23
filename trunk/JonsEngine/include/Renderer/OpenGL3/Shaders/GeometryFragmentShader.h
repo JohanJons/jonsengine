@@ -5,7 +5,7 @@
 namespace JonsEngine
 {
     const std::string gGeometryFragmentShader = 
-    "#version 330                                                                                                           \n \
+    "#version 430                                                                                                           \n \
                                                                                                                             \n \
     layout(std140) uniform;                                                                                                 \n \
                                                                                                                             \n \
@@ -18,8 +18,8 @@ namespace JonsEngine
         float mTextureTilingFactor;                                                                                         \n \
     } UnifGeometryPass;                                                                                                     \n \
                                                                                                                             \n \
-    uniform sampler2D unifDiffuseTexture;                                                                                   \n \
-    uniform sampler2D unifNormalTexture;                                                                                    \n \
+    layout (binding = 0) uniform sampler2D unifDiffuseTexture;                                                              \n \
+    layout (binding = 1) uniform sampler2D unifNormalTexture;                                                               \n \
                                                                                                                             \n \
     in vec3 frag_position;                                                                                                  \n \
     in vec3 frag_normal;                                                                                                    \n \

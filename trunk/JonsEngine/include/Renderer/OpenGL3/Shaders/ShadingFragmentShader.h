@@ -5,7 +5,7 @@
 namespace JonsEngine
 {
     const std::string gShadingFragmentShader = 
-    "#version 330                                                                                                           \n \
+    "#version 430                                                                                                           \n \
                                                                                                                             \n \
     layout(std140) uniform;                                                                                                 \n \
                                                                                                                             \n \
@@ -22,16 +22,16 @@ namespace JonsEngine
         float mMaxDistance;                                                                                                 \n \
     } UnifShadingPass;                                                                                                      \n \
                                                                                                                             \n \
-    uniform sampler2D unifPositionTexture;                                                                                  \n \
-    uniform sampler2D unifNormalTexture;                                                                                    \n \
-    uniform sampler2D unifDiffuseTexture;                                                                                   \n \
+    layout (binding = 2) uniform sampler2D unifPositionTexture;                                                             \n \
+    layout (binding = 3) uniform sampler2D unifNormalTexture;                                                               \n \
+    layout (binding = 4) uniform sampler2D unifDiffuseTexture;                                                              \n \
                                                                                                                             \n \
     out vec4 fragColor;                                                                                                     \n \
                                                                                                                             \n \
-    vec4 CalcPointLight(vec3 worldPos, vec3 normal)                                                                        \n \
+    vec4 CalcPointLight(vec3 worldPos, vec3 normal)                                                                         \n \
     {                                                                                                                       \n \
-       vec3 positionDiff = (UnifShadingPass.mLightPosOrDir.xyz - worldPos);                                                   \n \
-                                                                                                                              \n \
+       vec3 positionDiff = (UnifShadingPass.mLightPosOrDir.xyz - worldPos);                                                 \n \
+                                                                                                                            \n \
        float dist = length(positionDiff);                                                                                   \n \
        float attenuation = clamp(1.0 - (dist / UnifShadingPass.mMaxDistance), 0.0, 1.0);                                    \n \
                                                                                                                             \n \

@@ -24,14 +24,16 @@ namespace JonsEngine
     {
         enum TextureUnit
         {
-            TEXTURE_UNIT_UNKNOWN = -1,
-            TEXTURE_UNIT_DIFFUSE = 0,
-            TEXTURE_UNIT_NORMAL = 1,
-            TEXTURE_UNIT_SHADOW = 2
+            TEXTURE_UNIT_GEOMETRY_DIFFUSE = 0,
+            TEXTURE_UNIT_GEOMETRY_NORMAL,
+            TEXTURE_UNIT_GBUFFER_POSITION,
+            TEXTURE_UNIT_GBUFFER_NORMAL,
+            TEXTURE_UNIT_GBUFFER_DIFFUSE
         };
 
         OpenGLTexture(const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat, TextureType textureType, Logger& logger);
         ~OpenGLTexture();
+
 
         Logger& mLogger;
         TextureID mTextureID;

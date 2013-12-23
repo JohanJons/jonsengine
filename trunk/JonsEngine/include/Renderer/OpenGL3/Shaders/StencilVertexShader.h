@@ -5,7 +5,7 @@
 namespace JonsEngine
 {
     const std::string gStencilVertexShader =
-    "#version 330                                                                           \n \
+    "#version 430                                                                           \n \
                                                                                             \n \
     layout(std140) uniform;                                                                 \n \
                                                                                             \n \

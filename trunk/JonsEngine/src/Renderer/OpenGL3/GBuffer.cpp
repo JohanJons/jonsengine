@@ -1,6 +1,7 @@
 #include "include/Renderer/OpenGL3/GBuffer.h"
 
 #include "include/Renderer/OpenGL3/OpenGLUtils.h"
+#include "include/Renderer/OpenGL3/OpenGLTexture.h"
 #include "include/Core/Logging/Logger.h"
 
 #include <exception>
@@ -19,7 +20,6 @@ namespace JonsEngine
         {
             GLCALL(glBindTexture(GL_TEXTURE_2D, mGBufferTextures[index]));
             GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, 0));
-            GLCALL(glGenerateMipmap(GL_TEXTURE_2D));
             GLCALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D, mGBufferTextures[index], 0));
         }
         GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
@@ -48,12 +48,9 @@ namespace JonsEngine
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-        GLCALL(glUniform1i(glGetUniformLocation(shadingProgramID, "unifPositionTexture"), GBuffer::GBUFFER_TEXTURE_POSITION));
-        GLCALL(glUniform1i(glGetUniformLocation(shadingProgramID, "unifNormalTexture"), GBuffer::GBUFFER_TEXTURE_NORMAL));
-        GLCALL(glUniform1i(glGetUniformLocation(shadingProgramID, "unifDiffuseTexture"), GBuffer::GBUFFER_TEXTURE_DIFFUSE));
-        GLCALL(glBindSampler(GBuffer::GBUFFER_TEXTURE_POSITION, mTextureSampler));
-        GLCALL(glBindSampler(GBuffer::GBUFFER_TEXTURE_NORMAL, mTextureSampler));
-        GLCALL(glBindSampler(GBuffer::GBUFFER_TEXTURE_DIFFUSE, mTextureSampler));
+        GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GBUFFER_POSITION, mTextureSampler));
+        GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GBUFFER_NORMAL, mTextureSampler));
+        GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GBUFFER_DIFFUSE, mTextureSampler));
         GLCALL(glUseProgram(0));
 
         GLCALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));

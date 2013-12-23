@@ -156,10 +156,8 @@ namespace JonsEngine
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_S, GL_REPEAT));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_T, GL_REPEAT));
-        GLCALL(glUniform1i(glGetUniformLocation(mGeometryProgram.mProgramHandle, "unifDiffuseTexture"), OpenGLTexture::TEXTURE_UNIT_DIFFUSE));
-        GLCALL(glUniform1i(glGetUniformLocation(mGeometryProgram.mProgramHandle, "unifNormalTexture"), OpenGLTexture::TEXTURE_UNIT_NORMAL));
-        GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_DIFFUSE, mTextureSampler));
-        GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_NORMAL, mTextureSampler));
+        GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_DIFFUSE, mTextureSampler));
+        GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_NORMAL, mTextureSampler));
         GLCALL(glUseProgram(0));
 
         SetAnisotropicFiltering(mCurrentAnisotropy);
@@ -283,20 +281,20 @@ namespace JonsEngine
             mUniBufferGeometryPass.SetData(UnifGeometry(renderable.mWVPMatrix, renderable.mWorldMatrix, hasDiffuseTexture, hasNormalTexture, renderable.mTextureTilingFactor));
 
             if (hasDiffuseTexture)
-                BindTexture2D(OpenGLTexture::TEXTURE_UNIT_DIFFUSE, renderable.mDiffuseTexture, mTextures, mLogger);
+                BindTexture2D(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_DIFFUSE, renderable.mDiffuseTexture, mTextures, mLogger);
 
             if (hasNormalTexture)
-                BindTexture2D(OpenGLTexture::TEXTURE_UNIT_NORMAL, renderable.mNormalTexture, mTextures, mLogger);
+                BindTexture2D(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_NORMAL, renderable.mNormalTexture, mTextures, mLogger);
 
             GLCALL(glBindVertexArray(meshIterator->second));
             GLCALL(glDrawElements(GL_TRIANGLES, meshIterator->first->mIndices, GL_UNSIGNED_INT, 0));
             GLCALL(glBindVertexArray(0));
 
             if (hasDiffuseTexture)
-                UnbindTexture2D(OpenGLTexture::TEXTURE_UNIT_DIFFUSE, mLogger);
+                UnbindTexture2D(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_DIFFUSE, mLogger);
 
             if (hasNormalTexture)
-                UnbindTexture2D(OpenGLTexture::TEXTURE_UNIT_NORMAL, mLogger);
+                UnbindTexture2D(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_NORMAL, mLogger);
         }
 
         // debug: draw all lights
@@ -323,15 +321,12 @@ namespace JonsEngine
         GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
         // activate all the gbuffer textures
-        GLCALL(glActiveTexture(GL_TEXTURE0 + GBuffer::GBUFFER_TEXTURE_POSITION));
-        GLCALL(glBindTexture(GL_TEXTURE_2D, mGBuffer.mGBufferTextures[GBuffer::GBUFFER_TEXTURE_POSITION]))
-        GLCALL(glGenerateMipmap(GL_TEXTURE_2D));
-        GLCALL(glActiveTexture(GL_TEXTURE0 + GBuffer::GBUFFER_TEXTURE_NORMAL));
+        GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_POSITION));
+        GLCALL(glBindTexture(GL_TEXTURE_2D, mGBuffer.mGBufferTextures[GBuffer::GBUFFER_TEXTURE_POSITION]));
+        GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_NORMAL));
         GLCALL(glBindTexture(GL_TEXTURE_2D, mGBuffer.mGBufferTextures[GBuffer::GBUFFER_TEXTURE_NORMAL]));
-        GLCALL(glGenerateMipmap(GL_TEXTURE_2D));
-        GLCALL(glActiveTexture(GL_TEXTURE0 + GBuffer::GBUFFER_TEXTURE_DIFFUSE));
+        GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_DIFFUSE));
         GLCALL(glBindTexture(GL_TEXTURE_2D, mGBuffer.mGBufferTextures[GBuffer::GBUFFER_TEXTURE_DIFFUSE]));
-        GLCALL(glGenerateMipmap(GL_TEXTURE_2D));
 
         // draw fullscreen rect for ambient light
         mUniBufferShadingPass.SetData(UnifShading(Mat4(1.0f), lighting.mAmbientLight, Vec4(0.0f), lighting.mGamma, lighting.mScreenSize, UnifShading::LIGHT_TYPE_AMBIENT, 0.0f, 0.0f));
