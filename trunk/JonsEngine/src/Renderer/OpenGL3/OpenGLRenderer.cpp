@@ -347,13 +347,6 @@ namespace JonsEngine
         GLCALL(glBlendEquation(GL_FUNC_ADD));
         GLCALL(glBlendFunc(GL_ONE, GL_ONE));
 
-        // do all point lights
-        for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
-        {
-            mUniBufferShadingPass.SetData(UnifShading(pointLight.mWVPMatrix, pointLight.mLightColor, pointLight.mLightPosition, lighting.mGamma, lighting.mScreenSize, UnifShading::LIGHT_TYPE_POINT, pointLight.mFalloffFactor, pointLight.mMaxDistance));
-            mShadingGeometry.DrawSphere();
-        }
-
         // do all directional lights
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
         {
