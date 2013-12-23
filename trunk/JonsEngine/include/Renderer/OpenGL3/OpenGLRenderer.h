@@ -32,7 +32,7 @@ namespace JonsEngine
     {
     public:
         OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator);
-        OpenGLRenderer(OpenGLRenderer& renderer, IMemoryAllocatorPtr memoryAllocator);
+        OpenGLRenderer(const std::vector<OpenGLMeshPtr>& meshes, const std::vector<OpenGLTexturePtr>& textures, const uint32_t windowWidth, const uint32_t windowHeight, const float anisotropy, IMemoryAllocatorPtr memoryAllocator);
         OpenGLRenderer(const uint32_t windowWidth, const uint32_t windowHeight, const float anisotropy, IMemoryAllocatorPtr memoryAllocator);
         ~OpenGLRenderer();
 
@@ -44,6 +44,9 @@ namespace JonsEngine
         float GetMaxAnisotropicFiltering() const;
         float GetCurrentAnisotropicFiltering() const;
         void SetAnisotropicFiltering(const float newAnisoLevel);
+
+        std::vector<OpenGLMeshPtr> GetMeshes() const;
+        std::vector<OpenGLTexturePtr> GetTextures() const;
 
         float GetZNear() const;
         float GetZFar() const;

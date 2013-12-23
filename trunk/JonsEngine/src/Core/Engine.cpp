@@ -127,6 +127,11 @@ namespace JonsEngine
 
     void Engine::OnContextCreated()
     {
-        mRenderer.reset(mMemoryAllocator->AllocateObject<OpenGLRenderer>(*mRenderer, mMemoryAllocator));
+        auto meshes      = mRenderer->GetMeshes();
+        auto textures    = mRenderer->GetTextures();
+        float anisotropy = mRenderer->GetCurrentAnisotropicFiltering();
+
+        mRenderer.release();
+        mRenderer.reset(mMemoryAllocator->AllocateObject<OpenGLRenderer>(meshes, textures, mWindow.GetScreenWidth(), mWindow.GetScreenHeight(), anisotropy, mMemoryAllocator));
     }
 } 

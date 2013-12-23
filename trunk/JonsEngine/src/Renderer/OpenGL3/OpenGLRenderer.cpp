@@ -110,19 +110,15 @@ namespace JonsEngine
     {
     }
 
-    OpenGLRenderer::OpenGLRenderer(OpenGLRenderer& renderer, IMemoryAllocatorPtr memoryAllocator) : OpenGLRenderer(renderer.mWindowWidth, renderer.mWindowHeight, renderer.mCurrentAnisotropy, memoryAllocator)
+    OpenGLRenderer::OpenGLRenderer(const std::vector<OpenGLMeshPtr>& meshes, const std::vector<OpenGLTexturePtr>& textures, const uint32_t windowWidth, const uint32_t windowHeight, const float anisotropy, IMemoryAllocatorPtr memoryAllocator)
+        : 
+        OpenGLRenderer(windowWidth, windowHeight, anisotropy, memoryAllocator)
     {
-        // move the meshes, recreate the VAO
-        for (const OpenGLMeshPair mesh : renderer.mMeshes)
-        {
-            GLCALL(glDeleteVertexArrays(1, &mesh.second));
+        // recreate the VAOs
+        for (const OpenGLMeshPtr mesh : meshes)
+            mMeshes.emplace_back(mesh, SetupVAO(*mesh));
 
-            mMeshes.emplace_back(mesh.first, SetupVAO(*mesh.first));
-        }
-        renderer.mMeshes.clear();
-
-        for (const OpenGLTexturePtr texture : renderer.mTextures)
-            mTextures.push_back(texture);
+        mTextures = textures;
     }
 
     OpenGLRenderer::OpenGLRenderer(const uint32_t windowWidth, const uint32_t windowHeight, const float anisotropy, IMemoryAllocatorPtr memoryAllocator) :
@@ -238,6 +234,23 @@ namespace JonsEngine
             mCurrentAnisotropy = newAnisoLevel;
 
         GLCALL(glSamplerParameterf(mTextureSampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, mCurrentAnisotropy));
+    }
+
+
+    std::vector<OpenGLMeshPtr> OpenGLRenderer::GetMeshes() const
+    {
+        std::vector<OpenGLMeshPtr> ret;
+        ret.reserve(mMeshes.size());
+
+        for (const OpenGLMeshPair meshPair : mMeshes)
+            ret.push_back(meshPair.first);
+
+        return ret;
+    }
+
+    std::vector<OpenGLTexturePtr> OpenGLRenderer::GetTextures() const
+    {
+        return std::vector<OpenGLTexturePtr>(mTextures);
     }
 
 
