@@ -22,11 +22,13 @@ namespace JonsEngine
             GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, 0));
             GLCALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D, mGBufferTextures[index], 0));
         }
-        GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
 
-        // set attachment points
-        GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-        GLCALL(glDrawBuffers(GBUFFER_NUM_TEXTURES, drawBuffers));
+        // final texture
+        GLCALL(glGenTextures(1, &mFinalTexture));
+        GLCALL(glBindTexture(GL_TEXTURE_2D, mFinalTexture));
+        GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, windowWidth, windowHeight, 0, GL_RGBA, GL_FLOAT, 0));
+        GLCALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + GBUFFER_NUM_TEXTURES, GL_TEXTURE_2D, mFinalTexture, 0));
+        GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
 
         // depthbuffer
         GLCALL(glGenRenderbuffers(1, &mDepthbuffer));
@@ -59,8 +61,20 @@ namespace JonsEngine
     GBuffer::~GBuffer()
     {
         GLCALL(glDeleteTextures(GBUFFER_NUM_TEXTURES, &mGBufferTextures[0]));
+        GLCALL(glDeleteTextures(1, &mFinalTexture));
         GLCALL(glDeleteRenderbuffers(1, &mDepthbuffer));
         GLCALL(glDeleteSamplers(1, &mTextureSampler));
         GLCALL(glDeleteFramebuffers(1, &mFramebuffer));
+    }
+
+
+    void GBuffer::BindGBufferTextures()
+    {
+        GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_POSITION));
+        GLCALL(glBindTexture(GL_TEXTURE_2D, mGBufferTextures[GBuffer::GBUFFER_TEXTURE_POSITION]));
+        GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_NORMAL));
+        GLCALL(glBindTexture(GL_TEXTURE_2D, mGBufferTextures[GBuffer::GBUFFER_TEXTURE_NORMAL]));
+        GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_DIFFUSE));
+        GLCALL(glBindTexture(GL_TEXTURE_2D, mGBufferTextures[GBuffer::GBUFFER_TEXTURE_DIFFUSE]));
     }
 }

@@ -22,9 +22,14 @@ namespace JonsEngine
         GBuffer(Logger& logger, const uint32_t shadingProgramID, const uint32_t windowWidth, const uint32_t windowHeight);
         ~GBuffer();
 
+        
+        void BindGBufferTextures();
+
+
         Logger& mLogger;
 
         std::array<GLuint, GBUFFER_NUM_TEXTURES> mGBufferTextures;
+        GLuint mFinalTexture;
         GLuint mFramebuffer;
         GLuint mDepthbuffer;
         GLuint mTextureSampler;

@@ -58,7 +58,7 @@ namespace JonsEngine
 
         void GeometryPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights);
         void ShadingPass(const RenderableLighting& lighting);
-        void DebugPass(const DebugOptions::RenderingMode debugOptions);
+        void BlitToScreen(const DebugOptions::RenderingMode debugOptions);
 
         IMemoryAllocatorPtr mMemoryAllocator;
         Logger& mLogger;
