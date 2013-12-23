@@ -58,6 +58,8 @@ namespace JonsEngine
 
         void GeometryPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights);
         void ShadingPass(const RenderableLighting& lighting);
+        void PointLightStencilPass(const RenderableLighting::PointLight& pointLight);
+        void PointLightLightingPass(const RenderableLighting::PointLight& pointLight, const Vec4& gamma, const Vec2& screenSize);
         void BlitToScreen(const DebugOptions::RenderingMode debugOptions);
 
         IMemoryAllocatorPtr mMemoryAllocator;

@@ -140,9 +140,12 @@ namespace JonsEngine
         GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 
         // face culling
-        GLCALL(glEnable(GL_CULL_FACE));
 	    GLCALL(glCullFace(GL_BACK));
 	    GLCALL(glFrontFace(GL_CCW));
+
+        // stencil testing
+        GLCALL(glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP));
+        GLCALL(glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP));
 
         // z depth testing
         GLCALL(glDepthFunc(GL_LEQUAL));
@@ -252,6 +255,7 @@ namespace JonsEngine
     void OpenGLRenderer::GeometryPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights)
     {
         GLCALL(glUseProgram(mGeometryProgram.mProgramHandle));
+        GLCALL(glEnable(GL_CULL_FACE));
         GLCALL(glDepthMask(GL_TRUE));
         GLCALL(glEnable(GL_DEPTH_TEST));
 
@@ -320,6 +324,7 @@ namespace JonsEngine
         GLCALL(glDrawBuffer(GL_NONE));
         GLCALL(glDisable(GL_DEPTH_TEST));
         GLCALL(glDepthMask(GL_FALSE));
+        GLCALL(glDisable(GL_CULL_FACE));
         GLCALL(glUseProgram(0));
     }
         
@@ -356,10 +361,50 @@ namespace JonsEngine
             mShadingGeometry.DrawRectangle();
         }
 
+        // do all point lights
+        GLCALL(glEnable(GL_STENCIL_TEST));
+        for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
+        {
+            GLCALL(glClear(GL_STENCIL_BUFFER_BIT));
+        
+            GLCALL(glDrawBuffer(GL_NONE));
+            PointLightStencilPass(pointLight);
+        
+            GLCALL(glDrawBuffer(GL_COLOR_ATTACHMENT0 + GBuffer::GBUFFER_NUM_TEXTURES));
+            PointLightLightingPass(pointLight, lighting.mGamma, lighting.mScreenSize);
+        }
+        GLCALL(glDisable(GL_STENCIL_TEST));
+
         // reset state
         GLCALL(glDrawBuffer(GL_NONE));
         GLCALL(glDisable(GL_BLEND));
         GLCALL(glUseProgram(0));
+    }
+
+    void OpenGLRenderer::PointLightStencilPass(const RenderableLighting::PointLight& pointLight)
+    {
+        GLCALL(glUseProgram(mStencilProgram.mProgramHandle));
+        GLCALL(glEnable(GL_DEPTH_TEST));
+        GLCALL(glStencilFunc(GL_ALWAYS, 0, 0));
+        
+        mUniBufferStencilPass.SetData(UnifStencil(pointLight.mWVPMatrix));
+        mShadingGeometry.DrawSphere();
+        
+        GLCALL(glDisable(GL_DEPTH_TEST));
+    }
+
+    void OpenGLRenderer::PointLightLightingPass(const RenderableLighting::PointLight& pointLight, const Vec4& gamma, const Vec2& screenSize)
+    {
+        GLCALL(glUseProgram(mShadingProgram.mProgramHandle));
+        GLCALL(glEnable(GL_CULL_FACE));
+        GLCALL(glCullFace(GL_FRONT));
+        GLCALL(glStencilFunc(GL_NOTEQUAL, 0, 0xFF));
+
+        mUniBufferShadingPass.SetData(UnifShading(pointLight.mWVPMatrix, pointLight.mLightColor, pointLight.mLightPosition, gamma, screenSize, UnifShading::LIGHT_TYPE_POINT, pointLight.mFalloffFactor, pointLight.mMaxDistance));
+        mShadingGeometry.DrawSphere();
+
+        GLCALL(glCullFace(GL_BACK));
+        GLCALL(glDisable(GL_CULL_FACE));
     }
 
     void OpenGLRenderer::BlitToScreen(const DebugOptions::RenderingMode debugOptions)

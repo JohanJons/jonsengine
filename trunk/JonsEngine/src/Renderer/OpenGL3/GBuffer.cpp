@@ -33,8 +33,8 @@ namespace JonsEngine
         // depthbuffer
         GLCALL(glGenRenderbuffers(1, &mDepthbuffer));
         GLCALL(glBindRenderbuffer(GL_RENDERBUFFER, mDepthbuffer));
-        GLCALL(glRenderbufferStorageMultisample(GL_RENDERBUFFER, 0, GL_DEPTH_COMPONENT32F, windowWidth, windowHeight));
-        GLCALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, mDepthbuffer));
+        GLCALL(glRenderbufferStorageMultisample(GL_RENDERBUFFER, 0, GL_DEPTH32F_STENCIL8, windowWidth, windowHeight));
+        GLCALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mDepthbuffer));
         GLCALL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
         
         GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

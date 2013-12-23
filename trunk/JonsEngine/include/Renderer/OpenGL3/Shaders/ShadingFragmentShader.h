@@ -71,16 +71,4 @@ namespace JonsEngine
         else                                                                                                                \n \
             fragColor = vec4(diffuse, 0.0);                                                                                 \n \
     }                                                                                                                       \n";
-
-
-    /*
-      vec3 distSquared = dist * dist; \n \
-       float attS = 15.0; \n \
-       float attenuation = distSquared / (UnifShadingPass.mMaxDistance * UnifShadingPass.mMaxDistance);                     \n \
-       attenuation = 1.0 / (attenuation * attS + 1.0); \n \
-        attS = 1.0 / (attS + 1.0); \n \
-         attenuation = attenuation - attS; \n \
-         attenuation = attenuation / (1.0 - attS); \n \
-    
-    */
 }
