@@ -41,7 +41,7 @@ namespace JonsEngine
        return angleNormal * attenuation * UnifShadingPass.mLightColor;                                                      \n \
     }                                                                                                                       \n \
                                                                                                                             \n \
-    vec4 CalcDirectionalLight(vec3 worldPos, vec3 normal)                                                                  \n \
+    vec4 CalcDirectionalLight(vec3 worldPos, vec3 normal)                                                                   \n \
     {                                                                                                                       \n \
         float angleNormal = clamp(dot(normalize(normal), UnifShadingPass.mLightPosOrDir.xyz), 0, 1);                        \n \
                                                                                                                             \n \

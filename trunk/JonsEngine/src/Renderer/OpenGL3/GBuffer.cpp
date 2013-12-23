@@ -15,19 +15,19 @@ namespace JonsEngine
         GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 
         // color attachments to store geometry data
-        GLCALL(glGenTextures(GBUFFER_NUM_TEXTURES, &mGBufferTextures[0]));
-        for (uint32_t index = 0; index < GBUFFER_NUM_TEXTURES;  index++)
+        GLCALL(glGenTextures(GBUFFER_NUM_GEOMETRY_ATTACHMENTS, &mGBufferTextures[0]));
+        for (uint32_t index = 0; index < GBUFFER_NUM_GEOMETRY_ATTACHMENTS; index++)
         {
             GLCALL(glBindTexture(GL_TEXTURE_2D, mGBufferTextures[index]));
             GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, 0));
-            GLCALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D, mGBufferTextures[index], 0));
+            GLCALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GBUFFER_COLOR_ATTACHMENT_POSITION + index, GL_TEXTURE_2D, mGBufferTextures[index], 0));
         }
 
         // final texture
         GLCALL(glGenTextures(1, &mFinalTexture));
         GLCALL(glBindTexture(GL_TEXTURE_2D, mFinalTexture));
         GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, windowWidth, windowHeight, 0, GL_RGBA, GL_FLOAT, 0));
-        GLCALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + GBUFFER_NUM_TEXTURES, GL_TEXTURE_2D, mFinalTexture, 0));
+        GLCALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GBUFFER_COLOR_ATTACHMENT_FINAL, GL_TEXTURE_2D, mFinalTexture, 0));
         GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
 
         // depthbuffer
@@ -60,7 +60,7 @@ namespace JonsEngine
 
     GBuffer::~GBuffer()
     {
-        GLCALL(glDeleteTextures(GBUFFER_NUM_TEXTURES, &mGBufferTextures[0]));
+        GLCALL(glDeleteTextures(GBUFFER_NUM_GEOMETRY_ATTACHMENTS, &mGBufferTextures[0]));
         GLCALL(glDeleteTextures(1, &mFinalTexture));
         GLCALL(glDeleteRenderbuffers(1, &mDepthbuffer));
         GLCALL(glDeleteSamplers(1, &mTextureSampler));
@@ -70,11 +70,10 @@ namespace JonsEngine
 
     void GBuffer::BindGBufferTextures()
     {
-        GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_POSITION));
-        GLCALL(glBindTexture(GL_TEXTURE_2D, mGBufferTextures[GBuffer::GBUFFER_TEXTURE_POSITION]));
-        GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_NORMAL));
-        GLCALL(glBindTexture(GL_TEXTURE_2D, mGBufferTextures[GBuffer::GBUFFER_TEXTURE_NORMAL]));
-        GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_DIFFUSE));
-        GLCALL(glBindTexture(GL_TEXTURE_2D, mGBufferTextures[GBuffer::GBUFFER_TEXTURE_DIFFUSE]));
+        for (uint32_t index = 0; index < GBUFFER_NUM_GEOMETRY_ATTACHMENTS; index++)
+        {
+            GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_POSITION + index));
+            GLCALL(glBindTexture(GL_TEXTURE_2D, mGBufferTextures[index]));
+        }
     }
 }

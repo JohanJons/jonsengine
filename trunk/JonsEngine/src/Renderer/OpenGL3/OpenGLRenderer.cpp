@@ -260,8 +260,8 @@ namespace JonsEngine
         GLCALL(glEnable(GL_DEPTH_TEST));
 
         // set geometry pass output buffers
-        GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-        GLCALL(glDrawBuffers(GBuffer::GBUFFER_NUM_TEXTURES, drawBuffers));
+        GLenum drawBuffers[] = { GBuffer::GBUFFER_COLOR_ATTACHMENT_POSITION, GBuffer::GBUFFER_COLOR_ATTACHMENT_NORMAL, GBuffer::GBUFFER_COLOR_ATTACHMENT_DIFFUSE };
+        GLCALL(glDrawBuffers(GBuffer::GBUFFER_NUM_GEOMETRY_ATTACHMENTS, drawBuffers));
 
         // clear GBuffer position/normal/diffuse textures and depth buffer
         GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
@@ -331,7 +331,7 @@ namespace JonsEngine
     void OpenGLRenderer::ShadingPass(const RenderableLighting& lighting)
     {
         GLCALL(glUseProgram(mShadingProgram.mProgramHandle));
-        GLCALL(glDrawBuffer(GL_COLOR_ATTACHMENT0 + GBuffer::GBUFFER_NUM_TEXTURES));
+        GLCALL(glDrawBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
 
         mGBuffer.BindGBufferTextures();
 
@@ -363,7 +363,7 @@ namespace JonsEngine
             GLCALL(glDrawBuffer(GL_NONE));
             PointLightStencilPass(pointLight);
         
-            GLCALL(glDrawBuffer(GL_COLOR_ATTACHMENT0 + GBuffer::GBUFFER_NUM_TEXTURES));
+            GLCALL(glDrawBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
             PointLightLightingPass(pointLight, lighting.mGamma, lighting.mScreenSize);
         }
         GLCALL(glDisable(GL_STENCIL_TEST));
@@ -406,25 +406,25 @@ namespace JonsEngine
         {
             case DebugOptions::RENDER_MODE_FULL:
             {
-                GLCALL(glReadBuffer(GL_COLOR_ATTACHMENT0 + GBuffer::GBUFFER_NUM_TEXTURES));
+                GLCALL(glReadBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
                 break;
             }
             case DebugOptions::RENDER_MODE_POSITIONS:
             {
-                GLCALL(glReadBuffer(GL_COLOR_ATTACHMENT0 + GBuffer::GBUFFER_TEXTURE_POSITION));
+                GLCALL(glReadBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_POSITION));
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
                 break;
             }
             case DebugOptions::RENDER_MODE_NORMALS:
             {
-                GLCALL(glReadBuffer(GL_COLOR_ATTACHMENT0 + GBuffer::GBUFFER_TEXTURE_NORMAL));
+                GLCALL(glReadBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_NORMAL));
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
                 break;
             }
             case DebugOptions::RENDER_MODE_DIFFUSE:
             {
-                GLCALL(glReadBuffer(GL_COLOR_ATTACHMENT0 + GBuffer::GBUFFER_TEXTURE_DIFFUSE));
+                GLCALL(glReadBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_DIFFUSE));
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
                 break;
             }
