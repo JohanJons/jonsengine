@@ -55,12 +55,12 @@ namespace JonsEngine
             Vec4 mLightColor;
             Vec4 mLightPosition;
 
-            float mFalloffFactor;
+            float mLightIntensity;
             float mMaxDistance;
 
 
-            PointLight(const Mat4& wvpMatrix, const Mat4& worldMatrix, const Vec4& lightColor, const Vec4& lightPosition, const float fallOff, const float maxDistance) :
-                mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix), mLightColor(lightColor), mLightPosition(lightPosition), mFalloffFactor(fallOff), mMaxDistance(maxDistance)
+            PointLight(const Mat4& wvpMatrix, const Mat4& worldMatrix, const Vec4& lightColor, const Vec4& lightPosition, const float intensity, const float maxDistance) :
+                mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix), mLightColor(lightColor), mLightPosition(lightPosition), mLightIntensity(intensity), mMaxDistance(maxDistance)
             {
             }
         };

@@ -60,13 +60,13 @@ namespace JonsEngine
         Vec4 mGamma;
         Vec2 mScreenSize;
         uint32_t mLightType;
-        float mFalloffFactor;
+        float mLightIntensity;
         float mMaxDistance;
         
         
-        UnifShading(const Mat4& vwpMatrix, const Vec4& lightColor, const Vec4& lightPosOrDir, const Vec4& gamma, const Vec2& screenSize, const uint32_t lightType, const float falloffFactor, const float maxDistance)
+        UnifShading(const Mat4& vwpMatrix, const Vec4& lightColor, const Vec4& lightPosOrDir, const Vec4& gamma, const Vec2& screenSize, const uint32_t lightType, const float lightIntensity, const float maxDistance)
             :
-            mWVPMatrix(vwpMatrix), mLightColor(lightColor), mLightPosOrDir(lightPosOrDir), mGamma(gamma), mScreenSize(screenSize), mLightType(lightType), mFalloffFactor(falloffFactor), mMaxDistance(maxDistance)
+            mWVPMatrix(vwpMatrix), mLightColor(lightColor), mLightPosOrDir(lightPosOrDir), mGamma(gamma), mScreenSize(screenSize), mLightType(lightType), mLightIntensity(lightIntensity), mMaxDistance(maxDistance)
         {
         }
     };
@@ -142,6 +142,10 @@ namespace JonsEngine
         // stencil testing
         GLCALL(glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP));
         GLCALL(glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP));
+
+        // blend
+        GLCALL(glBlendEquation(GL_FUNC_ADD));
+        GLCALL(glBlendFunc(GL_ONE, GL_ONE));
 
         // z depth testing
         GLCALL(glDepthFunc(GL_LEQUAL));
@@ -357,8 +361,6 @@ namespace JonsEngine
 
         // for directional and point lights
         GLCALL(glEnable(GL_BLEND));
-        GLCALL(glBlendEquation(GL_FUNC_ADD));
-        GLCALL(glBlendFunc(GL_ONE, GL_ONE));
 
         // do all directional lights
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
@@ -382,8 +384,8 @@ namespace JonsEngine
         GLCALL(glDisable(GL_STENCIL_TEST));
 
         // reset state
-        GLCALL(glDrawBuffer(GL_NONE));
         GLCALL(glDisable(GL_BLEND));
+        GLCALL(glDrawBuffer(GL_NONE));
         GLCALL(glUseProgram(0));
     }
 
@@ -406,7 +408,7 @@ namespace JonsEngine
         GLCALL(glCullFace(GL_FRONT));
         GLCALL(glStencilFunc(GL_NOTEQUAL, 0, 0xFF));
 
-        mUniBufferShadingPass.SetData(UnifShading(pointLight.mWVPMatrix, pointLight.mLightColor, pointLight.mLightPosition, gamma, screenSize, UnifShading::LIGHT_TYPE_POINT, pointLight.mFalloffFactor, pointLight.mMaxDistance));
+        mUniBufferShadingPass.SetData(UnifShading(pointLight.mWVPMatrix, pointLight.mLightColor, pointLight.mLightPosition, gamma, screenSize, UnifShading::LIGHT_TYPE_POINT, pointLight.mLightIntensity, pointLight.mMaxDistance));
         mShadingGeometry.DrawSphere();
 
         GLCALL(glCullFace(GL_BACK));

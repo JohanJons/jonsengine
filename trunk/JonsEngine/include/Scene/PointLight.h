@@ -22,7 +22,7 @@ namespace JonsEngine
         Vec4 mLightColor;
         SceneNodePtr mSceneNode;
 
-        float mFalloffFactor;
+        float mLightIntensity;
         float mMaxDistance;
 
 

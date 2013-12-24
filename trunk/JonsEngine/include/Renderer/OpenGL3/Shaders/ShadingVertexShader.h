@@ -18,7 +18,7 @@ namespace JonsEngine
         vec2 mScreenSize;                                                                   \n \
                                                                                             \n \
         int   mLightType;                                                                   \n \
-        float mFalloffFactor;                                                               \n \
+        float mLightIntensity;                                                              \n \
         float mMaxDistance;                                                                 \n \
     } UnifShadingPass;                                                                      \n \
                                                                                             \n \

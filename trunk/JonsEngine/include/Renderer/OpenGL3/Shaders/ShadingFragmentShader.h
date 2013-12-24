@@ -18,7 +18,7 @@ namespace JonsEngine
         vec2 mScreenSize;                                                                                                           \n \
                                                                                                                                     \n \
         int   mLightType;                                                                                                           \n \
-        float mFalloffFactor;                                                                                                       \n \
+        float mLightIntensity;                                                                                                      \n \
         float mMaxDistance;                                                                                                         \n \
     } UnifShadingPass;                                                                                                              \n \
                                                                                                                                     \n \
@@ -39,7 +39,7 @@ namespace JonsEngine
        vec3 lightDir = normalize(positionDiff);                                                                                     \n \
        float angleNormal = clamp(dot(normalize(normal), lightDir), 0, 1);                                                           \n \
                                                                                                                                     \n \
-       return angleNormal * attenuation * UnifShadingPass.mLightColor;                                                              \n \
+       return angleNormal * attenuation * UnifShadingPass.mLightIntensity * UnifShadingPass.mLightColor;                            \n \
     }                                                                                                                               \n \
                                                                                                                                     \n \
     vec4 CalcDirectionalLight(vec3 worldPos, vec3 normal)                                                                           \n \

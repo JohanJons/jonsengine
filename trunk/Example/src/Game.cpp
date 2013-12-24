@@ -149,6 +149,7 @@ namespace JonsGame
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
         PointLightPtr movingLight    = myScene->CreatePointLight("MovingPointLight", nodeMovingLight);
         movingLight->mMaxDistance    = 10.0f;
+        movingLight->mLightIntensity = 2.0f;
         movingLight->mLightColor     = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
         nodeMovingLight->TranslateNode(Vec3(4.0f, 0.5f, -15.0f));
 
