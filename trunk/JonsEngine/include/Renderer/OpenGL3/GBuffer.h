@@ -23,7 +23,6 @@ namespace JonsEngine
         GBuffer(Logger& logger, const uint32_t windowWidth, const uint32_t windowHeight);
         ~GBuffer();
 
-        
         void BindGeometryTextures();
         void BindDepthTexture();
 
