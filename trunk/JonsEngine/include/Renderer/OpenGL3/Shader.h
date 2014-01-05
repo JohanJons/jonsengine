@@ -21,13 +21,10 @@ namespace JonsEngine
     /* Shader definition */
     struct Shader
     {
-        friend struct ShaderProgram;
-
         enum ShaderType
         {
             VERTEX_SHADER = GL_VERTEX_SHADER,
             FRAGMENT_SHADER = GL_FRAGMENT_SHADER,
-            UNKNOWN
         };
         
         Shader(const std::string& name, const std::string& shaderSource, ShaderType type);

@@ -89,12 +89,14 @@ namespace JonsEngine
         for (PointLightPtr pointLight : pointLights)
         {
             const Mat4 scaledWorldMatrix = Scale(pointLight->mSceneNode->GetNodeTransform(), Vec3(pointLight->mMaxDistance));
-            lighting.mPointLights.emplace_back(RenderableLighting::PointLight(perspectiveMatrix * viewMatrix * scaledWorldMatrix, scaledWorldMatrix, pointLight->mLightColor, Vec4(pointLight->mSceneNode->Position(), 1.0f),
-                                                pointLight->mLightIntensity, pointLight->mMaxDistance));
+            lighting.mPointLights.emplace_back(RenderableLighting::PointLight(perspectiveMatrix * viewMatrix * scaledWorldMatrix, scaledWorldMatrix, pointLight->mLightColor, pointLight->mSceneNode->Position(), pointLight->mLightIntensity, pointLight->mMaxDistance));
         }
 
         for (DirectionalLightPtr dirLight : directionalLights)
-            lighting.mDirectionalLights.emplace_back(RenderableLighting::DirectionalLight(dirLight->mLightColor, Vec4(dirLight->mLightDirection, 0.0f)));
+        {
+            const Mat4 worldMatrix = dirLight->mSceneNode->GetNodeTransform();
+            lighting.mDirectionalLights.emplace_back(RenderableLighting::DirectionalLight(perspectiveMatrix * viewMatrix * worldMatrix, worldMatrix, dirLight->mLightColor, dirLight->mLightDirection, dirLight->mSceneNode->Position()));
+        }
 
         return lighting;
     }

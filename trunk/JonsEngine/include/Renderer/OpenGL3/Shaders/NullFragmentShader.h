@@ -4,5 +4,5 @@
 
 namespace JonsEngine
 {
-    const std::string gStencilFragmentShader = "";
+    const std::string gNullFragmentShader = "";
 }

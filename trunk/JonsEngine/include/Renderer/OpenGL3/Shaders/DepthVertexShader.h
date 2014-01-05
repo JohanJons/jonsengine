@@ -4,28 +4,23 @@
 
 namespace JonsEngine
 {
-    const std::string gShadingVertexShader =
+    const std::string gDepthVertexShader =
     "#version 430                                                                           \n \
                                                                                             \n \
     layout(std140) uniform;                                                                 \n \
                                                                                             \n \
-    uniform UnifShading                                                                     \n \
+    uniform UnifDepth                                                                       \n \
     {                                                                                       \n \
         mat4 mWVPMatrix;                                                                    \n \
-        vec4 mLightColor;                                                                   \n \
-        vec4 mLightPosOrDir;                                                                \n \
-        vec4 mGamma;                                                                        \n \
         vec2 mScreenSize;                                                                   \n \
-                                                                                            \n \
-        int   mLightType;                                                                   \n \
-        float mLightIntensity;                                                              \n \
-        float mMaxDistance;                                                                 \n \
-    } UnifShadingPass;                                                                      \n \
+        float mZNear;                                                                       \n \
+        float mZFar;                                                                        \n \
+    } UnifDepthPass;                                                                        \n \
                                                                                             \n \
     layout(location = 0) in vec3 vert_position;                                             \n \
                                                                                             \n \
     void main()                                                                             \n \
     {                                                                                       \n \
-        gl_Position = UnifShadingPass.mWVPMatrix * vec4(vert_position, 1.0);                \n \
+        gl_Position = UnifDepthPass.mWVPMatrix * vec4(vert_position, 1.0);                  \n \
     }                                                                                       \n";
 }

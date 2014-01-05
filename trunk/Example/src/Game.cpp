@@ -49,51 +49,53 @@ namespace JonsGame
         if (evnt.mState == KeyEvent::STATE_PRESSED || evnt.mState == KeyEvent::STATE_REPEAT)
         {
             // camera position
-            if (evnt.mKey == A)
+            if (evnt.mKey == Key::A)
                 camera.TranslateCamera(-camera.Right() * mMoveSpeed);
-            else if (evnt.mKey == W)
+            else if (evnt.mKey == Key::W)
                 camera.TranslateCamera(camera.Forward() * mMoveSpeed);
-            else if (evnt.mKey == S)
+            else if (evnt.mKey == Key::S)
                 camera.TranslateCamera(-camera.Forward() * mMoveSpeed);
-            else if (evnt.mKey == D)
+            else if (evnt.mKey == Key::D)
                 camera.TranslateCamera(camera.Right() * mMoveSpeed);
 
             // moving the point light 
-            else if (evnt.mKey == Q)
+            else if (evnt.mKey == Key::Q)
                 activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(-0.05, 0.0f, 0.0f));
-            else if (evnt.mKey == E)
+            else if (evnt.mKey == Key::E)
                 activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.05, 0.0f, 0.0f));
-            else if (evnt.mKey == R)
+            else if (evnt.mKey == Key::R)
                 activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.00, -0.05f, 0.0f));
-            else if (evnt.mKey == T)
+            else if (evnt.mKey == Key::T)
                 activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.05f, 0.0f));
-            else if (evnt.mKey == F)
+            else if (evnt.mKey == Key::F)
                 activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, -0.05f));
-            else if (evnt.mKey == G)
+            else if (evnt.mKey == Key::G)
                 activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, 0.05f));
 
             //  renderering
-            else if (evnt.mKey == Y)
+            else if (evnt.mKey == Key::ONE)
                 mDebugOptions.mRenderingMode = DebugOptions::RENDER_MODE_FULL;
-            else if (evnt.mKey == U)
+            else if (evnt.mKey == Key::TWO)
                 mDebugOptions.mRenderingMode = DebugOptions::RENDER_MODE_POSITIONS;
-            else if (evnt.mKey == I)
+            else if (evnt.mKey == Key::THREE)
                 mDebugOptions.mRenderingMode = DebugOptions::RENDER_MODE_NORMALS;
-            else if (evnt.mKey == O)
+            else if (evnt.mKey == Key::FOUR)
                 mDebugOptions.mRenderingMode = DebugOptions::RENDER_MODE_DIFFUSE;
-            else if (evnt.mKey == P)
+            else if (evnt.mKey == Key::FIVE)
+                mDebugOptions.mRenderingMode = DebugOptions::RENDER_MODE_DEPTH;
+            else if (evnt.mKey == Key::P)
                 mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_DRAW_LIGHTS);
-            else if (evnt.mKey == H)
+            else if (evnt.mKey == Key::H)
                 mEngine->GetRenderer()->SetAnisotropicFiltering(1.0f);
-            else if (evnt.mKey == J)
+            else if (evnt.mKey == Key::J)
                 mEngine->GetRenderer()->SetAnisotropicFiltering(mEngine->GetRenderer()->GetMaxAnisotropicFiltering());
 
             // misc
-            else if (evnt.mKey == N)
+            else if (evnt.mKey == Key::N)
                 mEngine->GetWindow().SetFullscreen(true);
-            else if (evnt.mKey == M)
+            else if (evnt.mKey == Key::M)
                 mEngine->GetWindow().SetFullscreen(false);
-            else if (evnt.mKey == ESC)
+            else if (evnt.mKey == Key::ESC)
                 mRunning = false;
         }
     }
@@ -155,9 +157,10 @@ namespace JonsGame
 
         // directional light
         SceneNodePtr nodeDirLight = myScene->GetRootNode().CreateChildNode("nodeDirLight");
-        DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
-        directionalLight->mLightDirection = Vec3(0.5f, 0.5f, 0.0f);
-        directionalLight->mLightColor = Vec4(0.2f);
+        DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight", nodeDirLight);
+        directionalLight->mLightDirection = Vec3(0.5f, 0.0f, 0.0f);
+        directionalLight->mLightColor = Vec4(0.4f);
+        nodeDirLight->TranslateNode(Vec3(40.0f, 1.0f, 0.0f));
 
         // point light 2
        /* SceneNodePtr nodeMovingLight2 = myScene->GetRootNode().CreateChildNode("nodeStaticLight");

@@ -18,10 +18,9 @@ namespace JonsEngine
     {
         const std::string mName;
         const size_t mHashedID;
-
-        Vec4 mLightColor;
         SceneNodePtr mSceneNode;
 
+        Vec4 mLightColor;
         float mLightIntensity;
         float mMaxDistance;
 

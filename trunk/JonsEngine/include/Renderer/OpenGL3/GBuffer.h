@@ -20,19 +20,20 @@ namespace JonsEngine
             GBUFFER_COLOR_ATTACHMENT_FINAL    = GL_COLOR_ATTACHMENT3
         };
 
-        GBuffer(Logger& logger, const uint32_t shadingProgramID, const uint32_t windowWidth, const uint32_t windowHeight);
+        GBuffer(Logger& logger, const uint32_t windowWidth, const uint32_t windowHeight);
         ~GBuffer();
 
         
-        void BindGBufferTextures();
+        void BindGeometryTextures();
+        void BindDepthTexture();
 
 
         Logger& mLogger;
 
         std::array<GLuint, GBUFFER_NUM_GEOMETRY_ATTACHMENTS> mGBufferTextures;
         GLuint mFinalTexture;
-        GLuint mFramebuffer;
-        GLuint mDepthbuffer;
+        GLuint mFrameBuffer;
+        GLuint mDepthBuffer;
         GLuint mTextureSampler;
     };
 }

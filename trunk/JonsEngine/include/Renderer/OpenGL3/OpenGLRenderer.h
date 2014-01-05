@@ -2,10 +2,12 @@
 
 #include "include/Renderer/OpenGL3/OpenGLMesh.h"
 #include "include/Renderer/OpenGL3/OpenGLTexture.h"
-#include "include/Renderer/OpenGL3/ShaderProgram.h"
+#include "include/Renderer/OpenGL3/ShaderProgram.hpp"
 #include "include/Renderer/OpenGL3/GBuffer.h"
 #include "include/Renderer/OpenGL3/UniformBuffer.hpp"
 #include "include/Renderer/OpenGL3/ShadingGeometry.h"
+#include "include/Renderer/OpenGL3/DirectionalShadowMap.h"
+#include "include/Renderer/OpenGL3/UniformBufferDefinitions.hpp"
 #include "include/Renderer/RenderCommands.h"
 #include "include/Core/Types.h"
 #include "include/Core/Memory/HeapAllocator.h"
@@ -55,22 +57,24 @@ namespace JonsEngine
     private:
         typedef std::pair<OpenGLMeshPtr, GLuint> OpenGLMeshPair;
 
-        struct UnifGeometry;
-        struct UnifShading;
-        struct UnifStencil;
-
         void GeometryPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights);
-        void ShadingPass(const RenderableLighting& lighting);
+        void ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting);
+        void AmbientLightPass(const Vec4& ambientLight, const Vec4& gamma, const Vec2& screenSize);
         void PointLightStencilPass(const RenderableLighting::PointLight& pointLight);
         void PointLightLightingPass(const RenderableLighting::PointLight& pointLight, const Vec4& gamma, const Vec2& screenSize);
-        void BlitToScreen(const DebugOptions::RenderingMode debugOptions);
+        void DirLightShadowPass(const RenderableLighting::DirectionalLight& dirLight, const RenderQueue& renderQueue);
+        void DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const Vec4& gamma, const Vec2& screenSize);
+        void RenderToScreen(const DebugOptions::RenderingMode debugOptions, const Vec2& screenSize);
 
         IMemoryAllocatorPtr mMemoryAllocator;
         Logger& mLogger;
 
-        ShaderProgram mGeometryProgram;
-        ShaderProgram mShadingProgram;
-        ShaderProgram mStencilProgram;
+        ShaderProgram<UnifGeometry> mGeometryProgram;
+        ShaderProgram<UnifNull> mNullProgram;
+        ShaderProgram<UnifAmbientLight> mAmbientProgram;
+        ShaderProgram<UnifPointLight> mPointLightProgram;
+        ShaderProgram<UnifDirLight> mDirLightProgram;
+        ShaderProgram<UnifDepth> mDepthProgram;
         GBuffer mGBuffer;
         GLuint mTextureSampler;
         float mCurrentAnisotropy;
@@ -80,8 +84,6 @@ namespace JonsEngine
         std::vector<OpenGLMeshPair> mMeshes;
         std::vector<OpenGLTexturePtr> mTextures;
         ShadingGeometry mShadingGeometry;
-        UniformBuffer<OpenGLRenderer::UnifGeometry> mUniBufferGeometryPass;
-        UniformBuffer<OpenGLRenderer::UnifShading> mUniBufferShadingPass;
-        UniformBuffer<OpenGLRenderer::UnifStencil> mUniBufferStencilPass;
+        DirectionalShadowMap mDirectionalShadowMap;
     };
 }

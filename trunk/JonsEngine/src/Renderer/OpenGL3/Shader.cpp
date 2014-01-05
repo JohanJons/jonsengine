@@ -8,7 +8,6 @@
 
 namespace JonsEngine
 {
-
     Shader::Shader(const std::string& name, const std::string& shaderSource, ShaderType type) : mLogger(Logger::GetRendererLogger()), mName(name), mShaderHandle(0), mShaderType(type)
     {
         mShaderHandle = glCreateShader(mShaderType);

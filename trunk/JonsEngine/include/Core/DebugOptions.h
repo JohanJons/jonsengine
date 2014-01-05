@@ -18,6 +18,7 @@ namespace JonsEngine
             RENDER_MODE_POSITIONS,
             RENDER_MODE_NORMALS,
             RENDER_MODE_DIFFUSE,
+            RENDER_MODE_DEPTH
         };
 
         enum RenderingFlag

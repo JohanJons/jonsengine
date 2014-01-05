@@ -53,13 +53,13 @@ namespace JonsEngine
             Mat4 mWVPMatrix;
             Mat4 mWorldMatrix;
             Vec4 mLightColor;
-            Vec4 mLightPosition;
+            Vec3 mLightPosition;
 
             float mLightIntensity;
             float mMaxDistance;
 
 
-            PointLight(const Mat4& wvpMatrix, const Mat4& worldMatrix, const Vec4& lightColor, const Vec4& lightPosition, const float intensity, const float maxDistance) :
+            PointLight(const Mat4& wvpMatrix, const Mat4& worldMatrix, const Vec4& lightColor, const Vec3& lightPosition, const float intensity, const float maxDistance) :
                 mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix), mLightColor(lightColor), mLightPosition(lightPosition), mLightIntensity(intensity), mMaxDistance(maxDistance)
             {
             }
@@ -67,11 +67,15 @@ namespace JonsEngine
 
         struct DirectionalLight
         {
+            Mat4 mWVPMatrix;
+            Mat4 mWorldMatrix;
             Vec4 mLightColor;
-            Vec4 mLightDirection;
+            Vec3 mLightDirection;
+            Vec3 mLightPosition;
 
 
-            DirectionalLight(const Vec4& lightColor, const Vec4& lightDirection) : mLightColor(lightColor), mLightDirection(lightDirection)
+            DirectionalLight(const Mat4& wvpMatrix, const Mat4& worldMatrix, const Vec4& lightColor, const Vec3& lightDirection, const Vec3& lightPosition) :
+                mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix), mLightColor(lightColor), mLightDirection(lightDirection), mLightPosition(lightPosition)
             {
             }
         };

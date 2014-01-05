@@ -32,7 +32,7 @@ namespace JonsEngine
                                                                                             \n \
     void main()                                                                             \n \
     {                                                                                       \n \
-        gl_Position   = UnifGeometryPass.mWVPMatrix * vec4(vert_position, 1.0);             \n \
+        gl_Position = UnifGeometryPass.mWVPMatrix * vec4(vert_position, 1.0);               \n \
                                                                                             \n \
         frag_position  = (UnifGeometryPass.mWorldMatrix * vec4(vert_position, 1.0)).xyz;    \n \
         frag_normal    = (UnifGeometryPass.mWorldMatrix * vec4(vert_normal, 0.0)).xyz;      \n \

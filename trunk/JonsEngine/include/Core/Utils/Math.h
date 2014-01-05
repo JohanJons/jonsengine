@@ -10,6 +10,7 @@ namespace JonsEngine
      * Contains various math utilities
      */
 
+    const Mat4 gIdentityMatrix(1.0f);
 
     Mat4 Scale(const Mat4& matrix, const Vec3& scaleVec);
     Mat4 Rotate(const Mat4& matrix, const float angle, const Vec3& rotateVec);

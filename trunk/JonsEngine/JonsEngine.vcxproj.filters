@@ -134,9 +134,6 @@
     <ClCompile Include="src\Renderer\OpenGL3\Shader.cpp">
       <Filter>Source Files\Renderer\OpenGL3</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL3\ShaderProgram.cpp">
-      <Filter>Source Files\Renderer\OpenGL3</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLRenderer.cpp">
       <Filter>Source Files\Renderer\OpenGL3</Filter>
     </ClCompile>
@@ -189,6 +186,9 @@
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLUtils.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\DirectionalShadowMap.cpp">
       <Filter>Source Files\Renderer\OpenGL3</Filter>
     </ClCompile>
   </ItemGroup>
@@ -245,9 +245,6 @@
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\Shader.h">
-      <Filter>Header Files\Renderer\OpenGL3</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLRenderer.h">
@@ -322,12 +319,6 @@
     <ClInclude Include="include\Core\DebugOptions.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\ShadingFragmentShader.h">
-      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\ShadingVertexShader.h">
-      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\ShadingGeometry.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
@@ -340,10 +331,43 @@
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLUtils.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\StencilFragmentShader.h">
+    <ClInclude Include="include\Renderer\OpenGL3\DirectionalShadowMap.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\NullFragmentShader.h">
       <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\StencilVertexShader.h">
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\NullVertexShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightFragmentShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightVertexShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\UniformBufferDefinitions.hpp">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.hpp">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\AmbientLightFragmentShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\AmbientLightVertexShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\PointLightVertexShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\PointLightFragmentShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DepthFragmentShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DepthVertexShader.h">
       <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
     </ClInclude>
   </ItemGroup>

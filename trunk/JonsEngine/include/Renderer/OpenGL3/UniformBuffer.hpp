@@ -1,6 +1,5 @@
 #pragma once
 
-#include "include/Renderer/OpenGL3/ShaderProgram.h"
 #include "include/Renderer/OpenGL3/OpenGLUtils.h"
 #include "include/Core/EngineDefs.h"
 #include "include/Core/Logging/Logger.h"

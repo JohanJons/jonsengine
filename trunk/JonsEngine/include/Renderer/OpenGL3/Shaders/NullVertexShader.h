@@ -4,20 +4,20 @@
 
 namespace JonsEngine
 {
-    const std::string gStencilVertexShader =
+    const std::string gNullVertexShader =
     "#version 430                                                                           \n \
                                                                                             \n \
     layout(std140) uniform;                                                                 \n \
                                                                                             \n \
-    uniform UnifStencil                                                                     \n \
+    uniform UnifNull                                                                        \n \
     {                                                                                       \n \
         mat4 mWVPMatrix;                                                                    \n \
-    } UnifStencilPass;                                                                      \n \
+    } UnifNullPass;                                                                         \n \
                                                                                             \n \
     layout(location = 0) in vec3 vert_position;                                             \n \
                                                                                             \n \
     void main()                                                                             \n \
     {                                                                                       \n \
-        gl_Position = UnifStencilPass.mWVPMatrix * vec4(vert_position, 1.0);                \n \
+        gl_Position = UnifNullPass.mWVPMatrix * vec4(vert_position, 1.0);                   \n \
     }                                                                                       \n";
 }

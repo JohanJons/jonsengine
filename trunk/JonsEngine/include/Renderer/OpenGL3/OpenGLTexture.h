@@ -28,7 +28,8 @@ namespace JonsEngine
             TEXTURE_UNIT_GEOMETRY_NORMAL,
             TEXTURE_UNIT_GBUFFER_POSITION,
             TEXTURE_UNIT_GBUFFER_NORMAL,
-            TEXTURE_UNIT_GBUFFER_DIFFUSE
+            TEXTURE_UNIT_GBUFFER_DIFFUSE,
+            TEXTURE_UNIT_GBUFFER_DEPTH
         };
 
         OpenGLTexture(const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat, TextureType textureType, Logger& logger);

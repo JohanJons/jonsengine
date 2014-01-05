@@ -8,11 +8,10 @@
 
 namespace JonsEngine
 {
-    GBuffer::GBuffer(Logger& logger, const uint32_t shadingProgramID, const uint32_t windowWidth, const uint32_t windowHeight) : mLogger(logger), mFramebuffer(0), mDepthbuffer(0), mTextureSampler(0)
+    GBuffer::GBuffer(Logger& logger, const uint32_t windowWidth, const uint32_t windowHeight) : mLogger(logger), mFrameBuffer(0), mDepthBuffer(0), mTextureSampler(0)
     {
-        GLCALL(glGenFramebuffers(1, &mFramebuffer));
-        GLCALL(glBindFramebuffer(GL_FRAMEBUFFER, mFramebuffer));
-        GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
+        GLCALL(glGenFramebuffers(1, &mFrameBuffer));
+        GLCALL(glBindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer));
 
         // color attachments to store geometry data
         GLCALL(glGenTextures(GBUFFER_NUM_GEOMETRY_ATTACHMENTS, &mGBufferTextures[0]));
@@ -28,23 +27,21 @@ namespace JonsEngine
         GLCALL(glBindTexture(GL_TEXTURE_2D, mFinalTexture));
         GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, windowWidth, windowHeight, 0, GL_RGBA, GL_FLOAT, 0));
         GLCALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GBUFFER_COLOR_ATTACHMENT_FINAL, GL_TEXTURE_2D, mFinalTexture, 0));
-        GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
 
         // depthbuffer
-        GLCALL(glGenRenderbuffers(1, &mDepthbuffer));
-        GLCALL(glBindRenderbuffer(GL_RENDERBUFFER, mDepthbuffer));
-        GLCALL(glRenderbufferStorageMultisample(GL_RENDERBUFFER, 0, GL_DEPTH32F_STENCIL8, windowWidth, windowHeight));
-        GLCALL(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, mDepthbuffer));
-        GLCALL(glBindRenderbuffer(GL_RENDERBUFFER, 0));
+        GLCALL(glGenTextures(1, &mDepthBuffer));
+        GLCALL(glBindTexture(GL_TEXTURE_2D, mDepthBuffer));
+        GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, windowWidth, windowHeight, 0, GL_DEPTH_STENCIL, GL_FLOAT_32_UNSIGNED_INT_24_8_REV, 0));     // TODO: check ARB_depth_buffer_float available?
+        GLCALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, mDepthBuffer, 0));
+        GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
         
         GLenum Status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if (Status != GL_FRAMEBUFFER_COMPLETE) {
-            JONS_LOG_ERROR(mLogger, "Framebuffer incomplete!");
-            throw std::runtime_error("Framebuffer incomplete!");
+            JONS_LOG_ERROR(mLogger, "GBuffer Framebuffer incomplete!");
+            throw std::runtime_error("GBuffer Framebuffer incomplete!");
         }
 
         // color attachment texture sampler
-        GLCALL(glUseProgram(shadingProgramID));
         GLCALL(glGenSamplers(1, &mTextureSampler));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
@@ -53,7 +50,7 @@ namespace JonsEngine
         GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GBUFFER_POSITION, mTextureSampler));
         GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GBUFFER_NORMAL, mTextureSampler));
         GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GBUFFER_DIFFUSE, mTextureSampler));
-        GLCALL(glUseProgram(0));
+        GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GBUFFER_DEPTH, mTextureSampler));
 
         GLCALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     }
@@ -62,18 +59,24 @@ namespace JonsEngine
     {
         GLCALL(glDeleteTextures(GBUFFER_NUM_GEOMETRY_ATTACHMENTS, &mGBufferTextures[0]));
         GLCALL(glDeleteTextures(1, &mFinalTexture));
-        GLCALL(glDeleteRenderbuffers(1, &mDepthbuffer));
+        GLCALL(glDeleteTextures(1, &mDepthBuffer));
         GLCALL(glDeleteSamplers(1, &mTextureSampler));
-        GLCALL(glDeleteFramebuffers(1, &mFramebuffer));
+        GLCALL(glDeleteFramebuffers(1, &mFrameBuffer));
     }
 
 
-    void GBuffer::BindGBufferTextures()
+    void GBuffer::BindGeometryTextures()
     {
         for (uint32_t index = 0; index < GBUFFER_NUM_GEOMETRY_ATTACHMENTS; index++)
         {
-            GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_POSITION + index));
+            GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_POSITION + index));  // POSITION is starting texture index
             GLCALL(glBindTexture(GL_TEXTURE_2D, mGBufferTextures[index]));
         }
+    }
+
+    void GBuffer::BindDepthTexture()
+    {
+        GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_DEPTH));
+        GLCALL(glBindTexture(GL_TEXTURE_2D, mDepthBuffer));
     }
 }

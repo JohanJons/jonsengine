@@ -26,9 +26,9 @@ namespace JonsEngine
         return mPointLights.back();
     }
 
-    DirectionalLightPtr Scene::CreateDirectionalLight(const std::string& lightName)
+    DirectionalLightPtr Scene::CreateDirectionalLight(const std::string& lightName, const SceneNodePtr node)
     {
-        mDirectionalLights.emplace_back(mMemoryAllocator.AllocateObject<DirectionalLight>(lightName), std::bind(&HeapAllocator::DeallocateObject<DirectionalLight>, &mMemoryAllocator, std::placeholders::_1));
+        mDirectionalLights.emplace_back(mMemoryAllocator.AllocateObject<DirectionalLight>(lightName, node), std::bind(&HeapAllocator::DeallocateObject<DirectionalLight>, &mMemoryAllocator, std::placeholders::_1));
 
         return mDirectionalLights.back();
     }

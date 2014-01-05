@@ -5,10 +5,16 @@
 #include "include/Renderer/OpenGL3/Shader.h"
 #include "include/Renderer/OpenGL3/Shaders/GeometryVertexShader.h"
 #include "include/Renderer/OpenGL3/Shaders/GeometryFragmentShader.h"
-#include "include/Renderer/OpenGL3/Shaders/ShadingVertexShader.h"
-#include "include/Renderer/OpenGL3/Shaders/ShadingFragmentShader.h"
-#include "include/Renderer/OpenGL3/Shaders/StencilVertexShader.h"
-#include "include/Renderer/OpenGL3/Shaders/StencilFragmentShader.h"
+#include "include/Renderer/OpenGL3/Shaders/NullVertexShader.h"
+#include "include/Renderer/OpenGL3/Shaders/NullFragmentShader.h"
+#include "include/Renderer/OpenGL3/Shaders/AmbientLightVertexShader.h"
+#include "include/Renderer/OpenGL3/Shaders/AmbientLightFragmentShader.h"
+#include "include/Renderer/OpenGL3/Shaders/PointLightVertexShader.h"
+#include "include/Renderer/OpenGL3/Shaders/PointLightFragmentShader.h"
+#include "include/Renderer/OpenGL3/Shaders/DirLightVertexShader.h"
+#include "include/Renderer/OpenGL3/Shaders/DirLightFragmentShader.h"
+#include "include/Renderer/OpenGL3/Shaders/DepthVertexShader.h"
+#include "include/Renderer/OpenGL3/Shaders/DepthFragmentShader.h"
 #include "include/Renderer/OpenGL3/OpenGLUtils.h"
 #include "include/Renderer/Shapes.h"
 #include "include/Core/EngineSettings.h"
@@ -24,64 +30,8 @@
 
 namespace JonsEngine
 {
-    const float Z_NEAR = 0.1f;
-    const float Z_FAR  = 1000.0f;
-
-
-    struct OpenGLRenderer::UnifGeometry
-    {
-        Mat4 mWVPMatrix;
-        Mat4 mWorldMatrix;
-        uint32_t mHasDiffuseTexture;
-        uint32_t mHasNormalTexture;
-        float mTextureTilingFactor;
-
-        
-        UnifGeometry(const Mat4& WVPMatrix, const Mat4& WorldMatrix, const uint32_t hasDiffuseTexture, const uint32_t hasNormalTexture, const float textureTilingFactor)
-            :
-            mWVPMatrix(WVPMatrix), mWorldMatrix(WorldMatrix), mHasDiffuseTexture(hasDiffuseTexture), mHasNormalTexture(hasNormalTexture), mTextureTilingFactor(textureTilingFactor)
-        {
-        }
-    };
-    
-    struct OpenGLRenderer::UnifShading
-    {
-        enum LightType
-        {
-            LIGHT_TYPE_UNKNOWN = 0,
-            LIGHT_TYPE_POINT,
-            LIGHT_TYPE_DIRECTIONAL,
-            LIGHT_TYPE_AMBIENT
-        };
-        
-        Mat4 mWVPMatrix;
-        Vec4 mLightColor;
-        Vec4 mLightPosOrDir;
-        Vec4 mGamma;
-        Vec2 mScreenSize;
-        uint32_t mLightType;
-        float mLightIntensity;
-        float mMaxDistance;
-        
-        
-        UnifShading(const Mat4& vwpMatrix, const Vec4& lightColor, const Vec4& lightPosOrDir, const Vec4& gamma, const Vec2& screenSize, const uint32_t lightType, const float lightIntensity, const float maxDistance)
-            :
-            mWVPMatrix(vwpMatrix), mLightColor(lightColor), mLightPosOrDir(lightPosOrDir), mGamma(gamma), mScreenSize(screenSize), mLightType(lightType), mLightIntensity(lightIntensity), mMaxDistance(maxDistance)
-        {
-        }
-    };
-    
-    struct OpenGLRenderer::UnifStencil
-    {
-        Mat4 mWVPMatrix;
-        
-
-        UnifStencil(const Mat4& wvpMatrix)
-            : 
-            mWVPMatrix(wvpMatrix)
-        {
-        }
-    };
+    const float Z_NEAR = 1.0f;
+    const float Z_FAR  = 100.0f;
 
 
     void BindTexture2D(const OpenGLTexture::TextureUnit textureUnit, const TextureID targetTexture, const std::vector<OpenGLTexturePtr>& textures, Logger& logger)
@@ -123,15 +73,17 @@ namespace JonsEngine
 
     OpenGLRenderer::OpenGLRenderer(const uint32_t windowWidth, const uint32_t windowHeight, const float anisotropy, IMemoryAllocatorPtr memoryAllocator) :
         mMemoryAllocator(memoryAllocator), mLogger(Logger::GetRendererLogger()),
-        mGeometryProgram("GeometryProgram", ShaderPtr(new Shader("GeometryVertexShader", gGeometryVertexShader, Shader::VERTEX_SHADER)),  ShaderPtr(new Shader("GeometryFragmentShader", gGeometryFragmentShader, Shader::FRAGMENT_SHADER)), mLogger),
-        mShadingProgram("ShadingProgram", ShaderPtr(new Shader("ShadingVertexShader", gShadingVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("ShadingFragmentShader", gShadingFragmentShader, Shader::FRAGMENT_SHADER)), mLogger),
-        mStencilProgram("StencilProgram", ShaderPtr(new Shader("StencilVertexShader", gStencilVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("StencilFragmentShader", gStencilFragmentShader, Shader::FRAGMENT_SHADER)), mLogger),
+        mGeometryProgram("GeometryProgram", ShaderPtr(new Shader("GeometryVertexShader", gGeometryVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("GeometryFragmentShader", gGeometryFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifGeometry"),
+        mPointLightProgram("PointLightProgram", ShaderPtr(new Shader("PointLightVertexShader", gShadingVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("PointLightFragmentShader", gShadingFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifPointLight"),
+        mNullProgram("NullProgram", ShaderPtr(new Shader("NullVertexShader", gNullVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("NullFragmentShader", gNullFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifNull"),
+        mDirLightProgram("DirLightProgram", ShaderPtr(new Shader("DirLightVertexShader", gDirLightVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("DirLightFragmentShader", gDirLightFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifDirLight"),
+        mAmbientProgram("AmbientLightProgram", ShaderPtr(new Shader("AmbientLightVertexShader", gAmbientVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("AmbientLightFragmentShader", gAmbientFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifAmbient"),
+        mDepthProgram("DepthProgram", ShaderPtr(new Shader("DepthVertexShader", gDepthVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("DepthFragmentShader", gDepthFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifDepth"),
                                                             // VS2012 bug workaround. TODO: fixed in VS2013, when boost is rdy
         //mDefaultProgram("DefaultProgram", ShaderPtr(new Shader("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); }*/), 
         //                                 ShaderPtr(new Shader("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); })*/), mLogger),
-        mGBuffer(mLogger, mShadingProgram.mProgramHandle, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight),
-        mShadingGeometry(mLogger), mUniBufferGeometryPass("UnifGeometry", mLogger, mGeometryProgram.mProgramHandle), mUniBufferShadingPass("UnifShading", mLogger, mShadingProgram.mProgramHandle),
-        mUniBufferStencilPass("UnifStencil", mLogger, mStencilProgram.mProgramHandle)
+        mGBuffer(mLogger, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight),
+        mShadingGeometry(mLogger), mDirectionalShadowMap(mLogger, windowWidth, windowHeight)//, mUniBufferGeometryPass("UnifGeometry", mLogger, mGeometryProgram.mProgramHandle), mUniBufferShadingPass("UnifShading", mLogger, mShadingProgram.mProgramHandle),
     {
         GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 
@@ -153,7 +105,6 @@ namespace JonsEngine
         GLCALL(glClearDepth(1.0f));
 
         // diffuse/normal texture sampler setup
-        GLCALL(glUseProgram(mGeometryProgram.mProgramHandle));
         GLCALL(glGenSamplers(1, &mTextureSampler));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
@@ -161,7 +112,6 @@ namespace JonsEngine
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_T, GL_REPEAT));
         GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_DIFFUSE, mTextureSampler));
         GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_NORMAL, mTextureSampler));
-        GLCALL(glUseProgram(0));
 
         SetAnisotropicFiltering(mCurrentAnisotropy);
     }
@@ -199,15 +149,15 @@ namespace JonsEngine
         // clear default fbo color/buffer/stencil 
         GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 
-        GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFramebuffer));
+        GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFrameBuffer));
 
         GeometryPass(renderQueue, lighting, debugExtra.test(DebugOptions::RENDER_FLAG_DRAW_LIGHTS));
-        ShadingPass(lighting);
+        ShadingPass(renderQueue, lighting);
 
         GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
-        GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer.mFramebuffer));
+        GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer.mFrameBuffer));
 
-        BlitToScreen(debugMode);
+        RenderToScreen(debugMode, lighting.mScreenSize);
 
         GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
     }
@@ -271,10 +221,10 @@ namespace JonsEngine
 
     void OpenGLRenderer::GeometryPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights)
     {
-        GLCALL(glUseProgram(mGeometryProgram.mProgramHandle));
+        mGeometryProgram.UseProgram();
         GLCALL(glEnable(GL_CULL_FACE));
-        GLCALL(glDepthMask(GL_TRUE));
         GLCALL(glEnable(GL_DEPTH_TEST));
+        GLCALL(glDepthMask(GL_TRUE));
 
         // set geometry pass output buffers
         GLenum drawBuffers[] = { GBuffer::GBUFFER_COLOR_ATTACHMENT_POSITION, GBuffer::GBUFFER_COLOR_ATTACHMENT_NORMAL, GBuffer::GBUFFER_COLOR_ATTACHMENT_DIFFUSE };
@@ -309,7 +259,7 @@ namespace JonsEngine
             bool hasDiffuseTexture = renderable.mDiffuseTexture != INVALID_TEXTURE_ID;
             bool hasNormalTexture = renderable.mNormalTexture != INVALID_TEXTURE_ID;
 
-            mUniBufferGeometryPass.SetData(UnifGeometry(renderable.mWVPMatrix, renderable.mWorldMatrix, hasDiffuseTexture, hasNormalTexture, renderable.mTextureTilingFactor));
+            mGeometryProgram.SetUniformData(UnifGeometry(renderable.mWVPMatrix, renderable.mWorldMatrix, hasDiffuseTexture, hasNormalTexture, renderable.mTextureTilingFactor));
 
             if (hasDiffuseTexture)
                 BindTexture2D(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_DIFFUSE, renderable.mDiffuseTexture, mTextures, mLogger);
@@ -333,31 +283,34 @@ namespace JonsEngine
         {
             for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
             {
-                mUniBufferGeometryPass.SetData(UnifGeometry(pointLight.mWVPMatrix, pointLight.mWorldMatrix, false, false, 1.0f));
+                mGeometryProgram.SetUniformData(UnifGeometry(pointLight.mWVPMatrix, pointLight.mWorldMatrix, false, false, 1.0f));
+                mShadingGeometry.DrawSphere();
+            }
+
+            for (const RenderableLighting::DirectionalLight& dirLight : lighting.mDirectionalLights)
+            {
+                mGeometryProgram.SetUniformData(UnifGeometry(dirLight.mWVPMatrix, dirLight.mWorldMatrix, false, false, 1.0f));
                 mShadingGeometry.DrawSphere();
             }
         }
 
         GLCALL(glDrawBuffer(GL_NONE));
         GLCALL(glDisable(GL_DEPTH_TEST));
-        GLCALL(glDepthMask(GL_FALSE));
         GLCALL(glDisable(GL_CULL_FACE));
+        GLCALL(glDepthMask(GL_FALSE));
         GLCALL(glUseProgram(0));
     }
         
-    void OpenGLRenderer::ShadingPass(const RenderableLighting& lighting)
+    void OpenGLRenderer::ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting)
     {
-        GLCALL(glUseProgram(mShadingProgram.mProgramHandle));
         GLCALL(glDrawBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
-
-        mGBuffer.BindGBufferTextures();
+        mGBuffer.BindGeometryTextures();
 
         // clear final texture buffer
         GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
         // draw fullscreen rect for ambient light
-        mUniBufferShadingPass.SetData(UnifShading(Mat4(1.0f), lighting.mAmbientLight, Vec4(0.0f), lighting.mGamma, lighting.mScreenSize, UnifShading::LIGHT_TYPE_AMBIENT, 0.0f, 0.0f));
-        mShadingGeometry.DrawRectangle();
+        AmbientLightPass(lighting.mAmbientLight, lighting.mGamma, lighting.mScreenSize);
 
         // for directional and point lights
         GLCALL(glEnable(GL_BLEND));
@@ -365,16 +318,20 @@ namespace JonsEngine
         // do all directional lights
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
         {
-            mUniBufferShadingPass.SetData(UnifShading(Mat4(1.0f), directionalLight.mLightColor, directionalLight.mLightDirection, lighting.mGamma, lighting.mScreenSize, UnifShading::LIGHT_TYPE_DIRECTIONAL, 0.0f, 0.0f));
-            mShadingGeometry.DrawRectangle();
+            GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mDirectionalShadowMap.mFramebuffer));
+            GLCALL(glDrawBuffer(GL_NONE));
+            DirLightShadowPass(directionalLight, renderQueue);
+
+            GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFrameBuffer));
+            GLCALL(glDrawBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
+            DirLightLightingPass(directionalLight, lighting.mGamma, lighting.mScreenSize);
         }
 
         // do all point lights
         GLCALL(glEnable(GL_STENCIL_TEST));
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
-            GLCALL(glClear(GL_STENCIL_BUFFER_BIT));
-        
+            // stencil pass first to elimiate fragments that dosnt need to be lit
             GLCALL(glDrawBuffer(GL_NONE));
             PointLightStencilPass(pointLight);
         
@@ -384,18 +341,28 @@ namespace JonsEngine
         GLCALL(glDisable(GL_STENCIL_TEST));
 
         // reset state
+        GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
         GLCALL(glDisable(GL_BLEND));
         GLCALL(glDrawBuffer(GL_NONE));
         GLCALL(glUseProgram(0));
     }
 
+    void OpenGLRenderer::AmbientLightPass(const Vec4& ambientLight, const Vec4& gamma, const Vec2& screenSize)
+    {
+        mAmbientProgram.UseProgram();
+
+        mAmbientProgram.SetUniformData(UnifAmbientLight(gIdentityMatrix, ambientLight, gamma, screenSize));
+        mShadingGeometry.DrawRectangle();
+    }
+
     void OpenGLRenderer::PointLightStencilPass(const RenderableLighting::PointLight& pointLight)
     {
-        GLCALL(glUseProgram(mStencilProgram.mProgramHandle));
+        mNullProgram.UseProgram();
+        GLCALL(glClear(GL_STENCIL_BUFFER_BIT));
         GLCALL(glEnable(GL_DEPTH_TEST));
         GLCALL(glStencilFunc(GL_ALWAYS, 0, 0));
         
-        mUniBufferStencilPass.SetData(UnifStencil(pointLight.mWVPMatrix));
+        mNullProgram.SetUniformData(UnifNull(pointLight.mWVPMatrix));
         mShadingGeometry.DrawSphere();
         
         GLCALL(glDisable(GL_DEPTH_TEST));
@@ -403,19 +370,66 @@ namespace JonsEngine
 
     void OpenGLRenderer::PointLightLightingPass(const RenderableLighting::PointLight& pointLight, const Vec4& gamma, const Vec2& screenSize)
     {
-        GLCALL(glUseProgram(mShadingProgram.mProgramHandle));
+        mPointLightProgram.UseProgram();
         GLCALL(glEnable(GL_CULL_FACE));
-        GLCALL(glCullFace(GL_FRONT));
+        GLCALL(glCullFace(GL_FRONT));   // cull FRONT face so the light dosnt get culled when inside the radius
         GLCALL(glStencilFunc(GL_NOTEQUAL, 0, 0xFF));
 
-        mUniBufferShadingPass.SetData(UnifShading(pointLight.mWVPMatrix, pointLight.mLightColor, pointLight.mLightPosition, gamma, screenSize, UnifShading::LIGHT_TYPE_POINT, pointLight.mLightIntensity, pointLight.mMaxDistance));
+        mPointLightProgram.SetUniformData(UnifPointLight(pointLight.mWVPMatrix, pointLight.mLightColor, Vec4(pointLight.mLightPosition, 1.0f), gamma, screenSize, pointLight.mLightIntensity, pointLight.mMaxDistance));
         mShadingGeometry.DrawSphere();
 
         GLCALL(glCullFace(GL_BACK));
         GLCALL(glDisable(GL_CULL_FACE));
     }
 
-    void OpenGLRenderer::BlitToScreen(const DebugOptions::RenderingMode debugOptions)
+    void OpenGLRenderer::DirLightShadowPass(const RenderableLighting::DirectionalLight& dirLight, const RenderQueue& renderQueue)
+    {
+        mNullProgram.UseProgram();
+        GLCALL(glClear(GL_DEPTH_BUFFER_BIT));
+
+        // both containers are assumed to be sorted by MeshID ascending
+        auto meshIterator = mMeshes.begin();
+        for (const Renderable& renderable : renderQueue)
+        {
+            if (renderable.mMesh == INVALID_MESH_ID)
+            {
+                JONS_LOG_ERROR(mLogger, "Renderable MeshID is invalid");
+                throw std::runtime_error("Renderable MeshID is invalid");
+            }
+
+            if (renderable.mMesh < meshIterator->first->mMeshID)
+                continue;
+
+            while (renderable.mMesh > meshIterator->first->mMeshID)
+            {
+                meshIterator++;
+                if (meshIterator == mMeshes.end())
+                {
+                    JONS_LOG_ERROR(mLogger, "Renderable MeshID out of range");
+                    throw std::runtime_error("Renderable MeshID out of range");
+                }
+            }
+
+            Mat4 lightVP = CreatePerspectiveMatrix(90.0f, 1.0f, Z_NEAR, Z_FAR) * LookAt(dirLight.mLightPosition, dirLight.mLightDirection, Vec3(0.0f, 1.0f, 0.0f)) * dirLight.mWorldMatrix;
+            mNullProgram.SetUniformData(UnifNull(gIdentityMatrix));
+
+            GLCALL(glBindVertexArray(meshIterator->second));
+            GLCALL(glDrawElements(GL_TRIANGLES, meshIterator->first->mIndices, GL_UNSIGNED_INT, 0));
+            GLCALL(glBindVertexArray(0));
+        }
+    }
+
+    void OpenGLRenderer::DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const Vec4& gamma, const Vec2& screenSize)
+    {
+        mDirLightProgram.UseProgram();
+
+        mDirectionalShadowMap.BindShadowMap();
+
+        mDirLightProgram.SetUniformData(UnifDirLight(gIdentityMatrix, dirLight.mLightColor, Vec4(dirLight.mLightDirection, 0.0f), gamma, screenSize));
+        mShadingGeometry.DrawRectangle();
+    }
+
+    void OpenGLRenderer::RenderToScreen(const DebugOptions::RenderingMode debugOptions, const Vec2& screenSize)
     {
         switch (debugOptions)
         {
@@ -441,6 +455,14 @@ namespace JonsEngine
             {
                 GLCALL(glReadBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_DIFFUSE));
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
+                break;
+            }
+            case DebugOptions::RENDER_MODE_DEPTH:
+            {
+                mDepthProgram.UseProgram();
+                mDepthProgram.SetUniformData(UnifDepth(gIdentityMatrix, screenSize, Z_NEAR, Z_FAR));
+                mGBuffer.BindDepthTexture();
+                mShadingGeometry.DrawRectangle();
                 break;
             }
             default:
