@@ -51,15 +51,16 @@ namespace JonsEngine
     struct UnifDirLight
     {
         Mat4 mWVPMatrix;
+        Mat4 mVPMatrix;
         Vec4 mLightColor;
         Vec4 mLightDir;
         Vec4 mGamma;
         Vec2 mScreenSize;
 
 
-        UnifDirLight(const Mat4& vwpMatrix, const Vec4& lightColor, const Vec4& lightDir, const Vec4& gamma, const Vec2& screenSize)
+        UnifDirLight(const Mat4& vwpMatrix, const Mat4& vpMatrix, const Vec4& lightColor, const Vec4& lightDir, const Vec4& gamma, const Vec2& screenSize)
             :
-            mWVPMatrix(vwpMatrix), mLightColor(lightColor), mLightDir(lightDir), mGamma(gamma), mScreenSize(screenSize)
+            mWVPMatrix(vwpMatrix), mVPMatrix(vpMatrix), mLightColor(lightColor), mLightDir(lightDir), mGamma(gamma), mScreenSize(screenSize)
         {
         }
     };

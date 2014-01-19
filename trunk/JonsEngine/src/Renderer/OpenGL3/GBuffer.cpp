@@ -8,10 +8,10 @@
 
 namespace JonsEngine
 {
-    GBuffer::GBuffer(Logger& logger, const uint32_t windowWidth, const uint32_t windowHeight) : mLogger(logger), mFrameBuffer(0), mDepthBuffer(0), mTextureSampler(0)
+    GBuffer::GBuffer(Logger& logger, const uint32_t windowWidth, const uint32_t windowHeight) : mLogger(logger), mFramebuffer(0), mDepthBuffer(0), mTextureSampler(0)
     {
-        GLCALL(glGenFramebuffers(1, &mFrameBuffer));
-        GLCALL(glBindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer));
+        GLCALL(glGenFramebuffers(1, &mFramebuffer));
+        GLCALL(glBindFramebuffer(GL_FRAMEBUFFER, mFramebuffer));
 
         // color attachments to store geometry data
         GLCALL(glGenTextures(GBUFFER_NUM_GEOMETRY_ATTACHMENTS, &mGBufferTextures[0]));
@@ -61,7 +61,7 @@ namespace JonsEngine
         GLCALL(glDeleteTextures(1, &mFinalTexture));
         GLCALL(glDeleteTextures(1, &mDepthBuffer));
         GLCALL(glDeleteSamplers(1, &mTextureSampler));
-        GLCALL(glDeleteFramebuffers(1, &mFrameBuffer));
+        GLCALL(glDeleteFramebuffers(1, &mFramebuffer));
     }
 
 

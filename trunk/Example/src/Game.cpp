@@ -71,6 +71,10 @@ namespace JonsGame
                 activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, -0.05f));
             else if (evnt.mKey == Key::G)
                 activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, 0.05f));
+            else if (evnt.mKey == Key::U)
+                activeScene->GetDirectionalLight("DirectionalLight")->mLightDirection += (Vec3(0.0, 0.1f, 0.0f));
+            else if (evnt.mKey == Key::I)
+                activeScene->GetDirectionalLight("DirectionalLight")->mLightDirection -= (Vec3(0.0, 0.1f, 0.0f));
 
             //  renderering
             else if (evnt.mKey == Key::ONE)
@@ -129,11 +133,12 @@ namespace JonsGame
         mEngine->GetSceneManager().SetActiveScene("MyScene");
         JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
 
-        // chair
-        SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("nodeChair");
-        ModelPtr modelChair    = myScene->GetResourceManifest().LoadModel("chair", jonsPackage);
-        modelChair->mSceneNode = nodeChair;
-        nodeChair->TranslateNode(Vec3(0.0f, 0.0f, -8.0f));
+        // sectoid
+        SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
+        ModelPtr modelAlien    = myScene->GetResourceManifest().LoadModel("sectoid", jonsPackage);
+        modelAlien->mSceneNode = nodeAlien;
+        nodeAlien->TranslateNode(Vec3(0.0f, 0.0f, -8.0f));
+        nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
          // cube
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
@@ -142,10 +147,10 @@ namespace JonsGame
         nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
         
         // uhura
-        /*SceneNodePtr nodeUhura = myScene->GetRootNode().CreateChildNode("nodeUhura");
+        SceneNodePtr nodeUhura = myScene->GetRootNode().CreateChildNode("nodeUhura");
         ModelPtr modelUhura    = myScene->GetResourceManifest().LoadModel("uhura", jonsPackage);
         modelUhura->mSceneNode = nodeUhura;
-        nodeUhura->TranslateNode(Vec3(0.0f, 0.0f, -4.0f));*/
+        nodeUhura->TranslateNode(Vec3(-10.0f, 0.0f, -4.0f));
         
         // point light
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
@@ -158,9 +163,9 @@ namespace JonsGame
         // directional light
         SceneNodePtr nodeDirLight = myScene->GetRootNode().CreateChildNode("nodeDirLight");
         DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight", nodeDirLight);
-        directionalLight->mLightDirection = Vec3(0.5f, 0.0f, 0.0f);
-        directionalLight->mLightColor = Vec4(0.4f);
-        nodeDirLight->TranslateNode(Vec3(40.0f, 1.0f, 0.0f));
+        directionalLight->mLightDirection = Vec3(1.0f, 1.0f, 0.0f);
+        directionalLight->mLightColor = Vec4(0.3f);
+        nodeDirLight->TranslateNode(Vec3(40.0f, 20.0f, 0.0f));
 
         // point light 2
        /* SceneNodePtr nodeMovingLight2 = myScene->GetRootNode().CreateChildNode("nodeStaticLight");
@@ -170,7 +175,7 @@ namespace JonsGame
         nodeMovingLight2->TranslateNode(Vec3(0.0f, 3.0f, -8.0f));*/
 
         // ambient light
-        myScene->SetAmbientLight(Vec4(0.1f));
+        myScene->SetAmbientLight(Vec4(0.05f));
         
         // create a ground plane
         SceneNodePtr nodePlane       = myScene->GetRootNode().CreateChildNode("nodePlane");

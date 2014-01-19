@@ -2,6 +2,16 @@
 
 namespace JonsEngine
 {
+    enum VertexAttribute
+    {
+        VERTEX_ATTRIBUTE_POSITION = 0,
+        VERTEX_ATTRIBUTE_NORMAL,
+        VERTEX_ATTRIBUTE_TEXCOORD,
+        VERTEX_ATTRIBUTE_TANGENT,
+        VERTEX_ATTRIBUTE_BITANGENT
+    };
+
+
     OpenGLMesh CreateSphereMesh(const float radius, const uint32_t rings, const uint32_t sectors, Logger& logger)
     {
         std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
@@ -38,16 +48,17 @@ namespace JonsEngine
         GLCALL(glBindBuffer(GL_ARRAY_BUFFER, mesh.mVBO));
         GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.mIndexBuffer));
 
-        GLCALL(glEnableVertexAttribArray(0));
-        GLCALL(glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0));
-        GLCALL(glEnableVertexAttribArray(1));
-        GLCALL(glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh.mVertexDataSize)));
-        GLCALL(glEnableVertexAttribArray(2));
-        GLCALL(glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh.mVertexDataSize + mesh.mNormalDataSize)));
-        GLCALL(glEnableVertexAttribArray(3));
-        GLCALL(glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh.mVertexDataSize + mesh.mNormalDataSize + mesh.mTexCoordsSize)));
-        GLCALL(glEnableVertexAttribArray(4));
-        GLCALL(glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh.mVertexDataSize + mesh.mNormalDataSize + mesh.mTexCoordsSize + mesh.mTangentsSize)));
+        GLCALL(glEnableVertexAttribArray(VertexAttribute::VERTEX_ATTRIBUTE_POSITION));
+        GLCALL(glEnableVertexAttribArray(VertexAttribute::VERTEX_ATTRIBUTE_NORMAL));
+        GLCALL(glEnableVertexAttribArray(VertexAttribute::VERTEX_ATTRIBUTE_TEXCOORD));
+        GLCALL(glEnableVertexAttribArray(VertexAttribute::VERTEX_ATTRIBUTE_TANGENT));
+        GLCALL(glEnableVertexAttribArray(VertexAttribute::VERTEX_ATTRIBUTE_BITANGENT));
+
+        GLCALL(glVertexAttribPointer(VertexAttribute::VERTEX_ATTRIBUTE_POSITION, 3, GL_FLOAT, GL_FALSE, 0, 0));
+        GLCALL(glVertexAttribPointer(VertexAttribute::VERTEX_ATTRIBUTE_NORMAL, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh.mVertexDataSize)));
+        GLCALL(glVertexAttribPointer(VertexAttribute::VERTEX_ATTRIBUTE_TEXCOORD, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh.mVertexDataSize + mesh.mNormalDataSize)));
+        GLCALL(glVertexAttribPointer(VertexAttribute::VERTEX_ATTRIBUTE_TANGENT, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh.mVertexDataSize + mesh.mNormalDataSize + mesh.mTexCoordsSize)));
+        GLCALL(glVertexAttribPointer(VertexAttribute::VERTEX_ATTRIBUTE_BITANGENT, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)(mesh.mVertexDataSize + mesh.mNormalDataSize + mesh.mTexCoordsSize + mesh.mTangentsSize)));
 
         GLCALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
         GLCALL(glBindVertexArray(0));

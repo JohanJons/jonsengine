@@ -30,8 +30,13 @@
 
 namespace JonsEngine
 {
-    const float Z_NEAR = 1.0f;
+    const float Z_NEAR = 0.1f;
     const float Z_FAR  = 100.0f;
+
+    const Mat4 gNDCBiasMatrix(0.5f, 0.0f, 0.0f, 0.0f,
+                              0.0f, 0.5f, 0.0f, 0.0f,
+                              0.0f, 0.0f, 0.5f, 0.0f,
+                              0.5f, 0.5f, 0.5f, 1.0f);
 
 
     void BindTexture2D(const OpenGLTexture::TextureUnit textureUnit, const TextureID targetTexture, const std::vector<OpenGLTexturePtr>& textures, Logger& logger)
@@ -112,7 +117,6 @@ namespace JonsEngine
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_T, GL_REPEAT));
         GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_DIFFUSE, mTextureSampler));
         GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_NORMAL, mTextureSampler));
-
         SetAnisotropicFiltering(mCurrentAnisotropy);
     }
 
@@ -149,13 +153,13 @@ namespace JonsEngine
         // clear default fbo color/buffer/stencil 
         GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 
-        GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFrameBuffer));
+        GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFramebuffer));
 
         GeometryPass(renderQueue, lighting, debugExtra.test(DebugOptions::RENDER_FLAG_DRAW_LIGHTS));
         ShadingPass(renderQueue, lighting);
 
         GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
-        GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer.mFrameBuffer));
+        GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer.mFramebuffer));
 
         RenderToScreen(debugMode, lighting.mScreenSize);
 
@@ -318,13 +322,16 @@ namespace JonsEngine
         // do all directional lights
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
         {
+            // TODO: is spotlight, not directional light
+            Mat4 lightVP = CreatePerspectiveMatrix(45.0f, lighting.mScreenSize.x / lighting.mScreenSize.y, Z_NEAR, Z_FAR) * LookAt(directionalLight.mLightPosition, directionalLight.mLightDirection, Vec3(0.0f, 1.0f, 0.0f));
+
             GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mDirectionalShadowMap.mFramebuffer));
             GLCALL(glDrawBuffer(GL_NONE));
-            DirLightShadowPass(directionalLight, renderQueue);
+            DirLightShadowPass(directionalLight, lightVP, renderQueue);
 
-            GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFrameBuffer));
+            GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFramebuffer));
             GLCALL(glDrawBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
-            DirLightLightingPass(directionalLight, lighting.mGamma, lighting.mScreenSize);
+            DirLightLightingPass(directionalLight, gNDCBiasMatrix * lightVP, lighting.mGamma, lighting.mScreenSize);
         }
 
         // do all point lights
@@ -353,19 +360,23 @@ namespace JonsEngine
 
         mAmbientProgram.SetUniformData(UnifAmbientLight(gIdentityMatrix, ambientLight, gamma, screenSize));
         mShadingGeometry.DrawRectangle();
+
+        GLCALL(glUseProgram(0));
     }
 
     void OpenGLRenderer::PointLightStencilPass(const RenderableLighting::PointLight& pointLight)
     {
         mNullProgram.UseProgram();
-        GLCALL(glClear(GL_STENCIL_BUFFER_BIT));
         GLCALL(glEnable(GL_DEPTH_TEST));
         GLCALL(glStencilFunc(GL_ALWAYS, 0, 0));
+
+        GLCALL(glClear(GL_STENCIL_BUFFER_BIT));
         
         mNullProgram.SetUniformData(UnifNull(pointLight.mWVPMatrix));
         mShadingGeometry.DrawSphere();
         
         GLCALL(glDisable(GL_DEPTH_TEST));
+        GLCALL(glUseProgram(0));
     }
 
     void OpenGLRenderer::PointLightLightingPass(const RenderableLighting::PointLight& pointLight, const Vec4& gamma, const Vec2& screenSize)
@@ -380,11 +391,16 @@ namespace JonsEngine
 
         GLCALL(glCullFace(GL_BACK));
         GLCALL(glDisable(GL_CULL_FACE));
+        GLCALL(glUseProgram(0));
     }
 
-    void OpenGLRenderer::DirLightShadowPass(const RenderableLighting::DirectionalLight& dirLight, const RenderQueue& renderQueue)
+    void OpenGLRenderer::DirLightShadowPass(const RenderableLighting::DirectionalLight& dirLight, const Mat4& lightVP, const RenderQueue& renderQueue)
     {
         mNullProgram.UseProgram();
+        GLCALL(glEnable(GL_CULL_FACE));
+        GLCALL(glEnable(GL_DEPTH_TEST));
+        GLCALL(glDepthMask(GL_TRUE));
+
         GLCALL(glClear(GL_DEPTH_BUFFER_BIT));
 
         // both containers are assumed to be sorted by MeshID ascending
@@ -410,23 +426,30 @@ namespace JonsEngine
                 }
             }
 
-            Mat4 lightVP = CreatePerspectiveMatrix(90.0f, 1.0f, Z_NEAR, Z_FAR) * LookAt(dirLight.mLightPosition, dirLight.mLightDirection, Vec3(0.0f, 1.0f, 0.0f)) * dirLight.mWorldMatrix;
-            mNullProgram.SetUniformData(UnifNull(gIdentityMatrix));
+            Mat4 wvp = lightVP * renderable.mWorldMatrix;
+            mNullProgram.SetUniformData(UnifNull(wvp));
 
             GLCALL(glBindVertexArray(meshIterator->second));
             GLCALL(glDrawElements(GL_TRIANGLES, meshIterator->first->mIndices, GL_UNSIGNED_INT, 0));
             GLCALL(glBindVertexArray(0));
         }
+
+        GLCALL(glDisable(GL_DEPTH_TEST));
+        GLCALL(glDisable(GL_CULL_FACE));
+        GLCALL(glDepthMask(GL_FALSE));
+        GLCALL(glUseProgram(0));
     }
 
-    void OpenGLRenderer::DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const Vec4& gamma, const Vec2& screenSize)
+    void OpenGLRenderer::DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const Mat4& lightVP, const Vec4& gamma, const Vec2& screenSize)
     {
         mDirLightProgram.UseProgram();
 
         mDirectionalShadowMap.BindShadowMap();
 
-        mDirLightProgram.SetUniformData(UnifDirLight(gIdentityMatrix, dirLight.mLightColor, Vec4(dirLight.mLightDirection, 0.0f), gamma, screenSize));
+        mDirLightProgram.SetUniformData(UnifDirLight(gIdentityMatrix, lightVP, dirLight.mLightColor, Vec4(dirLight.mLightDirection, 0.0f), gamma, screenSize));
         mShadingGeometry.DrawRectangle();
+
+        GLCALL(glUseProgram(0));
     }
 
     void OpenGLRenderer::RenderToScreen(const DebugOptions::RenderingMode debugOptions, const Vec2& screenSize)

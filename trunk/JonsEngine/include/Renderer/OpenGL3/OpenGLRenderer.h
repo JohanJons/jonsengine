@@ -62,8 +62,8 @@ namespace JonsEngine
         void AmbientLightPass(const Vec4& ambientLight, const Vec4& gamma, const Vec2& screenSize);
         void PointLightStencilPass(const RenderableLighting::PointLight& pointLight);
         void PointLightLightingPass(const RenderableLighting::PointLight& pointLight, const Vec4& gamma, const Vec2& screenSize);
-        void DirLightShadowPass(const RenderableLighting::DirectionalLight& dirLight, const RenderQueue& renderQueue);
-        void DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const Vec4& gamma, const Vec2& screenSize);
+        void DirLightShadowPass(const RenderableLighting::DirectionalLight& dirLight, const Mat4& lightVP, const RenderQueue& renderQueue);
+        void DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const Mat4& lightVP, const Vec4& gamma, const Vec2& screenSize);
         void RenderToScreen(const DebugOptions::RenderingMode debugOptions, const Vec2& screenSize);
 
         IMemoryAllocatorPtr mMemoryAllocator;

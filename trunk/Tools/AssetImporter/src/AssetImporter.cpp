@@ -214,27 +214,29 @@ namespace JonsAssetImporter
         {
             const aiMaterial* material = scene->mMaterials[i];
             PackageMaterial pkgMaterial;
+            aiString assimpTexturePath;
 
-            aiString texturePath;
-            if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0 && material->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == aiReturn_SUCCESS) 
+            if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0 && material->GetTexture(aiTextureType_DIFFUSE, 0, &assimpTexturePath) == aiReturn_SUCCESS)
             {
+                const boost::filesystem::path texturePath = std::string(assimpTexturePath.C_Str());
                 std::string fullTexturePath = assetPath.parent_path().string();
                 if (assetPath.has_parent_path())
                     fullTexturePath.append("/");
-                fullTexturePath.append(texturePath.C_Str());
+                fullTexturePath.append(texturePath.filename().string());
 
                 PackageTexture diffuseTexture(ProcessTexture(fullTexturePath, TEXTURE_TYPE_DIFFUSE));
                 pkgMaterial.mDiffuseTexture    = diffuseTexture;
                 pkgMaterial.mHasDiffuseTexture = true;
             }
 
-            if ((material->GetTextureCount(aiTextureType_NORMALS) > 0 && material->GetTexture(aiTextureType_NORMALS, 0, &texturePath) == aiReturn_SUCCESS) ||
-                (material->GetTextureCount(aiTextureType_HEIGHT) > 0 && material->GetTexture(aiTextureType_HEIGHT, 0, &texturePath) == aiReturn_SUCCESS)) 
+            if ((material->GetTextureCount(aiTextureType_NORMALS) > 0 && material->GetTexture(aiTextureType_NORMALS, 0, &assimpTexturePath) == aiReturn_SUCCESS) ||
+                (material->GetTextureCount(aiTextureType_HEIGHT) > 0 && material->GetTexture(aiTextureType_HEIGHT, 0, &assimpTexturePath) == aiReturn_SUCCESS))
             {
+                const boost::filesystem::path texturePath = std::string(assimpTexturePath.C_Str());
                 std::string fullTexturePath = assetPath.parent_path().string();
                 if (assetPath.has_parent_path())
                     fullTexturePath.append("/");
-                fullTexturePath.append(texturePath.C_Str());
+                fullTexturePath.append(texturePath.filename().string());
 
                 PackageTexture normalTexture(ProcessTexture(fullTexturePath, TEXTURE_TYPE_NORMAL));
                 pkgMaterial.mNormalTexture    = normalTexture;
@@ -367,6 +369,7 @@ namespace JonsAssetImporter
         texture.mTextureWidth  = widthInPixels;
         texture.mTextureHeight = heightInPixels;
         texture.mTextureType   = textureType;
+        // FreeImage implicitly converts image format to RGB/RGBA from BRG/BRGA
         texture.mColorFormat   = colorType == FIC_RGB ? ColorFormat::COLOR_FORMAT_RGB : colorType == FIC_RGBALPHA ? ColorFormat::COLOR_FORMAT_RGBA : ColorFormat::COLOR_FORMAT_RGB;
 
         for(unsigned y = 0; y < FreeImage_GetHeight(bitmap); y++) {

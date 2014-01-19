@@ -16,7 +16,7 @@ namespace JonsEngine
         // shadow map texture
         GLCALL(glGenTextures(1, &mShadowMap));
         GLCALL(glBindTexture(GL_TEXTURE_2D, mShadowMap));
-        GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, windowWidth, windowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0));
+        GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, windowWidth, windowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0));
         GLCALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mShadowMap, 0));
         GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
 
@@ -28,11 +28,12 @@ namespace JonsEngine
 
         // color attachment texture sampler
         GLCALL(glGenSamplers(1, &mTextureSampler));
+        GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-        GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GBUFFER_DEPTH, mTextureSampler));
+        GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_SHADOW_DIRECTIONAL, mTextureSampler));
         GLCALL(glUseProgram(0));
 
         GLCALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
@@ -48,7 +49,7 @@ namespace JonsEngine
 
     void DirectionalShadowMap::BindShadowMap()
     {
-        GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_DEPTH));
+        GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_SHADOW_DIRECTIONAL));
         GLCALL(glBindTexture(GL_TEXTURE_2D, mShadowMap));
     }
 }

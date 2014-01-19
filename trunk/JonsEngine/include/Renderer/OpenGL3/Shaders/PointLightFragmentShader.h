@@ -36,15 +36,15 @@ namespace JonsEngine
         vec3 diffuse  = texture(unifDiffuseTexture, texcoord).xyz;                                                                          \n \
         normal        = normalize(normal);                                                                                                  \n \
                                                                                                                                             \n \
-       vec3 positionDiff = (UnifPointLightPass.mLightPos.xyz - worldPos);                                                                   \n \
+        vec3 positionDiff = (UnifPointLightPass.mLightPos.xyz - worldPos);                                                                   \n \
                                                                                                                                             \n \
-       float dist = length(positionDiff);                                                                                                   \n \
-       float attenuation = clamp(1.0 - dist*dist * (1 / (UnifPointLightPass.mMaxDistance * UnifPointLightPass.mMaxDistance)), 0.0, 1.0);    \n \
-       attenuation *= attenuation;                                                                                                          \n \
+        float dist = length(positionDiff);                                                                                                   \n \
+        float attenuation = clamp(1.0 - dist*dist * (1 / (UnifPointLightPass.mMaxDistance * UnifPointLightPass.mMaxDistance)), 0.0, 1.0);    \n \
+        attenuation *= attenuation;                                                                                                          \n \
                                                                                                                                             \n \
-       vec3 lightDir = normalize(positionDiff);                                                                                             \n \
-       float angleNormal = clamp(dot(normalize(normal), lightDir), 0, 1);                                                                   \n \
+        vec3 lightDir = normalize(positionDiff);                                                                                             \n \
+        float angleNormal = clamp(dot(normalize(normal), lightDir), 0, 1);                                                                   \n \
                                                                                                                                             \n \
-       fragColor = vec4(diffuse, 1.0) * (angleNormal * attenuation * UnifPointLightPass.mLightIntensity * UnifPointLightPass.mLightColor);  \n \
+        fragColor = vec4(diffuse, 1.0) * (angleNormal * attenuation * UnifPointLightPass.mLightIntensity * UnifPointLightPass.mLightColor);  \n \
     }                                                                                                                                       \n";
 }

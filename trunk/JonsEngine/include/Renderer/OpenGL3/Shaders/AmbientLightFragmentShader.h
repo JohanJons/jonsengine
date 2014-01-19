@@ -17,8 +17,6 @@ namespace JonsEngine
         vec2 mScreenSize;                                                                                                           \n \
     } UnifAmbientPass;                                                                                                              \n \
                                                                                                                                     \n \
-    layout (binding = 2) uniform sampler2D unifPositionTexture;                                                                     \n \
-    layout (binding = 3) uniform sampler2D unifNormalTexture;                                                                       \n \
     layout (binding = 4) uniform sampler2D unifDiffuseTexture;                                                                      \n \
                                                                                                                                     \n \
     out vec4 fragColor;                                                                                                             \n \
@@ -27,9 +25,7 @@ namespace JonsEngine
     {                                                                                                                               \n \
         vec2 texcoord = gl_FragCoord.xy / UnifAmbientPass.mScreenSize;                                                              \n \
                                                                                                                                     \n \
-        vec3 worldPos = texture(unifPositionTexture, texcoord).xyz;                                                                 \n \
-        vec3 normal   = normalize(texture(unifNormalTexture, texcoord).xyz);                                                        \n \
-        vec3 diffuse  = texture(unifDiffuseTexture, texcoord).xyz;                                                                  \n \
+        vec3 diffuse = texture(unifDiffuseTexture, texcoord).xyz;                                                                   \n \
                                                                                                                                     \n \
         fragColor = vec4(diffuse, 1.0) * UnifAmbientPass.mLightColor;                                                               \n \
     }                                                                                                                               \n";

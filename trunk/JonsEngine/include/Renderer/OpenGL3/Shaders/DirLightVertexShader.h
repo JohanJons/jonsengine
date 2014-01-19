@@ -12,6 +12,7 @@ namespace JonsEngine
     uniform UnifDirLight                                                                    \n \
     {                                                                                       \n \
         mat4 mWVPMatrix;                                                                    \n \
+        mat4 mVPMatrix;                                                                     \n \
         vec4 mLightColor;                                                                   \n \
         vec4 mLightDir;                                                                     \n \
         vec4 mGamma;                                                                        \n \

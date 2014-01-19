@@ -31,7 +31,7 @@ namespace JonsEngine
 
         std::array<GLuint, GBUFFER_NUM_GEOMETRY_ATTACHMENTS> mGBufferTextures;
         GLuint mFinalTexture;
-        GLuint mFrameBuffer;
+        GLuint mFramebuffer;
         GLuint mDepthBuffer;
         GLuint mTextureSampler;
     };
