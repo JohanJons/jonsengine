@@ -103,7 +103,7 @@ namespace JonsEngine
 
     void SceneNode::RotateNode(const float angle, const Vec3& rotateVec)       
     { 
-        Quaternion rotation = AngleAxisToQuaternion(angle, rotateVec);
+        Quaternion rotation = glm::angleAxis(angle, rotateVec);
         mOrientation = mOrientation * rotation;
     }
 
@@ -112,9 +112,9 @@ namespace JonsEngine
     {
         Mat4 modelMatrix(1.0f);
 
-        modelMatrix = Translate(modelMatrix, mTranslation);
-        modelMatrix *= QuaternionToMat4(mOrientation);
-        modelMatrix = Scale(modelMatrix, mScale);
+        modelMatrix = glm::translate(modelMatrix, mTranslation);
+        modelMatrix *= glm::toMat4(mOrientation);
+        modelMatrix = glm::scale(modelMatrix, mScale);
 
         mModelMatrix = parentModelMatrix * modelMatrix;
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "include/Scene/SceneNode.h"
 #include "include/Core/Types.h"
 
 #include <string>
@@ -18,13 +17,12 @@ namespace JonsEngine
     {
         const std::string mName;
         const size_t mHashedID;
-        SceneNodePtr mSceneNode;
 
         Vec4 mLightColor;
         Vec3 mLightDirection;
 
 
-        DirectionalLight(const std::string& name, SceneNodePtr node);
+        DirectionalLight(const std::string& name);
 
         bool operator==(const DirectionalLight& light);
         bool operator==(const std::string& lightName);

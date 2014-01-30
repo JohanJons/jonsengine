@@ -11,7 +11,6 @@ namespace JonsEngine
                                                                                                                                     \n \
     uniform UnifAmbient                                                                                                             \n \
     {                                                                                                                               \n \
-        mat4 mWVPMatrix;                                                                                                            \n \
         vec4 mLightColor;                                                                                                           \n \
         vec4 mGamma;                                                                                                                \n \
         vec2 mScreenSize;                                                                                                           \n \

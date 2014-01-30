@@ -88,7 +88,7 @@ namespace JonsEngine
         //mDefaultProgram("DefaultProgram", ShaderPtr(new Shader("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); }*/), 
         //                                 ShaderPtr(new Shader("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); })*/), mLogger),
         mGBuffer(mLogger, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight),
-        mShadingGeometry(mLogger), mDirectionalShadowMap(mLogger, windowWidth, windowHeight)//, mUniBufferGeometryPass("UnifGeometry", mLogger, mGeometryProgram.mProgramHandle), mUniBufferShadingPass("UnifShading", mLogger, mShadingProgram.mProgramHandle),
+        mShadingGeometry(mLogger), mDirectionalShadowMap(mLogger, windowWidth, windowHeight)
     {
         GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 
@@ -290,12 +290,6 @@ namespace JonsEngine
                 mGeometryProgram.SetUniformData(UnifGeometry(pointLight.mWVPMatrix, pointLight.mWorldMatrix, false, false, 1.0f));
                 mShadingGeometry.DrawSphere();
             }
-
-            for (const RenderableLighting::DirectionalLight& dirLight : lighting.mDirectionalLights)
-            {
-                mGeometryProgram.SetUniformData(UnifGeometry(dirLight.mWVPMatrix, dirLight.mWorldMatrix, false, false, 1.0f));
-                mShadingGeometry.DrawSphere();
-            }
         }
 
         GLCALL(glDrawBuffer(GL_NONE));
@@ -322,8 +316,8 @@ namespace JonsEngine
         // do all directional lights
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
         {
-            // TODO: is spotlight, not directional light
-            Mat4 lightVP = CreatePerspectiveMatrix(45.0f, lighting.mScreenSize.x / lighting.mScreenSize.y, Z_NEAR, Z_FAR) * LookAt(directionalLight.mLightPosition, directionalLight.mLightDirection, Vec3(0.0f, 1.0f, 0.0f));
+            Mat4 viewMatrix = glm::lookAt(lighting.mCameraPosition, lighting.mCameraPosition + glm::normalize(directionalLight.mLightDirection), Vec3(0.0f, 1.0f, 0.0f));
+            Mat4 lightVP = glm::ortho(lighting.mCameraPosition.x - 25.0f, lighting.mCameraPosition.x + 25.0f, lighting.mCameraPosition.y - 25.0f, lighting.mCameraPosition.y + 25.0f, lighting.mCameraPosition.z + 25.0f, lighting.mCameraPosition.z - 25.0f) * viewMatrix;
 
             GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mDirectionalShadowMap.mFramebuffer));
             GLCALL(glDrawBuffer(GL_NONE));
@@ -358,7 +352,7 @@ namespace JonsEngine
     {
         mAmbientProgram.UseProgram();
 
-        mAmbientProgram.SetUniformData(UnifAmbientLight(gIdentityMatrix, ambientLight, gamma, screenSize));
+        mAmbientProgram.SetUniformData(UnifAmbientLight(ambientLight, gamma, screenSize));
         mShadingGeometry.DrawRectangle();
 
         GLCALL(glUseProgram(0));
@@ -446,7 +440,7 @@ namespace JonsEngine
 
         mDirectionalShadowMap.BindShadowMap();
 
-        mDirLightProgram.SetUniformData(UnifDirLight(gIdentityMatrix, lightVP, dirLight.mLightColor, Vec4(dirLight.mLightDirection, 0.0f), gamma, screenSize));
+        mDirLightProgram.SetUniformData(UnifDirLight(lightVP, dirLight.mLightColor, Vec4(dirLight.mLightDirection, 0.0f), gamma, screenSize));
         mShadingGeometry.DrawRectangle();
 
         GLCALL(glUseProgram(0));
@@ -483,7 +477,7 @@ namespace JonsEngine
             case DebugOptions::RENDER_MODE_DEPTH:
             {
                 mDepthProgram.UseProgram();
-                mDepthProgram.SetUniformData(UnifDepth(gIdentityMatrix, screenSize, Z_NEAR, Z_FAR));
+                mDepthProgram.SetUniformData(UnifDepth(screenSize, Z_NEAR, Z_FAR));
                 mGBuffer.BindDepthTexture();
                 mShadingGeometry.DrawRectangle();
                 break;

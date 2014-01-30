@@ -47,12 +47,13 @@ namespace JonsEngine
             // update model matrix of all nodes in active scene
             activeScene->GetRootNode().UpdateModelMatrix(Mat4(1.0f));
 
-            const Mat4 viewMatrix = activeScene->GetSceneCamera().GetCameraTransform();
-            const Mat4 perspectiveMatrix = CreatePerspectiveMatrix(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer->GetZNear(), mRenderer->GetZFar());
+            const Camera& camera = activeScene->GetSceneCamera();
+            const Mat4 viewMatrix = camera.GetCameraTransform();
+            const Mat4 perspectiveMatrix = glm::perspective(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer->GetZNear(), mRenderer->GetZFar());
 
             // create the rendering queue and active lights
-            const RenderQueue renderQueue(CreateRenderQueue(activeScene, viewMatrix, perspectiveMatrix));
-            const RenderableLighting lighting(GetLightingInfo(activeScene, viewMatrix, perspectiveMatrix));
+            const RenderQueue renderQueue(CreateRenderQueue(activeScene->GetResourceManifest().GetAllModels(), viewMatrix, perspectiveMatrix));
+            const RenderableLighting lighting(GetLightingInfo(activeScene->GetGamma(), activeScene->GetAmbientLight(), camera.Position(), activeScene->GetPointLights(), activeScene->GetDirectionalLights(), viewMatrix, perspectiveMatrix));
 
             // render the scene
             mRenderer->DrawRenderables(renderQueue, lighting, debugOptions.mRenderingMode, debugOptions.mRenderingFlags);
@@ -62,10 +63,9 @@ namespace JonsEngine
     }
 
     
-    RenderQueue Engine::CreateRenderQueue(const Scene* scene, const Mat4& viewMatrix, const Mat4& perspectiveMatrix)
+    RenderQueue Engine::CreateRenderQueue(const std::vector<ModelPtr>& models, const Mat4& viewMatrix, const Mat4& perspectiveMatrix)
     {
         RenderQueue renderQueue;
-        const std::vector<ModelPtr>& models = scene->GetResourceManifest().GetAllModels();
 
         for(ModelPtr model : models)
         {
@@ -78,24 +78,19 @@ namespace JonsEngine
         return renderQueue;
     }
      
-    // TODO: Cull lights
-    RenderableLighting Engine::GetLightingInfo(const Scene* scene, const Mat4& viewMatrix, const Mat4& perspectiveMatrix)
+    RenderableLighting Engine::GetLightingInfo(const Vec4& gamma, const Vec4& ambientLight, const Vec3& cameraPosition, const std::vector<PointLightPtr>& pointLights, const std::vector<DirectionalLightPtr>& directionalLights, const Mat4& viewMatrix, const Mat4& perspectiveMatrix)
     {
-        const std::vector<PointLightPtr>& pointLights = scene->GetPointLights();
-        const std::vector<DirectionalLightPtr>& directionalLights = scene->GetDirectionalLights();
-
-        RenderableLighting lighting(scene->GetGamma(), Vec2(mWindow.GetScreenWidth(), mWindow.GetScreenHeight()), scene->GetAmbientLight());
+        RenderableLighting lighting(gamma, ambientLight, cameraPosition, Vec2(mWindow.GetScreenWidth(), mWindow.GetScreenHeight()));
 
         for (PointLightPtr pointLight : pointLights)
         {
-            const Mat4 scaledWorldMatrix = Scale(pointLight->mSceneNode->GetNodeTransform(), Vec3(pointLight->mMaxDistance));
+            const Mat4 scaledWorldMatrix = glm::scale(pointLight->mSceneNode->GetNodeTransform(), Vec3(pointLight->mMaxDistance));
             lighting.mPointLights.emplace_back(RenderableLighting::PointLight(perspectiveMatrix * viewMatrix * scaledWorldMatrix, scaledWorldMatrix, pointLight->mLightColor, pointLight->mSceneNode->Position(), pointLight->mLightIntensity, pointLight->mMaxDistance));
         }
 
         for (DirectionalLightPtr dirLight : directionalLights)
         {
-            const Mat4 worldMatrix = dirLight->mSceneNode->GetNodeTransform();
-            lighting.mDirectionalLights.emplace_back(RenderableLighting::DirectionalLight(perspectiveMatrix * viewMatrix * worldMatrix, worldMatrix, dirLight->mLightColor, dirLight->mLightDirection, dirLight->mSceneNode->Position()));
+            lighting.mDirectionalLights.emplace_back(RenderableLighting::DirectionalLight(dirLight->mLightColor, dirLight->mLightDirection));
         }
 
         return lighting;

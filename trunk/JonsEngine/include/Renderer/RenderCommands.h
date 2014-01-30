@@ -67,28 +67,25 @@ namespace JonsEngine
 
         struct DirectionalLight
         {
-            Mat4 mWVPMatrix;
-            Mat4 mWorldMatrix;
             Vec4 mLightColor;
             Vec3 mLightDirection;
-            Vec3 mLightPosition;
 
 
-            DirectionalLight(const Mat4& wvpMatrix, const Mat4& worldMatrix, const Vec4& lightColor, const Vec3& lightDirection, const Vec3& lightPosition) :
-                mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix), mLightColor(lightColor), mLightDirection(lightDirection), mLightPosition(lightPosition)
+            DirectionalLight(const Vec4& lightColor, const Vec3& lightDirection) : mLightColor(lightColor), mLightDirection(lightDirection)
             {
             }
         };
 
         Vec4 mGamma;
-        Vec2 mScreenSize;
         Vec4 mAmbientLight;
+        Vec3 mCameraPosition;
+        Vec2 mScreenSize;
        
         std::vector<PointLight> mPointLights;
         std::vector<DirectionalLight> mDirectionalLights;
 
 
-        RenderableLighting(const Vec4& gamma, const Vec2& screenSize, const Vec4& ambientLight) : mGamma(gamma), mScreenSize(screenSize), mAmbientLight(ambientLight)
+        RenderableLighting(const Vec4& gamma, const Vec4& ambientLight, const Vec3& cameraPosition, const Vec2& screenSize) : mGamma(gamma), mScreenSize(screenSize), mCameraPosition(cameraPosition), mAmbientLight(ambientLight)
         {
         }
     };

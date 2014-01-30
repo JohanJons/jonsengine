@@ -35,26 +35,31 @@ namespace JonsEngine
 
     Vec3 Camera::Forward() const
     {
-        return Vec3(Inverse(Orientation()) * Vec4(0.0f, 0.0f, -1.0f, 0.0f));
+        return Vec3(glm::inverse(Orientation()) * Vec4(0.0f, 0.0f, -1.0f, 0.0f));
     }
 
     Vec3 Camera::Right() const
     {
-        return Vec3(Inverse(Orientation()) * Vec4(1.0f, 0.0f, 0.0f, 0.0f));
+        return Vec3(glm::inverse(Orientation()) * Vec4(1.0f, 0.0f, 0.0f, 0.0f));
+    }
+
+    Vec3 Camera::Position() const
+    {
+        return mTranslation;
     }
 
     Mat4 Camera::Orientation() const
     {
         Quaternion rotation;
-        rotation = AngleAxisToQuaternion(mVerticalAngle, Vec3(1.0f, 0.0f, 0.0f));
-        rotation = rotation * AngleAxisToQuaternion(mHorizontalAngle, Vec3(0.0f, 1.0f, 0.0f));
+        rotation = glm::angleAxis(mVerticalAngle, Vec3(1.0f, 0.0f, 0.0f));
+        rotation = rotation * glm::angleAxis(mHorizontalAngle, Vec3(0.0f, 1.0f, 0.0f));
 
-        return QuaternionToMat4(rotation);
+        return glm::toMat4(rotation);
     }
 
        
     Mat4 Camera::GetCameraTransform() const
     {
-        return Orientation() * Translate(Mat4(1.0f), -mTranslation);    // TODO: gimbal lock?
+        return Orientation() * glm::translate(Mat4(1.0f), -mTranslation);    // TODO: gimbal lock?
     }
 }

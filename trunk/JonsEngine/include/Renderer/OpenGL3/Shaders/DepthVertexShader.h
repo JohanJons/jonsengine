@@ -11,7 +11,6 @@ namespace JonsEngine
                                                                                             \n \
     uniform UnifDepth                                                                       \n \
     {                                                                                       \n \
-        mat4 mWVPMatrix;                                                                    \n \
         vec2 mScreenSize;                                                                   \n \
         float mZNear;                                                                       \n \
         float mZFar;                                                                        \n \
@@ -21,6 +20,6 @@ namespace JonsEngine
                                                                                             \n \
     void main()                                                                             \n \
     {                                                                                       \n \
-        gl_Position = UnifDepthPass.mWVPMatrix * vec4(vert_position, 1.0);                  \n \
+        gl_Position = vec4(vert_position, 1.0);                                             \n \
     }                                                                                       \n";
 }

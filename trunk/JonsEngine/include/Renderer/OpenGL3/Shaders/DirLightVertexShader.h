@@ -11,7 +11,6 @@ namespace JonsEngine
                                                                                             \n \
     uniform UnifDirLight                                                                    \n \
     {                                                                                       \n \
-        mat4 mWVPMatrix;                                                                    \n \
         mat4 mVPMatrix;                                                                     \n \
         vec4 mLightColor;                                                                   \n \
         vec4 mLightDir;                                                                     \n \
@@ -23,6 +22,6 @@ namespace JonsEngine
                                                                                             \n \
     void main()                                                                             \n \
     {                                                                                       \n \
-        gl_Position = UnifDirLightPass.mWVPMatrix * vec4(vert_position, 1.0);               \n \
+        gl_Position = vec4(vert_position, 1.0);                                             \n \
     }                                                                                       \n";
 }

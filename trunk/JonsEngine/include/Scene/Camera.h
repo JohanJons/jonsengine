@@ -19,6 +19,7 @@ namespace JonsEngine
 
         Vec3 Forward() const;
         Vec3 Right() const;
+        Vec3 Position() const;
         Mat4 Orientation() const;
 
         Mat4 GetCameraTransform() const;

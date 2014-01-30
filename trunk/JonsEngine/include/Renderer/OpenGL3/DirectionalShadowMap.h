@@ -10,7 +10,7 @@ namespace JonsEngine
 
     struct DirectionalShadowMap
     {
-        DirectionalShadowMap(Logger& logger, const uint32_t windowWidth, const uint32_t windowHeight);
+        DirectionalShadowMap(Logger& logger, const uint32_t width, const uint32_t height);
         ~DirectionalShadowMap();
 
         void BindShadowMap();

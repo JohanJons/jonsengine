@@ -11,7 +11,6 @@ namespace JonsEngine
                                                                                                                                                                 \n \
     uniform UnifDepth                                                                                                                                           \n \
     {                                                                                                                                                           \n \
-        mat4 mWVPMatrix;                                                                                                                                        \n \
         vec2 mScreenSize;                                                                                                                                       \n \
         float mZNear;                                                                                                                                           \n \
         float mZFar;                                                                                                                                            \n \

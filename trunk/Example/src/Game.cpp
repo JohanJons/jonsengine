@@ -161,18 +161,9 @@ namespace JonsGame
         nodeMovingLight->TranslateNode(Vec3(4.0f, 0.5f, -15.0f));
 
         // directional light
-        SceneNodePtr nodeDirLight = myScene->GetRootNode().CreateChildNode("nodeDirLight");
-        DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight", nodeDirLight);
-        directionalLight->mLightDirection = Vec3(1.0f, 1.0f, 0.0f);
+        DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
+        directionalLight->mLightDirection = Vec3(0.0f, 1.0f, 1.0f);
         directionalLight->mLightColor = Vec4(0.3f);
-        nodeDirLight->TranslateNode(Vec3(40.0f, 20.0f, 0.0f));
-
-        // point light 2
-       /* SceneNodePtr nodeMovingLight2 = myScene->GetRootNode().CreateChildNode("nodeStaticLight");
-        LightPtr staticLight          = myScene->CreateLight("StaticPointLight", LightType::LIGHT_TYPE_POINT, nodeMovingLight2);
-        staticLight->mLightColor      = Vec4(0.4f, 0.4f, 0.0f, 1.0f);
-        staticLight->mRadius          = 5.0f;
-        nodeMovingLight2->TranslateNode(Vec3(0.0f, 3.0f, -8.0f));*/
 
         // ambient light
         myScene->SetAmbientLight(Vec4(0.05f));

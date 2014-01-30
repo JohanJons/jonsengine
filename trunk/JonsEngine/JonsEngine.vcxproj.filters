@@ -119,9 +119,6 @@
     <ClCompile Include="src\Core\Logging\Logger.cpp">
       <Filter>Source Files\Core\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Utils\Math.cpp">
-      <Filter>Source Files\Core\Utils</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scene\Scene.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>

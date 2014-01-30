@@ -13,7 +13,7 @@ namespace JonsEngine
 
         UnifGeometry(const Mat4& WVPMatrix, const Mat4& WorldMatrix, const uint32_t hasDiffuseTexture, const uint32_t hasNormalTexture, const float textureTilingFactor)
             :
-            mWVPMatrix(WVPMatrix), mWorldMatrix(WorldMatrix), mHasDiffuseTexture(hasDiffuseTexture), mHasNormalTexture(hasNormalTexture), mTextureTilingFactor(textureTilingFactor)
+        mWVPMatrix(WVPMatrix), mWorldMatrix(WorldMatrix), mHasDiffuseTexture(hasDiffuseTexture), mHasNormalTexture(hasNormalTexture), mTextureTilingFactor(textureTilingFactor)
         {
         }
     };
@@ -31,7 +31,7 @@ namespace JonsEngine
 
         UnifPointLight(const Mat4& vwpMatrix, const Vec4& lightColor, const Vec4& lightPos, const Vec4& gamma, const Vec2& screenSize, const float lightIntensity, const float maxDistance)
             :
-            mWVPMatrix(vwpMatrix), mLightColor(lightColor), mLightPos(lightPos), mGamma(gamma), mScreenSize(screenSize), mLightIntensity(lightIntensity), mMaxDistance(maxDistance)
+        mWVPMatrix(vwpMatrix), mLightColor(lightColor), mLightPos(lightPos), mGamma(gamma), mScreenSize(screenSize), mLightIntensity(lightIntensity), mMaxDistance(maxDistance)
         {
         }
     };
@@ -43,14 +43,13 @@ namespace JonsEngine
 
         UnifNull(const Mat4& wvpMatrix)
             :
-            mWVPMatrix(wvpMatrix)
+        mWVPMatrix(wvpMatrix)
         {
         }
     };
 
     struct UnifDirLight
     {
-        Mat4 mWVPMatrix;
         Mat4 mVPMatrix;
         Vec4 mLightColor;
         Vec4 mLightDir;
@@ -58,39 +57,37 @@ namespace JonsEngine
         Vec2 mScreenSize;
 
 
-        UnifDirLight(const Mat4& vwpMatrix, const Mat4& vpMatrix, const Vec4& lightColor, const Vec4& lightDir, const Vec4& gamma, const Vec2& screenSize)
+        UnifDirLight(const Mat4& vpMatrix, const Vec4& lightColor, const Vec4& lightDir, const Vec4& gamma, const Vec2& screenSize)
             :
-            mWVPMatrix(vwpMatrix), mVPMatrix(vpMatrix), mLightColor(lightColor), mLightDir(lightDir), mGamma(gamma), mScreenSize(screenSize)
+        mVPMatrix(vpMatrix), mLightColor(lightColor), mLightDir(lightDir), mGamma(gamma), mScreenSize(screenSize)
         {
         }
     };
 
     struct UnifAmbientLight
     {
-        Mat4 mWVPMatrix;
         Vec4 mLightColor;
         Vec4 mGamma;
         Vec2 mScreenSize;
 
 
-        UnifAmbientLight(const Mat4& wvpMatrix, const Vec4& lightColor, const Vec4& gamma, const Vec2& screenSize)
+        UnifAmbientLight(const Vec4& lightColor, const Vec4& gamma, const Vec2& screenSize)
             :
-            mWVPMatrix(wvpMatrix), mLightColor(lightColor), mGamma(gamma), mScreenSize(screenSize)
+        mLightColor(lightColor), mGamma(gamma), mScreenSize(screenSize)
         {
         }
     };
 
     struct UnifDepth
     {
-        Mat4 mWVPMatrix;
         Vec2 mScreenSize;
         float mZNear;
         float mZFar;
 
 
-        UnifDepth(const Mat4& wvpMatrix, const Vec2& screenSize, const float zNear, const float zFar)
+        UnifDepth(const Vec2& screenSize, const float zNear, const float zFar)
             :
-            mWVPMatrix(wvpMatrix), mScreenSize(screenSize), mZNear(zNear), mZFar(zFar)
+        mScreenSize(screenSize), mZNear(zNear), mZFar(zFar)
         {
         }
     };

@@ -23,7 +23,7 @@ namespace JonsEngine
         ~Scene();
 
         PointLightPtr CreatePointLight(const std::string& lightName, const SceneNodePtr node);
-        DirectionalLightPtr CreateDirectionalLight(const std::string& lightName, const SceneNodePtr node);
+        DirectionalLightPtr CreateDirectionalLight(const std::string& lightName);
 
         PointLightPtr Scene::GetPointLight(const std::string& lightName);
         DirectionalLightPtr Scene::GetDirectionalLight(const std::string& lightName);
