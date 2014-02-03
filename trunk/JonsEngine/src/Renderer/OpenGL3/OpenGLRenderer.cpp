@@ -60,6 +60,56 @@ namespace JonsEngine
         GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
     }
 
+    // TODO: performance...?
+    Mat4 CreateDirLightVPMatrix(const Vec3& lightDirection, const Mat4& viewProjectionMatrix)
+    {
+        const Vec3 lightDir = glm::normalize(lightDirection);
+        const Vec3 perpVec1 = glm::normalize(glm::cross(lightDir, Vec3(0.0f, 0.0f, 1.0f)));
+        const Vec3 perpVec2 = glm::normalize(glm::cross(lightDir, perpVec1));
+
+        Mat4 rotationMatrix(Vec4(perpVec1, 0.0f), Vec4(perpVec2, 0.0f), Vec4(lightDir, 0.0f), Vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
+        Vec4 corners[8] = { Vec4(-1.0f, -1.0f, 1.0f, 1.0f), Vec4(-1.0f, -1.0f, -1.0f, 1.0f), Vec4(-1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, 1.0f, -1.0f, 1.0f),
+                            Vec4(1.0f, -1.0f, 1.0f, 1.0f), Vec4(1.0f, -1.0f, -1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, -1.0f, 1.0f) };
+        const Mat4 inverseVPMatrix = glm::inverse(viewProjectionMatrix);
+        for (uint32_t i = 0; i < 8; i++)
+        {
+            corners[i] = inverseVPMatrix * corners[i];
+            corners[i] /= corners[i].w;
+            corners[i] = corners[i] * rotationMatrix;
+        }
+        
+        float minX = corners[0].x, minY = corners[0].y, minZ = corners[0].z, maxX = corners[0].x, maxY = corners[0].y, maxZ = corners[0].z;
+        for (uint32_t i = 0; i < 8; i++)
+        {
+            if (corners[i].x < minX)
+                minX = corners[i].x;
+            if (corners[i].x > maxX)
+                maxX = corners[i].x;
+            if (corners[i].y < minY)
+                minY = corners[i].y;
+            if (corners[i].y > maxY)
+                maxY = corners[i].y;
+            if (corners[i].z < minZ)
+                minZ = corners[i].z;
+            if (corners[i].z > maxZ)
+                maxZ = corners[i].z;
+        }
+
+        Mat4 viewMatrix(rotationMatrix);
+        viewMatrix[3][0] = -(minX + maxX) * 0.5f;
+        viewMatrix[3][1] = -(minY + maxY) * 0.5f;
+        viewMatrix[3][2] = -(minZ + maxZ) * 0.5f;
+        viewMatrix[0][3] = 0.0f;
+        viewMatrix[1][3] = 0.0f;
+        viewMatrix[2][3] = 0.0f;
+        viewMatrix[3][3] = 1.0f;
+
+        Vec3 halfExtents((maxX - minX) * 0.5, (maxY - minY) * 0.5, (maxZ - minZ) * 0.5);
+
+        return glm::ortho(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.y) * viewMatrix;
+    }
+
 
     OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator) : OpenGLRenderer(engineSettings.mWindowWidth, engineSettings.mWindowHeight, engineSettings.mAnisotropicFiltering, memoryAllocator)
     {
@@ -88,7 +138,7 @@ namespace JonsEngine
         //mDefaultProgram("DefaultProgram", ShaderPtr(new Shader("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); }*/), 
         //                                 ShaderPtr(new Shader("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); })*/), mLogger),
         mGBuffer(mLogger, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight),
-        mShadingGeometry(mLogger), mDirectionalShadowMap(mLogger, windowWidth, windowHeight)
+        mShadingGeometry(mLogger), mDirectionalShadowMap(mLogger, windowWidth, windowHeight), mOmniShadowMap(mLogger, windowWidth)
     {
         GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 
@@ -260,8 +310,8 @@ namespace JonsEngine
                 }
             }
 
-            bool hasDiffuseTexture = renderable.mDiffuseTexture != INVALID_TEXTURE_ID;
-            bool hasNormalTexture = renderable.mNormalTexture != INVALID_TEXTURE_ID;
+            const bool hasDiffuseTexture = renderable.mDiffuseTexture != INVALID_TEXTURE_ID;
+            const bool hasNormalTexture = renderable.mNormalTexture != INVALID_TEXTURE_ID;
 
             mGeometryProgram.SetUniformData(UnifGeometry(renderable.mWVPMatrix, renderable.mWorldMatrix, hasDiffuseTexture, hasNormalTexture, renderable.mTextureTilingFactor));
 
@@ -316,12 +366,11 @@ namespace JonsEngine
         // do all directional lights
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
         {
-            Mat4 viewMatrix = glm::lookAt(lighting.mCameraPosition, lighting.mCameraPosition + glm::normalize(directionalLight.mLightDirection), Vec3(0.0f, 1.0f, 0.0f));
-            Mat4 lightVP = glm::ortho(lighting.mCameraPosition.x - 25.0f, lighting.mCameraPosition.x + 25.0f, lighting.mCameraPosition.y - 25.0f, lighting.mCameraPosition.y + 25.0f, lighting.mCameraPosition.z + 25.0f, lighting.mCameraPosition.z - 25.0f) * viewMatrix;
+            Mat4 lightVP = CreateDirLightVPMatrix(directionalLight.mLightDirection, lighting.mViewProjectionMatrix);
 
             GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mDirectionalShadowMap.mFramebuffer));
             GLCALL(glDrawBuffer(GL_NONE));
-            DirLightShadowPass(directionalLight, lightVP, renderQueue);
+            DirLightShadowPass(renderQueue, lightVP);
 
             GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFramebuffer));
             GLCALL(glDrawBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
@@ -332,6 +381,12 @@ namespace JonsEngine
         GLCALL(glEnable(GL_STENCIL_TEST));
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
+            GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mOmniShadowMap.mFramebuffer));
+            GLCALL(glDrawBuffer(GL_NONE));
+            //GeometryDepthPass(renderQueue, lightVP);
+
+            GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFramebuffer));
+            GLCALL(glDrawBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
             // stencil pass first to elimiate fragments that dosnt need to be lit
             GLCALL(glDrawBuffer(GL_NONE));
             PointLightStencilPass(pointLight);
@@ -356,6 +411,57 @@ namespace JonsEngine
         mShadingGeometry.DrawRectangle();
 
         GLCALL(glUseProgram(0));
+    }
+
+    void OpenGLRenderer::GeometryDepthPass(const RenderQueue& renderQueue, const Mat4& lightVP)
+    {
+        mNullProgram.UseProgram();
+        GLCALL(glEnable(GL_CULL_FACE));
+        GLCALL(glEnable(GL_DEPTH_TEST));
+        GLCALL(glDepthMask(GL_TRUE));
+
+        GLCALL(glClear(GL_DEPTH_BUFFER_BIT));
+
+        // both containers are assumed to be sorted by MeshID ascending
+        auto meshIterator = mMeshes.begin();
+        for (const Renderable& renderable : renderQueue)
+        {
+            if (renderable.mMesh == INVALID_MESH_ID)
+            {
+                JONS_LOG_ERROR(mLogger, "Renderable MeshID is invalid");
+                throw std::runtime_error("Renderable MeshID is invalid");
+            }
+
+            if (renderable.mMesh < meshIterator->first->mMeshID)
+                continue;
+
+            while (renderable.mMesh > meshIterator->first->mMeshID)
+            {
+                meshIterator++;
+                if (meshIterator == mMeshes.end())
+                {
+                    JONS_LOG_ERROR(mLogger, "Renderable MeshID out of range");
+                    throw std::runtime_error("Renderable MeshID out of range");
+                }
+            }
+
+            const Mat4 wvp = lightVP * renderable.mWorldMatrix;
+            mNullProgram.SetUniformData(UnifNull(wvp));
+
+            GLCALL(glBindVertexArray(meshIterator->second));
+            GLCALL(glDrawElements(GL_TRIANGLES, meshIterator->first->mIndices, GL_UNSIGNED_INT, 0));
+            GLCALL(glBindVertexArray(0));
+        }
+
+        GLCALL(glDisable(GL_DEPTH_TEST));
+        GLCALL(glDisable(GL_CULL_FACE));
+        GLCALL(glDepthMask(GL_FALSE));
+        GLCALL(glUseProgram(0));
+    }
+
+    void OpenGLRenderer::PointLightShadowPass(const RenderQueue& renderQueue, const RenderableLighting::PointLight& pointLight)
+    {
+        GeometryDepthPass(renderQueue, gIdentityMatrix);
     }
 
     void OpenGLRenderer::PointLightStencilPass(const RenderableLighting::PointLight& pointLight)
@@ -388,50 +494,9 @@ namespace JonsEngine
         GLCALL(glUseProgram(0));
     }
 
-    void OpenGLRenderer::DirLightShadowPass(const RenderableLighting::DirectionalLight& dirLight, const Mat4& lightVP, const RenderQueue& renderQueue)
+    void OpenGLRenderer::DirLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightVP)
     {
-        mNullProgram.UseProgram();
-        GLCALL(glEnable(GL_CULL_FACE));
-        GLCALL(glEnable(GL_DEPTH_TEST));
-        GLCALL(glDepthMask(GL_TRUE));
-
-        GLCALL(glClear(GL_DEPTH_BUFFER_BIT));
-
-        // both containers are assumed to be sorted by MeshID ascending
-        auto meshIterator = mMeshes.begin();
-        for (const Renderable& renderable : renderQueue)
-        {
-            if (renderable.mMesh == INVALID_MESH_ID)
-            {
-                JONS_LOG_ERROR(mLogger, "Renderable MeshID is invalid");
-                throw std::runtime_error("Renderable MeshID is invalid");
-            }
-
-            if (renderable.mMesh < meshIterator->first->mMeshID)
-                continue;
-
-            while (renderable.mMesh > meshIterator->first->mMeshID)
-            {
-                meshIterator++;
-                if (meshIterator == mMeshes.end())
-                {
-                    JONS_LOG_ERROR(mLogger, "Renderable MeshID out of range");
-                    throw std::runtime_error("Renderable MeshID out of range");
-                }
-            }
-
-            Mat4 wvp = lightVP * renderable.mWorldMatrix;
-            mNullProgram.SetUniformData(UnifNull(wvp));
-
-            GLCALL(glBindVertexArray(meshIterator->second));
-            GLCALL(glDrawElements(GL_TRIANGLES, meshIterator->first->mIndices, GL_UNSIGNED_INT, 0));
-            GLCALL(glBindVertexArray(0));
-        }
-
-        GLCALL(glDisable(GL_DEPTH_TEST));
-        GLCALL(glDisable(GL_CULL_FACE));
-        GLCALL(glDepthMask(GL_FALSE));
-        GLCALL(glUseProgram(0));
+        GeometryDepthPass(renderQueue, lightVP);
     }
 
     void OpenGLRenderer::DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const Mat4& lightVP, const Vec4& gamma, const Vec2& screenSize)

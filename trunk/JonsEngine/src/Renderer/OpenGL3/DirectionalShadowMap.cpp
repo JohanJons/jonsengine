@@ -25,6 +25,7 @@ namespace JonsEngine
             JONS_LOG_ERROR(mLogger, "DirectionalShadowMap Framebuffer incomplete!");
             throw std::runtime_error("DirectionalShadowMap Framebuffer incomplete!");
         }
+        GLCALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
         // color attachment texture sampler
         GLCALL(glGenSamplers(1, &mTextureSampler));
@@ -34,9 +35,6 @@ namespace JonsEngine
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
         GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_SHADOW_DIRECTIONAL, mTextureSampler));
-        GLCALL(glUseProgram(0));
-
-        GLCALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
     }
 
     DirectionalShadowMap::~DirectionalShadowMap()

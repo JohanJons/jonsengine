@@ -130,6 +130,7 @@
     <ClCompile Include="src\Core\Utils\Time.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\DirectionalShadowMap.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\GBuffer.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\OmniShadowMap.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLMesh.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLRenderer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLTexture.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="include\Core\Utils\Math.h" />
     <ClInclude Include="include\Renderer\OpenGL3\DirectionalShadowMap.h" />
     <ClInclude Include="include\Renderer\OpenGL3\GBuffer.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\OmniShadowMap.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLMesh.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLRenderer.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLTexture.h" />

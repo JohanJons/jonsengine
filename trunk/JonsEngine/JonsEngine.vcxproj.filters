@@ -188,6 +188,9 @@
     <ClCompile Include="src\Renderer\OpenGL3\DirectionalShadowMap.cpp">
       <Filter>Source Files\Renderer\OpenGL3</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\OmniShadowMap.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -366,6 +369,9 @@
     </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\Shaders\DepthVertexShader.h">
       <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\OmniShadowMap.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

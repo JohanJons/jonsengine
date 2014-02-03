@@ -50,10 +50,11 @@ namespace JonsEngine
             const Camera& camera = activeScene->GetSceneCamera();
             const Mat4 viewMatrix = camera.GetCameraTransform();
             const Mat4 perspectiveMatrix = glm::perspective(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer->GetZNear(), mRenderer->GetZFar());
+            const Mat4 viewPerspectiveMatrix = perspectiveMatrix * viewMatrix;
 
             // create the rendering queue and active lights
-            const RenderQueue renderQueue(CreateRenderQueue(activeScene->GetResourceManifest().GetAllModels(), viewMatrix, perspectiveMatrix));
-            const RenderableLighting lighting(GetLightingInfo(activeScene->GetGamma(), activeScene->GetAmbientLight(), camera.Position(), activeScene->GetPointLights(), activeScene->GetDirectionalLights(), viewMatrix, perspectiveMatrix));
+            const RenderQueue renderQueue(CreateRenderQueue(activeScene->GetResourceManifest().GetAllModels(), viewPerspectiveMatrix));
+            const RenderableLighting lighting(GetLightingInfo(viewPerspectiveMatrix, activeScene->GetGamma(), activeScene->GetAmbientLight(), camera.Position(), activeScene->GetPointLights(), activeScene->GetDirectionalLights()));
 
             // render the scene
             mRenderer->DrawRenderables(renderQueue, lighting, debugOptions.mRenderingMode, debugOptions.mRenderingFlags);
@@ -63,14 +64,14 @@ namespace JonsEngine
     }
 
     
-    RenderQueue Engine::CreateRenderQueue(const std::vector<ModelPtr>& models, const Mat4& viewMatrix, const Mat4& perspectiveMatrix)
+    RenderQueue Engine::CreateRenderQueue(const std::vector<ModelPtr>& models, const Mat4& viewProjectionMatrix)
     {
         RenderQueue renderQueue;
 
         for(ModelPtr model : models)
         {
             if (model && model->mSceneNode)
-                CreateModelRenderable(model.get(), viewMatrix, perspectiveMatrix, model->mSceneNode->GetNodeTransform(), model->mLightingEnabled, renderQueue);
+                CreateModelRenderable(model.get(), viewProjectionMatrix, model->mSceneNode->GetNodeTransform(), model->mLightingEnabled, renderQueue);
         }
 
         std::sort(renderQueue.begin(), renderQueue.end(), [](const Renderable& smaller, const Renderable& larger) { return smaller.mMesh < larger.mMesh; });
@@ -78,14 +79,14 @@ namespace JonsEngine
         return renderQueue;
     }
      
-    RenderableLighting Engine::GetLightingInfo(const Vec4& gamma, const Vec4& ambientLight, const Vec3& cameraPosition, const std::vector<PointLightPtr>& pointLights, const std::vector<DirectionalLightPtr>& directionalLights, const Mat4& viewMatrix, const Mat4& perspectiveMatrix)
+    RenderableLighting Engine::GetLightingInfo(const Mat4& viewProjectionMatrix, const Vec4& gamma, const Vec4& ambientLight, const Vec3& cameraPosition, const std::vector<PointLightPtr>& pointLights, const std::vector<DirectionalLightPtr>& directionalLights)
     {
-        RenderableLighting lighting(gamma, ambientLight, cameraPosition, Vec2(mWindow.GetScreenWidth(), mWindow.GetScreenHeight()));
+        RenderableLighting lighting(viewProjectionMatrix, gamma, ambientLight, cameraPosition, Vec2(mWindow.GetScreenWidth(), mWindow.GetScreenHeight()));
 
         for (PointLightPtr pointLight : pointLights)
         {
             const Mat4 scaledWorldMatrix = glm::scale(pointLight->mSceneNode->GetNodeTransform(), Vec3(pointLight->mMaxDistance));
-            lighting.mPointLights.emplace_back(RenderableLighting::PointLight(perspectiveMatrix * viewMatrix * scaledWorldMatrix, scaledWorldMatrix, pointLight->mLightColor, pointLight->mSceneNode->Position(), pointLight->mLightIntensity, pointLight->mMaxDistance));
+            lighting.mPointLights.emplace_back(RenderableLighting::PointLight(viewProjectionMatrix * scaledWorldMatrix, scaledWorldMatrix, pointLight->mLightColor, pointLight->mSceneNode->Position(), pointLight->mLightIntensity, pointLight->mMaxDistance));
         }
 
         for (DirectionalLightPtr dirLight : directionalLights)
@@ -99,10 +100,10 @@ namespace JonsEngine
     /*
      * Creates a render unit for model 'model' and all its children.
      */
-    void Engine::CreateModelRenderable(const Model* model, const Mat4& viewMatrix, const Mat4& perspectiveMatrix, const Mat4& nodeTransform, const bool lightingEnabled, RenderQueue& renderQueue)
+    void Engine::CreateModelRenderable(const Model* model, const Mat4& viewProjectionMatrix, const Mat4& nodeTransform, const bool lightingEnabled, RenderQueue& renderQueue)
     {
         const Mat4 worldMatrix         = nodeTransform * model->mTransform;
-        const Mat4 worldViewProjMatrix = perspectiveMatrix * viewMatrix * worldMatrix;
+        const Mat4 worldViewProjMatrix = viewProjectionMatrix * worldMatrix;
 
         if (model->mMesh != INVALID_MESH_ID)
         {
@@ -118,7 +119,7 @@ namespace JonsEngine
 
         for(const Model& childModel : model->mChildren)
             // 'lightingEnabled' is passed on since it applies recursively on all children aswell
-            CreateModelRenderable(&childModel, viewMatrix, perspectiveMatrix, worldMatrix, lightingEnabled, renderQueue);
+            CreateModelRenderable(&childModel, viewProjectionMatrix, worldMatrix, lightingEnabled, renderQueue);
     }
 
 

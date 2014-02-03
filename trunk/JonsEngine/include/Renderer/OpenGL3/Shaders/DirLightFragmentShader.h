@@ -35,11 +35,11 @@ namespace JonsEngine
                                                                                                                                     \n \
         vec4 lightClipPos = UnifDirLightPass.mVPMatrix * vec4(worldPos, 1.0);                                                       \n \
         vec3 projCoords   = lightClipPos.xyz / lightClipPos.w;                                                                      \n \
-        projCoords.z      = projCoords.z - 0.005;                                                                                   \n \
+        projCoords.z      = projCoords.z - 0.0005;                                                                                   \n \
                                                                                                                                     \n \
         float visibilty  = texture(unifShadowTexture, projCoords);                                                                  \n \
                                                                                                                                     \n \
-        float angleNormal = clamp(dot(normal, UnifDirLightPass.mLightDir.xyz), 0, 1);                                               \n \
+        float angleNormal = clamp(dot(normal, -UnifDirLightPass.mLightDir.xyz), 0, 1);                                              \n \
                                                                                                                                     \n \
         fragColor = vec4(diffuse, 1.0) * visibilty * angleNormal * UnifDirLightPass.mLightColor;                                    \n \
     }                                                                                                                               \n";

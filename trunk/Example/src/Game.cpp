@@ -162,7 +162,7 @@ namespace JonsGame
 
         // directional light
         DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
-        directionalLight->mLightDirection = Vec3(0.0f, 1.0f, 1.0f);
+        directionalLight->mLightDirection = Vec3(0.0f, -1.0f, -1.0f);
         directionalLight->mLightColor = Vec4(0.3f);
 
         // ambient light

@@ -76,6 +76,7 @@ namespace JonsEngine
             }
         };
 
+        Mat4 mViewProjectionMatrix;
         Vec4 mGamma;
         Vec4 mAmbientLight;
         Vec3 mCameraPosition;
@@ -85,7 +86,7 @@ namespace JonsEngine
         std::vector<DirectionalLight> mDirectionalLights;
 
 
-        RenderableLighting(const Vec4& gamma, const Vec4& ambientLight, const Vec3& cameraPosition, const Vec2& screenSize) : mGamma(gamma), mScreenSize(screenSize), mCameraPosition(cameraPosition), mAmbientLight(ambientLight)
+        RenderableLighting(const Mat4& viewProjectionMatrix, const Vec4& gamma, const Vec4& ambientLight, const Vec3& cameraPosition, const Vec2& screenSize) : mViewProjectionMatrix(viewProjectionMatrix), mGamma(gamma), mScreenSize(screenSize), mCameraPosition(cameraPosition), mAmbientLight(ambientLight)
         {
         }
     };
