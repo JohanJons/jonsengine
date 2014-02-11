@@ -35,8 +35,8 @@ namespace JonsEngine
     {
     public:
         OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator);
-        OpenGLRenderer(const std::vector<OpenGLMeshPtr>& meshes, const std::vector<OpenGLTexturePtr>& textures, const uint32_t windowWidth, const uint32_t windowHeight, const float anisotropy, IMemoryAllocatorPtr memoryAllocator);
-        OpenGLRenderer(const uint32_t windowWidth, const uint32_t windowHeight, const float anisotropy, IMemoryAllocatorPtr memoryAllocator);
+        OpenGLRenderer(const std::vector<OpenGLMeshPtr>& meshes, const std::vector<OpenGLTexturePtr>& textures, const uint32_t windowWidth, const uint32_t windowHeight, const uint32_t shadowMapResolution, const float anisotropy, IMemoryAllocatorPtr memoryAllocator);
+        OpenGLRenderer(const uint32_t windowWidth, const uint32_t windowHeight, const uint32_t shadowMapResolution, const float anisotropy, IMemoryAllocatorPtr memoryAllocator);
         ~OpenGLRenderer();
 
         MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData);
@@ -53,6 +53,7 @@ namespace JonsEngine
 
         float GetZNear() const;
         float GetZFar() const;
+        uint32_t GetShadowMapResolution() const;
 
 
     private:
@@ -83,6 +84,7 @@ namespace JonsEngine
         float mCurrentAnisotropy;
         uint32_t mWindowWidth;
         uint32_t mWindowHeight;
+        uint32_t mShadowMapResolution;
 
         std::vector<OpenGLMeshPair> mMeshes;
         std::vector<OpenGLTexturePtr> mTextures;

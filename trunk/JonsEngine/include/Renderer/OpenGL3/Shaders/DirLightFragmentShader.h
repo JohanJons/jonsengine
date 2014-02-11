@@ -39,7 +39,7 @@ namespace JonsEngine
                                                                                                                                     \n \
         float visibilty  = texture(unifShadowTexture, projCoords);                                                                  \n \
                                                                                                                                     \n \
-        float angleNormal = clamp(dot(normal, -UnifDirLightPass.mLightDir.xyz), 0, 1);                                              \n \
+        float angleNormal = clamp(dot(normal, UnifDirLightPass.mLightDir.xyz), 0, 1);                                              \n \
                                                                                                                                     \n \
         fragColor = vec4(diffuse, 1.0) * visibilty * angleNormal * UnifDirLightPass.mLightColor;                                    \n \
     }                                                                                                                               \n";

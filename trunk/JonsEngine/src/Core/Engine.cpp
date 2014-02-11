@@ -129,7 +129,9 @@ namespace JonsEngine
         auto textures    = mRenderer->GetTextures();
         float anisotropy = mRenderer->GetCurrentAnisotropicFiltering();
 
+        uint32_t shadowMapResolution = mRenderer->GetShadowMapResolution();
+
         mRenderer.release();
-        mRenderer.reset(mMemoryAllocator->AllocateObject<OpenGLRenderer>(meshes, textures, mWindow.GetScreenWidth(), mWindow.GetScreenHeight(), anisotropy, mMemoryAllocator));
+        mRenderer.reset(mMemoryAllocator->AllocateObject<OpenGLRenderer>(meshes, textures, mWindow.GetScreenWidth(), mWindow.GetScreenHeight(), shadowMapResolution, anisotropy, mMemoryAllocator));
     }
 } 

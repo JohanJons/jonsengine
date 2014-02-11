@@ -31,7 +31,7 @@ namespace JonsEngine
         // depthbuffer
         GLCALL(glGenTextures(1, &mDepthBuffer));
         GLCALL(glBindTexture(GL_TEXTURE_2D, mDepthBuffer));
-        GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, windowWidth, windowHeight, 0, GL_DEPTH_STENCIL, GL_FLOAT_32_UNSIGNED_INT_24_8_REV, 0));     // TODO: check ARB_depth_buffer_float available?
+        GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, windowWidth, windowHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 0));
         GLCALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, mDepthBuffer, 0));
         GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
         

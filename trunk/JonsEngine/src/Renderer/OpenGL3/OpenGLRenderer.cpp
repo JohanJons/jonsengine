@@ -38,6 +38,19 @@ namespace JonsEngine
                               0.0f, 0.0f, 0.5f, 0.0f,
                               0.5f, 0.5f, 0.5f, 1.0f);
 
+    uint32_t ShadowQualityResolution(const EngineSettings::ShadowQuality shadowQuality)
+    {
+        switch (shadowQuality)
+        {
+            case EngineSettings::ShadowQuality::SHADOW_QUALITY_LOW:
+                return 1024;
+            case EngineSettings::ShadowQuality::SHADOW_QUALITY_HIGH:
+                return 4092;
+            case EngineSettings::ShadowQuality::SHADOW_QUALITY_MEDIUM:
+            default:
+                return 2048;
+        }
+    }
 
     void BindTexture2D(const OpenGLTexture::TextureUnit textureUnit, const TextureID targetTexture, const std::vector<OpenGLTexturePtr>& textures, Logger& logger)
     {
@@ -111,13 +124,13 @@ namespace JonsEngine
     }
 
 
-    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator) : OpenGLRenderer(engineSettings.mWindowWidth, engineSettings.mWindowHeight, engineSettings.mAnisotropicFiltering, memoryAllocator)
+    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator) : OpenGLRenderer(engineSettings.mWindowWidth, engineSettings.mWindowHeight, ShadowQualityResolution(engineSettings.mShadowQuality), engineSettings.mAnisotropicFiltering, memoryAllocator)
     {
     }
 
-    OpenGLRenderer::OpenGLRenderer(const std::vector<OpenGLMeshPtr>& meshes, const std::vector<OpenGLTexturePtr>& textures, const uint32_t windowWidth, const uint32_t windowHeight, const float anisotropy, IMemoryAllocatorPtr memoryAllocator)
+    OpenGLRenderer::OpenGLRenderer(const std::vector<OpenGLMeshPtr>& meshes, const std::vector<OpenGLTexturePtr>& textures, const uint32_t windowWidth, const uint32_t windowHeight, const uint32_t shadowMapResolution, const float anisotropy, IMemoryAllocatorPtr memoryAllocator)
         : 
-        OpenGLRenderer(windowWidth, windowHeight, anisotropy, memoryAllocator)
+        OpenGLRenderer(windowWidth, windowHeight, shadowMapResolution, anisotropy, memoryAllocator)
     {
         // recreate the VAOs
         for (const OpenGLMeshPtr mesh : meshes)
@@ -126,7 +139,7 @@ namespace JonsEngine
         mTextures = textures;
     }
 
-    OpenGLRenderer::OpenGLRenderer(const uint32_t windowWidth, const uint32_t windowHeight, const float anisotropy, IMemoryAllocatorPtr memoryAllocator) :
+    OpenGLRenderer::OpenGLRenderer(const uint32_t windowWidth, const uint32_t windowHeight, const uint32_t shadowMapResolution, const float anisotropy, IMemoryAllocatorPtr memoryAllocator) :
         mMemoryAllocator(memoryAllocator), mLogger(Logger::GetRendererLogger()),
         mGeometryProgram("GeometryProgram", ShaderPtr(new Shader("GeometryVertexShader", gGeometryVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("GeometryFragmentShader", gGeometryFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifGeometry"),
         mPointLightProgram("PointLightProgram", ShaderPtr(new Shader("PointLightVertexShader", gShadingVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("PointLightFragmentShader", gShadingFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifPointLight"),
@@ -137,8 +150,8 @@ namespace JonsEngine
                                                             // VS2012 bug workaround. TODO: fixed in VS2013, when boost is rdy
         //mDefaultProgram("DefaultProgram", ShaderPtr(new Shader("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); }*/), 
         //                                 ShaderPtr(new Shader("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); })*/), mLogger),
-        mGBuffer(mLogger, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight),
-        mShadingGeometry(mLogger), mDirectionalShadowMap(mLogger, windowWidth, windowHeight), mOmniShadowMap(mLogger, windowWidth)
+        mGBuffer(mLogger, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight), mShadowMapResolution(shadowMapResolution),
+        mShadingGeometry(mLogger), mDirectionalShadowMap(mLogger, shadowMapResolution), mOmniShadowMap(mLogger, windowWidth)
     {
         GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 
@@ -270,6 +283,11 @@ namespace JonsEngine
     float OpenGLRenderer::GetZFar() const
     { 
         return Z_FAR;
+    }
+
+    uint32_t OpenGLRenderer::GetShadowMapResolution() const
+    {
+        return mShadowMapResolution;
     }
 
 
@@ -496,7 +514,11 @@ namespace JonsEngine
 
     void OpenGLRenderer::DirLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightVP)
     {
+        GLCALL(glViewport(0, 0, (GLsizei)mShadowMapResolution, (GLsizei)mShadowMapResolution));
+
         GeometryDepthPass(renderQueue, lightVP);
+
+        GLCALL(glViewport(0, 0, (GLsizei)mWindowWidth, (GLsizei)mWindowHeight));
     }
 
     void OpenGLRenderer::DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const Mat4& lightVP, const Vec4& gamma, const Vec2& screenSize)
@@ -505,7 +527,7 @@ namespace JonsEngine
 
         mDirectionalShadowMap.BindShadowMap();
 
-        mDirLightProgram.SetUniformData(UnifDirLight(lightVP, dirLight.mLightColor, Vec4(dirLight.mLightDirection, 0.0f), gamma, screenSize));
+        mDirLightProgram.SetUniformData(UnifDirLight(lightVP, dirLight.mLightColor, Vec4(-dirLight.mLightDirection, 0.0f), gamma, screenSize));
         mShadingGeometry.DrawRectangle();
 
         GLCALL(glUseProgram(0));

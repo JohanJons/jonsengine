@@ -8,7 +8,7 @@
 
 namespace JonsEngine
 {
-    DirectionalShadowMap::DirectionalShadowMap(Logger& logger, const uint32_t width, const uint32_t height) : mLogger(logger)
+    DirectionalShadowMap::DirectionalShadowMap(Logger& logger, const uint32_t size) : mLogger(logger)
     {
         GLCALL(glGenFramebuffers(1, &mFramebuffer));
         GLCALL(glBindFramebuffer(GL_FRAMEBUFFER, mFramebuffer));
@@ -16,7 +16,7 @@ namespace JonsEngine
         // shadow map texture
         GLCALL(glGenTextures(1, &mShadowMap));
         GLCALL(glBindTexture(GL_TEXTURE_2D, mShadowMap));
-        GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0));
+        GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, size, size, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0));
         GLCALL(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mShadowMap, 0));
         GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
 
