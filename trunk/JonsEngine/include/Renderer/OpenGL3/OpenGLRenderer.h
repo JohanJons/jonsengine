@@ -6,8 +6,8 @@
 #include "include/Renderer/OpenGL3/GBuffer.h"
 #include "include/Renderer/OpenGL3/UniformBuffer.hpp"
 #include "include/Renderer/OpenGL3/ShadingGeometry.h"
-#include "include/Renderer/OpenGL3/DirectionalShadowMap.h"
-#include "include/Renderer/OpenGL3/OmniShadowMap.h"
+#include "include/Renderer/OpenGL3/DirectionalShadowmap.h"
+#include "include/Renderer/OpenGL3/OmniShadowmap.h"
 #include "include/Renderer/OpenGL3/UniformBufferDefinitions.hpp"
 #include "include/Renderer/RenderCommands.h"
 #include "include/Core/Types.h"
@@ -53,21 +53,21 @@ namespace JonsEngine
 
         float GetZNear() const;
         float GetZFar() const;
-        uint32_t GetShadowMapResolution() const;
+        uint32_t GetShadowmapResolution() const;
 
 
     private:
         typedef std::pair<OpenGLMeshPtr, GLuint> OpenGLMeshPair;
 
         void GeometryPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights);
-        void ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting);
+        void ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugShadowmapSplits);
         void AmbientLightPass(const Vec4& ambientLight, const Vec4& gamma, const Vec2& screenSize);
         void GeometryDepthPass(const RenderQueue& renderQueue, const Mat4& lightVP);
         void PointLightShadowPass(const RenderQueue& renderQueue, const RenderableLighting::PointLight& pointLight);
         void PointLightStencilPass(const RenderableLighting::PointLight& pointLight);
         void PointLightLightingPass(const RenderableLighting::PointLight& pointLight, const Vec4& gamma, const Vec2& screenSize);
-        void DirLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightVP);
-        void DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const Mat4& lightVP, const Vec4& gamma, const Vec2& screenSize);
+        void DirLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightVP, const uint8_t cascadeIndex);
+        void DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const std::array<Mat4, 4>& lightMatrices, const Mat4& cameraViewMatrix, const std::array<float, 4>& splitDistances, const Vec4& gamma, const Vec2& screenSize, const bool debugShadowmapSplits);
         void RenderToScreen(const DebugOptions::RenderingMode debugOptions, const Vec2& screenSize);
 
         IMemoryAllocatorPtr mMemoryAllocator;
@@ -78,18 +78,19 @@ namespace JonsEngine
         ShaderProgram<UnifAmbientLight> mAmbientProgram;
         ShaderProgram<UnifPointLight> mPointLightProgram;
         ShaderProgram<UnifDirLight> mDirLightProgram;
+        ShaderProgram<UnifDirLight> mDirLightDebugProgram;
         ShaderProgram<UnifDepth> mDepthProgram;
         GBuffer mGBuffer;
         GLuint mTextureSampler;
         float mCurrentAnisotropy;
         uint32_t mWindowWidth;
         uint32_t mWindowHeight;
-        uint32_t mShadowMapResolution;
+        uint32_t mShadowmapResolution;
 
         std::vector<OpenGLMeshPair> mMeshes;
         std::vector<OpenGLTexturePtr> mTextures;
         ShadingGeometry mShadingGeometry;
-        DirectionalShadowMap mDirectionalShadowMap;
-        OmniShadowMap mOmniShadowMap;
+        DirectionalShadowmap mDirectionalShadowmap;
+        OmniShadowmap mOmniShadowmap;
     };
 }

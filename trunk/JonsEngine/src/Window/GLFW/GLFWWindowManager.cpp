@@ -24,9 +24,9 @@ namespace JonsEngine
             throw std::runtime_error("GLFWWindow::GLFWWindow(): Unable to initialize GLFW!");
         }
         
-        // setup a forward-compatible context with openGL 4.3
+        // setup a forward-compatible context with openGL 4.2
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         SetupWindow();
 

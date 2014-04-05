@@ -373,5 +373,8 @@
     <ClInclude Include="include\Renderer\OpenGL3\OmniShadowMap.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightFragmentShader_debug.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

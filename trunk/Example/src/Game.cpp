@@ -89,6 +89,8 @@ namespace JonsGame
                 mDebugOptions.mRenderingMode = DebugOptions::RENDER_MODE_DEPTH;
             else if (evnt.mKey == Key::P)
                 mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_DRAW_LIGHTS);
+            else if (evnt.mKey == Key::O)
+                mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS);
             else if (evnt.mKey == Key::H)
                 mEngine->GetRenderer()->SetAnisotropicFiltering(1.0f);
             else if (evnt.mKey == Key::J)
@@ -137,20 +139,20 @@ namespace JonsGame
         SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
         ModelPtr modelAlien    = myScene->GetResourceManifest().LoadModel("sectoid", jonsPackage);
         modelAlien->mSceneNode = nodeAlien;
-        nodeAlien->TranslateNode(Vec3(0.0f, 0.0f, -8.0f));
         nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
+        nodeAlien->TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
 
          // cube
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
         ModelPtr modelCube    = myScene->GetResourceManifest().LoadModel("cube", jonsPackage);
         modelCube->mSceneNode = nodeCube;
-        nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
+        nodeCube->TranslateNode(Vec3(7.0f, 3.5f, -15.0f));
         
-        // uhura
+        // ninja
         SceneNodePtr nodeUhura = myScene->GetRootNode().CreateChildNode("nodeUhura");
         ModelPtr modelUhura    = myScene->GetResourceManifest().LoadModel("uhura", jonsPackage);
         modelUhura->mSceneNode = nodeUhura;
-        nodeUhura->TranslateNode(Vec3(-10.0f, 0.0f, -4.0f));
+        nodeUhura->TranslateNode(Vec3(-8.0f, 0.5f, -4.0f));
         
         // point light
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
@@ -170,11 +172,10 @@ namespace JonsGame
         
         // create a ground plane
         SceneNodePtr nodePlane       = myScene->GetRootNode().CreateChildNode("nodePlane");
-        ModelPtr plane               = myScene->GetResourceManifest().CreateRectangle("GroundPlane", 64, 0.5, 64);
+        ModelPtr plane               = myScene->GetResourceManifest().CreateRectangle("GroundPlane", 64, 1.0, 64);
         plane->mMaterial             = myScene->GetResourceManifest().LoadMaterial("checker", jonsPackage);
         plane->mSceneNode            = nodePlane;
         plane->mMaterialTilingFactor = 64.0f;
-        nodePlane->TranslateNode(Vec3(0.0f, -0.5f, 0.0f));
 
         // create a sphere
         SceneNodePtr nodeSphere = myScene->GetRootNode().CreateChildNode("nodeSphere");

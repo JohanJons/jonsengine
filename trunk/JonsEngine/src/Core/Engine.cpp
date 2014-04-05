@@ -46,7 +46,6 @@ namespace JonsEngine
 
             // update model matrix of all nodes in active scene
             activeScene->GetRootNode().UpdateModelMatrix(Mat4(1.0f));
-
             const Camera& camera = activeScene->GetSceneCamera();
             const Mat4 viewMatrix = camera.GetCameraTransform();
             const Mat4 perspectiveMatrix = glm::perspective(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer->GetZNear(), mRenderer->GetZFar());
@@ -54,7 +53,7 @@ namespace JonsEngine
 
             // create the rendering queue and active lights
             const RenderQueue renderQueue(CreateRenderQueue(activeScene->GetResourceManifest().GetAllModels(), viewPerspectiveMatrix));
-            const RenderableLighting lighting(GetLightingInfo(viewPerspectiveMatrix, activeScene->GetGamma(), activeScene->GetAmbientLight(), camera.Position(), activeScene->GetPointLights(), activeScene->GetDirectionalLights()));
+            const RenderableLighting lighting(GetLightingInfo(perspectiveMatrix, viewMatrix, viewPerspectiveMatrix, activeScene->GetGamma(), activeScene->GetAmbientLight(), camera.Position(), camera.Forward(), activeScene->GetPointLights(), activeScene->GetDirectionalLights()));
 
             // render the scene
             mRenderer->DrawRenderables(renderQueue, lighting, debugOptions.mRenderingMode, debugOptions.mRenderingFlags);
@@ -79,9 +78,9 @@ namespace JonsEngine
         return renderQueue;
     }
      
-    RenderableLighting Engine::GetLightingInfo(const Mat4& viewProjectionMatrix, const Vec4& gamma, const Vec4& ambientLight, const Vec3& cameraPosition, const std::vector<PointLightPtr>& pointLights, const std::vector<DirectionalLightPtr>& directionalLights)
+    RenderableLighting Engine::GetLightingInfo(const Mat4& projMatrix, const Mat4& viewMatrix, const Mat4& viewProjectionMatrix, const Vec4& gamma, const Vec4& ambientLight, const Vec3& cameraPosition, const Vec3& cameraDirection, const std::vector<PointLightPtr>& pointLights, const std::vector<DirectionalLightPtr>& directionalLights)
     {
-        RenderableLighting lighting(viewProjectionMatrix, gamma, ambientLight, cameraPosition, Vec2(mWindow.GetScreenWidth(), mWindow.GetScreenHeight()));
+        RenderableLighting lighting(viewMatrix, projMatrix, gamma, ambientLight, cameraPosition, cameraDirection, Vec2(mWindow.GetScreenWidth(), mWindow.GetScreenHeight()));
 
         for (PointLightPtr pointLight : pointLights)
         {
@@ -129,7 +128,7 @@ namespace JonsEngine
         auto textures    = mRenderer->GetTextures();
         float anisotropy = mRenderer->GetCurrentAnisotropicFiltering();
 
-        uint32_t shadowMapResolution = mRenderer->GetShadowMapResolution();
+        uint32_t shadowMapResolution = mRenderer->GetShadowmapResolution();
 
         mRenderer.release();
         mRenderer.reset(mMemoryAllocator->AllocateObject<OpenGLRenderer>(meshes, textures, mWindow.GetScreenWidth(), mWindow.GetScreenHeight(), shadowMapResolution, anisotropy, mMemoryAllocator));

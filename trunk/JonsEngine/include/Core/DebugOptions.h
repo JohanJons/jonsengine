@@ -23,7 +23,8 @@ namespace JonsEngine
 
         enum RenderingFlag
         {
-            RENDER_FLAG_DRAW_LIGHTS
+            RENDER_FLAG_DRAW_LIGHTS = 0,
+            RENDER_FLAG_SHADOWMAP_SPLITS
         };
 
 

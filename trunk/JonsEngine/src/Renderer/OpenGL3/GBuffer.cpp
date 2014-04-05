@@ -65,7 +65,7 @@ namespace JonsEngine
     }
 
 
-    void GBuffer::BindGeometryTextures()
+    void GBuffer::BindGeometryForReading()
     {
         for (uint32_t index = 0; index < GBUFFER_NUM_GEOMETRY_ATTACHMENTS; index++)
         {
@@ -74,9 +74,15 @@ namespace JonsEngine
         }
     }
 
-    void GBuffer::BindDepthTexture()
+    void GBuffer::BindDepthForReading()
     {
         GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_DEPTH));
         GLCALL(glBindTexture(GL_TEXTURE_2D, mDepthBuffer));
+    }
+
+    void GBuffer::BindFinalForDrawing()
+    {
+        GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFramebuffer));
+        GLCALL(glDrawBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
     }
 }

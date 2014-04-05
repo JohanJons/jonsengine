@@ -185,6 +185,7 @@
     <ClInclude Include="include\Renderer\OpenGL3\Shaders\DepthFragmentShader.h" />
     <ClInclude Include="include\Renderer\OpenGL3\Shaders\DepthVertexShader.h" />
     <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightFragmentShader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightFragmentShader_debug.h" />
     <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightVertexShader.h" />
     <ClInclude Include="include\Renderer\OpenGL3\Shaders\GeometryFragmentShader.h" />
     <ClInclude Include="include\Renderer\OpenGL3\Shaders\GeometryVertexShader.h" />

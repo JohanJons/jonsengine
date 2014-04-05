@@ -8,17 +8,17 @@ namespace JonsEngine
 {
     class Logger;
 
-    struct OmniShadowMap
+    struct OmniShadowmap
     {
-        OmniShadowMap(Logger& logger, const uint32_t size);
-        ~OmniShadowMap();
+        OmniShadowmap(Logger& logger, const uint32_t size);
+        ~OmniShadowmap();
 
-        void BindShadowMap();
+        void BindShadowmap();
 
 
         Logger& mLogger;
 
-        GLuint mShadowMap;
+        GLuint mShadowmap;
         GLuint mTextureSampler;
         GLuint mFramebuffer;
     };

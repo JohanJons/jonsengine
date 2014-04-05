@@ -5,11 +5,9 @@
 namespace JonsEngine
 {
     const std::string gAmbientFragmentShader =
-    "#version 430                                                                                                                   \n \
+    "#version 420                                                                                                                   \n \
                                                                                                                                     \n \
-    layout(std140) uniform;                                                                                                         \n \
-                                                                                                                                    \n \
-    uniform UnifAmbient                                                                                                             \n \
+    layout(std140) uniform UnifAmbient                                                                                              \n \
     {                                                                                                                               \n \
         vec4 mLightColor;                                                                                                           \n \
         vec4 mGamma;                                                                                                                \n \

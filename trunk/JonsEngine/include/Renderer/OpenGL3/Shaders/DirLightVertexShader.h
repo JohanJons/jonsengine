@@ -5,13 +5,13 @@
 namespace JonsEngine
 {
     const std::string gDirLightVertexShader =
-    "#version 430                                                                           \n \
+    "#version 420                                                                           \n \
                                                                                             \n \
-    layout(std140) uniform;                                                                 \n \
-                                                                                            \n \
-    uniform UnifDirLight                                                                    \n \
+    layout(std140) uniform UnifDirLight                                                                  \n \
     {                                                                                       \n \
-        mat4 mVPMatrix;                                                                     \n \
+        mat4 mVPMatrix[4];                                                                  \n \
+        mat4 mCamViewMatrix;    \n \
+        vec4 mSplitDistance;                                                            \n \
         vec4 mLightColor;                                                                   \n \
         vec4 mLightDir;                                                                     \n \
         vec4 mGamma;                                                                        \n \

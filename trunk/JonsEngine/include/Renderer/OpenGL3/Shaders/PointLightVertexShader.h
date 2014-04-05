@@ -5,11 +5,9 @@
 namespace JonsEngine
 {
     const std::string gShadingVertexShader =
-    "#version 430                                                                           \n \
+    "#version 420                                                                           \n \
                                                                                             \n \
-    layout(std140) uniform;                                                                 \n \
-                                                                                            \n \
-    uniform UnifPointLight                                                                  \n \
+    layout(std140) uniform UnifPointLight                                                   \n \
     {                                                                                       \n \
         mat4 mWVPMatrix;                                                                    \n \
         vec4 mLightColor;                                                                   \n \

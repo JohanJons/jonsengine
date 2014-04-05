@@ -13,6 +13,7 @@
 #include "include/Renderer/OpenGL3/Shaders/PointLightFragmentShader.h"
 #include "include/Renderer/OpenGL3/Shaders/DirLightVertexShader.h"
 #include "include/Renderer/OpenGL3/Shaders/DirLightFragmentShader.h"
+#include "include/Renderer/OpenGL3/Shaders/DirLightFragmentShader_debug.h"
 #include "include/Renderer/OpenGL3/Shaders/DepthVertexShader.h"
 #include "include/Renderer/OpenGL3/Shaders/DepthFragmentShader.h"
 #include "include/Renderer/OpenGL3/OpenGLUtils.h"
@@ -23,20 +24,24 @@
 #include "include/Core/Utils/Math.h"
 
 #include "GL/glew.h"
+#include <array>
 #include <exception>
 #include <functional>
 #include <utility>
-#include <exception>
 
 namespace JonsEngine
 {
+    typedef std::array<Vec4, 8> CameraFrustrum;
+
     const float Z_NEAR = 0.1f;
     const float Z_FAR  = 100.0f;
 
-    const Mat4 gNDCBiasMatrix(0.5f, 0.0f, 0.0f, 0.0f,
-                              0.0f, 0.5f, 0.0f, 0.0f,
-                              0.0f, 0.0f, 0.5f, 0.0f,
-                              0.5f, 0.5f, 0.5f, 1.0f);
+    const uint8_t gNumShadowmapCascades = 4;
+
+    const Mat4 gBiasMatrix(0.5f, 0.0f, 0.0f, 0.0f,
+                           0.0f, 0.5f, 0.0f, 0.0f,
+                           0.0f, 0.0f, 0.5f, 0.0f,
+                           0.5f, 0.5f, 0.5f, 1.0f);
 
     uint32_t ShadowQualityResolution(const EngineSettings::ShadowQuality shadowQuality)
     {
@@ -73,43 +78,103 @@ namespace JonsEngine
         GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
     }
 
-    // TODO: performance...?
-    Mat4 CreateDirLightVPMatrix(const Vec3& lightDirection, const Mat4& viewProjectionMatrix)
+    void CalculateShadowmapCascades(std::array<float, gNumShadowmapCascades>& nearDistArr, std::array<float, gNumShadowmapCascades>& farDistArr, const float nearDist, const float farDist)
     {
-        const Vec3 lightDir = glm::normalize(lightDirection);
-        const Vec3 perpVec1 = glm::normalize(glm::cross(lightDir, Vec3(0.0f, 0.0f, 1.0f)));
-        const Vec3 perpVec2 = glm::normalize(glm::cross(lightDir, perpVec1));
+        const float splitWeight = 0.75f;
+        const float ratio = nearDist / farDist;
 
-        Mat4 rotationMatrix(Vec4(perpVec1, 0.0f), Vec4(perpVec2, 0.0f), Vec4(lightDir, 0.0f), Vec4(0.0f, 0.0f, 0.0f, 1.0f));
-
-        Vec4 corners[8] = { Vec4(-1.0f, -1.0f, 1.0f, 1.0f), Vec4(-1.0f, -1.0f, -1.0f, 1.0f), Vec4(-1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, 1.0f, -1.0f, 1.0f),
-                            Vec4(1.0f, -1.0f, 1.0f, 1.0f), Vec4(1.0f, -1.0f, -1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, -1.0f, 1.0f) };
-        const Mat4 inverseVPMatrix = glm::inverse(viewProjectionMatrix);
-        for (uint32_t i = 0; i < 8; i++)
+        nearDistArr[0] = nearDist;
+        for (uint8_t index = 1; index < gNumShadowmapCascades; index++)
         {
-            corners[i] = inverseVPMatrix * corners[i];
-            corners[i] /= corners[i].w;
-            corners[i] = corners[i] * rotationMatrix;
+            const float si = index / (float)gNumShadowmapCascades;
+
+            nearDistArr[index] = splitWeight * (nearDist * powf(ratio, si)) + (1 - splitWeight) * (nearDist + (farDist - nearDist) * si);
+            farDistArr[index - 1] = nearDistArr[index] * 1.005f;
         }
+        farDistArr[gNumShadowmapCascades - 1] = farDist;
+    }
+
+    CameraFrustrum CalculateCameraFrustrum(const float minDist, const float maxDist, const Vec3& cameraPosition, const Vec3& cameraDirection, Vec4& camFarZ)
+    {
+        CameraFrustrum ret = { Vec4(-1.0f, -1.0f, 1.0f, 1.0f), Vec4(-1.0f, -1.0f, -1.0f, 1.0f), Vec4(-1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, 1.0f, -1.0f, 1.0f),
+                               Vec4(1.0f, -1.0f, 1.0f, 1.0f), Vec4(1.0f, -1.0f, -1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, -1.0f, 1.0f) };
+
+        const Vec3 forwardVec = glm::normalize(cameraDirection);
+        const Vec3 rightVec   = glm::normalize(glm::cross(forwardVec, Vec3(0.0f, 0.0f, 1.0f)));
+        const Vec3 upVec      = glm::normalize(glm::cross(rightVec, forwardVec));
+
+        const Vec3 nearCenter = cameraPosition + forwardVec * minDist;
+        const Vec3 farCenter  = cameraPosition + forwardVec * maxDist;
+
+        camFarZ = Vec4(farCenter, 1.0);
+
+        const float nearHeight = tan(glm::radians(70.0f) / 2.0f) * minDist;
+        const float nearWidth = nearHeight * 1920.0f / 1080.0f;
+        const float farHeight  = tan(glm::radians(70.0f) / 2.0f) * maxDist;
+        const float farWidth = farHeight * 1920.0f / 1080.0f;
+
+        ret[0] = Vec4(nearCenter - (upVec * nearHeight) - (rightVec * nearWidth), 1.0);
+        ret[1] = Vec4(nearCenter + (upVec * nearHeight) - (rightVec * nearWidth), 1.0);
+        ret[2] = Vec4(nearCenter + (upVec * nearHeight) + (rightVec * nearWidth), 1.0);
+        ret[3] = Vec4(nearCenter - (upVec * nearHeight) + (rightVec * nearWidth), 1.0);
+
+        ret[4] = Vec4(farCenter - upVec * farHeight - rightVec * farWidth, 1.0);
+        ret[5] = Vec4(farCenter + upVec * farHeight - rightVec * farWidth, 1.0);
+        ret[6] = Vec4(farCenter + upVec * farHeight + rightVec * farWidth, 1.0);
+        ret[7] = Vec4(farCenter - upVec * farHeight + rightVec * farWidth, 1.0);
+
+        return ret;
+    }
+
+    Mat4 CreateDirLightVPMatrix(const CameraFrustrum& cameraFrustrum, const Vec3& lightDir)
+    {
+        const Vec3 lightDirx = glm::normalize(lightDir);
+        const Vec3 perpVec1  = glm::normalize(glm::cross(lightDirx, Vec3(0.0f, 0.0f, 1.0f)));
+        const Vec3 perpVec2  = glm::normalize(glm::cross(lightDirx, perpVec1));
+        Mat4 lightViewMatrix(Vec4(perpVec1, 0.0f), Vec4(perpVec2, 0.0f), Vec4(lightDirx, 0.0f), Vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
+        Vec4 transf = lightViewMatrix * cameraFrustrum[0];
+        float maxZ = transf.z, minZ = transf.z;
+        float maxX = transf.x, minX = transf.x;
+        float maxY = transf.y, minY = transf.y;
+        for (uint32_t i = 1; i < 8; i++)
+        {
+            transf = lightViewMatrix * cameraFrustrum[i];
+            if (transf.z > maxZ)
+                maxZ = transf.z;
+            if (transf.z < minZ)
+                minZ = transf.z;
+            if (transf.x > maxX)
+                maxX = transf.x;
+            if (transf.x < minX)
+                minX = transf.x;
+            if (transf.y > maxY)
+                maxY = transf.y;
+            if (transf.y < minY)
+                minY = transf.y;
+        }
+
+       /* const Mat4 mvp = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, maxZ, minZ) * lightViewMatrix;
+
+        transf = mvp * cameraFrustrum[0];
+        float maxX = transf.x, minX = transf.x;
+        float maxY = transf.y, minY = transf.y;
+        for (uint32_t i = 1; i < 8; i++)
+        {
+            transf = mvp * cameraFrustrum[i];
+
+            if (transf.x > maxX)
+                maxX = transf.x;
+            if (transf.x < minX)
+                minX = transf.x;
+            if (transf.y > maxY)
+                maxY = transf.y;
+            if (transf.y < minY)
+                minY = transf.y;
+        }
+        */
         
-        float minX = corners[0].x, minY = corners[0].y, minZ = corners[0].z, maxX = corners[0].x, maxY = corners[0].y, maxZ = corners[0].z;
-        for (uint32_t i = 0; i < 8; i++)
-        {
-            if (corners[i].x < minX)
-                minX = corners[i].x;
-            if (corners[i].x > maxX)
-                maxX = corners[i].x;
-            if (corners[i].y < minY)
-                minY = corners[i].y;
-            if (corners[i].y > maxY)
-                maxY = corners[i].y;
-            if (corners[i].z < minZ)
-                minZ = corners[i].z;
-            if (corners[i].z > maxZ)
-                maxZ = corners[i].z;
-        }
-
-        Mat4 viewMatrix(rotationMatrix);
+        Mat4 viewMatrix(lightViewMatrix);
         viewMatrix[3][0] = -(minX + maxX) * 0.5f;
         viewMatrix[3][1] = -(minY + maxY) * 0.5f;
         viewMatrix[3][2] = -(minZ + maxZ) * 0.5f;
@@ -121,6 +186,21 @@ namespace JonsEngine
         Vec3 halfExtents((maxX - minX) * 0.5, (maxY - minY) * 0.5, (maxZ - minZ) * 0.5);
 
         return glm::ortho(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.y) * viewMatrix;
+        
+
+        
+      /*  float scaleX = 2.0f / (maxX - minX);
+        float scaleY = 2.0f / (maxY - minY);
+        float offsetX = -0.5f * (maxX + minX) * scaleX;
+        float offsetY = -0.5f * (maxY + minY) * scaleY;
+        
+        Mat4 cropMatrix(1.0f);
+        cropMatrix[0][0] = scaleX;
+        cropMatrix[1][1] = scaleY;
+        cropMatrix[3][0] = offsetX;
+        cropMatrix[3][1] = offsetY;
+
+        return cropMatrix * glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, maxZ, minZ) /*glm::ortho(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.y)*/// * lightViewMatrix;
     }
 
 
@@ -145,13 +225,14 @@ namespace JonsEngine
         mPointLightProgram("PointLightProgram", ShaderPtr(new Shader("PointLightVertexShader", gShadingVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("PointLightFragmentShader", gShadingFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifPointLight"),
         mNullProgram("NullProgram", ShaderPtr(new Shader("NullVertexShader", gNullVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("NullFragmentShader", gNullFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifNull"),
         mDirLightProgram("DirLightProgram", ShaderPtr(new Shader("DirLightVertexShader", gDirLightVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("DirLightFragmentShader", gDirLightFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifDirLight"),
+        mDirLightDebugProgram("DirLightDebugProgram", ShaderPtr(new Shader("DirLightVertexShader", gDirLightVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("DirLightFragmentDebugShader", gDirLightFragmentDebugShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifDirLight"),
         mAmbientProgram("AmbientLightProgram", ShaderPtr(new Shader("AmbientLightVertexShader", gAmbientVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("AmbientLightFragmentShader", gAmbientFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifAmbient"),
         mDepthProgram("DepthProgram", ShaderPtr(new Shader("DepthVertexShader", gDepthVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("DepthFragmentShader", gDepthFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifDepth"),
                                                             // VS2012 bug workaround. TODO: fixed in VS2013, when boost is rdy
         //mDefaultProgram("DefaultProgram", ShaderPtr(new Shader("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); }*/), 
         //                                 ShaderPtr(new Shader("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); })*/), mLogger),
-        mGBuffer(mLogger, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight), mShadowMapResolution(shadowMapResolution),
-        mShadingGeometry(mLogger), mDirectionalShadowMap(mLogger, shadowMapResolution), mOmniShadowMap(mLogger, windowWidth)
+        mGBuffer(mLogger, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight), mShadowmapResolution(shadowMapResolution),
+        mShadingGeometry(mLogger), mDirectionalShadowmap(mLogger, shadowMapResolution, gNumShadowmapCascades), mOmniShadowmap(mLogger, windowWidth)
     {
         GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 
@@ -219,7 +300,7 @@ namespace JonsEngine
         GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFramebuffer));
 
         GeometryPass(renderQueue, lighting, debugExtra.test(DebugOptions::RENDER_FLAG_DRAW_LIGHTS));
-        ShadingPass(renderQueue, lighting);
+        ShadingPass(renderQueue, lighting, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
 
         GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
         GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer.mFramebuffer));
@@ -285,9 +366,9 @@ namespace JonsEngine
         return Z_FAR;
     }
 
-    uint32_t OpenGLRenderer::GetShadowMapResolution() const
+    uint32_t OpenGLRenderer::GetShadowmapResolution() const
     {
-        return mShadowMapResolution;
+        return mShadowmapResolution;
     }
 
 
@@ -367,10 +448,10 @@ namespace JonsEngine
         GLCALL(glUseProgram(0));
     }
         
-    void OpenGLRenderer::ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting)
+    void OpenGLRenderer::ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugShadowmapSplits)
     {
-        GLCALL(glDrawBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
-        mGBuffer.BindGeometryTextures();
+        mGBuffer.BindGeometryForReading();
+        mGBuffer.BindFinalForDrawing();
 
         // clear final texture buffer
         GLCALL(glClear(GL_COLOR_BUFFER_BIT));
@@ -384,32 +465,47 @@ namespace JonsEngine
         // do all directional lights
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
         {
-            Mat4 lightVP = CreateDirLightVPMatrix(directionalLight.mLightDirection, lighting.mViewProjectionMatrix);
+            std::array<float, gNumShadowmapCascades> nearDistArr, farDistArr;
+            std::array<Mat4, gNumShadowmapCascades> lightVPMatrices;
 
-            GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mDirectionalShadowMap.mFramebuffer));
-            GLCALL(glDrawBuffer(GL_NONE));
-            DirLightShadowPass(renderQueue, lightVP);
+            CalculateShadowmapCascades(nearDistArr, farDistArr, Z_NEAR, Z_FAR);
+            std::array<float, gNumShadowmapCascades> splitDistances;
 
-            GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFramebuffer));
-            GLCALL(glDrawBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
-            DirLightLightingPass(directionalLight, gNDCBiasMatrix * lightVP, lighting.mGamma, lighting.mScreenSize);
+            // fill shadowmaps
+            mDirectionalShadowmap.BindForDrawing();
+            GLCALL(glViewport(0, 0, (GLsizei)mShadowmapResolution, (GLsizei)mShadowmapResolution));
+            for (uint8_t cascadeIndex = 0; cascadeIndex < 1; cascadeIndex++)
+            {
+                Vec4 camFarDistCenter;
+                CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(nearDistArr[cascadeIndex], farDistArr[cascadeIndex], lighting.mCameraPosition, lighting.mCameraDirection, camFarDistCenter);
+
+                lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, directionalLight.mLightDirection);
+                DirLightShadowPass(renderQueue, lightVPMatrices[cascadeIndex], cascadeIndex);
+
+                lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex];
+                camFarDistCenter = lighting.mCameraViewMatrix * camFarDistCenter;
+                splitDistances[cascadeIndex] = camFarDistCenter.z;
+            }
+
+            mGBuffer.BindFinalForDrawing();
+            GLCALL(glViewport(0, 0, (GLsizei)mWindowWidth, (GLsizei)mWindowHeight));
+            DirLightLightingPass(directionalLight, lightVPMatrices, lighting.mCameraViewMatrix, splitDistances, lighting.mGamma, lighting.mScreenSize, debugShadowmapSplits);
         }
 
         // do all point lights
         GLCALL(glEnable(GL_STENCIL_TEST));
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
-            GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mOmniShadowMap.mFramebuffer));
+            GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mOmniShadowmap.mFramebuffer));
             GLCALL(glDrawBuffer(GL_NONE));
             //GeometryDepthPass(renderQueue, lightVP);
 
             GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFramebuffer));
-            GLCALL(glDrawBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
             // stencil pass first to elimiate fragments that dosnt need to be lit
             GLCALL(glDrawBuffer(GL_NONE));
             PointLightStencilPass(pointLight);
         
-            GLCALL(glDrawBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
+            mGBuffer.BindFinalForDrawing();
             PointLightLightingPass(pointLight, lighting.mGamma, lighting.mScreenSize);
         }
         GLCALL(glDisable(GL_STENCIL_TEST));
@@ -512,22 +608,28 @@ namespace JonsEngine
         GLCALL(glUseProgram(0));
     }
 
-    void OpenGLRenderer::DirLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightVP)
+    void OpenGLRenderer::DirLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightVP, const uint8_t cascadeIndex)
     {
-        GLCALL(glViewport(0, 0, (GLsizei)mShadowMapResolution, (GLsizei)mShadowMapResolution));
+        mDirectionalShadowmap.BindShadowmapCascade(cascadeIndex);
 
         GeometryDepthPass(renderQueue, lightVP);
-
-        GLCALL(glViewport(0, 0, (GLsizei)mWindowWidth, (GLsizei)mWindowHeight));
     }
 
-    void OpenGLRenderer::DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const Mat4& lightVP, const Vec4& gamma, const Vec2& screenSize)
+    void OpenGLRenderer::DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const std::array<Mat4, gNumShadowmapCascades>& lightMatrices, const Mat4& cameraViewMatrix, const std::array<float, gNumShadowmapCascades>& splitDistances, const Vec4& gamma, const Vec2& screenSize, const bool debugShadowmapSplits)
     {
-        mDirLightProgram.UseProgram();
+        mDirectionalShadowmap.BindForReading();
 
-        mDirectionalShadowMap.BindShadowMap();
+        if (debugShadowmapSplits)
+        {
+            mDirLightDebugProgram.UseProgram();
+            mDirLightDebugProgram.SetUniformData(UnifDirLight(lightMatrices, cameraViewMatrix, splitDistances, dirLight.mLightColor, Vec4(-dirLight.mLightDirection, 0.0f), gamma, screenSize));
+        }
+        else
+        {
+            mDirLightProgram.UseProgram();
+            mDirLightProgram.SetUniformData(UnifDirLight(lightMatrices, cameraViewMatrix, splitDistances, dirLight.mLightColor, Vec4(-dirLight.mLightDirection, 0.0f), gamma, screenSize));
+        }
 
-        mDirLightProgram.SetUniformData(UnifDirLight(lightVP, dirLight.mLightColor, Vec4(-dirLight.mLightDirection, 0.0f), gamma, screenSize));
         mShadingGeometry.DrawRectangle();
 
         GLCALL(glUseProgram(0));
@@ -565,7 +667,7 @@ namespace JonsEngine
             {
                 mDepthProgram.UseProgram();
                 mDepthProgram.SetUniformData(UnifDepth(screenSize, Z_NEAR, Z_FAR));
-                mGBuffer.BindDepthTexture();
+                mGBuffer.BindDepthForReading();
                 mShadingGeometry.DrawRectangle();
                 break;
             }

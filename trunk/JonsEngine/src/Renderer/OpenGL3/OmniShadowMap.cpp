@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/Renderer/OpenGL3/OmniShadowMap.h"
+#include "include/Renderer/OpenGL3/OmniShadowmap.h"
 
 #include "include/Renderer/OpenGL3/OpenGLTexture.h"
 #include "include/Renderer/OpenGL3/OpenGLUtils.h"
@@ -15,13 +15,13 @@ namespace JonsEngine
                                                          Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f) };
 
 
-    OmniShadowMap::OmniShadowMap(Logger& logger, const uint32_t size) : mLogger(logger)
+    OmniShadowmap::OmniShadowmap(Logger& logger, const uint32_t size) : mLogger(logger)
     {
         GLCALL(glGenFramebuffers(1, &mFramebuffer));
         GLCALL(glBindFramebuffer(GL_FRAMEBUFFER, mFramebuffer));
 
-        GLCALL(glGenTextures(1, &mShadowMap));
-        GLCALL(glBindTexture(GL_TEXTURE_CUBE_MAP, mShadowMap));
+        GLCALL(glGenTextures(1, &mShadowmap));
+        GLCALL(glBindTexture(GL_TEXTURE_CUBE_MAP, mShadowmap));
         GLCALL(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         GLCALL(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         GLCALL(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
@@ -29,7 +29,7 @@ namespace JonsEngine
         GLCALL(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
         for (uint32_t i = 0; i < CUBEMAP_NUM_FACES; i++)
             GLCALL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT32, size, size, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0));
-        GLCALL(glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, mShadowMap, 0));
+        GLCALL(glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, mShadowmap, 0));
         GLCALL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 
         GLenum fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -49,15 +49,15 @@ namespace JonsEngine
         GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_SHADOW_OMNI, mTextureSampler));
     }
 
-    OmniShadowMap::~OmniShadowMap()
+    OmniShadowmap::~OmniShadowmap()
     {
-        GLCALL(glDeleteTextures(1, &mShadowMap));
+        GLCALL(glDeleteTextures(1, &mShadowmap));
         GLCALL(glDeleteSamplers(1, &mTextureSampler));
         GLCALL(glDeleteFramebuffers(1, &mFramebuffer));
     }
 
 
-    void OmniShadowMap::BindShadowMap()
+    void OmniShadowmap::BindShadowmap()
     {
     }
 }

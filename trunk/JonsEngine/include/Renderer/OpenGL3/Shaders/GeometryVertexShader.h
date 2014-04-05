@@ -5,11 +5,9 @@
 namespace JonsEngine
 {
     const std::string gGeometryVertexShader =
-    "#version 430                                                                           \n \
+    "#version 420                                                                           \n \
                                                                                             \n \
-    layout(std140) uniform;                                                                 \n \
-                                                                                            \n \
-    uniform UnifGeometry                                                                    \n \
+    layout(std140) uniform UnifGeometry                                                     \n \
     {                                                                                       \n \
         mat4 mWVPMatrix;                                                                    \n \
         mat4 mWorldMatrix;                                                                  \n \

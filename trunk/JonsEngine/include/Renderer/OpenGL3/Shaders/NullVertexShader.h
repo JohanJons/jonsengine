@@ -5,11 +5,9 @@
 namespace JonsEngine
 {
     const std::string gNullVertexShader =
-    "#version 430                                                                           \n \
+    "#version 420                                                                           \n \
                                                                                             \n \
-    layout(std140) uniform;                                                                 \n \
-                                                                                            \n \
-    uniform UnifNull                                                                        \n \
+    layout(std140) uniform UnifNull                                                         \n \
     {                                                                                       \n \
         mat4 mWVPMatrix;                                                                    \n \
     } UnifNullPass;                                                                         \n \

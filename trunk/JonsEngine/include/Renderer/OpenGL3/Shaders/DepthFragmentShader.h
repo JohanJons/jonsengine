@@ -5,11 +5,9 @@
 namespace JonsEngine
 {
     const std::string gDepthFragmentShader =
-    "#version 430                                                                                                                                               \n \
+    "#version 420                                                                                                                                               \n \
                                                                                                                                                                 \n \
-    layout(std140) uniform;                                                                                                                                     \n \
-                                                                                                                                                                \n \
-    uniform UnifDepth                                                                                                                                           \n \
+    layout(std140) uniform UnifDepth                                                                                                                            \n \
     {                                                                                                                                                           \n \
         vec2 mScreenSize;                                                                                                                                       \n \
         float mZNear;                                                                                                                                           \n \

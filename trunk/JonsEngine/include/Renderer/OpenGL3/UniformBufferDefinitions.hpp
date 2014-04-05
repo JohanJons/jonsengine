@@ -1,5 +1,7 @@
 #include "include/Core/Types.h"
 
+#include <array>
+
 namespace JonsEngine
 {
     struct UnifGeometry
@@ -50,16 +52,18 @@ namespace JonsEngine
 
     struct UnifDirLight
     {
-        Mat4 mVPMatrix;
+        std::array<Mat4, 4> mLightMatrices;
+        Mat4 mCameraViewMatrix;
+        Vec4 mSplitDistances;
         Vec4 mLightColor;
         Vec4 mLightDir;
         Vec4 mGamma;
         Vec2 mScreenSize;
 
 
-        UnifDirLight(const Mat4& vpMatrix, const Vec4& lightColor, const Vec4& lightDir, const Vec4& gamma, const Vec2& screenSize)
+        UnifDirLight(const std::array<Mat4, 4>& lightMatrices, const Mat4& cameraViewMatrix, const std::array<float, 4>& splitDistances, const Vec4& lightColor, const Vec4& lightDir, const Vec4& gamma, const Vec2& screenSize)
             :
-        mVPMatrix(vpMatrix), mLightColor(lightColor), mLightDir(lightDir), mGamma(gamma), mScreenSize(screenSize)
+            mLightMatrices(lightMatrices), mCameraViewMatrix(cameraViewMatrix), mSplitDistances(splitDistances[0], splitDistances[1], splitDistances[2], splitDistances[3]), mLightColor(lightColor), mLightDir(lightDir), mGamma(gamma), mScreenSize(screenSize)
         {
         }
     };
