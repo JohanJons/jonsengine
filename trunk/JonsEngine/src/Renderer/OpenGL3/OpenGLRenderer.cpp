@@ -474,7 +474,7 @@ namespace JonsEngine
             // fill shadowmaps
             mDirectionalShadowmap.BindForDrawing();
             GLCALL(glViewport(0, 0, (GLsizei)mShadowmapResolution, (GLsizei)mShadowmapResolution));
-            for (uint8_t cascadeIndex = 0; cascadeIndex < 1; cascadeIndex++)
+            for (uint8_t cascadeIndex = 0; cascadeIndex < gNumShadowmapCascades; cascadeIndex++)
             {
                 Vec4 camFarDistCenter;
                 CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(nearDistArr[cascadeIndex], farDistArr[cascadeIndex], lighting.mCameraPosition, lighting.mCameraDirection, camFarDistCenter);
