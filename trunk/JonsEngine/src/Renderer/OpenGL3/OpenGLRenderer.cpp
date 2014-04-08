@@ -94,44 +94,32 @@ namespace JonsEngine
         farDistArr[gNumShadowmapCascades - 1] = farDist;
     }
 
-    CameraFrustrum CalculateCameraFrustrum(const float minDist, const float maxDist, const Vec3& cameraPosition, const Vec3& cameraDirection, Vec4& camFarZ)
+    CameraFrustrum CalculateCameraFrustrum(const float minDist, const float maxDist, const Vec3& cameraPosition, const Vec3& cameraDirection, Vec4& camFarZ, const Mat4& camView)
     {
-        CameraFrustrum ret = { Vec4(-1.0f, -1.0f, 1.0f, 1.0f), Vec4(-1.0f, -1.0f, -1.0f, 1.0f), Vec4(-1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, 1.0f, -1.0f, 1.0f),
-                               Vec4(1.0f, -1.0f, 1.0f, 1.0f), Vec4(1.0f, -1.0f, -1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, -1.0f, 1.0f) };
+        CameraFrustrum ret = { Vec4(1.0f, 1.0f, -1.0f, 1.0f), Vec4(1.0f, -1.0f, -1.0f, 1.0f), Vec4(-1.0f, -1.0f, -1.0f, 1.0f), Vec4(-1.0f, 1.0f, -1.0f, 1.0f),
+                               Vec4(1.0f, -1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, -1.0f, 1.0f, 1.0f), };
 
-        const Vec3 forwardVec = glm::normalize(cameraDirection);
-        const Vec3 rightVec   = glm::normalize(glm::cross(forwardVec, Vec3(0.0f, 0.0f, 1.0f)));
-        const Vec3 upVec      = glm::normalize(glm::cross(rightVec, forwardVec));
+        const Mat4 perspectiveMatrix = glm::perspective(70.0f, 1920.0f / (float)1080.0f, minDist, maxDist);
+        const Mat4 invMVP = glm::inverse(perspectiveMatrix * camView);
 
-        const Vec3 nearCenter = cameraPosition + forwardVec * minDist;
-        const Vec3 farCenter  = cameraPosition + forwardVec * maxDist;
+        for (Vec4& v : ret)
+        {
+            v = invMVP * v;
+            v /= v.w;
+        }
 
-        camFarZ = Vec4(farCenter, 1.0);
-
-        const float nearHeight = tan(glm::radians(70.0f) / 2.0f) * minDist;
-        const float nearWidth = nearHeight * 1920.0f / 1080.0f;
-        const float farHeight  = tan(glm::radians(70.0f) / 2.0f) * maxDist;
-        const float farWidth = farHeight * 1920.0f / 1080.0f;
-
-        ret[0] = Vec4(nearCenter - (upVec * nearHeight) - (rightVec * nearWidth), 1.0);
-        ret[1] = Vec4(nearCenter + (upVec * nearHeight) - (rightVec * nearWidth), 1.0);
-        ret[2] = Vec4(nearCenter + (upVec * nearHeight) + (rightVec * nearWidth), 1.0);
-        ret[3] = Vec4(nearCenter - (upVec * nearHeight) + (rightVec * nearWidth), 1.0);
-
-        ret[4] = Vec4(farCenter - upVec * farHeight - rightVec * farWidth, 1.0);
-        ret[5] = Vec4(farCenter + upVec * farHeight - rightVec * farWidth, 1.0);
-        ret[6] = Vec4(farCenter + upVec * farHeight + rightVec * farWidth, 1.0);
-        ret[7] = Vec4(farCenter - upVec * farHeight + rightVec * farWidth, 1.0);
+        camFarZ = ret[4];
+        camFarZ += ret[5];
+        camFarZ += ret[6];
+        camFarZ += ret[7];
+        camFarZ /= 4;
 
         return ret;
     }
 
     Mat4 CreateDirLightVPMatrix(const CameraFrustrum& cameraFrustrum, const Vec3& lightDir)
     {
-        const Vec3 lightDirx = glm::normalize(lightDir);
-        const Vec3 perpVec1  = glm::normalize(glm::cross(lightDirx, Vec3(0.0f, 0.0f, 1.0f)));
-        const Vec3 perpVec2  = glm::normalize(glm::cross(lightDirx, perpVec1));
-        Mat4 lightViewMatrix(Vec4(perpVec1, 0.0f), Vec4(perpVec2, 0.0f), Vec4(lightDirx, 0.0f), Vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, 1.0f, 0.0f));
 
         Vec4 transf = lightViewMatrix * cameraFrustrum[0];
         float maxZ = transf.z, minZ = transf.z;
@@ -154,26 +142,6 @@ namespace JonsEngine
                 minY = transf.y;
         }
 
-       /* const Mat4 mvp = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, maxZ, minZ) * lightViewMatrix;
-
-        transf = mvp * cameraFrustrum[0];
-        float maxX = transf.x, minX = transf.x;
-        float maxY = transf.y, minY = transf.y;
-        for (uint32_t i = 1; i < 8; i++)
-        {
-            transf = mvp * cameraFrustrum[i];
-
-            if (transf.x > maxX)
-                maxX = transf.x;
-            if (transf.x < minX)
-                minX = transf.x;
-            if (transf.y > maxY)
-                maxY = transf.y;
-            if (transf.y < minY)
-                minY = transf.y;
-        }
-        */
-        
         Mat4 viewMatrix(lightViewMatrix);
         viewMatrix[3][0] = -(minX + maxX) * 0.5f;
         viewMatrix[3][1] = -(minY + maxY) * 0.5f;
@@ -186,21 +154,6 @@ namespace JonsEngine
         Vec3 halfExtents((maxX - minX) * 0.5, (maxY - minY) * 0.5, (maxZ - minZ) * 0.5);
 
         return glm::ortho(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.y) * viewMatrix;
-        
-
-        
-      /*  float scaleX = 2.0f / (maxX - minX);
-        float scaleY = 2.0f / (maxY - minY);
-        float offsetX = -0.5f * (maxX + minX) * scaleX;
-        float offsetY = -0.5f * (maxY + minY) * scaleY;
-        
-        Mat4 cropMatrix(1.0f);
-        cropMatrix[0][0] = scaleX;
-        cropMatrix[1][1] = scaleY;
-        cropMatrix[3][0] = offsetX;
-        cropMatrix[3][1] = offsetY;
-
-        return cropMatrix * glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, maxZ, minZ) /*glm::ortho(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.y)*/// * lightViewMatrix;
     }
 
 
@@ -477,7 +430,7 @@ namespace JonsEngine
             for (uint8_t cascadeIndex = 0; cascadeIndex < gNumShadowmapCascades; cascadeIndex++)
             {
                 Vec4 camFarDistCenter;
-                CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(nearDistArr[cascadeIndex], farDistArr[cascadeIndex], lighting.mCameraPosition, lighting.mCameraDirection, camFarDistCenter);
+                CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(nearDistArr[cascadeIndex], farDistArr[cascadeIndex], lighting.mCameraPosition, lighting.mCameraDirection, camFarDistCenter, lighting.mCameraViewMatrix);
 
                 lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, directionalLight.mLightDirection);
                 DirLightShadowPass(renderQueue, lightVPMatrices[cascadeIndex], cascadeIndex);
