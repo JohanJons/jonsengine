@@ -185,10 +185,10 @@
     <ClCompile Include="src\Renderer\OpenGL3\OpenGLUtils.cpp">
       <Filter>Source Files\Renderer\OpenGL3</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL3\DirectionalShadowMap.cpp">
+    <ClCompile Include="src\Renderer\OpenGL3\DirectionalShadowmap.cpp">
       <Filter>Source Files\Renderer\OpenGL3</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\OpenGL3\OmniShadowMap.cpp">
+    <ClCompile Include="src\Renderer\OpenGL3\OmnidirectionalShadowmap.cpp">
       <Filter>Source Files\Renderer\OpenGL3</Filter>
     </ClCompile>
   </ItemGroup>
@@ -331,9 +331,6 @@
     <ClInclude Include="include\Renderer\OpenGL3\OpenGLUtils.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\OpenGL3\DirectionalShadowMap.h">
-      <Filter>Header Files\Renderer\OpenGL3</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\Shaders\NullFragmentShader.h">
       <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
     </ClInclude>
@@ -370,10 +367,19 @@
     <ClInclude Include="include\Renderer\OpenGL3\Shaders\DepthVertexShader.h">
       <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\OpenGL3\OmniShadowMap.h">
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightFragmentShader_debug.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\DirectionalShadowmap.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightFragmentShader_debug.h">
+    <ClInclude Include="include\Renderer\OpenGL3\OmnidirectionalShadowmap.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\ShadowVertexShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\ShadowFragmentShader.h">
       <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
     </ClInclude>
   </ItemGroup>

@@ -36,6 +36,14 @@ namespace JonsEngine
     const float Z_NEAR = 0.1f;
     const float Z_FAR  = 100.0f;
 
+    const uint32_t CUBEMAP_NUM_FACES = 6;   // posX => negX => posY => negY => posZ => negZ
+
+    const Vec3 CUBEMAP_DIRECTION_VECTORS[CUBEMAP_NUM_FACES] = { Vec3(1.0f, 0.0f, 0.0f), Vec3(-1.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f),
+                                                                Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f, 0.0f, -1.0f) };
+
+    const Vec3 CUBEMAP_UP_VECTORS[CUBEMAP_NUM_FACES] = { Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f),
+                                                         Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f) };
+
     const uint8_t gNumShadowmapCascades = 4;
 
     const Mat4 gBiasMatrix(0.5f, 0.0f, 0.0f, 0.0f,
@@ -48,12 +56,12 @@ namespace JonsEngine
         switch (shadowQuality)
         {
             case EngineSettings::ShadowQuality::SHADOW_QUALITY_LOW:
-                return 1024;
+                return 512;
             case EngineSettings::ShadowQuality::SHADOW_QUALITY_HIGH:
-                return 4092;
+                return 2048;
             case EngineSettings::ShadowQuality::SHADOW_QUALITY_MEDIUM:
             default:
-                return 2048;
+                return 1024;
         }
     }
 
@@ -94,25 +102,19 @@ namespace JonsEngine
         farDistArr[gNumShadowmapCascades - 1] = farDist;
     }
 
-    CameraFrustrum CalculateCameraFrustrum(const float minDist, const float maxDist, const Vec3& cameraPosition, const Vec3& cameraDirection, Vec4& camFarZ, const Mat4& camView)
+    CameraFrustrum CalculateCameraFrustrum(const float minDist, const float maxDist, const Mat4& cameraViewMatrix)
     {
         CameraFrustrum ret = { Vec4(1.0f, 1.0f, -1.0f, 1.0f), Vec4(1.0f, -1.0f, -1.0f, 1.0f), Vec4(-1.0f, -1.0f, -1.0f, 1.0f), Vec4(-1.0f, 1.0f, -1.0f, 1.0f),
                                Vec4(1.0f, -1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, -1.0f, 1.0f, 1.0f), };
 
         const Mat4 perspectiveMatrix = glm::perspective(70.0f, 1920.0f / (float)1080.0f, minDist, maxDist);
-        const Mat4 invMVP = glm::inverse(perspectiveMatrix * camView);
+        const Mat4 invMVP = glm::inverse(perspectiveMatrix * cameraViewMatrix);
 
-        for (Vec4& v : ret)
+        for (Vec4& corner : ret)
         {
-            v = invMVP * v;
-            v /= v.w;
+            corner = invMVP * corner;
+            corner /= corner.w;
         }
-
-        camFarZ = ret[4];
-        camFarZ += ret[5];
-        camFarZ += ret[6];
-        camFarZ += ret[7];
-        camFarZ /= 4;
 
         return ret;
     }
@@ -128,18 +130,13 @@ namespace JonsEngine
         for (uint32_t i = 1; i < 8; i++)
         {
             transf = lightViewMatrix * cameraFrustrum[i];
-            if (transf.z > maxZ)
-                maxZ = transf.z;
-            if (transf.z < minZ)
-                minZ = transf.z;
-            if (transf.x > maxX)
-                maxX = transf.x;
-            if (transf.x < minX)
-                minX = transf.x;
-            if (transf.y > maxY)
-                maxY = transf.y;
-            if (transf.y < minY)
-                minY = transf.y;
+
+            if (transf.z > maxZ) maxZ = transf.z;
+            if (transf.z < minZ) minZ = transf.z;
+            if (transf.x > maxX) maxX = transf.x;
+            if (transf.x < minX) minX = transf.x;
+            if (transf.y > maxY) maxY = transf.y;
+            if (transf.y < minY) minY = transf.y;
         }
 
         Mat4 viewMatrix(lightViewMatrix);
@@ -185,7 +182,7 @@ namespace JonsEngine
         //mDefaultProgram("DefaultProgram", ShaderPtr(new Shader("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); }*/), 
         //                                 ShaderPtr(new Shader("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); })*/), mLogger),
         mGBuffer(mLogger, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight), mShadowmapResolution(shadowMapResolution),
-        mShadingGeometry(mLogger), mDirectionalShadowmap(mLogger, shadowMapResolution, gNumShadowmapCascades), mOmniShadowmap(mLogger, windowWidth)
+        mShadingGeometry(mLogger), mDirectionalShadowmap(mLogger, shadowMapResolution, gNumShadowmapCascades), mOmnidirectionalShadowmap(mLogger, shadowMapResolution, CUBEMAP_NUM_FACES)
     {
         GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
 
@@ -250,17 +247,10 @@ namespace JonsEngine
         // clear default fbo color/buffer/stencil 
         GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 
-        GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFramebuffer));
-
         GeometryPass(renderQueue, lighting, debugExtra.test(DebugOptions::RENDER_FLAG_DRAW_LIGHTS));
         ShadingPass(renderQueue, lighting, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
 
-        GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
-        GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, mGBuffer.mFramebuffer));
-
         RenderToScreen(debugMode, lighting.mScreenSize);
-
-        GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
     }
 
 
@@ -327,14 +317,12 @@ namespace JonsEngine
 
     void OpenGLRenderer::GeometryPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights)
     {
+        mGBuffer.BindGeometryForDrawing();
+
         mGeometryProgram.UseProgram();
         GLCALL(glEnable(GL_CULL_FACE));
         GLCALL(glEnable(GL_DEPTH_TEST));
         GLCALL(glDepthMask(GL_TRUE));
-
-        // set geometry pass output buffers
-        GLenum drawBuffers[] = { GBuffer::GBUFFER_COLOR_ATTACHMENT_POSITION, GBuffer::GBUFFER_COLOR_ATTACHMENT_NORMAL, GBuffer::GBUFFER_COLOR_ATTACHMENT_DIFFUSE };
-        GLCALL(glDrawBuffers(GBuffer::GBUFFER_NUM_GEOMETRY_ATTACHMENTS, drawBuffers));
 
         // clear GBuffer position/normal/diffuse textures and depth buffer
         GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
@@ -395,6 +383,7 @@ namespace JonsEngine
         }
 
         GLCALL(glDrawBuffer(GL_NONE));
+        GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
         GLCALL(glDisable(GL_DEPTH_TEST));
         GLCALL(glDisable(GL_CULL_FACE));
         GLCALL(glDepthMask(GL_FALSE));
@@ -429,15 +418,13 @@ namespace JonsEngine
             GLCALL(glViewport(0, 0, (GLsizei)mShadowmapResolution, (GLsizei)mShadowmapResolution));
             for (uint8_t cascadeIndex = 0; cascadeIndex < gNumShadowmapCascades; cascadeIndex++)
             {
-                Vec4 camFarDistCenter;
-                CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(nearDistArr[cascadeIndex], farDistArr[cascadeIndex], lighting.mCameraPosition, lighting.mCameraDirection, camFarDistCenter, lighting.mCameraViewMatrix);
+                CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(nearDistArr[cascadeIndex], farDistArr[cascadeIndex], lighting.mCameraViewMatrix);
 
-                lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, directionalLight.mLightDirection);
+                lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, directionalLight.mLightDirection);       // TODO: bounding box problems?
                 DirLightShadowPass(renderQueue, lightVPMatrices[cascadeIndex], cascadeIndex);
 
                 lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex];
-                camFarDistCenter = lighting.mCameraViewMatrix * camFarDistCenter;
-                splitDistances[cascadeIndex] = camFarDistCenter.z;
+                splitDistances[cascadeIndex] = -farDistArr[cascadeIndex];
             }
 
             mGBuffer.BindFinalForDrawing();
@@ -449,24 +436,32 @@ namespace JonsEngine
         GLCALL(glEnable(GL_STENCIL_TEST));
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
-            GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mOmniShadowmap.mFramebuffer));
-            GLCALL(glDrawBuffer(GL_NONE));
-            //GeometryDepthPass(renderQueue, lightVP);
+            mOmnidirectionalShadowmap.BindForDrawing();
+            GLCALL(glViewport(0, 0, (GLsizei)mShadowmapResolution, (GLsizei)mShadowmapResolution));
+            for (uint32_t face = 0; face < CUBEMAP_NUM_FACES; face++)
+            {
+                mOmnidirectionalShadowmap.BindShadowmapFace(face);
+                Mat4 lightViewMatrix = glm::lookAt(pointLight.mLightPosition, CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
+                Mat4 lightProjMatrix = glm::perspective(90.0f, 1.0f, Z_NEAR, Z_FAR);
+                PointLightShadowPass(renderQueue, lightProjMatrix, lightViewMatrix);
+            }
 
-            GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mGBuffer.mFramebuffer));
+            GLCALL(glViewport(0, 0, (GLsizei)mWindowWidth, (GLsizei)mWindowHeight));
             // stencil pass first to elimiate fragments that dosnt need to be lit
-            GLCALL(glDrawBuffer(GL_NONE));
+            mGBuffer.BindNullForDrawing();
             PointLightStencilPass(pointLight);
         
             mGBuffer.BindFinalForDrawing();
+            mOmnidirectionalShadowmap.BindForReading();
             PointLightLightingPass(pointLight, lighting.mGamma, lighting.mScreenSize);
         }
         GLCALL(glDisable(GL_STENCIL_TEST));
 
         // reset state
+        GLCALL(glDrawBuffer(GL_NONE));
+        GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
         GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
         GLCALL(glDisable(GL_BLEND));
-        GLCALL(glDrawBuffer(GL_NONE));
         GLCALL(glUseProgram(0));
     }
 
@@ -482,7 +477,6 @@ namespace JonsEngine
 
     void OpenGLRenderer::GeometryDepthPass(const RenderQueue& renderQueue, const Mat4& lightVP)
     {
-        mNullProgram.UseProgram();
         GLCALL(glEnable(GL_CULL_FACE));
         GLCALL(glEnable(GL_DEPTH_TEST));
         GLCALL(glDepthMask(GL_TRUE));
@@ -526,9 +520,10 @@ namespace JonsEngine
         GLCALL(glUseProgram(0));
     }
 
-    void OpenGLRenderer::PointLightShadowPass(const RenderQueue& renderQueue, const RenderableLighting::PointLight& pointLight)
+    void OpenGLRenderer::PointLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightProjMatrix, const Mat4& lightViewMatrix)
     {
-        GeometryDepthPass(renderQueue, gIdentityMatrix);
+        mNullProgram.UseProgram();
+        GeometryDepthPass(renderQueue, lightProjMatrix * lightViewMatrix);
     }
 
     void OpenGLRenderer::PointLightStencilPass(const RenderableLighting::PointLight& pointLight)
@@ -564,7 +559,7 @@ namespace JonsEngine
     void OpenGLRenderer::DirLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightVP, const uint8_t cascadeIndex)
     {
         mDirectionalShadowmap.BindShadowmapCascade(cascadeIndex);
-
+        mNullProgram.UseProgram();
         GeometryDepthPass(renderQueue, lightVP);
     }
 
@@ -590,6 +585,8 @@ namespace JonsEngine
 
     void OpenGLRenderer::RenderToScreen(const DebugOptions::RenderingMode debugOptions, const Vec2& screenSize)
     {
+        mGBuffer.BindFBOForReading();
+
         switch (debugOptions)
         {
             case DebugOptions::RENDER_MODE_FULL:
@@ -627,5 +624,7 @@ namespace JonsEngine
             default:
                 break;
         }
+
+        GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
     }
 }

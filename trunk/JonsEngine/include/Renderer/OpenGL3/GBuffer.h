@@ -9,8 +9,9 @@ namespace JonsEngine
 {
     class Logger;
 
-    struct GBuffer
+    class GBuffer
     {
+    public:
         enum GBUFFER_COLOR_ATTACHMENT
         {
             GBUFFER_COLOR_ATTACHMENT_POSITION = GL_COLOR_ATTACHMENT0,
@@ -23,11 +24,15 @@ namespace JonsEngine
         GBuffer(Logger& logger, const uint32_t windowWidth, const uint32_t windowHeight);
         ~GBuffer();
 
+        void BindGeometryForDrawing();
         void BindGeometryForReading();
+        void BindNullForDrawing();
         void BindDepthForReading();
         void BindFinalForDrawing();
+        void BindFBOForReading();
 
 
+    private:
         Logger& mLogger;
 
         std::array<GLuint, GBUFFER_NUM_GEOMETRY_ATTACHMENTS> mGBufferTextures;

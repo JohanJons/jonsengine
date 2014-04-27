@@ -65,6 +65,15 @@ namespace JonsEngine
     }
 
 
+    void GBuffer::BindGeometryForDrawing()
+    {
+        GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFramebuffer));
+
+        // set geometry pass output buffers
+        GLenum drawBuffers[] = { GBuffer::GBUFFER_COLOR_ATTACHMENT_POSITION, GBuffer::GBUFFER_COLOR_ATTACHMENT_NORMAL, GBuffer::GBUFFER_COLOR_ATTACHMENT_DIFFUSE };
+        GLCALL(glDrawBuffers(GBuffer::GBUFFER_NUM_GEOMETRY_ATTACHMENTS, drawBuffers));
+    }
+
     void GBuffer::BindGeometryForReading()
     {
         for (uint32_t index = 0; index < GBUFFER_NUM_GEOMETRY_ATTACHMENTS; index++)
@@ -72,6 +81,12 @@ namespace JonsEngine
             GLCALL(glActiveTexture(GL_TEXTURE0 + OpenGLTexture::TEXTURE_UNIT_GBUFFER_POSITION + index));  // POSITION is starting texture index
             GLCALL(glBindTexture(GL_TEXTURE_2D, mGBufferTextures[index]));
         }
+    }
+
+    void GBuffer::BindNullForDrawing()
+    {
+        GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFramebuffer));
+        GLCALL(glDrawBuffer(GL_NONE));
     }
 
     void GBuffer::BindDepthForReading()
@@ -84,5 +99,10 @@ namespace JonsEngine
     {
         GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFramebuffer));
         GLCALL(glDrawBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
+    }
+
+    void GBuffer::BindFBOForReading()
+    {
+        GLCALL(glBindFramebuffer(GL_READ_FRAMEBUFFER, mFramebuffer));
     }
 }

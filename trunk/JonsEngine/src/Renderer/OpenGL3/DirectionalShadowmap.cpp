@@ -15,7 +15,7 @@ namespace JonsEngine
         // shadow map texture
         GLCALL(glGenTextures(1, &mShadowmap));
         GLCALL(glBindTexture(GL_TEXTURE_2D_ARRAY, mShadowmap));
-        GLCALL(glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, textureSize, textureSize, numCascades, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0));
+        GLCALL(glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT32, textureSize, textureSize, numCascades, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0));
         GLCALL(glBindTexture(GL_TEXTURE_2D_ARRAY, 0));
 
         // color attachment texture sampler
@@ -51,7 +51,6 @@ namespace JonsEngine
 
     void DirectionalShadowmap::BindShadowmapCascade(const uint32_t cascadeIndex)
     {
-        GLCALL(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, mFramebuffer));
         GLCALL(glFramebufferTextureLayer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, mShadowmap, 0, cascadeIndex));
     }
 }

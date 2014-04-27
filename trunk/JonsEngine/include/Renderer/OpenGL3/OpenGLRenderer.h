@@ -7,7 +7,7 @@
 #include "include/Renderer/OpenGL3/UniformBuffer.hpp"
 #include "include/Renderer/OpenGL3/ShadingGeometry.h"
 #include "include/Renderer/OpenGL3/DirectionalShadowmap.h"
-#include "include/Renderer/OpenGL3/OmniShadowmap.h"
+#include "include/Renderer/OpenGL3/OmnidirectionalShadowmap.h"
 #include "include/Renderer/OpenGL3/UniformBufferDefinitions.hpp"
 #include "include/Renderer/RenderCommands.h"
 #include "include/Core/Types.h"
@@ -63,7 +63,7 @@ namespace JonsEngine
         void ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugShadowmapSplits);
         void AmbientLightPass(const Vec4& ambientLight, const Vec4& gamma, const Vec2& screenSize);
         void GeometryDepthPass(const RenderQueue& renderQueue, const Mat4& lightVP);
-        void PointLightShadowPass(const RenderQueue& renderQueue, const RenderableLighting::PointLight& pointLight);
+        void PointLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightProjMatrix, const Mat4& lightViewMatrix);
         void PointLightStencilPass(const RenderableLighting::PointLight& pointLight);
         void PointLightLightingPass(const RenderableLighting::PointLight& pointLight, const Vec4& gamma, const Vec2& screenSize);
         void DirLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightVP, const uint8_t cascadeIndex);
@@ -91,6 +91,6 @@ namespace JonsEngine
         std::vector<OpenGLTexturePtr> mTextures;
         ShadingGeometry mShadingGeometry;
         DirectionalShadowmap mDirectionalShadowmap;
-        OmniShadowmap mOmniShadowmap;
+        OmnidirectionalShadowmap mOmnidirectionalShadowmap;
     };
 }

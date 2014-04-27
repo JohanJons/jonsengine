@@ -8,16 +8,18 @@ namespace JonsEngine
 {
     class Logger;
 
-    struct DirectionalShadowmap
+    class OmnidirectionalShadowmap
     {
-        DirectionalShadowmap(Logger& logger, const uint32_t textureSize, const uint32_t numCascades);
-        ~DirectionalShadowmap();
+    public:
+        OmnidirectionalShadowmap(Logger& logger, const uint32_t size, const uint32_t numFaces);
+        ~OmnidirectionalShadowmap();
 
         void BindForDrawing();
         void BindForReading();
-        void BindShadowmapCascade(const uint32_t cascadeIndex);
+        void BindShadowmapFace(const uint32_t face);
 
 
+    private:
         Logger& mLogger;
 
         GLuint mShadowmap;
