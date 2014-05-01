@@ -411,7 +411,6 @@ namespace JonsEngine
             std::array<Mat4, gNumShadowmapCascades> lightVPMatrices;
 
             CalculateShadowmapCascades(nearDistArr, farDistArr, Z_NEAR, Z_FAR);
-            std::array<float, gNumShadowmapCascades> splitDistances;
 
             // fill shadowmaps
             mDirectionalShadowmap.BindForDrawing();
@@ -424,16 +423,15 @@ namespace JonsEngine
                 DirLightShadowPass(renderQueue, lightVPMatrices[cascadeIndex], cascadeIndex);
 
                 lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex];
-                splitDistances[cascadeIndex] = -farDistArr[cascadeIndex];
+                farDistArr[cascadeIndex]      = -farDistArr[cascadeIndex];
             }
 
             mGBuffer.BindFinalForDrawing();
             GLCALL(glViewport(0, 0, (GLsizei)mWindowWidth, (GLsizei)mWindowHeight));
-            DirLightLightingPass(directionalLight, lightVPMatrices, lighting.mCameraViewMatrix, splitDistances, lighting.mGamma, lighting.mScreenSize, debugShadowmapSplits);
+            DirLightLightingPass(directionalLight, lightVPMatrices, lighting.mCameraViewMatrix, farDistArr, lighting.mGamma, lighting.mScreenSize, debugShadowmapSplits);
         }
 
         // do all point lights
-        GLCALL(glEnable(GL_STENCIL_TEST));
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
             mOmnidirectionalShadowmap.BindForDrawing();
@@ -446,6 +444,7 @@ namespace JonsEngine
                 PointLightShadowPass(renderQueue, lightProjMatrix, lightViewMatrix);
             }
 
+			GLCALL(glEnable(GL_STENCIL_TEST));
             GLCALL(glViewport(0, 0, (GLsizei)mWindowWidth, (GLsizei)mWindowHeight));
             // stencil pass first to elimiate fragments that dosnt need to be lit
             mGBuffer.BindNullForDrawing();
@@ -454,8 +453,8 @@ namespace JonsEngine
             mGBuffer.BindFinalForDrawing();
             mOmnidirectionalShadowmap.BindForReading();
             PointLightLightingPass(pointLight, lighting.mGamma, lighting.mScreenSize);
+			GLCALL(glDisable(GL_STENCIL_TEST));
         }
-        GLCALL(glDisable(GL_STENCIL_TEST));
 
         // reset state
         GLCALL(glDrawBuffer(GL_NONE));
@@ -524,6 +523,8 @@ namespace JonsEngine
     {
         mNullProgram.UseProgram();
         GeometryDepthPass(renderQueue, lightProjMatrix * lightViewMatrix);
+		
+		GLCALL(glUseProgram(0));
     }
 
     void OpenGLRenderer::PointLightStencilPass(const RenderableLighting::PointLight& pointLight)
@@ -561,6 +562,8 @@ namespace JonsEngine
         mDirectionalShadowmap.BindShadowmapCascade(cascadeIndex);
         mNullProgram.UseProgram();
         GeometryDepthPass(renderQueue, lightVP);
+		
+		GLCALL(glUseProgram(0));
     }
 
     void OpenGLRenderer::DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const std::array<Mat4, gNumShadowmapCascades>& lightMatrices, const Mat4& cameraViewMatrix, const std::array<float, gNumShadowmapCascades>& splitDistances, const Vec4& gamma, const Vec2& screenSize, const bool debugShadowmapSplits)
