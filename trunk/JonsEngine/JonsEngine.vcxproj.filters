@@ -376,11 +376,5 @@
     <ClInclude Include="include\Renderer\OpenGL3\OmnidirectionalShadowmap.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\ShadowVertexShader.h">
-      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\ShadowFragmentShader.h">
-      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

@@ -193,8 +193,6 @@
     <ClInclude Include="include\Renderer\OpenGL3\Shaders\PointLightVertexShader.h" />
     <ClInclude Include="include\Renderer\OpenGL3\Shaders\NullFragmentShader.h" />
     <ClInclude Include="include\Renderer\OpenGL3\Shaders\NullVertexShader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\ShadowFragmentShader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\ShadowVertexShader.h" />
     <ClInclude Include="include\Renderer\OpenGL3\ShadingGeometry.h" />
     <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.hpp" />
     <ClInclude Include="include\Renderer\OpenGL3\UniformBufferDefinitions.hpp" />

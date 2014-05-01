@@ -161,7 +161,7 @@ namespace JonsGame
         movingLight->mMaxDistance    = 10.0f;
         movingLight->mLightIntensity = 2.0f;
         movingLight->mLightColor     = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
-        nodeMovingLight->TranslateNode(Vec3(5.0f, 5.5f, -15.0f));
+        nodeMovingLight->TranslateNode(Vec3(5.0f, 3.5f, -15.0f));
 
         // directional light
         //DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight");

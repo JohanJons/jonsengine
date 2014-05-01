@@ -41,8 +41,8 @@ namespace JonsEngine
     const Vec3 CUBEMAP_DIRECTION_VECTORS[CUBEMAP_NUM_FACES] = { Vec3(1.0f, 0.0f, 0.0f), Vec3(-1.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f),
                                                                 Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f, 0.0f, -1.0f) };
 
-    const Vec3 CUBEMAP_UP_VECTORS[CUBEMAP_NUM_FACES] = { Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f),
-                                                         Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f) };
+    const Vec3 CUBEMAP_UP_VECTORS[CUBEMAP_NUM_FACES] = { Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f),
+                                                         Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f) };
 
     const uint8_t gNumShadowmapCascades = 4;
 
@@ -441,7 +441,7 @@ namespace JonsEngine
             for (uint32_t face = 0; face < CUBEMAP_NUM_FACES; face++)
             {
                 mOmnidirectionalShadowmap.BindShadowmapFace(face);
-                Mat4 lightViewMatrix = glm::lookAt(pointLight.mLightPosition, CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
+                Mat4 lightViewMatrix = glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition - CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
                 Mat4 lightProjMatrix = glm::perspective(90.0f, 1.0f, Z_NEAR, Z_FAR);
                 PointLightShadowPass(renderQueue, lightProjMatrix, lightViewMatrix);
             }
