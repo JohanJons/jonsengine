@@ -33,7 +33,7 @@ namespace JonsEngine
                                                                                                                                             \n \
         const float f = 100.0;                                                                                                              \n \
         const float n = 0.1;                                                                                                                \n \
-        float NormZComp = (f + n) / (f - n) - (2 * f*n) / (f - n) / LocalZcomp;                                                             \n \
+        float NormZComp = (f + n) / (f - n) - (2 * f * n) / (f - n) / LocalZcomp;                                                           \n \
                                                                                                                                             \n \
         return (NormZComp + 1.0) * 0.5;                                                                                                     \n \
     }                                                                                                                                       \n \
@@ -52,7 +52,7 @@ namespace JonsEngine
         float storedDepth = texture(unifShadowmap, positionDiff);                                                                           \n \
         float visibility = 0.0;                                                                                                             \n \
         if (storedDepth + 0.0001 > VectorToDepthValue(positionDiff))                                                                        \n \
-               visibility = 1.0;                                                                                                            \n \
+            visibility = 1.0;                                                                                                               \n \
                                                                                                                                             \n \
         float dist = length(positionDiff);                                                                                                  \n \
         float attenuation = clamp(1.0 - dist*dist * (1 / (UnifPointLightPass.mMaxDistance * UnifPointLightPass.mMaxDistance)), 0.0, 1.0);   \n \

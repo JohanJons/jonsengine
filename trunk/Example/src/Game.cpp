@@ -147,7 +147,7 @@ namespace JonsGame
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
         ModelPtr modelCube    = myScene->GetResourceManifest().LoadModel("cube", jonsPackage);
         modelCube->mSceneNode = nodeCube;
-        nodeCube->TranslateNode(Vec3(7.0f, 0.5f, -15.0f));
+        nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
         
         // ninja
         SceneNodePtr nodeUhura = myScene->GetRootNode().CreateChildNode("nodeUhura");
