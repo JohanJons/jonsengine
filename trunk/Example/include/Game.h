@@ -23,6 +23,7 @@ namespace JonsGame
     private:
         void SetupInputCallbacks();
         void SetupScene();
+        void UpdateSun();
 
         JonsEngine::EngineSettings mSettings;
         JonsEngine::DebugOptions mDebugOptions;
@@ -30,6 +31,7 @@ namespace JonsGame
         bool mRunning;
         uint32_t mCenterXPos;
         uint32_t mCenterYPos;
+        float mSunAngle;
         const float mMoveSpeed;
     };
 }

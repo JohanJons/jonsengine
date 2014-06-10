@@ -58,11 +58,15 @@ namespace JonsEngine
         {
             mThisFrameTime = glfwGetTime();
 
-            const double endFrameTime = glfwGetTime() - mStartFrameTime;
+            const double endFrameTime = (mThisFrameTime - mStartFrameTime);
             const double frameTime = 1.0f / mFrameLimit;
 
             if (endFrameTime < frameTime)
-                std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<unsigned long>((frameTime - endFrameTime) * 1000)));
+            {
+                const unsigned long sleepTimeMs = static_cast<unsigned long>((frameTime - endFrameTime) * 1000);
+                
+                std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
+            }
         }
 
         glfwSwapBuffers(mWindow);
@@ -72,31 +76,37 @@ namespace JonsEngine
     void GLFWWindowManager::SetMouseButtonCallback()
     {
         mMouseButtonCallback = nullptr;
+        glfwSetMouseButtonCallback(mWindow, nullptr);
     }
 
     void GLFWWindowManager::SetMouseButtonCallback(const MouseButtonCallback& callback)
     {
         mMouseButtonCallback = callback;
+        glfwSetMouseButtonCallback(mWindow, glfwOnMouseButton);
     }
 
     void GLFWWindowManager::SetMouseMotionCallback()
     {
         mMouseMotionCallback = nullptr;
+        glfwSetCursorPosCallback(mWindow, nullptr);
     }
         
     void GLFWWindowManager::SetMouseMotionCallback(const MouseMotionCallback& callback)
     {
         mMouseMotionCallback = callback;
+        glfwSetCursorPosCallback(mWindow, glfwOnMouseMotion);
     }
 
     void GLFWWindowManager::SetKeyCallback()
     {
         mKeyCallback = nullptr;
+        glfwSetKeyCallback(mWindow, nullptr);
     }
         
     void GLFWWindowManager::SetKeyCallback(const KeyCallback& callback)
     {
         mKeyCallback = callback;
+        glfwSetKeyCallback(mWindow, glfwOnKey);
     }
 
         
@@ -226,9 +236,10 @@ namespace JonsEngine
         mWindow = newWindow;
 
         // listen to input callbacks
-        glfwSetMouseButtonCallback(mWindow, glfwOnMouseButton);
-        glfwSetCursorPosCallback(mWindow, glfwOnMouseMotion);
-        glfwSetKeyCallback(mWindow, glfwOnKey);
+        if (mMouseButtonCallback) glfwSetMouseButtonCallback(mWindow, glfwOnMouseButton);
+        if (mMouseMotionCallback) glfwSetCursorPosCallback(mWindow, glfwOnMouseMotion);
+        if (mKeyCallback) glfwSetKeyCallback(mWindow, glfwOnKey);
+
         glfwSetFramebufferSizeCallback(mWindow, glfwOnWindowChanged);
 
         ShowMouseCursor(mShowMouseCursor);

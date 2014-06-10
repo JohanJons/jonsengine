@@ -48,10 +48,10 @@ namespace JonsEngine
         normal        = normalize(normal);                                                                                                  \n \
                                                                                                                                             \n \
         vec3 positionDiff = (UnifPointLightPass.mLightPos.xyz - worldPos);                                                                  \n \
-                                                                                                                                            \n \
-        float storedDepth = texture(unifShadowmap, positionDiff);                                                                           \n \
+        vec3 cubemapDir   = (worldPos - UnifPointLightPass.mLightPos.xyz);                                                                  \n \
+        float storedDepth = texture(unifShadowmap, cubemapDir);                                                                             \n \
         float visibility = 0.0;                                                                                                             \n \
-        if (storedDepth + 0.0001 > VectorToDepthValue(positionDiff))                                                                        \n \
+        if (storedDepth + 0.0001 > VectorToDepthValue(cubemapDir))                                                                          \n \
             visibility = 1.0;                                                                                                               \n \
                                                                                                                                             \n \
         float dist = length(positionDiff);                                                                                                  \n \

@@ -16,7 +16,7 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mCenterYPos(mEngine->GetWindow().GetScreenHeight()/2), mCenterXPos(mEngine->GetWindow().GetScreenWidth()/2), mMoveSpeed(0.1f)
+    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mCenterYPos(mEngine->GetWindow().GetScreenHeight() / 2), mCenterXPos(mEngine->GetWindow().GetScreenWidth() / 2), mSunAngle(0.0f), mMoveSpeed(0.1f)
     {
     }
         
@@ -32,9 +32,12 @@ namespace JonsGame
         SetupScene();
 
         mEngine->GetWindow().ShowMouseCursor(false);
+        mEngine->GetWindow().SetFrameLimit(60);
 
         while (mRunning)
         {
+            UpdateSun();
+
             mEngine->GetWindow().SetMousePosition(mCenterXPos, mCenterYPos);
 
             mEngine->Tick(mDebugOptions);
@@ -59,7 +62,7 @@ namespace JonsGame
                 camera.TranslateCamera(camera.Right() * mMoveSpeed);
 
             // moving the point light 
-            else if (evnt.mKey == Key::Q)
+            /*else if (evnt.mKey == Key::Q)
                 activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(-0.05, 0.0f, 0.0f));
             else if (evnt.mKey == Key::E)
                 activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.05, 0.0f, 0.0f));
@@ -70,11 +73,7 @@ namespace JonsGame
             else if (evnt.mKey == Key::F)
                 activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, -0.05f));
             else if (evnt.mKey == Key::G)
-                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, 0.05f));
-            else if (evnt.mKey == Key::U)
-                activeScene->GetDirectionalLight("DirectionalLight")->mLightDirection += (Vec3(0.0, 0.1f, 0.0f));
-            else if (evnt.mKey == Key::I)
-                activeScene->GetDirectionalLight("DirectionalLight")->mLightDirection -= (Vec3(0.0, 0.1f, 0.0f));
+                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, 0.05f));*/
 
             //  renderering
             else if (evnt.mKey == Key::ONE)
@@ -108,7 +107,6 @@ namespace JonsGame
 
     void Game::OnMouseButtonEvent(const JonsEngine::MouseButtonEvent& evnt)
     {
-
     }
         
     void Game::OnMouseMotionEvent(const JonsEngine::MouseMotionEvent& evnt)
@@ -156,17 +154,17 @@ namespace JonsGame
         nodeUhura->TranslateNode(Vec3(-8.0f, 0.5f, -4.0f));
         
         // point light
-        SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
+        /*SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
         PointLightPtr movingLight    = myScene->CreatePointLight("MovingPointLight", nodeMovingLight);
         movingLight->mMaxDistance    = 10.0f;
         movingLight->mLightIntensity = 2.0f;
         movingLight->mLightColor     = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
-        nodeMovingLight->TranslateNode(Vec3(5.0f, 3.5f, -15.0f));
+        nodeMovingLight->TranslateNode(Vec3(5.0f, 3.5f, -15.0f));*/
 
         // directional light
-        //DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
-        //directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
-        //directionalLight->mLightColor = Vec4(0.3f);
+        DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
+        directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
+        directionalLight->mLightColor = Vec4(0.3f);
 
         // ambient light
         myScene->SetAmbientLight(Vec4(0.05f));
@@ -191,5 +189,15 @@ namespace JonsGame
         // set anisotropic filter to max
         float maxAnisoLevel = mEngine->GetRenderer()->GetMaxAnisotropicFiltering();
         mEngine->GetRenderer()->SetAnisotropicFiltering(maxAnisoLevel);
+    }
+
+    void Game::UpdateSun()
+    {
+        Scene* activeScene = mEngine->GetSceneManager().GetActiveScene();
+
+       // mSunDirection += JonsEngine::Vec3(glm::sin(0.1f), 0.0f, 0.0f);
+       // activeScene->GetDirectionalLight("DirectionalLight")->mLightDirection = mSunDirection;
+        //activeScene->GetDirectionalLight("DirectionalLight")->mLightDirection += (Vec3(0.0, 0.1f, 0.0f));
+        //activeScene->GetDirectionalLight("DirectionalLight")->mLightDirection -= (Vec3(0.0, 0.1f, 0.0f));
     }
 }
