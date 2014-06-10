@@ -96,7 +96,18 @@ namespace JonsEngine
         mMouseMotionCallback = callback;
         glfwSetCursorPosCallback(mWindow, glfwOnMouseMotion);
     }
+	
+	void GLFWWindowManager::SetMousePositionCallback()
+	{
+		mMousePositionCallback = nullptr;
+	}
+        
+	void GLFWWindowManager::SetMousePositionCallback(const MousePositionCallback& callback)
+	{
+		mMousePositionCallback = callback;
+	}
 
+	
     void GLFWWindowManager::SetKeyCallback()
     {
         mKeyCallback = nullptr;
@@ -136,6 +147,11 @@ namespace JonsEngine
 
         for(KeyEvent& ev : mKeyEvents)
             mKeyCallback(ev);
+			
+		if (mMousePositionCallback)
+		{
+			
+		}
 
         ClearAllEvents();
     }

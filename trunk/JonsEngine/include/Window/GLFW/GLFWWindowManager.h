@@ -30,6 +30,8 @@ namespace JonsEngine
         void SetMouseButtonCallback(const MouseButtonCallback& callback);
         void SetMouseMotionCallback();
         void SetMouseMotionCallback(const MouseMotionCallback& callback);
+		void SetMousePositionCallback();
+        void SetMousePositionCallback(const MousePositionCallback& callback);
         void SetKeyCallback();
         void SetKeyCallback(const KeyCallback& callback);
 
@@ -87,22 +89,23 @@ namespace JonsEngine
         float mFOV;
         std::string mWindowTitle;
         uint16_t mMSAA;
+		Vec2 mPreviousMousePosition;
 
         MouseButtonCallback mMouseButtonCallback;
         MouseMotionCallback mMouseMotionCallback;
+		MousePositionCallback mMousePositionCallback;
         KeyCallback mKeyCallback;
 
-        std::vector<MouseButtonEvent>    mMouseButtonEvents;
-        std::vector<MouseMotionEvent>    mMouseMotionEvents;
-        std::vector<KeyEvent>            mKeyEvents;
+        std::vector<MouseButtonEvent> mMouseButtonEvents;
+        std::vector<MouseMotionEvent> mMouseMotionEvents;
+        std::vector<KeyEvent>         mKeyEvents;
     };
 
 
     /* GLFWWindow inlines */
-    inline uint64_t GLFWWindowManager::GetFrameLimit() const                                 { return mFrameLimit;          }
-
-    inline bool GLFWWindowManager::GetFullscreen() const                                     { return mFullscreen;          }
-    inline float GLFWWindowManager::GetFOV() const                                           { return mFOV;                 }
-    inline const std::string& GLFWWindowManager::GetWindowTitle() const                      { return mWindowTitle;         }
-    inline uint16_t GLFWWindowManager::GetMSAA() const                                       { return mMSAA;                }
+    inline uint64_t GLFWWindowManager::GetFrameLimit() const                                 { return mFrameLimit;  }
+    inline bool GLFWWindowManager::GetFullscreen() const                                     { return mFullscreen;  }
+    inline float GLFWWindowManager::GetFOV() const                                           { return mFOV;         }
+    inline const std::string& GLFWWindowManager::GetWindowTitle() const                      { return mWindowTitle; }
+    inline uint16_t GLFWWindowManager::GetMSAA() const                                       { return mMSAA;        }
 }
