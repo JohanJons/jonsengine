@@ -16,7 +16,7 @@ namespace JonsEngine
     GLFWWindowManager::GLFWWindowManager(const EngineSettings& engineSettings, OnContextCreatedCallback contextCreatedCallback) : mOnContextCreated(contextCreatedCallback), 
                                                                                                                                   mLogger(Logger::GetWindowLogger()), mFrameLimit(engineSettings.mFrameLimit), mWindow(nullptr),
                                                                                                                                   mScreenWidth(engineSettings.mWindowWidth), mScreenHeight(engineSettings.mWindowHeight), mShowMouseCursor(false), mFullscreen(engineSettings.mFullscreen), mFOV(engineSettings.mFOV),
-                                                                                                                                  mWindowTitle(engineSettings.mWindowTitle), mMSAA(engineSettings.mMSAA)
+                                                                                                                                  mWindowTitle(engineSettings.mWindowTitle), mMSAA(engineSettings.mMSAA), mPreviousMouseX(mScreenWidth / 2), mPreviousMouseY(mScreenHeight / 2)
     {
         if (glfwInit() != GL_TRUE)
         {
@@ -150,7 +150,13 @@ namespace JonsEngine
 			
 		if (mMousePositionCallback)
 		{
-			
+            double currentPosX, currentPosY;
+
+            glfwGetCursorPos(mWindow, &currentPosX, &currentPosY);
+            mMousePositionCallback(MousePositionEvent(mPreviousMouseX, mPreviousMouseY, currentPosX, currentPosY));
+
+            mPreviousMouseX = currentPosX;
+            mPreviousMouseY = currentPosY;
 		}
 
         ClearAllEvents();

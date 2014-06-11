@@ -16,7 +16,7 @@ namespace JonsGame
         void Run();
 
         void OnMouseButtonEvent(const JonsEngine::MouseButtonEvent& evnt);
-        void OnMouseMotionEvent(const JonsEngine::MouseMotionEvent& evnt);
+        void OnMousePositionEvent(const JonsEngine::MousePositionEvent& evnt);
         void OnKeyEvent(const JonsEngine::KeyEvent& evnt);
 
 
@@ -29,8 +29,6 @@ namespace JonsGame
         JonsEngine::DebugOptions mDebugOptions;
         JonsEngine::Engine* mEngine;
         bool mRunning;
-        uint32_t mCenterXPos;
-        uint32_t mCenterYPos;
         float mSunAngle;
         const float mMoveSpeed;
     };

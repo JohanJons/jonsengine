@@ -16,7 +16,7 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mCenterYPos(mEngine->GetWindow().GetScreenHeight() / 2), mCenterXPos(mEngine->GetWindow().GetScreenWidth() / 2), mSunAngle(0.0f), mMoveSpeed(0.1f)
+    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mSunAngle(0.0f), mMoveSpeed(0.1f)
     {
     }
         
@@ -37,8 +37,6 @@ namespace JonsGame
         while (mRunning)
         {
             UpdateSun();
-
-            mEngine->GetWindow().SetMousePosition(mCenterXPos, mCenterYPos);
 
             mEngine->Tick(mDebugOptions);
         }
@@ -109,14 +107,14 @@ namespace JonsGame
     {
     }
         
-    void Game::OnMouseMotionEvent(const JonsEngine::MouseMotionEvent& evnt)
+    void Game::OnMousePositionEvent(const JonsEngine::MousePositionEvent& evnt)
     {
         Scene* activeScene = mEngine->GetSceneManager().GetActiveScene();
         Camera& camera = activeScene->GetSceneCamera();
 
         const float sens = 0.1f;
-        float newXPos = -((float)mCenterXPos - (float)evnt.mPosX) * sens;
-        float newYPos = -((float)mCenterYPos - (float)evnt.mPosY) * sens;
+        float newXPos = -((float)evnt.mPreviousPosX - (float)evnt.mCurrentPosX) * sens;
+        float newYPos = -((float)evnt.mPreviousPosY - (float)evnt.mCurrentPosY) * sens;
 
         camera.RotateCamera(newXPos, newYPos);
     }
@@ -124,7 +122,7 @@ namespace JonsGame
     void Game::SetupInputCallbacks()
     {
         mEngine->GetWindow().SetMouseButtonCallback(boost::bind(&Game::OnMouseButtonEvent, this, _1));
-        mEngine->GetWindow().SetMouseMotionCallback(boost::bind(&Game::OnMouseMotionEvent, this, _1));
+        mEngine->GetWindow().SetMousePositionCallback(boost::bind(&Game::OnMousePositionEvent, this, _1));
         mEngine->GetWindow().SetKeyCallback(boost::bind(&Game::OnKeyEvent, this, _1));
     }
 

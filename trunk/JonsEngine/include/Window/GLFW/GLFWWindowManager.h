@@ -89,7 +89,8 @@ namespace JonsEngine
         float mFOV;
         std::string mWindowTitle;
         uint16_t mMSAA;
-		Vec2 mPreviousMousePosition;
+		double mPreviousMouseX;
+        double mPreviousMouseY;
 
         MouseButtonCallback mMouseButtonCallback;
         MouseMotionCallback mMouseMotionCallback;
