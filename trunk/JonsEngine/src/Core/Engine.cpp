@@ -36,16 +36,15 @@ namespace JonsEngine
 
     void Engine::Tick(const DebugOptions& debugOptions)
     {
-        mWindow.StartFrame();
-
         mWindow.Poll();
 
-        if (mSceneManager.HasActiveScene())
-        {
-            Scene* activeScene = mSceneManager.GetActiveScene();
+        Scene* activeScene = mSceneManager.GetActiveScene();
 
+        if (activeScene)
+        {
             // update model matrix of all nodes in active scene
             activeScene->GetRootNode().UpdateModelMatrix(Mat4(1.0f));
+
             const Camera& camera = activeScene->GetSceneCamera();
             const Mat4 viewMatrix = camera.GetCameraTransform();
             const Mat4 perspectiveMatrix = glm::perspective(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer->GetZNear(), mRenderer->GetZFar());
@@ -59,7 +58,7 @@ namespace JonsEngine
             mRenderer->DrawRenderables(renderQueue, lighting, debugOptions.mRenderingMode, debugOptions.mRenderingFlags);
         }
 
-        mWindow.EndFrame();
+        mWindow.SwapColorBuffers();
     }
 
     

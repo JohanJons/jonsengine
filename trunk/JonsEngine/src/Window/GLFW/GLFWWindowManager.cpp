@@ -42,33 +42,41 @@ namespace JonsEngine
         gGLFWWindowInstance = nullptr;
     }
 
-        
-    void GLFWWindowManager::StartFrame()
-    {
-        mLastFrameTime = mThisFrameTime;
-        if (mFrameLimit)
-            mStartFrameTime = glfwGetTime();
 
+    /*
+    * Dispatches queued input events to all registered callbacks.
+    * Is called by the Engine once per frame.
+    */
+    void GLFWWindowManager::Poll()
+    {
         glfwPollEvents();
-    }
-        
-    void GLFWWindowManager::EndFrame()
-    {
-        if (mFrameLimit)
+
+        // Dispatch waiting events for each event type to registered callbacks
+        for (MouseButtonEvent& ev : mMouseButtonEvents)
+            mMouseButtonCallback(ev);
+
+        for (MouseMotionEvent& ev : mMouseMotionEvents)
+            mMouseMotionCallback(ev);
+
+        for (KeyEvent& ev : mKeyEvents)
+            mKeyCallback(ev);
+
+        if (mMousePositionCallback)
         {
-            mThisFrameTime = glfwGetTime();
+            double currentPosX, currentPosY;
 
-            const double endFrameTime = (mThisFrameTime - mStartFrameTime);
-            const double frameTime = 1.0f / mFrameLimit;
+            glfwGetCursorPos(mWindow, &currentPosX, &currentPosY);
+            mMousePositionCallback(MousePositionEvent(mPreviousMouseX, mPreviousMouseY, currentPosX, currentPosY));
 
-            if (endFrameTime < frameTime)
-            {
-                const unsigned long sleepTimeMs = static_cast<unsigned long>((frameTime - endFrameTime) * 1000);
-                
-                std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
-            }
+            mPreviousMouseX = currentPosX;
+            mPreviousMouseY = currentPosY;
         }
 
+        ClearAllEvents();
+    }
+        
+    void GLFWWindowManager::SwapColorBuffers()
+    {
         glfwSwapBuffers(mWindow);
     }
 
@@ -130,36 +138,6 @@ namespace JonsEngine
     void GLFWWindowManager::SetMousePosition(uint32_t x, uint32_t y)
     {
         glfwSetCursorPos(mWindow, x, y);
-    }
-
-    /*
-     * Dispatches queued input events to all registered callbacks.
-     * Is called by the Engine once per frame.
-     */
-    void GLFWWindowManager::Poll()
-    {
-        // Dispatch waiting events for each event type to registered callbacks
-        for(MouseButtonEvent& ev : mMouseButtonEvents)
-            mMouseButtonCallback(ev);
-
-        for(MouseMotionEvent& ev : mMouseMotionEvents)
-            mMouseMotionCallback(ev);
-
-        for(KeyEvent& ev : mKeyEvents)
-            mKeyCallback(ev);
-			
-		if (mMousePositionCallback)
-		{
-            double currentPosX, currentPosY;
-
-            glfwGetCursorPos(mWindow, &currentPosX, &currentPosY);
-            mMousePositionCallback(MousePositionEvent(mPreviousMouseX, mPreviousMouseY, currentPosX, currentPosY));
-
-            mPreviousMouseX = currentPosX;
-            mPreviousMouseY = currentPosY;
-		}
-
-        ClearAllEvents();
     }
 
     void GLFWWindowManager::ClearAllEvents()

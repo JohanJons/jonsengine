@@ -23,8 +23,12 @@ namespace JonsEngine
         GLFWWindowManager(const EngineSettings& engineSettings, OnContextCreatedCallback contextCreatedCallback);
         ~GLFWWindowManager();
 
-        void StartFrame();
-        void EndFrame();
+        /*
+        * Dispatches queued input events to all registered callbacks.
+        * Is called by the Engine once per frame.
+        */
+        void Poll();
+        void SwapColorBuffers();
 
         void SetMouseButtonCallback();
         void SetMouseButtonCallback(const MouseButtonCallback& callback);
@@ -37,12 +41,6 @@ namespace JonsEngine
 
         void ShowMouseCursor(bool show);
         void SetMousePosition(uint32_t x, uint32_t y);
-
-        /*
-         * Dispatches queued input events to all registered callbacks.
-         * Is called by the Engine once per frame.
-         */
-        void Poll();
 
         void SetFrameLimit(const uint64_t newFrameLimit);
         uint64_t GetFrameLimit() const;
