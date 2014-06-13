@@ -522,9 +522,11 @@ namespace JonsEngine
     void OpenGLRenderer::PointLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightProjMatrix, const Mat4& lightViewMatrix)
     {
         mNullProgram.UseProgram();
+        GLCALL(glCullFace(GL_FRONT));
 
         GeometryDepthPass(renderQueue, lightProjMatrix * lightViewMatrix);
 		
+        GLCALL(glCullFace(GL_BACK));
 		GLCALL(glUseProgram(0));
     }
 
