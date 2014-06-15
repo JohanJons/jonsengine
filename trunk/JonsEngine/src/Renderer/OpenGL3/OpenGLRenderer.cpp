@@ -156,7 +156,6 @@ namespace JonsEngine
     template<class RenderableFunc>
     void DrawModels(const RenderQueue& renderQueue, Logger& logger, std::vector<OpenGLRenderer::OpenGLMeshPair>& meshes, RenderableFunc&& preDrawFunc)
     {
-
         // both containers are assumed to be sorted by MeshID ascending
         auto meshIterator = meshes.begin();
         for (const Renderable& renderable : renderQueue)
@@ -423,13 +422,15 @@ namespace JonsEngine
 
             // fill shadowmaps
             mDirectionalShadowmap.BindForDrawing();
+            mNullProgram.UseProgram();
             GLCALL(glViewport(0, 0, (GLsizei)mShadowmapResolution, (GLsizei)mShadowmapResolution));
             for (uint8_t cascadeIndex = 0; cascadeIndex < gNumShadowmapCascades; cascadeIndex++)
             {
                 CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(nearDistArr[cascadeIndex], farDistArr[cascadeIndex], lighting.mCameraViewMatrix);
 
                 lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, directionalLight.mLightDirection);       // TODO: bounding box problems?
-                DirLightShadowPass(renderQueue, lightVPMatrices[cascadeIndex], cascadeIndex);
+                mDirectionalShadowmap.BindShadowmapCascade(cascadeIndex);
+                GeometryDepthPass(renderQueue, lightVPMatrices[cascadeIndex]);
 
                 lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex];
                 farDistArr[cascadeIndex]      = -farDistArr[cascadeIndex];
@@ -544,15 +545,6 @@ namespace JonsEngine
         GLCALL(glCullFace(GL_BACK));
         GLCALL(glDisable(GL_CULL_FACE));
         GLCALL(glUseProgram(0));
-    }
-
-    void OpenGLRenderer::DirLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightVP, const uint8_t cascadeIndex)
-    {
-        mDirectionalShadowmap.BindShadowmapCascade(cascadeIndex);
-        mNullProgram.UseProgram();
-        GeometryDepthPass(renderQueue, lightVP);
-		
-		GLCALL(glUseProgram(0));
     }
 
     void OpenGLRenderer::DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const std::array<Mat4, gNumShadowmapCascades>& lightMatrices, const Mat4& cameraViewMatrix, const std::array<float, gNumShadowmapCascades>& splitDistances, const Vec4& gamma, const Vec2& screenSize, const bool debugShadowmapSplits)

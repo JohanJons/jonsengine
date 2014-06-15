@@ -67,7 +67,6 @@ namespace JonsEngine
         void PointLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightProjMatrix, const Mat4& lightViewMatrix);
         void PointLightStencilPass(const RenderableLighting::PointLight& pointLight);
         void PointLightLightingPass(const RenderableLighting::PointLight& pointLight, const Vec4& gamma, const Vec2& screenSize);
-        void DirLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightVP, const uint8_t cascadeIndex);
         void DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const std::array<Mat4, 4>& lightMatrices, const Mat4& cameraViewMatrix, const std::array<float, 4>& splitDistances, const Vec4& gamma, const Vec2& screenSize, const bool debugShadowmapSplits);
         void RenderToScreen(const DebugOptions::RenderingMode debugOptions, const Vec2& screenSize);
 
