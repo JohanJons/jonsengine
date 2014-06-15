@@ -153,6 +153,41 @@ namespace JonsEngine
         return glm::ortho(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.y) * viewMatrix;
     }
 
+    template<class RenderableFunc>
+    void DrawModels(const RenderQueue& renderQueue, Logger& logger, std::vector<OpenGLRenderer::OpenGLMeshPair>& meshes, RenderableFunc&& preDrawFunc)
+    {
+
+        // both containers are assumed to be sorted by MeshID ascending
+        auto meshIterator = meshes.begin();
+        for (const Renderable& renderable : renderQueue)
+        {
+            if (renderable.mMesh == INVALID_MESH_ID)
+            {
+                JONS_LOG_ERROR(logger, "Renderable MeshID is invalid");
+                throw std::runtime_error("Renderable MeshID is invalid");
+            }
+
+            if (renderable.mMesh < meshIterator->first->mMeshID)
+                continue;
+
+            while (renderable.mMesh > meshIterator->first->mMeshID)
+            {
+                meshIterator++;
+                if (meshIterator == meshes.end())
+                {
+                    JONS_LOG_ERROR(logger, "Renderable MeshID out of range");
+                    throw std::runtime_error("Renderable MeshID out of range");
+                }
+            }
+
+            preDrawFunc(renderable);
+
+            GLCALL(glBindVertexArray(meshIterator->second));
+            GLCALL(glDrawElements(GL_TRIANGLES, meshIterator->first->mIndices, GL_UNSIGNED_INT, 0));
+            GLCALL(glBindVertexArray(0));
+        }
+    }
+
 
     OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator) : OpenGLRenderer(engineSettings.mWindowWidth, engineSettings.mWindowHeight, ShadowQualityResolution(engineSettings.mShadowQuality), engineSettings.mAnisotropicFiltering, memoryAllocator)
     {
@@ -242,13 +277,13 @@ namespace JonsEngine
     }
 
 
-    void OpenGLRenderer::DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
+    void OpenGLRenderer::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
         // clear default fbo color/buffer/stencil 
         GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 
-        GeometryPass(renderQueue, lighting, debugExtra.test(DebugOptions::RENDER_FLAG_DRAW_LIGHTS));
-        ShadingPass(renderQueue, lighting, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
+        GeometryStage(renderQueue, lighting, debugExtra.test(DebugOptions::RENDER_FLAG_DRAW_LIGHTS));
+        ShadingStage(renderQueue, lighting, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
 
         RenderToScreen(debugMode, lighting.mScreenSize);
     }
@@ -315,7 +350,7 @@ namespace JonsEngine
     }
 
 
-    void OpenGLRenderer::GeometryPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights)
+    void OpenGLRenderer::GeometryStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights)
     {
         mGBuffer.BindGeometryForDrawing();
 
@@ -327,50 +362,24 @@ namespace JonsEngine
         // clear GBuffer position/normal/diffuse textures and depth buffer
         GLCALL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-        // both containers are assumed to be sorted by MeshID ascending
-        auto meshIterator = mMeshes.begin();
-        for (const Renderable& renderable : renderQueue)
-        {
-            if (renderable.mMesh == INVALID_MESH_ID)
-            {
-                JONS_LOG_ERROR(mLogger, "Renderable MeshID is invalid");
-                throw std::runtime_error("Renderable MeshID is invalid");
-            }
+        auto preDrawRenderable = [&](const Renderable& renderable) 
+                                    {
+                                        const bool hasDiffuseTexture = renderable.mDiffuseTexture != INVALID_TEXTURE_ID;
+                                        const bool hasNormalTexture = renderable.mNormalTexture != INVALID_TEXTURE_ID;
 
-            if (renderable.mMesh < meshIterator->first->mMeshID)
-                continue;
+                                        mGeometryProgram.SetUniformData(UnifGeometry(renderable.mWVPMatrix, renderable.mWorldMatrix, hasDiffuseTexture, hasNormalTexture, renderable.mTextureTilingFactor));
 
-            while (renderable.mMesh > meshIterator->first->mMeshID)
-            {
-                meshIterator++;
-                if (meshIterator == mMeshes.end())
-                {
-                    JONS_LOG_ERROR(mLogger, "Renderable MeshID out of range");
-                    throw std::runtime_error("Renderable MeshID out of range");
-                }
-            }
+                                        if (hasDiffuseTexture)
+                                            BindTexture2D(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_DIFFUSE, renderable.mDiffuseTexture, mTextures, mLogger);
 
-            const bool hasDiffuseTexture = renderable.mDiffuseTexture != INVALID_TEXTURE_ID;
-            const bool hasNormalTexture = renderable.mNormalTexture != INVALID_TEXTURE_ID;
+                                        if (hasNormalTexture)
+                                            BindTexture2D(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_NORMAL, renderable.mNormalTexture, mTextures, mLogger);
+                                    };
 
-            mGeometryProgram.SetUniformData(UnifGeometry(renderable.mWVPMatrix, renderable.mWorldMatrix, hasDiffuseTexture, hasNormalTexture, renderable.mTextureTilingFactor));
+        DrawModels(renderQueue, mLogger, mMeshes, preDrawRenderable);
 
-            if (hasDiffuseTexture)
-                BindTexture2D(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_DIFFUSE, renderable.mDiffuseTexture, mTextures, mLogger);
-
-            if (hasNormalTexture)
-                BindTexture2D(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_NORMAL, renderable.mNormalTexture, mTextures, mLogger);
-
-            GLCALL(glBindVertexArray(meshIterator->second));
-            GLCALL(glDrawElements(GL_TRIANGLES, meshIterator->first->mIndices, GL_UNSIGNED_INT, 0));
-            GLCALL(glBindVertexArray(0));
-
-            if (hasDiffuseTexture)
-                UnbindTexture2D(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_DIFFUSE, mLogger);
-
-            if (hasNormalTexture)
-                UnbindTexture2D(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_NORMAL, mLogger);
-        }
+        UnbindTexture2D(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_DIFFUSE, mLogger);
+        UnbindTexture2D(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_NORMAL, mLogger);
 
         // debug: draw all lights
         if (debugLights)
@@ -390,7 +399,7 @@ namespace JonsEngine
         GLCALL(glUseProgram(0));
     }
         
-    void OpenGLRenderer::ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugShadowmapSplits)
+    void OpenGLRenderer::ShadingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugShadowmapSplits)
     {
         mGBuffer.BindGeometryForReading();
         mGBuffer.BindFinalForDrawing();
@@ -482,36 +491,13 @@ namespace JonsEngine
 
         GLCALL(glClear(GL_DEPTH_BUFFER_BIT));
 
-        // both containers are assumed to be sorted by MeshID ascending
-        auto meshIterator = mMeshes.begin();
-        for (const Renderable& renderable : renderQueue)
-        {
-            if (renderable.mMesh == INVALID_MESH_ID)
-            {
-                JONS_LOG_ERROR(mLogger, "Renderable MeshID is invalid");
-                throw std::runtime_error("Renderable MeshID is invalid");
-            }
+        auto preDrawRenderable = [&](const Renderable& renderable)
+                                    {
+                                        const Mat4 wvp = lightVP * renderable.mWorldMatrix;
+                                        mNullProgram.SetUniformData(UnifNull(wvp));
+                                    };
 
-            if (renderable.mMesh < meshIterator->first->mMeshID)
-                continue;
-
-            while (renderable.mMesh > meshIterator->first->mMeshID)
-            {
-                meshIterator++;
-                if (meshIterator == mMeshes.end())
-                {
-                    JONS_LOG_ERROR(mLogger, "Renderable MeshID out of range");
-                    throw std::runtime_error("Renderable MeshID out of range");
-                }
-            }
-
-            const Mat4 wvp = lightVP * renderable.mWorldMatrix;
-            mNullProgram.SetUniformData(UnifNull(wvp));
-
-            GLCALL(glBindVertexArray(meshIterator->second));
-            GLCALL(glDrawElements(GL_TRIANGLES, meshIterator->first->mIndices, GL_UNSIGNED_INT, 0));
-            GLCALL(glBindVertexArray(0));
-        }
+        DrawModels(renderQueue, mLogger, mMeshes, preDrawRenderable);
 
         GLCALL(glDisable(GL_DEPTH_TEST));
         GLCALL(glDisable(GL_CULL_FACE));

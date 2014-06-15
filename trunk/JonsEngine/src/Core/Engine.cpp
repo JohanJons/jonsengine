@@ -55,7 +55,7 @@ namespace JonsEngine
             const RenderableLighting lighting(GetLightingInfo(perspectiveMatrix, viewMatrix, viewPerspectiveMatrix, activeScene->GetGamma(), activeScene->GetAmbientLight(), camera.Position(), activeScene->GetPointLights(), activeScene->GetDirectionalLights()));
 
             // render the scene
-            mRenderer->DrawRenderables(renderQueue, lighting, debugOptions.mRenderingMode, debugOptions.mRenderingFlags);
+            mRenderer->Render(renderQueue, lighting, debugOptions.mRenderingMode, debugOptions.mRenderingFlags);
         }
 
         mWindow.SwapColorBuffers();

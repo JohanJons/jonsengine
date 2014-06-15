@@ -34,6 +34,9 @@ namespace JonsEngine
     class OpenGLRenderer
     {
     public:
+        typedef std::pair<OpenGLMeshPtr, GLuint> OpenGLMeshPair;
+
+
         OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator);
         OpenGLRenderer(const std::vector<OpenGLMeshPtr>& meshes, const std::vector<OpenGLTexturePtr>& textures, const uint32_t windowWidth, const uint32_t windowHeight, const uint32_t shadowMapResolution, const float anisotropy, IMemoryAllocatorPtr memoryAllocator);
         OpenGLRenderer(const uint32_t windowWidth, const uint32_t windowHeight, const uint32_t shadowMapResolution, const float anisotropy, IMemoryAllocatorPtr memoryAllocator);
@@ -42,7 +45,7 @@ namespace JonsEngine
         MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData);
         TextureID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat);
 
-        void DrawRenderables(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra);
+        void Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra);
 
         float GetMaxAnisotropicFiltering() const;
         float GetCurrentAnisotropicFiltering() const;
@@ -57,10 +60,8 @@ namespace JonsEngine
 
 
     private:
-        typedef std::pair<OpenGLMeshPtr, GLuint> OpenGLMeshPair;
-
-        void GeometryPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights);
-        void ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugShadowmapSplits);
+        void GeometryStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights);
+        void ShadingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugShadowmapSplits);
         void AmbientLightPass(const Vec4& ambientLight, const Vec4& gamma, const Vec2& screenSize);
         void GeometryDepthPass(const RenderQueue& renderQueue, const Mat4& lightVP);
         void PointLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightProjMatrix, const Mat4& lightViewMatrix);
