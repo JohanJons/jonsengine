@@ -50,14 +50,12 @@ namespace JonsEngine
         void SetScreenResolution(const uint32_t width, const uint32_t height);
         void SetWindowTitle(const std::string& windowTitle);
         void SetFOV(const float FOV);
-        void SetMSAA(const uint16_t msaa);
 
         bool GetFullscreen() const;
         uint32_t GetScreenWidth() const;
         uint32_t GetScreenHeight() const;
         const std::string& GetWindowTitle() const;
         float GetFOV() const;
-        uint16_t GetMSAA() const;
     
 
     private:
@@ -86,7 +84,6 @@ namespace JonsEngine
         bool mFullscreen;
         float mFOV;
         std::string mWindowTitle;
-        uint16_t mMSAA;
 		double mPreviousMouseX;
         double mPreviousMouseY;
 
@@ -106,5 +103,4 @@ namespace JonsEngine
     inline bool GLFWWindowManager::GetFullscreen() const                                     { return mFullscreen;  }
     inline float GLFWWindowManager::GetFOV() const                                           { return mFOV;         }
     inline const std::string& GLFWWindowManager::GetWindowTitle() const                      { return mWindowTitle; }
-    inline uint16_t GLFWWindowManager::GetMSAA() const                                       { return mMSAA;        }
 }

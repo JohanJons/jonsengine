@@ -16,7 +16,7 @@ namespace JonsEngine
     GLFWWindowManager::GLFWWindowManager(const EngineSettings& engineSettings, OnContextCreatedCallback contextCreatedCallback) : mOnContextCreated(contextCreatedCallback), 
                                                                                                                                   mLogger(Logger::GetWindowLogger()), mFrameLimit(engineSettings.mFrameLimit), mWindow(nullptr),
                                                                                                                                   mScreenWidth(engineSettings.mWindowWidth), mScreenHeight(engineSettings.mWindowHeight), mShowMouseCursor(false), mFullscreen(engineSettings.mFullscreen), mFOV(engineSettings.mFOV),
-                                                                                                                                  mWindowTitle(engineSettings.mWindowTitle), mMSAA(engineSettings.mMSAA), mPreviousMouseX(mScreenWidth / 2), mPreviousMouseY(mScreenHeight / 2)
+                                                                                                                                  mWindowTitle(engineSettings.mWindowTitle), mPreviousMouseX(mScreenWidth / 2), mPreviousMouseY(mScreenHeight / 2)
     {
         if (glfwInit() != GL_TRUE)
         {
@@ -197,12 +197,6 @@ namespace JonsEngine
         mFOV = FOV;
     }
 
-    void GLFWWindowManager::SetMSAA(const uint16_t msaa)
-    {
-        mMSAA = msaa;
-        SetupWindow();
-    }
-        
 
     uint32_t GLFWWindowManager::GetScreenWidth() const
     {
@@ -217,7 +211,6 @@ namespace JonsEngine
         
     bool GLFWWindowManager::SetupWindow()
     {
-        glfwWindowHint(GLFW_SAMPLES, mMSAA);
         auto newWindow = glfwCreateWindow(mScreenWidth, mScreenHeight, mWindowTitle.c_str(), mFullscreen ? glfwGetPrimaryMonitor() : nullptr, mWindow);
 
         if (!newWindow) 
