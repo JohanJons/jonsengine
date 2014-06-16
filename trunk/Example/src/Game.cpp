@@ -160,9 +160,9 @@ namespace JonsGame
         nodeMovingLight->TranslateNode(Vec3(5.0f, 3.5f, -15.0f));
 
         // directional light
-    //    DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
-    //    directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
-    //    directionalLight->mLightColor = Vec4(0.3f);
+        DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
+        directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
+        directionalLight->mLightColor = Vec4(0.3f);
 
         // ambient light
         myScene->SetAmbientLight(Vec4(0.05f));

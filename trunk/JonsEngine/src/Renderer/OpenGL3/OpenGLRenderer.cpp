@@ -503,7 +503,6 @@ namespace JonsEngine
         GLCALL(glDisable(GL_DEPTH_TEST));
         GLCALL(glDisable(GL_CULL_FACE));
         GLCALL(glDepthMask(GL_FALSE));
-        GLCALL(glUseProgram(0));
     }
 
     void OpenGLRenderer::PointLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightProjMatrix, const Mat4& lightViewMatrix)
