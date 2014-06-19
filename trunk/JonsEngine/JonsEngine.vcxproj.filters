@@ -191,6 +191,9 @@
     <ClCompile Include="src\Renderer\OpenGL3\OmnidirectionalShadowmap.cpp">
       <Filter>Source Files\Renderer\OpenGL3</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\AccumulationBuffer.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -374,6 +377,9 @@
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\OpenGL3\OmnidirectionalShadowmap.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\AccumulationBuffer.h">
       <Filter>Header Files\Renderer\OpenGL3</Filter>
     </ClInclude>
   </ItemGroup>

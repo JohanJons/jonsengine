@@ -12,6 +12,7 @@ namespace JonsEngine
         vec4 mLightColor;                                                                   \n \
         vec4 mGamma;                                                                        \n \
         vec2 mScreenSize;                                                                   \n \
+        int mNumSamples;                                                                    \n \
     } UnifAmbientPass;                                                                      \n \
                                                                                             \n \
     layout(location = 0) in vec3 vert_position;                                             \n \

@@ -89,9 +89,13 @@ namespace JonsGame
             else if (evnt.mKey == Key::O)
                 mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS);
             else if (evnt.mKey == Key::H)
-                mEngine->GetRenderer()->SetAnisotropicFiltering(1.0f);
+                mEngine->GetRenderer()->SetAnisotropicFiltering(EngineSettings::ANISOTROPIC_1X);
             else if (evnt.mKey == Key::J)
-                mEngine->GetRenderer()->SetAnisotropicFiltering(mEngine->GetRenderer()->GetMaxAnisotropicFiltering());
+                mEngine->GetRenderer()->SetAnisotropicFiltering(EngineSettings::ANISOTROPIC_16X);
+            else if (evnt.mKey == Key::K)
+                mEngine->GetRenderer()->SetMSAA(EngineSettings::MSAA_1X);
+            else if (evnt.mKey == Key::L)
+                mEngine->GetRenderer()->SetMSAA(EngineSettings::MSAA_4X);
 
             // misc
             else if (evnt.mKey == Key::N)
@@ -183,10 +187,6 @@ namespace JonsGame
         
         // move up camera
         myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
-
-        // set anisotropic filter to max
-        float maxAnisoLevel = mEngine->GetRenderer()->GetMaxAnisotropicFiltering();
-        mEngine->GetRenderer()->SetAnisotropicFiltering(maxAnisoLevel);
     }
 
     void Game::UpdateSun()

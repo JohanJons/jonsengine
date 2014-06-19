@@ -17,11 +17,12 @@ namespace JonsEngine
                                                                                                                                             \n \
         float mLightIntensity;                                                                                                              \n \
         float mMaxDistance;                                                                                                                 \n \
+        int mNumSamples;                                                                                                                    \n \
     } UnifPointLightPass;                                                                                                                   \n \
                                                                                                                                             \n \
-    layout (binding = 2) uniform sampler2D unifPositionTexture;                                                                             \n \
-    layout (binding = 3) uniform sampler2D unifNormalTexture;                                                                               \n \
-    layout (binding = 4) uniform sampler2D unifDiffuseTexture;                                                                              \n \
+    layout (binding = 2) uniform sampler2DMS unifPositionTexture;                                                                           \n \
+    layout (binding = 3) uniform sampler2DMS unifNormalTexture;                                                                             \n \
+    layout (binding = 4) uniform sampler2DMS unifDiffuseTexture;                                                                            \n \
     layout (binding = 7) uniform samplerCube unifShadowmap;                                                                                 \n \
                                                                                                                                             \n \
     out vec4 fragColor;                                                                                                                     \n \
@@ -40,12 +41,19 @@ namespace JonsEngine
                                                                                                                                             \n \
     void main()                                                                                                                             \n \
     {                                                                                                                                       \n \
-        vec2 texcoord = gl_FragCoord.xy / UnifPointLightPass.mScreenSize;                                                                   \n \
+        ivec2 texcoord = ivec2(textureSize(unifDiffuseTexture) * (gl_FragCoord.xy / UnifPointLightPass.mScreenSize));                       \n \
                                                                                                                                             \n \
-        vec3 worldPos = texture(unifPositionTexture, texcoord).xyz;                                                                         \n \
-        vec3 normal   = texture(unifNormalTexture, texcoord).xyz;                                                                           \n \
-        vec3 diffuse  = texture(unifDiffuseTexture, texcoord).xyz;                                                                          \n \
-        normal        = normalize(normal);                                                                                                  \n \
+        vec3 worldPos = vec3(0.0), normal = vec3(0.0), diffuse = vec3(0.0);                                                                 \n \
+        for (int i = 0; i < UnifPointLightPass.mNumSamples; i++)                                                                            \n \
+        {                                                                                                                                   \n \
+            worldPos += texelFetch(unifPositionTexture, texcoord, i).rgb;                                                                   \n \
+            normal   += texelFetch(unifNormalTexture, texcoord, i).rgb;                                                                     \n \
+            diffuse  += texelFetch(unifDiffuseTexture, texcoord, i).rgb;                                                                    \n \
+        }                                                                                                                                   \n \
+        worldPos /= UnifPointLightPass.mNumSamples;                                                                                         \n \
+        normal   /= UnifPointLightPass.mNumSamples;                                                                                         \n \
+        diffuse  /= UnifPointLightPass.mNumSamples;                                                                                         \n \
+        normal = normalize(normal);                                                                                                         \n \
                                                                                                                                             \n \
         vec3 positionDiff = (UnifPointLightPass.mLightPos.xyz - worldPos);                                                                  \n \
         vec3 cubemapDir   = (worldPos - UnifPointLightPass.mLightPos.xyz);                                                                  \n \

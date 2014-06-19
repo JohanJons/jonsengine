@@ -29,11 +29,12 @@ namespace JonsEngine
         Vec2 mScreenSize;
         float mLightIntensity;
         float mMaxDistance;
+        uint32_t mSamples;
 
 
-        UnifPointLight(const Mat4& vwpMatrix, const Vec4& lightColor, const Vec4& lightPos, const Vec4& gamma, const Vec2& screenSize, const float lightIntensity, const float maxDistance)
+        UnifPointLight(const Mat4& vwpMatrix, const Vec4& lightColor, const Vec4& lightPos, const Vec4& gamma, const Vec2& screenSize, const float lightIntensity, const float maxDistance, const uint32_t samples)
             :
-        mWVPMatrix(vwpMatrix), mLightColor(lightColor), mLightPos(lightPos), mGamma(gamma), mScreenSize(screenSize), mLightIntensity(lightIntensity), mMaxDistance(maxDistance)
+            mWVPMatrix(vwpMatrix), mLightColor(lightColor), mLightPos(lightPos), mGamma(gamma), mScreenSize(screenSize), mLightIntensity(lightIntensity), mMaxDistance(maxDistance), mSamples(samples)
         {
         }
     };
@@ -59,11 +60,12 @@ namespace JonsEngine
         Vec4 mLightDir;
         Vec4 mGamma;
         Vec2 mScreenSize;
+        uint32_t mSamples;
 
 
-        UnifDirLight(const std::array<Mat4, 4>& lightMatrices, const Mat4& cameraViewMatrix, const std::array<float, 4>& splitDistances, const Vec4& lightColor, const Vec4& lightDir, const Vec4& gamma, const Vec2& screenSize)
+        UnifDirLight(const std::array<Mat4, 4>& lightMatrices, const Mat4& cameraViewMatrix, const std::array<float, 4>& splitDistances, const Vec4& lightColor, const Vec4& lightDir, const Vec4& gamma, const Vec2& screenSize, const uint32_t samples)
             :
-            mLightMatrices(lightMatrices), mCameraViewMatrix(cameraViewMatrix), mSplitDistances(splitDistances[0], splitDistances[1], splitDistances[2], splitDistances[3]), mLightColor(lightColor), mLightDir(lightDir), mGamma(gamma), mScreenSize(screenSize)
+            mLightMatrices(lightMatrices), mCameraViewMatrix(cameraViewMatrix), mSplitDistances(splitDistances[0], splitDistances[1], splitDistances[2], splitDistances[3]), mLightColor(lightColor), mLightDir(lightDir), mGamma(gamma), mScreenSize(screenSize), mSamples(samples)
         {
         }
     };
@@ -73,11 +75,12 @@ namespace JonsEngine
         Vec4 mLightColor;
         Vec4 mGamma;
         Vec2 mScreenSize;
+        uint32_t mSamples;
 
 
-        UnifAmbientLight(const Vec4& lightColor, const Vec4& gamma, const Vec2& screenSize)
+        UnifAmbientLight(const Vec4& lightColor, const Vec4& gamma, const Vec2& screenSize, const uint32_t samples)
             :
-        mLightColor(lightColor), mGamma(gamma), mScreenSize(screenSize)
+            mLightColor(lightColor), mGamma(gamma), mScreenSize(screenSize), mSamples(samples)
         {
         }
     };

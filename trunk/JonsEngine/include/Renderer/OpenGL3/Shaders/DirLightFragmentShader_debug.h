@@ -18,6 +18,7 @@ namespace JonsEngine
         vec4 mLightDir;                                                                                                             \n \
         vec4 mGamma;                                                                                                                \n \
         vec2 mScreenSize;                                                                                                           \n \
+        int mNumSamples;                                                                                                            \n \
     } UnifDirLightPass;                                                                                                             \n \
                                                                                                                                     \n \
     layout (binding = 2) uniform sampler2D unifPositionTexture;                                                                     \n \

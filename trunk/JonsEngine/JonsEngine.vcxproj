@@ -128,6 +128,7 @@
     <ClCompile Include="src\Core\Threading\ThreadPool.cpp" />
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
     <ClCompile Include="src\Core\Utils\Time.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\AccumulationBuffer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\DirectionalShadowmap.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\GBuffer.cpp" />
     <ClCompile Include="src\Renderer\OpenGL3\OmnidirectionalShadowmap.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="include\Core\Types.h" />
     <ClInclude Include="include\Core\Utils\Time.h" />
     <ClInclude Include="include\Core\Utils\Math.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\AccumulationBuffer.h" />
     <ClInclude Include="include\Renderer\OpenGL3\DirectionalShadowmap.h" />
     <ClInclude Include="include\Renderer\OpenGL3\GBuffer.h" />
     <ClInclude Include="include\Renderer\OpenGL3\OmnidirectionalShadowmap.h" />

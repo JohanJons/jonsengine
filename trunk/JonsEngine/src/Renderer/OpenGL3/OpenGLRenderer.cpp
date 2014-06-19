@@ -188,13 +188,13 @@ namespace JonsEngine
     }
 
 
-    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator) : OpenGLRenderer(engineSettings.mWindowWidth, engineSettings.mWindowHeight, ShadowQualityResolution(engineSettings.mShadowQuality), engineSettings.mAnisotropicFiltering, memoryAllocator)
+    OpenGLRenderer::OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator) : OpenGLRenderer(engineSettings.mWindowWidth, engineSettings.mWindowHeight, ShadowQualityResolution(engineSettings.mShadowQuality), engineSettings.mAnisotropicFiltering, engineSettings.mMSAA, memoryAllocator)
     {
     }
 
-    OpenGLRenderer::OpenGLRenderer(const std::vector<OpenGLMeshPtr>& meshes, const std::vector<OpenGLTexturePtr>& textures, const uint32_t windowWidth, const uint32_t windowHeight, const uint32_t shadowMapResolution, const float anisotropy, IMemoryAllocatorPtr memoryAllocator)
+    OpenGLRenderer::OpenGLRenderer(const std::vector<OpenGLMeshPtr>& meshes, const std::vector<OpenGLTexturePtr>& textures, const uint32_t windowWidth, const uint32_t windowHeight, const uint32_t shadowMapResolution, const EngineSettings::Anisotropic anisotropy, const EngineSettings::MSAA msaa, IMemoryAllocatorPtr memoryAllocator)
         : 
-        OpenGLRenderer(windowWidth, windowHeight, shadowMapResolution, anisotropy, memoryAllocator)
+        OpenGLRenderer(windowWidth, windowHeight, shadowMapResolution, anisotropy, msaa, memoryAllocator)
     {
         // recreate the VAOs
         for (const OpenGLMeshPtr mesh : meshes)
@@ -203,7 +203,7 @@ namespace JonsEngine
         mTextures = textures;
     }
 
-    OpenGLRenderer::OpenGLRenderer(const uint32_t windowWidth, const uint32_t windowHeight, const uint32_t shadowMapResolution, const float anisotropy, IMemoryAllocatorPtr memoryAllocator) :
+    OpenGLRenderer::OpenGLRenderer(const uint32_t windowWidth, const uint32_t windowHeight, const uint32_t shadowMapResolution, const EngineSettings::Anisotropic anisotropy, const EngineSettings::MSAA msaa, IMemoryAllocatorPtr memoryAllocator) :
         mMemoryAllocator(memoryAllocator), mLogger(Logger::GetRendererLogger()),
         mGeometryProgram("GeometryProgram", ShaderPtr(new Shader("GeometryVertexShader", gGeometryVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("GeometryFragmentShader", gGeometryFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifGeometry"),
         mPointLightProgram("PointLightProgram", ShaderPtr(new Shader("PointLightVertexShader", gShadingVertexShader, Shader::VERTEX_SHADER)), ShaderPtr(new Shader("PointLightFragmentShader", gShadingFragmentShader, Shader::FRAGMENT_SHADER)), mLogger, "UnifPointLight"),
@@ -215,7 +215,9 @@ namespace JonsEngine
                                                             // VS2012 bug workaround. TODO: fixed in VS2013, when boost is rdy
         //mDefaultProgram("DefaultProgram", ShaderPtr(new Shader("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); }*/), 
         //                                 ShaderPtr(new Shader("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); })*/), mLogger),
-        mGBuffer(mLogger, windowWidth, windowHeight), mTextureSampler(0), mCurrentAnisotropy(anisotropy), mWindowWidth(windowWidth), mWindowHeight(windowHeight), mShadowmapResolution(shadowMapResolution),
+        mAccumulationBuffer(mLogger, windowWidth, windowHeight),
+        mGBuffer(mMemoryAllocator->AllocateObject<GBuffer>(mLogger, windowWidth, windowHeight, mMSAA), [this](GBuffer* gbuffer) { mMemoryAllocator->DeallocateObject(gbuffer); }),
+        mTextureSampler(0), mAnisotropicFiltering(anisotropy), mMSAA(msaa), mWindowWidth(windowWidth), mWindowHeight(windowHeight), mShadowmapResolution(shadowMapResolution),
         mShadingGeometry(mLogger), mDirectionalShadowmap(mLogger, shadowMapResolution, gNumShadowmapCascades), mOmnidirectionalShadowmap(mLogger, shadowMapResolution, CUBEMAP_NUM_FACES)
     {
         GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));
@@ -245,7 +247,7 @@ namespace JonsEngine
         GLCALL(glSamplerParameteri(mTextureSampler, GL_TEXTURE_WRAP_T, GL_REPEAT));
         GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_DIFFUSE, mTextureSampler));
         GLCALL(glBindSampler(OpenGLTexture::TEXTURE_UNIT_GEOMETRY_NORMAL, mTextureSampler));
-        SetAnisotropicFiltering(mCurrentAnisotropy);
+        SetAnisotropicFiltering(mAnisotropicFiltering);
     }
 
     OpenGLRenderer::~OpenGLRenderer()
@@ -288,31 +290,27 @@ namespace JonsEngine
     }
 
 
-    float OpenGLRenderer::GetMaxAnisotropicFiltering() const
+    EngineSettings::Anisotropic OpenGLRenderer::GetAnisotropicFiltering() const
     {
-        float maxAniso = 1.0f;
-        GLCALL(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAniso));
-
-        return maxAniso;
+        return mAnisotropicFiltering;
     }
 
-    float OpenGLRenderer::GetCurrentAnisotropicFiltering() const
+    void OpenGLRenderer::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
     {
-        return mCurrentAnisotropy;
+        mAnisotropicFiltering = anisotropic;
+
+        GLCALL(glSamplerParameterf(mTextureSampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, static_cast<float>(anisotropic)));
     }
-        
-    void OpenGLRenderer::SetAnisotropicFiltering(const float newAnisoLevel)
+
+    EngineSettings::MSAA OpenGLRenderer::GetMSAA() const
     {
-        const float maxAnisoFiltering = GetMaxAnisotropicFiltering();
+        return mMSAA;
+    }
 
-        if (newAnisoLevel > maxAnisoFiltering)
-            mCurrentAnisotropy = maxAnisoFiltering;
-        else if (newAnisoLevel < 1.0f)
-            mCurrentAnisotropy = 1.0f;
-        else
-            mCurrentAnisotropy = newAnisoLevel;
-
-        GLCALL(glSamplerParameterf(mTextureSampler, GL_TEXTURE_MAX_ANISOTROPY_EXT, mCurrentAnisotropy));
+    void OpenGLRenderer::SetMSAA(const EngineSettings::MSAA msaa)
+    {
+        mMSAA = msaa;
+        mGBuffer.reset(mMemoryAllocator->AllocateObject<GBuffer>(mLogger, mWindowWidth, mWindowHeight, mMSAA));
     }
 
 
@@ -351,7 +349,7 @@ namespace JonsEngine
 
     void OpenGLRenderer::GeometryStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights)
     {
-        mGBuffer.BindGeometryForDrawing();
+        mGBuffer->BindGeometryForDrawing();
 
         mGeometryProgram.UseProgram();
         GLCALL(glEnable(GL_CULL_FACE));
@@ -400,8 +398,8 @@ namespace JonsEngine
         
     void OpenGLRenderer::ShadingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugShadowmapSplits)
     {
-        mGBuffer.BindGeometryForReading();
-        mGBuffer.BindFinalForDrawing();
+        mGBuffer->BindGeometryForReading();
+        mAccumulationBuffer.BindForDrawing();
 
         // clear final texture buffer
         GLCALL(glClear(GL_COLOR_BUFFER_BIT));
@@ -436,12 +434,16 @@ namespace JonsEngine
                 farDistArr[cascadeIndex]      = -farDistArr[cascadeIndex];
             }
 
-            mGBuffer.BindFinalForDrawing();
+            mAccumulationBuffer.BindForDrawing();
             GLCALL(glViewport(0, 0, (GLsizei)mWindowWidth, (GLsizei)mWindowHeight));
             DirLightLightingPass(directionalLight, lightVPMatrices, lighting.mCameraViewMatrix, farDistArr, lighting.mGamma, lighting.mScreenSize, debugShadowmapSplits);
         }
-
+        
         // do all point lights
+        // first populate the accbuffers depth buffer for stencil operations
+        mAccumulationBuffer.BindNullForDrawing();
+        mNullProgram.UseProgram();
+        GeometryDepthPass(renderQueue, lighting.mCameraProjectionMatrix * lighting.mCameraViewMatrix);
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
             mOmnidirectionalShadowmap.BindForDrawing();
@@ -457,10 +459,10 @@ namespace JonsEngine
 			GLCALL(glEnable(GL_STENCIL_TEST));
             GLCALL(glViewport(0, 0, (GLsizei)mWindowWidth, (GLsizei)mWindowHeight));
             // stencil pass first to elimiate fragments that dosnt need to be lit
-            mGBuffer.BindNullForDrawing();
+            mAccumulationBuffer.BindNullForDrawing();
             PointLightStencilPass(pointLight);
         
-            mGBuffer.BindFinalForDrawing();
+            mAccumulationBuffer.BindForDrawing();
             mOmnidirectionalShadowmap.BindForReading();
             PointLightLightingPass(pointLight, lighting.mGamma, lighting.mScreenSize);
 			GLCALL(glDisable(GL_STENCIL_TEST));
@@ -478,7 +480,7 @@ namespace JonsEngine
     {
         mAmbientProgram.UseProgram();
 
-        mAmbientProgram.SetUniformData(UnifAmbientLight(ambientLight, gamma, screenSize));
+        mAmbientProgram.SetUniformData(UnifAmbientLight(ambientLight, gamma, screenSize, mMSAA));
         mShadingGeometry.DrawRectangle();
 
         GLCALL(glUseProgram(0));
@@ -538,7 +540,7 @@ namespace JonsEngine
         GLCALL(glCullFace(GL_FRONT));   // cull FRONT face so the light dosnt get culled when inside the radius
         GLCALL(glStencilFunc(GL_NOTEQUAL, 0, 0xFF));
 
-        mPointLightProgram.SetUniformData(UnifPointLight(pointLight.mWVPMatrix, pointLight.mLightColor, Vec4(pointLight.mLightPosition, 1.0f), gamma, screenSize, pointLight.mLightIntensity, pointLight.mMaxDistance));
+        mPointLightProgram.SetUniformData(UnifPointLight(pointLight.mWVPMatrix, pointLight.mLightColor, Vec4(pointLight.mLightPosition, 1.0f), gamma, screenSize, pointLight.mLightIntensity, pointLight.mMaxDistance, mMSAA));
         mShadingGeometry.DrawSphere();
 
         GLCALL(glCullFace(GL_BACK));
@@ -553,12 +555,12 @@ namespace JonsEngine
         if (debugShadowmapSplits)
         {
             mDirLightDebugProgram.UseProgram();
-            mDirLightDebugProgram.SetUniformData(UnifDirLight(lightMatrices, cameraViewMatrix, splitDistances, dirLight.mLightColor, Vec4(-dirLight.mLightDirection, 0.0f), gamma, screenSize));
+            mDirLightDebugProgram.SetUniformData(UnifDirLight(lightMatrices, cameraViewMatrix, splitDistances, dirLight.mLightColor, Vec4(-dirLight.mLightDirection, 0.0f), gamma, screenSize, mMSAA));
         }
         else
         {
             mDirLightProgram.UseProgram();
-            mDirLightProgram.SetUniformData(UnifDirLight(lightMatrices, cameraViewMatrix, splitDistances, dirLight.mLightColor, Vec4(-dirLight.mLightDirection, 0.0f), gamma, screenSize));
+            mDirLightProgram.SetUniformData(UnifDirLight(lightMatrices, cameraViewMatrix, splitDistances, dirLight.mLightColor, Vec4(-dirLight.mLightDirection, 0.0f), gamma, screenSize, mMSAA));
         }
 
         mShadingGeometry.DrawRectangle();
@@ -568,31 +570,29 @@ namespace JonsEngine
 
     void OpenGLRenderer::RenderToScreen(const DebugOptions::RenderingMode debugOptions, const Vec2& screenSize)
     {
-        mGBuffer.BindFBOForReading();
-
         switch (debugOptions)
         {
             case DebugOptions::RENDER_MODE_FULL:
             {
-                GLCALL(glReadBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_FINAL));
+                mAccumulationBuffer.BindForReading();
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
                 break;
             }
             case DebugOptions::RENDER_MODE_POSITIONS:
             {
-                GLCALL(glReadBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_POSITION));
+                mGBuffer->BindPositionForReading();
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
                 break;
             }
             case DebugOptions::RENDER_MODE_NORMALS:
             {
-                GLCALL(glReadBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_NORMAL));
+                mGBuffer->BindNormalsForReading();
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
                 break;
             }
             case DebugOptions::RENDER_MODE_DIFFUSE:
             {
-                GLCALL(glReadBuffer(GBuffer::GBUFFER_COLOR_ATTACHMENT_DIFFUSE));
+                mGBuffer->BindDiffuseForReading();
                 GLCALL(glBlitFramebuffer(0, 0, mWindowWidth, mWindowHeight, 0, 0, mWindowWidth, mWindowHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR));
                 break;
             }
@@ -600,7 +600,7 @@ namespace JonsEngine
             {
                 mDepthProgram.UseProgram();
                 mDepthProgram.SetUniformData(UnifDepth(screenSize, Z_NEAR, Z_FAR));
-                mGBuffer.BindDepthForReading();
+                mGBuffer->BindDepthForReading();
                 mShadingGeometry.DrawRectangle();
                 break;
             }

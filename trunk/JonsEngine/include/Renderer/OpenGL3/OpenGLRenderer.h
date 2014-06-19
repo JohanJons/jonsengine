@@ -3,6 +3,7 @@
 #include "include/Renderer/OpenGL3/OpenGLMesh.h"
 #include "include/Renderer/OpenGL3/OpenGLTexture.h"
 #include "include/Renderer/OpenGL3/ShaderProgram.hpp"
+#include "include/Renderer/OpenGL3/AccumulationBuffer.h"
 #include "include/Renderer/OpenGL3/GBuffer.h"
 #include "include/Renderer/OpenGL3/UniformBuffer.hpp"
 #include "include/Renderer/OpenGL3/ShadingGeometry.h"
@@ -11,6 +12,7 @@
 #include "include/Renderer/OpenGL3/UniformBufferDefinitions.hpp"
 #include "include/Renderer/RenderCommands.h"
 #include "include/Core/Types.h"
+#include "include/Core/EngineSettings.h"
 #include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/DebugOptions.h"
 
@@ -22,7 +24,6 @@
 
 namespace JonsEngine
 {
-    struct EngineSettings;
     class Logger;
     class OpenGLRenderer;
 
@@ -38,8 +39,9 @@ namespace JonsEngine
 
 
         OpenGLRenderer(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator);
-        OpenGLRenderer(const std::vector<OpenGLMeshPtr>& meshes, const std::vector<OpenGLTexturePtr>& textures, const uint32_t windowWidth, const uint32_t windowHeight, const uint32_t shadowMapResolution, const float anisotropy, IMemoryAllocatorPtr memoryAllocator);
-        OpenGLRenderer(const uint32_t windowWidth, const uint32_t windowHeight, const uint32_t shadowMapResolution, const float anisotropy, IMemoryAllocatorPtr memoryAllocator);
+        OpenGLRenderer(const std::vector<OpenGLMeshPtr>& meshes, const std::vector<OpenGLTexturePtr>& textures, const uint32_t windowWidth, const uint32_t windowHeight,
+                       const uint32_t shadowMapResolution, const EngineSettings::Anisotropic anisotropy, const EngineSettings::MSAA msaa, IMemoryAllocatorPtr memoryAllocator);
+        OpenGLRenderer(const uint32_t windowWidth, const uint32_t windowHeight, const uint32_t shadowMapResolution, const EngineSettings::Anisotropic anisotropy, const EngineSettings::MSAA msaa, IMemoryAllocatorPtr memoryAllocator);
         ~OpenGLRenderer();
 
         MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData);
@@ -47,9 +49,11 @@ namespace JonsEngine
 
         void Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra);
 
-        float GetMaxAnisotropicFiltering() const;
-        float GetCurrentAnisotropicFiltering() const;
-        void SetAnisotropicFiltering(const float newAnisoLevel);
+        EngineSettings::Anisotropic GetAnisotropicFiltering() const;
+        void SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic);
+
+        EngineSettings::MSAA GetMSAA() const;
+        void SetMSAA(const EngineSettings::MSAA msaa);
 
         std::vector<OpenGLMeshPtr> GetMeshes() const;
         std::vector<OpenGLTexturePtr> GetTextures() const;
@@ -80,9 +84,11 @@ namespace JonsEngine
         ShaderProgram<UnifDirLight> mDirLightProgram;
         ShaderProgram<UnifDirLight> mDirLightDebugProgram;
         ShaderProgram<UnifDepth> mDepthProgram;
-        GBuffer mGBuffer;
+        AccumulationBuffer mAccumulationBuffer;
+        GBufferPtr mGBuffer;
         GLuint mTextureSampler;
-        float mCurrentAnisotropy;
+        EngineSettings::Anisotropic mAnisotropicFiltering;
+        EngineSettings::MSAA mMSAA;
         uint32_t mWindowWidth;
         uint32_t mWindowHeight;
         uint32_t mShadowmapResolution;

@@ -17,6 +17,7 @@ namespace JonsEngine
                                                                                             \n \
         float mLightIntensity;                                                              \n \
         float mMaxDistance;                                                                 \n \
+        int mNumSamples;                                                                    \n \
     } UnifPointLightPass;                                                                   \n \
                                                                                             \n \
     layout(location = 0) in vec3 vert_position;                                             \n \

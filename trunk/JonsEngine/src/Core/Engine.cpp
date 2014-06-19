@@ -121,13 +121,13 @@ namespace JonsEngine
 
     void Engine::OnContextCreated()
     {
-        auto meshes      = mRenderer->GetMeshes();
-        auto textures    = mRenderer->GetTextures();
-        float anisotropy = mRenderer->GetCurrentAnisotropicFiltering();
+        auto msaa       = mRenderer->GetMSAA();
+        auto meshes     = mRenderer->GetMeshes();
+        auto textures   = mRenderer->GetTextures();
+        auto anisotropy = mRenderer->GetAnisotropicFiltering();
 
         uint32_t shadowMapResolution = mRenderer->GetShadowmapResolution();
 
-        mRenderer.release();
-        mRenderer.reset(mMemoryAllocator->AllocateObject<OpenGLRenderer>(meshes, textures, mWindow.GetScreenWidth(), mWindow.GetScreenHeight(), shadowMapResolution, anisotropy, mMemoryAllocator));
+        mRenderer.reset(mMemoryAllocator->AllocateObject<OpenGLRenderer>(meshes, textures, mWindow.GetScreenWidth(), mWindow.GetScreenHeight(), shadowMapResolution, anisotropy, msaa, mMemoryAllocator));
     }
 } 
