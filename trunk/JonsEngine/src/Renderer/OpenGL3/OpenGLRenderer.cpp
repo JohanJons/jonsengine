@@ -398,6 +398,9 @@ namespace JonsEngine
         
     void OpenGLRenderer::ShadingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugShadowmapSplits)
     {
+        // fill the depth buffer of the accumulation fbo - is used for point lights stencil pass for example
+        AccumulationBufferDepthPass(renderQueue, lighting.mCameraProjectionMatrix * lighting.mCameraViewMatrix);
+
         mGBuffer->BindGeometryForReading();
         mAccumulationBuffer.BindForDrawing();
 
@@ -440,10 +443,6 @@ namespace JonsEngine
         }
         
         // do all point lights
-        // first populate the accbuffers depth buffer for stencil operations
-        mAccumulationBuffer.BindNullForDrawing();
-        mNullProgram.UseProgram();
-        GeometryDepthPass(renderQueue, lighting.mCameraProjectionMatrix * lighting.mCameraViewMatrix);
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
             mOmnidirectionalShadowmap.BindForDrawing();
@@ -476,6 +475,16 @@ namespace JonsEngine
         GLCALL(glUseProgram(0));
     }
 
+    void OpenGLRenderer::AccumulationBufferDepthPass(const RenderQueue& renderQueue, const Mat4& camViewProjMatrix)
+    {
+        mAccumulationBuffer.BindNullForDrawing();
+        mNullProgram.UseProgram();
+
+        GeometryDepthPass(renderQueue, camViewProjMatrix);
+
+        GLCALL(glUseProgram(0));
+    }
+
     void OpenGLRenderer::AmbientLightPass(const Vec4& ambientLight, const Vec4& gamma, const Vec2& screenSize)
     {
         mAmbientProgram.UseProgram();
@@ -486,7 +495,7 @@ namespace JonsEngine
         GLCALL(glUseProgram(0));
     }
 
-    void OpenGLRenderer::GeometryDepthPass(const RenderQueue& renderQueue, const Mat4& lightVP)
+    void OpenGLRenderer::GeometryDepthPass(const RenderQueue& renderQueue, const Mat4& viewProjectionMatrix)
     {
         GLCALL(glEnable(GL_CULL_FACE));
         GLCALL(glEnable(GL_DEPTH_TEST));
@@ -496,7 +505,7 @@ namespace JonsEngine
 
         auto preDrawRenderable = [&](const Renderable& renderable)
                                     {
-                                        const Mat4 wvp = lightVP * renderable.mWorldMatrix;
+                                        const Mat4 wvp = viewProjectionMatrix * renderable.mWorldMatrix;
                                         mNullProgram.SetUniformData(UnifNull(wvp));
                                     };
 

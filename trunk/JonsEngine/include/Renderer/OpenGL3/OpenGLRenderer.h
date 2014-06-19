@@ -66,6 +66,7 @@ namespace JonsEngine
     private:
         void GeometryStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugLights);
         void ShadingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const bool debugShadowmapSplits);
+        void AccumulationBufferDepthPass(const RenderQueue& renderQueue, const Mat4& camViewProjMatrix);
         void AmbientLightPass(const Vec4& ambientLight, const Vec4& gamma, const Vec2& screenSize);
         void GeometryDepthPass(const RenderQueue& renderQueue, const Mat4& lightVP);
         void PointLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightProjMatrix, const Mat4& lightViewMatrix);
