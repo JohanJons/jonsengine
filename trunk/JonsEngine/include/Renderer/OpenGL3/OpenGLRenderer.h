@@ -69,7 +69,6 @@ namespace JonsEngine
         void AccumulationBufferDepthPass(const RenderQueue& renderQueue, const Mat4& camViewProjMatrix);
         void AmbientLightPass(const Vec4& ambientLight, const Vec4& gamma, const Vec2& screenSize);
         void GeometryDepthPass(const RenderQueue& renderQueue, const Mat4& lightVP);
-        void PointLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightProjMatrix, const Mat4& lightViewMatrix);
         void PointLightStencilPass(const RenderableLighting::PointLight& pointLight);
         void PointLightLightingPass(const RenderableLighting::PointLight& pointLight, const Vec4& gamma, const Vec2& screenSize);
         void DirLightLightingPass(const RenderableLighting::DirectionalLight& dirLight, const std::array<Mat4, 4>& lightMatrices, const Mat4& cameraViewMatrix, const std::array<float, 4>& splitDistances, const Vec4& gamma, const Vec2& screenSize, const bool debugShadowmapSplits);

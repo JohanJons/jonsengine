@@ -446,14 +446,17 @@ namespace JonsEngine
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
             mOmnidirectionalShadowmap.BindForDrawing();
+            mNullProgram.UseProgram();
             GLCALL(glViewport(0, 0, (GLsizei)mShadowmapResolution, (GLsizei)mShadowmapResolution));
+            GLCALL(glCullFace(GL_FRONT));
             for (uint32_t face = 0; face < CUBEMAP_NUM_FACES; face++)
             {
                 mOmnidirectionalShadowmap.BindShadowmapFace(face);
                 Mat4 lightViewMatrix = glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition + CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
                 Mat4 lightProjMatrix = glm::perspective(90.0f, 1.0f, Z_NEAR, Z_FAR);
-                PointLightShadowPass(renderQueue, lightProjMatrix, lightViewMatrix);
+                GeometryDepthPass(renderQueue, lightProjMatrix * lightViewMatrix);
             }
+            GLCALL(glCullFace(GL_BACK));
 
 			GLCALL(glEnable(GL_STENCIL_TEST));
             GLCALL(glViewport(0, 0, (GLsizei)mWindowWidth, (GLsizei)mWindowHeight));
@@ -514,17 +517,6 @@ namespace JonsEngine
         GLCALL(glDisable(GL_DEPTH_TEST));
         GLCALL(glDisable(GL_CULL_FACE));
         GLCALL(glDepthMask(GL_FALSE));
-    }
-
-    void OpenGLRenderer::PointLightShadowPass(const RenderQueue& renderQueue, const Mat4& lightProjMatrix, const Mat4& lightViewMatrix)
-    {
-        mNullProgram.UseProgram();
-        GLCALL(glCullFace(GL_FRONT));
-
-        GeometryDepthPass(renderQueue, lightProjMatrix * lightViewMatrix);
-		
-        GLCALL(glCullFace(GL_BACK));
-		GLCALL(glUseProgram(0));
     }
 
     void OpenGLRenderer::PointLightStencilPass(const RenderableLighting::PointLight& pointLight)
