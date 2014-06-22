@@ -121,13 +121,14 @@ namespace JonsEngine
 
     void Engine::OnContextCreated()
     {
-        auto msaa       = mRenderer->GetMSAA();
-        auto meshes     = mRenderer->GetMeshes();
-        auto textures   = mRenderer->GetTextures();
+        auto msaa = mRenderer->GetMSAA();
+        auto meshes = mRenderer->GetMeshes();
+        auto textures = mRenderer->GetTextures();
         auto anisotropy = mRenderer->GetAnisotropicFiltering();
+        auto shadowMapSize = mRenderer->GetShadowmapResolution();
 
-        uint32_t shadowMapResolution = mRenderer->GetShadowmapResolution();
-
-        mRenderer.reset(mMemoryAllocator->AllocateObject<OpenGLRenderer>(meshes, textures, mWindow.GetScreenWidth(), mWindow.GetScreenHeight(), shadowMapResolution, anisotropy, msaa, mMemoryAllocator));
+        // unique_ptr.reset deletes after new; causes problem with VAOs on new context, thus manually delete first is needed
+        mMemoryAllocator->DeallocateObject(mRenderer.release());
+        mRenderer.reset(mMemoryAllocator->AllocateObject<OpenGLRenderer>(meshes, textures, mWindow.GetScreenWidth(), mWindow.GetScreenHeight(), shadowMapSize, anisotropy, msaa, mMemoryAllocator));
     }
 } 
