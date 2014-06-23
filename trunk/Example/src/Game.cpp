@@ -154,6 +154,7 @@ namespace JonsGame
         ModelPtr modelUhura    = myScene->GetResourceManifest().LoadModel("uhura", jonsPackage);
         modelUhura->mSceneNode = nodeUhura;
         nodeUhura->TranslateNode(Vec3(-8.0f, 0.5f, -4.0f));
+        nodeUhura->ScaleNode(Vec3(2.0f));
         
         // point light
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
