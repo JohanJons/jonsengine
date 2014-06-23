@@ -1,0 +1,9 @@
+# CMake generation dependency list for this directory.
+C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/contrib/zlib/CMakeLists.txt
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/CheckTypeSize.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/CheckIncludeFile.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/CheckFunctionExists.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/CheckIncludeFile.cmake
+C:/Program Files (x86)/CMake 2.8/share/cmake-2.8/Modules/CheckCSourceCompiles.cmake
+C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/contrib/zlib/zlib.pc.cmakein
+C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/contrib/zlib/zconf.h.cmakein

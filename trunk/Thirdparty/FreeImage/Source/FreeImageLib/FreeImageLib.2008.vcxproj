@@ -123,6 +123,7 @@
     </ProjectReference>
     <Lib>
       <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalDependencies>zlib.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -380,10 +381,6 @@ copy ..\FreeImage.h ..\..\Dist
     </ProjectReference>
     <ProjectReference Include="..\OpenEXR\OpenEXR.2008.vcxproj">
       <Project>{17a4874b-0606-4687-90b6-f91f8cb3b8af}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\ZLib\ZLib.2008.vcxproj">
-      <Project>{33134f61-c1ad-4b6f-9cea-503a9f140c52}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
