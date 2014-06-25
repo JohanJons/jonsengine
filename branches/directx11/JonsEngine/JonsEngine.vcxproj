@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{96000F2E-1268-46DB-AE59-2F0F4C3EBAC9}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>JonsEngine</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="JonsEngineCommon.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="JonsEngineCommon.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <SourcePath>$(SourcePath)</SourcePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)/bin/$(Configuration)/$(Platform)/</OutDir>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
+    <IntDir>$(SolutionDir)/bin/$(Configuration)/$(Platform)/Temp/$(MSBuildProjectName)/</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <IntDir>$(SolutionDir)/bin/$(Configuration)/$(Platform)/Temp/$(MSBuildProjectName)/</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_VARIADIC_MAX=6;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\glfw-3.0.1\include;$(SolutionDir)\..\Thirdparty\glew-1.10.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>winmm.lib;OpenGL32.lib;glew32.lib;GLFW.lib;libboost_serialization-vc110-mt-sgd-1_53.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(SolutionDir)/../Thirdparty/boost_1_53_0/bin.v2/libs/serialization/build/msvc-11.0/debug/link-static/runtime-link-static/threading-multi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\glfw-3.0.1\include;$(SolutionDir)\..\Thirdparty\glew-1.9.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>winmm.lib;OpenGL32.lib;glew32.lib;GLFW.lib;libboost_serialization-vc110-mt-s-1_53.lib;libboost_filesystem-vc110-mt-s-1_53.lib;libboost_system-vc110-mt-s-1_53.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)/../Thirdparty/boost_1_53_0/bin.v2/libs/system/build/msvc-11.0/release/link-static/runtime-link-static/threading-multi;$(SolutionDir)/../Thirdparty/boost_1_53_0/bin.v2/libs/serialization/build/msvc-11.0/release/link-static/runtime-link-static/threading-multi;$(SolutionDir)/../Thirdparty/boost_1_53_0/bin.v2/libs/filesystem/build/msvc-11.0/release/link-static/runtime-link-static/threading-multi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c" />
+    <ClCompile Include="src\Core\Engine.cpp" />
+    <ClCompile Include="src\Core\Logging\OutputStream.cpp" />
+    <ClCompile Include="src\Core\Logging\StreamBuf.cpp" />
+    <ClCompile Include="src\Core\Logging\Logger.cpp" />
+    <ClCompile Include="src\Core\Memory\HeapAllocator.cpp" />
+    <ClCompile Include="src\Core\Threading\ConditionVariable.cpp" />
+    <ClCompile Include="src\Core\Threading\Mutex.cpp" />
+    <ClCompile Include="src\Core\Threading\Thread.cpp" />
+    <ClCompile Include="src\Core\Threading\ThreadPool.cpp" />
+    <ClCompile Include="src\Core\Logging\LogManager.cpp" />
+    <ClCompile Include="src\Core\Utils\Time.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\AccumulationBuffer.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\DirectionalShadowmap.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\GBuffer.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\OmnidirectionalShadowmap.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\OpenGLMesh.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\OpenGLRenderer.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\OpenGLTexture.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\OpenGLUtils.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\Shader.cpp" />
+    <ClCompile Include="src\Renderer\OpenGL3\ShadingGeometry.cpp" />
+    <ClCompile Include="src\Renderer\Shapes.cpp" />
+    <ClCompile Include="src\Resources\JonsPackage.cpp" />
+    <ClCompile Include="src\Resources\ResourceManifest.cpp" />
+    <ClCompile Include="src\Scene\Camera.cpp" />
+    <ClCompile Include="src\Scene\DirectionalLight.cpp" />
+    <ClCompile Include="src\Scene\Material.cpp" />
+    <ClCompile Include="src\Scene\Model.cpp" />
+    <ClCompile Include="src\Scene\PointLight.cpp" />
+    <ClCompile Include="src\Scene\Scene.cpp" />
+    <ClCompile Include="src\Scene\SceneManager.cpp" />
+    <ClCompile Include="src\Scene\SceneNode.cpp" />
+    <ClCompile Include="src\Window\GLFW\GLFWWindowManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
+    <ClInclude Include="include\Core\Containers\Vector.h" />
+    <ClInclude Include="include\Core\DebugOptions.h" />
+    <ClInclude Include="include\Core\Engine.h" />
+    <ClInclude Include="include\Core\EngineDefs.h" />
+    <ClInclude Include="include\Core\EngineSettings.h" />
+    <ClInclude Include="include\Core\Logging\OutputStream.h" />
+    <ClInclude Include="include\Core\Logging\StreamBuf.h" />
+    <ClInclude Include="include\Core\Logging\Logger.h" />
+    <ClInclude Include="include\Core\Logging\LogManager.h" />
+    <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
+    <ClInclude Include="include\Core\Memory\IMemoryAllocator.h" />
+    <ClInclude Include="include\Core\Threading\ConditionVariable.h" />
+    <ClInclude Include="include\Core\Threading\Mutex.h" />
+    <ClInclude Include="include\Core\Threading\ScopedLock.h" />
+    <ClInclude Include="include\Core\Threading\Thread.h" />
+    <ClInclude Include="include\Core\Threading\ThreadPool.h" />
+    <ClInclude Include="include\Core\Types.h" />
+    <ClInclude Include="include\Core\Utils\Time.h" />
+    <ClInclude Include="include\Core\Utils\Math.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\AccumulationBuffer.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\DirectionalShadowmap.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\GBuffer.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\OmnidirectionalShadowmap.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLMesh.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLRenderer.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLTexture.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLUtils.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.hpp" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\AmbientLightFragmentShader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\AmbientLightVertexShader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DepthFragmentShader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DepthVertexShader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightFragmentShader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightFragmentShader_debug.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightVertexShader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\GeometryFragmentShader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\GeometryVertexShader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\PointLightFragmentShader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\PointLightVertexShader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\NullFragmentShader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\NullVertexShader.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\ShadingGeometry.h" />
+    <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.hpp" />
+    <ClInclude Include="include\Renderer\OpenGL3\UniformBufferDefinitions.hpp" />
+    <ClInclude Include="include\Renderer\RenderCommands.h" />
+    <ClInclude Include="include\Renderer\Shapes.h" />
+    <ClInclude Include="include\Resources\JonsPackage.h" />
+    <ClInclude Include="include\Resources\ResourceManifest.h" />
+    <ClInclude Include="include\Scene\Camera.h" />
+    <ClInclude Include="include\Scene\DirectionalLight.h" />
+    <ClInclude Include="include\Scene\Material.h" />
+    <ClInclude Include="include\Scene\Model.h" />
+    <ClInclude Include="include\Scene\PointLight.h" />
+    <ClInclude Include="include\Scene\Scene.h" />
+    <ClInclude Include="include\Scene\SceneManager.h" />
+    <ClInclude Include="include\Scene\SceneNode.h" />
+    <ClInclude Include="include\Window\GLFW\GLFWWindowManager.h" />
+    <ClInclude Include="include\Window\KeyCallback.h" />
+    <ClInclude Include="include\Window\KeyDefinition.h" />
+    <ClInclude Include="include\Window\MouseCallback.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
