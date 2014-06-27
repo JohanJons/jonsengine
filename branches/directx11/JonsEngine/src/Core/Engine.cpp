@@ -41,12 +41,12 @@ namespace JonsEngine
         if (activeScene)
         {
             // update model matrix of all nodes in active scene
-            activeScene->GetRootNode().UpdateModelMatrix(GetIdentityMatrix());
+            activeScene->GetRootNode().UpdateModelMatrix(Mat4::Identity());
 
             const Camera& camera = activeScene->GetSceneCamera();
             const Mat4 viewMatrix = camera.GetCameraTransform();
-            const Mat4 perspectiveMatrix = Perspective(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer.GetZNear(), mRenderer.GetZFar());
-            const Mat4 viewPerspectiveMatrix = Multiply(viewMatrix, perspectiveMatrix);
+            const Mat4 perspectiveMatrix = Mat4::CreatePerspectiveFieldOfView(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer.GetZNear(), mRenderer.GetZFar());
+            const Mat4 viewPerspectiveMatrix = viewMatrix * perspectiveMatrix;
 
             // create the rendering queue and active lights
             const RenderQueue renderQueue(CreateRenderQueue(activeScene->GetResourceManifest().GetAllModels(), viewPerspectiveMatrix));
@@ -79,8 +79,8 @@ namespace JonsEngine
 
         for (PointLightPtr pointLight : pointLights)
         {
-            const Mat4 scaledWorldMatrix = Scale(pointLight->mSceneNode->GetNodeTransform(), Vec3(pointLight->mMaxDistance, pointLight->mMaxDistance, pointLight->mMaxDistance));
-            lighting.mPointLights.emplace_back(RenderableLighting::PointLight(Multiply(scaledWorldMatrix, viewProjectionMatrix), scaledWorldMatrix, pointLight->mLightColor, pointLight->mSceneNode->Position(), pointLight->mLightIntensity, pointLight->mMaxDistance));
+            const Mat4 scaledWorldMatrix = pointLight->mSceneNode->GetNodeTransform() * Mat4::CreateScale(Vec3(pointLight->mMaxDistance));
+            lighting.mPointLights.emplace_back(RenderableLighting::PointLight(scaledWorldMatrix * viewProjectionMatrix, scaledWorldMatrix, pointLight->mLightColor, pointLight->mSceneNode->Position(), pointLight->mLightIntensity, pointLight->mMaxDistance));
         }
 
         for (DirectionalLightPtr dirLight : directionalLights)
@@ -94,8 +94,8 @@ namespace JonsEngine
      */
     void Engine::CreateModelRenderable(const Model* model, const Mat4& viewProjectionMatrix, const Mat4& nodeTransform, const bool lightingEnabled, RenderQueue& renderQueue)
     {
-        const Mat4 worldMatrix = Multiply(model->mTransform, nodeTransform);
-        const Mat4 worldViewProjMatrix = Multiply(worldMatrix, viewProjectionMatrix);
+        const Mat4 worldMatrix = model->mTransform * nodeTransform;
+        const Mat4 worldViewProjMatrix = worldMatrix * viewProjectionMatrix;
 
         if (model->mMesh != INVALID_MESH_ID)
         {

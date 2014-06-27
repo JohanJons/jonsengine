@@ -6,7 +6,6 @@
 #include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/DebugOptions.h"
 
-#include "GL/glew.h"
 #include <string>
 #include <vector>
 #include <memory>

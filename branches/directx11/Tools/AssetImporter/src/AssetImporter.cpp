@@ -149,7 +149,7 @@ namespace JonsAssetImporter
             {
                 case MODEL:
                     {
-                              const aiScene* scene = importer.ReadFile(asset.string(), aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_MaxQuality);
+                        const aiScene* scene = importer.ReadFile(asset.string(), aiProcessPreset_TargetRealtime_MaxQuality);
                         if(!scene)
                         {
                             Log("-JonsAssetImporter: Assimp parsing error: ");

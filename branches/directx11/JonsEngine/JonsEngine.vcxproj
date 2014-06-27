@@ -63,7 +63,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;_VARIADIC_MAX=6;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\glfw-3.0.1\include;$(SolutionDir)\..\Thirdparty\glew-1.10.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\DirectXTK\Inc;$(SolutionDir)\..\Thirdparty\glfw-3.0.1\include;$(SolutionDir)\..\Thirdparty\glew-1.10.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -127,7 +127,6 @@
     <ClCompile Include="src\Core\Threading\Thread.cpp" />
     <ClCompile Include="src\Core\Threading\ThreadPool.cpp" />
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
-    <ClCompile Include="src\Core\Utils\Math.cpp" />
     <ClCompile Include="src\Core\Utils\Time.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DirectXRenderer.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />

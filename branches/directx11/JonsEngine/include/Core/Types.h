@@ -1,8 +1,8 @@
 #pragma once
 
 #include "include/Core/EngineDefs.h"
+#include "include/Core/Utils/Math.h"
 
-#include <DirectXMath.h>
 #include <vector>
 
 namespace JonsEngine
@@ -29,10 +29,9 @@ namespace JonsEngine
     const MeshID    INVALID_MESH_ID    = 0;
     const TextureID INVALID_TEXTURE_ID = 0;
 
-    typedef DirectX::XMFLOAT2 Vec2;
-    typedef DirectX::XMFLOAT3 Vec3;
-    typedef DirectX::XMFLOAT4 Vec4;
-    typedef DirectX::XMFLOAT3X3 Mat3;
-    typedef DirectX::XMFLOAT4X4 Mat4;
-    typedef DirectX::XMFLOAT4 Quaternion;
+    typedef ::DirectX::SimpleMath::Vector2 Vec2;
+    typedef ::DirectX::SimpleMath::Vector3 Vec3;
+    typedef ::DirectX::SimpleMath::Vector4 Vec4;
+    typedef ::DirectX::SimpleMath::Matrix Mat4;
+    typedef ::DirectX::SimpleMath::Quaternion Quaternion;
 }

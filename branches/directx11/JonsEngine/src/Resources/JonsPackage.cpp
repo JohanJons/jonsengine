@@ -18,7 +18,7 @@ namespace JonsEngine
     {
     }
 
-    PackageModel::PackageModel() : mName(""), mTransform(GetIdentityMatrix())
+    PackageModel::PackageModel() : mName("")
     {
     }
 

@@ -51,9 +51,9 @@ namespace JonsGame
         {
             // camera position
             if (evnt.mKey == Key::A)
-                camera.TranslateCamera(Multiply(Negate(camera.Right()), mMoveSpeed));
+                camera.TranslateCamera(-camera.Right() * mMoveSpeed);
             else if (evnt.mKey == Key::W)
-                camera.TranslateCamera(Multiply(camera.Forward(), mMoveSpeed));
+                camera.TranslateCamera(camera.Forward() * mMoveSpeed);
             else if (evnt.mKey == Key::S)
                 camera.TranslateCamera(-camera.Forward() * mMoveSpeed);
             else if (evnt.mKey == Key::D)
@@ -61,17 +61,17 @@ namespace JonsGame
 
             // moving the point light 
             else if (evnt.mKey == Key::Q)
-                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(-0.05, 0.0f, 0.0f));
+                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(-0.05f, 0.0f, 0.0f));
             else if (evnt.mKey == Key::E)
-                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.05, 0.0f, 0.0f));
+                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.05f, 0.0f, 0.0f));
             else if (evnt.mKey == Key::R)
-                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.00, -0.05f, 0.0f));
+                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0f, -0.05f, 0.0f));
             else if (evnt.mKey == Key::T)
-                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.05f, 0.0f));
+                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0f, 0.05f, 0.0f));
             else if (evnt.mKey == Key::F)
-                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, -0.05f));
+                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, -0.05f));
             else if (evnt.mKey == Key::G)
-                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0, 0.0f, 0.05f));
+                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, 0.05f));
 
             //  renderering
             else if (evnt.mKey == Key::ONE)
@@ -89,13 +89,13 @@ namespace JonsGame
             else if (evnt.mKey == Key::O)
                 mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS);
             else if (evnt.mKey == Key::H)
-                mEngine->GetRenderer()->SetAnisotropicFiltering(EngineSettings::ANISOTROPIC_1X);
+                mEngine->GetRenderer().SetAnisotropicFiltering(EngineSettings::ANISOTROPIC_1X);
             else if (evnt.mKey == Key::J)
-                mEngine->GetRenderer()->SetAnisotropicFiltering(EngineSettings::ANISOTROPIC_16X);
+                mEngine->GetRenderer().SetAnisotropicFiltering(EngineSettings::ANISOTROPIC_16X);
             else if (evnt.mKey == Key::K)
-                mEngine->GetRenderer()->SetMSAA(EngineSettings::MSAA_1X);
+                mEngine->GetRenderer().SetMSAA(EngineSettings::MSAA_1X);
             else if (evnt.mKey == Key::L)
-                mEngine->GetRenderer()->SetMSAA(EngineSettings::MSAA_4X);
+                mEngine->GetRenderer().SetMSAA(EngineSettings::MSAA_4X);
 
             // misc
             else if (evnt.mKey == Key::N)

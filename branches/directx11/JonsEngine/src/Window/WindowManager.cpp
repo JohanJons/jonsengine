@@ -1,10 +1,96 @@
 #include "include/Window/WindowManager.h"
 
+#include <Windows.h>
+
+
 namespace JonsEngine
 {
-    WindowManager::WindowManager(const EngineSettings& engineSettings)
+    LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
+        switch (message)
+        {
+            case WM_PAINT:
+            {
+                PAINTSTRUCT ps;
 
+                BeginPaint(hWnd, &ps);
+                EndPaint(hWnd, &ps);
+
+                break;
+            }
+
+            case WM_INPUT:
+            {
+                PUINT rawInputSize;
+                RAWINPUT rawInput;
+
+                GetRawInputData((HRAWINPUT) (lParam), RID_INPUT, &rawInput, rawInputSize, sizeof(RAWINPUTHEADER));
+
+                if (rawInput.header.dwType == RIM_TYPEKEYBOARD)
+                {
+
+                }
+                else if (rawInput.header.dwType == RIM_TYPEMOUSE)
+                {
+
+                }
+
+                break;
+            }
+
+            default:
+                return DefWindowProc(hWnd, message, wParam, lParam);
+        }
+
+        return 0;
+    }
+
+
+    WindowManager::WindowManager(const EngineSettings& engineSettings) : mInstanceHandle(GetModuleHandle(NULL))
+    {
+        // Register class
+        WNDCLASSEX wcex;
+        wcex.cbSize = sizeof(WNDCLASSEX);
+        wcex.style = CS_HREDRAW | CS_VREDRAW;
+        wcex.lpfnWndProc = WndProc;
+        wcex.cbClsExtra = 0;
+        wcex.cbWndExtra = 0;
+        wcex.hInstance = (HINSTANCE)mInstanceHandle;
+        wcex.hIcon = nullptr;
+        wcex.hCursor = nullptr;
+        wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+        wcex.lpszMenuName = nullptr;
+        wcex.lpszClassName = mWindowTitle.c_str();
+        wcex.hIconSm = nullptr;
+        if (!RegisterClassEx(&wcex))
+        {
+          //  throw new Exception();
+          //  ....
+        }
+
+        // Create window
+        RECT rc = { 0, 0, 640, 480 };
+        AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+        g_hWnd = CreateWindow(L"TutorialWindowClass", L"Direct3D 11 Tutorial 7", WS_OVERLAPPEDWINDOW,
+            CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
+            nullptr);
+     //   if (!g_hWnd)
+
+        ShowWindow(g_hWnd, nCmdShow);
+
+        // initialize RAW input
+        RAWINPUTDEVICE rawInputDevices[2] =
+        {
+            { 0x01, 0x02, 0, hWnd },  // mouse
+            { 0x01, 0x06, 0, hWnd }   // keyboard
+        };
+        if (!RegisterRawInputDevices(rawInputDevices, 2, sizeof(rawInputDevices[0]))
+        {
+            throw new Exception();
+            ....
+        }
+
+        gWindowManagerInstance = this;
     }
 
     WindowManager::~WindowManager()

@@ -9,7 +9,7 @@
 namespace JonsEngine
 {
     SceneNode::SceneNode(const std::string& nodeName) : mName(nodeName), mHashedID(boost::hash_value(nodeName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()),
-        mModelMatrix(GetIdentityMatrix()), mOrientation(1.0f, 0.0f, 0.0f, 0.0f), mScale(1.0f, 1.0f, 1.0f), mTranslation(0.0f, 0.0f, 0.0f)
+        mModelMatrix(Mat4::Identity()), mOrientation(1.0f, 0.0f, 0.0f, 0.0f), mScale(1.0f, 1.0f, 1.0f), mTranslation(0.0f, 0.0f, 0.0f)
     {
     }
         
@@ -94,27 +94,28 @@ namespace JonsEngine
         
     void SceneNode::ScaleNode(const Vec3& scaleVec)                                
     {
-        mScale = Multiply(mScale, scaleVec);
+        mScale *= scaleVec;
     }
 
     void SceneNode::TranslateNode(const Vec3& translateVec)
     {
-        mTranslation = Add(mTranslation, translateVec);
+        mTranslation += translateVec;
     }
 
     void SceneNode::RotateNode(const float angle, const Vec3& rotateVec)       
     {
-        mOrientation = RotateAxis(mOrientation, rotateVec, angle);
+        Quaternion rotation = Quaternion::CreateFromAxisAngle(rotateVec, angle);
+        mOrientation *= rotation;
     }
 
 
     void SceneNode::UpdateModelMatrix(const Mat4& parentModelMatrix)
     {
-        Mat4 modelMatrix = Scale(GetIdentityMatrix(), mScale);
-        modelMatrix = Multiply(modelMatrix, RotationMatrix(mOrientation));
-        modelMatrix = Translate(modelMatrix, mTranslation);
+        Mat4 modelMatrix = Mat4::CreateScale(mScale);
+        modelMatrix *= Mat4::CreateFromQuaternion(mOrientation);
+        modelMatrix *= Mat4::CreateTranslation(mTranslation);
 
-        mModelMatrix = Multiply(parentModelMatrix, modelMatrix);    // Other way around?
+        mModelMatrix *= parentModelMatrix;    // Other way around?
 
         for(SceneNodePtr childNode : mChildNodes)
             childNode->UpdateModelMatrix(mModelMatrix);
@@ -123,9 +124,7 @@ namespace JonsEngine
 
     Vec3 SceneNode::Position() const
     {
-        Vec3 position(0.0f, 0.0f, 0.0f);
-
-        return Add(position, mTranslation);
+        return mTranslation;
     }
 
 

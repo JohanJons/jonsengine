@@ -6,6 +6,8 @@
 
 #include <string>
 #include <vector>
+#include <memory>
+
 
 namespace JonsEngine
 {
@@ -54,13 +56,5 @@ namespace JonsEngine
 
 
     private:
-        uint32_t mScreenWidth;
-        uint32_t mScreenHeight;
-        bool mShowMouseCursor;
-        bool mFullscreen;
-        float mFOV;
-        std::string mWindowTitle;
-        double mPreviousMouseX;
-        double mPreviousMouseY;
     };
 }

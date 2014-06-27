@@ -20,7 +20,7 @@ namespace JonsEngine
 
     void Camera::TranslateCamera(const Vec3& translateVec)
     {
-        mTranslation = Add(mTranslation, translateVec);
+        mTranslation += translateVec;
     }
         
     void Camera::RotateCamera(const float offsetHorizontalAngle, const float offsetVerticalAngle)
@@ -35,16 +35,12 @@ namespace JonsEngine
 
     Vec3 Camera::Forward() const
     {
-        Vec4 temp = Multiply(Vec4(0.0f, 0.0f, -1.0f, 0.0f), Inverse(Orientation()));
-
-        return Vec3(temp.x, temp.y, temp.z);
+        return Vec3(Vec4::Transform(Vec4(0.0f, 0.0f, -1.0f, 0.0f), Orientation().Invert()));
     }
 
     Vec3 Camera::Right() const
     {
-        Vec4 temp = Multiply(Vec4(1.0f, 0.0f, 0.0f, 0.0f), Inverse(Orientation()));
-
-        return Vec3(temp.x, temp.y, temp.z);
+        return Vec3(Vec4::Transform(Vec4(1.0f, 0.0f, 0.0f, 0.0f), Orientation().Invert()));
     }
 
     Vec3 Camera::Position() const
@@ -54,17 +50,17 @@ namespace JonsEngine
 
     Mat4 Camera::Orientation() const
     {
-        Quaternion rotation = GetIdentityQuaternion();
+        Quaternion rotation;
 
-        rotation = RotateAxis(rotation, Vec3(1.0f, 0.0f, 0.0f), mVerticalAngle);
-        rotation = RotateAxis(rotation, Vec3(0.0f, 1.0f, 0.0f), mHorizontalAngle);
+        rotation *= Quaternion::CreateFromAxisAngle(Vec3(1.0f, 0.0f, 0.0f), mVerticalAngle);
+        rotation *= Quaternion::CreateFromAxisAngle(Vec3(0.0f, 1.0f, 0.0f), mHorizontalAngle);
 
-        return RotationMatrix(rotation);
+        return Mat4::CreateFromQuaternion(rotation);
     }
 
        
     Mat4 Camera::GetCameraTransform() const
     {
-        return Multiply(Translate(GetIdentityMatrix(), mTranslation), Orientation());
+        return Orientation() * Mat4::CreateTranslation(-mTranslation);
     }
 }
