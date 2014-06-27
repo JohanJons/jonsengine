@@ -127,17 +127,9 @@
     <ClCompile Include="src\Core\Threading\Thread.cpp" />
     <ClCompile Include="src\Core\Threading\ThreadPool.cpp" />
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
+    <ClCompile Include="src\Core\Utils\Math.cpp" />
     <ClCompile Include="src\Core\Utils\Time.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL3\AccumulationBuffer.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL3\DirectionalShadowmap.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL3\GBuffer.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL3\OmnidirectionalShadowmap.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL3\OpenGLMesh.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL3\OpenGLRenderer.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL3\OpenGLTexture.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL3\OpenGLUtils.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL3\Shader.cpp" />
-    <ClCompile Include="src\Renderer\OpenGL3\ShadingGeometry.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DirectXRenderer.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
@@ -149,7 +141,7 @@
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneManager.cpp" />
     <ClCompile Include="src\Scene\SceneNode.cpp" />
-    <ClCompile Include="src\Window\GLFW\GLFWWindowManager.cpp" />
+    <ClCompile Include="src\Window\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
@@ -172,32 +164,7 @@
     <ClInclude Include="include\Core\Types.h" />
     <ClInclude Include="include\Core\Utils\Time.h" />
     <ClInclude Include="include\Core\Utils\Math.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\AccumulationBuffer.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\DirectionalShadowmap.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\GBuffer.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\OmnidirectionalShadowmap.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\OpenGLMesh.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\OpenGLRenderer.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\OpenGLTexture.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\OpenGLUtils.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.hpp" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\AmbientLightFragmentShader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\AmbientLightVertexShader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DepthFragmentShader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DepthVertexShader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightFragmentShader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightFragmentShader_debug.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightVertexShader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\GeometryFragmentShader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\GeometryVertexShader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\PointLightFragmentShader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\PointLightVertexShader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\NullFragmentShader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\Shaders\NullVertexShader.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\ShadingGeometry.h" />
-    <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.hpp" />
-    <ClInclude Include="include\Renderer\OpenGL3\UniformBufferDefinitions.hpp" />
+    <ClInclude Include="include\Renderer\DirectX11\DirectXRenderer.h" />
     <ClInclude Include="include\Renderer\RenderCommands.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />
@@ -210,10 +177,10 @@
     <ClInclude Include="include\Scene\Scene.h" />
     <ClInclude Include="include\Scene\SceneManager.h" />
     <ClInclude Include="include\Scene\SceneNode.h" />
-    <ClInclude Include="include\Window\GLFW\GLFWWindowManager.h" />
     <ClInclude Include="include\Window\KeyCallback.h" />
     <ClInclude Include="include\Window\KeyDefinition.h" />
     <ClInclude Include="include\Window\MouseCallback.h" />
+    <ClInclude Include="include\Window\WindowManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

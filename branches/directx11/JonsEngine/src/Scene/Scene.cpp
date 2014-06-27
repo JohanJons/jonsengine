@@ -9,7 +9,7 @@
 namespace JonsEngine
 {
     Scene::Scene(const std::string& sceneName, ResourceManifest& resManifest) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mRootNode("Root"), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), 
-                                                                                mGamma(2.1f), mAmbientLight(0.2f), mResourceManifest(resManifest)
+                                                                                mAmbientLight(0.2f, 0.2f, 0.2f, 0.2f), mResourceManifest(resManifest)
     {
     }
 
@@ -87,25 +87,6 @@ namespace JonsEngine
 
         if (iter != mDirectionalLights.end())
             mDirectionalLights.erase(iter);
-    }
-
-
-    void Scene::SetGammaFactor(const float gamma)
-    {
-        mGamma = gamma;
-    }
-        
-    float Scene::GetGammaFactor() const
-    {
-        return mGamma;
-    }
-
-    Vec4 Scene::GetGamma() const
-    {
-        Vec4 gamma(1.0f / mGamma);
-        gamma.w = 1.0f;
-
-        return gamma;
     }
 
 

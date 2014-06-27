@@ -149,7 +149,7 @@ namespace JonsAssetImporter
             {
                 case MODEL:
                     {
-                        const aiScene* scene = importer.ReadFile(asset.string(), aiProcessPreset_TargetRealtime_MaxQuality);
+                              const aiScene* scene = importer.ReadFile(asset.string(), aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_MaxQuality);
                         if(!scene)
                         {
                             Log("-JonsAssetImporter: Assimp parsing error: ");
@@ -432,10 +432,10 @@ namespace JonsAssetImporter
     {
         Mat4 jMat;
 
-        jMat[0].x = aiMat.a1; jMat[0].y = aiMat.b1; jMat[0].z = aiMat.c1; jMat[0].w = aiMat.d1;
-        jMat[1].x = aiMat.a2; jMat[1].y = aiMat.b2; jMat[1].z = aiMat.c2; jMat[1].w = aiMat.d2;
-        jMat[2].x = aiMat.a3; jMat[2].y = aiMat.b3; jMat[2].z = aiMat.c3; jMat[2].w = aiMat.d3;
-        jMat[3].x = aiMat.a4; jMat[3].y = aiMat.b4; jMat[3].z = aiMat.c4; jMat[3].w = aiMat.d4;
+        jMat.m[0][0] = aiMat.a1; jMat.m[0][1] = aiMat.b1; jMat.m[0][2] = aiMat.c1; jMat.m[0][3] = aiMat.d1;
+        jMat.m[1][0] = aiMat.a2; jMat.m[1][1] = aiMat.b2; jMat.m[1][2] = aiMat.c2; jMat.m[1][3] = aiMat.d2;
+        jMat.m[2][0] = aiMat.a3; jMat.m[2][1] = aiMat.b3; jMat.m[2][2] = aiMat.c3; jMat.m[2][3] = aiMat.d3;
+        jMat.m[3][0] = aiMat.a4; jMat.m[3][1] = aiMat.b4; jMat.m[3][2] = aiMat.c4; jMat.m[3][3] = aiMat.d4;
 
         return jMat;
     }

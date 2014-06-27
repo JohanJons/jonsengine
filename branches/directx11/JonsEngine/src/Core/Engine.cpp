@@ -6,8 +6,7 @@
 #include "include/Core/EngineSettings.h"
 #include "include/Core/DebugOptions.h"
 #include "include/Scene/Scene.h"
-#include "include/Window/GLFW/GLFWWindowManager.h"
-#include "include/Renderer/OpenGL3/OpenGLRenderer.h"
+#include "include/Window/WindowManager.h"
 #include "include/Resources/ResourceManifest.h"
 
 #include <exception>
@@ -19,9 +18,8 @@ namespace JonsEngine
     Engine::Engine(const EngineSettings& settings) : mLog(Logger::GetCoreLogger()), 
                                                      mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<HeapAllocator>("DefaultHeapAllocator"), 
                                                                       [](HeapAllocator* allocator) { HeapAllocator::GetDefaultHeapAllocator().DeallocateObject(allocator); }),
-                                                     mWindow(settings, std::bind(&Engine::OnContextCreated, this)), 
-                                                     mRenderer(mMemoryAllocator->AllocateObject<OpenGLRenderer>(settings, mMemoryAllocator),
-                                                               [this](OpenGLRenderer* renderer) { mMemoryAllocator->DeallocateObject(renderer); }),
+                                                     mWindow(settings), 
+                                                     mRenderer(),
                                                      mResourceManifest(mRenderer, mMemoryAllocator), 
                                                      mSceneManager(mResourceManifest)
     {
@@ -43,22 +41,20 @@ namespace JonsEngine
         if (activeScene)
         {
             // update model matrix of all nodes in active scene
-            activeScene->GetRootNode().UpdateModelMatrix(Mat4(1.0f));
+            activeScene->GetRootNode().UpdateModelMatrix(GetIdentityMatrix());
 
             const Camera& camera = activeScene->GetSceneCamera();
             const Mat4 viewMatrix = camera.GetCameraTransform();
-            const Mat4 perspectiveMatrix = glm::perspective(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer->GetZNear(), mRenderer->GetZFar());
-            const Mat4 viewPerspectiveMatrix = perspectiveMatrix * viewMatrix;
+            const Mat4 perspectiveMatrix = Perspective(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer.GetZNear(), mRenderer.GetZFar());
+            const Mat4 viewPerspectiveMatrix = Multiply(viewMatrix, perspectiveMatrix);
 
             // create the rendering queue and active lights
             const RenderQueue renderQueue(CreateRenderQueue(activeScene->GetResourceManifest().GetAllModels(), viewPerspectiveMatrix));
-            const RenderableLighting lighting(GetLightingInfo(perspectiveMatrix, viewMatrix, viewPerspectiveMatrix, activeScene->GetGamma(), activeScene->GetAmbientLight(), camera.Position(), activeScene->GetPointLights(), activeScene->GetDirectionalLights()));
+            const RenderableLighting lighting(GetLightingInfo(perspectiveMatrix, viewMatrix, viewPerspectiveMatrix, activeScene->GetAmbientLight(), camera.Position(), activeScene->GetPointLights(), activeScene->GetDirectionalLights()));
 
             // render the scene
-            mRenderer->Render(renderQueue, lighting, debugOptions.mRenderingMode, debugOptions.mRenderingFlags);
+            mRenderer.Render(renderQueue, lighting, debugOptions.mRenderingMode, debugOptions.mRenderingFlags);
         }
-
-        mWindow.SwapColorBuffers();
     }
 
     
@@ -77,14 +73,14 @@ namespace JonsEngine
         return renderQueue;
     }
      
-    RenderableLighting Engine::GetLightingInfo(const Mat4& projMatrix, const Mat4& viewMatrix, const Mat4& viewProjectionMatrix, const Vec4& gamma, const Vec4& ambientLight, const Vec3& cameraPosition, const std::vector<PointLightPtr>& pointLights, const std::vector<DirectionalLightPtr>& directionalLights)
+    RenderableLighting Engine::GetLightingInfo(const Mat4& projMatrix, const Mat4& viewMatrix, const Mat4& viewProjectionMatrix, const Vec4& ambientLight, const Vec3& cameraPosition, const std::vector<PointLightPtr>& pointLights, const std::vector<DirectionalLightPtr>& directionalLights)
     {
-        RenderableLighting lighting(viewMatrix, projMatrix, gamma, ambientLight, cameraPosition, Vec2(mWindow.GetScreenWidth(), mWindow.GetScreenHeight()));
+        RenderableLighting lighting(viewMatrix, projMatrix, ambientLight, cameraPosition, Vec2(mWindow.GetScreenWidth(), mWindow.GetScreenHeight()));
 
         for (PointLightPtr pointLight : pointLights)
         {
-            const Mat4 scaledWorldMatrix = glm::scale(pointLight->mSceneNode->GetNodeTransform(), Vec3(pointLight->mMaxDistance));
-            lighting.mPointLights.emplace_back(RenderableLighting::PointLight(viewProjectionMatrix * scaledWorldMatrix, scaledWorldMatrix, pointLight->mLightColor, pointLight->mSceneNode->Position(), pointLight->mLightIntensity, pointLight->mMaxDistance));
+            const Mat4 scaledWorldMatrix = Scale(pointLight->mSceneNode->GetNodeTransform(), Vec3(pointLight->mMaxDistance, pointLight->mMaxDistance, pointLight->mMaxDistance));
+            lighting.mPointLights.emplace_back(RenderableLighting::PointLight(Multiply(scaledWorldMatrix, viewProjectionMatrix), scaledWorldMatrix, pointLight->mLightColor, pointLight->mSceneNode->Position(), pointLight->mLightIntensity, pointLight->mMaxDistance));
         }
 
         for (DirectionalLightPtr dirLight : directionalLights)
@@ -98,16 +94,17 @@ namespace JonsEngine
      */
     void Engine::CreateModelRenderable(const Model* model, const Mat4& viewProjectionMatrix, const Mat4& nodeTransform, const bool lightingEnabled, RenderQueue& renderQueue)
     {
-        const Mat4 worldMatrix         = nodeTransform * model->mTransform;
-        const Mat4 worldViewProjMatrix = viewProjectionMatrix * worldMatrix;
+        const Mat4 worldMatrix = Multiply(model->mTransform, nodeTransform);
+        const Mat4 worldViewProjMatrix = Multiply(worldMatrix, viewProjectionMatrix);
 
         if (model->mMesh != INVALID_MESH_ID)
         {
             // TODO: replace push_back with emplace_back once boost is compatible with MSVC12
             const MaterialPtr material(model->mMaterial);
             if (material)
-                renderQueue.push_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor, 
-                                                 Vec4(material->mDiffuseColor, 1.0f), Vec4(material->mAmbientColor, 1.0f), Vec4(material->mSpecularColor, 1.0f), Vec4(material->mEmissiveColor, 1.0f),
+                renderQueue.push_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor,        /// TODO - REFACTOR
+                                    Vec4(material->mDiffuseColor.x, material->mDiffuseColor.y, material->mDiffuseColor.z, 1.0f), Vec4(material->mAmbientColor.x, material->mAmbientColor.y, material->mAmbientColor.z, 1.0f), 
+                                    Vec4(material->mSpecularColor.x, material->mSpecularColor.y, material->mSpecularColor.z, 1.0f), Vec4(material->mEmissiveColor.x, material->mEmissiveColor.y, material->mEmissiveColor.z, 1.0f),
                                                  material->mDiffuseTexture, material->mNormalTexture, lightingEnabled, material->mSpecularFactor));
             else
                 renderQueue.push_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, lightingEnabled));
@@ -116,19 +113,5 @@ namespace JonsEngine
         for(const Model& childModel : model->mChildren)
             // 'lightingEnabled' is passed on since it applies recursively on all children aswell
             CreateModelRenderable(&childModel, viewProjectionMatrix, worldMatrix, lightingEnabled, renderQueue);
-    }
-
-
-    void Engine::OnContextCreated()
-    {
-        auto msaa = mRenderer->GetMSAA();
-        auto meshes = mRenderer->GetMeshes();
-        auto textures = mRenderer->GetTextures();
-        auto anisotropy = mRenderer->GetAnisotropicFiltering();
-        auto shadowMapSize = mRenderer->GetShadowmapResolution();
-
-        // unique_ptr.reset deletes after new; causes problem with VAOs on new context, thus manually delete first is needed
-        mMemoryAllocator->DeallocateObject(mRenderer.release());
-        mRenderer.reset(mMemoryAllocator->AllocateObject<OpenGLRenderer>(meshes, textures, mWindow.GetScreenWidth(), mWindow.GetScreenHeight(), shadowMapSize, anisotropy, msaa, mMemoryAllocator));
     }
 } 

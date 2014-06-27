@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    Camera::Camera() : mTranslation(0.0f), mHorizontalAngle(0.0f), mVerticalAngle(0.0f)
+    Camera::Camera() : mTranslation(0.0f, 0.0f, 0.0f), mHorizontalAngle(0.0f), mVerticalAngle(0.0f)
     {
     }
         
@@ -20,7 +20,7 @@ namespace JonsEngine
 
     void Camera::TranslateCamera(const Vec3& translateVec)
     {
-        mTranslation += translateVec;
+        mTranslation = Add(mTranslation, translateVec);
     }
         
     void Camera::RotateCamera(const float offsetHorizontalAngle, const float offsetVerticalAngle)
@@ -35,12 +35,16 @@ namespace JonsEngine
 
     Vec3 Camera::Forward() const
     {
-        return Vec3(glm::inverse(Orientation()) * Vec4(0.0f, 0.0f, -1.0f, 0.0f));
+        Vec4 temp = Multiply(Vec4(0.0f, 0.0f, -1.0f, 0.0f), Inverse(Orientation()));
+
+        return Vec3(temp.x, temp.y, temp.z);
     }
 
     Vec3 Camera::Right() const
     {
-        return Vec3(glm::inverse(Orientation()) * Vec4(1.0f, 0.0f, 0.0f, 0.0f));
+        Vec4 temp = Multiply(Vec4(1.0f, 0.0f, 0.0f, 0.0f), Inverse(Orientation()));
+
+        return Vec3(temp.x, temp.y, temp.z);
     }
 
     Vec3 Camera::Position() const
@@ -50,16 +54,17 @@ namespace JonsEngine
 
     Mat4 Camera::Orientation() const
     {
-        Quaternion rotation;
-        rotation = glm::angleAxis(mVerticalAngle, Vec3(1.0f, 0.0f, 0.0f));
-        rotation = rotation * glm::angleAxis(mHorizontalAngle, Vec3(0.0f, 1.0f, 0.0f));
+        Quaternion rotation = GetIdentityQuaternion();
 
-        return glm::toMat4(rotation);
+        rotation = RotateAxis(rotation, Vec3(1.0f, 0.0f, 0.0f), mVerticalAngle);
+        rotation = RotateAxis(rotation, Vec3(0.0f, 1.0f, 0.0f), mHorizontalAngle);
+
+        return RotationMatrix(rotation);
     }
 
        
     Mat4 Camera::GetCameraTransform() const
     {
-        return Orientation() * glm::translate(Mat4(1.0f), -mTranslation);    // TODO: gimbal lock?
+        return Multiply(Translate(GetIdentityMatrix(), mTranslation), Orientation());
     }
 }

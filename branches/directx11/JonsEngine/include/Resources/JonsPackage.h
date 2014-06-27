@@ -186,16 +186,16 @@ namespace boost
         }
 
         template<class Archive>
-        void serialize(Archive & ar, glm::detail::tmat4x4<glm::mediump_float>& transform, const unsigned int version)
+        void serialize(Archive & ar, JonsEngine::Mat4& transform, const unsigned int version)
         {
-            ar & transform[0];
-            ar & transform[1];
-            ar & transform[2];
-            ar & transform[3];
+            ar & transform.m[0][0]; ar & transform.m[0][1]; ar & transform.m[0][2]; ar & transform.m[0][3];
+            ar & transform.m[1][0]; ar & transform.m[1][1]; ar & transform.m[1][2]; ar & transform.m[1][3];
+            ar & transform.m[2][0]; ar & transform.m[2][1]; ar & transform.m[2][2]; ar & transform.m[2][3];
+            ar & transform.m[3][0]; ar & transform.m[3][1]; ar & transform.m[3][2]; ar & transform.m[3][3];
         }
 
         template<class Archive>
-        void serialize(Archive & ar, glm::detail::tvec4<glm::mediump_float>& vec, const unsigned int version)
+        void serialize(Archive & ar, JonsEngine::Vec4& vec, const unsigned int version)
         {
             ar & vec.x;
             ar & vec.y;
@@ -204,7 +204,7 @@ namespace boost
         }
 
         template<class Archive>
-        void serialize(Archive & ar, glm::detail::tvec3<glm::mediump_float>& vec, const unsigned int version)
+        void serialize(Archive & ar, JonsEngine::Vec3& vec, const unsigned int version)
         {
             ar & vec.x;
             ar & vec.y;
@@ -212,7 +212,7 @@ namespace boost
         }
 
         template<class Archive>
-        void serialize(Archive & ar, glm::detail::tvec2<glm::mediump_float>& vec, const unsigned int version)
+        void serialize(Archive & ar, JonsEngine::Vec2& vec, const unsigned int version)
         {
             ar & vec.x;
             ar & vec.y;

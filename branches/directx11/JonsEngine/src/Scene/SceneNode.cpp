@@ -5,10 +5,11 @@
 #include "boost/functional/hash.hpp"
 #include <algorithm>
 
+
 namespace JonsEngine
 {
     SceneNode::SceneNode(const std::string& nodeName) : mName(nodeName), mHashedID(boost::hash_value(nodeName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()),
-                                                        mModelMatrix(1.0f), mOrientation(1.0f, 0.0f, 0.0f, 0.0f), mScale(1.0f, 1.0f, 1.0f), mTranslation(0.0f, 0.0f, 0.0f)
+        mModelMatrix(GetIdentityMatrix()), mOrientation(1.0f, 0.0f, 0.0f, 0.0f), mScale(1.0f, 1.0f, 1.0f), mTranslation(0.0f, 0.0f, 0.0f)
     {
     }
         
@@ -92,31 +93,28 @@ namespace JonsEngine
 
         
     void SceneNode::ScaleNode(const Vec3& scaleVec)                                
-    { 
-        mScale *= scaleVec;            
+    {
+        mScale = Multiply(mScale, scaleVec);
     }
 
     void SceneNode::TranslateNode(const Vec3& translateVec)
-    { 
-        mTranslation += translateVec;
+    {
+        mTranslation = Add(mTranslation, translateVec);
     }
 
     void SceneNode::RotateNode(const float angle, const Vec3& rotateVec)       
-    { 
-        Quaternion rotation = glm::angleAxis(angle, rotateVec);
-        mOrientation = mOrientation * rotation;
+    {
+        mOrientation = RotateAxis(mOrientation, rotateVec, angle);
     }
 
 
     void SceneNode::UpdateModelMatrix(const Mat4& parentModelMatrix)
     {
-        Mat4 modelMatrix(1.0f);
+        Mat4 modelMatrix = Scale(GetIdentityMatrix(), mScale);
+        modelMatrix = Multiply(modelMatrix, RotationMatrix(mOrientation));
+        modelMatrix = Translate(modelMatrix, mTranslation);
 
-        modelMatrix = glm::translate(modelMatrix, mTranslation);
-        modelMatrix *= glm::toMat4(mOrientation);
-        modelMatrix = glm::scale(modelMatrix, mScale);
-
-        mModelMatrix = parentModelMatrix * modelMatrix;
+        mModelMatrix = Multiply(parentModelMatrix, modelMatrix);    // Other way around?
 
         for(SceneNodePtr childNode : mChildNodes)
             childNode->UpdateModelMatrix(mModelMatrix);
@@ -125,10 +123,9 @@ namespace JonsEngine
 
     Vec3 SceneNode::Position() const
     {
-        Vec3 position(0.0f);
-        position += mTranslation;
+        Vec3 position(0.0f, 0.0f, 0.0f);
 
-        return position;
+        return Add(position, mTranslation);
     }
 
 

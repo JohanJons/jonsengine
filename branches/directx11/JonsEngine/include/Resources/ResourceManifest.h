@@ -4,7 +4,7 @@
 #include "include/Core/Memory/IMemoryAllocator.h"
 #include "include/Scene/Model.h"
 #include "include/Scene/Material.h"
-#include "include/Renderer/OpenGL3/OpenGLRenderer.h"
+#include "include/Renderer/DirectX11/DirectXRenderer.h"
 #include "include/Renderer/Shapes.h"
 
 #include <vector>
@@ -18,7 +18,7 @@ namespace JonsEngine
     class ResourceManifest
     {
     public:
-        ResourceManifest(OpenGLRendererPtr renderer, IMemoryAllocatorPtr memoryAllocator);
+        ResourceManifest(DirectXRenderer& renderer, IMemoryAllocatorPtr memoryAllocator);
         ~ResourceManifest();
 
         ModelPtr CreateRectangle(const std::string& modelName, const double sizeX, const double sizeY, const double sizeZ);
@@ -39,7 +39,7 @@ namespace JonsEngine
         Material ProcessMaterial(PackageMaterial& pkgMaterial, const JonsPackagePtr jonsPkg);
 
         IMemoryAllocatorPtr mMemoryAllocator;
-        OpenGLRendererPtr mRenderer;
+        DirectXRenderer& mRenderer;
         std::vector<ModelPtr> mModels;
         std::vector<MaterialPtr> mMaterials;
         std::multimap<uint32_t, std::string> mPackageAssetMap;

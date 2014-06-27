@@ -26,7 +26,8 @@ namespace JonsEngine
 
         Renderable(const MeshID mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix, const bool lightingEnabled)
             :
-            Renderable(mesh, wvpMatrix, worldMatrix, 1.0f, Vec4(1.0f), Vec4(1.0f), Vec4(1.0f), Vec4(0.0f), INVALID_TEXTURE_ID, INVALID_TEXTURE_ID, lightingEnabled, 0.02f)
+            Renderable(mesh, wvpMatrix, worldMatrix, 1.0f, Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(0.0f, 0.0f, 0.0f, 0.0f),
+                       INVALID_TEXTURE_ID, INVALID_TEXTURE_ID, lightingEnabled, 0.02f)
         {
 
         }
@@ -78,7 +79,6 @@ namespace JonsEngine
 
         Mat4 mCameraViewMatrix;
         Mat4 mCameraProjectionMatrix;
-        Vec4 mGamma;
         Vec4 mAmbientLight;
         Vec3 mCameraPosition;
         Vec2 mScreenSize;
@@ -87,8 +87,8 @@ namespace JonsEngine
         std::vector<DirectionalLight> mDirectionalLights;
 
 
-        RenderableLighting(const Mat4& camViewMatrix,  const Mat4& camProjMatrix, const Vec4& gamma, const Vec4& ambientLight, const Vec3& cameraPosition, const Vec2& screenSize) :
-            mCameraViewMatrix(camViewMatrix), mCameraProjectionMatrix(camProjMatrix), mGamma(gamma), mScreenSize(screenSize), mCameraPosition(cameraPosition), mAmbientLight(ambientLight)
+        RenderableLighting(const Mat4& camViewMatrix,  const Mat4& camProjMatrix, const Vec4& ambientLight, const Vec3& cameraPosition, const Vec2& screenSize) :
+            mCameraViewMatrix(camViewMatrix), mCameraProjectionMatrix(camProjMatrix), mScreenSize(screenSize), mCameraPosition(cameraPosition), mAmbientLight(ambientLight)
         {
         }
     };

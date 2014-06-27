@@ -34,10 +34,6 @@ namespace JonsEngine
         void DeletePointLight(const std::string& lightName);
         void DeleteDirectionalLight(const std::string& lightName);
 
-        void SetGammaFactor(const float gamma);
-        float GetGammaFactor() const;
-        Vec4 GetGamma() const;
-
         void SetAmbientLight(const Vec4& ambientLight);
         const Vec4& GetAmbientLight() const;
 
@@ -58,7 +54,6 @@ namespace JonsEngine
         size_t mHashedID;
         Camera mSceneCamera;
         SceneNode mRootNode;
-        float mGamma;
         Vec4 mAmbientLight;
 
         std::vector<PointLightPtr> mPointLights;

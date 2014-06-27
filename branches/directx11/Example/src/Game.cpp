@@ -51,9 +51,9 @@ namespace JonsGame
         {
             // camera position
             if (evnt.mKey == Key::A)
-                camera.TranslateCamera(-camera.Right() * mMoveSpeed);
+                camera.TranslateCamera(Multiply(Negate(camera.Right()), mMoveSpeed));
             else if (evnt.mKey == Key::W)
-                camera.TranslateCamera(camera.Forward() * mMoveSpeed);
+                camera.TranslateCamera(Multiply(camera.Forward(), mMoveSpeed));
             else if (evnt.mKey == Key::S)
                 camera.TranslateCamera(-camera.Forward() * mMoveSpeed);
             else if (evnt.mKey == Key::D)

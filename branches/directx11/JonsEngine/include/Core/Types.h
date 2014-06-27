@@ -2,8 +2,7 @@
 
 #include "include/Core/EngineDefs.h"
 
-#include "glm/glm.hpp"
-#include "glm/gtc/type_ptr.hpp"
+#include <DirectXMath.h>
 #include <vector>
 
 namespace JonsEngine
@@ -30,10 +29,10 @@ namespace JonsEngine
     const MeshID    INVALID_MESH_ID    = 0;
     const TextureID INVALID_TEXTURE_ID = 0;
 
-    typedef glm::vec2 Vec2;
-    typedef glm::vec3 Vec3;
-    typedef glm::vec4 Vec4;
-    typedef glm::mat3 Mat3;
-    typedef glm::mat4 Mat4;
-    typedef glm::fquat Quaternion;
+    typedef DirectX::XMFLOAT2 Vec2;
+    typedef DirectX::XMFLOAT3 Vec3;
+    typedef DirectX::XMFLOAT4 Vec4;
+    typedef DirectX::XMFLOAT3X3 Mat3;
+    typedef DirectX::XMFLOAT4X4 Mat4;
+    typedef DirectX::XMFLOAT4 Quaternion;
 }
