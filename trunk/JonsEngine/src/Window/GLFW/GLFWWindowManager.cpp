@@ -52,14 +52,23 @@ namespace JonsEngine
         glfwPollEvents();
 
         // Dispatch waiting events for each event type to registered callbacks
-        for (MouseButtonEvent& ev : mMouseButtonEvents)
-            mMouseButtonCallback(ev);
+        if (mMouseButtonCallback)
+        {
+            for (MouseButtonEvent& ev : mMouseButtonEvents)
+                mMouseButtonCallback(ev);
+        }
 
-        for (MouseMotionEvent& ev : mMouseMotionEvents)
-            mMouseMotionCallback(ev);
+        if (mMouseMotionCallback)
+        {
+            for (MouseMotionEvent& ev : mMouseMotionEvents)
+                mMouseMotionCallback(ev);
+        }
 
-        for (KeyEvent& ev : mKeyEvents)
-            mKeyCallback(ev);
+        if (mKeyCallback)
+        {
+            for (KeyEvent& ev : mKeyEvents)
+                mKeyCallback(ev);
+        }
 
         if (mMousePositionCallback)
         {
