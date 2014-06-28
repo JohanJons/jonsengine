@@ -32,7 +32,6 @@ namespace JonsGame
         SetupScene();
 
         mEngine->GetWindow().ShowMouseCursor(false);
-        mEngine->GetWindow().SetFrameLimit(60);
 
         while (mRunning)
         {

@@ -1,223 +1,119 @@
 #include "include/Window/WindowManager.h"
 
-#include <Windows.h>
+#include "include/Window/WindowManagerImpl.h"
+#include "include/Core/EngineSettings.h"
 
 
 namespace JonsEngine
 {
-    LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+    WindowManager::WindowManager(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator, Logger& logger) :
+        mLogger(logger), mMemoryAllocator(memoryAllocator),
+        mImplementation(mMemoryAllocator->AllocateObject<WindowManagerImpl>(engineSettings, mLogger), [this](WindowManagerImpl* windowMgrImpl) { mMemoryAllocator->DeallocateObject(windowMgrImpl); })
     {
-        switch (message)
-        {
-            case WM_PAINT:
-            {
-                PAINTSTRUCT ps;
-
-                BeginPaint(hWnd, &ps);
-                EndPaint(hWnd, &ps);
-
-                break;
-            }
-
-            case WM_INPUT:
-            {
-                PUINT rawInputSize;
-                RAWINPUT rawInput;
-
-                GetRawInputData((HRAWINPUT) (lParam), RID_INPUT, &rawInput, rawInputSize, sizeof(RAWINPUTHEADER));
-
-                if (rawInput.header.dwType == RIM_TYPEKEYBOARD)
-                {
-
-                }
-                else if (rawInput.header.dwType == RIM_TYPEMOUSE)
-                {
-
-                }
-
-                break;
-            }
-
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-        }
-
-        return 0;
     }
-
-
-    WindowManager::WindowManager(const EngineSettings& engineSettings) : mInstanceHandle(GetModuleHandle(NULL))
-    {
-        // Register class
-        WNDCLASSEX wcex;
-        wcex.cbSize = sizeof(WNDCLASSEX);
-        wcex.style = CS_HREDRAW | CS_VREDRAW;
-        wcex.lpfnWndProc = WndProc;
-        wcex.cbClsExtra = 0;
-        wcex.cbWndExtra = 0;
-        wcex.hInstance = (HINSTANCE)mInstanceHandle;
-        wcex.hIcon = nullptr;
-        wcex.hCursor = nullptr;
-        wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-        wcex.lpszMenuName = nullptr;
-        wcex.lpszClassName = mWindowTitle.c_str();
-        wcex.hIconSm = nullptr;
-        if (!RegisterClassEx(&wcex))
-        {
-          //  throw new Exception();
-          //  ....
-        }
-
-        // Create window
-        RECT rc = { 0, 0, 640, 480 };
-        AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
-        g_hWnd = CreateWindow(L"TutorialWindowClass", L"Direct3D 11 Tutorial 7", WS_OVERLAPPEDWINDOW,
-            CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, hInstance,
-            nullptr);
-     //   if (!g_hWnd)
-
-        ShowWindow(g_hWnd, nCmdShow);
-
-        // initialize RAW input
-        RAWINPUTDEVICE rawInputDevices[2] =
-        {
-            { 0x01, 0x02, 0, hWnd },  // mouse
-            { 0x01, 0x06, 0, hWnd }   // keyboard
-        };
-        if (!RegisterRawInputDevices(rawInputDevices, 2, sizeof(rawInputDevices[0]))
-        {
-            throw new Exception();
-            ....
-        }
-
-        gWindowManagerInstance = this;
-    }
-
+    
     WindowManager::~WindowManager()
     {
-
     }
-
-
+    
     void WindowManager::Poll()
     {
-
+        mImplementation->Poll();
     }
-
-
+    
     void WindowManager::SetMouseButtonCallback()
     {
-
+        mImplementation->SetMouseButtonCallback();
     }
-
+    
     void WindowManager::SetMouseButtonCallback(const MouseButtonCallback& callback)
     {
-
+        mImplementation->SetMouseButtonCallback(callback);
     }
-
+    
     void WindowManager::SetMouseMotionCallback()
     {
-
+        mImplementation->SetMouseMotionCallback();
     }
-
+    
     void WindowManager::SetMouseMotionCallback(const MouseMotionCallback& callback)
     {
-
+        mImplementation->SetMouseMotionCallback(callback);
     }
-
+    
     void WindowManager::SetMousePositionCallback()
     {
-
+        mImplementation->SetMousePositionCallback();
     }
-
+    
     void WindowManager::SetMousePositionCallback(const MousePositionCallback& callback)
     {
-
+        mImplementation->SetMousePositionCallback(callback);
     }
-
+    
     void WindowManager::SetKeyCallback()
     {
-
+        mImplementation->SetKeyCallback();
     }
-
+    
     void WindowManager::SetKeyCallback(const KeyCallback& callback)
     {
-
+        mImplementation->SetKeyCallback(callback);
     }
-
 
     void WindowManager::ShowMouseCursor(bool show)
     {
-
+        mImplementation->ShowMouseCursor(show);
     }
 
     void WindowManager::SetMousePosition(uint32_t x, uint32_t y)
     {
-
-    }
-
-
-    void WindowManager::SetFrameLimit(const uint64_t newFrameLimit)
-    {
-
-    }
-
-    uint64_t WindowManager::GetFrameLimit() const
-    {
-        // TODO
-        return 0;
-    }
-
-    uint64_t WindowManager::GetCurrentFPS() const
-    {
-        // TODO
-        return 0;
+        mImplementation->SetMousePosition(x, y);
     }
 
 
     void WindowManager::SetFullscreen(bool fullscreen)
     {
-
+        mImplementation->SetFullscreen(fullscreen);
     }
 
     void WindowManager::SetScreenResolution(const uint32_t width, const uint32_t height)
     {
-
+        mImplementation->SetScreenResolution(width, height);
     }
 
     void WindowManager::SetWindowTitle(const std::string& windowTitle)
     {
-
+        mImplementation->SetWindowTitle(windowTitle);
     }
 
     void WindowManager::SetFOV(const float FOV)
     {
-
+        mImplementation->SetFOV(FOV);
     }
-
 
     bool WindowManager::GetFullscreen() const
     {
-        return mFullscreen;
+        return mImplementation->GetFullscreen();
     }
 
     uint32_t WindowManager::GetScreenWidth() const
     {
-        return mScreenWidth;
+        return mImplementation->GetScreenWidth();
     }
 
     uint32_t WindowManager::GetScreenHeight() const
     {
-        return mScreenHeight;
+        return mImplementation->GetScreenHeight();
     }
 
     const std::string& WindowManager::GetWindowTitle() const
     {
-        return mWindowTitle;
+        return mImplementation->GetWindowTitle();
     }
 
     float WindowManager::GetFOV() const
     {
-        return mFOV;
+        return mImplementation->GetFOV();
     }
 }

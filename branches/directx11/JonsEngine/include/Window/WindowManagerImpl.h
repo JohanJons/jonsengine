@@ -3,25 +3,23 @@
 #include "include/Window/KeyCallback.h"
 #include "include/Window/KeyDefinition.h"
 #include "include/Window/MouseCallback.h"
-#include "include/Core/Memory/IMemoryAllocator.h"
 
+#include <Windows.h>
 #include <string>
 #include <vector>
-#include <memory>
 
 
 namespace JonsEngine
 {
     struct EngineSettings;
     class Logger;
-    class WindowManagerImpl;
 
-    /* WindowManager definition */
-    class WindowManager
+    /* WindowManagerImpl definition */
+    class WindowManagerImpl
     {
     public:
-        WindowManager(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator, Logger& logger);
-        ~WindowManager();
+        WindowManagerImpl(const EngineSettings& engineSettings, Logger& logger);
+        ~WindowManagerImpl();
 
         /*
         * Dispatches queued input events to all registered callbacks.
@@ -55,7 +53,17 @@ namespace JonsEngine
 
     private:
         Logger& mLogger;
-        IMemoryAllocatorPtr mMemoryAllocator;
-        std::unique_ptr<WindowManagerImpl, std::function<void(WindowManagerImpl*)>> mImplementation;
+
+        std::string mWindowTitle;
+        uint32_t mScreenWidth;
+        uint32_t mScreenHeight;
+        bool mShowMouseCursor;
+        bool mFullscreen;
+        float mFOV;
+        double mPreviousMouseX;
+        double mPreviousMouseY;
+
+        HINSTANCE mInstanceHandle;
+        HWND mWindowHandle;
     };
 }

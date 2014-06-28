@@ -141,6 +141,7 @@
     <ClCompile Include="src\Scene\SceneManager.cpp" />
     <ClCompile Include="src\Scene\SceneNode.cpp" />
     <ClCompile Include="src\Window\WindowManager.cpp" />
+    <ClCompile Include="src\Window\WindowManagerImpl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
@@ -180,6 +181,7 @@
     <ClInclude Include="include\Window\KeyDefinition.h" />
     <ClInclude Include="include\Window\MouseCallback.h" />
     <ClInclude Include="include\Window\WindowManager.h" />
+    <ClInclude Include="include\Window\WindowManagerImpl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
