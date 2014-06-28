@@ -51,7 +51,8 @@ namespace JonsEngine
     }
 
 
-    WindowManagerImpl::WindowManagerImpl(const EngineSettings& engineSettings, Logger& logger) : mLogger(logger), mInstanceHandle(GetModuleHandle(NULL)), mWindowHandle(nullptr)
+    WindowManagerImpl::WindowManagerImpl(const EngineSettings& engineSettings, Logger& logger) : mLogger(logger), mWindowTitle(engineSettings.mWindowTitle), mScreenWidth(engineSettings.mWindowWidth), mScreenHeight(engineSettings.mWindowHeight),
+        mShowMouseCursor(false), mFullscreen(engineSettings.mFullscreen), mFOV(engineSettings.mFOV), mPreviousMouseX(0.0), mPreviousMouseY(0.0), mInstanceHandle(GetModuleHandle(NULL)), mWindowHandle(nullptr)
     {
         // Register class
         WNDCLASSEX wcex;
