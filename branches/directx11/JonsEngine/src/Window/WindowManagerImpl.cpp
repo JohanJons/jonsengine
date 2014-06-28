@@ -50,6 +50,17 @@ namespace JonsEngine
         return 0;
     }
 
+	std::string GetWin32ErrorString()
+	{
+		DWORD dwLastError = GetLastError();
+		TCHAR lpBuffer[256] = "?";
+
+		if (dwLastError != 0)
+			FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwLastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), lpBuffer, 255, NULL);
+
+		return std::string(lpBuffer);
+	}
+
 
     WindowManagerImpl::WindowManagerImpl(const EngineSettings& engineSettings, Logger& logger) : mLogger(logger), mWindowTitle(engineSettings.mWindowTitle), mScreenWidth(engineSettings.mWindowWidth), mScreenHeight(engineSettings.mWindowHeight),
         mShowMouseCursor(false), mFullscreen(engineSettings.mFullscreen), mFOV(engineSettings.mFOV), mPreviousMouseX(0.0), mPreviousMouseY(0.0), mInstanceHandle(GetModuleHandle(NULL)), mWindowHandle(nullptr)
@@ -62,26 +73,28 @@ namespace JonsEngine
         wcex.cbClsExtra = 0;
         wcex.cbWndExtra = 0;
         wcex.hInstance = mInstanceHandle;
-        wcex.hIcon = nullptr;
+		wcex.hIcon = LoadIcon(NULL, IDI_APPLICATION);
         wcex.hCursor = nullptr;
         wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
         wcex.lpszMenuName = nullptr;
         wcex.lpszClassName = mWindowTitle.c_str();
-        wcex.hIconSm = nullptr;
+		wcex.hIconSm = LoadIcon(NULL, IDI_APPLICATION);;
         if (!RegisterClassEx(&wcex))
         {
-            JONS_LOG_ERROR(mLogger, "WindowManagerImpl::WindowManagerImpl(): RegisterClassEx failed");
-            throw std::runtime_error("WindowManagerImpl::WindowManagerImpl(): RegisterClassEx failed");
+			const std::string win32Error = GetWin32ErrorString();
+            JONS_LOG_ERROR(mLogger, "WindowManagerImpl::WindowManagerImpl(): RegisterClassEx failed" + win32Error);
+			throw std::runtime_error("WindowManagerImpl::WindowManagerImpl(): RegisterClassEx failed" + win32Error);
         }
 
         // Create window
-        RECT rc = {0, 0, engineSettings.mWindowWidth, engineSettings.mWindowHeight};
+        RECT rc = {0, 0, mScreenWidth, mScreenHeight};
         AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
         mWindowHandle = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, rc.right - rc.left, rc.bottom - rc.top, nullptr, nullptr, mInstanceHandle, nullptr);
-        if (!mWindowHandle) 
+        if (!mWindowHandle)
         {
-            JONS_LOG_ERROR(mLogger, "WindowManagerImpl::WindowManagerImpl(): CreateWindow failed");
-            throw std::runtime_error("WindowManagerImpl::WindowManagerImpl(): CreateWindow failed");
+			const std::string win32Error = GetWin32ErrorString();
+			JONS_LOG_ERROR(mLogger, "WindowManagerImpl::WindowManagerImpl(): CreateWindow failed" + win32Error);
+			throw std::runtime_error("WindowManagerImpl::WindowManagerImpl(): CreateWindow failed" + win32Error);
         }
 
         ShowWindow(mWindowHandle, SW_SHOWMAXIMIZED);
@@ -149,18 +162,18 @@ namespace JonsEngine
     {
     }
 
-    void WindowManagerImpl::ShowMouseCursor(bool show)
+    void WindowManagerImpl::ShowMouseCursor(const bool show)
     {
 
     }
 
-    void WindowManagerImpl::SetMousePosition(uint32_t x, uint32_t y)
+	void WindowManagerImpl::SetMousePosition(const uint32_t x, const uint32_t y)
     {
 
     }
 
 
-    void WindowManagerImpl::SetFullscreen(bool fullscreen)
+	void WindowManagerImpl::SetFullscreen(const bool fullscreen)
     {
 
     }

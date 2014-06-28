@@ -61,18 +61,18 @@ namespace JonsEngine
         mImplementation->SetKeyCallback(callback);
     }
 
-    void WindowManager::ShowMouseCursor(bool show)
+    void WindowManager::ShowMouseCursor(const bool show)
     {
         mImplementation->ShowMouseCursor(show);
     }
 
-    void WindowManager::SetMousePosition(uint32_t x, uint32_t y)
+    void WindowManager::SetMousePosition(const uint32_t x, const uint32_t y)
     {
         mImplementation->SetMousePosition(x, y);
     }
 
 
-    void WindowManager::SetFullscreen(bool fullscreen)
+    void WindowManager::SetFullscreen(const bool fullscreen)
     {
         mImplementation->SetFullscreen(fullscreen);
     }

@@ -36,10 +36,10 @@ namespace JonsEngine
         void SetKeyCallback();
         void SetKeyCallback(const KeyCallback& callback);
 
-        void ShowMouseCursor(bool show);
-        void SetMousePosition(uint32_t x, uint32_t y);
+		void ShowMouseCursor(const bool show);
+		void SetMousePosition(const uint32_t x, const uint32_t y);
 
-        void SetFullscreen(bool fullscreen);
+		void SetFullscreen(const bool fullscreen);
         void SetScreenResolution(const uint32_t width, const uint32_t height);
         void SetWindowTitle(const std::string& windowTitle);
         void SetFOV(const float FOV);
