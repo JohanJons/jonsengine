@@ -202,62 +202,6 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="..\..\..\contrib\zlib\CMakeLists.txt">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/contrib/zlib/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
-"C:\Program Files (x86)\CMake 2.8\bin\cmake.exe" -HC:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp -BC:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/build --check-stamp-file C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\build\contrib\zlib\CMakeFiles\generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/contrib/zlib/CMakeLists.txt;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\CMakeLists.txt;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckTypeSize.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckFunctionExists.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckCSourceCompiles.cmake;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\zlib.pc.cmakein;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\zconf.h.cmakein;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\build\contrib\zlib\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/contrib/zlib/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
-"C:\Program Files (x86)\CMake 2.8\bin\cmake.exe" -HC:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp -BC:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/build --check-stamp-file C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\build\contrib\zlib\CMakeFiles\generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/contrib/zlib/CMakeLists.txt;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\CMakeLists.txt;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckTypeSize.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckFunctionExists.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckCSourceCompiles.cmake;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\zlib.pc.cmakein;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\zconf.h.cmakein;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\build\contrib\zlib\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/contrib/zlib/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
-"C:\Program Files (x86)\CMake 2.8\bin\cmake.exe" -HC:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp -BC:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/build --check-stamp-file C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\build\contrib\zlib\CMakeFiles\generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/contrib/zlib/CMakeLists.txt;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\CMakeLists.txt;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckTypeSize.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckFunctionExists.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckCSourceCompiles.cmake;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\zlib.pc.cmakein;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\zconf.h.cmakein;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\build\contrib\zlib\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/contrib/zlib/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
-"C:\Program Files (x86)\CMake 2.8\bin\cmake.exe" -HC:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp -BC:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/build --check-stamp-file C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\build\contrib\zlib\CMakeFiles\generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/contrib/zlib/CMakeLists.txt;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\CMakeLists.txt;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckTypeSize.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckFunctionExists.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake 2.8\share\cmake-2.8\Modules\CheckCSourceCompiles.cmake;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\zlib.pc.cmakein;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\zconf.h.cmakein;C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\contrib\zlib\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\Johan\Desktop\SVN\jonsengine\Thirdparty\assimp\build\contrib\zlib\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
-    </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="zconf.h" />
     <ClInclude Include="..\..\..\contrib\zlib\zlib.h" />
     <ClInclude Include="..\..\..\contrib\zlib\crc32.h" />
@@ -284,11 +228,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="..\..\..\contrib\zlib\trees.c" />
     <ClCompile Include="..\..\..\contrib\zlib\uncompr.c" />
     <ClCompile Include="..\..\..\contrib\zlib\zutil.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/build/ZERO_CHECK.vcxproj">
-      <Project>FD2CD7D4-84DD-4086-8F51-C7D88B27D93D</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
