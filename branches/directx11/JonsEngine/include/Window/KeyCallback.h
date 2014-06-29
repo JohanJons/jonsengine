@@ -4,6 +4,7 @@
 #include "include/Window/KeyDefinition.h"
 
 #include <functional>
+#include <bitset>
 
 namespace JonsEngine
 {
@@ -18,6 +19,8 @@ namespace JonsEngine
     struct KeyEvent
     {
     public:
+        typedef std::bitset<sizeof(uint32_t)> KeyModifiers;
+
         enum KeyState
         {
             STATE_UNKNOWN = 0,
@@ -28,23 +31,22 @@ namespace JonsEngine
 
         enum KeyModifier
         {
-            MODIFIER_NONE = 0,
-            MODIFIER_SHIFT,
+            MODIFIER_SHIFT = 0,
             MODIFIER_CONTROL,
             MODIFIER_ALT
         };
 
         Key mKey;
-        int mScancode;      /* System-specific scancode */
+        uint16_t mScancode;      /* System-specific scancode */
         KeyState mState;
-        KeyModifier mModifier;
+        KeyModifiers mModifiers;
 
 
-        KeyEvent(Key keySymbol, int scanCode, KeyState state, KeyModifier modifier);
+        KeyEvent(Key keySymbol, uint16_t scanCode, KeyState state, KeyModifiers modifiers);
     };
 
 
     /* KeyEvent inlines */
-    inline KeyEvent::KeyEvent(Key keySymbol, int scanCode, KeyState state, KeyModifier modifier) : mKey(keySymbol), mScancode(scanCode), mState(state), mModifier(modifier) { }
+    inline KeyEvent::KeyEvent(Key keySymbol, uint16_t scanCode, KeyState state, KeyModifiers modifiers) : mKey(keySymbol), mScancode(scanCode), mState(state), mModifiers(modifiers) { }
 
 }
