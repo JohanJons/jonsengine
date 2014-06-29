@@ -61,24 +61,24 @@ namespace JonsEngine
     /* MouseMotionEvent definition */
     struct MouseMotionEvent
     {
-        double mPosX;
-        double mPosY;
+        uint32_t mPosX;
+        uint32_t mPosY;
 
         
-        MouseMotionEvent(const double x, const double y);
+        MouseMotionEvent(const uint32_t x, const uint32_t y);
     };
 
 	
 	/* MousePositionEvent definition */
 	struct MousePositionEvent
 	{
-        double mPreviousPosX;
-        double mPreviousPosY;
-        double mCurrentPosX;
-        double mCurrentPosY;
+        uint32_t mPreviousPosX;
+        uint32_t mPreviousPosY;
+        uint32_t mCurrentPosX;
+        uint32_t mCurrentPosY;
 		
 		
-        MousePositionEvent(const double prevX, const double prevY, const double currX, const double currY);
+        MousePositionEvent(const uint32_t prevX, const uint32_t prevY, const uint32_t currX, const uint32_t currY);
 	};
 
 
@@ -86,8 +86,8 @@ namespace JonsEngine
     inline MouseButtonEvent::MouseButtonEvent(MouseButton button, MouseButtonState state, MouseModifier modifier) : mButton(button), mState(state), mModifier(modifier) { }
 
     /* MouseMotionEvent inlines */
-    inline MouseMotionEvent::MouseMotionEvent(const double x, const double y) : mPosX(x), mPosY(y) { }
+    inline MouseMotionEvent::MouseMotionEvent(const uint32_t x, const uint32_t y) : mPosX(x), mPosY(y) { }
 	
 	/* MousePositionEvent inlines */
-    inline MousePositionEvent::MousePositionEvent(const double prevX, const double prevY, const double currX, const double currY) : mPreviousPosX(prevX), mPreviousPosY(prevY), mCurrentPosX(currX), mCurrentPosY(currY) { }
+    inline MousePositionEvent::MousePositionEvent(const uint32_t prevX, const uint32_t prevY, const uint32_t currX, const uint32_t currY) : mPreviousPosX(prevX), mPreviousPosY(prevY), mCurrentPosX(currX), mCurrentPosY(currY) { }
 }

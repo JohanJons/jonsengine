@@ -50,6 +50,7 @@ namespace JonsEngine
         uint32_t GetScreenWidth() const;
         uint32_t GetScreenHeight() const;
         const std::string& GetWindowTitle() const;
+        bool GetShowMouseCursor() const;
         float GetFOV() const;
 
 

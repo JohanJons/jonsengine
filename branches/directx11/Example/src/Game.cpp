@@ -101,6 +101,10 @@ namespace JonsGame
                 mEngine->GetWindow().SetFullscreen(true);
             else if (evnt.mKey == Key::M)
                 mEngine->GetWindow().SetFullscreen(false);
+            else if (evnt.mKey == Key::V)
+                mEngine->GetWindow().ShowMouseCursor(true);
+            else if (evnt.mKey == Key::B)
+                mEngine->GetWindow().ShowMouseCursor(false);
             else if (evnt.mKey == Key::ESC)
                 mRunning = false;
         }
@@ -136,7 +140,7 @@ namespace JonsGame
         JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
 
         // sectoid
-        SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
+        /*SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
         ModelPtr modelAlien    = myScene->GetResourceManifest().LoadModel("sectoid", jonsPackage);
         modelAlien->mSceneNode = nodeAlien;
         nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
@@ -185,7 +189,7 @@ namespace JonsGame
         sphere->mSceneNode = nodeSphere;
         nodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
         
-        // move up camera
+        // move up camera*/
         myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
     }
 

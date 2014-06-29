@@ -112,6 +112,11 @@ namespace JonsEngine
         return mImplementation->GetWindowTitle();
     }
 
+    bool WindowManager::GetShowMouseCursor() const
+    {
+        return mImplementation->GetShowMouseCursor();
+    }
+
     float WindowManager::GetFOV() const
     {
         return mImplementation->GetFOV();

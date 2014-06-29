@@ -48,10 +48,15 @@ namespace JonsEngine
         uint32_t GetScreenWidth() const;
         uint32_t GetScreenHeight() const;
         const std::string& GetWindowTitle() const;
+        bool GetShowMouseCursor() const;
         float GetFOV() const;
 
 
     private:
+        static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+        void ProcessKeyboardInput(const RAWKEYBOARD& keyInput);
+        void ProcessMouseInput(const RAWMOUSE& mouseInput);
+
         Logger& mLogger;
 
         std::string mWindowTitle;
@@ -60,8 +65,17 @@ namespace JonsEngine
         bool mShowMouseCursor;
         bool mFullscreen;
         float mFOV;
-        double mPreviousMouseX;
-        double mPreviousMouseY;
+        uint32_t mPreviousMouseX;
+        uint32_t mPreviousMouseY;
+
+        MouseButtonCallback mMouseButtonCallback;
+        MouseMotionCallback mMouseMotionCallback;
+        MousePositionCallback mMousePositionCallback;
+        KeyCallback mKeyCallback;
+
+        std::vector<MouseButtonEvent> mMouseButtonEvents;
+        std::vector<MouseMotionEvent> mMouseMotionEvents;
+        std::vector<KeyEvent> mKeyEvents;
 
         HINSTANCE mInstanceHandle;
         HWND mWindowHandle;
