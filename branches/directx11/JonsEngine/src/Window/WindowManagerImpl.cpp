@@ -9,6 +9,8 @@ namespace JonsEngine
 {
     static WindowManagerImpl* gWindowManagerImpl = nullptr;
 
+    const LONG windowStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME;
+
 
     LRESULT CALLBACK WindowManagerImpl::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
@@ -26,11 +28,10 @@ namespace JonsEngine
 
             case WM_INPUT:
             {
-                UINT rawInputSize;
-                LPBYTE inputBuffer[40];
                 RAWINPUT rawInput;
+                UINT rawInputSize = sizeof(rawInput);
 
-                GetRawInputData((HRAWINPUT)(lParam), RID_INPUT, inputBuffer, &rawInputSize, sizeof(RAWINPUTHEADER));
+                GetRawInputData((HRAWINPUT)(lParam), RID_INPUT, &rawInput, &rawInputSize, sizeof(RAWINPUTHEADER));
 
                 if (rawInput.header.dwType == RIM_TYPEKEYBOARD)
                     gWindowManagerImpl->ProcessKeyboardInput(rawInput.data.keyboard);
@@ -53,16 +54,16 @@ namespace JonsEngine
         return 0;
     }
 
-	std::string GetWin32ErrorString()
-	{
-		DWORD dwLastError = GetLastError();
-		TCHAR lpBuffer[256] = "?";
+    std::string GetWin32ErrorString()
+    {
+        DWORD dwLastError = GetLastError();
+        TCHAR lpBuffer[256] = "?";
 
-		if (dwLastError != 0)
-			FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwLastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), lpBuffer, 255, NULL);
+        if (dwLastError != 0)
+            FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwLastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), lpBuffer, 255, NULL);
 
-		return std::string(lpBuffer);
-	}
+        return std::string(lpBuffer);
+    }
 
 
     WindowManagerImpl::WindowManagerImpl(const EngineSettings& engineSettings, Logger& logger) : mLogger(logger), mWindowTitle(engineSettings.mWindowTitle), mScreenWidth(engineSettings.mWindowWidth), mScreenHeight(engineSettings.mWindowHeight),
@@ -77,33 +78,34 @@ namespace JonsEngine
         wcex.cbClsExtra = 0;
         wcex.cbWndExtra = 0;
         wcex.hInstance = mInstanceHandle;
-		wcex.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+        wcex.hIcon = LoadIcon(NULL, IDI_APPLICATION);
         wcex.hCursor = nullptr;
         wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-        wcex.lpszMenuName = nullptr;
+        wcex.lpszMenuName = mWindowTitle.c_str();
         wcex.lpszClassName = mWindowTitle.c_str();
-		wcex.hIconSm = LoadIcon(NULL, IDI_APPLICATION);;
+        wcex.hIconSm = LoadIcon(NULL, IDI_APPLICATION);;
         if (!RegisterClassEx(&wcex))
         {
-			const std::string win32Error = GetWin32ErrorString();
+            const std::string win32Error = GetWin32ErrorString();
             JONS_LOG_ERROR(mLogger, "WindowManagerImpl::WindowManagerImpl(): RegisterClassEx failed: " + win32Error);
-			throw std::runtime_error("WindowManagerImpl::WindowManagerImpl(): RegisterClassEx failed: " + win32Error);
+            throw std::runtime_error("WindowManagerImpl::WindowManagerImpl(): RegisterClassEx failed: " + win32Error);
         }
 
         // Create window
-        RECT windowRect = {0, 0, mScreenWidth, mScreenHeight};
+        RECT windowRect = { 0, 0, mScreenWidth, mScreenHeight };
         AdjustWindowRect(&windowRect, WS_MAXIMIZE, FALSE);
-        mWindowHandle = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, WS_MAXIMIZE | WS_OVERLAPPED, CW_USEDEFAULT, CW_USEDEFAULT, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
+        mWindowHandle = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, windowStyle, CW_USEDEFAULT, CW_USEDEFAULT, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
             nullptr, nullptr, mInstanceHandle, nullptr);
         if (!mWindowHandle)
         {
-			const std::string win32Error = GetWin32ErrorString();
-			JONS_LOG_ERROR(mLogger, "WindowManagerImpl::WindowManagerImpl(): CreateWindow failed: " + win32Error);
-			throw std::runtime_error("WindowManagerImpl::WindowManagerImpl(): CreateWindow failed: " + win32Error);
+            const std::string win32Error = GetWin32ErrorString();
+            JONS_LOG_ERROR(mLogger, "WindowManagerImpl::WindowManagerImpl(): CreateWindow failed: " + win32Error);
+            throw std::runtime_error("WindowManagerImpl::WindowManagerImpl(): CreateWindow failed: " + win32Error);
         }
 
         ShowCursor(mShowMouseCursor);
         ShowWindow(mWindowHandle, SW_SHOWNORMAL);
+        UpdateWindow(mWindowHandle);
 
         // initialize RAW input
         RAWINPUTDEVICE rawInputDevices[2] =
@@ -130,7 +132,7 @@ namespace JonsEngine
 
     void WindowManagerImpl::Poll()
     {
-        MSG msg = {0};
+        MSG msg = { 0 };
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&msg);
@@ -174,8 +176,6 @@ namespace JonsEngine
         mMouseButtonEvents.clear();
         mMouseMotionEvents.clear();
         mKeyEvents.clear();
-
-        UpdateWindow(mWindowHandle);    // needed?
     }
 
     void WindowManagerImpl::SetMouseButtonCallback()
@@ -189,7 +189,7 @@ namespace JonsEngine
     }
 
     void WindowManagerImpl::SetMouseMotionCallback()
-    { 
+    {
         mMouseMotionCallback = nullptr;
     }
 
@@ -212,7 +212,7 @@ namespace JonsEngine
     {
         mKeyCallback = nullptr;
     }
-    
+
     void WindowManagerImpl::SetKeyCallback(const KeyCallback& callback)
     {
         mKeyCallback = callback;
@@ -221,32 +221,72 @@ namespace JonsEngine
     void WindowManagerImpl::ShowMouseCursor(const bool show)
     {
         mShowMouseCursor = show;
+
         ShowCursor(mShowMouseCursor);
+
+        UpdateWindow(mWindowHandle);
     }
 
-	void WindowManagerImpl::SetMousePosition(const uint32_t x, const uint32_t y)
+    void WindowManagerImpl::SetMousePosition(const uint32_t x, const uint32_t y)
     {
-        POINT cursorPos = {x, y};
+        POINT cursorPos = { x, y };
 
         ClientToScreen(mWindowHandle, &cursorPos);
         SetCursorPos(cursorPos.x, cursorPos.y);
+
+        UpdateWindow(mWindowHandle);
     }
 
 
-	void WindowManagerImpl::SetFullscreen(const bool fullscreen)
+    void WindowManagerImpl::SetFullscreen(const bool fullscreen)
     {
         mFullscreen = fullscreen;
+
+        if (!fullscreen)
+        {
+            SetScreenResolution(mScreenWidth, mScreenHeight);
+            return;
+        }
+
+        DWORD dwStyle = GetWindowLong(mWindowHandle, GWL_STYLE);
+        MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+
+        GetMonitorInfo(MonitorFromWindow(mWindowHandle, MONITOR_DEFAULTTOPRIMARY), &monitorInfo);
+        
+        const LONG left = monitorInfo.rcMonitor.left;
+        const LONG top = monitorInfo.rcMonitor.top;
+        const LONG monitorWidth = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
+        const LONG monitorHeight = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
+        
+        SetWindowLong(mWindowHandle, GWL_STYLE, dwStyle & ~windowStyle);
+        SetWindowPos(mWindowHandle, HWND_TOP, left, top, monitorWidth, monitorHeight, SWP_SHOWWINDOW);
+
+        UpdateWindow(mWindowHandle);
     }
 
     void WindowManagerImpl::SetScreenResolution(const uint32_t width, const uint32_t height)
     {
         mScreenWidth = width;
         mScreenHeight = height;
+
+        DWORD dwStyle = GetWindowLong(mWindowHandle, GWL_STYLE);
+        MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+
+        GetMonitorInfo(MonitorFromWindow(mWindowHandle, MONITOR_DEFAULTTOPRIMARY), &monitorInfo);
+
+        SetWindowLong(mWindowHandle, GWL_STYLE, dwStyle | windowStyle);
+        SetWindowPos(mWindowHandle, HWND_TOP, monitorInfo.rcMonitor.left, monitorInfo.rcMonitor.top, mScreenWidth, mScreenHeight, SWP_SHOWWINDOW);
+
+        UpdateWindow(mWindowHandle);
     }
 
     void WindowManagerImpl::SetWindowTitle(const std::string& windowTitle)
     {
         mWindowTitle = windowTitle;
+
+        SetWindowText(mWindowHandle, mWindowTitle.c_str());
+
+        UpdateWindow(mWindowHandle);
     }
 
     void WindowManagerImpl::SetFOV(const float FOV)
@@ -399,7 +439,7 @@ namespace JonsEngine
             default:                return UNKNOWN;
             };
         }(),
-        static_cast<uint16_t>(keyInput.VKey),
+            static_cast<uint16_t>(keyInput.VKey),
             [&]()
         {
             switch (keyInput.Flags)

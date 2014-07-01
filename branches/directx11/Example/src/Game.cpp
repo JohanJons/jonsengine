@@ -105,6 +105,10 @@ namespace JonsGame
                 mEngine->GetWindow().ShowMouseCursor(true);
             else if (evnt.mKey == Key::B)
                 mEngine->GetWindow().ShowMouseCursor(false);
+            else if (evnt.mKey == Key::X)
+                mEngine->GetWindow().SetScreenResolution(1080, 720);
+            else if (evnt.mKey == Key::C)
+                mEngine->GetWindow().SetScreenResolution(1920, 1080);
             else if (evnt.mKey == Key::ESC)
                 mRunning = false;
         }
