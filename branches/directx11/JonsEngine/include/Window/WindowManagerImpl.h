@@ -29,8 +29,6 @@ namespace JonsEngine
 
         void SetMouseButtonCallback();
         void SetMouseButtonCallback(const MouseButtonCallback& callback);
-        void SetMouseMotionCallback();
-        void SetMouseMotionCallback(const MouseMotionCallback& callback);
         void SetMousePositionCallback();
         void SetMousePositionCallback(const MousePositionCallback& callback);
         void SetKeyCallback();
@@ -69,12 +67,10 @@ namespace JonsEngine
         uint32_t mPreviousMouseY;
 
         MouseButtonCallback mMouseButtonCallback;
-        MouseMotionCallback mMouseMotionCallback;
         MousePositionCallback mMousePositionCallback;
         KeyCallback mKeyCallback;
 
         std::vector<MouseButtonEvent> mMouseButtonEvents;
-        std::vector<MouseMotionEvent> mMouseMotionEvents;
         std::vector<KeyEvent> mKeyEvents;
 
         HINSTANCE mInstanceHandle;

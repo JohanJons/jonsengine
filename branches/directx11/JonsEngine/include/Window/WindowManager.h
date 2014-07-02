@@ -31,8 +31,6 @@ namespace JonsEngine
 
         void SetMouseButtonCallback();
         void SetMouseButtonCallback(const MouseButtonCallback& callback);
-        void SetMouseMotionCallback();
-        void SetMouseMotionCallback(const MouseMotionCallback& callback);
         void SetMousePositionCallback();
         void SetMousePositionCallback(const MousePositionCallback& callback);
         void SetKeyCallback();

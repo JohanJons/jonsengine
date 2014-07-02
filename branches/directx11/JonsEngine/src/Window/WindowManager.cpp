@@ -31,16 +31,6 @@ namespace JonsEngine
         mImplementation->SetMouseButtonCallback(callback);
     }
     
-    void WindowManager::SetMouseMotionCallback()
-    {
-        mImplementation->SetMouseMotionCallback();
-    }
-    
-    void WindowManager::SetMouseMotionCallback(const MouseMotionCallback& callback)
-    {
-        mImplementation->SetMouseMotionCallback(callback);
-    }
-    
     void WindowManager::SetMousePositionCallback()
     {
         mImplementation->SetMousePositionCallback();
