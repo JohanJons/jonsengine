@@ -16,39 +16,39 @@ namespace JonsEngine
     {
         switch (message)
         {
-            case WM_PAINT:
-            {
-                PAINTSTRUCT ps;
+        case WM_PAINT:
+        {
+                         PAINTSTRUCT ps;
 
-                BeginPaint(hWnd, &ps);
-                EndPaint(hWnd, &ps);
+                         BeginPaint(hWnd, &ps);
+                         EndPaint(hWnd, &ps);
 
-                break;
-            }
+                         break;
+        }
 
-            case WM_INPUT:
-            {
-                RAWINPUT rawInput;
-                UINT rawInputSize = sizeof(rawInput);
+        case WM_INPUT:
+        {
+                         RAWINPUT rawInput;
+                         UINT rawInputSize = sizeof(rawInput);
 
-                GetRawInputData((HRAWINPUT)(lParam), RID_INPUT, &rawInput, &rawInputSize, sizeof(RAWINPUTHEADER));
+                         GetRawInputData((HRAWINPUT)(lParam), RID_INPUT, &rawInput, &rawInputSize, sizeof(RAWINPUTHEADER));
 
-                if (rawInput.header.dwType == RIM_TYPEKEYBOARD)
-                    gWindowManagerImpl->ProcessKeyboardInput(rawInput.data.keyboard);
-                else if (rawInput.header.dwType == RIM_TYPEMOUSE)
-                    gWindowManagerImpl->ProcessMouseInput(rawInput.data.mouse);
+                         if (rawInput.header.dwType == RIM_TYPEKEYBOARD)
+                             gWindowManagerImpl->ProcessKeyboardInput(rawInput.data.keyboard);
+                         else if (rawInput.header.dwType == RIM_TYPEMOUSE)
+                             gWindowManagerImpl->ProcessMouseInput(rawInput.data.mouse);
 
-                break;
-            }
+                         break;
+        }
 
-            case WM_DESTROY:
-            {
-                PostQuitMessage(0);
-                break;
-            }
+        case WM_DESTROY:
+        {
+                           PostQuitMessage(0);
+                           break;
+        }
 
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
         }
 
         return 0;
@@ -67,7 +67,7 @@ namespace JonsEngine
 
 
     WindowManagerImpl::WindowManagerImpl(const EngineSettings& engineSettings, Logger& logger) : mLogger(logger), mWindowTitle(engineSettings.mWindowTitle), mScreenWidth(engineSettings.mWindowWidth), mScreenHeight(engineSettings.mWindowHeight),
-        mShowMouseCursor(false), mFullscreen(engineSettings.mFullscreen), mFOV(engineSettings.mFOV), mPreviousMouseX(0), mPreviousMouseY(0), mMouseButtonCallback(nullptr), mMouseMotionCallback(nullptr),
+        mShowMouseCursor(false), mFullscreen(engineSettings.mFullscreen), mFOV(engineSettings.mFOV), mPreviousMouseX(0), mPreviousMouseY(0), mMouseButtonCallback(nullptr),
         mMousePositionCallback(nullptr), mKeyCallback(nullptr), mInstanceHandle(GetModuleHandle(NULL)), mWindowHandle(nullptr)
     {
         // Register class
@@ -93,9 +93,9 @@ namespace JonsEngine
 
         // Create window
         RECT windowRect = { 0, 0, mScreenWidth, mScreenHeight };
-        AdjustWindowRect(&windowRect, WS_MAXIMIZE, FALSE);
-        mWindowHandle = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, windowStyle, CW_USEDEFAULT, CW_USEDEFAULT, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top,
-            nullptr, nullptr, mInstanceHandle, nullptr);
+        AdjustWindowRect(&windowRect, windowStyle, FALSE);
+        mWindowHandle = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, windowStyle, CW_USEDEFAULT, CW_USEDEFAULT, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, nullptr, nullptr, mInstanceHandle,
+            nullptr);
         if (!mWindowHandle)
         {
             const std::string win32Error = GetWin32ErrorString();
@@ -140,37 +140,31 @@ namespace JonsEngine
         }
 
         // Dispatch waiting events for each event type to registered callbacks
+        if (mMousePositionCallback)
+        {
+            /*POINT cursorPos;
+
+            if (GetCursorPos(&cursorPos))
+            {
+            ScreenToClient(mWindowHandle, &cursorPos);
+
+            mMousePositionCallback(MousePositionEvent(mPreviousMouseX, mPreviousMouseY, cursorPos.x, cursorPos.y));
+
+            mPreviousMouseX = cursorPos.x;
+            mPreviousMouseY = cursorPos.y;
+            }*/
+        }
+
         if (mMouseButtonCallback)
         {
             for (MouseButtonEvent& ev : mMouseButtonEvents)
                 mMouseButtonCallback(ev);
         }
 
-        if (mMouseMotionCallback)
-        {
-            for (MouseMotionEvent& ev : mMouseMotionEvents)
-                mMouseMotionCallback(ev);
-        }
-
         if (mKeyCallback)
         {
             for (KeyEvent& ev : mKeyEvents)
                 mKeyCallback(ev);
-        }
-
-        if (mMousePositionCallback)
-        {
-            POINT cursorPos;
-
-            if (GetCursorPos(&cursorPos))
-            {
-                ScreenToClient(mWindowHandle, &cursorPos);
-
-                mMousePositionCallback(MousePositionEvent(mPreviousMouseX, mPreviousMouseY, cursorPos.x, cursorPos.y));
-
-                mPreviousMouseX = cursorPos.x;
-                mPreviousMouseY = cursorPos.y;
-            }
         }
 
         mMouseButtonEvents.clear();
@@ -186,16 +180,6 @@ namespace JonsEngine
     void WindowManagerImpl::SetMouseButtonCallback(const MouseButtonCallback& callback)
     {
         mMouseButtonCallback = callback;
-    }
-
-    void WindowManagerImpl::SetMouseMotionCallback()
-    {
-        mMouseMotionCallback = nullptr;
-    }
-
-    void WindowManagerImpl::SetMouseMotionCallback(const MouseMotionCallback& callback)
-    {
-        mMouseMotionCallback = callback;
     }
 
     void WindowManagerImpl::SetMousePositionCallback()
@@ -222,7 +206,12 @@ namespace JonsEngine
     {
         mShowMouseCursor = show;
 
-        ShowCursor(mShowMouseCursor);
+        if (mShowMouseCursor)
+        while (ShowCursor(true) <= 0);
+        else
+        while (ShowCursor(false) >= 0);
+
+        SendMessage(mWindowHandle, WM_SETCURSOR, (WPARAM)mWindowHandle, MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));     // needed?
 
         UpdateWindow(mWindowHandle);
     }
@@ -252,12 +241,12 @@ namespace JonsEngine
         MONITORINFO monitorInfo = { sizeof(monitorInfo) };
 
         GetMonitorInfo(MonitorFromWindow(mWindowHandle, MONITOR_DEFAULTTOPRIMARY), &monitorInfo);
-        
+
         const LONG left = monitorInfo.rcMonitor.left;
         const LONG top = monitorInfo.rcMonitor.top;
         const LONG monitorWidth = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
         const LONG monitorHeight = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
-        
+
         SetWindowLong(mWindowHandle, GWL_STYLE, dwStyle & ~windowStyle);
         SetWindowPos(mWindowHandle, HWND_TOP, left, top, monitorWidth, monitorHeight, SWP_SHOWWINDOW);
 
@@ -270,12 +259,12 @@ namespace JonsEngine
         mScreenHeight = height;
 
         DWORD dwStyle = GetWindowLong(mWindowHandle, GWL_STYLE);
-        MONITORINFO monitorInfo = { sizeof(monitorInfo) };
 
-        GetMonitorInfo(MonitorFromWindow(mWindowHandle, MONITOR_DEFAULTTOPRIMARY), &monitorInfo);
+        RECT windowRect = { 0, 0, mScreenWidth, mScreenHeight };
+        AdjustWindowRect(&windowRect, dwStyle | windowStyle, FALSE);
 
         SetWindowLong(mWindowHandle, GWL_STYLE, dwStyle | windowStyle);
-        SetWindowPos(mWindowHandle, HWND_TOP, monitorInfo.rcMonitor.left, monitorInfo.rcMonitor.top, mScreenWidth, mScreenHeight, SWP_SHOWWINDOW);
+        SetWindowPos(mWindowHandle, HWND_TOP, windowRect.left, windowRect.top, windowRect.right, windowRect.bottom, SWP_SHOWWINDOW);
 
         UpdateWindow(mWindowHandle);
     }
@@ -327,6 +316,9 @@ namespace JonsEngine
 
     void WindowManagerImpl::ProcessKeyboardInput(const RAWKEYBOARD& keyInput)
     {
+        if (!mKeyCallback)
+            return;
+
         SHORT altDown = GetKeyState(VK_MENU);
         SHORT shiftDown = GetKeyState(VK_SHIFT);
         SHORT ctrlDown = GetKeyState(VK_CONTROL);
@@ -464,6 +456,23 @@ namespace JonsEngine
 
     void WindowManagerImpl::ProcessMouseInput(const RAWMOUSE& mouseInput)
     {
+        if (!mMouseButtonCallback && !mMousePositionCallback)
+            return;
 
+        ....mCurrentPos update
+
+            mMouseButtonEvents.push_back(MouseButtonEvent([&]()
+        {
+            switch (mouseInput.usButtonFlags)
+            {
+            case RI_MOUSE_LEFT_BUTTON_DOWN:     return MouseButtonEvent(MouseButton::BUTTON_LEFT, MouseButtonState::STATE_PRESSED);
+            case RI_MOUSE_LEFT_BUTTON_UP:       return MouseButtonEvent(MouseButton::BUTTON_LEFT, MouseButtonState::STATE_RELEASED);
+            case RI_MOUSE_MIDDLE_BUTTON_DOWN:   return MouseButtonEvent(MouseButton::BUTTON_MIDDLE, MouseButtonState::STATE_PRESSED);
+            case RI_MOUSE_MIDDLE_BUTTON_UP:     return MouseButtonEvent(MouseButton::BUTTON_MIDDLE, MouseButtonState::STATE_RELEASED);
+            case RI_MOUSE_RIGHT_BUTTON_DOWN:    return MouseButtonEvent(MouseButton::BUTTON_RIGHT, MouseButtonState::STATE_PRESSED);
+            case RI_MOUSE_RIGHT_BUTTON_UP:      return MouseButtonEvent(MouseButton::BUTTON_RIGHT, MouseButtonState::STATE_RELEASED);
+            default:                            return MouseButtonEvent(MouseButton::BUTTON_NONE, MouseButtonState::STATE_UNKNOWN);
+            };
+        }()));
     }
 }
