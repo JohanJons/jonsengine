@@ -143,7 +143,7 @@ namespace JonsGame
         mEngine->GetSceneManager().SetActiveScene("MyScene");
         JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
 
-        // sectoid
+        // sectoid 
         /*SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
         ModelPtr modelAlien    = myScene->GetResourceManifest().LoadModel("sectoid", jonsPackage);
         modelAlien->mSceneNode = nodeAlien;
