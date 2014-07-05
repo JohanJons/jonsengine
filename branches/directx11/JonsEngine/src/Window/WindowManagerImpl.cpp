@@ -16,39 +16,39 @@ namespace JonsEngine
     {
         switch (message)
         {
-        case WM_PAINT:
-        {
-                         PAINTSTRUCT ps;
+            case WM_PAINT:
+            {
+                PAINTSTRUCT ps;
 
-                         BeginPaint(hWnd, &ps);
-                         EndPaint(hWnd, &ps);
+                BeginPaint(hWnd, &ps);
+                EndPaint(hWnd, &ps);
 
-                         break;
-        }
+                break;
+            }
 
-        case WM_INPUT:
-        {
-                         RAWINPUT rawInput;
-                         UINT rawInputSize = sizeof(rawInput);
+            case WM_INPUT:
+            {
+                RAWINPUT rawInput;
+                UINT rawInputSize = sizeof(rawInput);
 
-                         GetRawInputData((HRAWINPUT)(lParam), RID_INPUT, &rawInput, &rawInputSize, sizeof(RAWINPUTHEADER));
+                GetRawInputData((HRAWINPUT)(lParam), RID_INPUT, &rawInput, &rawInputSize, sizeof(RAWINPUTHEADER));
 
-                         if (rawInput.header.dwType == RIM_TYPEKEYBOARD)
-                             gWindowManagerImpl->ProcessKeyboardInput(rawInput.data.keyboard);
-                         else if (rawInput.header.dwType == RIM_TYPEMOUSE)
-                             gWindowManagerImpl->ProcessMouseInput(rawInput.data.mouse);
+                if (rawInput.header.dwType == RIM_TYPEKEYBOARD)
+                    gWindowManagerImpl->ProcessKeyboardInput(rawInput.data.keyboard);
+                else if (rawInput.header.dwType == RIM_TYPEMOUSE)
+                    gWindowManagerImpl->ProcessMouseInput(rawInput.data.mouse);
 
-                         break;
-        }
+                break;
+            }
 
-        case WM_DESTROY:
-        {
-                           PostQuitMessage(0);
-                           break;
-        }
+            case WM_DESTROY:
+            {
+                PostQuitMessage(0);
+                break;
+            }
 
-        default:
-            return DefWindowProc(hWnd, message, wParam, lParam);
+            default:
+                return DefWindowProc(hWnd, message, wParam, lParam);
         }
 
         return 0;
@@ -206,9 +206,9 @@ namespace JonsEngine
         mShowMouseCursor = show;
 
         if (mShowMouseCursor)
-        while (ShowCursor(true) <= 0);
+            while (ShowCursor(true) <= 0);
         else
-        while (ShowCursor(false) >= 0);
+            while (ShowCursor(false) >= 0);
 
         SendMessage(mWindowHandle, WM_SETCURSOR, (WPARAM)mWindowHandle, MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));     // needed?
 

@@ -53,7 +53,6 @@ namespace JonsEngine
 
 
     private:
-        Logger& mLogger;
         IMemoryAllocatorPtr mMemoryAllocator;
         std::unique_ptr<WindowManagerImpl, std::function<void(WindowManagerImpl*)>> mImplementation;
     };

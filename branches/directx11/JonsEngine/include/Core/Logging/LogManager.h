@@ -3,7 +3,6 @@
 #include "include/Core/EngineDefs.h"
 #include "include/Core/Logging/StreamBuf.h"
 #include "include/Core/Logging/OutputStream.h"
-#include "include/Core/Threading/Mutex.h"
 
 #include <iostream>
 #include <fstream>
@@ -55,8 +54,6 @@ namespace JonsEngine
         std::ofstream mFileStream;
         StreamBuf mStreamBuf;
         LogLevel mLogFilter;
-        Mutex mMutex;
-
     };
 
 

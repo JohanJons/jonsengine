@@ -71,7 +71,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>winmm.lib;libboost_serialization-vc110-mt-sgd-1_53.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;libboost_serialization-vc110-mt-sgd-1_53.lib;d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)/../Thirdparty/boost_1_53_0/bin.v2/libs/serialization/build/msvc-11.0/debug/link-static/runtime-link-static/threading-multi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
@@ -129,6 +129,7 @@
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
     <ClCompile Include="src\Core\Utils\Time.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DirectXRenderer.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DirectXRendererImpl.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="include\Core\Utils\Time.h" />
     <ClInclude Include="include\Core\Utils\Math.h" />
     <ClInclude Include="include\Renderer\DirectX11\DirectXRenderer.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DirectXRendererImpl.h" />
     <ClInclude Include="include\Renderer\RenderCommands.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />

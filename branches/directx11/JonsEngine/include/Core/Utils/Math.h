@@ -1,7 +1,5 @@
 #pragma once
 
-#include "include/Core/Types.h"
-
 #include "SimpleMath.h"
 #include <math.h>
 

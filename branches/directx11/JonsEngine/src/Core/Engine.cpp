@@ -19,7 +19,7 @@ namespace JonsEngine
                                                      mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<HeapAllocator>("DefaultHeapAllocator"), 
                                                                       [](HeapAllocator* allocator) { HeapAllocator::GetDefaultHeapAllocator().DeallocateObject(allocator); }),
                                                      mWindow(settings, mMemoryAllocator, mLog), 
-                                                     mRenderer(),
+                                                     mRenderer(settings, mMemoryAllocator, mLog),
                                                      mResourceManifest(mRenderer, mMemoryAllocator), 
                                                      mSceneManager(mResourceManifest)
     {

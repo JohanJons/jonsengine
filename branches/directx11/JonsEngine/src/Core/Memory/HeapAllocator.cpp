@@ -1,5 +1,8 @@
 #include "include/Core/Memory/HeapAllocator.h"
 
+#include "../Thirdparty/dlmalloc/dlmalloc.h"
+
+
 namespace JonsEngine
 {
     static HeapAllocator gHeapAllocator("DefaultHeapAllocator", HeapAllocator::DLMALLOC);

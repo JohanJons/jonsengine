@@ -7,8 +7,7 @@
 namespace JonsEngine
 {
     WindowManager::WindowManager(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator, Logger& logger) :
-        mLogger(logger), mMemoryAllocator(memoryAllocator),
-        mImplementation(mMemoryAllocator->AllocateObject<WindowManagerImpl>(engineSettings, mLogger), [this](WindowManagerImpl* windowMgrImpl) { mMemoryAllocator->DeallocateObject(windowMgrImpl); })
+        mMemoryAllocator(memoryAllocator), mImplementation(mMemoryAllocator->AllocateObject<WindowManagerImpl>(engineSettings, logger), [this](WindowManagerImpl* windowMgrImpl) { mMemoryAllocator->DeallocateObject(windowMgrImpl); })
     {
     }
     

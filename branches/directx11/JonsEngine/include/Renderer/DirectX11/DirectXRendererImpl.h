@@ -3,9 +3,10 @@
 #include "include/Renderer/RenderCommands.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
-#include "include/Core/Memory/IMemoryAllocator.h"
+#include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/DebugOptions.h"
 
+#include <d3d11.h>
 #include <string>
 #include <vector>
 #include <memory>
@@ -15,13 +16,12 @@
 namespace JonsEngine
 {
     class Logger;
-    class DirectXRendererImpl;
 
-    class DirectXRenderer
+    class DirectXRendererImpl
     {
     public:
-        DirectXRenderer(const EngineSettings& settings, IMemoryAllocatorPtr memoryAllocator, Logger& logger);
-        ~DirectXRenderer();
+        DirectXRendererImpl(const EngineSettings& settings, Logger& logger);
+        ~DirectXRendererImpl();
 
         MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData);
         TextureID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat);
@@ -40,7 +40,11 @@ namespace JonsEngine
 
 
     private:
-        IMemoryAllocatorPtr mMemoryAllocator;
-        std::unique_ptr<DirectXRendererImpl, std::function<void(DirectXRendererImpl*)>> mImplementation;
+        Logger& mLogger;
+
+        IDXGISwapChain* mSwapchain;
+        ID3D11RenderTargetView* mBackbuffer;
+        ID3D11Device* mDevice;
+        ID3D11DeviceContext* mDeviceContext;
     };
 }

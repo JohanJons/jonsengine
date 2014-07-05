@@ -1,5 +1,5 @@
 #include "include/Core/Logging/LogManager.h"
-#include "include/Core/Threading/ScopedLock.h"
+
 
 namespace JonsEngine
 {
@@ -8,8 +8,6 @@ namespace JonsEngine
 
     LogManager::LogManager(const std::string logPrefix) : mLogPrefix(logPrefix), mLogStream(&mStreamBuf), mLogPath(InternalGetLogName()), mLogFilter(LEVEL_INFO)
     {
-        ScopedLock lock(mMutex);
-
         mFileStream.open(mLogPath, std::ifstream::trunc);
 
         AddOutputStream(mFileStream.rdbuf());
@@ -17,8 +15,6 @@ namespace JonsEngine
 
     LogManager::~LogManager()
     {
-        ScopedLock lock(mMutex);
-
         if (mFileStream.is_open())
             mFileStream.close();
     }
@@ -30,8 +26,6 @@ namespace JonsEngine
 
     void LogManager::Log(LogLevel level, const std::string& logMsg)
     {
-        ScopedLock lock(mMutex);
-
         if (level < mLogFilter)
             return;
 
@@ -40,24 +34,18 @@ namespace JonsEngine
 
     void LogManager::AddOutputStream(std::streambuf* const sb)
     {
-        ScopedLock lock(mMutex);
-
         if (sb)
             mStreamBuf.AddStream(sb);
     }
 
     void LogManager::RemoveOutputStream(std::streambuf* const sb)
     {
-        ScopedLock lock(mMutex);
-
         if (sb)
             mStreamBuf.RemoveStream(sb);
     }
 
     bool LogManager::IsOutputStreamAdded(std::streambuf* const sb)
     {
-        ScopedLock lock(mMutex);
-
         if (sb)
             return mStreamBuf.IsStreamAdded(sb);
         else
@@ -66,8 +54,6 @@ namespace JonsEngine
 
     void LogManager::SetLevelFilter(LogLevel level)
     {
-        ScopedLock lock(mMutex);
-
         mLogFilter = level;
     }
 
@@ -93,6 +79,5 @@ namespace JonsEngine
             case LEVEL_CRITICAL:    {   return "CRITICAL";  break;  }
             default:                {   return "UNKNOWN";   break;  }
         }
-
     }
 }
