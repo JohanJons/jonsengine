@@ -11,7 +11,7 @@ namespace JonsEngine
         // create swapchain, device and devicecontext
         DXGI_SWAP_CHAIN_DESC swapChainDesc;
         ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
-        swapChainDesc.BufferCount = 2;        // front + back buffer
+        swapChainDesc.BufferCount = 2;
         swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         swapChainDesc.OutputWindow = GetActiveWindow();
@@ -29,7 +29,14 @@ namespace JonsEngine
             throw std::runtime_error("DirectXRenderer::DirectXRenderer(): D3D11CreateDeviceAndSwapChain failed: code " + result);
         }
 
+        // backbuffer rendertarget setup
+        ID3D11Texture2D* backbuffer;
+        mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer);
 
+        mDevice->CreateRenderTargetView(backbuffer, nullptr, &mBackbuffer);
+        backbuffer->Release();
+
+        mDeviceContext->OMSetRenderTargets(1, &mBackbuffer, nullptr);
 
         // setup viewport
         D3D11_VIEWPORT viewport;
@@ -46,6 +53,7 @@ namespace JonsEngine
     DirectXRendererImpl::~DirectXRendererImpl()
     {
         mSwapchain->Release();
+        mBackbuffer->Release();
         mDevice->Release();
         mDeviceContext->Release();
     }
