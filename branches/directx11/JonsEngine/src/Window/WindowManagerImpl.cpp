@@ -67,8 +67,8 @@ namespace JonsEngine
 
 
     WindowManagerImpl::WindowManagerImpl(const EngineSettings& engineSettings, Logger& logger) : mLogger(logger), mWindowTitle(engineSettings.mWindowTitle), mScreenWidth(engineSettings.mWindowWidth), mScreenHeight(engineSettings.mWindowHeight),
-        mShowMouseCursor(false), mFullscreen(engineSettings.mFullscreen), mFOV(engineSettings.mFOV), mPreviousMouseX(0), mPreviousMouseY(0), mMouseButtonCallback(nullptr),
-        mMousePositionCallback(nullptr), mKeyCallback(nullptr), mInstanceHandle(GetModuleHandle(NULL)), mWindowHandle(nullptr)
+		mShowMouseCursor(false), mFullscreen(engineSettings.mFullscreen), mFOV(engineSettings.mFOV), mCurrentMouseX(0), mCurrentMouseY(0), mPreviousMouseX(0),
+		mPreviousMouseY(0), mMouseButtonCallback(nullptr), mMousePositionCallback(nullptr), mKeyCallback(nullptr), mInstanceHandle(GetModuleHandle(NULL)), mWindowHandle(nullptr)
     {
         // Register class
         WNDCLASSEX wcex;
@@ -142,17 +142,10 @@ namespace JonsEngine
         // Dispatch waiting events for each event type to registered callbacks
         if (mMousePositionCallback)
         {
-            /*POINT cursorPos;
+			mMousePositionCallback(MousePositionEvent(mPreviousMouseX, mPreviousMouseY, mCurrentMouseX, mCurrentMouseY));
 
-            if (GetCursorPos(&cursorPos))
-            {
-            ScreenToClient(mWindowHandle, &cursorPos);
-
-            mMousePositionCallback(MousePositionEvent(mPreviousMouseX, mPreviousMouseY, cursorPos.x, cursorPos.y));
-
-            mPreviousMouseX = cursorPos.x;
-            mPreviousMouseY = cursorPos.y;
-            }*/
+			mPreviousMouseX = mCurrentMouseX;
+			mPreviousMouseY = mCurrentMouseY;
         }
 
         if (mMouseButtonCallback)
@@ -458,7 +451,8 @@ namespace JonsEngine
         if (!mMouseButtonCallback && !mMousePositionCallback)
             return;
 
-        //....mCurrentPos update
+		mCurrentMouseX += mouseInput.lLastX;
+		mCurrentMouseY += mouseInput.lLastY;
 
         mMouseButtonEvents.push_back(MouseButtonEvent([&]()
         {

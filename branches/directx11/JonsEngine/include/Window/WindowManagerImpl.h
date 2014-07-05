@@ -63,6 +63,8 @@ namespace JonsEngine
         bool mShowMouseCursor;
         bool mFullscreen;
         float mFOV;
+		uint32_t mCurrentMouseX;
+		uint32_t mCurrentMouseY;
         uint32_t mPreviousMouseX;
         uint32_t mPreviousMouseY;
 

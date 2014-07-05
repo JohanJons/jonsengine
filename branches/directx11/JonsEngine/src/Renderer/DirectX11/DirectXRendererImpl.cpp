@@ -1,12 +1,14 @@
 #include "include/Renderer/DirectX11/DirectXRendererImpl.h"
 
 #include "include/Core/Logging/Logger.h"
+#include "include/Core/Utils/Math.h"
 
 
 namespace JonsEngine
 {
     DirectXRendererImpl::DirectXRendererImpl(const EngineSettings& settings, Logger& logger) : mLogger(logger), mSwapchain(nullptr), mBackbuffer(nullptr), mDevice(nullptr), mDeviceContext(nullptr)
     {
+        // create swapchain, device and devicecontext
         DXGI_SWAP_CHAIN_DESC swapChainDesc;
         ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
         swapChainDesc.BufferCount = 2;        // front + back buffer
@@ -26,6 +28,19 @@ namespace JonsEngine
             JONS_LOG_ERROR(mLogger, "DirectXRenderer::DirectXRenderer(): D3D11CreateDeviceAndSwapChain failed: code " + result);
             throw std::runtime_error("DirectXRenderer::DirectXRenderer(): D3D11CreateDeviceAndSwapChain failed: code " + result);
         }
+
+
+
+        // setup viewport
+        D3D11_VIEWPORT viewport;
+        ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
+        viewport.TopLeftX = 0;
+        viewport.TopLeftY = 0;
+        viewport.Width = settings.mWindowWidth;
+        viewport.Height = settings.mWindowHeight;
+
+        mDeviceContext->RSSetViewports(1, &viewport);
+
     }
 
     DirectXRendererImpl::~DirectXRendererImpl()
@@ -60,7 +75,11 @@ namespace JonsEngine
 
     void DirectXRendererImpl::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
     {
+        const FLOAT clearColor[4] = {0.2f, 0.5f, 0.0f, 1.0f};
 
+        mDeviceContext->ClearRenderTargetView(mBackbuffer, clearColor);
+
+        mSwapchain->Present(0, 0);
     }
 
 
