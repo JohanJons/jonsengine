@@ -72,6 +72,7 @@ namespace JonsEngine
     {
         // Register class
         WNDCLASSEX wcex;
+        ZeroMemory(&wcex, sizeof(wcex));
         wcex.cbSize = sizeof(WNDCLASSEX);
         wcex.style = CS_HREDRAW | CS_VREDRAW;
         wcex.lpfnWndProc = WndProc;
@@ -80,7 +81,6 @@ namespace JonsEngine
         wcex.hInstance = mInstanceHandle;
         wcex.hIcon = LoadIcon(NULL, IDI_APPLICATION);
         wcex.hCursor = nullptr;
-        wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
         wcex.lpszMenuName = mWindowTitle.c_str();
         wcex.lpszClassName = mWindowTitle.c_str();
         wcex.hIconSm = LoadIcon(NULL, IDI_APPLICATION);;
@@ -92,7 +92,7 @@ namespace JonsEngine
         }
 
         // Create window
-        RECT windowRect = { 0, 0, mScreenWidth, mScreenHeight };
+        RECT windowRect = {0, 0, mScreenWidth, mScreenHeight};
         AdjustWindowRect(&windowRect, windowStyle, FALSE);
         mWindowHandle = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, windowStyle, CW_USEDEFAULT, CW_USEDEFAULT, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, nullptr, nullptr, mInstanceHandle,
             nullptr);

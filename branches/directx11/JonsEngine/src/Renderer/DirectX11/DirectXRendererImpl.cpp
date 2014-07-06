@@ -15,7 +15,7 @@ namespace JonsEngine
         swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         swapChainDesc.OutputWindow = GetActiveWindow();
-        swapChainDesc.SampleDesc.Count = 1;           // deferred MSAA instead
+        swapChainDesc.SampleDesc.Count = 1;
         swapChainDesc.SampleDesc.Quality = 0;
         swapChainDesc.Windowed = true;
 
@@ -43,8 +43,8 @@ namespace JonsEngine
         ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
         viewport.TopLeftX = 0;
         viewport.TopLeftY = 0;
-        viewport.Width = settings.mWindowWidth;
-        viewport.Height = settings.mWindowHeight;
+        viewport.Width = static_cast<FLOAT>(settings.mWindowWidth);
+        viewport.Height = static_cast<FLOAT>(settings.mWindowHeight);
 
         mDeviceContext->RSSetViewports(1, &viewport);
 
@@ -52,6 +52,8 @@ namespace JonsEngine
 
     DirectXRendererImpl::~DirectXRendererImpl()
     {
+        mSwapchain->SetFullscreenState(false, nullptr);    // needed?
+
         mSwapchain->Release();
         mBackbuffer->Release();
         mDevice->Release();
@@ -72,7 +74,11 @@ namespace JonsEngine
 
     void DirectXRendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
+        const FLOAT clearColor[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
 
+        mDeviceContext->ClearRenderTargetView(mBackbuffer, clearColor);
+
+        mSwapchain->Present(0, 0);
     }
 
 
