@@ -9,7 +9,7 @@ namespace JonsEngine
 {
     static WindowManagerImpl* gWindowManagerImpl = nullptr;
 
-    const LONG windowStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME;
+    const LONG gWindowedStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME;
 
 
     LRESULT CALLBACK WindowManagerImpl::WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -93,8 +93,8 @@ namespace JonsEngine
 
         // Create window
         RECT windowRect = {0, 0, mScreenWidth, mScreenHeight};
-        AdjustWindowRect(&windowRect, windowStyle, FALSE);
-        mWindowHandle = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, windowStyle, CW_USEDEFAULT, CW_USEDEFAULT, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, nullptr, nullptr, mInstanceHandle,
+        AdjustWindowRect(&windowRect, gWindowedStyle, FALSE);
+        mWindowHandle = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, gWindowedStyle, CW_USEDEFAULT, CW_USEDEFAULT, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, nullptr, nullptr, mInstanceHandle,
             nullptr);
         if (!mWindowHandle)
         {
@@ -196,9 +196,7 @@ namespace JonsEngine
 
     void WindowManagerImpl::ShowMouseCursor(const bool show)
     {
-        mShowMouseCursor = show;
-
-        if (mShowMouseCursor)
+        if (show)
             while (ShowCursor(true) <= 0);
         else
             while (ShowCursor(false) >= 0);
@@ -206,6 +204,8 @@ namespace JonsEngine
         SendMessage(mWindowHandle, WM_SETCURSOR, (WPARAM)mWindowHandle, MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));     // needed?
 
         UpdateWindow(mWindowHandle);
+
+        mShowMouseCursor = show;
     }
 
     void WindowManagerImpl::SetMousePosition(const uint32_t x, const uint32_t y)
@@ -223,7 +223,7 @@ namespace JonsEngine
     {
         mFullscreen = fullscreen;
 
-        if (!fullscreen)
+        if (!mFullscreen)
         {
             SetScreenResolution(mScreenWidth, mScreenHeight);
             return;
@@ -239,26 +239,22 @@ namespace JonsEngine
         const LONG monitorWidth = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
         const LONG monitorHeight = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
 
-        SetWindowLong(mWindowHandle, GWL_STYLE, dwStyle & ~windowStyle);
-        SetWindowPos(mWindowHandle, HWND_TOP, left, top, monitorWidth, monitorHeight, SWP_SHOWWINDOW);
-
-        UpdateWindow(mWindowHandle);
+        SetWindowLongPtr(mWindowHandle, GWL_STYLE, dwStyle & ~gWindowedStyle);
+        SetWindowPos(mWindowHandle, HWND_TOP, left, top, monitorWidth, monitorHeight, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
     }
 
     void WindowManagerImpl::SetScreenResolution(const uint32_t width, const uint32_t height)
     {
-        mScreenWidth = width;
-        mScreenHeight = height;
-
         DWORD dwStyle = GetWindowLong(mWindowHandle, GWL_STYLE);
 
-        RECT windowRect = { 0, 0, mScreenWidth, mScreenHeight };
-        AdjustWindowRect(&windowRect, dwStyle | windowStyle, FALSE);
+        RECT windowRect = {0, 0, width, height};
+        AdjustWindowRect(&windowRect, dwStyle | gWindowedStyle, FALSE);
 
-        SetWindowLong(mWindowHandle, GWL_STYLE, dwStyle | windowStyle);
-        SetWindowPos(mWindowHandle, HWND_TOP, windowRect.left, windowRect.top, windowRect.right, windowRect.bottom, SWP_SHOWWINDOW);
+        SetWindowLongPtr(mWindowHandle, GWL_STYLE, dwStyle | gWindowedStyle);
+        SetWindowPos(mWindowHandle, HWND_TOP, windowRect.left, windowRect.top, windowRect.right, windowRect.bottom, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
-        UpdateWindow(mWindowHandle);
+        mScreenWidth = width;
+        mScreenHeight = height;
     }
 
     void WindowManagerImpl::SetWindowTitle(const std::string& windowTitle)

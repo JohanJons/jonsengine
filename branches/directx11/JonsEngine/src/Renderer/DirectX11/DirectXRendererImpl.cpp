@@ -3,10 +3,35 @@
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Utils/Math.h"
 
+#include <Commctrl.h>
+
 
 namespace JonsEngine
 {
-    DirectXRendererImpl::DirectXRendererImpl(const EngineSettings& settings, Logger& logger) : mLogger(logger), mSwapchain(nullptr), mBackbuffer(nullptr), mDevice(nullptr), mDeviceContext(nullptr)
+    static DirectXRendererImpl* gDirectXRendererImpl = nullptr;
+
+    const UINT_PTR gSubClassID = 1;
+    
+    
+    LRESULT CALLBACK DirectXRendererImpl::OwnerDrawButtonProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+    {
+        switch (uMsg)
+        {
+            case WM_SIZE:
+            {
+                WORD width = LOWORD(lParam);
+                WORD height = HIWORD(lParam);
+
+                return 0;
+            }
+            
+            default:
+                return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+        }
+    }
+
+
+    DirectXRendererImpl::DirectXRendererImpl(const EngineSettings& settings, Logger& logger) : mLogger(logger), mWindowHandle(GetActiveWindow()), mSwapchain(nullptr), mBackbuffer(nullptr), mDevice(nullptr), mDeviceContext(nullptr)
     {
         // create swapchain, device and devicecontext
         DXGI_SWAP_CHAIN_DESC swapChainDesc;
@@ -14,7 +39,7 @@ namespace JonsEngine
         swapChainDesc.BufferCount = 2;
         swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        swapChainDesc.OutputWindow = GetActiveWindow();
+        swapChainDesc.OutputWindow = mWindowHandle;
         swapChainDesc.SampleDesc.Count = 1;
         swapChainDesc.SampleDesc.Quality = 0;
         swapChainDesc.Windowed = true;
@@ -48,10 +73,20 @@ namespace JonsEngine
 
         mDeviceContext->RSSetViewports(1, &viewport);
 
+        // register as window subclass to listen for WM_SIZE events. etc
+        if (!SetWindowSubclass(mWindowHandle, OwnerDrawButtonProc, gSubClassID, 0))
+        {
+            JONS_LOG_ERROR(mLogger, "DirectXRenderer::DirectXRenderer(): SetWindowSubclass() failed");
+            throw std::runtime_error("DirectXRenderer::DirectXRenderer(): SetWindowSubclass() failed");
+        }
+        
+        gDirectXRendererImpl = this;
     }
 
     DirectXRendererImpl::~DirectXRendererImpl()
     {
+        RemoveWindowSubclass(mWindowHandle, OwnerDrawButtonProc, gSubClassID);
+    
         mSwapchain->SetFullscreenState(false, nullptr);    // needed?
 
         mSwapchain->Release();

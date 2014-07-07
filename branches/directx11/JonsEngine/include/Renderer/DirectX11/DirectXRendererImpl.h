@@ -6,6 +6,7 @@
 #include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/DebugOptions.h"
 
+#include <windows.h>
 #include <d3d11.h>
 #include <string>
 #include <vector>
@@ -40,8 +41,10 @@ namespace JonsEngine
 
 
     private:
+        static LRESULT CALLBACK DirectXRendererImpl::OwnerDrawButtonProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
         Logger& mLogger;
 
+        HWND mWindowHandle;
         IDXGISwapChain* mSwapchain;
         ID3D11RenderTargetView* mBackbuffer;
         ID3D11Device* mDevice;
