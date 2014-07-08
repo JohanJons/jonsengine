@@ -221,37 +221,17 @@ namespace JonsEngine
 
     void WindowManagerImpl::SetFullscreen(const bool fullscreen)
     {
+		if (mFullscreen == fullscreen)
+			return;
+
+	    SendMessage(mWindowHandle, WM_JONS_FULLSCREEN, mFullscreen, (mScreenWidth & 0xFFFF0000) | (mScreenHeight & 0x0000FFFF));
+
         mFullscreen = fullscreen;
-
-        if (!mFullscreen)
-        {
-            SetScreenResolution(mScreenWidth, mScreenHeight);
-            return;
-        }
-
-        DWORD dwStyle = GetWindowLong(mWindowHandle, GWL_STYLE);
-        MONITORINFO monitorInfo = { sizeof(monitorInfo) };
-
-        GetMonitorInfo(MonitorFromWindow(mWindowHandle, MONITOR_DEFAULTTOPRIMARY), &monitorInfo);
-
-        const LONG left = monitorInfo.rcMonitor.left;
-        const LONG top = monitorInfo.rcMonitor.top;
-        const LONG monitorWidth = monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left;
-        const LONG monitorHeight = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
-
-        SetWindowLongPtr(mWindowHandle, GWL_STYLE, dwStyle & ~gWindowedStyle);
-        SetWindowPos(mWindowHandle, HWND_TOP, left, top, monitorWidth, monitorHeight, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
     }
 
     void WindowManagerImpl::SetScreenResolution(const uint32_t width, const uint32_t height)
     {
-        DWORD dwStyle = GetWindowLong(mWindowHandle, GWL_STYLE);
-
-        RECT windowRect = {0, 0, width, height};
-        AdjustWindowRect(&windowRect, dwStyle | gWindowedStyle, FALSE);
-
-        SetWindowLongPtr(mWindowHandle, GWL_STYLE, dwStyle | gWindowedStyle);
-        SetWindowPos(mWindowHandle, HWND_TOP, windowRect.left, windowRect.top, windowRect.right, windowRect.bottom, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+        SendMessage(mWindowHandle, WM_JONS_RESIZE, mFullscreen, (mScreenWidth & 0xFFFF0000) | (mScreenHeight & 0x0000FFFF));
 
         mScreenWidth = width;
         mScreenHeight = height;
@@ -276,12 +256,12 @@ namespace JonsEngine
         return mFullscreen;
     }
 
-    uint32_t WindowManagerImpl::GetScreenWidth() const
+    uint16_t WindowManagerImpl::GetScreenWidth() const
     {
         return mScreenWidth;
     }
 
-    uint32_t WindowManagerImpl::GetScreenHeight() const
+    uint16_t WindowManagerImpl::GetScreenHeight() const
     {
         return mScreenHeight;
     }

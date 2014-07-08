@@ -17,6 +17,16 @@ namespace JonsEngine
     {
         switch (uMsg)
         {
+			case WM_JONS_FULLSCREEN:
+			{
+				...
+			}
+
+			case WM_JONS_RESIZE:
+			{
+				..
+			}
+
             case WM_SIZE:
             {
                 WORD width = LOWORD(lParam);

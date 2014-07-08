@@ -43,8 +43,8 @@ namespace JonsEngine
         void SetFOV(const float FOV);
 
         bool GetFullscreen() const;
-        uint32_t GetScreenWidth() const;
-        uint32_t GetScreenHeight() const;
+        uint16_t GetScreenWidth() const;
+        uint16_t GetScreenHeight() const;
         const std::string& GetWindowTitle() const;
         bool GetShowMouseCursor() const;
         float GetFOV() const;
@@ -58,8 +58,8 @@ namespace JonsEngine
         Logger& mLogger;
 
         std::string mWindowTitle;
-        uint32_t mScreenWidth;
-        uint32_t mScreenHeight;
+        uint16_t mScreenWidth;
+        uint16_t mScreenHeight;
         bool mShowMouseCursor;
         bool mFullscreen;
         float mFOV;

@@ -38,8 +38,8 @@ namespace JonsEngine
 
         // window settings
         std::string mWindowTitle;
-        uint32_t mWindowWidth;
-        uint32_t mWindowHeight;
+        uint16_t mWindowWidth;
+        uint16_t mWindowHeight;
         bool mFullscreen;
         float mFOV;
         uint16_t mFrameLimit;
