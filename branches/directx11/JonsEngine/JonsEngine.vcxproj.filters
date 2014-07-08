@@ -283,5 +283,8 @@
     <ClInclude Include="include\Renderer\DirectX11\DirectXRendererImpl.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
+    <ClInclude Include="include\Core\Utils\Win32.h">
+      <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

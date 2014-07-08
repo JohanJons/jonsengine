@@ -2,6 +2,7 @@
 
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Utils/Math.h"
+#include "include/Core/Utils/Win32.h"
 
 #include <Commctrl.h>
 
