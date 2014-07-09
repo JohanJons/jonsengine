@@ -95,7 +95,7 @@ namespace JonsEngine
 
         // Create window
         RECT windowRect = {0, 0, mScreenWidth, mScreenHeight};
-        AdjustWindowRect(&windowRect, gWindowedStyle, FALSE);
+        AdjustWindowRectEx(&windowRect, gWindowedStyle, FALSE, WS_EX_APPWINDOW);
         mWindowHandle = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, gWindowedStyle, CW_USEDEFAULT, CW_USEDEFAULT, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, nullptr, nullptr, mInstanceHandle,
             nullptr);
         if (!mWindowHandle)
