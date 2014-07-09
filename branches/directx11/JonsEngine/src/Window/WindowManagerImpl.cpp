@@ -226,14 +226,14 @@ namespace JonsEngine
 		if (mFullscreen == fullscreen)
 			return;
 
-	    SendMessage(mWindowHandle, WM_JONS_FULLSCREEN, mFullscreen, ((mScreenWidth <<16) | (mScreenHeight & 0xffff))/*(mScreenWidth & 0xFFFF0000) | (mScreenHeight & 0x0000FFFF)*/);
+	    SendMessage(mWindowHandle, WM_JONS_FULLSCREEN, mFullscreen, mScreenWidth | (mScreenHeight << 16)));
 
         mFullscreen = fullscreen;
     }
 
     void WindowManagerImpl::SetScreenResolution(const uint32_t width, const uint32_t height)
     {
-        SendMessage(mWindowHandle, WM_JONS_RESIZE, mFullscreen, ((mScreenWidth <<16) | (mScreenHeight & 0xffff)));
+        SendMessage(mWindowHandle, WM_JONS_RESIZE, mFullscreen, mScreenWidth | (mScreenHeight << 16));
 
         mScreenWidth = width;
         mScreenHeight = height;
