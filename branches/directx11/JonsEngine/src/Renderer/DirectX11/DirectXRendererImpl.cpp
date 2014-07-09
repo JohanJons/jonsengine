@@ -12,26 +12,83 @@ namespace JonsEngine
     static DirectXRendererImpl* gDirectXRendererImpl = nullptr;
 
     const UINT_PTR gSubClassID = 1;
-    
-    
+
+
     LRESULT CALLBACK DirectXRendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
     {
         switch (uMsg)
         {
 			case WM_JONS_FULLSCREEN:
 			{
+                const uint16_t width = LOWORD(lParam);
+                const uint16_t height = HIWORD(lParam);
+
+                DXGI_MODE_DESC displayDesc;
+                ZeroMemory(&displayDesc, sizeof(D3D11_VIEWPORT));
+                displayDesc.Width = width;
+                displayDesc.Height = height;
+                displayDesc.Format = DXGI_FORMAT_UNKNOWN;
+
+                if (wParam)     // --> to fullscreen
+                {
+                    gDirectXRendererImpl->mSwapchain->SetFullscreenState(wParam, NULL);
+                    gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc);
+                }
+                else
+                {
+                    gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc);
+                    gDirectXRendererImpl->mSwapchain->SetFullscreenState(wParam, NULL);
+                }
+
 				return 0;
 			}
 
 			case WM_JONS_RESIZE:
 			{
+                const uint16_t width = LOWORD(lParam);
+                const uint16_t height = HIWORD(lParam);
+
+                DXGI_MODE_DESC displayDesc;
+                ZeroMemory(&displayDesc, sizeof(D3D11_VIEWPORT));
+                displayDesc.Width = width;
+                displayDesc.Height = height;
+                displayDesc.Format = DXGI_FORMAT_UNKNOWN;
+
+                gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc);
+
 				return 0;
 			}
 
             case WM_SIZE:
             {
-                WORD width = LOWORD(lParam);
-                WORD height = HIWORD(lParam);
+                const uint16_t width = LOWORD(lParam);
+                const uint16_t height = HIWORD(lParam);
+
+                gDirectXRendererImpl->mContext->ClearState();
+                gDirectXRendererImpl->mContext->OMSetRenderTargets(0, 0, 0);
+                gDirectXRendererImpl->mBackbuffer->Release();
+                gDirectXRendererImpl->mBackbuffer = nullptr;
+
+                HRESULT result = gDirectXRendererImpl->mSwapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+
+                // backbuffer rendertarget setup
+                ID3D11Texture2D* backbuffer = nullptr;
+                gDirectXRendererImpl->mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer);
+
+                gDirectXRendererImpl->mDevice->CreateRenderTargetView(backbuffer, NULL, &gDirectXRendererImpl->mBackbuffer);
+                backbuffer->Release();
+
+                gDirectXRendererImpl->mContext->OMSetRenderTargets(1, &gDirectXRendererImpl->mBackbuffer, NULL);
+
+                D3D11_VIEWPORT vp;
+                vp.Width = width;
+                vp.Height = height;
+                vp.MinDepth = 0.0f;
+                vp.MaxDepth = 1.0f;
+                vp.TopLeftX = 0;
+                vp.TopLeftY = 0;
+                gDirectXRendererImpl->mContext->RSSetViewports(1, &vp);
+
 
                 return 0;
             }
@@ -66,21 +123,27 @@ namespace JonsEngine
         }
 
         // backbuffer rendertarget setup
-        ID3D11Texture2D* backbuffer;
+        ID3D11Texture2D* backbuffer = nullptr;
         mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer);
 
-        mDevice->CreateRenderTargetView(backbuffer, nullptr, &mBackbuffer);
+        mDevice->CreateRenderTargetView(backbuffer, NULL, &mBackbuffer);
         backbuffer->Release();
 
-        mContext->OMSetRenderTargets(1, &mBackbuffer, nullptr);
-
+        mContext->OMSetRenderTargets(1, &mBackbuffer, NULL);
+        
         // setup viewport
+        // query width/height from d3d
+        ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
+        mSwapchain->GetDesc(&swapChainDesc);
+
         D3D11_VIEWPORT viewport;
         ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
         viewport.TopLeftX = 0;
         viewport.TopLeftY = 0;
-        viewport.Width = static_cast<FLOAT>(settings.mWindowWidth);
-        viewport.Height = static_cast<FLOAT>(settings.mWindowHeight);
+        viewport.Width = static_cast<float>(swapChainDesc.BufferDesc.Width);
+        viewport.Height = static_cast<float>(swapChainDesc.BufferDesc.Height);
+        viewport.MinDepth = 0.0f;
+        viewport.MaxDepth = 1.0f;
 
         mContext->RSSetViewports(1, &viewport);
 
@@ -98,7 +161,7 @@ namespace JonsEngine
     {
         RemoveWindowSubclass(mWindowHandle, WndProc, gSubClassID);
     
-        mSwapchain->SetFullscreenState(false, nullptr);    // needed?
+        mSwapchain->SetFullscreenState(false, NULL);    // needed?
 
         mSwapchain->Release();
         mBackbuffer->Release();

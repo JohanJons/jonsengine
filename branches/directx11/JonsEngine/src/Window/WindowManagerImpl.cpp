@@ -69,7 +69,7 @@ namespace JonsEngine
 
 
     WindowManagerImpl::WindowManagerImpl(const EngineSettings& engineSettings, Logger& logger) : mLogger(logger), mWindowTitle(engineSettings.mWindowTitle), mScreenWidth(engineSettings.mWindowWidth), mScreenHeight(engineSettings.mWindowHeight),
-		mShowMouseCursor(false), mFullscreen(engineSettings.mFullscreen), mFOV(engineSettings.mFOV), mCurrentMouseX(0), mCurrentMouseY(0), mPreviousMouseX(0),
+		mShowMouseCursor(false), mFullscreen(false), mFOV(engineSettings.mFOV), mCurrentMouseX(0), mCurrentMouseY(0), mPreviousMouseX(0),
 		mPreviousMouseY(0), mMouseButtonCallback(nullptr), mMousePositionCallback(nullptr), mKeyCallback(nullptr), mInstanceHandle(GetModuleHandle(NULL)), mWindowHandle(nullptr)
     {
         // Register class
@@ -82,7 +82,7 @@ namespace JonsEngine
         wcex.cbWndExtra = 0;
         wcex.hInstance = mInstanceHandle;
         wcex.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-        wcex.hCursor = nullptr;
+        wcex.hCursor = NULL;
         wcex.lpszMenuName = mWindowTitle.c_str();
         wcex.lpszClassName = mWindowTitle.c_str();
         wcex.hIconSm = LoadIcon(NULL, IDI_APPLICATION);;
@@ -96,8 +96,7 @@ namespace JonsEngine
         // Create window
         RECT windowRect = {0, 0, mScreenWidth, mScreenHeight};
         AdjustWindowRectEx(&windowRect, gWindowedStyle, FALSE, WS_EX_APPWINDOW);
-        mWindowHandle = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, gWindowedStyle, CW_USEDEFAULT, CW_USEDEFAULT, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, nullptr, nullptr, mInstanceHandle,
-            nullptr);
+        mWindowHandle = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, gWindowedStyle, CW_USEDEFAULT, CW_USEDEFAULT, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, NULL, NULL, mInstanceHandle, NULL);
         if (!mWindowHandle)
         {
             const std::string win32Error = GetWin32ErrorString();
@@ -123,6 +122,9 @@ namespace JonsEngine
             throw std::runtime_error("WindowManagerImpl::WindowManagerImpl(): RegisterRawInputDevices failed: " + win32Error);
         }
 
+        if (engineSettings.mFullscreen)
+            SetFullscreen(true);
+
         gWindowManagerImpl = this;
     }
 
@@ -135,7 +137,7 @@ namespace JonsEngine
     void WindowManagerImpl::Poll()
     {
         MSG msg = { 0 };
-        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
@@ -226,14 +228,14 @@ namespace JonsEngine
 		if (mFullscreen == fullscreen)
 			return;
 
-	    SendMessage(mWindowHandle, WM_JONS_FULLSCREEN, mFullscreen, mScreenWidth | (mScreenHeight << 16)));
+        SendMessage(mWindowHandle, WM_JONS_FULLSCREEN, fullscreen, mScreenWidth | (mScreenHeight << 16));
 
         mFullscreen = fullscreen;
     }
 
     void WindowManagerImpl::SetScreenResolution(const uint32_t width, const uint32_t height)
     {
-        SendMessage(mWindowHandle, WM_JONS_RESIZE, mFullscreen, mScreenWidth | (mScreenHeight << 16));
+        SendMessage(mWindowHandle, WM_JONS_RESIZE, mFullscreen, width | (height << 16));
 
         mScreenWidth = width;
         mScreenHeight = height;
