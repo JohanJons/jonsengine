@@ -41,13 +41,13 @@ namespace JonsEngine
 
 
     private:
-        static LRESULT CALLBACK DirectXRendererImpl::OwnerDrawButtonProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+        static LRESULT CALLBACK DirectXRendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
         Logger& mLogger;
 
         HWND mWindowHandle;
         IDXGISwapChain* mSwapchain;
         ID3D11RenderTargetView* mBackbuffer;
         ID3D11Device* mDevice;
-        ID3D11DeviceContext* mDeviceContext;
+        ID3D11DeviceContext* mContext;
     };
 }

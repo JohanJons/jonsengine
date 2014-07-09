@@ -14,18 +14,18 @@ namespace JonsEngine
     const UINT_PTR gSubClassID = 1;
     
     
-    LRESULT CALLBACK DirectXRendererImpl::OwnerDrawButtonProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+    LRESULT CALLBACK DirectXRendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
     {
         switch (uMsg)
         {
 			case WM_JONS_FULLSCREEN:
 			{
-				...
+				return 0;
 			}
 
 			case WM_JONS_RESIZE:
 			{
-				..
+				return 0;
 			}
 
             case WM_SIZE:
@@ -42,7 +42,7 @@ namespace JonsEngine
     }
 
 
-    DirectXRendererImpl::DirectXRendererImpl(const EngineSettings& settings, Logger& logger) : mLogger(logger), mWindowHandle(GetActiveWindow()), mSwapchain(nullptr), mBackbuffer(nullptr), mDevice(nullptr), mDeviceContext(nullptr)
+    DirectXRendererImpl::DirectXRendererImpl(const EngineSettings& settings, Logger& logger) : mLogger(logger), mWindowHandle(GetActiveWindow()), mSwapchain(nullptr), mBackbuffer(nullptr), mDevice(nullptr), mContext(nullptr)
     {
         // create swapchain, device and devicecontext
         DXGI_SWAP_CHAIN_DESC swapChainDesc;
@@ -58,7 +58,7 @@ namespace JonsEngine
         const D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
         const UINT numFeatureLevels = 1;
 
-        HRESULT result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, &featureLevel, numFeatureLevels, D3D11_SDK_VERSION, &swapChainDesc, &mSwapchain, &mDevice, NULL, &mDeviceContext);
+        HRESULT result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, &featureLevel, numFeatureLevels, D3D11_SDK_VERSION, &swapChainDesc, &mSwapchain, &mDevice, NULL, &mContext);
         if (result != S_OK)
         {
             JONS_LOG_ERROR(mLogger, "DirectXRenderer::DirectXRenderer(): D3D11CreateDeviceAndSwapChain failed: code " + result);
@@ -72,7 +72,7 @@ namespace JonsEngine
         mDevice->CreateRenderTargetView(backbuffer, nullptr, &mBackbuffer);
         backbuffer->Release();
 
-        mDeviceContext->OMSetRenderTargets(1, &mBackbuffer, nullptr);
+        mContext->OMSetRenderTargets(1, &mBackbuffer, nullptr);
 
         // setup viewport
         D3D11_VIEWPORT viewport;
@@ -82,10 +82,10 @@ namespace JonsEngine
         viewport.Width = static_cast<FLOAT>(settings.mWindowWidth);
         viewport.Height = static_cast<FLOAT>(settings.mWindowHeight);
 
-        mDeviceContext->RSSetViewports(1, &viewport);
+        mContext->RSSetViewports(1, &viewport);
 
         // register as window subclass to listen for WM_SIZE events. etc
-        if (!SetWindowSubclass(mWindowHandle, OwnerDrawButtonProc, gSubClassID, 0))
+        if (!SetWindowSubclass(mWindowHandle, WndProc, gSubClassID, 0))
         {
             JONS_LOG_ERROR(mLogger, "DirectXRenderer::DirectXRenderer(): SetWindowSubclass() failed");
             throw std::runtime_error("DirectXRenderer::DirectXRenderer(): SetWindowSubclass() failed");
@@ -96,14 +96,14 @@ namespace JonsEngine
 
     DirectXRendererImpl::~DirectXRendererImpl()
     {
-        RemoveWindowSubclass(mWindowHandle, OwnerDrawButtonProc, gSubClassID);
+        RemoveWindowSubclass(mWindowHandle, WndProc, gSubClassID);
     
         mSwapchain->SetFullscreenState(false, nullptr);    // needed?
 
         mSwapchain->Release();
         mBackbuffer->Release();
         mDevice->Release();
-        mDeviceContext->Release();
+        mContext->Release();
     }
 
 
@@ -122,7 +122,7 @@ namespace JonsEngine
     {
         const FLOAT clearColor[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
 
-        mDeviceContext->ClearRenderTargetView(mBackbuffer, clearColor);
+        mContext->ClearRenderTargetView(mBackbuffer, clearColor);
 
         mSwapchain->Present(0, 0);
     }
@@ -135,11 +135,7 @@ namespace JonsEngine
 
     void DirectXRendererImpl::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
     {
-        const FLOAT clearColor[4] = {0.2f, 0.5f, 0.0f, 1.0f};
-
-        mDeviceContext->ClearRenderTargetView(mBackbuffer, clearColor);
-
-        mSwapchain->Present(0, 0);
+        
     }
 
 
