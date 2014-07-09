@@ -161,7 +161,7 @@ namespace JonsEngine
     {
         RemoveWindowSubclass(mWindowHandle, WndProc, gSubClassID);
     
-        mSwapchain->SetFullscreenState(false, NULL);    // needed?
+        mSwapchain->SetFullscreenState(false, NULL);
 
         mSwapchain->Release();
         mBackbuffer->Release();
