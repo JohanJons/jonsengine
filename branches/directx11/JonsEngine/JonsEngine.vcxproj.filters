@@ -81,6 +81,9 @@
     <Filter Include="Source Files\Renderer\DirectX11">
       <UniqueIdentifier>{12243de2-7a17-4a69-949e-1ef6f12919bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Renderer\DirectX11\Shaders">
+      <UniqueIdentifier>{c2480e19-3446-43fa-8891-a1bd483bb955}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Engine.cpp">
@@ -286,5 +289,13 @@
     <ClInclude Include="include\Core\Utils\Win32.h">
       <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\forward_vertex.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\forward_pixel.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -4,6 +4,9 @@
 #include "include/Core/Utils/Math.h"
 #include "include/Core/Utils/Win32.h"
 
+#include "include/Renderer/DirectX11/Shaders/Compiled/forward_vertex.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/forward_pixel.h"
+
 #include <Commctrl.h>
 
 
@@ -99,7 +102,8 @@ namespace JonsEngine
     }
 
 
-    DirectXRendererImpl::DirectXRendererImpl(const EngineSettings& settings, Logger& logger) : mLogger(logger), mWindowHandle(GetActiveWindow()), mSwapchain(nullptr), mBackbuffer(nullptr), mDevice(nullptr), mContext(nullptr)
+    DirectXRendererImpl::DirectXRendererImpl(const EngineSettings& settings, Logger& logger) : mLogger(logger), mWindowHandle(GetActiveWindow()), mSwapchain(nullptr), mBackbuffer(nullptr), mDevice(nullptr), mContext(nullptr),
+        mForwardVertexShader(nullptr), mForwardPixelShader(nullptr)
     {
         // create swapchain, device and devicecontext
         DXGI_SWAP_CHAIN_DESC swapChainDesc;
@@ -147,13 +151,20 @@ namespace JonsEngine
 
         mContext->RSSetViewports(1, &viewport);
 
+        // create shader objects
+        mDevice->CreateVertexShader(gForwardVertexShader, sizeof(gForwardVertexShader), NULL, &mForwardVertexShader);
+        mDevice->CreatePixelShader(gForwardPixelShader, sizeof(gForwardPixelShader), NULL, &mForwardPixelShader);
+
+        mContext->VSSetShader(mForwardVertexShader, NULL, NULL);
+        mContext->PSSetShader(mForwardPixelShader, NULL, NULL);
+
         // register as window subclass to listen for WM_SIZE events. etc
         if (!SetWindowSubclass(mWindowHandle, WndProc, gSubClassID, 0))
         {
             JONS_LOG_ERROR(mLogger, "DirectXRenderer::DirectXRenderer(): SetWindowSubclass() failed");
             throw std::runtime_error("DirectXRenderer::DirectXRenderer(): SetWindowSubclass() failed");
         }
-        
+
         gDirectXRendererImpl = this;
     }
 
@@ -163,6 +174,8 @@ namespace JonsEngine
     
         mSwapchain->SetFullscreenState(false, NULL);
 
+        mForwardVertexShader->Release();
+        mForwardPixelShader->Release();
         mSwapchain->Release();
         mBackbuffer->Release();
         mDevice->Release();
@@ -180,12 +193,22 @@ namespace JonsEngine
         return INVALID_TEXTURE_ID;
     }
 
+    struct VERTEX
+    {
+        FLOAT X, Y, Z;      // position
+    };
 
     void DirectXRendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
         const FLOAT clearColor[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
-
         mContext->ClearRenderTargetView(mBackbuffer, clearColor);
+
+        VERTEX OurVertices[] =
+        {
+            { 0.0f, 0.5f, 0.0f },
+            { 0.45f, -0.5, 0.0f},
+            { -0.45f, -0.5f, 0.0f }
+        };
 
         mSwapchain->Present(0, 0);
     }

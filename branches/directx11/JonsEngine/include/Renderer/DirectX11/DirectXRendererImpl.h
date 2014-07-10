@@ -49,5 +49,8 @@ namespace JonsEngine
         ID3D11RenderTargetView* mBackbuffer;
         ID3D11Device* mDevice;
         ID3D11DeviceContext* mContext;
+
+        ID3D11VertexShader* mForwardVertexShader;
+        ID3D11PixelShader* mForwardPixelShader;
     };
 }
