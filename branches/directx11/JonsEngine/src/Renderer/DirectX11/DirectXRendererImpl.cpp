@@ -16,6 +16,11 @@ namespace JonsEngine
 
     const UINT_PTR gSubClassID = 1;
 
+	struct VERTEX
+    {
+        FLOAT X, Y, Z;      // position
+    };
+
 
     LRESULT CALLBACK DirectXRendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
     {
@@ -103,7 +108,7 @@ namespace JonsEngine
 
 
     DirectXRendererImpl::DirectXRendererImpl(const EngineSettings& settings, Logger& logger) : mLogger(logger), mWindowHandle(GetActiveWindow()), mSwapchain(nullptr), mBackbuffer(nullptr), mDevice(nullptr), mContext(nullptr),
-        mForwardVertexShader(nullptr), mForwardPixelShader(nullptr)
+        mForwardVertexShader(nullptr), mForwardPixelShader(nullptr), mVertexBuffer(nullptr), mInputLayout(nullptr)
     {
         // create swapchain, device and devicecontext
         DXGI_SWAP_CHAIN_DESC swapChainDesc;
@@ -158,6 +163,40 @@ namespace JonsEngine
         mContext->VSSetShader(mForwardVertexShader, NULL, NULL);
         mContext->PSSetShader(mForwardPixelShader, NULL, NULL);
 
+		// fill vertex buffer
+		VERTEX OurVertices[] =
+        {
+            { 0.0f, 0.5f, 0.0f },
+            { 0.45f, -0.5, 0.0f},
+            { -0.45f, -0.5f, 0.0f }
+        };
+
+		D3D11_BUFFER_DESC bufferDescription;
+		ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
+		bufferDescription.Usage = D3D11_USAGE_DEFAULT;
+		bufferDescription.ByteWidth = sizeof(OurVertices);
+		bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bufferDescription.CPUAccessFlags = 0;
+		bufferDescription.MiscFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA initData;
+		ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
+		initData.pSysMem = OurVertices;
+
+		mDevice->CreateBuffer(&bufferDescription, &initData, &mVertexBuffer);
+
+		D3D11_INPUT_ELEMENT_DESC inputDescription;
+		ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC));
+		inputDescription.SemanticName = "POSITION";
+		inputDescription.SemanticIndex = 0;
+		inputDescription.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		inputDescription.InputSlot = 0;
+		inputDescription.AlignedByteOffset = 0;
+		inputDescription.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputDescription.InstanceDataStepRate = 0;
+
+		mDevice->CreateInputLayout(&inputDescription, 1, gForwardVertexShader, sizeof(gForwardVertexShader), &mInputLayout);
+
         // register as window subclass to listen for WM_SIZE events. etc
         if (!SetWindowSubclass(mWindowHandle, WndProc, gSubClassID, 0))
         {
@@ -174,6 +213,8 @@ namespace JonsEngine
     
         mSwapchain->SetFullscreenState(false, NULL);
 
+		mInputLayout->Release();
+		mVertexBuffer->Release();
         mForwardVertexShader->Release();
         mForwardPixelShader->Release();
         mSwapchain->Release();
@@ -193,22 +234,19 @@ namespace JonsEngine
         return INVALID_TEXTURE_ID;
     }
 
-    struct VERTEX
-    {
-        FLOAT X, Y, Z;      // position
-    };
 
     void DirectXRendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
         const FLOAT clearColor[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
         mContext->ClearRenderTargetView(mBackbuffer, clearColor);
 
-        VERTEX OurVertices[] =
-        {
-            { 0.0f, 0.5f, 0.0f },
-            { 0.45f, -0.5, 0.0f},
-            { -0.45f, -0.5f, 0.0f }
-        };
+		uint32_t vertexSize = sizeof(VERTEX);
+		uint32_t offset = 0;
+		mContext->IASetVertexBuffers(0, 1, &mVertexBuffer, &vertexSize, &offset);
+		mContext->IASetInputLayout(mInputLayout);
+		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		mContext->Draw(3, 0);
 
         mSwapchain->Present(0, 0);
     }

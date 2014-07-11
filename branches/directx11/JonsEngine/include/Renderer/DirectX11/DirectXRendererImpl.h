@@ -52,5 +52,7 @@ namespace JonsEngine
 
         ID3D11VertexShader* mForwardVertexShader;
         ID3D11PixelShader* mForwardPixelShader;
+		ID3D11Buffer* mVertexBuffer;
+		ID3D11InputLayout* mInputLayout;
     };
 }
