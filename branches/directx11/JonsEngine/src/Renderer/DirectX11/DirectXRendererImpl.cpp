@@ -40,13 +40,13 @@ namespace JonsEngine
 
                 if (wParam)     // --> to fullscreen
                 {
-                    DXCALL(gDirectXRendererImpl->mSwapchain->SetFullscreenState(wParam, NULL));
                     DXCALL(gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc));
+                    DXCALL(gDirectXRendererImpl->mSwapchain->SetFullscreenState(wParam, NULL));
                 }
                 else
                 {
-                    DXCALL(gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc));
                     DXCALL(gDirectXRendererImpl->mSwapchain->SetFullscreenState(wParam, NULL));
+                    DXCALL(gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc));
                 }
 
 				return 0;
