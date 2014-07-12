@@ -115,28 +115,23 @@ namespace JonsEngine
         const D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
         const UINT numFeatureLevels = 1;
 
-        HRESULT result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, &featureLevel, numFeatureLevels, D3D11_SDK_VERSION, &swapChainDesc, &mSwapchain, &mDevice, NULL, &mContext);
-        if (result != S_OK)
-        {
-            JONS_LOG_ERROR(mLogger, "DirectXRenderer::DirectXRenderer(): D3D11CreateDeviceAndSwapChain failed: code " + result);
-            throw std::runtime_error("DirectXRenderer::DirectXRenderer(): D3D11CreateDeviceAndSwapChain failed: code " + result);
-        }
+        DXCALL(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, &featureLevel, numFeatureLevels, D3D11_SDK_VERSION, &swapChainDesc, &mSwapchain, &mDevice, NULL, &mContext));
 
         // backbuffer rendertarget setup
         ID3D11Texture2D* backbuffer = nullptr;
-        mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer);
+        DXCALL(mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer));
 
-        mDevice->CreateRenderTargetView(backbuffer, NULL, &mBackbuffer);
+        DXCALL(mDevice->CreateRenderTargetView(backbuffer, NULL, &mBackbuffer));
         backbuffer->Release();
         
         // setup viewport
         // query width/height from d3d
         ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
-        mSwapchain->GetDesc(&swapChainDesc);
+        DXCALL(mSwapchain->GetDesc(&swapChainDesc));
 
         // create shader objects
-        mDevice->CreateVertexShader(gForwardVertexShader, sizeof(gForwardVertexShader), NULL, &mForwardVertexShader);
-        mDevice->CreatePixelShader(gForwardPixelShader, sizeof(gForwardPixelShader), NULL, &mForwardPixelShader);
+        DXCALL(mDevice->CreateVertexShader(gForwardVertexShader, sizeof(gForwardVertexShader), NULL, &mForwardVertexShader));
+        DXCALL(mDevice->CreatePixelShader(gForwardPixelShader, sizeof(gForwardPixelShader), NULL, &mForwardPixelShader));
 
 		// fill vertex buffer
 		VERTEX OurVertices[] =
@@ -158,7 +153,7 @@ namespace JonsEngine
 		ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
 		initData.pSysMem = OurVertices;
 
-		mDevice->CreateBuffer(&bufferDescription, &initData, &mVertexBuffer);
+		DXCALL(mDevice->CreateBuffer(&bufferDescription, &initData, &mVertexBuffer));
 
 		D3D11_INPUT_ELEMENT_DESC inputDescription;
 		ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC));
@@ -170,7 +165,7 @@ namespace JonsEngine
 		inputDescription.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputDescription.InstanceDataStepRate = 0;
 
-		mDevice->CreateInputLayout(&inputDescription, 1, gForwardVertexShader, sizeof(gForwardVertexShader), &mInputLayout);
+        DXCALL(mDevice->CreateInputLayout(&inputDescription, 1, gForwardVertexShader, sizeof(gForwardVertexShader), &mInputLayout));
         
         SetupContext(swapChainDesc.BufferDesc.Width, swapChainDesc.BufferDesc.Height);
 
@@ -188,7 +183,7 @@ namespace JonsEngine
     {
         RemoveWindowSubclass(mWindowHandle, WndProc, gSubClassID);
     
-        mSwapchain->SetFullscreenState(false, NULL);
+        DXCALL(mSwapchain->SetFullscreenState(false, NULL));
 
 		mInputLayout->Release();
 		mVertexBuffer->Release();
@@ -224,7 +219,7 @@ namespace JonsEngine
 
 		mContext->Draw(3, 0);
 
-        mSwapchain->Present(0, 0);
+        DXCALL(mSwapchain->Present(0, 0));
     }
 
 
