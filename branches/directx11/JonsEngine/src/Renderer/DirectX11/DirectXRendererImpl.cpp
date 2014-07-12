@@ -87,17 +87,7 @@ namespace JonsEngine
                 DXCALL(gDirectXRendererImpl->mDevice->CreateRenderTargetView(backbuffer, NULL, &gDirectXRendererImpl->mBackbuffer));
                 backbuffer->Release();
 
-                gDirectXRendererImpl->mContext->OMSetRenderTargets(1, &gDirectXRendererImpl->mBackbuffer, NULL);
-
-                D3D11_VIEWPORT vp;
-                vp.Width = width;
-                vp.Height = height;
-                vp.MinDepth = 0.0f;
-                vp.MaxDepth = 1.0f;
-                vp.TopLeftX = 0;
-                vp.TopLeftY = 0;
-                gDirectXRendererImpl->mContext->RSSetViewports(1, &vp);
-
+                gDirectXRendererImpl->SetupContext(width, height);
 
                 return 0;
             }
@@ -138,31 +128,15 @@ namespace JonsEngine
 
         mDevice->CreateRenderTargetView(backbuffer, NULL, &mBackbuffer);
         backbuffer->Release();
-
-        mContext->OMSetRenderTargets(1, &mBackbuffer, NULL);
         
         // setup viewport
         // query width/height from d3d
         ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
         mSwapchain->GetDesc(&swapChainDesc);
 
-        D3D11_VIEWPORT viewport;
-        ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
-        viewport.TopLeftX = 0;
-        viewport.TopLeftY = 0;
-        viewport.Width = static_cast<float>(swapChainDesc.BufferDesc.Width);
-        viewport.Height = static_cast<float>(swapChainDesc.BufferDesc.Height);
-        viewport.MinDepth = 0.0f;
-        viewport.MaxDepth = 1.0f;
-
-        mContext->RSSetViewports(1, &viewport);
-
         // create shader objects
         mDevice->CreateVertexShader(gForwardVertexShader, sizeof(gForwardVertexShader), NULL, &mForwardVertexShader);
         mDevice->CreatePixelShader(gForwardPixelShader, sizeof(gForwardPixelShader), NULL, &mForwardPixelShader);
-
-        mContext->VSSetShader(mForwardVertexShader, NULL, NULL);
-        mContext->PSSetShader(mForwardPixelShader, NULL, NULL);
 
 		// fill vertex buffer
 		VERTEX OurVertices[] =
@@ -198,7 +172,7 @@ namespace JonsEngine
 
 		mDevice->CreateInputLayout(&inputDescription, 1, gForwardVertexShader, sizeof(gForwardVertexShader), &mInputLayout);
         
-        mContext->IASetInputLayout(mInputLayout);
+        SetupContext(swapChainDesc.BufferDesc.Width, swapChainDesc.BufferDesc.Height);
 
         // register as window subclass to listen for WM_SIZE events. etc
         if (!SetWindowSubclass(mWindowHandle, WndProc, gSubClassID, 0))
@@ -289,5 +263,26 @@ namespace JonsEngine
     uint32_t DirectXRendererImpl::GetShadowmapResolution() const
     {
         return 1024;
+    }
+
+
+    void DirectXRendererImpl::SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight)
+    {
+        mContext->OMSetRenderTargets(1, &mBackbuffer, NULL);
+
+        D3D11_VIEWPORT viewport;
+        ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
+        viewport.TopLeftX = 0;
+        viewport.TopLeftY = 0;
+        viewport.Width = static_cast<float>(viewportWidth);
+        viewport.Height = static_cast<float>(viewportHeight);
+        viewport.MinDepth = 0.0f;
+        viewport.MaxDepth = 1.0f;
+        mContext->RSSetViewports(1, &viewport);
+
+        mContext->VSSetShader(mForwardVertexShader, NULL, NULL);
+        mContext->PSSetShader(mForwardPixelShader, NULL, NULL);
+
+        mContext->IASetInputLayout(mInputLayout);
     }
 }

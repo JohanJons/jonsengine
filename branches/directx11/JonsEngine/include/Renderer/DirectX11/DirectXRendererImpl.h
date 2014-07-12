@@ -42,6 +42,7 @@ namespace JonsEngine
 
     private:
         static LRESULT CALLBACK DirectXRendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+        void SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight);
         Logger& mLogger;
 
         HWND mWindowHandle;
