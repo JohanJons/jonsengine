@@ -289,6 +289,9 @@
     <ClInclude Include="include\Core\Utils\Win32.h">
       <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DirectXUtils.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\forward_vertex.hlsl">

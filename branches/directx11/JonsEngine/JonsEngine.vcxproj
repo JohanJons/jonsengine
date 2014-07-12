@@ -168,6 +168,7 @@
     <ClInclude Include="include\Core\Utils\Win32.h" />
     <ClInclude Include="include\Renderer\DirectX11\DirectXRenderer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DirectXRendererImpl.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DirectXUtils.h" />
     <ClInclude Include="include\Renderer\RenderCommands.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />
@@ -190,6 +191,8 @@
     <FxCompile Include="include\Renderer\DirectX11\Shaders\forward_pixel.hlsl">
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gForwardPixelShader</VariableName>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/include/Renderer/DirectX11/Shaders/Compiled/%(Filename).h</HeaderFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\forward_vertex.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>

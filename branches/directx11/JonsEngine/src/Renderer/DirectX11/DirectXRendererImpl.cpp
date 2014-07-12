@@ -3,6 +3,7 @@
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Utils/Math.h"
 #include "include/Core/Utils/Win32.h"
+#include "include/Renderer/DirectX11/DirectXUtils.h"
 
 #include "include/Renderer/DirectX11/Shaders/Compiled/forward_vertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/forward_pixel.h"
@@ -39,13 +40,13 @@ namespace JonsEngine
 
                 if (wParam)     // --> to fullscreen
                 {
-                    gDirectXRendererImpl->mSwapchain->SetFullscreenState(wParam, NULL);
-                    gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc);
+                    DXCALL(gDirectXRendererImpl->mSwapchain->SetFullscreenState(wParam, NULL));
+                    DXCALL(gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc));
                 }
                 else
                 {
-                    gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc);
-                    gDirectXRendererImpl->mSwapchain->SetFullscreenState(wParam, NULL);
+                    DXCALL(gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc));
+                    DXCALL(gDirectXRendererImpl->mSwapchain->SetFullscreenState(wParam, NULL));
                 }
 
 				return 0;
@@ -62,7 +63,7 @@ namespace JonsEngine
                 displayDesc.Height = height;
                 displayDesc.Format = DXGI_FORMAT_UNKNOWN;
 
-                gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc);
+                DXCALL(gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc));
 
 				return 0;
 			}
@@ -77,13 +78,13 @@ namespace JonsEngine
                 gDirectXRendererImpl->mBackbuffer->Release();
                 gDirectXRendererImpl->mBackbuffer = nullptr;
 
-                HRESULT result = gDirectXRendererImpl->mSwapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+                DXCALL(gDirectXRendererImpl->mSwapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0));
 
                 // backbuffer rendertarget setup
                 ID3D11Texture2D* backbuffer = nullptr;
-                gDirectXRendererImpl->mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer);
+                DXCALL(gDirectXRendererImpl->mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer));
 
-                gDirectXRendererImpl->mDevice->CreateRenderTargetView(backbuffer, NULL, &gDirectXRendererImpl->mBackbuffer);
+                DXCALL(gDirectXRendererImpl->mDevice->CreateRenderTargetView(backbuffer, NULL, &gDirectXRendererImpl->mBackbuffer));
                 backbuffer->Release();
 
                 gDirectXRendererImpl->mContext->OMSetRenderTargets(1, &gDirectXRendererImpl->mBackbuffer, NULL);
@@ -196,6 +197,8 @@ namespace JonsEngine
 		inputDescription.InstanceDataStepRate = 0;
 
 		mDevice->CreateInputLayout(&inputDescription, 1, gForwardVertexShader, sizeof(gForwardVertexShader), &mInputLayout);
+        
+        mContext->IASetInputLayout(mInputLayout);
 
         // register as window subclass to listen for WM_SIZE events. etc
         if (!SetWindowSubclass(mWindowHandle, WndProc, gSubClassID, 0))
@@ -243,7 +246,6 @@ namespace JonsEngine
 		uint32_t vertexSize = sizeof(VERTEX);
 		uint32_t offset = 0;
 		mContext->IASetVertexBuffers(0, 1, &mVertexBuffer, &vertexSize, &offset);
-		mContext->IASetInputLayout(mInputLayout);
 		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		mContext->Draw(3, 0);
