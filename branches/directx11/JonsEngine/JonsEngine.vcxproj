@@ -130,6 +130,7 @@
     <ClCompile Include="src\Core\Utils\Time.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DirectXRenderer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DirectXRendererImpl.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\Mesh.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DirectXRenderer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DirectXRendererImpl.h" />
     <ClInclude Include="include\Renderer\DirectX11\DirectXUtils.h" />
+    <ClInclude Include="include\Renderer\DirectX11\Mesh.h" />
     <ClInclude Include="include\Renderer\RenderCommands.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />
