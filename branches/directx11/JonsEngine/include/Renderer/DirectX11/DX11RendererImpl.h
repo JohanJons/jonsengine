@@ -18,11 +18,11 @@ namespace JonsEngine
 {
     class Logger;
 
-    class DirectXRendererImpl
+    class DX11RendererImpl
     {
     public:
-        DirectXRendererImpl(const EngineSettings& settings, Logger& logger);
-        ~DirectXRendererImpl();
+        DX11RendererImpl(const EngineSettings& settings, Logger& logger);
+        ~DX11RendererImpl();
 
         MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData);
         TextureID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat);
@@ -41,7 +41,7 @@ namespace JonsEngine
 
 
     private:
-        static LRESULT CALLBACK DirectXRendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+        static LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
         void SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight);
         Logger& mLogger;
 

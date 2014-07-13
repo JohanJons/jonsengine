@@ -128,9 +128,9 @@
     <ClCompile Include="src\Core\Threading\ThreadPool.cpp" />
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
     <ClCompile Include="src\Core\Utils\Time.cpp" />
-    <ClCompile Include="src\Renderer\DirectX11\DirectXRenderer.cpp" />
-    <ClCompile Include="src\Renderer\DirectX11\DirectXRendererImpl.cpp" />
-    <ClCompile Include="src\Renderer\DirectX11\Mesh.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11Mesh.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11Renderer.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11RendererImpl.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
@@ -167,10 +167,10 @@
     <ClInclude Include="include\Core\Utils\Time.h" />
     <ClInclude Include="include\Core\Utils\Math.h" />
     <ClInclude Include="include\Core\Utils\Win32.h" />
-    <ClInclude Include="include\Renderer\DirectX11\DirectXRenderer.h" />
-    <ClInclude Include="include\Renderer\DirectX11\DirectXRendererImpl.h" />
-    <ClInclude Include="include\Renderer\DirectX11\DirectXUtils.h" />
-    <ClInclude Include="include\Renderer\DirectX11\Mesh.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11Mesh.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11Renderer.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11RendererImpl.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h" />
     <ClInclude Include="include\Renderer\RenderCommands.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />

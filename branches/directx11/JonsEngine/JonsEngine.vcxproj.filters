@@ -155,19 +155,19 @@
     <ClCompile Include="src\Scene\PointLight.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX11\DirectXRenderer.cpp">
-      <Filter>Source Files\Renderer\DirectX11</Filter>
-    </ClCompile>
     <ClCompile Include="src\Window\WindowManager.cpp">
       <Filter>Source Files\Window</Filter>
     </ClCompile>
     <ClCompile Include="src\Window\WindowManagerImpl.cpp">
       <Filter>Source Files\Window</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX11\DirectXRendererImpl.cpp">
+    <ClCompile Include="src\Renderer\DirectX11\DX11Mesh.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX11\Mesh.cpp">
+    <ClCompile Include="src\Renderer\DirectX11\DX11Renderer.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11RendererImpl.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
   </ItemGroup>
@@ -277,25 +277,25 @@
     <ClInclude Include="include\Scene\PointLight.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DirectXRenderer.h">
-      <Filter>Header Files\Renderer\DirectX11</Filter>
-    </ClInclude>
     <ClInclude Include="include\Window\WindowManager.h">
       <Filter>Header Files\Window</Filter>
     </ClInclude>
     <ClInclude Include="include\Window\WindowManagerImpl.h">
       <Filter>Header Files\Window</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DirectXRendererImpl.h">
-      <Filter>Header Files\Renderer\DirectX11</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Utils\Win32.h">
       <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DirectXUtils.h">
+    <ClInclude Include="include\Renderer\DirectX11\DX11Mesh.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\Mesh.h">
+    <ClInclude Include="include\Renderer\DirectX11\DX11Renderer.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11RendererImpl.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
   </ItemGroup>

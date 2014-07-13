@@ -1,6 +1,6 @@
 #include "include/Resources/ResourceManifest.h"
 #include "include/Renderer/Shapes.h"
-#include "include/Renderer/DirectX11/DirectXRenderer.h"
+#include "include/Renderer/DirectX11/DX11Renderer.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
 #include "boost/functional/hash.hpp"
@@ -9,7 +9,7 @@
 
 namespace JonsEngine
 {
-    ResourceManifest::ResourceManifest(DirectXRenderer& renderer, IMemoryAllocatorPtr memoryAllocator) : mMemoryAllocator(memoryAllocator), mRenderer(renderer)
+    ResourceManifest::ResourceManifest(DX11Renderer& renderer, IMemoryAllocatorPtr memoryAllocator) : mMemoryAllocator(memoryAllocator), mRenderer(renderer)
     {
     }
        

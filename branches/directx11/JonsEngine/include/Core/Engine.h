@@ -7,7 +7,7 @@
 #include "include/Scene/Model.h"
 #include "include/Resources/ResourceManifest.h"
 #include "include/Window/WindowManager.h"
-#include "include/Renderer/DirectX11/DirectXRenderer.h"
+#include "include/Renderer/DirectX11/DX11Renderer.h"
 #include "include/Renderer/RenderCommands.h"
 
 
@@ -35,7 +35,7 @@ namespace JonsEngine
         void Tick(const DebugOptions& debugOtions);
 
         WindowManager& GetWindow();
-        DirectXRenderer& GetRenderer();
+        DX11Renderer& GetRenderer();
         SceneManager& GetSceneManager();
 
 
@@ -49,7 +49,7 @@ namespace JonsEngine
 
         /* Modules */
         WindowManager mWindow;
-        DirectXRenderer mRenderer;
+        DX11Renderer mRenderer;
         ResourceManifest mResourceManifest;
         SceneManager mSceneManager;
     };
@@ -57,6 +57,6 @@ namespace JonsEngine
 
     /* Engine inlines */
     inline WindowManager& Engine::GetWindow()        { return mWindow; }
-    inline DirectXRenderer& Engine::GetRenderer()    { return mRenderer;     }
+    inline DX11Renderer& Engine::GetRenderer()    { return mRenderer;     }
     inline SceneManager& Engine::GetSceneManager()   { return mSceneManager; }
 }

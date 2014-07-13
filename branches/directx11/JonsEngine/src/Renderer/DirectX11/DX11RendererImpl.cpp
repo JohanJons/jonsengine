@@ -1,9 +1,9 @@
-#include "include/Renderer/DirectX11/DirectXRendererImpl.h"
+#include "include/Renderer/DirectX11/DX11RendererImpl.h"
 
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Utils/Math.h"
 #include "include/Core/Utils/Win32.h"
-#include "include/Renderer/DirectX11/DirectXUtils.h"
+#include "include/Renderer/DirectX11/DX11Utils.h"
 
 #include "include/Renderer/DirectX11/Shaders/Compiled/forward_vertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/forward_pixel.h"
@@ -13,7 +13,7 @@
 
 namespace JonsEngine
 {
-    static DirectXRendererImpl* gDirectXRendererImpl = nullptr;
+    static DX11RendererImpl* gDX11RendererImpl = nullptr;
 
     const UINT_PTR gSubClassID = 1;
 
@@ -23,7 +23,7 @@ namespace JonsEngine
     };
 
 
-    LRESULT CALLBACK DirectXRendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+    LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
     {
         switch (uMsg)
         {
@@ -40,13 +40,13 @@ namespace JonsEngine
 
                 if (wParam)     // --> to fullscreen
                 {
-                    DXCALL(gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc));
-                    DXCALL(gDirectXRendererImpl->mSwapchain->SetFullscreenState(wParam, NULL));
+                    DXCALL(gDX11RendererImpl->mSwapchain->ResizeTarget(&displayDesc));
+                    DXCALL(gDX11RendererImpl->mSwapchain->SetFullscreenState(wParam, NULL));
                 }
                 else
                 {
-                    DXCALL(gDirectXRendererImpl->mSwapchain->SetFullscreenState(wParam, NULL));
-                    DXCALL(gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc));
+                    DXCALL(gDX11RendererImpl->mSwapchain->SetFullscreenState(wParam, NULL));
+                    DXCALL(gDX11RendererImpl->mSwapchain->ResizeTarget(&displayDesc));
                 }
 
 				return 0;
@@ -63,7 +63,7 @@ namespace JonsEngine
                 displayDesc.Height = height;
                 displayDesc.Format = DXGI_FORMAT_UNKNOWN;
 
-                DXCALL(gDirectXRendererImpl->mSwapchain->ResizeTarget(&displayDesc));
+                DXCALL(gDX11RendererImpl->mSwapchain->ResizeTarget(&displayDesc));
 
 				return 0;
 			}
@@ -73,21 +73,21 @@ namespace JonsEngine
                 const uint16_t width = LOWORD(lParam);
                 const uint16_t height = HIWORD(lParam);
 
-                gDirectXRendererImpl->mContext->ClearState();
-                gDirectXRendererImpl->mContext->OMSetRenderTargets(0, 0, 0);
-                gDirectXRendererImpl->mBackbuffer->Release();
-                gDirectXRendererImpl->mBackbuffer = nullptr;
+                gDX11RendererImpl->mContext->ClearState();
+                gDX11RendererImpl->mContext->OMSetRenderTargets(0, 0, 0);
+                gDX11RendererImpl->mBackbuffer->Release();
+                gDX11RendererImpl->mBackbuffer = nullptr;
 
-                DXCALL(gDirectXRendererImpl->mSwapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0));
+                DXCALL(gDX11RendererImpl->mSwapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0));
 
                 // backbuffer rendertarget setup
                 ID3D11Texture2D* backbuffer = nullptr;
-                DXCALL(gDirectXRendererImpl->mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer));
+                DXCALL(gDX11RendererImpl->mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer));
 
-                DXCALL(gDirectXRendererImpl->mDevice->CreateRenderTargetView(backbuffer, NULL, &gDirectXRendererImpl->mBackbuffer));
+                DXCALL(gDX11RendererImpl->mDevice->CreateRenderTargetView(backbuffer, NULL, &gDX11RendererImpl->mBackbuffer));
                 backbuffer->Release();
 
-                gDirectXRendererImpl->SetupContext(width, height);
+                gDX11RendererImpl->SetupContext(width, height);
 
                 return 0;
             }
@@ -98,7 +98,7 @@ namespace JonsEngine
     }
 
 
-    DirectXRendererImpl::DirectXRendererImpl(const EngineSettings& settings, Logger& logger) : mLogger(logger), mWindowHandle(GetActiveWindow()), mSwapchain(nullptr), mBackbuffer(nullptr), mDevice(nullptr), mContext(nullptr),
+    DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger) : mLogger(logger), mWindowHandle(GetActiveWindow()), mSwapchain(nullptr), mBackbuffer(nullptr), mDevice(nullptr), mContext(nullptr),
         mForwardVertexShader(nullptr), mForwardPixelShader(nullptr), mVertexBuffer(nullptr), mIndexBuffer(nullptr), mInputLayout(nullptr)
     {
         // create swapchain, device and devicecontext
@@ -182,14 +182,14 @@ namespace JonsEngine
         // register as window subclass to listen for WM_SIZE events. etc
         if (!SetWindowSubclass(mWindowHandle, WndProc, gSubClassID, 0))
         {
-            JONS_LOG_ERROR(mLogger, "DirectXRenderer::DirectXRenderer(): SetWindowSubclass() failed");
-            throw std::runtime_error("DirectXRenderer::DirectXRenderer(): SetWindowSubclass() failed");
+            JONS_LOG_ERROR(mLogger, "DX11Renderer::DX11Renderer(): SetWindowSubclass() failed");
+            throw std::runtime_error("DX11Renderer::DX11Renderer(): SetWindowSubclass() failed");
         }
 
-        gDirectXRendererImpl = this;
+        gDX11RendererImpl = this;
     }
 
-    DirectXRendererImpl::~DirectXRendererImpl()
+    DX11RendererImpl::~DX11RendererImpl()
     {
         RemoveWindowSubclass(mWindowHandle, WndProc, gSubClassID);
     
@@ -207,18 +207,18 @@ namespace JonsEngine
     }
 
 
-    MeshID DirectXRendererImpl::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData)
+    MeshID DX11RendererImpl::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData)
     {
         return INVALID_MESH_ID;
     }
 
-    TextureID DirectXRendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat)
+    TextureID DX11RendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat)
     {
         return INVALID_TEXTURE_ID;
     }
 
 
-    void DirectXRendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
+    void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
         const FLOAT clearColor[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
         mContext->ClearRenderTargetView(mBackbuffer, clearColor);
@@ -235,45 +235,45 @@ namespace JonsEngine
     }
 
 
-    EngineSettings::Anisotropic DirectXRendererImpl::GetAnisotropicFiltering() const
+    EngineSettings::Anisotropic DX11RendererImpl::GetAnisotropicFiltering() const
     {
         return EngineSettings::ANISOTROPIC_1X;
     }
 
-    void DirectXRendererImpl::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
+    void DX11RendererImpl::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
     {
         
     }
 
 
-    EngineSettings::MSAA DirectXRendererImpl::GetMSAA() const
+    EngineSettings::MSAA DX11RendererImpl::GetMSAA() const
     {
         return EngineSettings::MSAA_1X;
     }
 
-    void DirectXRendererImpl::SetMSAA(const EngineSettings::MSAA msaa)
+    void DX11RendererImpl::SetMSAA(const EngineSettings::MSAA msaa)
     {
 
     }
 
 
-    float DirectXRendererImpl::GetZNear() const
+    float DX11RendererImpl::GetZNear() const
     {
         return 0.0f;
     }
 
-    float DirectXRendererImpl::GetZFar() const
+    float DX11RendererImpl::GetZFar() const
     {
         return 1.0f;
     }
 
-    uint32_t DirectXRendererImpl::GetShadowmapResolution() const
+    uint32_t DX11RendererImpl::GetShadowmapResolution() const
     {
         return 1024;
     }
 
 
-    void DirectXRendererImpl::SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight)
+    void DX11RendererImpl::SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight)
     {
         mContext->OMSetRenderTargets(1, &mBackbuffer, NULL);
 

@@ -15,13 +15,13 @@
 namespace JonsEngine
 {
     class Logger;
-    class DirectXRendererImpl;
+    class DX11RendererImpl;
 
-    class DirectXRenderer
+    class DX11Renderer
     {
     public:
-        DirectXRenderer(const EngineSettings& settings, IMemoryAllocatorPtr memoryAllocator, Logger& logger);
-        ~DirectXRenderer();
+        DX11Renderer(const EngineSettings& settings, IMemoryAllocatorPtr memoryAllocator, Logger& logger);
+        ~DX11Renderer();
 
         MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData);
         TextureID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat);
@@ -41,6 +41,6 @@ namespace JonsEngine
 
     private:
         IMemoryAllocatorPtr mMemoryAllocator;
-        std::unique_ptr<DirectXRendererImpl, std::function<void(DirectXRendererImpl*)>> mImplementation;
+        std::unique_ptr<DX11RendererImpl, std::function<void(DX11RendererImpl*)>> mImplementation;
     };
 }
