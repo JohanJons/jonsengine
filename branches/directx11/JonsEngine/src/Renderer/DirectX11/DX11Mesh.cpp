@@ -4,39 +4,28 @@
 
 namespace JonsEngine
 {
-    struct VERTEX { float x, y, z; };
-
     DX11Mesh::DX11Mesh(ID3D11Device* device, const BYTE* shaderBytecode, const uint32_t shaderBytecodeSize, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData, Logger& logger) : mLogger(logger)
     {
-        VERTEX OurVertices[] =
-        {
-            { 0.0f, 0.5f, 0.0f },
-            { 0.45f, -0.5, 0.0f },
-            { -0.45f, -0.5f, 0.0f }
-        };
-
         D3D11_BUFFER_DESC bufferDescription;
         ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
         bufferDescription.Usage = D3D11_USAGE_DEFAULT;
-        bufferDescription.ByteWidth = sizeof(OurVertices);
+        bufferDescription.ByteWidth = vertexData.size() * sizeof(float);
         bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
         D3D11_SUBRESOURCE_DATA initData;
         ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
-        initData.pSysMem = OurVertices;
+        initData.pSysMem = &vertexData.at(0);
 
         DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mVertexBuffer));
 
         // index buffer
-        uint16_t indices[] = { 0, 1, 2 };
-
         ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
         bufferDescription.Usage = D3D11_USAGE_DEFAULT;
-        bufferDescription.ByteWidth = sizeof(indices);
+        bufferDescription.ByteWidth = indexData.size() * sizeof(uint32_t);
         bufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
         ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
-        initData.pSysMem = indices;
+        initData.pSysMem = &indexData.at(0);
 
         DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mIndexBuffer));
 

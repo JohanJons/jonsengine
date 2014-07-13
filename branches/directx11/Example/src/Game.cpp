@@ -179,14 +179,14 @@ namespace JonsGame
 
         // ambient light
         myScene->SetAmbientLight(Vec4(0.05f));
-        
+        */
         // create a ground plane
         SceneNodePtr nodePlane       = myScene->GetRootNode().CreateChildNode("nodePlane");
         ModelPtr plane               = myScene->GetResourceManifest().CreateRectangle("GroundPlane", 64, 1.0, 64);
-        plane->mMaterial             = myScene->GetResourceManifest().LoadMaterial("checker", jonsPackage);
+        //plane->mMaterial             = myScene->GetResourceManifest().LoadMaterial("checker", jonsPackage);
         plane->mSceneNode            = nodePlane;
         plane->mMaterialTilingFactor = 64.0f;
-
+        /*
         // create a sphere
         SceneNodePtr nodeSphere = myScene->GetRootNode().CreateChildNode("nodeSphere");
         ModelPtr sphere = myScene->GetResourceManifest().CreateSphere("Sphere", 1.0f, 12, 24);

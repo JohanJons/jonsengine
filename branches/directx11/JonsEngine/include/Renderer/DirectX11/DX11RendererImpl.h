@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Renderer/RenderCommands.h"
+#include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Memory/HeapAllocator.h"
