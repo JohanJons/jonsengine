@@ -4,7 +4,12 @@
 
 namespace JonsEngine
 {
-    DX11Mesh::DX11Mesh(ID3D11Device* device, const BYTE* shaderBytecode, const uint32_t shaderBytecodeSize, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData, Logger& logger) : mLogger(logger)
+    static MeshID gNextMeshID = 1;
+
+
+    DX11Mesh::DX11Mesh(ID3D11Device* device, const BYTE* shaderBytecode, const uint32_t shaderBytecodeSize, const std::vector<float>& vertexData, const std::vector<float>& normalData,
+        const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData, Logger& logger) 
+        : mLogger(logger), mMeshID(gNextMeshID++), mNumIndices(indexData.size()), mVertexSize(sizeof(float)* 3), mVertexBuffer(nullptr), mIndexBuffer(nullptr), mInputLayout(nullptr)
     {
         D3D11_BUFFER_DESC bufferDescription;
         ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
@@ -47,5 +52,23 @@ namespace JonsEngine
         mVertexBuffer->Release();
         mIndexBuffer->Release();
         mInputLayout->Release();
+    }
+
+
+    void DX11Mesh::DrawMesh(ID3D11DeviceContext* context)
+    {
+        uint32_t offset = 0;
+
+        context->IASetVertexBuffers(0, 1, &mVertexBuffer, &mVertexSize, &offset);
+        context->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+        context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        context->IASetInputLayout(mInputLayout);
+
+        context->DrawIndexed(mNumIndices, 0, 0);
+    }
+
+    MeshID DX11Mesh::GetMeshID() const
+    {
+        return mMeshID;
     }
 }

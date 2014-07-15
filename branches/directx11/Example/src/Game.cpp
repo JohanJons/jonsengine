@@ -31,7 +31,7 @@ namespace JonsGame
         SetupInputCallbacks();
         SetupScene();
 
-        mEngine->GetWindow().SetFullscreen(true);
+        //mEngine->GetWindow().SetFullscreen(true);
         mEngine->GetWindow().ShowMouseCursor(false);
 
         while (mRunning)

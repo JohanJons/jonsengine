@@ -22,7 +22,9 @@ namespace JonsEngine
     class DX11RendererImpl
     {
     public:
-        DX11RendererImpl(const EngineSettings& settings, Logger& logger);
+        typedef std::unique_ptr<DX11Mesh, std::function<void(DX11Mesh*)>> DX11MeshPtr;
+
+        DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator);
         ~DX11RendererImpl();
 
         MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData);
@@ -44,7 +46,9 @@ namespace JonsEngine
     private:
         static LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
         void SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight);
+
         Logger& mLogger;
+        IMemoryAllocatorPtr mMemoryAllocator;
 
         HWND mWindowHandle;
         IDXGISwapChain* mSwapchain;
@@ -54,8 +58,8 @@ namespace JonsEngine
 
         ID3D11VertexShader* mForwardVertexShader;
         ID3D11PixelShader* mForwardPixelShader;
-		ID3D11Buffer* mVertexBuffer;
-        ID3D11Buffer* mIndexBuffer;
-		ID3D11InputLayout* mInputLayout;
+        ID3D11RasterizerState* mRasterizerState;
+
+        std::vector<DX11MeshPtr> mMeshes;
     };
 }

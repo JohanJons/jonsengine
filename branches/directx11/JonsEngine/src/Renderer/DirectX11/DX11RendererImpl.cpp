@@ -17,11 +17,6 @@ namespace JonsEngine
 
     const UINT_PTR gSubClassID = 1;
 
-	struct VERTEX
-    {
-        FLOAT X, Y, Z;      // position
-    };
-
 
     LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
     {
@@ -98,9 +93,12 @@ namespace JonsEngine
     }
 
 
-    DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger) : mLogger(logger), mWindowHandle(GetActiveWindow()), mSwapchain(nullptr), mBackbuffer(nullptr), mDevice(nullptr), mContext(nullptr),
-        mForwardVertexShader(nullptr), mForwardPixelShader(nullptr), mVertexBuffer(nullptr), mIndexBuffer(nullptr), mInputLayout(nullptr)
+    DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : mLogger(logger), mMemoryAllocator(memoryAllocator), mWindowHandle(GetActiveWindow()),
+        mSwapchain(nullptr), mBackbuffer(nullptr), mDevice(nullptr), mContext(nullptr), mForwardVertexShader(nullptr), mForwardPixelShader(nullptr)
     {
+        const D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
+        const UINT numFeatureLevels = 1;
+
         // create swapchain, device and devicecontext
         DXGI_SWAP_CHAIN_DESC swapChainDesc;
         ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
@@ -110,16 +108,11 @@ namespace JonsEngine
         swapChainDesc.OutputWindow = mWindowHandle;
         swapChainDesc.SampleDesc.Count = 1;
         swapChainDesc.Windowed = true;
-
-        const D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
-        const UINT numFeatureLevels = 1;
-
         DXCALL(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, &featureLevel, numFeatureLevels, D3D11_SDK_VERSION, &swapChainDesc, &mSwapchain, &mDevice, NULL, &mContext));
 
         // backbuffer rendertarget setup
         ID3D11Texture2D* backbuffer = nullptr;
         DXCALL(mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer));
-
         DXCALL(mDevice->CreateRenderTargetView(backbuffer, NULL, &mBackbuffer));
         backbuffer->Release();
         
@@ -132,51 +125,21 @@ namespace JonsEngine
         DXCALL(mDevice->CreateVertexShader(gForwardVertexShader, sizeof(gForwardVertexShader), NULL, &mForwardVertexShader));
         DXCALL(mDevice->CreatePixelShader(gForwardPixelShader, sizeof(gForwardPixelShader), NULL, &mForwardPixelShader));
 
-        // vertex buffer
-		VERTEX OurVertices[] =
-        {
-            { 0.0f, 0.5f, 0.0f },
-            { 0.45f, -0.5, 0.0f},
-            { -0.45f, -0.5f, 0.0f }
-        };
+        // set CCW as front face
+        D3D11_RASTERIZER_DESC rasterizerDesc;
+        ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
+        rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+        rasterizerDesc.CullMode = D3D11_CULL_BACK;
+        rasterizerDesc.FrontCounterClockwise = true;
+        rasterizerDesc.DepthBias = 0;
+        rasterizerDesc.SlopeScaledDepthBias = 0.0f;
+        rasterizerDesc.DepthBiasClamp = 0.0f;
+        rasterizerDesc.DepthClipEnable = true;
+        rasterizerDesc.ScissorEnable = false;
+        rasterizerDesc.MultisampleEnable = false;
+        rasterizerDesc.AntialiasedLineEnable = false;
+        DXCALL(mDevice->CreateRasterizerState(&rasterizerDesc, &mRasterizerState));
 
-		D3D11_BUFFER_DESC bufferDescription;
-		ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
-		bufferDescription.Usage = D3D11_USAGE_DEFAULT;
-		bufferDescription.ByteWidth = sizeof(OurVertices);
-		bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-		D3D11_SUBRESOURCE_DATA initData;
-		ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
-		initData.pSysMem = OurVertices;
-
-		DXCALL(mDevice->CreateBuffer(&bufferDescription, &initData, &mVertexBuffer));
-
-        // index buffer
-        uint16_t indices[] = {0, 1, 2};
-
-        ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
-        bufferDescription.Usage = D3D11_USAGE_DEFAULT;
-        bufferDescription.ByteWidth = sizeof(indices);
-        bufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
-
-        ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
-        initData.pSysMem = indices;
-
-        DXCALL(mDevice->CreateBuffer(&bufferDescription, &initData, &mIndexBuffer));
-
-		D3D11_INPUT_ELEMENT_DESC inputDescription;
-		ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC));
-		inputDescription.SemanticName = "POSITION";
-		inputDescription.SemanticIndex = 0;
-		inputDescription.Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		inputDescription.InputSlot = 0;
-		inputDescription.AlignedByteOffset = 0;
-		inputDescription.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputDescription.InstanceDataStepRate = 0;
-
-        DXCALL(mDevice->CreateInputLayout(&inputDescription, 1, gForwardVertexShader, sizeof(gForwardVertexShader), &mInputLayout));
-        
         SetupContext(swapChainDesc.BufferDesc.Width, swapChainDesc.BufferDesc.Height);
 
         // register as window subclass to listen for WM_SIZE events. etc
@@ -195,9 +158,7 @@ namespace JonsEngine
     
         DXCALL(mSwapchain->SetFullscreenState(false, NULL));
 
-		mInputLayout->Release();
-        mIndexBuffer->Release();
-		mVertexBuffer->Release();
+        mRasterizerState->Release();
         mForwardVertexShader->Release();
         mForwardPixelShader->Release();
         mSwapchain->Release();
@@ -209,7 +170,11 @@ namespace JonsEngine
 
     MeshID DX11RendererImpl::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData)
     {
-        return INVALID_MESH_ID;
+        auto allocator = mMemoryAllocator;
+
+        mMeshes.emplace_back(DX11MeshPtr(allocator->AllocateObject<DX11Mesh>(mDevice, gForwardVertexShader, sizeof(gForwardVertexShader), vertexData, normalData, texCoords, tangents, bitangents, indexData, mLogger), [=](DX11Mesh* mesh) { allocator->DeallocateObject<DX11Mesh>(mesh); }));
+
+        return mMeshes.back()->GetMeshID();
     }
 
     TextureID DX11RendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat)
@@ -220,16 +185,10 @@ namespace JonsEngine
 
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
-        const FLOAT clearColor[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
+        const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
         mContext->ClearRenderTargetView(mBackbuffer, clearColor);
 
-		uint32_t vertexSize = sizeof(VERTEX);
-		uint32_t offset = 0;
-		mContext->IASetVertexBuffers(0, 1, &mVertexBuffer, &vertexSize, &offset);
-        mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-        mContext->DrawIndexed(3, 0, 0);
+        mMeshes.front()->DrawMesh(mContext);
 
         DXCALL(mSwapchain->Present(0, 0));
     }
@@ -276,6 +235,7 @@ namespace JonsEngine
     void DX11RendererImpl::SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight)
     {
         mContext->OMSetRenderTargets(1, &mBackbuffer, NULL);
+        mContext->RSSetState(mRasterizerState);
 
         D3D11_VIEWPORT viewport;
         ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
@@ -289,7 +249,5 @@ namespace JonsEngine
 
         mContext->VSSetShader(mForwardVertexShader, NULL, NULL);
         mContext->PSSetShader(mForwardPixelShader, NULL, NULL);
-
-        mContext->IASetInputLayout(mInputLayout);
     }
 }
