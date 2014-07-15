@@ -41,12 +41,12 @@ namespace JonsEngine
         if (activeScene)
         {
             // update model matrix of all nodes in active scene
-            activeScene->GetRootNode().UpdateModelMatrix(Mat4::Identity());
+            activeScene->GetRootNode().UpdateModelMatrix(Mat4(1.0f));
 
             const Camera& camera = activeScene->GetSceneCamera();
             const Mat4 viewMatrix = camera.GetCameraTransform();
-            const Mat4 perspectiveMatrix = Mat4::CreatePerspectiveFieldOfView(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer.GetZNear(), mRenderer.GetZFar());
-            const Mat4 viewPerspectiveMatrix = viewMatrix * perspectiveMatrix;
+            const Mat4 perspectiveMatrix = glm::perspective(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer.GetZNear(), mRenderer.GetZFar());
+            const Mat4 viewPerspectiveMatrix = perspectiveMatrix * viewMatrix;
 
             // create the rendering queue and active lights
             const RenderQueue renderQueue(CreateRenderQueue(activeScene->GetResourceManifest().GetAllModels(), viewPerspectiveMatrix));
@@ -79,8 +79,8 @@ namespace JonsEngine
 
         for (PointLightPtr pointLight : pointLights)
         {
-            const Mat4 scaledWorldMatrix = pointLight->mSceneNode->GetNodeTransform() * Mat4::CreateScale(Vec3(pointLight->mMaxDistance));
-            lighting.mPointLights.emplace_back(RenderableLighting::PointLight(scaledWorldMatrix * viewProjectionMatrix, scaledWorldMatrix, pointLight->mLightColor, pointLight->mSceneNode->Position(), pointLight->mLightIntensity, pointLight->mMaxDistance));
+            const Mat4 scaledWorldMatrix = glm::scale(pointLight->mSceneNode->GetNodeTransform(), Vec3(pointLight->mMaxDistance));
+            lighting.mPointLights.emplace_back(RenderableLighting::PointLight(viewProjectionMatrix * scaledWorldMatrix, scaledWorldMatrix, pointLight->mLightColor, pointLight->mSceneNode->Position(), pointLight->mLightIntensity, pointLight->mMaxDistance));
         }
 
         for (DirectionalLightPtr dirLight : directionalLights)
@@ -94,17 +94,16 @@ namespace JonsEngine
      */
     void Engine::CreateModelRenderable(const Model* model, const Mat4& viewProjectionMatrix, const Mat4& nodeTransform, const bool lightingEnabled, RenderQueue& renderQueue)
     {
-        const Mat4 worldMatrix = model->mTransform * nodeTransform;
-        const Mat4 worldViewProjMatrix = worldMatrix * viewProjectionMatrix;
+        const Mat4 worldMatrix         = nodeTransform * model->mTransform;
+        const Mat4 worldViewProjMatrix = viewProjectionMatrix * worldMatrix;
 
         if (model->mMesh != INVALID_MESH_ID)
         {
             // TODO: replace push_back with emplace_back once boost is compatible with MSVC12
             const MaterialPtr material(model->mMaterial);
             if (material)
-                renderQueue.push_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor,        /// TODO - REFACTOR
-                                    Vec4(material->mDiffuseColor.x, material->mDiffuseColor.y, material->mDiffuseColor.z, 1.0f), Vec4(material->mAmbientColor.x, material->mAmbientColor.y, material->mAmbientColor.z, 1.0f), 
-                                    Vec4(material->mSpecularColor.x, material->mSpecularColor.y, material->mSpecularColor.z, 1.0f), Vec4(material->mEmissiveColor.x, material->mEmissiveColor.y, material->mEmissiveColor.z, 1.0f),
+                renderQueue.push_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor, 
+                                                 Vec4(material->mDiffuseColor, 1.0f), Vec4(material->mAmbientColor, 1.0f), Vec4(material->mSpecularColor, 1.0f), Vec4(material->mEmissiveColor, 1.0f),
                                                  material->mDiffuseTexture, material->mNormalTexture, lightingEnabled, material->mSpecularFactor));
             else
                 renderQueue.push_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, lightingEnabled));

@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    DirectionalLight::DirectionalLight(const std::string& name) : mName(name), mHashedID(boost::hash_value(name)), mLightColor(1.0f, 1.0f, 1.0f, 1.0f), mLightDirection(0.0f, 0.0f, -1.0f)
+    DirectionalLight::DirectionalLight(const std::string& name) : mName(name), mHashedID(boost::hash_value(name)), mLightColor(1.0f), mLightDirection(0.0f, 0.0f, -1.0f)
     {
     }
 

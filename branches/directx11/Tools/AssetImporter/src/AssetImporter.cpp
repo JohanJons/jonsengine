@@ -432,10 +432,10 @@ namespace JonsAssetImporter
     {
         Mat4 jMat;
 
-        jMat.m[0][0] = aiMat.a1; jMat.m[0][1] = aiMat.b1; jMat.m[0][2] = aiMat.c1; jMat.m[0][3] = aiMat.d1;
-        jMat.m[1][0] = aiMat.a2; jMat.m[1][1] = aiMat.b2; jMat.m[1][2] = aiMat.c2; jMat.m[1][3] = aiMat.d2;
-        jMat.m[2][0] = aiMat.a3; jMat.m[2][1] = aiMat.b3; jMat.m[2][2] = aiMat.c3; jMat.m[2][3] = aiMat.d3;
-        jMat.m[3][0] = aiMat.a4; jMat.m[3][1] = aiMat.b4; jMat.m[3][2] = aiMat.c4; jMat.m[3][3] = aiMat.d4;
+        jMat[0][0] = aiMat.a1; jMat[0][1] = aiMat.b1; jMat[0][2] = aiMat.c1; jMat[0][3] = aiMat.d1;
+        jMat[1][0] = aiMat.a2; jMat[1][1] = aiMat.b2; jMat[1][2] = aiMat.c2; jMat[1][3] = aiMat.d2;
+        jMat[2][0] = aiMat.a3; jMat[2][1] = aiMat.b3; jMat[2][2] = aiMat.c3; jMat[2][3] = aiMat.d3;
+        jMat[3][0] = aiMat.a4; jMat[3][1] = aiMat.b4; jMat[3][2] = aiMat.c4; jMat[3][3] = aiMat.d4;
 
         return jMat;
     }

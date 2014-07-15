@@ -188,7 +188,30 @@ namespace JonsEngine
         const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
         mContext->ClearRenderTargetView(mBackbuffer, clearColor);
 
-        mMeshes.front()->DrawMesh(mContext);
+        auto meshIterator = mMeshes.begin();
+        for (const Renderable& renderable : renderQueue)
+        {
+            if (renderable.mMesh == INVALID_MESH_ID)
+            {
+                JONS_LOG_ERROR(mLogger, "Renderable MeshID is invalid");
+                throw std::runtime_error("Renderable MeshID is invalid");
+            }
+
+            if (renderable.mMesh < (*meshIterator)->GetMeshID())
+                continue;
+
+            while (renderable.mMesh > (*meshIterator)->GetMeshID())
+            {
+                meshIterator++;
+                if (meshIterator == mMeshes.end())
+                {
+                    JONS_LOG_ERROR(mLogger, "Renderable MeshID out of range");
+                    throw std::runtime_error("Renderable MeshID out of range");
+                }
+            }
+
+            (*meshIterator)->Draw(mContext);
+        }
 
         DXCALL(mSwapchain->Present(0, 0));
     }

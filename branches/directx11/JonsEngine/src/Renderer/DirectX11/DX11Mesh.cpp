@@ -55,7 +55,7 @@ namespace JonsEngine
     }
 
 
-    void DX11Mesh::DrawMesh(ID3D11DeviceContext* context)
+    void DX11Mesh::Draw(ID3D11DeviceContext* context)
     {
         uint32_t offset = 0;
 

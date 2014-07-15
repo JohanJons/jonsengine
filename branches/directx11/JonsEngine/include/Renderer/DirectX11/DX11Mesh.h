@@ -17,7 +17,7 @@ namespace JonsEngine
                  const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData, Logger& logger);
         ~DX11Mesh();
 
-        void DrawMesh(ID3D11DeviceContext* context);
+        void Draw(ID3D11DeviceContext* context);
         MeshID GetMeshID() const;
 
 

@@ -1,7 +1,5 @@
 #include "include/Resources/JonsPackage.h"
-
 #include "include/Core/Memory/HeapAllocator.h"
-#include "include/Core/Utils/Math.h"
 
 #include <string>
 #include <iostream>
@@ -18,7 +16,7 @@ namespace JonsEngine
     {
     }
 
-    PackageModel::PackageModel() : mName("")
+    PackageModel::PackageModel() : mName(""), mTransform(1.0f)
     {
     }
 
@@ -30,7 +28,7 @@ namespace JonsEngine
     {
     }
 
-    PackageMaterial::PackageMaterial() : mName(""), mHasDiffuseTexture(false), mHasNormalTexture(false), mDiffuseColor(1.0f, 1.0f, 1.0f), mAmbientColor(1.0f, 1.0f, 1.0f), mSpecularColor(1.0f, 1.0f, 1.0f), mEmissiveColor(0.0f, 0.0f, 0.0f)
+    PackageMaterial::PackageMaterial() : mName(""), mHasDiffuseTexture(false), mHasNormalTexture(false), mDiffuseColor(1.0f), mAmbientColor(1.0f), mSpecularColor(1.0f), mEmissiveColor(0.0f)
     {
     }
 

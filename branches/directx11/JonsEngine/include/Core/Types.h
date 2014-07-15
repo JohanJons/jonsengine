@@ -1,8 +1,9 @@
 #pragma once
 
 #include "include/Core/EngineDefs.h"
-#include "include/Core/Utils/Math.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include <vector>
 
 namespace JonsEngine
@@ -29,9 +30,10 @@ namespace JonsEngine
     const MeshID    INVALID_MESH_ID    = 0;
     const TextureID INVALID_TEXTURE_ID = 0;
 
-    typedef ::DirectX::SimpleMath::Vector2 Vec2;
-    typedef ::DirectX::SimpleMath::Vector3 Vec3;
-    typedef ::DirectX::SimpleMath::Vector4 Vec4;
-    typedef ::DirectX::SimpleMath::Matrix Mat4;
-    typedef ::DirectX::SimpleMath::Quaternion Quaternion;
+    typedef glm::vec2 Vec2;
+    typedef glm::vec3 Vec3;
+    typedef glm::vec4 Vec4;
+    typedef glm::mat3 Mat3;
+    typedef glm::mat4 Mat4;
+    typedef glm::fquat Quaternion;
 }
