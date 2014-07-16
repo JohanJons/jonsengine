@@ -2,6 +2,9 @@
 
 #include "include/Renderer/RenderCommands.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
+#include "include/Renderer/DirectX11/DX11Context.h"
+#include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
+#include "include/Renderer/DirectX11/DX11ConstantBufferDefinitions.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Memory/HeapAllocator.h"
@@ -19,7 +22,7 @@ namespace JonsEngine
 {
     class Logger;
 
-    class DX11RendererImpl
+    class DX11RendererImpl : protected DX11Context
     {
     public:
         typedef std::unique_ptr<DX11Mesh, std::function<void(DX11Mesh*)>> DX11MeshPtr;
@@ -50,15 +53,11 @@ namespace JonsEngine
         Logger& mLogger;
         IMemoryAllocatorPtr mMemoryAllocator;
 
-        HWND mWindowHandle;
-        IDXGISwapChain* mSwapchain;
         ID3D11RenderTargetView* mBackbuffer;
-        ID3D11Device* mDevice;
-        ID3D11DeviceContext* mContext;
-
         ID3D11VertexShader* mForwardVertexShader;
         ID3D11PixelShader* mForwardPixelShader;
         ID3D11RasterizerState* mRasterizerState;
+        DX11ConstantBuffer<ConstantBufferForward> mConstantBuffer;
 
         std::vector<DX11MeshPtr> mMeshes;
     };

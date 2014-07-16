@@ -3,6 +3,7 @@
 #include "include/Core/Logging/Logger.h"
 
 #include "boost/current_function.hpp"
+#include <d3d11.h>
 #include <sstream>
 #include <exception>
 
