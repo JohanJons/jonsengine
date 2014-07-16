@@ -93,23 +93,9 @@ namespace JonsEngine
     }
 
 
-    DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : mLogger(logger), mMemoryAllocator(memoryAllocator), mWindowHandle(GetActiveWindow()),
-        mSwapchain(nullptr), mBackbuffer(nullptr), mDevice(nullptr), mContext(nullptr), mForwardVertexShader(nullptr), mForwardPixelShader(nullptr)
+    DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
+        mForwardVertexShader(nullptr), mForwardPixelShader(nullptr), mConstantBuffer(mDevice)
     {
-        const D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
-        const UINT numFeatureLevels = 1;
-
-        // create swapchain, device and devicecontext
-        DXGI_SWAP_CHAIN_DESC swapChainDesc;
-        ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
-        swapChainDesc.BufferCount = 2;
-        swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        swapChainDesc.OutputWindow = mWindowHandle;
-        swapChainDesc.SampleDesc.Count = 1;
-        swapChainDesc.Windowed = true;
-        DXCALL(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, &featureLevel, numFeatureLevels, D3D11_SDK_VERSION, &swapChainDesc, &mSwapchain, &mDevice, NULL, &mContext));
-
         // backbuffer rendertarget setup
         ID3D11Texture2D* backbuffer = nullptr;
         DXCALL(mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer));
@@ -118,6 +104,7 @@ namespace JonsEngine
         
         // setup viewport
         // query width/height from d3d
+        DXGI_SWAP_CHAIN_DESC swapChainDesc;
         ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
         DXCALL(mSwapchain->GetDesc(&swapChainDesc));
 
@@ -161,10 +148,7 @@ namespace JonsEngine
         mRasterizerState->Release();
         mForwardVertexShader->Release();
         mForwardPixelShader->Release();
-        mSwapchain->Release();
         mBackbuffer->Release();
-        mDevice->Release();
-        mContext->Release();
     }
 
 
@@ -187,6 +171,11 @@ namespace JonsEngine
     {
         const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
         mContext->ClearRenderTargetView(mBackbuffer, clearColor);
+
+        ConstantBufferForward buffer;
+        buffer.mColor = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
+
+        mConstantBuffer.SetData(buffer, mContext);
 
         auto meshIterator = mMeshes.begin();
         for (const Renderable& renderable : renderQueue)
@@ -257,6 +246,7 @@ namespace JonsEngine
 
     void DX11RendererImpl::SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight)
     {
+
         mContext->OMSetRenderTargets(1, &mBackbuffer, NULL);
         mContext->RSSetState(mRasterizerState);
 

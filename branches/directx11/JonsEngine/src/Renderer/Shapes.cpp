@@ -10,14 +10,14 @@ namespace JonsEngine
         const float Y = sizeY / 2.0f;
         const float Z = sizeZ / 2.0f;
 
-        float cubeVertices[] = {-X, -Y, -Z, -X, -Y, Z, X, -Y, Z,
+        /*float cubeVertices[] = {-X, -Y, -Z, -X, -Y, Z, X, -Y, Z,
                                 X, -Y, -Z, -X, Y, -Z, -X, Y, Z,
                                 X, Y, Z, X, Y, -Z, -X, -Y, -Z,
                                 -X, Y, -Z, X, Y, -Z, X, -Y, -Z,
                                 -X, -Y, Z, -X, Y, Z, X, Y, Z,
                                 X, -Y, Z, -X, -Y, -Z, -X, -Y, Z,
                                 -X, Y, Z, -X, Y, -Z, X, -Y, -Z,
-                                X, -Y, Z, X, Y, Z, X, Y, -Z};
+                                X, -Y, Z, X, Y, Z, X, Y, -Z};*/
 
         float cubeNormals[] = {0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
                                0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
@@ -35,14 +35,14 @@ namespace JonsEngine
                                  0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
                                  1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f};
 
-        uint32_t cubeIndices[] = {0, 2, 1, 0, 3, 2, 4, 5, 6,
+       /* uint32_t cubeIndices[] = {0, 2, 1, 0, 3, 2, 4, 5, 6,
                                   4, 6, 7, 8, 9, 10, 8, 10, 11,
                                   12, 15, 14, 12, 14, 13, 16, 17, 18,
-                                  16, 18, 19, 20, 23, 22, 20, 22, 21};
-        /*float cubeVertices[] = { 0.0f, 0.5f, 0.0f,
+                                  16, 18, 19, 20, 23, 22, 20, 22, 21}; */
+        float cubeVertices[] = { 0.0f, 0.5f, 0.0f,
                                  0.45f, -0.5, 0.0f,
                                  -0.45f, -0.5f, 0.0f };
-        uint32_t cubeIndices[] = {0, 2, 1};*/
+        uint32_t cubeIndices[] = {0, 2, 1};
 
         vertexData.insert(vertexData.begin(), cubeVertices, cubeVertices + (sizeof(cubeVertices) / sizeof(float)));
         normalData.insert(normalData.begin(), cubeNormals, cubeNormals + (sizeof(cubeNormals) / sizeof(float)));

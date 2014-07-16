@@ -128,6 +128,7 @@
     <ClCompile Include="src\Core\Threading\ThreadPool.cpp" />
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
     <ClCompile Include="src\Core\Utils\Time.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11Context.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Mesh.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Renderer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11RendererImpl.cpp" />
@@ -167,6 +168,9 @@
     <ClInclude Include="include\Core\Utils\Time.h" />
     <ClInclude Include="include\Core\Utils\Math.h" />
     <ClInclude Include="include\Core\Utils\Win32.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11ConstantBuffer.hpp" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11ConstantBufferDefinitions.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11Context.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Mesh.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Renderer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11RendererImpl.h" />
