@@ -53,6 +53,7 @@ namespace JonsEngine
         Logger& mLogger;
         IMemoryAllocatorPtr mMemoryAllocator;
 
+        ID3D11Texture2D* mDepthStencilBuffer;
         ID3D11RenderTargetView* mBackbuffer;
         ID3D11VertexShader* mForwardVertexShader;
         ID3D11PixelShader* mForwardPixelShader;

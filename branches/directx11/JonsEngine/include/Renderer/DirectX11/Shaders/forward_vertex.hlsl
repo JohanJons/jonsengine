@@ -14,7 +14,7 @@ VOut main(float4 position : POSITION)
 {
     VOut output;
 
-    output.position = position;
+    output.position = mul(position, gWVPMatrix);
     output.color = gColor;
 
     return output;

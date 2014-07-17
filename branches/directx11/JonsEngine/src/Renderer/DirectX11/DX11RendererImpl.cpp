@@ -127,6 +127,20 @@ namespace JonsEngine
         rasterizerDesc.AntialiasedLineEnable = false;
         DXCALL(mDevice->CreateRasterizerState(&rasterizerDesc, &mRasterizerState));
 
+        D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
+        ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
+
+        depthStencilBufferDesc.ArraySize = 1;
+        depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+        depthStencilBufferDesc.CPUAccessFlags = 0; // No CPU access required.
+        depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        depthStencilBufferDesc.Width = clientWidth;
+        depthStencilBufferDesc.Height = clientHeight;
+        depthStencilBufferDesc.MipLevels = 1;
+        depthStencilBufferDesc.SampleDesc.Count = 1;
+        depthStencilBufferDesc.SampleDesc.Quality = 0;
+        depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+
         SetupContext(swapChainDesc.BufferDesc.Width, swapChainDesc.BufferDesc.Height);
 
         // register as window subclass to listen for WM_SIZE events. etc
@@ -172,8 +186,12 @@ namespace JonsEngine
         const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
         mContext->ClearRenderTargetView(mBackbuffer, clearColor);
 
+
+        Mat4 perspectiveMatrix = glm::perspective(70.0f, 1920 / (float)1080, 0.0f, 100.0f);
+        Mat4 viewMatrix = glm::lookAt(Vec3(0.0f, 3.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 1.0f, 0.0f));
         ConstantBufferForward buffer;
         buffer.mColor = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
+        buffer.mWVPMatrix = perspectiveMatrix * viewMatrix * Mat4(1.0f);
 
         mConstantBuffer.SetData(buffer, mContext);
 
