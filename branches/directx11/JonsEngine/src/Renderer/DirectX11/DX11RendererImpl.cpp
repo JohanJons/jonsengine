@@ -129,17 +129,17 @@ namespace JonsEngine
 
         D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
         ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
-
         depthStencilBufferDesc.ArraySize = 1;
         depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-        depthStencilBufferDesc.CPUAccessFlags = 0; // No CPU access required.
+        depthStencilBufferDesc.CPUAccessFlags = 0;
         depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        depthStencilBufferDesc.Width = clientWidth;
-        depthStencilBufferDesc.Height = clientHeight;
+        depthStencilBufferDesc.Width = swapChainDesc.BufferDesc.Width;
+        depthStencilBufferDesc.Height = swapChainDesc.BufferDesc.Height;
         depthStencilBufferDesc.MipLevels = 1;
         depthStencilBufferDesc.SampleDesc.Count = 1;
         depthStencilBufferDesc.SampleDesc.Quality = 0;
         depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+        DXCALL(mDevice->CreateTexture2D(&depthStencilBufferDesc, NULL, &mDepthStencilBuffer));
 
         SetupContext(swapChainDesc.BufferDesc.Width, swapChainDesc.BufferDesc.Height);
 
@@ -159,6 +159,7 @@ namespace JonsEngine
     
         DXCALL(mSwapchain->SetFullscreenState(false, NULL));
 
+        mDepthStencilBuffer->Release();
         mRasterizerState->Release();
         mForwardVertexShader->Release();
         mForwardPixelShader->Release();
