@@ -105,7 +105,7 @@ namespace JonsEngine
             return ptr;
 
         size_t hashedName = boost::hash_value(assetName);
-        auto iter = std::find_if(jonsPkg->mMaterials.begin(), jonsPkg->mMaterials.end(), [hashedName](const PackageMaterial model) { return boost::hash_value(model.mName) == hashedName; });
+        auto iter = std::find_if(jonsPkg->mMaterials.begin(), jonsPkg->mMaterials.end(), [hashedName](const PackageMaterial material) { return boost::hash_value(material.mName) == hashedName; });
 
         if (iter != jonsPkg->mMaterials.end())
         {

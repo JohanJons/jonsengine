@@ -192,7 +192,6 @@ namespace JonsEngine
         return INVALID_TEXTURE_ID;
     }
 
-#include <DirectXMath.h>
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
         const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
