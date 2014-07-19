@@ -2,6 +2,7 @@
 
 #include "include/Renderer/RenderCommands.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
+#include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11Context.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11ConstantBufferDefinitions.h"
@@ -26,6 +27,7 @@ namespace JonsEngine
     {
     public:
         typedef std::unique_ptr<DX11Mesh, std::function<void(DX11Mesh*)>> DX11MeshPtr;
+        typedef std::unique_ptr<DX11Texture, std::function<void(DX11Texture*)>> DX11TexturePtr;
 
         DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator);
         ~DX11RendererImpl();
@@ -61,5 +63,6 @@ namespace JonsEngine
         DX11ConstantBuffer<ConstantBufferForward> mConstantBuffer;
 
         std::vector<DX11MeshPtr> mMeshes;
+        std::vector<DX11TexturePtr> mTextures;
     };
 }

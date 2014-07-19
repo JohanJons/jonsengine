@@ -189,7 +189,11 @@ namespace JonsEngine
 
     TextureID DX11RendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat)
     {
-        return INVALID_TEXTURE_ID;
+        auto allocator = mMemoryAllocator;
+
+        mTextures.emplace_back(DX11TexturePtr(allocator->AllocateObject<DX11Texture>(mDevice, textureData, textureWidth, textureHeight, colorFormat, textureType, mLogger), [=](DX11Texture* texture) { allocator->DeallocateObject<DX11Texture>(texture); }));
+
+        return mTextures.back()->GetTextureID();
     }
 
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)

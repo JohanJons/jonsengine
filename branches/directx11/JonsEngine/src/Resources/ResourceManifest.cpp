@@ -75,7 +75,7 @@ namespace JonsEngine
         size_t hashedName = boost::hash_value(assetName);
         std::vector<PackageModel>::iterator iter = std::find_if(jonsPkg->mModels.begin(), jonsPkg->mModels.end(), [hashedName](const PackageModel model) { return boost::hash_value(model.mName) == hashedName; });
 
-        if (iter != jonsPkg->mModels.end())
+        if (iter == jonsPkg->mModels.end())
         {
             auto allocator = mMemoryAllocator;
             ptr            = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(ProcessModel(*iter, jonsPkg)), [=](Model* model) { allocator->DeallocateObject(model); }));
@@ -107,7 +107,7 @@ namespace JonsEngine
         size_t hashedName = boost::hash_value(assetName);
         auto iter = std::find_if(jonsPkg->mMaterials.begin(), jonsPkg->mMaterials.end(), [hashedName](const PackageMaterial material) { return boost::hash_value(material.mName) == hashedName; });
 
-        if (iter != jonsPkg->mMaterials.end())
+        if (iter == jonsPkg->mMaterials.end())
         {
             auto allocator = mMemoryAllocator;
             ptr            = *mMaterials.insert(mMaterials.end(), MaterialPtr(allocator->AllocateObject<Material>(ProcessMaterial(*iter, jonsPkg)), [=](Material* material) { allocator->DeallocateObject(material); }));
