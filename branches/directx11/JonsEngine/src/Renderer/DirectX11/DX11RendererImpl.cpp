@@ -94,7 +94,7 @@ namespace JonsEngine
 
 
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
-        mForwardVertexShader(nullptr), mForwardPixelShader(nullptr), mConstantBuffer(mDevice)
+        mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr), mDepthStencilState(nullptr), mForwardVertexShader(nullptr), mForwardPixelShader(nullptr), mConstantBuffer(mDevice)
     {
         // backbuffer rendertarget setup
         ID3D11Texture2D* backbuffer = nullptr;
@@ -140,6 +140,15 @@ namespace JonsEngine
         depthStencilBufferDesc.SampleDesc.Quality = 0;
         depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
         DXCALL(mDevice->CreateTexture2D(&depthStencilBufferDesc, NULL, &mDepthStencilBuffer));
+        DXCALL(mDevice->CreateDepthStencilView(mDepthStencilBuffer, NULL, &mDepthStencilView));
+
+        D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+        ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
+        depthStencilDesc.DepthEnable = true;
+        depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+        depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+        depthStencilDesc.StencilEnable = false;
+        DXCALL(mDevice->CreateDepthStencilState(&depthStencilDesc, &mDepthStencilState));
 
         SetupContext(swapChainDesc.BufferDesc.Width, swapChainDesc.BufferDesc.Height);
 
@@ -160,6 +169,8 @@ namespace JonsEngine
         DXCALL(mSwapchain->SetFullscreenState(false, NULL));
 
         mDepthStencilBuffer->Release();
+        mDepthStencilView->Release();
+        mDepthStencilState->Release();
         mRasterizerState->Release();
         mForwardVertexShader->Release();
         mForwardPixelShader->Release();
@@ -181,15 +192,15 @@ namespace JonsEngine
         return INVALID_TEXTURE_ID;
     }
 
-
+#include <DirectXMath.h>
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
         const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
         mContext->ClearRenderTargetView(mBackbuffer, clearColor);
+        mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-
-        Mat4 perspectiveMatrix = glm::perspective(70.0f, 1920 / (float)1080, 0.0f, 100.0f);
-        Mat4 viewMatrix = glm::lookAt(Vec3(0.0f, 3.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 1.0f, 0.0f));
+        Mat4 perspectiveMatrix = DX11PerspectiveMatrixFov(70.0f, 1920 / (float)1080, 0.1f, 100.0f);
+        Mat4 viewMatrix = glm::lookAt(Vec3(0.0f, 4.0f, 3.5f), Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f, 1.0f, 0.0f));
         ConstantBufferForward buffer;
         buffer.mColor = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
         buffer.mWVPMatrix = perspectiveMatrix * viewMatrix * Mat4(1.0f);
@@ -266,7 +277,8 @@ namespace JonsEngine
     void DX11RendererImpl::SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight)
     {
 
-        mContext->OMSetRenderTargets(1, &mBackbuffer, NULL);
+        mContext->OMSetRenderTargets(1, &mBackbuffer, mDepthStencilView);
+        mContext->OMSetDepthStencilState(mDepthStencilState, 1);
         mContext->RSSetState(mRasterizerState);
 
         D3D11_VIEWPORT viewport;

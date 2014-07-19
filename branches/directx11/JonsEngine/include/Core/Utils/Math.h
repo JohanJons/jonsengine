@@ -16,4 +16,6 @@ namespace JonsEngine
      */
 
     const Mat4 gIdentityMatrix(1.0f);
+
+    Mat4 DX11PerspectiveMatrixFov(const float fovDegrees, const float ratio, const float zNear, const float zFar);
 }
