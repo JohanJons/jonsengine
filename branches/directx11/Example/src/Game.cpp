@@ -183,7 +183,7 @@ namespace JonsGame
         // create a ground plane
         SceneNodePtr nodePlane = myScene->GetRootNode().CreateChildNode("nodePlane");
         ModelPtr plane = myScene->GetResourceManifest().CreateRectangle("GroundPlane", 64, 1.0, 64);
-        plane->mMaterial = myScene->GetResourceManifest().LoadMaterial("checker", jonsPackage);
+        plane->mMaterial = myScene->GetResourceManifest().LoadMaterial("checkers", jonsPackage);
         plane->mSceneNode = nodePlane;
         plane->mMaterialTilingFactor = 64.0f;
         /*

@@ -17,6 +17,8 @@ namespace JonsEngine
 
     const UINT_PTR gSubClassID = 1;
 
+    const uint32_t gTextureSamplerSlot = 0;
+
 
     LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
     {
@@ -94,7 +96,7 @@ namespace JonsEngine
 
 
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
-        mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr), mDepthStencilState(nullptr), mForwardVertexShader(nullptr), mForwardPixelShader(nullptr), mConstantBuffer(mDevice)
+        mAnisotropicFiltering(settings.mAnisotropicFiltering), mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr), mDepthStencilState(nullptr), mForwardVertexShader(nullptr), mForwardPixelShader(nullptr), mConstantBuffer(mDevice), mTextureSampler(nullptr)
     {
         // backbuffer rendertarget setup
         ID3D11Texture2D* backbuffer = nullptr;
@@ -126,7 +128,8 @@ namespace JonsEngine
         rasterizerDesc.MultisampleEnable = false;
         rasterizerDesc.AntialiasedLineEnable = false;
         DXCALL(mDevice->CreateRasterizerState(&rasterizerDesc, &mRasterizerState));
-
+        
+        // create depth buffer/view
         D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
         ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
         depthStencilBufferDesc.ArraySize = 1;
@@ -149,6 +152,18 @@ namespace JonsEngine
         depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
         depthStencilDesc.StencilEnable = false;
         DXCALL(mDevice->CreateDepthStencilState(&depthStencilDesc, &mDepthStencilState));
+
+        // create texture sampler
+        D3D11_SAMPLER_DESC samplerDesc;
+        ZeroMemory(&samplerDesc, sizeof(D3D11_SAMPLER_DESC));
+        samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.MaxAnisotropy = mAnisotropicFiltering;
+        samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+        samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+        DXCALL(mDevice->CreateSamplerState(&samplerDesc, &mTextureSampler));
 
         SetupContext(swapChainDesc.BufferDesc.Width, swapChainDesc.BufferDesc.Height);
 
@@ -175,6 +190,7 @@ namespace JonsEngine
         mForwardVertexShader->Release();
         mForwardPixelShader->Release();
         mBackbuffer->Release();
+        mTextureSampler->Release();
     }
 
 
@@ -187,11 +203,11 @@ namespace JonsEngine
         return mMeshes.back()->GetMeshID();
     }
 
-    TextureID DX11RendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat)
+    TextureID DX11RendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
     {
         auto allocator = mMemoryAllocator;
 
-        mTextures.emplace_back(DX11TexturePtr(allocator->AllocateObject<DX11Texture>(mDevice, textureData, textureWidth, textureHeight, colorFormat, textureType, mLogger), [=](DX11Texture* texture) { allocator->DeallocateObject<DX11Texture>(texture); }));
+        mTextures.emplace_back(DX11TexturePtr(allocator->AllocateObject<DX11Texture>(mDevice, mContext, textureData, textureWidth, textureHeight, textureType, mLogger), [=](DX11Texture* texture) { allocator->DeallocateObject<DX11Texture>(texture); }));
 
         return mTextures.back()->GetTextureID();
     }
@@ -241,7 +257,7 @@ namespace JonsEngine
 
     EngineSettings::Anisotropic DX11RendererImpl::GetAnisotropicFiltering() const
     {
-        return EngineSettings::ANISOTROPIC_1X;
+        return mAnisotropicFiltering;
     }
 
     void DX11RendererImpl::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
@@ -296,5 +312,6 @@ namespace JonsEngine
 
         mContext->VSSetShader(mForwardVertexShader, NULL, NULL);
         mContext->PSSetShader(mForwardPixelShader, NULL, NULL);
+        mContext->PSSetSamplers(gTextureSamplerSlot, 1, &mTextureSampler);
     }
 }

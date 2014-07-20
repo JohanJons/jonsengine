@@ -1,4 +1,4 @@
-cbuffer VertexConstants : register (b0)
+cbuffer VertexConstants : register(b0)
 {
     float4x4 gWVPMatrix;
     float4 gColor;
@@ -7,15 +7,15 @@ cbuffer VertexConstants : register (b0)
 struct VOut
 {
     float4 position : SV_POSITION;
-    float4 color : COLOR;
+    float2 texcoord : TEXCOORD;
 };
 
-VOut main(float4 position : POSITION)
+VOut main(float4 position : POSITION, float2 texcoord : TEXCOORD)
 {
     VOut output;
 
     output.position = mul(position, gWVPMatrix);
-    output.color = gColor;
+    output.texcoord = texcoord;
 
     return output;
 }

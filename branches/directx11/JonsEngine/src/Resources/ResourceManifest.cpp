@@ -75,10 +75,11 @@ namespace JonsEngine
         size_t hashedName = boost::hash_value(assetName);
         std::vector<PackageModel>::iterator iter = std::find_if(jonsPkg->mModels.begin(), jonsPkg->mModels.end(), [hashedName](const PackageModel model) { return boost::hash_value(model.mName) == hashedName; });
 
-        if (iter == jonsPkg->mModels.end())
+        if (iter != jonsPkg->mModels.end())
         {
             auto allocator = mMemoryAllocator;
-            ptr            = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(ProcessModel(*iter, jonsPkg)), [=](Model* model) { allocator->DeallocateObject(model); }));
+            ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(ProcessModel(*iter, jonsPkg)), [=](Model* model) { allocator->DeallocateObject(model); }));
+
             mPackageAssetMap.insert(std::make_pair(jonsPkg->mInternalID , ptr->mName));
         }
 
@@ -107,10 +108,11 @@ namespace JonsEngine
         size_t hashedName = boost::hash_value(assetName);
         auto iter = std::find_if(jonsPkg->mMaterials.begin(), jonsPkg->mMaterials.end(), [hashedName](const PackageMaterial material) { return boost::hash_value(material.mName) == hashedName; });
 
-        if (iter == jonsPkg->mMaterials.end())
+        if (iter != jonsPkg->mMaterials.end())
         {
             auto allocator = mMemoryAllocator;
-            ptr            = *mMaterials.insert(mMaterials.end(), MaterialPtr(allocator->AllocateObject<Material>(ProcessMaterial(*iter, jonsPkg)), [=](Material* material) { allocator->DeallocateObject(material); }));
+            ptr = *mMaterials.insert(mMaterials.end(), MaterialPtr(allocator->AllocateObject<Material>(ProcessMaterial(*iter, jonsPkg)), [=](Material* material) { allocator->DeallocateObject(material); }));
+
             mPackageAssetMap.insert(std::make_pair(jonsPkg->mInternalID, ptr->mName));
         }
 
@@ -158,12 +160,10 @@ namespace JonsEngine
         TextureID normalTexture  = INVALID_TEXTURE_ID;
 
         if (pkgMaterial.mHasDiffuseTexture)
-            diffuseTexture = mRenderer.CreateTexture(pkgMaterial.mDiffuseTexture.mTextureType, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth,
-                                                                pkgMaterial.mDiffuseTexture.mTextureHeight, pkgMaterial.mDiffuseTexture.mColorFormat);
+            diffuseTexture = mRenderer.CreateTexture(pkgMaterial.mDiffuseTexture.mTextureType, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth, pkgMaterial.mDiffuseTexture.mTextureHeight);
 
         if (pkgMaterial.mHasNormalTexture)
-            normalTexture = mRenderer.CreateTexture(pkgMaterial.mNormalTexture.mTextureType, pkgMaterial.mNormalTexture.mTextureData, pkgMaterial.mNormalTexture.mTextureWidth,
-                                                                pkgMaterial.mNormalTexture.mTextureHeight, pkgMaterial.mNormalTexture.mColorFormat);
+            normalTexture = mRenderer.CreateTexture(pkgMaterial.mNormalTexture.mTextureType, pkgMaterial.mNormalTexture.mTextureData, pkgMaterial.mNormalTexture.mTextureWidth, pkgMaterial.mNormalTexture.mTextureHeight);
 
         return Material(pkgMaterial.mName, diffuseTexture, normalTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, 0.02f);
     }

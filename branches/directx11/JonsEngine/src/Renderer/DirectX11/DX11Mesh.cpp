@@ -34,17 +34,25 @@ namespace JonsEngine
 
         DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mIndexBuffer));
 
-        D3D11_INPUT_ELEMENT_DESC inputDescription;
-        ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC));
-        inputDescription.SemanticName = "POSITION";
-        inputDescription.SemanticIndex = 0;
-        inputDescription.Format = DXGI_FORMAT_R32G32B32_FLOAT;
-        inputDescription.InputSlot = 0;
-        inputDescription.AlignedByteOffset = 0;
-        inputDescription.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-        inputDescription.InstanceDataStepRate = 0;
+        // input layout
+        D3D11_INPUT_ELEMENT_DESC inputDescription[2];
+        ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC) * 2);
+        inputDescription[0].SemanticName = "POSITION";
+        inputDescription[0].SemanticIndex = 0;
+        inputDescription[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        inputDescription[0].InputSlot = 0;
+        inputDescription[0].AlignedByteOffset = 0;
+        inputDescription[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[0].InstanceDataStepRate = 0;
+        inputDescription[1].SemanticName = "TEXCOORD";
+        inputDescription[1].SemanticIndex = 0;
+        inputDescription[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+        inputDescription[1].InputSlot = 0;
+        inputDescription[1].AlignedByteOffset = 12;
+        inputDescription[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[1].InstanceDataStepRate = 0;
 
-        DXCALL(device->CreateInputLayout(&inputDescription, 1, shaderBytecode, shaderBytecodeSize, &mInputLayout));
+        DXCALL(device->CreateInputLayout(inputDescription, 2, shaderBytecode, shaderBytecodeSize, &mInputLayout));
     }
     
     DX11Mesh::~DX11Mesh()

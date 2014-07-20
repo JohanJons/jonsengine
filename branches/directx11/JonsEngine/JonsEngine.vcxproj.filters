@@ -176,6 +176,9 @@
     <ClCompile Include="src\Core\Utils\Math.cpp">
       <Filter>Source Files\Core\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11Texture.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -311,6 +314,9 @@
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11Context.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11Texture.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
   </ItemGroup>

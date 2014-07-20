@@ -33,7 +33,7 @@ namespace JonsEngine
         ~DX11RendererImpl();
 
         MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData);
-        TextureID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat);
+        TextureID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight);
         void Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra);
 
         EngineSettings::Anisotropic GetAnisotropicFiltering() const;
@@ -53,6 +53,7 @@ namespace JonsEngine
 
         Logger& mLogger;
         IMemoryAllocatorPtr mMemoryAllocator;
+        EngineSettings::Anisotropic mAnisotropicFiltering;
 
         ID3D11Texture2D* mDepthStencilBuffer;
         ID3D11DepthStencilView* mDepthStencilView;
@@ -61,6 +62,7 @@ namespace JonsEngine
         ID3D11PixelShader* mForwardPixelShader;
         ID3D11RasterizerState* mRasterizerState;
         DX11ConstantBuffer<ConstantBufferForward> mConstantBuffer;
+        ID3D11SamplerState* mTextureSampler;
 
         std::vector<DX11MeshPtr> mMeshes;
         std::vector<DX11TexturePtr> mTextures;

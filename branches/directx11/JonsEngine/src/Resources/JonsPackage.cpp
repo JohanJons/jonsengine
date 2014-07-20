@@ -24,7 +24,7 @@ namespace JonsEngine
     {
     }
 
-    PackageTexture::PackageTexture() : mName(""), mTextureWidth(0), mTextureHeight(0), mColorFormat(ColorFormat::COLOR_FORMAT_RGB), mTextureType(TextureType::TEXTURE_TYPE_DIFFUSE)
+    PackageTexture::PackageTexture() : mName(""), mTextureWidth(0), mTextureHeight(0), mTextureType(TextureType::TEXTURE_TYPE_DIFFUSE)
     {
     }
 

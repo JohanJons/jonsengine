@@ -370,7 +370,6 @@ namespace JonsAssetImporter
         texture.mTextureHeight = heightInPixels;
         texture.mTextureType   = textureType;
         // FreeImage implicitly converts image format to RGB/RGBA from BRG/BRGA
-        texture.mColorFormat   = colorType == FIC_RGB ? ColorFormat::COLOR_FORMAT_RGB : colorType == FIC_RGBALPHA ? ColorFormat::COLOR_FORMAT_RGBA : ColorFormat::COLOR_FORMAT_RGB;
 
         for(unsigned y = 0; y < FreeImage_GetHeight(bitmap); y++) {
             BYTE *bits = FreeImage_GetScanLine(bitmap, y);
@@ -381,6 +380,8 @@ namespace JonsAssetImporter
                 texture.mTextureData.push_back(bits[FI_RGBA_BLUE]);
                 if (colorType == FIC_RGBALPHA)
                     texture.mTextureData.push_back(bits[FI_RGBA_ALPHA]);
+                else
+                    texture.mTextureData.push_back(0);
 
                 bits += bytesPerPixel;
             }

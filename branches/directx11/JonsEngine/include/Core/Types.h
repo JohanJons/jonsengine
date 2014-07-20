@@ -12,12 +12,6 @@ namespace JonsEngine
      * Definitions of general data types commonly used across subsystems
      */
 
-    enum ColorFormat
-    {
-        COLOR_FORMAT_RGB = 0,
-        COLOR_FORMAT_RGBA
-    };
-
     enum TextureType
     {
         TEXTURE_TYPE_DIFFUSE = 0,

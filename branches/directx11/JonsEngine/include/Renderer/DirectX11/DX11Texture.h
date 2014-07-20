@@ -11,14 +11,23 @@ namespace JonsEngine
     class DX11Texture
     {
     public:
-        DX11Texture(ID3D11Device* device, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat, TextureType textureType, Logger& logger);
+        enum TextureRegister
+        {
+            TEXTURE_REGISTER_DIFFUSE = 0,
+            TEXTURE_REGISTER_NORMAL
+        };
+
+        DX11Texture(ID3D11Device* device, ID3D11DeviceContext* context, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureType textureType, Logger& logger);
         ~DX11Texture();
 
+        void Activate(ID3D11DeviceContext* context);
         TextureID GetTextureID() const;
 
 
     private:
         ID3D11Texture2D* mTexture;
+        ID3D11ShaderResourceView* mShaderResourceView;
         TextureID mTextureID;
+        TextureType mTextureType;
     };
 }

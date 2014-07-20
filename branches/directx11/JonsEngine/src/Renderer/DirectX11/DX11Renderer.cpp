@@ -20,9 +20,9 @@ namespace JonsEngine
         return mImplementation->CreateMesh(vertexData, normalData, texCoords, tangents, bitangents, indexData);
     }
 
-    TextureID DX11Renderer::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, ColorFormat colorFormat)
+    TextureID DX11Renderer::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
     {
-        return mImplementation->CreateTexture(textureType, textureData, textureWidth, textureHeight, colorFormat);
+        return mImplementation->CreateTexture(textureType, textureData, textureWidth, textureHeight);
     }
 
 

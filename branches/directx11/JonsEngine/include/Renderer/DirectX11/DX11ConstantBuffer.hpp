@@ -35,7 +35,7 @@ namespace JonsEngine
             D3D11_MAPPED_SUBRESOURCE mappedResource;
             ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
-            context->Map(mConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+            DXCALL(context->Map(mConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
             std::memcpy(mappedResource.pData, &content, sizeof(ContentType));
             context->Unmap(mConstantBuffer, 0);
 

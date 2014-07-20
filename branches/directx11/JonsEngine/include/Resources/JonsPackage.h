@@ -54,7 +54,6 @@ namespace JonsEngine
         std::vector<uint8_t> mTextureData;
         uint32_t mTextureWidth;         // width/height in pixels
         uint32_t mTextureHeight;
-        ColorFormat mColorFormat;
         TextureType mTextureType;
 
 
@@ -159,7 +158,6 @@ namespace boost
             ar & texture.mTextureData;
             ar & texture.mTextureWidth;
             ar & texture.mTextureHeight;
-            ar & texture.mColorFormat;
             ar & texture.mTextureType;
         }
 
