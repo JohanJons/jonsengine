@@ -9,8 +9,22 @@ namespace JonsEngine
 
     DX11Mesh::DX11Mesh(ID3D11Device* device, const BYTE* shaderBytecode, const uint32_t shaderBytecodeSize, const std::vector<float>& vertexData, const std::vector<float>& normalData,
         const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData, Logger& logger) 
-        : mLogger(logger), mMeshID(gNextMeshID++), mNumIndices(indexData.size()), mVertexSize(sizeof(float)* 3), mVertexBuffer(nullptr), mIndexBuffer(nullptr), mInputLayout(nullptr)
+        : mLogger(logger), mMeshID(gNextMeshID++), mNumIndices(indexData.size()), mVertexSize(sizeof(float)* 3), mVertexBuffer(nullptr), mTexcoordBuffer(nullptr), mIndexBuffer(nullptr), mInputLayout(nullptr)
     {
+        // vertex buffer
+        D3D11_BUFFER_DESC bufferDescription;
+        ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
+        bufferDescription.Usage = D3D11_USAGE_DEFAULT;
+        bufferDescription.ByteWidth = vertexData.size() * sizeof(float);
+        bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+        D3D11_SUBRESOURCE_DATA initData;
+        ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
+        initData.pSysMem = &vertexData.at(0);
+
+        DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mVertexBuffer));
+
+        // texcoord buffer
         D3D11_BUFFER_DESC bufferDescription;
         ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
         bufferDescription.Usage = D3D11_USAGE_DEFAULT;

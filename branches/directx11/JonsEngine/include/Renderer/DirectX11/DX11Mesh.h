@@ -28,6 +28,7 @@ namespace JonsEngine
         uint32_t mVertexSize;
 
         ID3D11Buffer* mVertexBuffer;
+        ID3D11Buffer* mTexcoordBuffer;
         ID3D11Buffer* mIndexBuffer;
         ID3D11InputLayout* mInputLayout;
     };
