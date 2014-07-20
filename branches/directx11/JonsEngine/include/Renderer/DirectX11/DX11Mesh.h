@@ -25,7 +25,6 @@ namespace JonsEngine
         Logger& mLogger;
         MeshID mMeshID;
         uint32_t mNumIndices;
-        uint32_t mVertexSize;
 
         ID3D11Buffer* mVertexBuffer;
         ID3D11Buffer* mTexcoordBuffer;
