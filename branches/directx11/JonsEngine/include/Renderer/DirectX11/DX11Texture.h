@@ -11,12 +11,6 @@ namespace JonsEngine
     class DX11Texture
     {
     public:
-        enum TextureRegister
-        {
-            TEXTURE_REGISTER_DIFFUSE = 0,
-            TEXTURE_REGISTER_NORMAL
-        };
-
         DX11Texture(ID3D11Device* device, ID3D11DeviceContext* context, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureType textureType, Logger& logger);
         ~DX11Texture();
 

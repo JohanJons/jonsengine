@@ -7,6 +7,5 @@ namespace JonsEngine
     struct ConstantBufferForward
     {
         Mat4 mWVPMatrix;
-        Vec4 mColor;
     };
 }

@@ -1,5 +1,6 @@
 #include "include/Game.h"
 
+#include "include/Core/Logging/Logger.h"
 #include "include/Core/Types.h"
 #include "include/Core/Utils/Math.h"
 #include "include/Scene/Scene.h"
@@ -118,15 +119,22 @@ namespace JonsGame
     void Game::OnMouseButtonEvent(const JonsEngine::MouseButtonEvent& evnt)
     {
     }
-        
+
     void Game::OnMousePositionEvent(const JonsEngine::MousePositionEvent& evnt)
     {
         Scene* activeScene = mEngine->GetSceneManager().GetActiveScene();
         Camera& camera = activeScene->GetSceneCamera();
 
         const float sens = 0.1f;
-        float newXPos = -((float)evnt.mPreviousPosX - (float)evnt.mCurrentPosX) * sens;
-        float newYPos = -((float)evnt.mPreviousPosY - (float)evnt.mCurrentPosY) * sens;
+        float newXPos = (float)evnt.mRelativePosX * sens;
+        float newYPos = (float)evnt.mRelativePosY * sens;
+
+        std::stringstream errorSS;
+        if (newXPos > 0.0f || newYPos > 0.0f)
+        {
+            errorSS << newXPos << " " << newYPos;
+            JONS_LOG_INFO(JonsEngine::Logger::GetCoreLogger(), errorSS.str());
+        }
 
         camera.RotateCamera(newXPos, newYPos);
     }

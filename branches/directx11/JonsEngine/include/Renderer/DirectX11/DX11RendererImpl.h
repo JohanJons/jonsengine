@@ -26,8 +26,9 @@ namespace JonsEngine
     class DX11RendererImpl : protected DX11Context
     {
     public:
-        typedef std::unique_ptr<DX11Mesh, std::function<void(DX11Mesh*)>> DX11MeshPtr;
-        typedef std::unique_ptr<DX11Texture, std::function<void(DX11Texture*)>> DX11TexturePtr;
+        typedef std::shared_ptr<DX11Mesh> DX11MeshPtr;
+        typedef std::shared_ptr<DX11Texture> DX11TexturePtr;
+
 
         DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator);
         ~DX11RendererImpl();

@@ -7,12 +7,13 @@ namespace JonsEngine
     static TextureID gNextTextureID = 1;
 
 
-    DX11Texture::TextureRegister TextureTypeToRegister(const TextureType textureType)
+    uint32_t TextureTypeToSlot(const TextureType textureType)
     {
         switch (textureType)
         {
-            case TextureType::TEXTURE_TYPE_DIFFUSE: return DX11Texture::TEXTURE_REGISTER_DIFFUSE;
-            case TextureType::TEXTURE_TYPE_NORMAL:  return DX11Texture::TEXTURE_REGISTER_NORMAL;
+            case TextureType::TEXTURE_TYPE_DIFFUSE: return 0;
+            case TextureType::TEXTURE_TYPE_NORMAL:  return 1;
+            default:                                return 0;
         }
     }
 
@@ -34,12 +35,7 @@ namespace JonsEngine
         DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mTexture));
 
         // mip-level 0 data
-        D3D11_MAPPED_SUBRESOURCE mappedResource;
-        ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-
-        DXCALL(context->Map(mTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-        std::memcpy(mappedResource.pData, &textureData.at(0), sizeof(uint8_t) * 4 * textureWidth * textureHeight);
-        context->Unmap(mTexture, 0);
+        context->UpdateSubresource(mTexture, 0, NULL, &textureData.at(0), textureWidth * sizeof(uint8_t), textureHeight * sizeof(uint8_t));
 
         DXCALL(device->CreateShaderResourceView(mTexture, NULL, &mShaderResourceView));
         
@@ -48,14 +44,14 @@ namespace JonsEngine
 
     DX11Texture::~DX11Texture()
     {
-        mTexture->Release();
         mShaderResourceView->Release();
+        mTexture->Release();
     }
 
 
     void DX11Texture::Activate(ID3D11DeviceContext* context)
     {
-        context->PSSetShaderResources(TextureTypeToRegister(mTextureType), 1, &mShaderResourceView);
+        context->PSSetShaderResources(TextureTypeToSlot(mTextureType), 1, &mShaderResourceView);
     }
 
     TextureID DX11Texture::GetTextureID() const

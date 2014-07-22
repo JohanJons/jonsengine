@@ -218,13 +218,7 @@ namespace JonsEngine
         mContext->ClearRenderTargetView(mBackbuffer, clearColor);
         mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-        Mat4 perspectiveMatrix = DX11PerspectiveMatrixFov(70.0f, 1920 / (float)1080, 0.1f, 100.0f);
-        Mat4 viewMatrix = glm::lookAt(Vec3(0.0f, 4.0f, 3.5f), Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f, 1.0f, 0.0f));
         ConstantBufferForward buffer;
-        buffer.mColor = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
-        buffer.mWVPMatrix = perspectiveMatrix * viewMatrix * Mat4(1.0f);
-
-        mConstantBuffer.SetData(buffer, mContext);
 
         auto meshIterator = mMeshes.begin();
         for (const Renderable& renderable : renderQueue)
@@ -247,6 +241,21 @@ namespace JonsEngine
                     throw std::runtime_error("Renderable MeshID out of range");
                 }
             }
+
+            if (renderable.mDiffuseTexture != INVALID_TEXTURE_ID)
+            {
+                auto texture = std::find_if(mTextures.begin(), mTextures.end(), [&](const DX11TexturePtr ptr) { return ptr->GetTextureID() == renderable.mDiffuseTexture; });
+                if (texture == mTextures.end())
+                {
+                    JONS_LOG_ERROR(mLogger, "Renderable TextureID out of range");
+                    throw std::runtime_error("Renderable TextureID out of range");
+                }
+
+                (*texture)->Activate(mContext);
+            }
+
+            buffer.mWVPMatrix = renderable.mWVPMatrix;
+            mConstantBuffer.SetData(buffer, mContext);
 
             (*meshIterator)->Draw(mContext);
         }
@@ -279,12 +288,12 @@ namespace JonsEngine
 
     float DX11RendererImpl::GetZNear() const
     {
-        return 0.0f;
+        return 0.1f;
     }
 
     float DX11RendererImpl::GetZFar() const
     {
-        return 1.0f;
+        return 100.0f;
     }
 
     uint32_t DX11RendererImpl::GetShadowmapResolution() const
@@ -295,7 +304,6 @@ namespace JonsEngine
 
     void DX11RendererImpl::SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight)
     {
-
         mContext->OMSetRenderTargets(1, &mBackbuffer, mDepthStencilView);
         mContext->OMSetDepthStencilState(mDepthStencilState, 1);
         mContext->RSSetState(mRasterizerState);

@@ -69,8 +69,8 @@ namespace JonsEngine
 
 
     WindowManagerImpl::WindowManagerImpl(const EngineSettings& engineSettings, Logger& logger) : mLogger(logger), mWindowTitle(engineSettings.mWindowTitle), mScreenWidth(engineSettings.mWindowWidth), mScreenHeight(engineSettings.mWindowHeight),
-		mShowMouseCursor(false), mFullscreen(false), mFOV(engineSettings.mFOV), mCurrentMouseX(0), mCurrentMouseY(0), mPreviousMouseX(0),
-		mPreviousMouseY(0), mMouseButtonCallback(nullptr), mMousePositionCallback(nullptr), mKeyCallback(nullptr), mInstanceHandle(GetModuleHandle(NULL)), mWindowHandle(nullptr)
+        mShowMouseCursor(false), mFullscreen(false), mFOV(engineSettings.mFOV), mRelativePosX(0), mRelativePosY(0),
+		mMouseButtonCallback(nullptr), mMousePositionCallback(nullptr), mKeyCallback(nullptr), mInstanceHandle(GetModuleHandle(NULL)), mWindowHandle(nullptr)
     {
         // Register class
         WNDCLASSEX wcex;
@@ -146,10 +146,10 @@ namespace JonsEngine
         // Dispatch waiting events for each event type to registered callbacks
         if (mMousePositionCallback)
         {
-			mMousePositionCallback(MousePositionEvent(mPreviousMouseX, mPreviousMouseY, mCurrentMouseX, mCurrentMouseY));
+            mMousePositionCallback(MousePositionEvent(mRelativePosX, mRelativePosY));
 
-			mPreviousMouseX = mCurrentMouseX;
-			mPreviousMouseY = mCurrentMouseY;
+            mRelativePosX = 0;
+            mRelativePosY = 0;
         }
 
         if (mMouseButtonCallback)
@@ -431,8 +431,13 @@ namespace JonsEngine
         if (!mMouseButtonCallback && !mMousePositionCallback)
             return;
 
-		mCurrentMouseX += mouseInput.lLastX;
-		mCurrentMouseY += mouseInput.lLastY;
+        mRelativePosX += mouseInput.lLastX;
+        mRelativePosY += mouseInput.lLastY;
+
+        if (mRelativePosX > 25.0f || mRelativePosY > 25.0f)
+        {
+            int i = 2;
+        }
 
         mMouseButtonEvents.push_back(MouseButtonEvent([&]()
         {

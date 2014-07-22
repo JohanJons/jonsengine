@@ -6,6 +6,12 @@ namespace JonsEngine
 {
     static MeshID gNextMeshID = 1;
 
+    enum BUFFER_SLOT
+    {
+        BUFFER_SLOT_VERTEX = 0,
+        BUFFER_SLOT_TEXCOORD
+    };
+
 
     DX11Mesh::DX11Mesh(ID3D11Device* device, const BYTE* shaderBytecode, const uint32_t shaderBytecodeSize, const std::vector<float>& vertexData, const std::vector<float>& normalData,
         const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData, Logger& logger) 
@@ -78,11 +84,11 @@ namespace JonsEngine
 
     void DX11Mesh::Draw(ID3D11DeviceContext* context)
     {
-        uint32_t vertexSize = sizeof(float)* 3, texcoordSize = sizeof(float) * 2;
+        uint32_t vertexSize = sizeof(float) * 3, texcoordSize = sizeof(float) * 2;
         uint32_t offset = 0;
 
-        context->IASetVertexBuffers(0, 1, &mVertexBuffer, &vertexSize, &offset);
-        context->IASetVertexBuffers(1, 1, &mTexcoordBuffer, &texcoordSize, &offset);
+        context->IASetVertexBuffers(BUFFER_SLOT::BUFFER_SLOT_VERTEX, 1, &mVertexBuffer, &vertexSize, &offset);
+        context->IASetVertexBuffers(BUFFER_SLOT::BUFFER_SLOT_TEXCOORD, 1, &mTexcoordBuffer, &texcoordSize, &offset);
         context->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
         context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         context->IASetInputLayout(mInputLayout);

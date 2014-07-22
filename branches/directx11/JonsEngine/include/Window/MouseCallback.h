@@ -47,13 +47,11 @@ namespace JonsEngine
     /* MousePositionEvent definition */
     struct MousePositionEvent
     {
-        double mPreviousPosX;
-        double mPreviousPosY;
-        double mCurrentPosX;
-        double mCurrentPosY;
+        int32_t mRelativePosX;
+        int32_t mRelativePosY;
 
 
-        MousePositionEvent(const double prevX, const double prevY, const double currX, const double currY);
+        MousePositionEvent(const int32_t relX, const int32_t relY);
     };
 
 
@@ -61,5 +59,5 @@ namespace JonsEngine
     inline MouseButtonEvent::MouseButtonEvent(const MouseButton button, const MouseButtonState state) : mButton(button), mState(state) { }
 
     /* MousePositionEvent inlines */
-    inline MousePositionEvent::MousePositionEvent(const double prevX, const double prevY, const double currX, const double currY) : mPreviousPosX(prevX), mPreviousPosY(prevY), mCurrentPosX(currX), mCurrentPosY(currY) { }
+    inline MousePositionEvent::MousePositionEvent(const int32_t relX, const int32_t relY) : mRelativePosX(relX), mRelativePosY(relY) { }
 }

@@ -45,7 +45,7 @@ namespace JonsEngine
 
             const Camera& camera = activeScene->GetSceneCamera();
             const Mat4 viewMatrix = camera.GetCameraTransform();
-            const Mat4 perspectiveMatrix = glm::perspective(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer.GetZNear(), mRenderer.GetZFar());
+            const Mat4 perspectiveMatrix = DX11PerspectiveMatrixFov(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer.GetZNear(), mRenderer.GetZFar());
             const Mat4 viewPerspectiveMatrix = perspectiveMatrix * viewMatrix;
 
             // create the rendering queue and active lights
