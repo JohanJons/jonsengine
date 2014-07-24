@@ -43,7 +43,7 @@ namespace JonsEngine
 
         // mip-level 0 data
         uint32_t sizeWidth = textureWidth * sizeof(uint8_t) * 4;
-        context->UpdateSubresource(mTexture, 0, NULL, &textureData.at(0), textureData.size() /*textureHeight * sizeWidth*/, 0);
+        context->UpdateSubresource(mTexture, 0, NULL, &textureData.at(0), sizeWidth, 0);
 
         context->GenerateMips(mShaderResourceView);
     }

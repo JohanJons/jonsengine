@@ -14,7 +14,7 @@ VOut main(float4 position : POSITION, float2 texcoord : TEXCOORD)
     VOut output;
 
     output.position = mul(gWVPMatrix, position);
-    output.texcoord = texcoord;
+    output.texcoord = 64.0 * texcoord;
 
     return output;
 }

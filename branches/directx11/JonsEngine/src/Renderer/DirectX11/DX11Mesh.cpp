@@ -65,8 +65,8 @@ namespace JonsEngine
         inputDescription[1].SemanticName = "TEXCOORD";
         inputDescription[1].SemanticIndex = 0;
         inputDescription[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-        inputDescription[1].InputSlot = 0;
-        inputDescription[1].AlignedByteOffset = 12;
+        inputDescription[1].InputSlot = 1;
+        inputDescription[1].AlignedByteOffset = 0;
         inputDescription[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
         inputDescription[1].InstanceDataStepRate = 0;
 
