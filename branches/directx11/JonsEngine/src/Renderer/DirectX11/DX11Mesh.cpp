@@ -87,8 +87,8 @@ namespace JonsEngine
         uint32_t vertexSize = sizeof(float) * 3, texcoordSize = sizeof(float) * 2;
         uint32_t offset = 0;
 
-        context->IASetVertexBuffers(BUFFER_SLOT::BUFFER_SLOT_VERTEX, 1, &mVertexBuffer, &vertexSize, &offset);
-        context->IASetVertexBuffers(BUFFER_SLOT::BUFFER_SLOT_TEXCOORD, 1, &mTexcoordBuffer, &texcoordSize, &offset);
+        context->IASetVertexBuffers(0, 1, &mVertexBuffer, &vertexSize, &offset);
+        context->IASetVertexBuffers(1, 1, &mTexcoordBuffer, &texcoordSize, &offset);
         context->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
         context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         context->IASetInputLayout(mInputLayout);

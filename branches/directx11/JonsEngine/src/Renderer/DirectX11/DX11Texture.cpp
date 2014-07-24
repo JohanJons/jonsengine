@@ -34,11 +34,17 @@ namespace JonsEngine
         textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
         DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mTexture));
 
-        // mip-level 0 data
-        context->UpdateSubresource(mTexture, 0, NULL, &textureData.at(0), textureWidth * sizeof(uint8_t), textureHeight * sizeof(uint8_t));
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+        ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+        srvDesc.Format = textureDesc.Format;
+        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+        srvDesc.Texture2D.MipLevels = -1;
+        DXCALL(device->CreateShaderResourceView(mTexture, &srvDesc, &mShaderResourceView));
 
-        DXCALL(device->CreateShaderResourceView(mTexture, NULL, &mShaderResourceView));
-        
+        // mip-level 0 data
+        uint32_t sizeWidth = textureWidth * sizeof(uint8_t) * 4;
+        context->UpdateSubresource(mTexture, 0, NULL, &textureData.at(0), textureData.size() /*textureHeight * sizeWidth*/, 0);
+
         context->GenerateMips(mShaderResourceView);
     }
 
