@@ -153,18 +153,7 @@ namespace JonsEngine
         depthStencilDesc.StencilEnable = false;
         DXCALL(mDevice->CreateDepthStencilState(&depthStencilDesc, &mDepthStencilState));
 
-        // create texture sampler
-        D3D11_SAMPLER_DESC samplerDesc;
-        ZeroMemory(&samplerDesc, sizeof(D3D11_SAMPLER_DESC));
-        samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-        samplerDesc.MaxAnisotropy = mAnisotropicFiltering;
-        samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-        samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-        DXCALL(mDevice->CreateSamplerState(&samplerDesc, &mTextureSampler));
-
+        SetAnisotropicFiltering(settings.mAnisotropicFiltering);
         SetupContext(swapChainDesc.BufferDesc.Width, swapChainDesc.BufferDesc.Height);
 
         // register as window subclass to listen for WM_SIZE events. etc
@@ -271,7 +260,24 @@ namespace JonsEngine
 
     void DX11RendererImpl::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
     {
-        
+        if (mTextureSampler)
+        {
+            mTextureSampler->Release();
+            mTextureSampler = nullptr;
+        }
+
+        D3D11_SAMPLER_DESC samplerDesc;
+        ZeroMemory(&samplerDesc, sizeof(D3D11_SAMPLER_DESC));
+        samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.MaxAnisotropy = anisotropic;
+        samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+        samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+        DXCALL(mDevice->CreateSamplerState(&samplerDesc, &mTextureSampler));
+
+        mAnisotropicFiltering = anisotropic;
     }
 
 
