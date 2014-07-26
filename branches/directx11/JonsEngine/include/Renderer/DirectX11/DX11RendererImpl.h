@@ -6,6 +6,7 @@
 #include "include/Renderer/DirectX11/DX11Context.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11ConstantBufferDefinitions.h"
+#include "include/Renderer/DirectX11/DX11GBuffer.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Memory/HeapAllocator.h"
@@ -56,6 +57,7 @@ namespace JonsEngine
         IMemoryAllocatorPtr mMemoryAllocator;
         EngineSettings::Anisotropic mAnisotropicFiltering;
 
+        GBuffer mGBuffer;
         ID3D11Texture2D* mDepthStencilBuffer;
         ID3D11DepthStencilView* mDepthStencilView;
         ID3D11DepthStencilState* mDepthStencilState;

@@ -130,6 +130,7 @@
     <ClCompile Include="src\Core\Utils\Math.cpp" />
     <ClCompile Include="src\Core\Utils\Time.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Context.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11Gbuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Mesh.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Renderer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11RendererImpl.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11ConstantBuffer.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11ConstantBufferDefinitions.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Context.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11GBuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Mesh.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Renderer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11RendererImpl.h" />
@@ -197,6 +199,12 @@
     <ClInclude Include="include\Window\WindowManagerImpl.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\Constants.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </EntryPointName>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\forward_pixel.hlsl">
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gForwardPixelShader</VariableName>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/include/Renderer/DirectX11/Shaders/Compiled/%(Filename).h</HeaderFileOutput>
@@ -209,6 +217,20 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">main</EntryPointName>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gForwardVertexShader</VariableName>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/include/Renderer/DirectX11/Shaders/Compiled/%(Filename).h</HeaderFileOutput>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferPixel.hlsl">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PreprocessorDefinitions>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/include/Renderer/DirectX11/Shaders/Compiled/%(Filename).h</HeaderFileOutput>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gGBufferPixelShader</VariableName>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferVertex.hlsl">
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/include/Renderer/DirectX11/Shaders/Compiled/%(Filename).h</HeaderFileOutput>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gGBufferVertexShader</VariableName>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

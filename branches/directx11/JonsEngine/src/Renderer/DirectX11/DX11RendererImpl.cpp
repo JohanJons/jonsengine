@@ -96,7 +96,8 @@ namespace JonsEngine
 
 
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
-        mAnisotropicFiltering(settings.mAnisotropicFiltering), mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr), mDepthStencilState(nullptr), mForwardVertexShader(nullptr), mForwardPixelShader(nullptr), mConstantBuffer(mDevice), mTextureSampler(nullptr)
+        mAnisotropicFiltering(settings.mAnisotropicFiltering), mGBuffer(mDevice, mSwapchain), mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr),
+        mDepthStencilState(nullptr), mForwardVertexShader(nullptr), mForwardPixelShader(nullptr), mConstantBuffer(mDevice), mTextureSampler(nullptr)
     {
         // backbuffer rendertarget setup
         ID3D11Texture2D* backbuffer = nullptr;
@@ -120,9 +121,6 @@ namespace JonsEngine
         rasterizerDesc.FillMode = D3D11_FILL_SOLID;
         rasterizerDesc.CullMode = D3D11_CULL_BACK;
         rasterizerDesc.FrontCounterClockwise = true;
-        rasterizerDesc.DepthBias = 0;
-        rasterizerDesc.SlopeScaledDepthBias = 0.0f;
-        rasterizerDesc.DepthBiasClamp = 0.0f;
         rasterizerDesc.DepthClipEnable = true;
         rasterizerDesc.ScissorEnable = false;
         rasterizerDesc.MultisampleEnable = false;
@@ -134,13 +132,11 @@ namespace JonsEngine
         ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
         depthStencilBufferDesc.ArraySize = 1;
         depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-        depthStencilBufferDesc.CPUAccessFlags = 0;
         depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
         depthStencilBufferDesc.Width = swapChainDesc.BufferDesc.Width;
         depthStencilBufferDesc.Height = swapChainDesc.BufferDesc.Height;
         depthStencilBufferDesc.MipLevels = 1;
         depthStencilBufferDesc.SampleDesc.Count = 1;
-        depthStencilBufferDesc.SampleDesc.Quality = 0;
         depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
         DXCALL(mDevice->CreateTexture2D(&depthStencilBufferDesc, NULL, &mDepthStencilBuffer));
         DXCALL(mDevice->CreateDepthStencilView(mDepthStencilBuffer, NULL, &mDepthStencilView));
@@ -203,10 +199,6 @@ namespace JonsEngine
 
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
-        const FLOAT clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-        mContext->ClearRenderTargetView(mBackbuffer, clearColor);
-        mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
         ConstantBufferForward buffer;
 
         auto meshIterator = mMeshes.begin();
@@ -310,8 +302,6 @@ namespace JonsEngine
 
     void DX11RendererImpl::SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight)
     {
-        mContext->OMSetRenderTargets(1, &mBackbuffer, mDepthStencilView);
-        mContext->OMSetDepthStencilState(mDepthStencilState, 1);
         mContext->RSSetState(mRasterizerState);
 
         D3D11_VIEWPORT viewport;
