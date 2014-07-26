@@ -52,6 +52,8 @@ namespace JonsEngine
     private:
         static LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
         void SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight);
+        void GeometryPass(const RenderQueue& renderQueue);
+        void ShadingPass();
 
         Logger& mLogger;
         IMemoryAllocatorPtr mMemoryAllocator;
@@ -61,10 +63,7 @@ namespace JonsEngine
         ID3D11Texture2D* mDepthStencilBuffer;
         ID3D11DepthStencilView* mDepthStencilView;
         ID3D11DepthStencilState* mDepthStencilState;
-        ID3D11VertexShader* mForwardVertexShader;
-        ID3D11PixelShader* mForwardPixelShader;
         ID3D11RasterizerState* mRasterizerState;
-        DX11ConstantBuffer<ConstantBufferForward> mConstantBuffer;
         ID3D11SamplerState* mTextureSampler;
 
         std::vector<DX11MeshPtr> mMeshes;

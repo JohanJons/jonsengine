@@ -1,13 +1,16 @@
 #include "include/Renderer/DirectX11/DX11GBuffer.h"
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/GBufferVertex.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/GBufferPixel.h"
 
 namespace JonsEngine
 {
     const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
-    GBuffer::GBuffer(ID3D11Device* device, IDXGISwapChain* swapChain)
+    GBuffer::GBuffer(ID3D11Device* device, IDXGISwapChain* swapChain) : mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr), mDepthStencilState(nullptr),
+        mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device)
     {
         // get backbuffer width/height
         DXGI_SWAP_CHAIN_DESC swapChainDesc;
@@ -53,6 +56,29 @@ namespace JonsEngine
         depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
         depthStencilDesc.StencilEnable = false;
         DXCALL(device->CreateDepthStencilState(&depthStencilDesc, &mDepthStencilState));
+
+        // input layout
+        D3D11_INPUT_ELEMENT_DESC inputDescription[2];
+        ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC)* 2);
+        inputDescription[0].SemanticName = "POSITION";
+        inputDescription[0].SemanticIndex = 0;
+        inputDescription[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        inputDescription[0].InputSlot = 0;
+        inputDescription[0].AlignedByteOffset = 0;
+        inputDescription[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[0].InstanceDataStepRate = 0;
+        inputDescription[1].SemanticName = "TEXCOORD";
+        inputDescription[1].SemanticIndex = 0;
+        inputDescription[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+        inputDescription[1].InputSlot = 1;
+        inputDescription[1].AlignedByteOffset = 0;
+        inputDescription[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[1].InstanceDataStepRate = 0;
+        DXCALL(device->CreateInputLayout(inputDescription, 2, gGBufferVertexShader, sizeof(gGBufferVertexShader), &mInputLayout));
+
+        // create shader objects
+        DXCALL(device->CreateVertexShader(gGBufferVertexShader, sizeof(gGBufferVertexShader), NULL, &mVertexShader));
+        DXCALL(device->CreatePixelShader(gGBufferPixelShader, sizeof(gGBufferPixelShader), NULL, &mPixelShader));
     }
 
     GBuffer::~GBuffer()
@@ -66,8 +92,16 @@ namespace JonsEngine
         mDepthStencilBuffer->Release();
         mDepthStencilView->Release();
         mDepthStencilState->Release();
+        mInputLayout->Release();
+        mVertexShader->Release();
+        mPixelShader->Release();
     }
 
+
+    void GBuffer::SetConstantData(ID3D11DeviceContext* context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture)
+    {
+        mConstantBuffer.SetData({wvpMatrix, worldMatrix, textureTilingFactor, hasDiffuseTexture}, context);
+    }
 
     void GBuffer::BindForDrawing(ID3D11DeviceContext* context)
     {
@@ -77,6 +111,12 @@ namespace JonsEngine
 
         context->OMSetRenderTargets(GBuffer::GBUFFER_NUM_RENDERTARGETS, &mRenderTargets[0], mDepthStencilView);
         context->OMSetDepthStencilState(mDepthStencilState, 1);
+        
+        context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        context->IASetInputLayout(mInputLayout);
+
+        context->VSSetShader(mVertexShader, NULL, NULL);
+        context->PSSetShader(mPixelShader, NULL, NULL);
     }
 
     void GBuffer::BindForReading(ID3D11DeviceContext* context)

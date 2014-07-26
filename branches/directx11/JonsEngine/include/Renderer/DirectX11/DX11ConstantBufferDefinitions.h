@@ -4,8 +4,11 @@
 
 namespace JonsEngine
 {
-    struct ConstantBufferForward
+    struct ConstantBufferGBuffer
     {
         Mat4 mWVPMatrix;
+        Mat4 mWorldMatrix;
+        float mTextureTilingFactor;
+        bool mHasDiffuseTexture;
     };
 }

@@ -97,7 +97,7 @@ namespace JonsEngine
 
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
         mAnisotropicFiltering(settings.mAnisotropicFiltering), mGBuffer(mDevice, mSwapchain), mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr),
-        mDepthStencilState(nullptr), mForwardVertexShader(nullptr), mForwardPixelShader(nullptr), mConstantBuffer(mDevice), mTextureSampler(nullptr)
+        mDepthStencilState(nullptr), mTextureSampler(nullptr)
     {
         // backbuffer rendertarget setup
         ID3D11Texture2D* backbuffer = nullptr;
@@ -110,10 +110,6 @@ namespace JonsEngine
         DXGI_SWAP_CHAIN_DESC swapChainDesc;
         ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
         DXCALL(mSwapchain->GetDesc(&swapChainDesc));
-
-        // create shader objects
-        DXCALL(mDevice->CreateVertexShader(gForwardVertexShader, sizeof(gForwardVertexShader), NULL, &mForwardVertexShader));
-        DXCALL(mDevice->CreatePixelShader(gForwardPixelShader, sizeof(gForwardPixelShader), NULL, &mForwardPixelShader));
 
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -172,8 +168,6 @@ namespace JonsEngine
         mDepthStencilView->Release();
         mDepthStencilState->Release();
         mRasterizerState->Release();
-        mForwardVertexShader->Release();
-        mForwardPixelShader->Release();
         mBackbuffer->Release();
         mTextureSampler->Release();
     }
@@ -183,7 +177,7 @@ namespace JonsEngine
     {
         auto allocator = mMemoryAllocator;
 
-        mMeshes.emplace_back(DX11MeshPtr(allocator->AllocateObject<DX11Mesh>(mDevice, gForwardVertexShader, sizeof(gForwardVertexShader), vertexData, normalData, texCoords, tangents, bitangents, indexData, mLogger), [=](DX11Mesh* mesh) { allocator->DeallocateObject<DX11Mesh>(mesh); }));
+        mMeshes.emplace_back(DX11MeshPtr(allocator->AllocateObject<DX11Mesh>(mDevice, vertexData, normalData, texCoords, tangents, bitangents, indexData, mLogger), [=](DX11Mesh* mesh) { allocator->DeallocateObject<DX11Mesh>(mesh); }));
 
         return mMeshes.back()->GetMeshID();
     }
@@ -199,47 +193,8 @@ namespace JonsEngine
 
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
-        ConstantBufferForward buffer;
-
-        auto meshIterator = mMeshes.begin();
-        for (const Renderable& renderable : renderQueue)
-        {
-            if (renderable.mMesh == INVALID_MESH_ID)
-            {
-                JONS_LOG_ERROR(mLogger, "Renderable MeshID is invalid");
-                throw std::runtime_error("Renderable MeshID is invalid");
-            }
-
-            if (renderable.mMesh < (*meshIterator)->GetMeshID())
-                continue;
-
-            while (renderable.mMesh > (*meshIterator)->GetMeshID())
-            {
-                meshIterator++;
-                if (meshIterator == mMeshes.end())
-                {
-                    JONS_LOG_ERROR(mLogger, "Renderable MeshID out of range");
-                    throw std::runtime_error("Renderable MeshID out of range");
-                }
-            }
-
-            if (renderable.mDiffuseTexture != INVALID_TEXTURE_ID)
-            {
-                auto texture = std::find_if(mTextures.begin(), mTextures.end(), [&](const DX11TexturePtr ptr) { return ptr->GetTextureID() == renderable.mDiffuseTexture; });
-                if (texture == mTextures.end())
-                {
-                    JONS_LOG_ERROR(mLogger, "Renderable TextureID out of range");
-                    throw std::runtime_error("Renderable TextureID out of range");
-                }
-
-                (*texture)->Activate(mContext);
-            }
-
-            buffer.mWVPMatrix = renderable.mWVPMatrix;
-            mConstantBuffer.SetData(buffer, mContext);
-
-            (*meshIterator)->Draw(mContext);
-        }
+        GeometryPass(renderQueue);
+        ShadingPass();
 
         DXCALL(mSwapchain->Present(0, 0));
     }
@@ -314,8 +269,54 @@ namespace JonsEngine
         viewport.MaxDepth = 1.0f;
         mContext->RSSetViewports(1, &viewport);
 
-        mContext->VSSetShader(mForwardVertexShader, NULL, NULL);
-        mContext->PSSetShader(mForwardPixelShader, NULL, NULL);
         mContext->PSSetSamplers(gTextureSamplerSlot, 1, &mTextureSampler);
+    }
+
+    void DX11RendererImpl::GeometryPass(const RenderQueue& renderQueue)
+    {
+        mGBuffer.BindForDrawing(mContext);
+
+        auto meshIterator = mMeshes.begin();
+        for (const Renderable& renderable : renderQueue)
+        {
+            if (renderable.mMesh == INVALID_MESH_ID)
+            {
+                JONS_LOG_ERROR(mLogger, "Renderable MeshID is invalid");
+                throw std::runtime_error("Renderable MeshID is invalid");
+            }
+
+            if (renderable.mMesh < (*meshIterator)->GetMeshID())
+                continue;
+
+            while (renderable.mMesh >(*meshIterator)->GetMeshID())
+            {
+                meshIterator++;
+                if (meshIterator == mMeshes.end())
+                {
+                    JONS_LOG_ERROR(mLogger, "Renderable MeshID out of range");
+                    throw std::runtime_error("Renderable MeshID out of range");
+                }
+            }
+
+            if (renderable.mDiffuseTexture != INVALID_TEXTURE_ID)
+            {
+                auto texture = std::find_if(mTextures.begin(), mTextures.end(), [&](const DX11TexturePtr ptr) { return ptr->GetTextureID() == renderable.mDiffuseTexture; });
+                if (texture == mTextures.end())
+                {
+                    JONS_LOG_ERROR(mLogger, "Renderable TextureID out of range");
+                    throw std::runtime_error("Renderable TextureID out of range");
+                }
+
+                (*texture)->Activate(mContext);
+            }
+
+            mGBuffer.SetConstantData(mContext, renderable.mWVPMatrix, renderable.mWorldMatrix, renderable.mTextureTilingFactor, renderable.mDiffuseTexture != INVALID_TEXTURE_ID);
+            (*meshIterator)->Draw(mContext);
+        }
+    }
+
+    void DX11RendererImpl::ShadingPass()
+    {
+
     }
 }

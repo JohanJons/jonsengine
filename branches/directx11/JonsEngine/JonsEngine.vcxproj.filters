@@ -327,12 +327,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="include\Renderer\DirectX11\Shaders\forward_vertex.hlsl">
-      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="include\Renderer\DirectX11\Shaders\forward_pixel.hlsl">
-      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferPixel.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>

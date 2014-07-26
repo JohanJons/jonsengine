@@ -13,9 +13,9 @@ namespace JonsEngine
     };
 
 
-    DX11Mesh::DX11Mesh(ID3D11Device* device, const BYTE* shaderBytecode, const uint32_t shaderBytecodeSize, const std::vector<float>& vertexData, const std::vector<float>& normalData,
+    DX11Mesh::DX11Mesh(ID3D11Device* device, const std::vector<float>& vertexData, const std::vector<float>& normalData,
         const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData, Logger& logger) 
-        : mLogger(logger), mMeshID(gNextMeshID++), mNumIndices(indexData.size()), mVertexBuffer(nullptr), mTexcoordBuffer(nullptr), mIndexBuffer(nullptr), mInputLayout(nullptr)
+        : mLogger(logger), mMeshID(gNextMeshID++), mNumIndices(indexData.size()), mVertexBuffer(nullptr), mTexcoordBuffer(nullptr), mIndexBuffer(nullptr)
     {
         // vertex buffer
         D3D11_BUFFER_DESC bufferDescription;
@@ -51,26 +51,6 @@ namespace JonsEngine
         initData.pSysMem = &indexData.at(0);
 
         DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mIndexBuffer));
-
-        // input layout
-        D3D11_INPUT_ELEMENT_DESC inputDescription[2];
-        ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC) * 2);
-        inputDescription[0].SemanticName = "POSITION";
-        inputDescription[0].SemanticIndex = 0;
-        inputDescription[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-        inputDescription[0].InputSlot = 0;
-        inputDescription[0].AlignedByteOffset = 0;
-        inputDescription[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-        inputDescription[0].InstanceDataStepRate = 0;
-        inputDescription[1].SemanticName = "TEXCOORD";
-        inputDescription[1].SemanticIndex = 0;
-        inputDescription[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-        inputDescription[1].InputSlot = 1;
-        inputDescription[1].AlignedByteOffset = 0;
-        inputDescription[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-        inputDescription[1].InstanceDataStepRate = 0;
-
-        DXCALL(device->CreateInputLayout(inputDescription, 2, shaderBytecode, shaderBytecodeSize, &mInputLayout));
     }
     
     DX11Mesh::~DX11Mesh()
@@ -78,7 +58,6 @@ namespace JonsEngine
         mVertexBuffer->Release();
         mTexcoordBuffer->Release();
         mIndexBuffer->Release();
-        mInputLayout->Release();
     }
 
 
@@ -90,9 +69,6 @@ namespace JonsEngine
         context->IASetVertexBuffers(0, 1, &mVertexBuffer, &vertexSize, &offset);
         context->IASetVertexBuffers(1, 1, &mTexcoordBuffer, &texcoordSize, &offset);
         context->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-        context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        context->IASetInputLayout(mInputLayout);
-
         context->DrawIndexed(mNumIndices, 0, 0);
     }
 
