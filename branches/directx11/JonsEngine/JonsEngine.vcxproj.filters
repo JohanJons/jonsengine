@@ -185,6 +185,12 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11AmbientPass.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11PointLightPass.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11DirectionalLightPass.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -326,6 +332,12 @@
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11DirectionalLightPass.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11PointLightPass.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
   </ItemGroup>

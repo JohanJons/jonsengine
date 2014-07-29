@@ -131,8 +131,10 @@
     <ClCompile Include="src\Core\Utils\Time.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11AmbientPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Context.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11DirectionalLightPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Gbuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Mesh.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11PointLightPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Renderer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11RendererImpl.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Texture.cpp" />
@@ -175,8 +177,10 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11AmbientPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11ConstantBuffer.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Context.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11DirectionalLightPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11GBuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Mesh.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11PointLightPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Renderer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11RendererImpl.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Texture.h" />
