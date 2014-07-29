@@ -35,6 +35,7 @@ struct GBufferPSOut
 #ifdef AMBIENT_CONSTANTS
 cbuffer AmbientConstants : register(b0)
 {
+    float4 gAmbientLight;
     float2 gScreenSize;
 };
 #endif

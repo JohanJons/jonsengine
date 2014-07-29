@@ -185,7 +185,7 @@ namespace JonsEngine
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
         GeometryPass(renderQueue);
-        ShadingPass(renderQueue);
+        ShadingPass(renderQueue, lighting);
 
         DXCALL(mSwapchain->Present(0, 0));
     }
@@ -306,7 +306,7 @@ namespace JonsEngine
         }
     }
 
-    void DX11RendererImpl::ShadingPass(const RenderQueue& renderQueue)
+    void DX11RendererImpl::ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting)
     {
         mContext->OMSetRenderTargets(1, &mBackbuffer, NULL);
         mContext->OMSetDepthStencilState(NULL, 0);
@@ -314,6 +314,6 @@ namespace JonsEngine
 
         mGBuffer.BindForReading(mContext);
 
-        mAmbientPass.Render(mContext, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
+        mAmbientPass.Render(mContext,  mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
     }
 }

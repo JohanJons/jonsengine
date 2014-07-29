@@ -53,7 +53,7 @@ namespace JonsEngine
         static LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
         void SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight);
         void GeometryPass(const RenderQueue& renderQueue);
-        void ShadingPass(const RenderQueue& renderQueue);
+        void ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting);
 
         Logger& mLogger;
         IMemoryAllocatorPtr mMemoryAllocator;
