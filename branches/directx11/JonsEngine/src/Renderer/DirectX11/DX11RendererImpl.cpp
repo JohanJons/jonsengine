@@ -14,7 +14,7 @@ namespace JonsEngine
 
     const UINT_PTR gSubClassID = 1;
     const uint32_t gTextureSamplerSlot = 0;
-    const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+    const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
     LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)

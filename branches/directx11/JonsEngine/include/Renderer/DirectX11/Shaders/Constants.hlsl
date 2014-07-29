@@ -26,16 +26,8 @@ struct GBufferVSOut
 
 struct GBufferPSOut
 {
-    float4 mWorldPosition : SV_Target0;
-    float4 mDiffuse : SV_Target1;
-};
-#endif
-
-#ifdef FULLSCREEN_TRIANGLE
-struct FullscreenTriangleOut
-{
-    float4 mPosition : SV_POSITION;
-    float4 mWorldPosition : TEXCOORD0;
+    float4 mDiffuse : SV_Target0;
+    float4 mWorldPosition : SV_Target1;
 };
 #endif
 
