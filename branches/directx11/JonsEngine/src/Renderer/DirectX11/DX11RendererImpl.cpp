@@ -314,6 +314,6 @@ namespace JonsEngine
 
         mGBuffer.BindForReading(mContext);
 
-        mAmbientPass.Render(mContext,  mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
+        mAmbientPass.Render(mContext, lighting.mAmbientLight, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
     }
 }

@@ -11,7 +11,7 @@ float4 main(float4 position : SV_Position) : SV_Target0
 {
     float2 texcoord = position.xy / gScreenSize;
 
-    return gDiffuseTexture.Sample(gSampler, texcoord);
+    return gDiffuseTexture.Sample(gSampler, texcoord) * gAmbientLight;
 }
 
 #endif
