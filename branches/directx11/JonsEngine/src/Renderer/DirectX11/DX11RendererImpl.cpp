@@ -136,6 +136,19 @@ namespace JonsEngine
         depthStencilDesc.StencilEnable = false;
         DXCALL(mDevice->CreateDepthStencilState(&depthStencilDesc, &mDepthStencilState));
 
+        // create blend state for shading pass
+        D3D11_BLEND_DESC blendDesc;
+        ZeroMemory(&blendDesc, sizeof(D3D11_BLEND_DESC));
+        blendDesc.RenderTarget[0].BlendEnable = true;
+        blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+        blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+        blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+        blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+        blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+        blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+        blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+        DXCALL(mDevice->CreateBlendState(&blendDesc, &mBlendState));
+
         SetAnisotropicFiltering(settings.mAnisotropicFiltering);
         SetupContext(mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
 
@@ -159,6 +172,7 @@ namespace JonsEngine
         mDepthStencilView->Release();
         mDepthStencilState->Release();
         mRasterizerState->Release();
+        mBlendState->Release();
         mBackbuffer->Release();
         mTextureSampler->Release();
     }
@@ -314,6 +328,19 @@ namespace JonsEngine
 
         mGBuffer.BindForReading(mContext);
 
+        // ambient light
         mAmbientPass.Render(mContext, lighting.mAmbientLight, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
+
+        // additive blending for further shading
+        mContext->OMSetBlendState(mBlendState, NULL, 0xffffffff);
+
+        // do all directional lights
+        for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
+        {
+            //DirLightLightingPass(directionalLight, lightVPMatrices, lighting.mCameraViewMatrix, farDistArr, lighting.mGamma, lighting.mScreenSize, debugShadowmapSplits);
+        }
+
+
+        mContext->OMSetBlendState(NULL, NULL, 0xffffffff);
     }
 }

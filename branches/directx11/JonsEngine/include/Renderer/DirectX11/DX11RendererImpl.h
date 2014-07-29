@@ -66,6 +66,7 @@ namespace JonsEngine
         ID3D11DepthStencilView* mDepthStencilView;
         ID3D11DepthStencilState* mDepthStencilState;
         ID3D11RasterizerState* mRasterizerState;
+        ID3D11BlendState* mBlendState;
         ID3D11SamplerState* mTextureSampler;
 
         std::vector<DX11MeshPtr> mMeshes;
