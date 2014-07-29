@@ -20,14 +20,30 @@ struct GBufferVSIn
 struct GBufferVSOut
 {
     float4 mPosition : SV_POSITION;
-    float3 mWorldPosition : WORLD_POSITION;
+    float4 mWorldPosition : WORLD_POSITION;
     float2 mTexcoord : TEXCOORD;
 };
 
 struct GBufferPSOut
 {
-    float3 mWorldPosition : SV_Target0;
-    float3 mDiffuse : SV_Target1;
+    float4 mWorldPosition : SV_Target0;
+    float4 mDiffuse : SV_Target1;
+};
+#endif
+
+#ifdef FULLSCREEN_TRIANGLE
+struct FullscreenTriangleOut
+{
+    float4 mPosition : SV_POSITION;
+    float4 mWorldPosition : TEXCOORD0;
+};
+#endif
+
+// ambient pixel shader
+#ifdef AMBIENT_CONSTANTS
+cbuffer AmbientConstants : register(b0)
+{
+    float2 gScreenSize;
 };
 #endif
 

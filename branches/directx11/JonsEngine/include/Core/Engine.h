@@ -57,6 +57,6 @@ namespace JonsEngine
 
     /* Engine inlines */
     inline WindowManager& Engine::GetWindow()        { return mWindow; }
-    inline DX11Renderer& Engine::GetRenderer()    { return mRenderer;     }
+    inline DX11Renderer& Engine::GetRenderer()    { return mRenderer; }
     inline SceneManager& Engine::GetSceneManager()   { return mSceneManager; }
 }

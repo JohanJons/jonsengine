@@ -5,9 +5,6 @@
 #include "include/Core/Utils/Win32.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 
-#include "include/Renderer/DirectX11/Shaders/Compiled/forward_vertex.h"
-#include "include/Renderer/DirectX11/Shaders/Compiled/forward_pixel.h"
-
 #include <Commctrl.h>
 
 
@@ -16,8 +13,8 @@ namespace JonsEngine
     static DX11RendererImpl* gDX11RendererImpl = nullptr;
 
     const UINT_PTR gSubClassID = 1;
-
     const uint32_t gTextureSamplerSlot = 0;
+    const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 
     LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
@@ -96,7 +93,7 @@ namespace JonsEngine
 
 
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
-        mAnisotropicFiltering(settings.mAnisotropicFiltering), mGBuffer(mDevice, mSwapchain), mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr),
+        mAnisotropicFiltering(settings.mAnisotropicFiltering), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mAmbientPass(mDevice), mBackbuffer(nullptr), mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr),
         mDepthStencilState(nullptr), mTextureSampler(nullptr)
     {
         // backbuffer rendertarget setup
@@ -105,12 +102,6 @@ namespace JonsEngine
         DXCALL(mDevice->CreateRenderTargetView(backbuffer, NULL, &mBackbuffer));
         backbuffer->Release();
         
-        // setup viewport
-        // query width/height from d3d
-        DXGI_SWAP_CHAIN_DESC swapChainDesc;
-        ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
-        DXCALL(mSwapchain->GetDesc(&swapChainDesc));
-
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;
         ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
@@ -129,8 +120,8 @@ namespace JonsEngine
         depthStencilBufferDesc.ArraySize = 1;
         depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
         depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        depthStencilBufferDesc.Width = swapChainDesc.BufferDesc.Width;
-        depthStencilBufferDesc.Height = swapChainDesc.BufferDesc.Height;
+        depthStencilBufferDesc.Width = mSwapchainDesc.BufferDesc.Width;
+        depthStencilBufferDesc.Height = mSwapchainDesc.BufferDesc.Height;
         depthStencilBufferDesc.MipLevels = 1;
         depthStencilBufferDesc.SampleDesc.Count = 1;
         depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -146,7 +137,7 @@ namespace JonsEngine
         DXCALL(mDevice->CreateDepthStencilState(&depthStencilDesc, &mDepthStencilState));
 
         SetAnisotropicFiltering(settings.mAnisotropicFiltering);
-        SetupContext(swapChainDesc.BufferDesc.Width, swapChainDesc.BufferDesc.Height);
+        SetupContext(mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
 
         // register as window subclass to listen for WM_SIZE events. etc
         if (!SetWindowSubclass(mWindowHandle, WndProc, gSubClassID, 0))
@@ -194,7 +185,7 @@ namespace JonsEngine
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
         GeometryPass(renderQueue);
-        ShadingPass();
+        ShadingPass(renderQueue);
 
         DXCALL(mSwapchain->Present(0, 0));
     }
@@ -307,7 +298,7 @@ namespace JonsEngine
                     throw std::runtime_error("Renderable TextureID out of range");
                 }
 
-                (*texture)->Activate(mContext);
+                (*texture)->Activate(mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_DIFFUSE);
             }
 
             mGBuffer.SetConstantData(mContext, renderable.mWVPMatrix, renderable.mWorldMatrix, renderable.mTextureTilingFactor, renderable.mDiffuseTexture != INVALID_TEXTURE_ID);
@@ -315,8 +306,14 @@ namespace JonsEngine
         }
     }
 
-    void DX11RendererImpl::ShadingPass()
+    void DX11RendererImpl::ShadingPass(const RenderQueue& renderQueue)
     {
+        mContext->OMSetRenderTargets(1, &mBackbuffer, NULL);
+        mContext->OMSetDepthStencilState(NULL, 0);
+        mContext->ClearRenderTargetView(mBackbuffer, gClearColor);
 
+        mGBuffer.BindForReading(mContext);
+
+        mAmbientPass.Render(mContext, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
     }
 }

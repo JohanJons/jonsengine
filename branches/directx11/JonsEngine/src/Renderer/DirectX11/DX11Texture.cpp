@@ -7,17 +7,6 @@ namespace JonsEngine
     static TextureID gNextTextureID = 1;
 
 
-    uint32_t TextureTypeToSlot(const TextureType textureType)
-    {
-        switch (textureType)
-        {
-            case TextureType::TEXTURE_TYPE_DIFFUSE: return 0;
-            case TextureType::TEXTURE_TYPE_NORMAL:  return 1;
-            default:                                return 0;
-        }
-    }
-
-
     DX11Texture::DX11Texture(ID3D11Device* device, ID3D11DeviceContext* context, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureType textureType, Logger& logger) :
         mTexture(nullptr), mShaderResourceView(nullptr), mTextureID(gNextTextureID++), mTextureType(textureType)
     {
@@ -55,9 +44,9 @@ namespace JonsEngine
     }
 
 
-    void DX11Texture::Activate(ID3D11DeviceContext* context)
+    void DX11Texture::Activate(ID3D11DeviceContext* context, uint32_t textureSlot)
     {
-        context->PSSetShaderResources(TextureTypeToSlot(mTextureType), 1, &mShaderResourceView);
+        context->PSSetShaderResources(textureSlot, 1, &mShaderResourceView);
     }
 
     TextureID DX11Texture::GetTextureID() const

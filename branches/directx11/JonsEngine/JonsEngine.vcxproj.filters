@@ -182,6 +182,9 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Gbuffer.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11AmbientPass.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -298,6 +301,18 @@
     <ClInclude Include="include\Core\Utils\Win32.h">
       <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11AmbientPass.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11ConstantBuffer.hpp">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11Context.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11GBuffer.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11Mesh.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
@@ -307,22 +322,10 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11RendererImpl.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h">
-      <Filter>Header Files\Renderer\DirectX11</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DX11ConstantBuffer.hpp">
-      <Filter>Header Files\Renderer\DirectX11</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DX11ConstantBufferDefinitions.h">
-      <Filter>Header Files\Renderer\DirectX11</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DX11Context.h">
-      <Filter>Header Files\Renderer\DirectX11</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11Texture.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DX11GBuffer.h">
+    <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
   </ItemGroup>
@@ -334,6 +337,12 @@
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\Constants.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\FullscreenTriangleVertex.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\AmbientPixel.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

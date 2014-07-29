@@ -15,8 +15,8 @@ namespace JonsEngine
     protected:
         const HWND mWindowHandle;
         IDXGISwapChain* mSwapchain;
-        ID3D11RenderTargetView* mBackbuffer;
         ID3D11Device* mDevice;
         ID3D11DeviceContext* mContext;
+        DXGI_SWAP_CHAIN_DESC mSwapchainDesc;
     };
 }

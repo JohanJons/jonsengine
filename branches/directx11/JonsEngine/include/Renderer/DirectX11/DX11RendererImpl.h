@@ -5,8 +5,8 @@
 #include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11Context.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
-#include "include/Renderer/DirectX11/DX11ConstantBufferDefinitions.h"
 #include "include/Renderer/DirectX11/DX11GBuffer.h"
+#include "include/Renderer/DirectX11/DX11AmbientPass.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Memory/HeapAllocator.h"
@@ -53,13 +53,15 @@ namespace JonsEngine
         static LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
         void SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight);
         void GeometryPass(const RenderQueue& renderQueue);
-        void ShadingPass();
+        void ShadingPass(const RenderQueue& renderQueue);
 
         Logger& mLogger;
         IMemoryAllocatorPtr mMemoryAllocator;
         EngineSettings::Anisotropic mAnisotropicFiltering;
 
-        GBuffer mGBuffer;
+        DX11GBuffer mGBuffer;
+        DX11AmbientPass mAmbientPass;
+        ID3D11RenderTargetView* mBackbuffer;
         ID3D11Texture2D* mDepthStencilBuffer;
         ID3D11DepthStencilView* mDepthStencilView;
         ID3D11DepthStencilState* mDepthStencilState;

@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    Mat4 DX11PerspectiveMatrixFov(const float fovDegrees, const float aspectRatio, const float zNear, const float zFar)
+    Mat4 PerspectiveMatrixFov(const float fovDegrees, const float aspectRatio, const float zNear, const float zFar)
     {
         const float fovRadians = glm::radians(fovDegrees);
         const float yScale = 1 / tan(fovRadians / 2.0f);

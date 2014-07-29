@@ -129,13 +129,6 @@ namespace JonsGame
         float newXPos = (float)evnt.mRelativePosX * sens;
         float newYPos = (float)evnt.mRelativePosY * sens;
 
-        std::stringstream errorSS;
-        if (newXPos > 0.0f || newYPos > 0.0f)
-        {
-            errorSS << newXPos << " " << newYPos;
-            JONS_LOG_INFO(JonsEngine::Logger::GetCoreLogger(), errorSS.str());
-        }
-
         camera.RotateCamera(newXPos, newYPos);
     }
 

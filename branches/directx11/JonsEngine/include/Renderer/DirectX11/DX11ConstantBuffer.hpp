@@ -14,12 +14,11 @@ namespace JonsEngine
         DX11ConstantBuffer(ID3D11Device* device) : mConstantBuffer(nullptr)
         {
             D3D11_BUFFER_DESC bufferDescription;
+            ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
             bufferDescription.ByteWidth = sizeof(ContentType);
             bufferDescription.Usage = D3D11_USAGE_DYNAMIC;
             bufferDescription.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
             bufferDescription.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-            bufferDescription.MiscFlags = 0;
-            bufferDescription.StructureByteStride = 0;
 
             DXCALL(device->CreateBuffer(&bufferDescription, NULL, &mConstantBuffer));
         }
@@ -30,7 +29,7 @@ namespace JonsEngine
         }
 
 
-        void SetData(const ContentType& content, ID3D11DeviceContext* context)
+        void SetData(const ContentType& content, ID3D11DeviceContext* context, uint32_t bufferSlot)
         {
             D3D11_MAPPED_SUBRESOURCE mappedResource;
             ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
@@ -39,7 +38,8 @@ namespace JonsEngine
             std::memcpy(mappedResource.pData, &content, sizeof(ContentType));
             context->Unmap(mConstantBuffer, 0);
 
-            context->VSSetConstantBuffers(0, 1, &mConstantBuffer);
+            context->VSSetConstantBuffers(bufferSlot, 1, &mConstantBuffer);
+            context->PSSetConstantBuffers(bufferSlot, 1, &mConstantBuffer);
         }
 
 

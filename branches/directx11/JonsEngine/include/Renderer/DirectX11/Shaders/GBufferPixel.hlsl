@@ -12,7 +12,7 @@ GBufferPSOut main(GBufferVSOut input)
     GBufferPSOut output;
 
     output.mWorldPosition = input.mWorldPosition;
-    output.mDiffuse = (float3)gDiffuseTexture.Sample(gSampler, input.mTexcoord);
+    output.mDiffuse = gDiffuseTexture.Sample(gSampler, input.mTexcoord);
 
     return output;
 }

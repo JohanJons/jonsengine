@@ -9,30 +9,26 @@ namespace JonsEngine
     const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
-    GBuffer::GBuffer(ID3D11Device* device, IDXGISwapChain* swapChain) : mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr), mDepthStencilState(nullptr),
+    DX11GBuffer::DX11GBuffer(ID3D11Device* device, uint32_t textureWidth, uint32_t textureHeight) : mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr), mDepthStencilState(nullptr),
         mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device)
     {
-        // get backbuffer width/height
-        DXGI_SWAP_CHAIN_DESC swapChainDesc;
-        ZeroMemory(&swapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
-        DXCALL(swapChain->GetDesc(&swapChainDesc));
-
         // create gbuffer textures/rendertargets
         D3D11_TEXTURE2D_DESC textureDesc;
         ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
-        textureDesc.Width = swapChainDesc.BufferDesc.Width;
-        textureDesc.Height = swapChainDesc.BufferDesc.Height;
+        textureDesc.Width = textureWidth;
+        textureDesc.Height = textureHeight;
         textureDesc.ArraySize = 1;
         textureDesc.MipLevels = 1;
-        textureDesc.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
         textureDesc.SampleDesc.Count = 1;
         textureDesc.Usage = D3D11_USAGE_DEFAULT;
         textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
         
-        for (uint32_t index = 0; index < GBuffer::GBUFFER_NUM_RENDERTARGETS; index++) 
+        for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
         {
-            DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mGeometryTextures[index]));
-            DXCALL(device->CreateRenderTargetView(mGeometryTextures[index], NULL, &mRenderTargets[index]));
+            DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mTextures[index]));
+            DXCALL(device->CreateRenderTargetView(mTextures[index], NULL, &mRenderTargets[index]));
+            DXCALL(device->CreateShaderResourceView(mTextures[index], NULL, &mShaderResourceViews[index]));
         }
 
         // create depth buffer/view
@@ -41,8 +37,8 @@ namespace JonsEngine
         depthStencilBufferDesc.ArraySize = 1;
         depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
         depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        depthStencilBufferDesc.Width = swapChainDesc.BufferDesc.Width;
-        depthStencilBufferDesc.Height = swapChainDesc.BufferDesc.Height;
+        depthStencilBufferDesc.Width = textureWidth;
+        depthStencilBufferDesc.Height = textureHeight;
         depthStencilBufferDesc.MipLevels = 1;
         depthStencilBufferDesc.SampleDesc.Count = 1;
         depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -81,12 +77,13 @@ namespace JonsEngine
         DXCALL(device->CreatePixelShader(gGBufferPixelShader, sizeof(gGBufferPixelShader), NULL, &mPixelShader));
     }
 
-    GBuffer::~GBuffer()
+    DX11GBuffer::~DX11GBuffer()
     {
-        for (uint32_t index = 0; index < GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
+        for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
         {
-            mGeometryTextures[index]->Release();
+            mTextures[index]->Release();
             mRenderTargets[index]->Release();
+            mShaderResourceViews[index]->Release();
         }
 
         mDepthStencilBuffer->Release();
@@ -98,29 +95,30 @@ namespace JonsEngine
     }
 
 
-    void GBuffer::SetConstantData(ID3D11DeviceContext* context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture)
+    void DX11GBuffer::SetConstantData(ID3D11DeviceContext* context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture)
     {
-        mConstantBuffer.SetData({wvpMatrix, worldMatrix, textureTilingFactor, hasDiffuseTexture}, context);
+        mConstantBuffer.SetData({wvpMatrix, worldMatrix, textureTilingFactor, hasDiffuseTexture, false}, context, 0);
     }
 
-    void GBuffer::BindForDrawing(ID3D11DeviceContext* context)
+    void DX11GBuffer::BindForDrawing(ID3D11DeviceContext* context)
     {
-        for (uint32_t index = 0; index < GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
+        for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
             context->ClearRenderTargetView(mRenderTargets[index], gClearColor);
         context->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-        context->OMSetRenderTargets(GBuffer::GBUFFER_NUM_RENDERTARGETS, &mRenderTargets[0], mDepthStencilView);
+        context->OMSetRenderTargets(DX11GBuffer::GBUFFER_NUM_RENDERTARGETS, &mRenderTargets[0], mDepthStencilView);
         context->OMSetDepthStencilState(mDepthStencilState, 1);
-        
         context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        
         context->IASetInputLayout(mInputLayout);
 
         context->VSSetShader(mVertexShader, NULL, NULL);
         context->PSSetShader(mPixelShader, NULL, NULL);
     }
 
-    void GBuffer::BindForReading(ID3D11DeviceContext* context)
+    void DX11GBuffer::BindForReading(ID3D11DeviceContext* context)
     {
-
+        for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
+            context->PSSetShaderResources(index, 1, &mShaderResourceViews[index]);
     }
 }

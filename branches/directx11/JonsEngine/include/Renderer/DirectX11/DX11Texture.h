@@ -14,7 +14,7 @@ namespace JonsEngine
         DX11Texture(ID3D11Device* device, ID3D11DeviceContext* context, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureType textureType, Logger& logger);
         ~DX11Texture();
 
-        void Activate(ID3D11DeviceContext* context);
+        void Activate(ID3D11DeviceContext* context, uint32_t textureSlot);
         TextureID GetTextureID() const;
 
 
