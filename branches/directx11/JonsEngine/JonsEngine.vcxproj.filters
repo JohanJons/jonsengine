@@ -348,13 +348,16 @@
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferVertex.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="include\Renderer\DirectX11\Shaders\Constants.hlsl">
-      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\FullscreenTriangleVertex.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\AmbientPixel.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\DirectionalLightPixel.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\PointLightPixel.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

@@ -17,7 +17,7 @@ namespace JonsEngine
     private:
         struct PointLightCBuffer
         {
-
+            Mat4 mLightViewProjectionMatrix;
         };
 
         ID3D11VertexShader* mVertexShader;

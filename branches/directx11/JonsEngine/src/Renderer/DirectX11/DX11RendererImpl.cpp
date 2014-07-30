@@ -6,16 +6,65 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 
 #include <Commctrl.h>
+#include <array>
 
 
 namespace JonsEngine
 {
+    typedef std::array<Vec4, 8> CameraFrustrum;
+
     static DX11RendererImpl* gDX11RendererImpl = nullptr;
 
     const UINT_PTR gSubClassID = 1;
     const uint32_t gTextureSamplerSlot = 0;
     const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
+
+    Mat4 CreateDirLightVPMatrix(const CameraFrustrum& cameraFrustrum, const Vec3& lightDir)
+    {
+        Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, 1.0f, 0.0f));
+
+        Vec4 transf = lightViewMatrix * cameraFrustrum[0];
+        float maxZ = transf.z, minZ = transf.z;
+        float maxX = transf.x, minX = transf.x;
+        float maxY = transf.y, minY = transf.y;
+        for (uint32_t i = 1; i < 8; i++)
+        {
+            transf = lightViewMatrix * cameraFrustrum[i];
+
+            if (transf.z > maxZ) maxZ = transf.z;
+            if (transf.z < minZ) minZ = transf.z;
+            if (transf.x > maxX) maxX = transf.x;
+            if (transf.x < minX) minX = transf.x;
+            if (transf.y > maxY) maxY = transf.y;
+            if (transf.y < minY) minY = transf.y;
+        }
+
+        Mat4 viewMatrix(lightViewMatrix);
+        viewMatrix[3][0] = -(minX + maxX) * 0.5f;
+        viewMatrix[3][1] = -(minY + maxY) * 0.5f;
+        viewMatrix[3][2] = -(minZ + maxZ) * 0.5f;
+        viewMatrix[0][3] = 0.0f;
+        viewMatrix[1][3] = 0.0f;
+        viewMatrix[2][3] = 0.0f;
+        viewMatrix[3][3] = 1.0f;
+
+        Vec3 halfExtents((maxX - minX) * 0.5, (maxY - minY) * 0.5, (maxZ - minZ) * 0.5);
+
+        return glm::ortho(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.y) * viewMatrix;
+    }
+
+    void ActivateTexture(const std::vector<DX11RendererImpl::DX11TexturePtr>& textures, Logger& logger, const TextureID textureID, ID3D11DeviceContext* context, uint32_t textureSlot)
+    {
+        auto texture = std::find_if(textures.begin(), textures.end(), [&](const DX11RendererImpl::DX11TexturePtr ptr) { return ptr->GetTextureID() == textureID; });
+        if (texture == textures.end())
+        {
+            JONS_LOG_ERROR(logger, "Renderable TextureID out of range");
+            throw std::runtime_error("Renderable TextureID out of range");
+        }
+
+        (*texture)->Activate(context, textureSlot);
+    }
 
     LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
     {
@@ -93,8 +142,8 @@ namespace JonsEngine
 
 
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
-        mAnisotropicFiltering(settings.mAnisotropicFiltering), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mAmbientPass(mDevice), mBackbuffer(nullptr), mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr),
-        mDepthStencilState(nullptr), mTextureSampler(nullptr)
+        mAnisotropicFiltering(settings.mAnisotropicFiltering), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mAmbientPass(mDevice), mDirectionalLightPass(mDevice), mBackbuffer(nullptr),
+        mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr), mDepthStencilState(nullptr), mTextureSampler(nullptr)
     {
         // backbuffer rendertarget setup
         ID3D11Texture2D* backbuffer = nullptr;
@@ -304,16 +353,10 @@ namespace JonsEngine
             }
 
             if (renderable.mDiffuseTexture != INVALID_TEXTURE_ID)
-            {
-                auto texture = std::find_if(mTextures.begin(), mTextures.end(), [&](const DX11TexturePtr ptr) { return ptr->GetTextureID() == renderable.mDiffuseTexture; });
-                if (texture == mTextures.end())
-                {
-                    JONS_LOG_ERROR(mLogger, "Renderable TextureID out of range");
-                    throw std::runtime_error("Renderable TextureID out of range");
-                }
+                ActivateTexture(mTextures, mLogger, renderable.mDiffuseTexture, mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_DIFFUSE);
 
-                (*texture)->Activate(mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_DIFFUSE);
-            }
+            if (renderable.mNormalTexture != INVALID_TEXTURE_ID)
+                ActivateTexture(mTextures, mLogger, renderable.mNormalTexture, mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_NORMAL);
 
             mGBuffer.SetConstantData(mContext, renderable.mWVPMatrix, renderable.mWorldMatrix, renderable.mTextureTilingFactor, renderable.mDiffuseTexture != INVALID_TEXTURE_ID);
             (*meshIterator)->Draw(mContext);
@@ -335,9 +378,10 @@ namespace JonsEngine
         mContext->OMSetBlendState(mBlendState, NULL, 0xffffffff);
 
         // do all directional lights
+        mDirectionalLightPass.BindForDrawing(mContext);
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
         {
-            //DirLightLightingPass(directionalLight, lightVPMatrices, lighting.mCameraViewMatrix, farDistArr, lighting.mGamma, lighting.mScreenSize, debugShadowmapSplits);
+            //mDirectionalLightPass.Render(mContext, Mat4(0.0f), directionalLight.mLightColor, directionalLight.mLightDirection, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
         }
 
 
