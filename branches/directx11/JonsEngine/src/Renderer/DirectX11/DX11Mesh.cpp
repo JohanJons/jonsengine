@@ -14,7 +14,7 @@ namespace JonsEngine
 
 
     DX11Mesh::DX11Mesh(ID3D11Device* device, const std::vector<float>& vertexData, const std::vector<float>& normalData,
-        const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData, Logger& logger) 
+        const std::vector<float>& texCoords, const std::vector<float>& tangentData, const std::vector<float>& bitangentData, const std::vector<uint32_t>& indexData, Logger& logger) 
         : mLogger(logger), mMeshID(gNextMeshID++), mNumIndices(indexData.size()), mVertexBuffer(nullptr), mTexcoordBuffer(nullptr), mIndexBuffer(nullptr)
     {
         // vertex buffer
@@ -27,8 +27,43 @@ namespace JonsEngine
         D3D11_SUBRESOURCE_DATA initData;
         ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
         initData.pSysMem = &vertexData.at(0);
-
         DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mVertexBuffer));
+
+        // normal buffer
+        ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
+        bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
+        bufferDescription.ByteWidth = normalData.size() * sizeof(float);
+        bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+        ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
+        initData.pSysMem = &normalData.at(0);
+        DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mNormalBuffer));
+
+        // tangent buffer
+        if (tangentData.size() > 0)
+        {
+            ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
+            bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
+            bufferDescription.ByteWidth = tangentData.size() * sizeof(float);
+            bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+            ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
+            initData.pSysMem = &tangentData.at(0);
+            DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mTangentBuffer));
+        }
+
+        // bitangent buffer
+        if (bitangentData.size() > 0)
+        {
+            ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
+            bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
+            bufferDescription.ByteWidth = bitangentData.size() * sizeof(float);
+            bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+            ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
+            initData.pSysMem = &bitangentData.at(0);
+            DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mBitangentBuffer));
+        }
 
         // texcoord buffer
         ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
@@ -38,7 +73,6 @@ namespace JonsEngine
 
         ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
         initData.pSysMem = &texCoords.at(0);
-
         DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mTexcoordBuffer));
 
         // index buffer
@@ -49,13 +83,17 @@ namespace JonsEngine
 
         ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
         initData.pSysMem = &indexData.at(0);
-
         DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mIndexBuffer));
     }
     
     DX11Mesh::~DX11Mesh()
     {
         mVertexBuffer->Release();
+        mNormalBuffer->Release();
+        if (mTangentBuffer)
+            mTangentBuffer->Release();
+        if (mBitangentBuffer)
+            mBitangentBuffer->Release();
         mTexcoordBuffer->Release();
         mIndexBuffer->Release();
     }
@@ -66,8 +104,13 @@ namespace JonsEngine
         uint32_t vertexSize = sizeof(float) * 3, texcoordSize = sizeof(float) * 2;
         uint32_t offset = 0;
 
-        context->IASetVertexBuffers(0, 1, &mVertexBuffer, &vertexSize, &offset);
-        context->IASetVertexBuffers(1, 1, &mTexcoordBuffer, &texcoordSize, &offset);
+        context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_VERTICES, 1, &mVertexBuffer, &vertexSize, &offset);
+        context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer, &vertexSize, &offset);
+        if (mTangentBuffer)
+            context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer, &vertexSize, &offset);
+        if (mBitangentBuffer)
+            context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BITANGENTS, 1, &mBitangentBuffer, &vertexSize, &offset);
+        context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer, &texcoordSize, &offset);
         context->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
         context->DrawIndexed(mNumIndices, 0, 0);
     }

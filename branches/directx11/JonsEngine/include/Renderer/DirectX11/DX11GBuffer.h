@@ -22,7 +22,7 @@ namespace JonsEngine
         DX11GBuffer(ID3D11Device* device, uint32_t textureWidth, uint32_t textureHeight);
         ~DX11GBuffer();
 
-        void SetConstantData(ID3D11DeviceContext* context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture);
+        void SetConstantData(ID3D11DeviceContext* context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture);
         void BindForDrawing(ID3D11DeviceContext* context);
         void BindForReading(ID3D11DeviceContext* context);
 
@@ -33,9 +33,9 @@ namespace JonsEngine
             Mat4 mWVPMatrix;
             Mat4 mWorldMatrix;
             float mTextureTilingFactor;
-            int mHasDiffuseTexture;
-            int mHasNormalTexture;
-            int _padding;
+            uint32_t mHasDiffuseTexture;
+            uint32_t mHasNormalTexture;
+            uint32_t _padding;
 
             GBufferCBuffer(const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuse, const bool hasNormal) :
                 mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix), mTextureTilingFactor(textureTilingFactor), mHasDiffuseTexture(hasDiffuse), mHasNormalTexture(hasNormal)

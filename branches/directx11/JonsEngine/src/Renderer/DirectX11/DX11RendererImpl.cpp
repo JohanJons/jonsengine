@@ -352,13 +352,16 @@ namespace JonsEngine
                 }
             }
 
-            if (renderable.mDiffuseTexture != INVALID_TEXTURE_ID)
+            const bool hasDiffuseTexture = renderable.mDiffuseTexture != INVALID_TEXTURE_ID;
+            const bool hasNormalTexture = renderable.mNormalTexture != INVALID_TEXTURE_ID;
+
+            if (hasDiffuseTexture)
                 ActivateTexture(mTextures, mLogger, renderable.mDiffuseTexture, mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_DIFFUSE);
 
-            if (renderable.mNormalTexture != INVALID_TEXTURE_ID)
+            if (hasNormalTexture)
                 ActivateTexture(mTextures, mLogger, renderable.mNormalTexture, mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_NORMAL);
 
-            mGBuffer.SetConstantData(mContext, renderable.mWVPMatrix, renderable.mWorldMatrix, renderable.mTextureTilingFactor, renderable.mDiffuseTexture != INVALID_TEXTURE_ID);
+            mGBuffer.SetConstantData(mContext, renderable.mWVPMatrix, renderable.mWorldMatrix, renderable.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
             (*meshIterator)->Draw(mContext);
         }
     }

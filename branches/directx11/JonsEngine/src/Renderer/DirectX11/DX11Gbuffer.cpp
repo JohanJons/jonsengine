@@ -1,6 +1,7 @@
 #include "include/Renderer/DirectX11/DX11GBuffer.h"
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/GBufferVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/GBufferPixel.h"
 
@@ -54,23 +55,44 @@ namespace JonsEngine
         DXCALL(device->CreateDepthStencilState(&depthStencilDesc, &mDepthStencilState));
 
         // input layout
-        D3D11_INPUT_ELEMENT_DESC inputDescription[2];
+        D3D11_INPUT_ELEMENT_DESC inputDescription[DX11Mesh::NUM_VERTEX_BUFFER_SLOTS];
         ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC)* 2);
-        inputDescription[0].SemanticName = "POSITION";
-        inputDescription[0].SemanticIndex = 0;
-        inputDescription[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-        inputDescription[0].InputSlot = 0;
-        inputDescription[0].AlignedByteOffset = 0;
-        inputDescription[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-        inputDescription[0].InstanceDataStepRate = 0;
-        inputDescription[1].SemanticName = "TEXCOORD";
-        inputDescription[1].SemanticIndex = 0;
-        inputDescription[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-        inputDescription[1].InputSlot = 1;
-        inputDescription[1].AlignedByteOffset = 0;
-        inputDescription[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-        inputDescription[1].InstanceDataStepRate = 0;
-        DXCALL(device->CreateInputLayout(inputDescription, 2, gGBufferVertexShader, sizeof(gGBufferVertexShader), &mInputLayout));
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].SemanticName = "POSITION";
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].SemanticIndex = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].InputSlot = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].AlignedByteOffset = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].InstanceDataStepRate = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].SemanticName = "NORMAL";
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].SemanticIndex = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].InputSlot = 1;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].AlignedByteOffset = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].InstanceDataStepRate = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS].SemanticName = "TANGENT";
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS].SemanticIndex = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS].InputSlot = 2;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS].AlignedByteOffset = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS].InstanceDataStepRate = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_BITANGENTS].SemanticName = "BITANGENT";
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_BITANGENTS].SemanticIndex = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_BITANGENTS].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_BITANGENTS].InputSlot = 3;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_BITANGENTS].AlignedByteOffset = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_BITANGENTS].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_BITANGENTS].InstanceDataStepRate = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS].SemanticName = "TEXCOORD";
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS].SemanticIndex = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS].Format = DXGI_FORMAT_R32G32_FLOAT;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS].InputSlot = 4;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS].AlignedByteOffset = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS].InstanceDataStepRate = 0;
+        DXCALL(device->CreateInputLayout(inputDescription, DX11Mesh::NUM_VERTEX_BUFFER_SLOTS, gGBufferVertexShader, sizeof(gGBufferVertexShader), &mInputLayout));
 
         // create shader objects
         DXCALL(device->CreateVertexShader(gGBufferVertexShader, sizeof(gGBufferVertexShader), NULL, &mVertexShader));
@@ -95,9 +117,9 @@ namespace JonsEngine
     }
 
 
-    void DX11GBuffer::SetConstantData(ID3D11DeviceContext* context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture)
+    void DX11GBuffer::SetConstantData(ID3D11DeviceContext* context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture)
     {
-        mConstantBuffer.SetData({wvpMatrix, worldMatrix, textureTilingFactor, hasDiffuseTexture, false}, context, 0);
+        mConstantBuffer.SetData({wvpMatrix, worldMatrix, textureTilingFactor, hasDiffuseTexture, hasNormalTexture}, context, 0);
     }
 
     void DX11GBuffer::BindForDrawing(ID3D11DeviceContext* context)
