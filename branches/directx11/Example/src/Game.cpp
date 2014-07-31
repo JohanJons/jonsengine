@@ -191,7 +191,7 @@ namespace JonsGame
         // create a sphere
         SceneNodePtr nodeSphere = myScene->GetRootNode().CreateChildNode("nodeSphere");
         ModelPtr sphere = myScene->GetResourceManifest().CreateSphere("Sphere", 1.0f, 12, 24);
-        sphere->mMaterial = myScene->GetResourceManifest().GetMaterial("checker");
+        sphere->mMaterial = myScene->GetResourceManifest().GetMaterial("checkers");
         sphere->mSceneNode = nodeSphere;
         nodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
         
