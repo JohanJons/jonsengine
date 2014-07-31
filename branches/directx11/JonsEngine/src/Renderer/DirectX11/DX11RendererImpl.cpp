@@ -384,7 +384,7 @@ namespace JonsEngine
         mDirectionalLightPass.BindForDrawing(mContext);
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
         {
-            //mDirectionalLightPass.Render(mContext, Mat4(0.0f), directionalLight.mLightColor, directionalLight.mLightDirection, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
+            mDirectionalLightPass.Render(mContext, directionalLight.mLightColor, directionalLight.mLightDirection, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
         }
 
 

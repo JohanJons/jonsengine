@@ -11,6 +11,15 @@ struct GBufferPSOut
 };
 
 
+// needed due to float4x4 constructor is row-major
+float4x4 CreateMatrixFromCols(float4 c0, float4 c1, float4 c2, float4 c3)
+{
+    return float4x4(c0.x, c1.x, c2.x, c3.x,
+                    c0.y, c1.y, c2.y, c3.y,
+                    c0.z, c1.z, c2.z, c3.z,
+                    c0.w, c1.w, c2.w, c3.w);
+}
+
 GBufferPSOut ps_main(GBufferVSOut input)
 {
     GBufferPSOut output;
@@ -25,7 +34,7 @@ GBufferPSOut ps_main(GBufferVSOut input)
     if (gHasNormalTexture)
     {
         float4 normalTangentSpace = normalize(gNormalTexture.Sample(gSampler, input.mTexcoord) * 2.0 - 1.0);
-        float4x4 tangentToWorldSpace = float4x4(normalize(input.mTangent), normalize(input.mBitangent), normalize(input.mNormal), float4(0.0, 0.0, 0.0, 1.0));
+        float4x4 tangentToWorldSpace = CreateMatrixFromCols(normalize(input.mTangent), normalize(input.mBitangent), normalize(input.mNormal), float4(0.0, 0.0, 0.0, 1.0));
 
         output.mNormal = mul(tangentToWorldSpace, normalTangentSpace);
     }

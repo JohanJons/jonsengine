@@ -5,9 +5,8 @@
 
 cbuffer DirectionalLightConstants : register(b0)
 {
-    float4x4 gLightViewProjectionMatrix;
     float4 gLightColor;
-    float3 gLightDirection;
+    float4 gLightDirection;
     float2 gScreenSize;
 };
 
@@ -19,8 +18,12 @@ SamplerState gSampler : register(s0);
 float4 ps_main(float4 position : SV_Position) : SV_Target0
 {
     float2 texcoord = position.xy / gScreenSize;
+    float4 diffuse = gDiffuseTexture.Sample(gSampler, texcoord);
+    float4 normal = gNormalTexture.Sample(gSampler, texcoord);
 
-    return float4(0.0, 0.0, 0.0, 0.0);
+    float angleNormal = clamp(dot(normal, gLightDirection), 0, 1);
+
+    return diffuse * angleNormal * gLightColor;
 }
 
 #endif

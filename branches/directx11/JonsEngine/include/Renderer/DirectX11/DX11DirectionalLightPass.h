@@ -14,21 +14,20 @@ namespace JonsEngine
         ~DX11DirectionalLightPass();
 
         void BindForDrawing(ID3D11DeviceContext* context);
-        void Render(ID3D11DeviceContext* context, const Mat4& lightVPMatrix, const Vec4& lightColor, const Vec3& lightDir, uint32_t screenWidth, uint32_t screenHeight);
+        void Render(ID3D11DeviceContext* context, const Vec4& lightColor, const Vec3& lightDir, uint32_t screenWidth, uint32_t screenHeight);
 
 
     private:
         struct DirectionalLightCBuffer
         {
-            Mat4 mLightViewProjectionMatrix;
             Vec4 mLightColor;
-            Vec3 mLightDirection;
+            Vec4 mLightDirection;
             Vec2 mScreenSize;
-            float _padding[3];
+            float __padding[2];
 
 
-            DirectionalLightCBuffer(const Mat4& lightVPMatrix, const Vec4& lightColor, const Vec3& lightDir, const Vec2& screenSize) :
-                mLightViewProjectionMatrix(lightVPMatrix), mLightColor(lightColor), mLightDirection(lightDir), mScreenSize(screenSize)
+            DirectionalLightCBuffer(const Vec4& lightColor, const Vec3& lightDir, const Vec2& screenSize) :
+                mLightColor(lightColor), mLightDirection(Vec4(-lightDir, 0.0f)), mScreenSize(screenSize)
             {
             }
         };
