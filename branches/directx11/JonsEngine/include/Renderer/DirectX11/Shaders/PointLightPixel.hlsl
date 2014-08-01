@@ -17,7 +17,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
 {
     float2 texcoord = position.xy / gScreenSize;
 
-    return float4(0.0, 0.0, 0.0, 0.0);
+    return float4(1.0, 0.0, 0.0, 1.0);
 }
 
 #endif

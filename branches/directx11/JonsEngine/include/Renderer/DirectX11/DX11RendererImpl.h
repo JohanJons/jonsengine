@@ -4,10 +4,10 @@
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11Context.h"
-#include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11GBuffer.h"
 #include "include/Renderer/DirectX11/DX11AmbientPass.h"
 #include "include/Renderer/DirectX11/DX11DirectionalLightPass.h"
+#include "include/Renderer/DirectX11/DX11PointLightPass.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Memory/HeapAllocator.h"
@@ -63,6 +63,7 @@ namespace JonsEngine
         DX11GBuffer mGBuffer;
         DX11AmbientPass mAmbientPass;
         DX11DirectionalLightPass mDirectionalLightPass;
+        DX11PointLightPass mPointLightPass;
         ID3D11RenderTargetView* mBackbuffer;
         ID3D11Texture2D* mDepthStencilBuffer;
         ID3D11DepthStencilView* mDepthStencilView;

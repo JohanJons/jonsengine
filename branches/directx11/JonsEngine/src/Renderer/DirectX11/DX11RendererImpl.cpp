@@ -142,8 +142,8 @@ namespace JonsEngine
 
 
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
-        mAnisotropicFiltering(settings.mAnisotropicFiltering), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mAmbientPass(mDevice), mDirectionalLightPass(mDevice), mBackbuffer(nullptr),
-        mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr), mDepthStencilState(nullptr), mTextureSampler(nullptr)
+        mAnisotropicFiltering(settings.mAnisotropicFiltering), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mAmbientPass(mDevice), mDirectionalLightPass(mDevice),
+        mPointLightPass(mDevice), mBackbuffer(nullptr), mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr), mDepthStencilState(nullptr), mTextureSampler(nullptr)
     {
         // backbuffer rendertarget setup
         ID3D11Texture2D* backbuffer = nullptr;
@@ -231,7 +231,7 @@ namespace JonsEngine
     {
         auto allocator = mMemoryAllocator;
 
-        mMeshes.emplace_back(DX11MeshPtr(allocator->AllocateObject<DX11Mesh>(mDevice, vertexData, normalData, texCoords, tangents, bitangents, indexData, mLogger), [=](DX11Mesh* mesh) { allocator->DeallocateObject<DX11Mesh>(mesh); }));
+        mMeshes.emplace_back(DX11MeshPtr(allocator->AllocateObject<DX11Mesh>(mDevice, vertexData, normalData, texCoords, tangents, bitangents, indexData), [=](DX11Mesh* mesh) { allocator->DeallocateObject<DX11Mesh>(mesh); }));
 
         return mMeshes.back()->GetMeshID();
     }
@@ -240,7 +240,7 @@ namespace JonsEngine
     {
         auto allocator = mMemoryAllocator;
 
-        mTextures.emplace_back(DX11TexturePtr(allocator->AllocateObject<DX11Texture>(mDevice, mContext, textureData, textureWidth, textureHeight, textureType, mLogger), [=](DX11Texture* texture) { allocator->DeallocateObject<DX11Texture>(texture); }));
+        mTextures.emplace_back(DX11TexturePtr(allocator->AllocateObject<DX11Texture>(mDevice, mContext, textureData, textureWidth, textureHeight, textureType), [=](DX11Texture* texture) { allocator->DeallocateObject<DX11Texture>(texture); }));
 
         return mTextures.back()->GetTextureID();
     }
@@ -368,10 +368,10 @@ namespace JonsEngine
 
     void DX11RendererImpl::ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting)
     {
+        // set backbuffer as rendertarget and bind gbuffer textures as texture inputs
         mContext->OMSetRenderTargets(1, &mBackbuffer, NULL);
         mContext->OMSetDepthStencilState(NULL, 0);
         mContext->ClearRenderTargetView(mBackbuffer, gClearColor);
-
         mGBuffer.BindForReading(mContext);
 
         // ambient light
@@ -381,12 +381,18 @@ namespace JonsEngine
         mContext->OMSetBlendState(mBlendState, NULL, 0xffffffff);
 
         // do all directional lights
-        mDirectionalLightPass.BindForDrawing(mContext);
+        mDirectionalLightPass.BindForShading(mContext);
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
         {
             mDirectionalLightPass.Render(mContext, directionalLight.mLightColor, directionalLight.mLightDirection, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
         }
 
+        // do all point lights
+        mPointLightPass.BindForShading(mContext);
+        for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
+        {
+            mPointLightPass.Render(mContext, pointLight.mWVPMatrix, pointLight.mLightColor, pointLight.mLightPosition, pointLight.mLightIntensity, pointLight.mMaxDistance, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
+        }
 
         mContext->OMSetBlendState(NULL, NULL, 0xffffffff);
     }

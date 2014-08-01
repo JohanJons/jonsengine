@@ -13,7 +13,7 @@ namespace JonsEngine
         DX11DirectionalLightPass(ID3D11Device* device);
         ~DX11DirectionalLightPass();
 
-        void BindForDrawing(ID3D11DeviceContext* context);
+        void BindForShading(ID3D11DeviceContext* context);
         void Render(ID3D11DeviceContext* context, const Vec4& lightColor, const Vec3& lightDir, uint32_t screenWidth, uint32_t screenHeight);
 
 

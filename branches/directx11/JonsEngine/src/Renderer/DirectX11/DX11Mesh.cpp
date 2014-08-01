@@ -14,8 +14,8 @@ namespace JonsEngine
 
 
     DX11Mesh::DX11Mesh(ID3D11Device* device, const std::vector<float>& vertexData, const std::vector<float>& normalData,
-        const std::vector<float>& texCoords, const std::vector<float>& tangentData, const std::vector<float>& bitangentData, const std::vector<uint32_t>& indexData, Logger& logger) 
-        : mLogger(logger), mMeshID(gNextMeshID++), mNumIndices(indexData.size()), mVertexBuffer(nullptr), mTexcoordBuffer(nullptr), mIndexBuffer(nullptr)
+        const std::vector<float>& texCoords, const std::vector<float>& tangentData, const std::vector<float>& bitangentData, const std::vector<uint32_t>& indexData) 
+        : mMeshID(gNextMeshID++), mNumIndices(indexData.size()), mVertexBuffer(nullptr), mTexcoordBuffer(nullptr), mIndexBuffer(nullptr)
     {
         // vertex buffer
         D3D11_BUFFER_DESC bufferDescription;

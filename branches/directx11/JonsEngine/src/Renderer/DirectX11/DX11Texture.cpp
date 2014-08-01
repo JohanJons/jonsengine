@@ -7,7 +7,7 @@ namespace JonsEngine
     static TextureID gNextTextureID = 1;
 
 
-    DX11Texture::DX11Texture(ID3D11Device* device, ID3D11DeviceContext* context, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureType textureType, Logger& logger) :
+    DX11Texture::DX11Texture(ID3D11Device* device, ID3D11DeviceContext* context, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight, TextureType textureType) :
         mTexture(nullptr), mShaderResourceView(nullptr), mTextureID(gNextTextureID++), mTextureType(textureType)
     {
         // create texture

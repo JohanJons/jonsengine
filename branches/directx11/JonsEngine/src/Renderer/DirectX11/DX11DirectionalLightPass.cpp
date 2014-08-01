@@ -20,7 +20,7 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::BindForDrawing(ID3D11DeviceContext* context)
+    void DX11DirectionalLightPass::BindForShading(ID3D11DeviceContext* context)
     {
         context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
         for (uint32_t index = 0; index < DX11Mesh::NUM_VERTEX_BUFFER_SLOTS; index++)

@@ -56,7 +56,7 @@ namespace JonsEngine
 
         // input layout
         D3D11_INPUT_ELEMENT_DESC inputDescription[DX11Mesh::NUM_VERTEX_BUFFER_SLOTS];
-        ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC)* 2);
+        ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC) * DX11Mesh::NUM_VERTEX_BUFFER_SLOTS);
         inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].SemanticName = "POSITION";
         inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].SemanticIndex = 0;
         inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].Format = DXGI_FORMAT_R32G32B32_FLOAT;

@@ -1,14 +1,41 @@
 #include "include/Renderer/DirectX11/DX11PointLightPass.h"
 
+#include "include/Renderer/Shapes.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/Renderer/DirectX11/Shaders/Compiled/FullscreenTriangleVertex.h"
+#include "include/Renderer/DirectX11/DX11Mesh.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/PointLightVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/PointLightPixel.h"
 
 namespace JonsEngine
 {
-    DX11PointLightPass::DX11PointLightPass(ID3D11Device* device) : mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device)
+    DX11Mesh CreateSphereMesh(ID3D11Device* device)
     {
-        DXCALL(device->CreateVertexShader(gFullscreenTriangleVertexShader, sizeof(gFullscreenTriangleVertexShader), NULL, &mVertexShader));
+        std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
+        std::vector<uint32_t> indiceData;
+        if (!CreateSphereData(1.0f, 12, 24, vertexData, normalData, texcoordData, indiceData))
+        {
+            JONS_LOG_ERROR(Logger::GetRendererLogger(), "Failed to create sphere for shading pass");
+            throw std::runtime_error("Failed to create sphere for shading pass");
+        }
+
+        return DX11Mesh(device, vertexData, normalData, texcoordData, tangents, bitangents, indiceData);
+    }
+
+
+    DX11PointLightPass::DX11PointLightPass(ID3D11Device* device) : mVertexShader(nullptr), mPixelShader(nullptr), mInputLayout(nullptr), mSphereMesh(CreateSphereMesh(device)), mConstantBuffer(device)
+    {
+        D3D11_INPUT_ELEMENT_DESC inputDescription;
+        ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC));
+        inputDescription.SemanticName = "POSITION";
+        inputDescription.SemanticIndex = 0;
+        inputDescription.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        inputDescription.InputSlot = 0;
+        inputDescription.AlignedByteOffset = 0;
+        inputDescription.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription.InstanceDataStepRate = 0;
+        DXCALL(device->CreateInputLayout(&inputDescription, 1, gPointLightVertexShader, sizeof(gPointLightVertexShader), &mInputLayout));
+
+        DXCALL(device->CreateVertexShader(gPointLightVertexShader, sizeof(gPointLightVertexShader), NULL, &mVertexShader));
         DXCALL(device->CreatePixelShader(gPointLightPixelShader, sizeof(gPointLightPixelShader), NULL, &mPixelShader));
     }
 
@@ -16,5 +43,23 @@ namespace JonsEngine
     {
         mVertexShader->Release();
         mPixelShader->Release();
+        mInputLayout->Release();
+    }
+
+
+    void DX11PointLightPass::BindForShading(ID3D11DeviceContext* context)
+    {
+        context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        context->IASetInputLayout(mInputLayout);
+
+        context->VSSetShader(mVertexShader, NULL, NULL);
+        context->PSSetShader(mPixelShader, NULL, NULL);
+    }
+
+    void DX11PointLightPass::Render(ID3D11DeviceContext* context, const Mat4& lightWVP, const Vec4& lightColor, const Vec3& lightPosition, const float lightIntensity, const float maxDistance, uint32_t screenWidth, uint32_t screenHeight)
+    {
+        mConstantBuffer.SetData(PointLightCBuffer(lightWVP, lightColor, Vec4(lightPosition, 1.0), Vec2(screenWidth, screenHeight), lightIntensity, maxDistance), context, 0);
+
+        mSphereMesh.Draw(context);
     }
 }
