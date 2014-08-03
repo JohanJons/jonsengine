@@ -161,7 +161,7 @@ namespace JonsEngine
         rasterizerDesc.ScissorEnable = false;
         rasterizerDesc.MultisampleEnable = false;
         rasterizerDesc.AntialiasedLineEnable = false;
-        DXCALL(mDevice->CreateRasterizerState(&rasterizerDesc, &mRasterizerState));
+        DXCALL(mDevice->CreateRasterizerState(&rasterizerDesc, &mDefaultRasterizerState));
         
         // create depth buffer/view
         D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
@@ -220,7 +220,7 @@ namespace JonsEngine
         mDepthStencilBuffer->Release();
         mDepthStencilView->Release();
         mDepthStencilState->Release();
-        mRasterizerState->Release();
+        mDefaultRasterizerState->Release();
         mBlendState->Release();
         mBackbuffer->Release();
         mTextureSampler->Release();
@@ -311,7 +311,7 @@ namespace JonsEngine
 
     void DX11RendererImpl::SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight)
     {
-        mContext->RSSetState(mRasterizerState);
+        mContext->RSSetState(mDefaultRasterizerState);
 
         D3D11_VIEWPORT viewport;
         ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));

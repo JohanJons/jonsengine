@@ -35,6 +35,18 @@ namespace JonsEngine
         inputDescription.InstanceDataStepRate = 0;
         DXCALL(device->CreateInputLayout(&inputDescription, 1, gPointLightVertexShader, sizeof(gPointLightVertexShader), &mInputLayout));
 
+        // rasterize for front-face culling due to light volumes
+        D3D11_RASTERIZER_DESC rasterizerDesc;
+        ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
+        rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+        rasterizerDesc.CullMode = D3D11_CULL_FRONT;
+        rasterizerDesc.FrontCounterClockwise = true;
+        rasterizerDesc.DepthClipEnable = true;
+        rasterizerDesc.ScissorEnable = false;
+        rasterizerDesc.MultisampleEnable = false;
+        rasterizerDesc.AntialiasedLineEnable = false;
+        DXCALL(device->CreateRasterizerState(&rasterizerDesc, &mRSCullFront));
+
         DXCALL(device->CreateVertexShader(gPointLightVertexShader, sizeof(gPointLightVertexShader), NULL, &mVertexShader));
         DXCALL(device->CreatePixelShader(gPointLightPixelShader, sizeof(gPointLightPixelShader), NULL, &mPixelShader));
     }
@@ -44,6 +56,8 @@ namespace JonsEngine
         mVertexShader->Release();
         mPixelShader->Release();
         mInputLayout->Release();
+        //mDepthStencilState->Release();
+        mRSCullFront->Release();
     }
 
 
@@ -58,8 +72,18 @@ namespace JonsEngine
 
     void DX11PointLightPass::Render(ID3D11DeviceContext* context, const Mat4& lightWVP, const Vec4& lightColor, const Vec3& lightPosition, const float lightIntensity, const float maxDistance, uint32_t screenWidth, uint32_t screenHeight)
     {
+        // preserve current rs state
+        ID3D11RasterizerState* previousRasterizerState = nullptr;
+        context->RSGetState(&previousRasterizerState);
+
+        // set cullface front
+        context->RSSetState(mRSCullFront);
+
         mConstantBuffer.SetData(PointLightCBuffer(lightWVP, lightColor, Vec4(lightPosition, 1.0), Vec2(screenWidth, screenHeight), lightIntensity, maxDistance), context, 0);
 
         mSphereMesh.Draw(context);
+
+        // restore rs state
+        context->RSSetState(previousRasterizerState);
     }
 }

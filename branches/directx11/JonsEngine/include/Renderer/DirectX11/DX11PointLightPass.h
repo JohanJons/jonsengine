@@ -38,6 +38,8 @@ namespace JonsEngine
         ID3D11VertexShader* mVertexShader;
         ID3D11PixelShader* mPixelShader;
         ID3D11InputLayout* mInputLayout;
+        ID3D11DepthStencilState* mDepthStencilState;
+        ID3D11RasterizerState* mRSCullFront;
         DX11Mesh mSphereMesh;
         DX11ConstantBuffer<PointLightCBuffer> mConstantBuffer;
     };
