@@ -181,7 +181,7 @@ namespace JonsEngine
         ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
         depthStencilDesc.DepthEnable = true;
         depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-        depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+        depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
         depthStencilDesc.StencilEnable = false;
         DXCALL(mDevice->CreateDepthStencilState(&depthStencilDesc, &mDepthStencilState));
 

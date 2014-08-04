@@ -47,6 +47,18 @@ namespace JonsEngine
         rasterizerDesc.AntialiasedLineEnable = false;
         DXCALL(device->CreateRasterizerState(&rasterizerDesc, &mRSCullFront));
 
+        //GLCALL(glStencilOpSeparate(GL_BACK, GL_KEEP, GL_INCR_WRAP, GL_KEEP));
+        //GLCALL(glStencilOpSeparate(GL_FRONT, GL_KEEP, GL_DECR_WRAP, GL_KEEP));
+        D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+        ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
+        depthStencilDesc.DepthEnable = true;
+        depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+        depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+        depthStencilDesc.StencilEnable = true;
+        depthStencilDesc.StencilReadMask = 0;
+        depthStencilDesc.StencilWriteMask = 0;
+        DXCALL(device->CreateDepthStencilState(&depthStencilDesc, &mDepthStencilState));
+
         DXCALL(device->CreateVertexShader(gPointLightVertexShader, sizeof(gPointLightVertexShader), NULL, &mVertexShader));
         DXCALL(device->CreatePixelShader(gPointLightPixelShader, sizeof(gPointLightPixelShader), NULL, &mPixelShader));
     }
@@ -56,7 +68,7 @@ namespace JonsEngine
         mVertexShader->Release();
         mPixelShader->Release();
         mInputLayout->Release();
-        //mDepthStencilState->Release();
+        mDepthStencilState->Release();
         mRSCullFront->Release();
     }
 
