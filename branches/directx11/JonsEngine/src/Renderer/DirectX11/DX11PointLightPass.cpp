@@ -57,6 +57,7 @@ namespace JonsEngine
         depthStencilDesc.StencilEnable = true;
         depthStencilDesc.StencilReadMask = 0;
         depthStencilDesc.StencilWriteMask = 0;
+        depthStencilDesc.FrontFace. 
         DXCALL(device->CreateDepthStencilState(&depthStencilDesc, &mDepthStencilState));
 
         DXCALL(device->CreateVertexShader(gPointLightVertexShader, sizeof(gPointLightVertexShader), NULL, &mVertexShader));
