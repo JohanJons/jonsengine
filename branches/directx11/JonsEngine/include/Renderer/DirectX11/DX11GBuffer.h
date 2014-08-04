@@ -25,6 +25,7 @@ namespace JonsEngine
         void SetConstantData(ID3D11DeviceContext* context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture);
         void BindForDrawing(ID3D11DeviceContext* context);
         void BindForReading(ID3D11DeviceContext* context);
+        ID3D11DepthStencilView* GetDepthStencilView();
 
 
     private:
@@ -49,7 +50,6 @@ namespace JonsEngine
         ID3D11ShaderResourceView* mShaderResourceViews[DX11GBuffer::GBUFFER_NUM_RENDERTARGETS];
         ID3D11Texture2D* mDepthStencilBuffer;
         ID3D11DepthStencilView* mDepthStencilView;
-        ID3D11DepthStencilState* mDepthStencilState;
         ID3D11InputLayout* mInputLayout;
         ID3D11VertexShader* mVertexShader;
         ID3D11PixelShader* mPixelShader;

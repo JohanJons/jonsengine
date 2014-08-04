@@ -363,5 +363,8 @@
     <FxCompile Include="include\Renderer\DirectX11\Shaders\PointLightVertex.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\NullVertex.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -179,9 +179,9 @@ namespace JonsEngine
 
         D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
         ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
-        depthStencilDesc.DepthEnable = true;
-        depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-        depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+        depthStencilDesc.DepthEnable = false;
+        depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+        depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
         depthStencilDesc.StencilEnable = false;
         DXCALL(mDevice->CreateDepthStencilState(&depthStencilDesc, &mDepthStencilState));
 
@@ -368,9 +368,13 @@ namespace JonsEngine
 
     void DX11RendererImpl::ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting)
     {
+        // geometry pass also filled gbuffer depthbuffer. We need it for further shading ops.
+        ID3D11DepthStencilView* gbufferDepthBuffer = mGBuffer.GetDepthStencilView();
+
         // set backbuffer as rendertarget and bind gbuffer textures as texture inputs
-        mContext->OMSetRenderTargets(1, &mBackbuffer, NULL);
-        mContext->OMSetDepthStencilState(NULL, 0);
+        mContext->OMSetRenderTargets(1, &mBackbuffer, gbufferDepthBuffer);
+        // disable further depth testing/writing
+        mContext->OMSetDepthStencilState(mDepthStencilState, 0);
         mContext->ClearRenderTargetView(mBackbuffer, gClearColor);
         mGBuffer.BindForReading(mContext);
 
@@ -391,6 +395,7 @@ namespace JonsEngine
         mPointLightPass.BindForShading(mContext);
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
+            mContext->ClearDepthStencilView(gbufferDepthBuffer, D3D11_CLEAR_STENCIL, 1.0f, 0);
             mPointLightPass.Render(mContext, pointLight.mWVPMatrix, pointLight.mLightColor, pointLight.mLightPosition, pointLight.mLightIntensity, pointLight.mMaxDistance, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
         }
 

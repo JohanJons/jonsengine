@@ -10,7 +10,7 @@ namespace JonsEngine
     const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
-    DX11GBuffer::DX11GBuffer(ID3D11Device* device, uint32_t textureWidth, uint32_t textureHeight) : mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr), mDepthStencilState(nullptr),
+    DX11GBuffer::DX11GBuffer(ID3D11Device* device, uint32_t textureWidth, uint32_t textureHeight) : mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr),
         mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device)
     {
         // create gbuffer textures/rendertargets
@@ -45,14 +45,6 @@ namespace JonsEngine
         depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
         DXCALL(device->CreateTexture2D(&depthStencilBufferDesc, NULL, &mDepthStencilBuffer));
         DXCALL(device->CreateDepthStencilView(mDepthStencilBuffer, NULL, &mDepthStencilView));
-
-        D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-        ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
-        depthStencilDesc.DepthEnable = true;
-        depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-        depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-        depthStencilDesc.StencilEnable = false;
-        DXCALL(device->CreateDepthStencilState(&depthStencilDesc, &mDepthStencilState));
 
         // input layout
         D3D11_INPUT_ELEMENT_DESC inputDescription[DX11Mesh::NUM_VERTEX_BUFFER_SLOTS];
@@ -110,7 +102,6 @@ namespace JonsEngine
 
         mDepthStencilBuffer->Release();
         mDepthStencilView->Release();
-        mDepthStencilState->Release();
         mInputLayout->Release();
         mVertexShader->Release();
         mPixelShader->Release();
@@ -126,12 +117,13 @@ namespace JonsEngine
     {
         for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
             context->ClearRenderTargetView(mRenderTargets[index], gClearColor);
-        context->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+        context->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
+        // default == depth testing/writing on
+        context->OMSetDepthStencilState(NULL, 0);
         context->OMSetRenderTargets(DX11GBuffer::GBUFFER_NUM_RENDERTARGETS, &mRenderTargets[0], mDepthStencilView);
-        context->OMSetDepthStencilState(mDepthStencilState, 1);
         context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        
+
         context->IASetInputLayout(mInputLayout);
 
         context->VSSetShader(mVertexShader, NULL, NULL);
@@ -142,5 +134,10 @@ namespace JonsEngine
     {
         for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
             context->PSSetShaderResources(index, 1, &mShaderResourceViews[index]);
+    }
+
+    ID3D11DepthStencilView* DX11GBuffer::GetDepthStencilView()
+    {
+        return mDepthStencilView;
     }
 }

@@ -19,6 +19,16 @@ namespace JonsEngine
 
 
     private:
+        struct NullCBuffer
+        {
+            Mat4 mWVPMatrix;
+
+
+            NullCBuffer(const Mat4& wvpMatrix) : mWVPMatrix(wvpMatrix)
+            {
+            }
+        };
+
         struct PointLightCBuffer
         {
             Mat4 mLightWVPMatrix;
@@ -35,12 +45,16 @@ namespace JonsEngine
             }
         };
 
-        ID3D11VertexShader* mVertexShader;
+        ID3D11VertexShader* mShadingVertexShader;
+        ID3D11VertexShader* mStencilVertexShader;
         ID3D11PixelShader* mPixelShader;
         ID3D11InputLayout* mInputLayout;
-        ID3D11DepthStencilState* mDepthStencilState;
+        ID3D11DepthStencilState* mDSSStencilPass;
+        ID3D11DepthStencilState* mDSSShadingPass;
         ID3D11RasterizerState* mRSCullFront;
+        ID3D11RasterizerState* mRSNoCulling;
         DX11Mesh mSphereMesh;
-        DX11ConstantBuffer<PointLightCBuffer> mConstantBuffer;
+        DX11ConstantBuffer<NullCBuffer> mNullCBuffer;
+        DX11ConstantBuffer<PointLightCBuffer> mPointLightCBuffer;
     };
 }
