@@ -215,9 +215,9 @@ namespace JonsEngine
                                                             // VS2012 bug workaround. TODO: fixed in VS2013, when boost is rdy
         //mDefaultProgram("DefaultProgram", ShaderPtr(new Shader("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultVertexShader", gVertexShader, Shader::VERTEX_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); }*/), 
         //                                 ShaderPtr(new Shader("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER)/*mMemoryAllocator->AllocateObject<Shader>("DefaultFragmentShader", gFragmentShader, Shader::FRAGMENT_SHADER), [this](Shader* shader) { mMemoryAllocator->DeallocateObject(shader); })*/), mLogger),
-        mAccumulationBuffer(mLogger, windowWidth, windowHeight),
+        mAccumulationBuffer(mLogger, windowWidth, windowHeight), mAnisotropicFiltering(anisotropy), mMSAA(msaa),
         mGBuffer(mMemoryAllocator->AllocateObject<GBuffer>(mLogger, windowWidth, windowHeight, mMSAA), [this](GBuffer* gbuffer) { mMemoryAllocator->DeallocateObject(gbuffer); }),
-        mTextureSampler(0), mAnisotropicFiltering(anisotropy), mMSAA(msaa), mWindowWidth(windowWidth), mWindowHeight(windowHeight), mShadowmapResolution(shadowMapResolution),
+        mTextureSampler(0), mWindowWidth(windowWidth), mWindowHeight(windowHeight), mShadowmapResolution(shadowMapResolution),
         mShadingGeometry(mLogger), mDirectionalShadowmap(mLogger, shadowMapResolution, gNumShadowmapCascades), mOmnidirectionalShadowmap(mLogger, shadowMapResolution, CUBEMAP_NUM_FACES)
     {
         GLCALL(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));

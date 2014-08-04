@@ -76,6 +76,8 @@ namespace JonsEngine
 
         IMemoryAllocatorPtr mMemoryAllocator;
         Logger& mLogger;
+        EngineSettings::Anisotropic mAnisotropicFiltering;
+        EngineSettings::MSAA mMSAA;
 
         ShaderProgram<UnifGeometry> mGeometryProgram;
         ShaderProgram<UnifNull> mNullProgram;
@@ -87,8 +89,6 @@ namespace JonsEngine
         AccumulationBuffer mAccumulationBuffer;
         GBufferPtr mGBuffer;
         GLuint mTextureSampler;
-        EngineSettings::Anisotropic mAnisotropicFiltering;
-        EngineSettings::MSAA mMSAA;
         uint32_t mWindowWidth;
         uint32_t mWindowHeight;
         uint32_t mShadowmapResolution;
