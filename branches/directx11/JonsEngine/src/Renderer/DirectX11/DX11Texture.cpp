@@ -44,7 +44,7 @@ namespace JonsEngine
     }
 
 
-    void DX11Texture::Activate(ID3D11DeviceContext* context, uint32_t textureSlot)
+    void DX11Texture::Bind(ID3D11DeviceContext* context, uint32_t textureSlot)
     {
         context->PSSetShaderResources(textureSlot, 1, &mShaderResourceView);
     }

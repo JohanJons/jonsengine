@@ -54,7 +54,7 @@ namespace JonsEngine
         return glm::ortho(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.y) * viewMatrix;
     }
 
-    void ActivateTexture(const std::vector<DX11RendererImpl::DX11TexturePtr>& textures, Logger& logger, const TextureID textureID, ID3D11DeviceContext* context, uint32_t textureSlot)
+    void BindTexture(const std::vector<DX11RendererImpl::DX11TexturePtr>& textures, Logger& logger, const TextureID textureID, ID3D11DeviceContext* context, uint32_t textureSlot)
     {
         auto texture = std::find_if(textures.begin(), textures.end(), [&](const DX11RendererImpl::DX11TexturePtr ptr) { return ptr->GetTextureID() == textureID; });
         if (texture == textures.end())
@@ -63,7 +63,7 @@ namespace JonsEngine
             throw std::runtime_error("Renderable TextureID out of range");
         }
 
-        (*texture)->Activate(context, textureSlot);
+        (*texture)->Bind(context, textureSlot);
     }
 
     LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
@@ -356,10 +356,10 @@ namespace JonsEngine
             const bool hasNormalTexture = renderable.mNormalTexture != INVALID_TEXTURE_ID;
 
             if (hasDiffuseTexture)
-                ActivateTexture(mTextures, mLogger, renderable.mDiffuseTexture, mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_DIFFUSE);
+                BindTexture(mTextures, mLogger, renderable.mDiffuseTexture, mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_DIFFUSE);
 
             if (hasNormalTexture)
-                ActivateTexture(mTextures, mLogger, renderable.mNormalTexture, mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_NORMAL);
+                BindTexture(mTextures, mLogger, renderable.mNormalTexture, mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_NORMAL);
 
             mGBuffer.SetConstantData(mContext, renderable.mWVPMatrix, renderable.mWorldMatrix, renderable.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
             (*meshIterator)->Draw(mContext);
