@@ -54,7 +54,7 @@ namespace JonsEngine
         return glm::ortho(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.y) * viewMatrix;
     }
 
-    void BindTexture(const std::vector<DX11RendererImpl::DX11TexturePtr>& textures, Logger& logger, const TextureID textureID, ID3D11DeviceContext* context, uint32_t textureSlot)
+    void BindTexture2D(const std::vector<DX11RendererImpl::DX11TexturePtr>& textures, Logger& logger, const TextureID textureID, ID3D11DeviceContext* context, uint32_t textureSlot)
     {
         auto texture = std::find_if(textures.begin(), textures.end(), [&](const DX11RendererImpl::DX11TexturePtr ptr) { return ptr->GetTextureID() == textureID; });
         if (texture == textures.end())
@@ -356,10 +356,10 @@ namespace JonsEngine
             const bool hasNormalTexture = renderable.mNormalTexture != INVALID_TEXTURE_ID;
 
             if (hasDiffuseTexture)
-                BindTexture(mTextures, mLogger, renderable.mDiffuseTexture, mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_DIFFUSE);
+                BindTexture2D(mTextures, mLogger, renderable.mDiffuseTexture, mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_DIFFUSE);
 
             if (hasNormalTexture)
-                BindTexture(mTextures, mLogger, renderable.mNormalTexture, mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_NORMAL);
+                BindTexture2D(mTextures, mLogger, renderable.mNormalTexture, mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_NORMAL);
 
             mGBuffer.SetConstantData(mContext, renderable.mWVPMatrix, renderable.mWorldMatrix, renderable.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
             (*meshIterator)->Draw(mContext);
