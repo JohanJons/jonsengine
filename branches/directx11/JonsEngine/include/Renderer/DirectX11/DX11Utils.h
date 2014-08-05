@@ -9,6 +9,9 @@
 
 namespace JonsEngine
 {
+    const float Z_NEAR = 0.1f;
+    const float Z_FAR = 100.0f;
+
     #ifdef _DEBUG
     #define DXCALL(function)                                                                                                                            \
     {                                                                                                                                                   \

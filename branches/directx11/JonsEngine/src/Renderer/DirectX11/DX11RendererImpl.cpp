@@ -17,7 +17,6 @@ namespace JonsEngine
 
     const UINT_PTR gSubClassID = 1;
     const uint32_t gTextureSamplerSlot = 0;
-    const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
     Mat4 CreateDirLightVPMatrix(const CameraFrustrum& cameraFrustrum, const Vec3& lightDir)
@@ -116,19 +115,20 @@ namespace JonsEngine
                 const uint16_t width = LOWORD(lParam);
                 const uint16_t height = HIWORD(lParam);
 
-                gDX11RendererImpl->mContext->ClearState();
+               /* gDX11RendererImpl->mContext->ClearState();
                 gDX11RendererImpl->mContext->OMSetRenderTargets(0, 0, 0);
                 gDX11RendererImpl->mBackbuffer->Release();
-                gDX11RendererImpl->mBackbuffer = nullptr;
+                gDX11RendererImpl->mBackbuffer = nullptr;*/
+                // TODO
 
                 DXCALL(gDX11RendererImpl->mSwapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0));
 
                 // backbuffer rendertarget setup
-                ID3D11Texture2D* backbuffer = nullptr;
-                DXCALL(gDX11RendererImpl->mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer));
+                //ID3D11Texture2D* backbuffer = nullptr;
+                //DXCALL(gDX11RendererImpl->mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer));
 
-                DXCALL(gDX11RendererImpl->mDevice->CreateRenderTargetView(backbuffer, NULL, &gDX11RendererImpl->mBackbuffer));
-                backbuffer->Release();
+                //DXCALL(gDX11RendererImpl->mDevice->CreateRenderTargetView(backbuffer, NULL, &gDX11RendererImpl->mBackbuffer));
+                //backbuffer->Release();
 
                 gDX11RendererImpl->SetupContext(width, height);
 
@@ -140,17 +140,25 @@ namespace JonsEngine
         }
     }
 
+    uint32_t ShadowQualityResolution(const EngineSettings::ShadowQuality shadowQuality)
+    {
+        switch (shadowQuality)
+        {
+        case EngineSettings::ShadowQuality::SHADOW_QUALITY_LOW:
+            return 512;
+        case EngineSettings::ShadowQuality::SHADOW_QUALITY_HIGH:
+            return 2048;
+        case EngineSettings::ShadowQuality::SHADOW_QUALITY_MEDIUM:
+        default:
+            return 1024;
+        }
+    }
+
 
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
-        mAnisotropicFiltering(settings.mAnisotropicFiltering), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mAmbientPass(mDevice), mDirectionalLightPass(mDevice),
-        mPointLightPass(mDevice), mBackbuffer(nullptr), mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr), mDepthStencilState(nullptr), mTextureSampler(nullptr)
+        mAnisotropicFiltering(settings.mAnisotropicFiltering), mShadowQuality(settings.mShadowQuality), mBackBuffer(mDevice, mSwapchain, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
+        mAmbientPass(mDevice), mDirectionalLightPass(mDevice), mPointLightPass(mDevice, mBackBuffer, ShadowQualityResolution(mShadowQuality)), mTextureSampler(nullptr)
     {
-        // backbuffer rendertarget setup
-        ID3D11Texture2D* backbuffer = nullptr;
-        DXCALL(mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer));
-        DXCALL(mDevice->CreateRenderTargetView(backbuffer, NULL, &mBackbuffer));
-        backbuffer->Release();
-        
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;
         ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
@@ -163,28 +171,6 @@ namespace JonsEngine
         rasterizerDesc.AntialiasedLineEnable = false;
         DXCALL(mDevice->CreateRasterizerState(&rasterizerDesc, &mDefaultRasterizerState));
         
-        // create depth buffer/view
-        D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
-        ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
-        depthStencilBufferDesc.ArraySize = 1;
-        depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-        depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        depthStencilBufferDesc.Width = mSwapchainDesc.BufferDesc.Width;
-        depthStencilBufferDesc.Height = mSwapchainDesc.BufferDesc.Height;
-        depthStencilBufferDesc.MipLevels = 1;
-        depthStencilBufferDesc.SampleDesc.Count = 1;
-        depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-        DXCALL(mDevice->CreateTexture2D(&depthStencilBufferDesc, NULL, &mDepthStencilBuffer));
-        DXCALL(mDevice->CreateDepthStencilView(mDepthStencilBuffer, NULL, &mDepthStencilView));
-
-        D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-        ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
-        depthStencilDesc.DepthEnable = false;
-        depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-        depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-        depthStencilDesc.StencilEnable = false;
-        DXCALL(mDevice->CreateDepthStencilState(&depthStencilDesc, &mDepthStencilState));
-
         // create blend state for shading pass
         D3D11_BLEND_DESC blendDesc;
         ZeroMemory(&blendDesc, sizeof(D3D11_BLEND_DESC));
@@ -217,12 +203,8 @@ namespace JonsEngine
     
         DXCALL(mSwapchain->SetFullscreenState(false, NULL));
 
-        mDepthStencilBuffer->Release();
-        mDepthStencilView->Release();
-        mDepthStencilState->Release();
         mDefaultRasterizerState->Release();
         mBlendState->Release();
-        mBackbuffer->Release();
         mTextureSampler->Release();
     }
 
@@ -247,8 +229,8 @@ namespace JonsEngine
 
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
-        GeometryPass(renderQueue);
-        ShadingPass(renderQueue, lighting);
+        GeometryStage(renderQueue);
+        ShadingStage(renderQueue, lighting);
 
         DXCALL(mSwapchain->Present(0, 0));
     }
@@ -295,12 +277,12 @@ namespace JonsEngine
 
     float DX11RendererImpl::GetZNear() const
     {
-        return 0.1f;
+        return Z_NEAR;
     }
 
     float DX11RendererImpl::GetZFar() const
     {
-        return 100.0f;
+        return Z_FAR;
     }
 
     uint32_t DX11RendererImpl::GetShadowmapResolution() const
@@ -326,9 +308,9 @@ namespace JonsEngine
         mContext->PSSetSamplers(gTextureSamplerSlot, 1, &mTextureSampler);
     }
 
-    void DX11RendererImpl::GeometryPass(const RenderQueue& renderQueue)
+    void DX11RendererImpl::GeometryStage(const RenderQueue& renderQueue)
     {
-        mGBuffer.BindForDrawing(mContext);
+        mGBuffer.BindForGeometryStage(mContext);
 
         auto meshIterator = mMeshes.begin();
         for (const Renderable& renderable : renderQueue)
@@ -366,17 +348,13 @@ namespace JonsEngine
         }
     }
 
-    void DX11RendererImpl::ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting)
+    void DX11RendererImpl::ShadingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting)
     {
         // geometry pass also filled gbuffer depthbuffer. We need it for further shading ops.
-        ID3D11DepthStencilView* gbufferDepthBuffer = mGBuffer.GetDepthStencilView();
+        ID3D11DepthStencilView* depthBuffer = mGBuffer.GetDepthStencilView();
 
-        // set backbuffer as rendertarget and bind gbuffer textures as texture inputs
-        mContext->OMSetRenderTargets(1, &mBackbuffer, gbufferDepthBuffer);
-        // disable further depth testing/writing
-        mContext->OMSetDepthStencilState(mDepthStencilState, 0);
-        mContext->ClearRenderTargetView(mBackbuffer, gClearColor);
-        mGBuffer.BindForReading(mContext);
+        mBackBuffer.BindForShadingStage(mContext, depthBuffer);
+        mGBuffer.BindForShadingStage(mContext);
 
         // ambient light
         mAmbientPass.Render(mContext, lighting.mAmbientLight, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
@@ -395,8 +373,8 @@ namespace JonsEngine
         mPointLightPass.BindForShading(mContext);
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
-            mContext->ClearDepthStencilView(gbufferDepthBuffer, D3D11_CLEAR_STENCIL, 1.0f, 0);
-            mPointLightPass.Render(mContext, pointLight.mWVPMatrix, pointLight.mLightColor, pointLight.mLightPosition, pointLight.mLightIntensity, pointLight.mMaxDistance, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
+            mGBuffer.ClearStencilBuffer(mContext);
+            mPointLightPass.Render(mContext, renderQueue, pointLight, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
         }
 
         mContext->OMSetBlendState(NULL, NULL, 0xffffffff);

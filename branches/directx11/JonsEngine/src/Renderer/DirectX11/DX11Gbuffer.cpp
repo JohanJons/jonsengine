@@ -113,7 +113,7 @@ namespace JonsEngine
         mConstantBuffer.SetData({wvpMatrix, worldMatrix, textureTilingFactor, hasDiffuseTexture, hasNormalTexture}, context, 0);
     }
 
-    void DX11GBuffer::BindForDrawing(ID3D11DeviceContext* context)
+    void DX11GBuffer::BindForGeometryStage(ID3D11DeviceContext* context)
     {
         for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
             context->ClearRenderTargetView(mRenderTargets[index], gClearColor);
@@ -130,11 +130,17 @@ namespace JonsEngine
         context->PSSetShader(mPixelShader, NULL, NULL);
     }
 
-    void DX11GBuffer::BindForReading(ID3D11DeviceContext* context)
+    void DX11GBuffer::BindForShadingStage(ID3D11DeviceContext* context)
     {
         for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
             context->PSSetShaderResources(index, 1, &mShaderResourceViews[index]);
     }
+
+    void DX11GBuffer::ClearStencilBuffer(ID3D11DeviceContext* context)
+    {
+        context->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_STENCIL, 1.0f, 0);
+    }
+
 
     ID3D11DepthStencilView* DX11GBuffer::GetDepthStencilView()
     {

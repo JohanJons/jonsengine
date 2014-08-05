@@ -130,6 +130,7 @@
     <ClCompile Include="src\Core\Utils\Math.cpp" />
     <ClCompile Include="src\Core\Utils\Time.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11AmbientPass.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11BackBuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Context.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11DirectionalLightPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Gbuffer.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="include\Core\Utils\Math.h" />
     <ClInclude Include="include\Core\Utils\Win32.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11AmbientPass.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11BackBuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11ConstantBuffer.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Context.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11DirectionalLightPass.h" />

@@ -4,6 +4,7 @@
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11Context.h"
+#include "include/Renderer/DirectX11/DX11BackBuffer.h"
 #include "include/Renderer/DirectX11/DX11GBuffer.h"
 #include "include/Renderer/DirectX11/DX11AmbientPass.h"
 #include "include/Renderer/DirectX11/DX11DirectionalLightPass.h"
@@ -53,21 +54,19 @@ namespace JonsEngine
     private:
         static LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
         void SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight);
-        void GeometryPass(const RenderQueue& renderQueue);
-        void ShadingPass(const RenderQueue& renderQueue, const RenderableLighting& lighting);
+        void GeometryStage(const RenderQueue& renderQueue);
+        void ShadingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting);
 
         Logger& mLogger;
         IMemoryAllocatorPtr mMemoryAllocator;
         EngineSettings::Anisotropic mAnisotropicFiltering;
+        EngineSettings::ShadowQuality mShadowQuality;
 
+        DX11BackBuffer mBackBuffer;
         DX11GBuffer mGBuffer;
         DX11AmbientPass mAmbientPass;
         DX11DirectionalLightPass mDirectionalLightPass;
         DX11PointLightPass mPointLightPass;
-        ID3D11RenderTargetView* mBackbuffer;
-        ID3D11Texture2D* mDepthStencilBuffer;
-        ID3D11DepthStencilView* mDepthStencilView;
-        ID3D11DepthStencilState* mDepthStencilState;
         ID3D11RasterizerState* mDefaultRasterizerState;
         ID3D11BlendState* mBlendState;
         ID3D11SamplerState* mTextureSampler;
