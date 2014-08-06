@@ -8,6 +8,10 @@ namespace JonsEngine
     {
         const D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
         const UINT numFeatureLevels = 1;
+        uint32_t deviceFlags = 0;
+        #if _DEBUG
+            deviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+        #endif
 
         // create swapchain, device and devicecontext
         ZeroMemory(&mSwapchainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
@@ -17,10 +21,12 @@ namespace JonsEngine
         mSwapchainDesc.OutputWindow = mWindowHandle;
         mSwapchainDesc.SampleDesc.Count = 1;
         mSwapchainDesc.Windowed = true;
-        DXCALL(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL, &featureLevel, numFeatureLevels, D3D11_SDK_VERSION, &mSwapchainDesc, &mSwapchain, &mDevice, NULL, &mContext));
+        DXCALL(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, deviceFlags, &featureLevel, numFeatureLevels, D3D11_SDK_VERSION, &mSwapchainDesc, &mSwapchain, &mDevice, NULL, &mContext));
 
         ZeroMemory(&mSwapchainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
         DXCALL(mSwapchain->GetDesc(&mSwapchainDesc));
+
+        //mDevice->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&dbg));
     }
 
     DX11Context::~DX11Context()
@@ -28,5 +34,7 @@ namespace JonsEngine
         mSwapchain->Release();
         mDevice->Release();
         mContext->Release();
+
+        //dbg->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
     }
 }

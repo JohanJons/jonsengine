@@ -35,7 +35,7 @@ namespace JonsEngine
 
 
     DX11PointLightPass::DX11PointLightPass(ID3D11Device* device, DX11BackBuffer& backbuffer, uint32_t shadowmapSize) : mShadingVertexShader(nullptr), mNullVertexShader(nullptr), mPixelShader(nullptr),
-        mInputLayout(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mShadowmapTexture(nullptr), mShadowmapView(nullptr), mShadowmapSRV(nullptr), mSphereMesh(CreateSphereMesh(device)),
+        mInputLayout(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mShadowmapTexture(nullptr), mShadowmapSRV(nullptr), mSphereMesh(CreateSphereMesh(device)),
         mBackBuffer(backbuffer), mNullCBuffer(device), mPointLightCBuffer(device)
     {
         D3D11_INPUT_ELEMENT_DESC inputDescription;
@@ -112,8 +112,8 @@ namespace JonsEngine
         // create shadowmap texture/view/srv
         D3D11_TEXTURE2D_DESC depthBufferDesc;
         ZeroMemory(&depthBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
-        depthBufferDesc.ArraySize = 6;
-        depthBufferDesc.Format = DXGI_FORMAT_D32_FLOAT;     // potential issue? UNORM instead?
+        depthBufferDesc.ArraySize = TEXTURE_CUBE_NUM_FACES;
+        depthBufferDesc.Format = DXGI_FORMAT_R32_TYPELESS;     // potential issue? UNORM instead?
         depthBufferDesc.Width = shadowmapSize;
         depthBufferDesc.Height = shadowmapSize;
         depthBufferDesc.MipLevels = 1;
@@ -122,8 +122,26 @@ namespace JonsEngine
         depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
         depthBufferDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
         DXCALL(device->CreateTexture2D(&depthBufferDesc, NULL, &mShadowmapTexture));
-        DXCALL(device->CreateDepthStencilView(mShadowmapTexture, NULL, &mShadowmapView));
-        DXCALL(device->CreateShaderResourceView(mShadowmapTexture, NULL, &mShadowmapSRV));
+
+        D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+        ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
+        dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+        dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+        dsvDesc.Texture2DArray.ArraySize = 1;
+        dsvDesc.Texture2DArray.MipSlice = 0;
+        for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
+        {
+            dsvDesc.Texture2DArray.FirstArraySlice = face;
+            DXCALL(device->CreateDepthStencilView(mShadowmapTexture, &dsvDesc, &mShadowmapView[face]));
+        }
+
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+        ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+        srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+        srvDesc.TextureCube.MipLevels = 1;
+        srvDesc.TextureCube.MostDetailedMip = 0;
+        DXCALL(device->CreateShaderResourceView(mShadowmapTexture, &srvDesc, &mShadowmapSRV));
 
         // viewport used during shadow pass
         ZeroMemory(&mShadowPassViewport, sizeof(D3D11_VIEWPORT));
@@ -151,8 +169,10 @@ namespace JonsEngine
         mRSCullFront->Release();
         mRSNoCulling->Release();
         mShadowmapTexture->Release();
-        mShadowmapView->Release();
         mShadowmapSRV->Release();
+
+        for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
+            mShadowmapView[face]->Release();
     }
 
 

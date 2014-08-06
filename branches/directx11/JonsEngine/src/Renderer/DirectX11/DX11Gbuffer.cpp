@@ -9,6 +9,9 @@ namespace JonsEngine
 {
     const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
+    // used to reset gbuffer textures from input to rendertarget before geometry stage
+    ID3D11ShaderResourceView* const gNullSrv = nullptr;
+
 
     DX11GBuffer::DX11GBuffer(ID3D11Device* device, uint32_t textureWidth, uint32_t textureHeight) : mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr),
         mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device)
@@ -116,7 +119,11 @@ namespace JonsEngine
     void DX11GBuffer::BindForGeometryStage(ID3D11DeviceContext* context)
     {
         for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
+        {
+            // unbind gbuffer texture as input, it is now rendertarget
+            context->PSSetShaderResources(index, 1, &gNullSrv);
             context->ClearRenderTargetView(mRenderTargets[index], gClearColor);
+        }
         context->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
         // default == depth testing/writing on

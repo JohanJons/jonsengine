@@ -57,7 +57,7 @@ namespace JonsEngine
         ID3D11RasterizerState* mRSCullFront;
         ID3D11RasterizerState* mRSNoCulling;
         ID3D11Texture2D* mShadowmapTexture;
-        ID3D11DepthStencilView* mShadowmapView;
+        ID3D11DepthStencilView* mShadowmapView[6];
         ID3D11ShaderResourceView* mShadowmapSRV;
         DX11Mesh mSphereMesh;
         DX11BackBuffer& mBackBuffer;

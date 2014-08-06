@@ -10,7 +10,7 @@ namespace JonsEngine
     public:
         DX11Context(const HWND windowHandle);
         ~DX11Context();
-
+        //ID3D11Debug* dbg;
 
     protected:
         const HWND mWindowHandle;
