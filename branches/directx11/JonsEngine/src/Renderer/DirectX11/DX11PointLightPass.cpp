@@ -119,7 +119,7 @@ namespace JonsEngine
         depthBufferDesc.MipLevels = 1;
         depthBufferDesc.SampleDesc.Count = 1;
         depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-        depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+        depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
         depthBufferDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
         DXCALL(device->CreateTexture2D(&depthBufferDesc, NULL, &mShadowmapTexture));
         DXCALL(device->CreateDepthStencilView(mShadowmapTexture, NULL, &mShadowmapView));
