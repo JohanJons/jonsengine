@@ -31,9 +31,9 @@ namespace JonsEngine
 
     DX11Context::~DX11Context()
     {
-        mSwapchain->Release();
-        mDevice->Release();
         mContext->Release();
+        mDevice->Release();
+        mSwapchain->Release();
 
         //dbg->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
     }

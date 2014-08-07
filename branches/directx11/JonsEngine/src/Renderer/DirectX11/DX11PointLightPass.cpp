@@ -2,12 +2,13 @@
 
 #include "include/Renderer/Shapes.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/Renderer/DirectX11/DX11Mesh.h"
+#include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11BackBuffer.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/NullVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/PointLightVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/PointLightPixel.h"
 #include "include/Core/Utils/Math.h"
+#include "include/Core/Logging/Logger.h"
 
 namespace JonsEngine
 {
@@ -18,6 +19,9 @@ namespace JonsEngine
 
     const Vec3 CUBEMAP_UP_VECTORS[TEXTURE_CUBE_NUM_FACES] = { Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f),
                                                               Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f) };
+
+    // used to reset shadowmap from input to rendertarget
+    ID3D11ShaderResourceView* const gNullSrv = nullptr;
 
 
     DX11Mesh CreateSphereMesh(ID3D11Device* device)
@@ -182,7 +186,7 @@ namespace JonsEngine
         context->IASetInputLayout(mInputLayout);
     }
 
-    void DX11PointLightPass::Render(ID3D11DeviceContext* context, const RenderQueue& renderQueue, const RenderableLighting::PointLight& pointLight, uint32_t screenWidth, uint32_t screenHeight)
+    void DX11PointLightPass::Render(ID3D11DeviceContext* context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, ID3D11DepthStencilView* gbufferDSV, const RenderableLighting::PointLight& pointLight, uint32_t screenWidth, uint32_t screenHeight)
     {
         // preserve current rs state
         ID3D11RasterizerState* prevRasterizerState = nullptr;
@@ -193,29 +197,33 @@ namespace JonsEngine
         context->OMGetDepthStencilState(&prevDepthStencilState, 0);
         context->RSGetViewports(&numViewports, &prevViewport);
 
-        context->VSSetShader(mNullVertexShader, NULL, NULL);
-        context->PSSetShader(NULL, NULL, NULL);
-
         //
         // shadow pass
         //
+        context->VSSetShader(mNullVertexShader, NULL, NULL);
+        context->PSSetShader(NULL, NULL, NULL);
+
         context->OMSetDepthStencilState(NULL, 0);       // defaults to depth rendering/testing
         context->RSSetState(mRSCullFront);
         context->RSSetViewports(1, &mShadowPassViewport);
         for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
         {
-            //mOmnidirectionalShadowmap.BindShadowmapFace(face);
+            context->OMSetRenderTargets(0, NULL, mShadowmapView[face]);
             Mat4 lightViewMatrix = glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition + CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
             Mat4 lightProjMatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, Z_FAR);
-            //GeometryDepthPass(renderQueue, lightProjMatrix * lightViewMatrix);
+            DepthPass(context, renderQueue, meshes, lightProjMatrix * lightViewMatrix);
         }
-
 
         //
         // stencil pass
         //
+
+        // restore rendering to the backbuffer
+        mBackBuffer.BindForShadingStage(context, gbufferDSV);       // refactor the call?
+
         context->OMSetDepthStencilState(mDSSStencilPass, 0);
         context->RSSetState(mRSNoCulling);
+
         // restore screen viewport
         context->RSSetViewports(1, &prevViewport);
 
@@ -227,6 +235,7 @@ namespace JonsEngine
         //
         context->OMSetDepthStencilState(mDSSShadingPass, 0);
         context->RSSetState(mRSCullFront);
+        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mShadowmapSRV);
 
         context->VSSetShader(mShadingVertexShader, NULL, NULL);
         context->PSSetShader(mPixelShader, NULL, NULL);
@@ -235,7 +244,38 @@ namespace JonsEngine
         mSphereMesh.Draw(context);
 
         // restore state
+        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv);
         context->OMSetDepthStencilState(prevDepthStencilState, 0);
         context->RSSetState(prevRasterizerState);
+    }
+
+
+    void DX11PointLightPass::DepthPass(ID3D11DeviceContext* context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const Mat4& lightVPMatrix)
+    {
+        auto meshIterator = meshes.begin();
+        for (const Renderable& renderable : renderQueue)
+        {
+            if (renderable.mMesh == INVALID_MESH_ID)
+            {
+                JONS_LOG_ERROR(Logger::GetRendererLogger(), "Renderable MeshID is invalid");
+                throw std::runtime_error("Renderable MeshID is invalid");
+            }
+
+            if (renderable.mMesh < (*meshIterator)->GetMeshID())
+                continue;
+
+            while (renderable.mMesh >(*meshIterator)->GetMeshID())
+            {
+                meshIterator++;
+                if (meshIterator == meshes.end())
+                {
+                    JONS_LOG_ERROR(Logger::GetRendererLogger(), "Renderable MeshID out of range");
+                    throw std::runtime_error("Renderable MeshID out of range");
+                }
+            }
+
+            mNullCBuffer.SetData(NullCBuffer(lightVPMatrix * renderable.mWorldMatrix), context, 0);
+            (*meshIterator)->Draw(context);
+        }
     }
 }

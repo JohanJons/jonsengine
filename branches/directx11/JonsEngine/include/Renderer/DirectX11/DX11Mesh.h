@@ -5,9 +5,13 @@
 
 #include <d3d11.h>
 #include <vector>
+#include <memory>
 
 namespace JonsEngine
 {
+    class DX11Mesh;
+    typedef std::shared_ptr<DX11Mesh> DX11MeshPtr;
+
     class DX11Mesh
     {
     public:

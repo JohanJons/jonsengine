@@ -32,6 +32,11 @@ namespace JonsEngine
     }
 
 
+    void DX11BackBuffer::ClearBackbuffer(ID3D11DeviceContext* context)
+    {
+        context->ClearRenderTargetView(mBackbuffer, gClearColor);
+    }
+
     void DX11BackBuffer::BindForShadingStage(ID3D11DeviceContext* context, ID3D11DepthStencilView* depthBuffer)
     {
         // set backbuffer as rendertarget and bind gbuffer textures as texture inputs
@@ -39,6 +44,5 @@ namespace JonsEngine
 
         // disable further depth testing/writing
         context->OMSetDepthStencilState(mDepthStencilState, 0);
-        context->ClearRenderTargetView(mBackbuffer, gClearColor);
     }
 }

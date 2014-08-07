@@ -6,6 +6,7 @@
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 
 #include <d3d11.h>
+#include <vector>
 
 namespace JonsEngine
 {
@@ -18,7 +19,7 @@ namespace JonsEngine
         ~DX11PointLightPass();
 
         void BindForShading(ID3D11DeviceContext* context);
-        void Render(ID3D11DeviceContext* context, const RenderQueue& renderQueue, const RenderableLighting::PointLight& pointLight, uint32_t screenWidth, uint32_t screenHeight);
+        void Render(ID3D11DeviceContext* context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, ID3D11DepthStencilView* gbufferDSV, const RenderableLighting::PointLight& pointLight, uint32_t screenWidth, uint32_t screenHeight);
 
 
     private:
@@ -47,6 +48,8 @@ namespace JonsEngine
             {
             }
         };
+
+        void DepthPass(ID3D11DeviceContext* context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const Mat4& lightVPMatrix);
 
         ID3D11VertexShader* mShadingVertexShader;
         ID3D11VertexShader* mNullVertexShader;

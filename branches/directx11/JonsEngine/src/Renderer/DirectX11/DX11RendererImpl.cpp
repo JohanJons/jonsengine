@@ -53,9 +53,9 @@ namespace JonsEngine
         return glm::ortho(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.y) * viewMatrix;
     }
 
-    void BindTexture2D(const std::vector<DX11RendererImpl::DX11TexturePtr>& textures, Logger& logger, const TextureID textureID, ID3D11DeviceContext* context, uint32_t textureSlot)
+    void BindTexture2D(const std::vector<DX11TexturePtr>& textures, Logger& logger, const TextureID textureID, ID3D11DeviceContext* context, uint32_t textureSlot)
     {
-        auto texture = std::find_if(textures.begin(), textures.end(), [&](const DX11RendererImpl::DX11TexturePtr ptr) { return ptr->GetTextureID() == textureID; });
+        auto texture = std::find_if(textures.begin(), textures.end(), [&](const DX11TexturePtr ptr) { return ptr->GetTextureID() == textureID; });
         if (texture == textures.end())
         {
             JONS_LOG_ERROR(logger, "Renderable TextureID out of range");
@@ -338,10 +338,10 @@ namespace JonsEngine
             const bool hasNormalTexture = renderable.mNormalTexture != INVALID_TEXTURE_ID;
 
             if (hasDiffuseTexture)
-                BindTexture2D(mTextures, mLogger, renderable.mDiffuseTexture, mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_DIFFUSE);
+                BindTexture2D(mTextures, mLogger, renderable.mDiffuseTexture, mContext, DX11Texture::SHADER_TEXTURE_SLOT_DIFFUSE);
 
             if (hasNormalTexture)
-                BindTexture2D(mTextures, mLogger, renderable.mNormalTexture, mContext, DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_NORMAL);
+                BindTexture2D(mTextures, mLogger, renderable.mNormalTexture, mContext, DX11Texture::SHADER_TEXTURE_SLOT_NORMAL);
 
             mGBuffer.SetConstantData(mContext, renderable.mWVPMatrix, renderable.mWorldMatrix, renderable.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
             (*meshIterator)->Draw(mContext);
@@ -353,6 +353,7 @@ namespace JonsEngine
         // geometry pass also filled gbuffer depthbuffer. We need it for further shading ops.
         ID3D11DepthStencilView* depthBuffer = mGBuffer.GetDepthStencilView();
 
+        mBackBuffer.ClearBackbuffer(mContext);
         mBackBuffer.BindForShadingStage(mContext, depthBuffer);
         mGBuffer.BindForShadingStage(mContext);
 
@@ -374,7 +375,7 @@ namespace JonsEngine
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
             mGBuffer.ClearStencilBuffer(mContext);
-            mPointLightPass.Render(mContext, renderQueue, pointLight, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
+            mPointLightPass.Render(mContext, renderQueue, mMeshes, depthBuffer, pointLight, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
         }
 
         mContext->OMSetBlendState(NULL, NULL, 0xffffffff);

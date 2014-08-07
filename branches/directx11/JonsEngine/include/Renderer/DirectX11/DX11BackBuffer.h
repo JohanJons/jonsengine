@@ -12,6 +12,7 @@ namespace JonsEngine
         DX11BackBuffer(ID3D11Device* context, IDXGISwapChain* swapchain, uint32_t textureWidth, uint32_t textureHeight);
         ~DX11BackBuffer();
 
+        void ClearBackbuffer(ID3D11DeviceContext* context);
         void BindForShadingStage(ID3D11DeviceContext* context, ID3D11DepthStencilView* depthBuffer);
 
 

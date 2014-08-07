@@ -16,6 +16,7 @@ cbuffer PointLightConstants : register(b0)
 Texture2D gPositionTexture : register(t0);
 Texture2D gDiffuseTexture : register(t1);
 Texture2D gNormalTexture : register(t2);
+TextureCube gShadowmap : register(t3);
 SamplerState gSampler : register(s0);
 
 

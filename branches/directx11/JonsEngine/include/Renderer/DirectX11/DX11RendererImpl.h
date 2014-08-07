@@ -29,10 +29,6 @@ namespace JonsEngine
     class DX11RendererImpl : protected DX11Context
     {
     public:
-        typedef std::shared_ptr<DX11Mesh> DX11MeshPtr;
-        typedef std::shared_ptr<DX11Texture> DX11TexturePtr;
-
-
         DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator);
         ~DX11RendererImpl();
 
@@ -62,8 +58,8 @@ namespace JonsEngine
         EngineSettings::Anisotropic mAnisotropicFiltering;
         EngineSettings::ShadowQuality mShadowQuality;
 
-        DX11BackBuffer mBackBuffer;
         DX11GBuffer mGBuffer;
+        DX11BackBuffer mBackBuffer;
         DX11AmbientPass mAmbientPass;
         DX11DirectionalLightPass mDirectionalLightPass;
         DX11PointLightPass mPointLightPass;
