@@ -27,7 +27,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120_CTP_Nov2012</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -68,8 +68,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>assimp.lib;JonsEngine.lib;FreeImageLib.lib;libboost_filesystem-vc110-mt-sgd-1_53.lib;libboost_system-vc110-mt-sgd-1_53.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)/../Thirdparty/boost_1_53_0/bin.v2/libs/system/build/msvc-11.0/debug/link-static/runtime-link-static/threading-multi;$(SolutionDir)/../Thirdparty/boost_1_53_0/bin.v2/libs/filesystem/build/msvc-11.0/debug/link-static/runtime-link-static/threading-multi;$(SolutionDir)/bin/$(Configuration)/$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp.lib;JonsEngine.lib;FreeImageLib.lib;libboost_filesystem-vc120-mt-sgd-1_56.lib;libboost_system-vc120-mt-sgd-1_56.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)/../Thirdparty/boost_1_56_0/bin.v2/libs/system/build/msvc-12.0/debug/link-static/runtime-link-static/threading-multi;$(SolutionDir)/../Thirdparty/boost_1_56_0/bin.v2/libs/filesystem/build/msvc-12.0/debug/link-static/runtime-link-static/threading-multi;$(SolutionDir)/bin/$(Configuration)/$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>

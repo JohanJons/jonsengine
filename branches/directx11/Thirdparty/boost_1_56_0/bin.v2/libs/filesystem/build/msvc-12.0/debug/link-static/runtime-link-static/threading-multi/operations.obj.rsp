@@ -1,0 +1,5 @@
+"libs\filesystem\src\operations.cpp" -Fo"bin.v2\libs\filesystem\build\msvc-12.0\debug\link-static\runtime-link-static\threading-multi\operations.obj"    -TP /Z7 /Od /Ob0 /W3 /GR /MTd /Zc:forScope /Zc:wchar_t /wd4675 /EHs -D_HAS_ITERATOR_DEBUGGING=0 -c 
+-DBOOST_ALL_NO_LIB=1 
+-DBOOST_FILESYSTEM_STATIC_LINK=1 
+-DBOOST_SYSTEM_STATIC_LINK=1 
+"-I."
