@@ -13,18 +13,16 @@ namespace JonsEngine
         DX11AmbientPass(ID3D11Device* device);
         ~DX11AmbientPass();
 
-        void Render(ID3D11DeviceContext* context, const Vec4& ambientLight, uint32_t screenWidth, uint32_t screenHeight);
+        void Render(ID3D11DeviceContext* context, const Vec4& ambientLight);
 
 
     private:
         struct AmbientCBuffer
         {
             Vec4 mAmbientLight;
-            Vec2 mScreenSize;
-            float _padding[2];
 
 
-            AmbientCBuffer(const Vec4& ambientLight, const Vec2& screenSize) : mAmbientLight(ambientLight), mScreenSize(screenSize)
+            AmbientCBuffer(const Vec4& ambientLight) : mAmbientLight(ambientLight)
             {
             }
         };

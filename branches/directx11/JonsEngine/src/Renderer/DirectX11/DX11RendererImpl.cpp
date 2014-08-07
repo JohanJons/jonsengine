@@ -358,7 +358,7 @@ namespace JonsEngine
         mGBuffer.BindForShadingStage(mContext);
 
         // ambient light
-        mAmbientPass.Render(mContext, lighting.mAmbientLight, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
+        mAmbientPass.Render(mContext, lighting.mAmbientLight);
 
         // additive blending for further shading
         mContext->OMSetBlendState(mBlendState, NULL, 0xffffffff);
@@ -367,7 +367,7 @@ namespace JonsEngine
         mDirectionalLightPass.BindForShading(mContext);
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
         {
-            mDirectionalLightPass.Render(mContext, directionalLight.mLightColor, directionalLight.mLightDirection, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
+            mDirectionalLightPass.Render(mContext, directionalLight.mLightColor, directionalLight.mLightDirection);
         }
 
         // do all point lights
@@ -375,7 +375,7 @@ namespace JonsEngine
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
             mGBuffer.ClearStencilBuffer(mContext);
-            mPointLightPass.Render(mContext, renderQueue, mMeshes, depthBuffer, pointLight, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
+            mPointLightPass.Render(mContext, renderQueue, mMeshes, depthBuffer, pointLight);
         }
 
         mContext->OMSetBlendState(NULL, NULL, 0xffffffff);

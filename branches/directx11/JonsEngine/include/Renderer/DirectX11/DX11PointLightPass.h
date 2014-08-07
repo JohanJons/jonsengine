@@ -19,7 +19,7 @@ namespace JonsEngine
         ~DX11PointLightPass();
 
         void BindForShading(ID3D11DeviceContext* context);
-        void Render(ID3D11DeviceContext* context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, ID3D11DepthStencilView* gbufferDSV, const RenderableLighting::PointLight& pointLight, uint32_t screenWidth, uint32_t screenHeight);
+        void Render(ID3D11DeviceContext* context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, ID3D11DepthStencilView* gbufferDSV, const RenderableLighting::PointLight& pointLight);
 
 
     private:
@@ -38,13 +38,13 @@ namespace JonsEngine
             Mat4 mLightWVPMatrix;
             Vec4 mLightColor;
             Vec4 mLightPosition;
-            Vec2 mScreenSize;
             float mLightIntensity;
             float mMaxDistance;
+            float __padding[2];
 
 
-            PointLightCBuffer(const Mat4 lightWVPMatrix, const Vec4& lightColor, const Vec4& lightPosition, const Vec2& screenSize, const float lightIntensity, const float maxDistance) :
-                mLightWVPMatrix(lightWVPMatrix), mLightColor(lightColor), mLightPosition(lightPosition), mScreenSize(screenSize), mLightIntensity(lightIntensity), mMaxDistance(maxDistance)
+            PointLightCBuffer(const Mat4 lightWVPMatrix, const Vec4& lightColor, const Vec4& lightPosition, const float lightIntensity, const float maxDistance) :
+                mLightWVPMatrix(lightWVPMatrix), mLightColor(lightColor), mLightPosition(lightPosition), mLightIntensity(lightIntensity), mMaxDistance(maxDistance)
             {
             }
         };

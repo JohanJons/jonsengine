@@ -186,7 +186,7 @@ namespace JonsEngine
         context->IASetInputLayout(mInputLayout);
     }
 
-    void DX11PointLightPass::Render(ID3D11DeviceContext* context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, ID3D11DepthStencilView* gbufferDSV, const RenderableLighting::PointLight& pointLight, uint32_t screenWidth, uint32_t screenHeight)
+    void DX11PointLightPass::Render(ID3D11DeviceContext* context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, ID3D11DepthStencilView* gbufferDSV, const RenderableLighting::PointLight& pointLight)
     {
         // preserve current rs state
         ID3D11RasterizerState* prevRasterizerState = nullptr;
@@ -240,7 +240,7 @@ namespace JonsEngine
         context->VSSetShader(mShadingVertexShader, NULL, NULL);
         context->PSSetShader(mPixelShader, NULL, NULL);
 
-        mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mWVPMatrix, pointLight.mLightColor, Vec4(pointLight.mLightPosition, 1.0), Vec2(screenWidth, screenHeight), pointLight.mLightIntensity, pointLight.mMaxDistance), context, 0);
+        mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mWVPMatrix, pointLight.mLightColor, Vec4(pointLight.mLightPosition, 1.0), pointLight.mLightIntensity, pointLight.mMaxDistance), context, 0);
         mSphereMesh.Draw(context);
 
         // restore state

@@ -14,7 +14,7 @@ namespace JonsEngine
         ~DX11DirectionalLightPass();
 
         void BindForShading(ID3D11DeviceContext* context);
-        void Render(ID3D11DeviceContext* context, const Vec4& lightColor, const Vec3& lightDir, uint32_t screenWidth, uint32_t screenHeight);
+        void Render(ID3D11DeviceContext* context, const Vec4& lightColor, const Vec3& lightDir);
 
 
     private:
@@ -22,12 +22,9 @@ namespace JonsEngine
         {
             Vec4 mLightColor;
             Vec4 mLightDirection;
-            Vec2 mScreenSize;
-            float __padding[2];
 
 
-            DirectionalLightCBuffer(const Vec4& lightColor, const Vec3& lightDir, const Vec2& screenSize) :
-                mLightColor(lightColor), mLightDirection(Vec4(-lightDir, 0.0f)), mScreenSize(screenSize)
+            DirectionalLightCBuffer(const Vec4& lightColor, const Vec3& lightDir) : mLightColor(lightColor), mLightDirection(Vec4(-lightDir, 0.0f))
             {
             }
         };

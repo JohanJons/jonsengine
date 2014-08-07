@@ -20,7 +20,7 @@ namespace JonsEngine
     }
 
 
-    void DX11AmbientPass::Render(ID3D11DeviceContext* context, const Vec4& ambientLight, uint32_t screenWidth, uint32_t screenHeight)
+    void DX11AmbientPass::Render(ID3D11DeviceContext* context, const Vec4& ambientLight)
     {
         context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
         for (uint32_t index = 0; index < DX11Mesh::NUM_VERTEX_BUFFER_SLOTS; index++)
@@ -30,7 +30,7 @@ namespace JonsEngine
         context->VSSetShader(mVertexShader, NULL, NULL);
         context->PSSetShader(mPixelShader, NULL, NULL);
 
-        mConstantBuffer.SetData(AmbientCBuffer(ambientLight, Vec2(screenWidth, screenHeight)), context, 0);
+        mConstantBuffer.SetData(AmbientCBuffer(ambientLight), context, 0);
 
         context->Draw(3, 0);
     }

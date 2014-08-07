@@ -31,9 +31,9 @@ namespace JonsEngine
         context->PSSetShader(mPixelShader, NULL, NULL);
     }
 
-    void DX11DirectionalLightPass::Render(ID3D11DeviceContext* context, const Vec4& lightColor, const Vec3& lightDir, uint32_t screenWidth, uint32_t screenHeight)
+    void DX11DirectionalLightPass::Render(ID3D11DeviceContext* context, const Vec4& lightColor, const Vec3& lightDir)
     {
-        mConstantBuffer.SetData(DirectionalLightCBuffer(lightColor, lightDir, Vec2(screenWidth, screenHeight)), context, 0);
+        mConstantBuffer.SetData(DirectionalLightCBuffer(lightColor, lightDir), context, 0);
 
         context->Draw(3, 0);
     }
