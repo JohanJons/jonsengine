@@ -176,8 +176,8 @@ namespace JonsEngine
     void DX11PointLightPass::Render(ID3D11DeviceContext* context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, ID3D11DepthStencilView* gbufferDSV, const RenderableLighting::PointLight& pointLight)
     {
         // preserve current rs state
-        ID3D11RasterizerState* prevRasterizerState = nullptr;
-        ID3D11DepthStencilState* prevDepthStencilState = nullptr;
+        ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
+        ID3D11DepthStencilStatePtr prevDepthStencilState = nullptr;
         D3D11_VIEWPORT prevViewport;
         uint32_t numViewports = 1;
         context->RSGetState(&prevRasterizerState);

@@ -121,7 +121,7 @@ namespace JonsEngine
                 gDX11RendererImpl->mBackbuffer = nullptr;*/
                 // TODO
 
-                DXCALL(gDX11RendererImpl->mSwapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0));
+               // DXCALL(gDX11RendererImpl->mSwapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0));
 
                 // backbuffer rendertarget setup
                 //ID3D11Texture2D* backbuffer = nullptr;
@@ -130,7 +130,7 @@ namespace JonsEngine
                 //DXCALL(gDX11RendererImpl->mDevice->CreateRenderTargetView(backbuffer, NULL, &gDX11RendererImpl->mBackbuffer));
                 //backbuffer->Release();
 
-                gDX11RendererImpl->SetupContext(width, height);
+               // gDX11RendererImpl->SetupContext(width, height);
 
                 return 0;
             }
