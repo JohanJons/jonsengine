@@ -29,10 +29,6 @@ cbuffer GBufferConstants : register(b0)
     bool gHasNormalTexture;
 };
 
-Texture2D gDiffuseTexture : register(t1);
-Texture2D gNormalTexture : register(t2);
-SamplerState gSampler : register(s0);
-
 
 GBufferVSOut vs_main(GBufferVSIn input)
 {

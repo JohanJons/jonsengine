@@ -10,6 +10,10 @@ struct GBufferPSOut
     float4 mNormal : SV_Target2;
 };
 
+Texture2D gDiffuseTexture : register(t1);
+Texture2D gNormalTexture : register(t2);
+SamplerState gSampler : register(s0);
+
 
 // needed due to float4x4 constructor is row-major
 float4x4 CreateMatrixFromCols(float4 c0, float4 c1, float4 c2, float4 c3)
