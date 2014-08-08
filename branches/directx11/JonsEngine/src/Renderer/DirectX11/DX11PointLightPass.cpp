@@ -3,7 +3,7 @@
 #include "include/Renderer/Shapes.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Texture.h"
-#include "include/Renderer/DirectX11/DX11BackBuffer.h"
+#include "include/Renderer/DirectX11/DX11Backbuffer.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/NullVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/PointLightVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/PointLightPixel.h"
@@ -38,9 +38,9 @@ namespace JonsEngine
     }
 
 
-    DX11PointLightPass::DX11PointLightPass(ID3D11Device* device, DX11BackBuffer& backbuffer, uint32_t shadowmapSize) : mShadingVertexShader(nullptr), mNullVertexShader(nullptr), mPixelShader(nullptr),
+    DX11PointLightPass::DX11PointLightPass(ID3D11Device* device, DX11Backbuffer& backbuffer, uint32_t shadowmapSize) : mShadingVertexShader(nullptr), mNullVertexShader(nullptr), mPixelShader(nullptr),
         mInputLayout(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mShadowmapTexture(nullptr), mShadowmapSRV(nullptr), mSphereMesh(CreateSphereMesh(device)),
-        mBackBuffer(backbuffer), mNullCBuffer(device), mPointLightCBuffer(device)
+        mBackbuffer(backbuffer), mNullCBuffer(device), mPointLightCBuffer(device)
     {
         D3D11_INPUT_ELEMENT_DESC inputDescription;
         ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC));
@@ -164,19 +164,6 @@ namespace JonsEngine
 
     DX11PointLightPass::~DX11PointLightPass()
     {
-        mShadingVertexShader->Release();
-        mNullVertexShader->Release();
-        mPixelShader->Release();
-        mInputLayout->Release();
-        mDSSStencilPass->Release();
-        mDSSShadingPass->Release();
-        mRSCullFront->Release();
-        mRSNoCulling->Release();
-        mShadowmapTexture->Release();
-        mShadowmapSRV->Release();
-
-        for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
-            mShadowmapView[face]->Release();
     }
 
 
@@ -219,7 +206,7 @@ namespace JonsEngine
         //
 
         // restore rendering to the backbuffer
-        mBackBuffer.BindForShadingStage(context, gbufferDSV);       // refactor the call?
+        mBackbuffer.BindForShadingStage(context, gbufferDSV);       // refactor the call?
 
         context->OMSetDepthStencilState(mDSSStencilPass, 0);
         context->RSSetState(mRSNoCulling);
@@ -235,7 +222,7 @@ namespace JonsEngine
         //
         context->OMSetDepthStencilState(mDSSShadingPass, 0);
         context->RSSetState(mRSCullFront);
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mShadowmapSRV);
+        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mShadowmapSRV.p);
 
         context->VSSetShader(mShadingVertexShader, NULL, NULL);
         context->PSSetShader(mPixelShader, NULL, NULL);

@@ -4,6 +4,7 @@
 
 #include "boost/current_function.hpp"
 #include <d3d11.h>
+#include <atlbase.h>
 #include <sstream>
 #include <exception>
 
@@ -11,6 +12,7 @@ namespace JonsEngine
 {
     const float Z_NEAR = 0.1f;
     const float Z_FAR = 100.0f;
+
 
     #ifdef _DEBUG
     #define DXCALL(function)                                                                                                                            \
@@ -27,4 +29,22 @@ namespace JonsEngine
     #else
     #define DXCALL(function) function;
     #endif
+
+    // COM smart pointers
+    typedef CComPtr<ID3D11Buffer> ID3D11BufferPtr;
+    typedef CComPtr<ID3D11VertexShader> ID3D11VertexShaderPtr;
+    typedef CComPtr<ID3D11PixelShader> ID3D11PixelShaderPtr;
+    typedef CComPtr<ID3D11RasterizerState> ID3D11RasterizerStatePtr;
+    typedef CComPtr<ID3D11BlendState> ID3D11BlendStatePtr;
+    typedef CComPtr<ID3D11SamplerState> ID3D11SamplerStatePtr;
+    typedef CComPtr<ID3D11RenderTargetView> ID3D11RenderTargetViewPtr;
+    typedef CComPtr<ID3D11DepthStencilState> ID3D11DepthStencilStatePtr;
+    typedef CComPtr<ID3D11DepthStencilView> ID3D11DepthStencilViewPtr;
+    typedef CComPtr<IDXGISwapChain> IDXGISwapChainPtr;
+    typedef CComPtr<ID3D11Device> ID3D11DevicePtr;
+    typedef CComPtr<ID3D11DeviceContext> ID3D11DeviceContextPtr;
+    typedef CComPtr<ID3D11Texture2D> ID3D11Texture2DPtr;
+    typedef CComPtr<ID3D11ShaderResourceView> ID3D11ShaderResourceViewPtr;
+    typedef CComPtr<ID3D11InputLayout> ID3D11InputLayoutPtr;
+    typedef CComPtr<ID3D11Device> ID3D11DevicePtr;
 }

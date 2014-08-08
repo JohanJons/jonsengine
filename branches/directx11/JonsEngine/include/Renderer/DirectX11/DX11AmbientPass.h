@@ -1,7 +1,8 @@
 #pragma once
 
-#include "include/Core/Types.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
+#include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Core/Types.h"
 
 #include <d3d11.h>
 
@@ -27,8 +28,8 @@ namespace JonsEngine
             }
         };
 
-        ID3D11VertexShader* mVertexShader;
-        ID3D11PixelShader* mPixelShader;
+        ID3D11VertexShaderPtr mVertexShader;
+        ID3D11PixelShaderPtr mPixelShader;
         DX11ConstantBuffer<AmbientCBuffer> mConstantBuffer;
     };
 }

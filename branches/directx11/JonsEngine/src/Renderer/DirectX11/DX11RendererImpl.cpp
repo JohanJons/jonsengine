@@ -156,8 +156,8 @@ namespace JonsEngine
 
 
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
-        mAnisotropicFiltering(settings.mAnisotropicFiltering), mShadowQuality(settings.mShadowQuality), mBackBuffer(mDevice, mSwapchain, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
-        mAmbientPass(mDevice), mDirectionalLightPass(mDevice), mPointLightPass(mDevice, mBackBuffer, ShadowQualityResolution(mShadowQuality)), mTextureSampler(nullptr)
+        mAnisotropicFiltering(settings.mAnisotropicFiltering), mShadowQuality(settings.mShadowQuality), mBackbuffer(mDevice, mSwapchain, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
+        mAmbientPass(mDevice), mDirectionalLightPass(mDevice), mPointLightPass(mDevice, mBackbuffer, ShadowQualityResolution(mShadowQuality)), mTextureSampler(nullptr)
     {
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -202,10 +202,6 @@ namespace JonsEngine
         RemoveWindowSubclass(mWindowHandle, WndProc, gSubClassID);
     
         DXCALL(mSwapchain->SetFullscreenState(false, NULL));
-
-        mDefaultRasterizerState->Release();
-        mBlendState->Release();
-        mTextureSampler->Release();
     }
 
 
@@ -244,10 +240,7 @@ namespace JonsEngine
     void DX11RendererImpl::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
     {
         if (mTextureSampler)
-        {
-            mTextureSampler->Release();
             mTextureSampler = nullptr;
-        }
 
         D3D11_SAMPLER_DESC samplerDesc;
         ZeroMemory(&samplerDesc, sizeof(D3D11_SAMPLER_DESC));
@@ -305,7 +298,7 @@ namespace JonsEngine
         viewport.MaxDepth = 1.0f;
         mContext->RSSetViewports(1, &viewport);
 
-        mContext->PSSetSamplers(gTextureSamplerSlot, 1, &mTextureSampler);
+        mContext->PSSetSamplers(gTextureSamplerSlot, 1, &mTextureSampler.p);
     }
 
     void DX11RendererImpl::GeometryStage(const RenderQueue& renderQueue)
@@ -353,8 +346,8 @@ namespace JonsEngine
         // geometry pass also filled gbuffer depthbuffer. We need it for further shading ops.
         ID3D11DepthStencilView* depthBuffer = mGBuffer.GetDepthStencilView();
 
-        mBackBuffer.ClearBackbuffer(mContext);
-        mBackBuffer.BindForShadingStage(mContext, depthBuffer);
+        mBackbuffer.ClearBackbuffer(mContext);
+        mBackbuffer.BindForShadingStage(mContext, depthBuffer);
         mGBuffer.BindForShadingStage(mContext);
 
         // ambient light

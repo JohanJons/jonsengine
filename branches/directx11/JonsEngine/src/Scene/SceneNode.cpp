@@ -19,7 +19,7 @@ namespace JonsEngine
 
     SceneNodePtr SceneNode::CreateChildNode(const std::string& nodeName)
     {
-        mChildNodes.push_back(SceneNodePtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<SceneNode, const std::string&>(nodeName), std::bind(&HeapAllocator::DeallocateObject<SceneNode>, &HeapAllocator::GetDefaultHeapAllocator(), std::placeholders::_1)));
+        mChildNodes.emplace_back(SceneNodePtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<SceneNode, const std::string&>(nodeName), std::bind(&HeapAllocator::DeallocateObject<SceneNode>, &HeapAllocator::GetDefaultHeapAllocator(), std::placeholders::_1)));
 
         return mChildNodes.back();
     }

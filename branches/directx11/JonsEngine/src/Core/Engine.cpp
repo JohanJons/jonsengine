@@ -99,14 +99,13 @@ namespace JonsEngine
 
         if (model->mMesh != INVALID_MESH_ID)
         {
-            // TODO: replace push_back with emplace_back once boost is compatible with MSVC12
             const MaterialPtr material(model->mMaterial);
             if (material)
-                renderQueue.push_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor, 
-                                                 Vec4(material->mDiffuseColor, 1.0f), Vec4(material->mAmbientColor, 1.0f), Vec4(material->mSpecularColor, 1.0f), Vec4(material->mEmissiveColor, 1.0f),
-                                                 material->mDiffuseTexture, material->mNormalTexture, lightingEnabled, material->mSpecularFactor));
+                renderQueue.emplace_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor, 
+                                                    Vec4(material->mDiffuseColor, 1.0f), Vec4(material->mAmbientColor, 1.0f), Vec4(material->mSpecularColor, 1.0f), Vec4(material->mEmissiveColor, 1.0f),
+                                                     material->mDiffuseTexture, material->mNormalTexture, lightingEnabled, material->mSpecularFactor));
             else
-                renderQueue.push_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, lightingEnabled));
+                renderQueue.emplace_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, lightingEnabled));
         }
 
         for(const Model& childModel : model->mChildren)

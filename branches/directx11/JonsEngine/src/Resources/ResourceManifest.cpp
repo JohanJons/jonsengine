@@ -149,7 +149,7 @@ namespace JonsEngine
         }
 
         for(PackageModel& m : pkgModel.mChildren)
-            model.mChildren.push_back(ProcessModel(m, jonsPkg));
+            model.mChildren.emplace_back(ProcessModel(m, jonsPkg));
 
         return model;
     }

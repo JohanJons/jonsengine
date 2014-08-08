@@ -22,7 +22,7 @@ namespace JonsEngine
         
         if (iter == mScenes.end())
         {
-            mScenes.push_back(mMemoryAllocator.AllocateObject<Scene, const std::string&, ResourceManifest&>(sceneName, mResourceManifest));
+            mScenes.emplace_back(mMemoryAllocator.AllocateObject<Scene, const std::string&, ResourceManifest&>(sceneName, mResourceManifest));
 
             return mScenes.back();
         }

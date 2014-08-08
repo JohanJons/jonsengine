@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/Types.h"
 
 #include <d3d11.h>
@@ -31,8 +32,8 @@ namespace JonsEngine
 
 
     private:
-        ID3D11Texture2D* mTexture;
-        ID3D11ShaderResourceView* mShaderResourceView;
+        ID3D11Texture2DPtr mTexture;
+        ID3D11ShaderResourceViewPtr mShaderResourceView;
         TextureID mTextureID;
         TextureType mTextureType;
     };

@@ -4,11 +4,12 @@
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11Context.h"
-#include "include/Renderer/DirectX11/DX11BackBuffer.h"
+#include "include/Renderer/DirectX11/DX11Backbuffer.h"
 #include "include/Renderer/DirectX11/DX11GBuffer.h"
 #include "include/Renderer/DirectX11/DX11AmbientPass.h"
 #include "include/Renderer/DirectX11/DX11DirectionalLightPass.h"
 #include "include/Renderer/DirectX11/DX11PointLightPass.h"
+#include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Memory/HeapAllocator.h"
@@ -59,13 +60,13 @@ namespace JonsEngine
         EngineSettings::ShadowQuality mShadowQuality;
 
         DX11GBuffer mGBuffer;
-        DX11BackBuffer mBackBuffer;
+        DX11Backbuffer mBackbuffer;
         DX11AmbientPass mAmbientPass;
         DX11DirectionalLightPass mDirectionalLightPass;
         DX11PointLightPass mPointLightPass;
-        ID3D11RasterizerState* mDefaultRasterizerState;
-        ID3D11BlendState* mBlendState;
-        ID3D11SamplerState* mTextureSampler;
+        ID3D11RasterizerStatePtr mDefaultRasterizerState;
+        ID3D11BlendStatePtr mBlendState;
+        ID3D11SamplerStatePtr mTextureSampler;
 
         std::vector<DX11MeshPtr> mMeshes;
         std::vector<DX11TexturePtr> mTextures;

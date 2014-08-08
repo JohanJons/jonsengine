@@ -15,8 +15,6 @@ namespace JonsEngine
 
     DX11DirectionalLightPass::~DX11DirectionalLightPass()
     {
-        mVertexShader->Release();
-        mPixelShader->Release();
     }
 
 

@@ -15,8 +15,6 @@ namespace JonsEngine
 
     DX11AmbientPass::~DX11AmbientPass()
     {
-        mVertexShader->Release();
-        mPixelShader->Release();
     }
 
 

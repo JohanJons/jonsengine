@@ -1,7 +1,11 @@
 #pragma once
 
+#include "include/Renderer/DirectX11/DX11Utils.h"
+
 #include <Windows.h>
 #include <d3d11.h>
+
+//static ID3D11Debug* dbg = nullptr;
 
 namespace JonsEngine
 {
@@ -10,13 +14,13 @@ namespace JonsEngine
     public:
         DX11Context(const HWND windowHandle);
         ~DX11Context();
-        //ID3D11Debug* dbg;
+
 
     protected:
         const HWND mWindowHandle;
-        IDXGISwapChain* mSwapchain;
-        ID3D11Device* mDevice;
-        ID3D11DeviceContext* mContext;
+        IDXGISwapChainPtr mSwapchain;
+        ID3D11DevicePtr mDevice;
+        ID3D11DeviceContextPtr mContext;
         DXGI_SWAP_CHAIN_DESC mSwapchainDesc;
     };
 }

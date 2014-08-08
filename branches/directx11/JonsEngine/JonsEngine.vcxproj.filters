@@ -191,7 +191,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11DirectionalLightPass.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX11\DX11BackBuffer.cpp">
+    <ClCompile Include="src\Renderer\DirectX11\DX11Backbuffer.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
   </ItemGroup>
@@ -343,7 +343,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11PointLightPass.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DX11BackBuffer.h">
+    <ClInclude Include="include\Renderer\DirectX11\DX11Backbuffer.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
   </ItemGroup>

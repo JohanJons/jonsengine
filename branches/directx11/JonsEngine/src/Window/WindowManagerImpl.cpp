@@ -295,7 +295,7 @@ namespace JonsEngine
         SHORT shiftDown = GetKeyState(VK_SHIFT);
         SHORT ctrlDown = GetKeyState(VK_CONTROL);
 
-        mKeyEvents.push_back(KeyEvent(
+        mKeyEvents.emplace_back(KeyEvent(
             [&]()
         {
             switch (keyInput.VKey)
@@ -439,7 +439,7 @@ namespace JonsEngine
             int i = 2;
         }
 
-        mMouseButtonEvents.push_back(MouseButtonEvent([&]()
+        mMouseButtonEvents.emplace_back(MouseButtonEvent([&]()
         {
             switch (mouseInput.usButtonFlags)
             {

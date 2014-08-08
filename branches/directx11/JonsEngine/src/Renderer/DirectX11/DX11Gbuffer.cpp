@@ -30,9 +30,9 @@ namespace JonsEngine
         
         for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
         {
-            DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mTextures[index]));
-            DXCALL(device->CreateRenderTargetView(mTextures[index], NULL, &mRenderTargets[index]));
-            DXCALL(device->CreateShaderResourceView(mTextures[index], NULL, &mShaderResourceViews[index]));
+            DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mTextures.at(index)));
+            DXCALL(device->CreateRenderTargetView(mTextures.at(index), NULL, &mRenderTargets.at(index)));
+            DXCALL(device->CreateShaderResourceView(mTextures.at(index), NULL, &mShaderResourceViews.at(index)));
         }
 
         // create depth buffer/view
@@ -96,18 +96,6 @@ namespace JonsEngine
 
     DX11GBuffer::~DX11GBuffer()
     {
-        for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
-        {
-            mTextures[index]->Release();
-            mRenderTargets[index]->Release();
-            mShaderResourceViews[index]->Release();
-        }
-
-        mDepthStencilBuffer->Release();
-        mDepthStencilView->Release();
-        mInputLayout->Release();
-        mVertexShader->Release();
-        mPixelShader->Release();
     }
 
 
@@ -122,13 +110,13 @@ namespace JonsEngine
         {
             // unbind gbuffer texture as input, it is now rendertarget
             context->PSSetShaderResources(index, 1, &gNullSrv);
-            context->ClearRenderTargetView(mRenderTargets[index], gClearColor);
+            context->ClearRenderTargetView(mRenderTargets.at(index), gClearColor);
         }
         context->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
         // default == depth testing/writing on
         context->OMSetDepthStencilState(NULL, 0);
-        context->OMSetRenderTargets(DX11GBuffer::GBUFFER_NUM_RENDERTARGETS, &mRenderTargets[0], mDepthStencilView);
+        context->OMSetRenderTargets(DX11GBuffer::GBUFFER_NUM_RENDERTARGETS, &(mRenderTargets.begin()->p), mDepthStencilView);
         context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         context->IASetInputLayout(mInputLayout);
@@ -140,7 +128,7 @@ namespace JonsEngine
     void DX11GBuffer::BindForShadingStage(ID3D11DeviceContext* context)
     {
         for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
-            context->PSSetShaderResources(index, 1, &mShaderResourceViews[index]);
+            context->PSSetShaderResources(index, 1, &mShaderResourceViews.at(index).p);
     }
 
     void DX11GBuffer::ClearStencilBuffer(ID3D11DeviceContext* context)

@@ -39,14 +39,12 @@ namespace JonsEngine
 
     DX11Texture::~DX11Texture()
     {
-        mShaderResourceView->Release();
-        mTexture->Release();
     }
 
 
     void DX11Texture::Bind(ID3D11DeviceContext* context, uint32_t textureSlot)
     {
-        context->PSSetShaderResources(textureSlot, 1, &mShaderResourceView);
+        context->PSSetShaderResources(textureSlot, 1, &mShaderResourceView.p);
     }
 
     TextureID DX11Texture::GetTextureID() const

@@ -25,7 +25,6 @@ namespace JonsEngine
 
         ~DX11ConstantBuffer()
         {
-            mConstantBuffer->Release();
         }
 
 
@@ -38,12 +37,12 @@ namespace JonsEngine
             std::memcpy(mappedResource.pData, &content, sizeof(ContentType));
             context->Unmap(mConstantBuffer, 0);
 
-            context->VSSetConstantBuffers(bufferSlot, 1, &mConstantBuffer);
-            context->PSSetConstantBuffers(bufferSlot, 1, &mConstantBuffer);
+            context->VSSetConstantBuffers(bufferSlot, 1, &mConstantBuffer.p);
+            context->PSSetConstantBuffers(bufferSlot, 1, &mConstantBuffer.p);
         }
 
 
     private:
-        ID3D11Buffer* mConstantBuffer;
+        ID3D11BufferPtr mConstantBuffer;
     };
 }

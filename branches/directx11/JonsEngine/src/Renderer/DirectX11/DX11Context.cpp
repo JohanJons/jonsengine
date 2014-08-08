@@ -25,16 +25,11 @@ namespace JonsEngine
 
         ZeroMemory(&mSwapchainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
         DXCALL(mSwapchain->GetDesc(&mSwapchainDesc));
-
         //mDevice->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&dbg));
     }
 
     DX11Context::~DX11Context()
     {
-        mContext->Release();
-        mDevice->Release();
-        mSwapchain->Release();
-
         //dbg->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
     }
 }

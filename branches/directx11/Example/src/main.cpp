@@ -9,6 +9,6 @@ int CALLBACK WinMain(_In_  HINSTANCE hInstance, _In_  HINSTANCE hPrevInstance, _
     game->Run();
 
     delete game;
-
+    
     return 0;
 }

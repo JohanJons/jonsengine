@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/EngineDefs.h"
 #include "include/Core/Types.h"
 
@@ -38,11 +39,11 @@ namespace JonsEngine
         MeshID mMeshID;
         uint32_t mNumIndices;
 
-        ID3D11Buffer* mVertexBuffer;
-        ID3D11Buffer* mNormalBuffer;
-        ID3D11Buffer* mTangentBuffer;
-        ID3D11Buffer* mBitangentBuffer;
-        ID3D11Buffer* mTexcoordBuffer;
-        ID3D11Buffer* mIndexBuffer;
+        ID3D11BufferPtr mVertexBuffer;
+        ID3D11BufferPtr mNormalBuffer;
+        ID3D11BufferPtr mTangentBuffer;
+        ID3D11BufferPtr mBitangentBuffer;
+        ID3D11BufferPtr mTexcoordBuffer;
+        ID3D11BufferPtr mIndexBuffer;
     };
 }

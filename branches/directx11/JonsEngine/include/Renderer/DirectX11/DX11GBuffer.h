@@ -1,9 +1,11 @@
 #pragma once
 
-#include "include/Core/Types.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
+#include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Core/Types.h"
 
 #include <d3d11.h>
+#include <array>
 
 namespace JonsEngine
 {
@@ -47,14 +49,14 @@ namespace JonsEngine
         };
 
 
-        ID3D11Texture2D* mTextures[DX11GBuffer::GBUFFER_NUM_RENDERTARGETS];
-        ID3D11RenderTargetView* mRenderTargets[DX11GBuffer::GBUFFER_NUM_RENDERTARGETS];
-        ID3D11ShaderResourceView* mShaderResourceViews[DX11GBuffer::GBUFFER_NUM_RENDERTARGETS];
-        ID3D11Texture2D* mDepthStencilBuffer;
-        ID3D11DepthStencilView* mDepthStencilView;
-        ID3D11InputLayout* mInputLayout;
-        ID3D11VertexShader* mVertexShader;
-        ID3D11PixelShader* mPixelShader;
+        std::array<ID3D11Texture2DPtr, DX11GBuffer::GBUFFER_NUM_RENDERTARGETS> mTextures;
+        std::array<ID3D11RenderTargetViewPtr, DX11GBuffer::GBUFFER_NUM_RENDERTARGETS> mRenderTargets;
+        std::array<ID3D11ShaderResourceViewPtr, DX11GBuffer::GBUFFER_NUM_RENDERTARGETS> mShaderResourceViews;
+        ID3D11Texture2DPtr mDepthStencilBuffer;
+        ID3D11DepthStencilViewPtr mDepthStencilView;
+        ID3D11InputLayoutPtr mInputLayout;
+        ID3D11VertexShaderPtr mVertexShader;
+        ID3D11PixelShaderPtr mPixelShader;
         DX11ConstantBuffer<GBufferCBuffer> mConstantBuffer;
     };
 }

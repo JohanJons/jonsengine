@@ -88,14 +88,6 @@ namespace JonsEngine
     
     DX11Mesh::~DX11Mesh()
     {
-        mVertexBuffer->Release();
-        mNormalBuffer->Release();
-        if (mTangentBuffer)
-            mTangentBuffer->Release();
-        if (mBitangentBuffer)
-            mBitangentBuffer->Release();
-        mTexcoordBuffer->Release();
-        mIndexBuffer->Release();
     }
 
 
@@ -104,13 +96,13 @@ namespace JonsEngine
         uint32_t vertexSize = sizeof(float) * 3, texcoordSize = sizeof(float) * 2;
         uint32_t offset = 0;
 
-        context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_VERTICES, 1, &mVertexBuffer, &vertexSize, &offset);
-        context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer, &vertexSize, &offset);
+        context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_VERTICES, 1, &mVertexBuffer.p, &vertexSize, &offset);
+        context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer.p, &vertexSize, &offset);
         if (mTangentBuffer)
-            context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer, &vertexSize, &offset);
+            context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer.p, &vertexSize, &offset);
         if (mBitangentBuffer)
-            context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BITANGENTS, 1, &mBitangentBuffer, &vertexSize, &offset);
-        context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer, &texcoordSize, &offset);
+            context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BITANGENTS, 1, &mBitangentBuffer.p, &vertexSize, &offset);
+        context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer.p, &texcoordSize, &offset);
         context->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
         context->DrawIndexed(mNumIndices, 0, 0);
     }
