@@ -196,6 +196,7 @@ namespace JonsEngine
         for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
         {
             context->OMSetRenderTargets(0, NULL, mShadowmapView[face]);
+			context->ClearDepthStencilView(mShadowmapView[face], D3D11_CLEAR_DEPTH, 1.0f, 0);
             Mat4 lightViewMatrix = glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition + CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
             Mat4 lightProjMatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, Z_FAR);
             DepthPass(context, renderQueue, meshes, lightProjMatrix * lightViewMatrix);
