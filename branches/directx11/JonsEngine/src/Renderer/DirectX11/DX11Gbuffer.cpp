@@ -10,10 +10,10 @@ namespace JonsEngine
     const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
     // used to reset gbuffer textures from input to rendertarget before geometry stage
-    ID3D11ShaderResourceView* const gNullSrv = nullptr;
+    ID3D11ShaderResourceViewPtr const gNullSrv = nullptr;
 
 
-    DX11GBuffer::DX11GBuffer(ID3D11Device* device, uint32_t textureWidth, uint32_t textureHeight) : mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr),
+    DX11GBuffer::DX11GBuffer(ID3D11DevicePtr device, uint32_t textureWidth, uint32_t textureHeight) : mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr),
         mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device)
     {
         // create gbuffer textures/rendertargets
@@ -99,17 +99,17 @@ namespace JonsEngine
     }
 
 
-    void DX11GBuffer::SetConstantData(ID3D11DeviceContext* context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture)
+    void DX11GBuffer::SetConstantData(ID3D11DeviceContextPtr context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture)
     {
         mConstantBuffer.SetData({wvpMatrix, worldMatrix, textureTilingFactor, hasDiffuseTexture, hasNormalTexture}, context, 0);
     }
 
-    void DX11GBuffer::BindForGeometryStage(ID3D11DeviceContext* context)
+    void DX11GBuffer::BindForGeometryStage(ID3D11DeviceContextPtr context)
     {
         for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
         {
             // unbind gbuffer texture as input, it is now rendertarget
-            context->PSSetShaderResources(index, 1, &gNullSrv);
+            context->PSSetShaderResources(index, 1, &gNullSrv.p);
             context->ClearRenderTargetView(mRenderTargets.at(index), gClearColor);
         }
         context->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
@@ -125,19 +125,19 @@ namespace JonsEngine
         context->PSSetShader(mPixelShader, NULL, NULL);
     }
 
-    void DX11GBuffer::BindForShadingStage(ID3D11DeviceContext* context)
+    void DX11GBuffer::BindForShadingStage(ID3D11DeviceContextPtr context)
     {
         for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
             context->PSSetShaderResources(index, 1, &mShaderResourceViews.at(index).p);
     }
 
-    void DX11GBuffer::ClearStencilBuffer(ID3D11DeviceContext* context)
+    void DX11GBuffer::ClearStencilBuffer(ID3D11DeviceContextPtr context)
     {
         context->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_STENCIL, 1.0f, 0);
     }
 
 
-    ID3D11DepthStencilView* DX11GBuffer::GetDepthStencilView()
+    ID3D11DepthStencilViewPtr DX11GBuffer::GetDepthStencilView()
     {
         return mDepthStencilView;
     }

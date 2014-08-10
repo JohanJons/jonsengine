@@ -11,7 +11,7 @@ namespace JonsEngine
     class DX11ConstantBuffer
     {
     public:
-        DX11ConstantBuffer(ID3D11Device* device) : mConstantBuffer(nullptr)
+        DX11ConstantBuffer(ID3D11DevicePtr device) : mConstantBuffer(nullptr)
         {
             D3D11_BUFFER_DESC bufferDescription;
             ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
@@ -28,7 +28,7 @@ namespace JonsEngine
         }
 
 
-        void SetData(const ContentType& content, ID3D11DeviceContext* context, uint32_t bufferSlot)
+        void SetData(const ContentType& content, ID3D11DeviceContextPtr context, uint32_t bufferSlot)
         {
             D3D11_MAPPED_SUBRESOURCE mappedResource;
             ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));

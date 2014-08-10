@@ -11,10 +11,10 @@ namespace JonsEngine
     class DX11AmbientPass
     {
     public:
-        DX11AmbientPass(ID3D11Device* device);
+        DX11AmbientPass(ID3D11DevicePtr device);
         ~DX11AmbientPass();
 
-        void Render(ID3D11DeviceContext* context, const Vec4& ambientLight);
+        void Render(ID3D11DeviceContextPtr context, const Vec4& ambientLight);
 
 
     private:

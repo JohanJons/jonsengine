@@ -21,15 +21,15 @@ namespace JonsEngine
         };
 
 
-        DX11GBuffer(ID3D11Device* device, uint32_t textureWidth, uint32_t textureHeight);
+        DX11GBuffer(ID3D11DevicePtr device, uint32_t textureWidth, uint32_t textureHeight);
         ~DX11GBuffer();
 
-        void SetConstantData(ID3D11DeviceContext* context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture);
-        void BindForGeometryStage(ID3D11DeviceContext* context);
-        void BindForShadingStage(ID3D11DeviceContext* context);
-        void ClearStencilBuffer(ID3D11DeviceContext* context);
+        void SetConstantData(ID3D11DeviceContextPtr context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture);
+        void BindForGeometryStage(ID3D11DeviceContextPtr context);
+        void BindForShadingStage(ID3D11DeviceContextPtr context);
+        void ClearStencilBuffer(ID3D11DeviceContextPtr context);
 
-        ID3D11DepthStencilView* GetDepthStencilView();
+        ID3D11DepthStencilViewPtr GetDepthStencilView();
 
 
     private:

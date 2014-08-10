@@ -19,10 +19,10 @@ namespace JonsEngine
                                                                                   Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f) };
 
     // used to reset shadowmap from input to rendertarget
-    ID3D11ShaderResourceView* const gNullSrv = nullptr;
+    ID3D11ShaderResourceViewPtr const gNullSrv = nullptr;
 
 
-    DX11Mesh CreateSphereMesh(ID3D11Device* device)
+    DX11Mesh CreateSphereMesh(ID3D11DevicePtr device)
     {
         std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
         std::vector<uint32_t> indiceData;
@@ -36,7 +36,7 @@ namespace JonsEngine
     }
 
 
-    DX11PointLightPass::DX11PointLightPass(ID3D11Device* device, DX11Backbuffer& backbuffer, uint32_t shadowmapSize) : mShadingVertexShader(nullptr), mPixelShader(nullptr),
+    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, uint32_t shadowmapSize) : mShadingVertexShader(nullptr), mPixelShader(nullptr),
         mInputLayout(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mShadowmapTexture(nullptr), mShadowmapSRV(nullptr), mSphereMesh(CreateSphereMesh(device)),
         mBackbuffer(backbuffer), mNullPass(device), mPointLightCBuffer(device)
     {
@@ -164,13 +164,13 @@ namespace JonsEngine
     }
 
 
-    void DX11PointLightPass::BindForShading(ID3D11DeviceContext* context)
+    void DX11PointLightPass::BindForShading(ID3D11DeviceContextPtr context)
     {
         context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         context->IASetInputLayout(mInputLayout);
     }
 
-    void DX11PointLightPass::Render(ID3D11DeviceContext* context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, ID3D11DepthStencilView* gbufferDSV, const RenderableLighting::PointLight& pointLight)
+    void DX11PointLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, ID3D11DepthStencilViewPtr gbufferDSV, const RenderableLighting::PointLight& pointLight)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
@@ -232,7 +232,7 @@ namespace JonsEngine
         mSphereMesh.Draw(context);
 
         // restore state
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv);
+        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv.p);
         context->OMSetDepthStencilState(prevDepthStencilState, 0);
         context->RSSetState(prevRasterizerState);
     }

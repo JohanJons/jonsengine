@@ -20,11 +20,11 @@ namespace JonsEngine
     public:
         const static uint32_t TEXTURE_CUBE_NUM_FACES = 6;
 
-        DX11PointLightPass(ID3D11Device* device, DX11Backbuffer& backbuffer, uint32_t shadowmapSize);
+        DX11PointLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, uint32_t shadowmapSize);
         ~DX11PointLightPass();
 
-        void BindForShading(ID3D11DeviceContext* context);
-        void Render(ID3D11DeviceContext* context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, ID3D11DepthStencilView* gbufferDSV, const RenderableLighting::PointLight& pointLight);
+        void BindForShading(ID3D11DeviceContextPtr context);
+        void Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, ID3D11DepthStencilViewPtr gbufferDSV, const RenderableLighting::PointLight& pointLight);
 
 
     private:

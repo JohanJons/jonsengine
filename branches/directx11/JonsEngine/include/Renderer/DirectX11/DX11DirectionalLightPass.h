@@ -11,11 +11,11 @@ namespace JonsEngine
     class DX11DirectionalLightPass
     {
     public:
-        DX11DirectionalLightPass(ID3D11Device* device);
+        DX11DirectionalLightPass(ID3D11DevicePtr device);
         ~DX11DirectionalLightPass();
 
-        void BindForShading(ID3D11DeviceContext* context);
-        void Render(ID3D11DeviceContext* context, const Vec4& lightColor, const Vec3& lightDir);
+        void BindForShading(ID3D11DeviceContextPtr context);
+        void Render(ID3D11DeviceContextPtr context, const Vec4& lightColor, const Vec3& lightDir);
 
 
     private:

@@ -87,7 +87,7 @@ namespace JonsEngine
     }
 
 
-    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11Device* device) : mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device)
+    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device) : mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device)
     {
         DXCALL(device->CreateVertexShader(gFullscreenTriangleVertexShader, sizeof(gFullscreenTriangleVertexShader), NULL, &mVertexShader));
         DXCALL(device->CreatePixelShader(gDirectionalLightPixelShader, sizeof(gDirectionalLightPixelShader), NULL, &mPixelShader));
@@ -98,7 +98,7 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::BindForShading(ID3D11DeviceContext* context)
+    void DX11DirectionalLightPass::BindForShading(ID3D11DeviceContextPtr context)
     {
         context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
         for (uint32_t index = 0; index < DX11Mesh::NUM_VERTEX_BUFFER_SLOTS; index++)
@@ -109,7 +109,7 @@ namespace JonsEngine
         context->PSSetShader(mPixelShader, NULL, NULL);
     }
 
-    void DX11DirectionalLightPass::Render(ID3D11DeviceContext* context, const Vec4& lightColor, const Vec3& lightDir)
+    void DX11DirectionalLightPass::Render(ID3D11DeviceContextPtr context, const Vec4& lightColor, const Vec3& lightDir)
     {
 
         /*

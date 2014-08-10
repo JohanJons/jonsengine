@@ -24,7 +24,7 @@ namespace JonsEngine
     };
 
 
-    void BindTexture2D(const std::vector<DX11TexturePtr>& textures, Logger& logger, const TextureID textureID, ID3D11DeviceContext* context, uint32_t textureSlot)
+    void BindTexture2D(const std::vector<DX11TexturePtr>& textures, Logger& logger, const TextureID textureID, ID3D11DeviceContextPtr context, uint32_t textureSlot)
     {
         auto texture = std::find_if(textures.begin(), textures.end(), [&](const DX11TexturePtr ptr) { return ptr->GetTextureID() == textureID; });
         if (texture == textures.end())
@@ -95,7 +95,7 @@ namespace JonsEngine
                // DXCALL(gDX11RendererImpl->mSwapchain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0));
 
                 // backbuffer rendertarget setup
-                //ID3D11Texture2D* backbuffer = nullptr;
+                //ID3D11Texture2DPtr backbuffer = nullptr;
                 //DXCALL(gDX11RendererImpl->mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer));
 
                 //DXCALL(gDX11RendererImpl->mDevice->CreateRenderTargetView(backbuffer, NULL, &gDX11RendererImpl->mBackbuffer));
