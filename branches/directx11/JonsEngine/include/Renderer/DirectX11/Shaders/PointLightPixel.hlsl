@@ -16,7 +16,7 @@ Texture2D gPositionTexture : register(t0);
 Texture2D gDiffuseTexture : register(t1);
 Texture2D gNormalTexture : register(t2);
 TextureCube gShadowmap : register(t3);
-SamplerState gSampler : register(s0);
+SamplerState gShadowmapSampler : register(s1);
 
 
 float VectorToDepthValue(float3 Vec)
@@ -40,7 +40,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
 
     // shadowmapping
     float3 cubemapDir = (float3)(worldPosition - gLightPosition);
-    float storedDepth = gShadowmap.Sample(gSampler, cubemapDir).r;
+    float storedDepth = gShadowmap.Sample(gShadowmapSampler, cubemapDir).r;
     float visibility = 0.0;
     if (storedDepth + 0.0001 > VectorToDepthValue(cubemapDir))
         visibility = 1.0;

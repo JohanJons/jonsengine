@@ -12,13 +12,11 @@
 
 namespace JonsEngine
 {
-    const uint32_t TEXTURE_CUBE_NUM_FACES = 6;
+    const Vec3 CUBEMAP_DIRECTION_VECTORS[DX11PointLightPass::TEXTURE_CUBE_NUM_FACES] = { Vec3(1.0f, 0.0f, 0.0f), Vec3(-1.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f),
+                                                                                         Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f, 0.0f, -1.0f) };
 
-    const Vec3 CUBEMAP_DIRECTION_VECTORS[TEXTURE_CUBE_NUM_FACES] = { Vec3(1.0f, 0.0f, 0.0f), Vec3(-1.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f),
-                                                                     Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f, 0.0f, -1.0f) };
-
-    const Vec3 CUBEMAP_UP_VECTORS[TEXTURE_CUBE_NUM_FACES] = { Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f),
-                                                              Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f) };
+    const Vec3 CUBEMAP_UP_VECTORS[DX11PointLightPass::TEXTURE_CUBE_NUM_FACES] = { Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f),
+                                                                                  Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f) };
 
     // used to reset shadowmap from input to rendertarget
     ID3D11ShaderResourceView* const gNullSrv = nullptr;
@@ -117,7 +115,7 @@ namespace JonsEngine
         D3D11_TEXTURE2D_DESC depthBufferDesc;
         ZeroMemory(&depthBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
         depthBufferDesc.ArraySize = TEXTURE_CUBE_NUM_FACES;
-        depthBufferDesc.Format = DXGI_FORMAT_R32_TYPELESS;     // potential issue? UNORM instead?
+        depthBufferDesc.Format = DXGI_FORMAT_R32_TYPELESS;
         depthBufferDesc.Width = shadowmapSize;
         depthBufferDesc.Height = shadowmapSize;
         depthBufferDesc.MipLevels = 1;
@@ -136,7 +134,7 @@ namespace JonsEngine
         for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
         {
             dsvDesc.Texture2DArray.FirstArraySlice = face;
-            DXCALL(device->CreateDepthStencilView(mShadowmapTexture, &dsvDesc, &mShadowmapView[face]));
+            DXCALL(device->CreateDepthStencilView(mShadowmapTexture, &dsvDesc, &mShadowmapView.at(face)));
         }
 
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
@@ -175,7 +173,7 @@ namespace JonsEngine
 
     void DX11PointLightPass::Render(ID3D11DeviceContext* context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, ID3D11DepthStencilView* gbufferDSV, const RenderableLighting::PointLight& pointLight)
     {
-        // preserve current rs state
+        // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
         ID3D11DepthStencilStatePtr prevDepthStencilState = nullptr;
         D3D11_VIEWPORT prevViewport;
@@ -195,8 +193,8 @@ namespace JonsEngine
         context->RSSetViewports(1, &mShadowPassViewport);
         for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
         {
-            context->OMSetRenderTargets(0, NULL, mShadowmapView[face]);
-			context->ClearDepthStencilView(mShadowmapView[face], D3D11_CLEAR_DEPTH, 1.0f, 0);
+            context->OMSetRenderTargets(0, NULL, mShadowmapView.at(face));
+            context->ClearDepthStencilView(mShadowmapView.at(face), D3D11_CLEAR_DEPTH, 1.0f, 0);
             Mat4 lightViewMatrix = glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition + CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
             Mat4 lightProjMatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, Z_FAR);
             DepthPass(context, renderQueue, meshes, lightProjMatrix * lightViewMatrix);

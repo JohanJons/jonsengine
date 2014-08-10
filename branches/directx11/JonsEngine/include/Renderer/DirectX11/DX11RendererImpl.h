@@ -67,6 +67,7 @@ namespace JonsEngine
         ID3D11RasterizerStatePtr mDefaultRasterizerState;
         ID3D11BlendStatePtr mBlendState;
         ID3D11SamplerStatePtr mTextureSampler;
+        ID3D11SamplerStatePtr mShadowmapSampler;
 
         std::vector<DX11MeshPtr> mMeshes;
         std::vector<DX11TexturePtr> mTextures;

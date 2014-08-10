@@ -16,7 +16,12 @@ namespace JonsEngine
     static DX11RendererImpl* gDX11RendererImpl = nullptr;
 
     const UINT_PTR gSubClassID = 1;
-    const uint32_t gTextureSamplerSlot = 0;
+
+    enum TEXTURE_SAMPLER_SLOT
+    {
+        TEXTURE_SAMPLER_SLOT_MODELS = 0,
+        TEXTURE_SAMPLER_SLOT_SHADOWMAP
+    };
 
 
     Mat4 CreateDirLightVPMatrix(const CameraFrustrum& cameraFrustrum, const Vec3& lightDir)
@@ -184,6 +189,18 @@ namespace JonsEngine
         blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
         DXCALL(mDevice->CreateBlendState(&blendDesc, &mBlendState));
 
+        // shadowsampler
+        D3D11_SAMPLER_DESC samplerDesc;
+        ZeroMemory(&samplerDesc, sizeof(D3D11_SAMPLER_DESC));
+        samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+        samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+        samplerDesc.MaxAnisotropy = 1;
+        samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+        samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+        DXCALL(mDevice->CreateSamplerState(&samplerDesc, &mShadowmapSampler));
+
         SetAnisotropicFiltering(settings.mAnisotropicFiltering);
         SetupContext(mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
 
@@ -298,7 +315,8 @@ namespace JonsEngine
         viewport.MaxDepth = 1.0f;
         mContext->RSSetViewports(1, &viewport);
 
-        mContext->PSSetSamplers(gTextureSamplerSlot, 1, &mTextureSampler.p);
+        mContext->PSSetSamplers(TEXTURE_SAMPLER_SLOT::TEXTURE_SAMPLER_SLOT_MODELS, 1, &mTextureSampler.p);
+        mContext->PSSetSamplers(TEXTURE_SAMPLER_SLOT::TEXTURE_SAMPLER_SLOT_SHADOWMAP, 1, &mShadowmapSampler.p);
     }
 
     void DX11RendererImpl::GeometryStage(const RenderQueue& renderQueue)
@@ -344,7 +362,7 @@ namespace JonsEngine
     void DX11RendererImpl::ShadingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting)
     {
         // geometry pass also filled gbuffer depthbuffer. We need it for further shading ops.
-        ID3D11DepthStencilView* depthBuffer = mGBuffer.GetDepthStencilView();
+        ID3D11DepthStencilViewPtr depthBuffer = mGBuffer.GetDepthStencilView();
 
         mBackbuffer.ClearBackbuffer(mContext);
         mBackbuffer.BindForShadingStage(mContext, depthBuffer);

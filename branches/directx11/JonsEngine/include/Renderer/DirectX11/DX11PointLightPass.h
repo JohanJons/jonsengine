@@ -8,6 +8,7 @@
 
 #include <d3d11.h>
 #include <vector>
+#include <array>
 
 namespace JonsEngine
 {
@@ -16,6 +17,8 @@ namespace JonsEngine
     class DX11PointLightPass
     {
     public:
+        const static uint32_t TEXTURE_CUBE_NUM_FACES = 6;
+
         DX11PointLightPass(ID3D11Device* device, DX11Backbuffer& backbuffer, uint32_t shadowmapSize);
         ~DX11PointLightPass();
 
@@ -61,7 +64,7 @@ namespace JonsEngine
         ID3D11RasterizerStatePtr mRSCullFront;
         ID3D11RasterizerStatePtr mRSNoCulling;
         ID3D11Texture2DPtr mShadowmapTexture;
-        ID3D11DepthStencilViewPtr mShadowmapView[6];
+        std::array<ID3D11DepthStencilViewPtr, TEXTURE_CUBE_NUM_FACES> mShadowmapView;
         ID3D11ShaderResourceViewPtr mShadowmapSRV;
         DX11Mesh mSphereMesh;
         DX11Backbuffer& mBackbuffer;
