@@ -135,6 +135,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11DirectionalLightPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Gbuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Mesh.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11NullPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11PointLightPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Renderer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11RendererImpl.cpp" />
@@ -182,6 +183,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11DirectionalLightPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11GBuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Mesh.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11NullPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11PointLightPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Renderer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11RendererImpl.h" />
