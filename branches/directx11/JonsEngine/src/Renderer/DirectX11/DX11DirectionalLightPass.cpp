@@ -12,27 +12,25 @@ namespace JonsEngine
 {
     typedef std::array<Vec4, 8> CameraFrustrum;
 
-    const uint8_t gNumShadowmapCascades = 4;
-
     const Mat4 gBiasMatrix(0.5f, 0.0f, 0.0f, 0.0f,
                            0.0f, 0.5f, 0.0f, 0.0f,
                            0.0f, 0.0f, 0.5f, 0.0f,
                            0.5f, 0.5f, 0.5f, 1.0f);
 
-    void CalculateShadowmapCascades(std::array<float, gNumShadowmapCascades>& nearDistArr, std::array<float, gNumShadowmapCascades>& farDistArr, const float nearDist, const float farDist)
+    void CalculateShadowmapCascades(std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES>& nearDistArr, std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES>& farDistArr, const float nearDist, const float farDist)
     {
         const float splitWeight = 0.75f;
         const float ratio = nearDist / farDist;
 
         nearDistArr[0] = nearDist;
-        for (uint8_t index = 1; index < gNumShadowmapCascades; index++)
+        for (uint8_t index = 1; index < DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES; index++)
         {
-            const float si = index / (float)gNumShadowmapCascades;
+            const float si = index / (float)DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES;
 
             nearDistArr[index] = splitWeight * (nearDist * powf(ratio, si)) + (1 - splitWeight) * (nearDist + (farDist - nearDist) * si);
             farDistArr[index - 1] = nearDistArr[index] * 1.005f;
         }
-        farDistArr[gNumShadowmapCascades - 1] = farDist;
+        farDistArr[DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES - 1] = farDist;
     }
 
     CameraFrustrum CalculateCameraFrustrum(const float fovDegrees, const float aspectRatio, const float minDist, const float maxDist, const Mat4& cameraViewMatrix)
@@ -87,8 +85,50 @@ namespace JonsEngine
     }
 
 
-    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device) : mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device)
+    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, uint32_t shadowmapSize) : mVertexShader(nullptr), mPixelShader(nullptr), mShadowmapTexture(nullptr), mNullPass(device),
+        mShadowmapSRV(nullptr), mBackbuffer(backbuffer), mConstantBuffer(device)
     {
+        // create shadowmap texture/view/srv
+        D3D11_TEXTURE2D_DESC depthBufferDesc;
+        ZeroMemory(&depthBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
+        depthBufferDesc.ArraySize = NUM_SHADOWMAP_CASCADES;
+        depthBufferDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+        depthBufferDesc.Width = shadowmapSize;
+        depthBufferDesc.Height = shadowmapSize;
+        depthBufferDesc.MipLevels = 1;
+        depthBufferDesc.SampleDesc.Count = 1;
+        depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+        depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+        DXCALL(device->CreateTexture2D(&depthBufferDesc, NULL, &mShadowmapTexture));
+
+        D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+        ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
+        dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+        dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+        dsvDesc.Texture2DArray.ArraySize = 1;
+        for (uint32_t face = 0; face < NUM_SHADOWMAP_CASCADES; face++)
+        {
+            dsvDesc.Texture2DArray.FirstArraySlice = face;
+            DXCALL(device->CreateDepthStencilView(mShadowmapTexture, &dsvDesc, &mShadowmapView.at(face)));
+        }
+
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+        ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
+        srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
+        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+        srvDesc.Texture2DArray.ArraySize = NUM_SHADOWMAP_CASCADES;
+        srvDesc.Texture2DArray.MipLevels = 1;
+        DXCALL(device->CreateShaderResourceView(mShadowmapTexture, &srvDesc, &mShadowmapSRV));
+
+        // viewport used during shadow pass
+        ZeroMemory(&mShadowPassViewport, sizeof(D3D11_VIEWPORT));
+        mShadowPassViewport.TopLeftX = 0;
+        mShadowPassViewport.TopLeftY = 0;
+        mShadowPassViewport.Width = static_cast<float>(shadowmapSize);
+        mShadowPassViewport.Height = static_cast<float>(shadowmapSize);
+        mShadowPassViewport.MinDepth = 0.0f;
+        mShadowPassViewport.MaxDepth = 1.0f;
+
         DXCALL(device->CreateVertexShader(gFullscreenTriangleVertexShader, sizeof(gFullscreenTriangleVertexShader), NULL, &mVertexShader));
         DXCALL(device->CreatePixelShader(gDirectionalLightPixelShader, sizeof(gDirectionalLightPixelShader), NULL, &mPixelShader));
     }
@@ -111,12 +151,13 @@ namespace JonsEngine
 
     void DX11DirectionalLightPass::Render(ID3D11DeviceContextPtr context, const Vec4& lightColor, const Vec3& lightDir)
     {
+        D3D11_VIEWPORT prevViewport;
+        uint32_t numViewports = 1;
+        context->RSGetViewports(&numViewports, &prevViewport);
 
         /*
         // fill shadowmaps
         mDirectionalShadowmap.BindForDrawing();
-        mNullProgram.UseProgram();
-        GLCALL(glViewport(0, 0, (GLsizei)mShadowmapResolution, (GLsizei)mShadowmapResolution));
         for (uint8_t cascadeIndex = 0; cascadeIndex < gNumShadowmapCascades; cascadeIndex++)
         {
             CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(nearDistArr[cascadeIndex], farDistArr[cascadeIndex], lighting.mCameraViewMatrix);
@@ -136,15 +177,24 @@ namespace JonsEngine
         //
         // Shadow pass
         //
-        std::array<float, gNumShadowmapCascades> nearDistArr, farDistArr;
-        std::array<Mat4, gNumShadowmapCascades> lightVPMatrices;
+        std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES> nearDistArr, farDistArr;
+        std::array<Mat4, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES> lightVPMatrices;
 
-        CalculateShadowmapCascades(nearDistArr, farDistArr, Z_NEAR, Z_FAR);     // TODO: precompute?
+        // TODO: precompute?
+        CalculateShadowmapCascades(nearDistArr, farDistArr, Z_NEAR, Z_FAR);
+
+        mNullPass.BindForDepthStencilPass(context);
+        context->RSSetViewports(numViewports, &mShadowPassViewport);
+
 
 
         //
         // Shading pass
         //
+
+        // restore viewport
+        context->RSSetViewports(numViewports, &prevViewport);
+
         mConstantBuffer.SetData(DirectionalLightCBuffer(lightColor, lightDir), context, 0);
 
         context->Draw(3, 0);

@@ -128,7 +128,8 @@ namespace JonsEngine
 
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
         mAnisotropicFiltering(settings.mAnisotropicFiltering), mShadowQuality(settings.mShadowQuality), mBackbuffer(mDevice, mSwapchain, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
-        mAmbientPass(mDevice), mDirectionalLightPass(mDevice), mPointLightPass(mDevice, mBackbuffer, ShadowQualityResolution(mShadowQuality)), mTextureSampler(nullptr)
+        mAmbientPass(mDevice), mDirectionalLightPass(mDevice, mBackbuffer, ShadowQualityResolution(mShadowQuality)), mPointLightPass(mDevice, mBackbuffer, ShadowQualityResolution(mShadowQuality)),
+        mNullPass(mDevice), mTextureSampler(nullptr)
     {
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -343,9 +344,7 @@ namespace JonsEngine
         // do all directional lights
         mDirectionalLightPass.BindForShading(mContext);
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
-        {
             mDirectionalLightPass.Render(mContext, directionalLight.mLightColor, directionalLight.mLightDirection);
-        }
 
         // do all point lights
         mPointLightPass.BindForShading(mContext);

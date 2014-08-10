@@ -130,7 +130,6 @@ namespace JonsEngine
         dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
         dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
         dsvDesc.Texture2DArray.ArraySize = 1;
-        dsvDesc.Texture2DArray.MipSlice = 0;
         for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
         {
             dsvDesc.Texture2DArray.FirstArraySlice = face;
@@ -142,7 +141,6 @@ namespace JonsEngine
         srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
         srvDesc.TextureCube.MipLevels = 1;
-        srvDesc.TextureCube.MostDetailedMip = 0;
         DXCALL(device->CreateShaderResourceView(mShadowmapTexture, &srvDesc, &mShadowmapSRV));
 
         // viewport used during shadow pass
@@ -174,11 +172,9 @@ namespace JonsEngine
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
-        ID3D11DepthStencilStatePtr prevDepthStencilState = nullptr;
         D3D11_VIEWPORT prevViewport;
         uint32_t numViewports = 1;
         context->RSGetState(&prevRasterizerState);
-        context->OMGetDepthStencilState(&prevDepthStencilState, 0);
         context->RSGetViewports(&numViewports, &prevViewport);
 
         //
@@ -214,7 +210,7 @@ namespace JonsEngine
         context->RSSetState(mRSNoCulling);
 
         // restore screen viewport
-        context->RSSetViewports(1, &prevViewport);
+        context->RSSetViewports(numViewports, &prevViewport);
 
         mNullPass.RenderMesh(context, mSphereMesh, pointLight.mWVPMatrix);
 
@@ -233,7 +229,6 @@ namespace JonsEngine
 
         // restore state
         context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv.p);
-        context->OMSetDepthStencilState(prevDepthStencilState, 0);
         context->RSSetState(prevRasterizerState);
     }
 }
