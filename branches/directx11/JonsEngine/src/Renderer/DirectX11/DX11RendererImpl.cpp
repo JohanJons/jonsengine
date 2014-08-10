@@ -24,40 +24,6 @@ namespace JonsEngine
     };
 
 
-    Mat4 CreateDirLightVPMatrix(const CameraFrustrum& cameraFrustrum, const Vec3& lightDir)
-    {
-        Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, 1.0f, 0.0f));
-
-        Vec4 transf = lightViewMatrix * cameraFrustrum[0];
-        float maxZ = transf.z, minZ = transf.z;
-        float maxX = transf.x, minX = transf.x;
-        float maxY = transf.y, minY = transf.y;
-        for (uint32_t i = 1; i < 8; i++)
-        {
-            transf = lightViewMatrix * cameraFrustrum[i];
-
-            if (transf.z > maxZ) maxZ = transf.z;
-            if (transf.z < minZ) minZ = transf.z;
-            if (transf.x > maxX) maxX = transf.x;
-            if (transf.x < minX) minX = transf.x;
-            if (transf.y > maxY) maxY = transf.y;
-            if (transf.y < minY) minY = transf.y;
-        }
-
-        Mat4 viewMatrix(lightViewMatrix);
-        viewMatrix[3][0] = -(minX + maxX) * 0.5f;
-        viewMatrix[3][1] = -(minY + maxY) * 0.5f;
-        viewMatrix[3][2] = -(minZ + maxZ) * 0.5f;
-        viewMatrix[0][3] = 0.0f;
-        viewMatrix[1][3] = 0.0f;
-        viewMatrix[2][3] = 0.0f;
-        viewMatrix[3][3] = 1.0f;
-
-        Vec3 halfExtents((maxX - minX) * 0.5, (maxY - minY) * 0.5, (maxZ - minZ) * 0.5);
-
-        return glm::ortho(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.y) * viewMatrix;
-    }
-
     void BindTexture2D(const std::vector<DX11TexturePtr>& textures, Logger& logger, const TextureID textureID, ID3D11DeviceContext* context, uint32_t textureSlot)
     {
         auto texture = std::find_if(textures.begin(), textures.end(), [&](const DX11TexturePtr ptr) { return ptr->GetTextureID() == textureID; });

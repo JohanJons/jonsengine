@@ -4,6 +4,7 @@
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/DirectX11/DX11NullPass.h"
 #include "include/Core/Types.h"
 
 #include <d3d11.h>
@@ -27,16 +28,6 @@ namespace JonsEngine
 
 
     private:
-        struct NullCBuffer
-        {
-            Mat4 mWVPMatrix;
-
-
-            NullCBuffer(const Mat4& wvpMatrix) : mWVPMatrix(wvpMatrix)
-            {
-            }
-        };
-
         struct PointLightCBuffer
         {
             Mat4 mLightWVPMatrix;
@@ -53,10 +44,7 @@ namespace JonsEngine
             }
         };
 
-        void DepthPass(ID3D11DeviceContext* context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const Mat4& lightVPMatrix);
-
         ID3D11VertexShaderPtr mShadingVertexShader;
-        ID3D11VertexShaderPtr mNullVertexShader;
         ID3D11PixelShaderPtr mPixelShader;
         ID3D11InputLayoutPtr mInputLayout;
         ID3D11DepthStencilStatePtr mDSSStencilPass;
@@ -68,8 +56,8 @@ namespace JonsEngine
         ID3D11ShaderResourceViewPtr mShadowmapSRV;
         DX11Mesh mSphereMesh;
         DX11Backbuffer& mBackbuffer;
+        DX11NullPass mNullPass;
         D3D11_VIEWPORT mShadowPassViewport;
-        DX11ConstantBuffer<NullCBuffer> mNullCBuffer;
         DX11ConstantBuffer<PointLightCBuffer> mPointLightCBuffer;
     };
 }
