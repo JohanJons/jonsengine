@@ -2,6 +2,8 @@
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
+#include "include/Renderer/DirectX11/DX11Texture.h"
+#include "include/Renderer/DirectX11/DX11Backbuffer.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/FullscreenTriangleVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPixel.h"
 #include "include/Core/Utils/Math.h"
@@ -149,7 +151,7 @@ namespace JonsEngine
         context->PSSetShader(mPixelShader, NULL, NULL);
     }
 
-    void DX11DirectionalLightPass::Render(const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, ID3D11DeviceContextPtr context, const Vec4& lightColor, const Vec3& lightDir)
+    void DX11DirectionalLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Vec4& lightColor, const Vec3& lightDir)
     {
         D3D11_VIEWPORT prevViewport;
         uint32_t numViewports = 1;
@@ -169,7 +171,7 @@ namespace JonsEngine
         // TODO: precompute?
         CalculateShadowmapCascades(nearDistArr, farDistArr, Z_NEAR, Z_FAR);
 
-        mNullPass.BindForDepthStencilPass(context);
+       /* mNullPass.BindForDepthStencilPass(context);
         context->RSSetViewports(numViewports, &mShadowPassViewport);
         context->OMSetDepthStencilState(NULL, 0);
         
@@ -178,13 +180,13 @@ namespace JonsEngine
             context->OMSetRenderTargets(0, NULL, mShadowmapView.at(cascadeIndex));
             context->ClearDepthStencilView(mShadowmapView.at(cascadeIndex), D3D11_CLEAR_DEPTH, 1.0f, 0);
             
-            CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, nearDistArr[cascadeIndex], farDistArr[cascadeIndex], lighting.mCameraViewMatrix);
-            lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, directionalLight.mLightDirection);
+            CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, nearDistArr[cascadeIndex], farDistArr[cascadeIndex], cameraViewMatrix);
+            lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, lightDir);
             mNullPass.RenderMeshes(context, renderQueue, meshes, lightVPMatrices[cascadeIndex]);
 
             lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex];
             farDistArr[cascadeIndex] = -farDistArr[cascadeIndex];
-        }
+        }*/
 
 
 
@@ -193,7 +195,7 @@ namespace JonsEngine
         //
         
         // restore rendering to backbuffer
-        mBackbuffer.BindForShadingStage(context, gbufferDSV);
+        mBackbuffer.BindForShadingStage(context);
 
         // restore viewport
         context->RSSetViewports(numViewports, &prevViewport);

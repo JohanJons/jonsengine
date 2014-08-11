@@ -7,7 +7,8 @@ namespace JonsEngine
     const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
-    DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, uint32_t textureWidth, uint32_t textureHeight) : mBackbuffer(nullptr), mDepthStencilState(nullptr)
+    DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DepthStencilViewPtr depthBuffer, uint32_t textureWidth, uint32_t textureHeight) : 
+        mBackbuffer(nullptr), mDepthbuffer(depthBuffer), mDepthStencilState(nullptr)
     {
         // backbuffer rendertarget setup
         ID3D11Texture2DPtr backbuffer = nullptr;
@@ -34,10 +35,10 @@ namespace JonsEngine
         context->ClearRenderTargetView(mBackbuffer, gClearColor);
     }
 
-    void DX11Backbuffer::BindForShadingStage(ID3D11DeviceContextPtr context, ID3D11DepthStencilViewPtr depthBuffer)
+    void DX11Backbuffer::BindForShadingStage(ID3D11DeviceContextPtr context)
     {
         // set backbuffer as rendertarget and bind gbuffer textures as texture inputs
-        context->OMSetRenderTargets(1, &mBackbuffer.p, depthBuffer);
+        context->OMSetRenderTargets(1, &mBackbuffer.p, mDepthbuffer);
 
         // disable further depth testing/writing
         context->OMSetDepthStencilState(mDepthStencilState, 0);

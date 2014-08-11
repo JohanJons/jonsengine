@@ -13,10 +13,10 @@
 namespace JonsEngine
 {
     const Vec3 CUBEMAP_DIRECTION_VECTORS[DX11PointLightPass::TEXTURE_CUBE_NUM_FACES] = { Vec3(1.0f, 0.0f, 0.0f), Vec3(-1.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f),
-                                                                                         Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f), Vec3(0.0f, 0.0f, -1.0f) };
+                                                                                         Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 0.0f, 1.0f) };
 
-    const Vec3 CUBEMAP_UP_VECTORS[DX11PointLightPass::TEXTURE_CUBE_NUM_FACES] = { Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f),
-                                                                                  Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, -1.0f, 0.0f) };
+    const Vec3 CUBEMAP_UP_VECTORS[DX11PointLightPass::TEXTURE_CUBE_NUM_FACES] = { Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f),
+                                                                                  Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f) };
 
     // used to reset shadowmap from input to rendertarget
     ID3D11ShaderResourceViewPtr const gNullSrv = nullptr;
@@ -168,7 +168,7 @@ namespace JonsEngine
         context->IASetInputLayout(mInputLayout);
     }
 
-    void DX11PointLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, ID3D11DepthStencilViewPtr gbufferDSV, const RenderableLighting::PointLight& pointLight)
+    void DX11PointLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
@@ -205,7 +205,7 @@ namespace JonsEngine
         //
 
         // restore rendering to the backbuffer
-        mBackbuffer.BindForShadingStage(context, gbufferDSV);
+        mBackbuffer.BindForShadingStage(context);
 
         context->OMSetDepthStencilState(mDSSStencilPass, 0);
         context->RSSetState(mRSNoCulling);

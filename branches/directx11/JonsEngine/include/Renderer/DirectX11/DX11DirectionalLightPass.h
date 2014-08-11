@@ -21,7 +21,7 @@ namespace JonsEngine
         ~DX11DirectionalLightPass();
 
         void BindForShading(ID3D11DeviceContextPtr context);
-        void Render(const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, ID3D11DeviceContextPtr context, const Vec4& lightColor, const Vec3& lightDir);
+        void Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Vec4& lightColor, const Vec3& lightDir);
 
 
     private:

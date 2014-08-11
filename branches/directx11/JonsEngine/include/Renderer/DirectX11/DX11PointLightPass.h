@@ -24,7 +24,7 @@ namespace JonsEngine
         ~DX11PointLightPass();
 
         void BindForShading(ID3D11DeviceContextPtr context);
-        void Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, ID3D11DepthStencilViewPtr gbufferDSV, const RenderableLighting::PointLight& pointLight);
+        void Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight);
 
 
     private:

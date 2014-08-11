@@ -127,9 +127,9 @@ namespace JonsEngine
 
 
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
-        mAnisotropicFiltering(settings.mAnisotropicFiltering), mShadowQuality(settings.mShadowQuality), mBackbuffer(mDevice, mSwapchain, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
-        mAmbientPass(mDevice), mDirectionalLightPass(mDevice, mBackbuffer, ShadowQualityResolution(mShadowQuality)), mPointLightPass(mDevice, mBackbuffer, ShadowQualityResolution(mShadowQuality)),
-        mNullPass(mDevice), mTextureSampler(nullptr)
+        mAnisotropicFiltering(settings.mAnisotropicFiltering), mShadowQuality(settings.mShadowQuality), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), 
+        mBackbuffer(mDevice, mSwapchain, mGBuffer.GetDepthStencilView(), mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mAmbientPass(mDevice), mDirectionalLightPass(mDevice, mBackbuffer, ShadowQualityResolution(mShadowQuality)),
+        mPointLightPass(mDevice, mBackbuffer, ShadowQualityResolution(mShadowQuality)), mNullPass(mDevice), mTextureSampler(nullptr)
     {
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -328,11 +328,8 @@ namespace JonsEngine
 
     void DX11RendererImpl::ShadingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting)
     {
-        // geometry pass also filled gbuffer depthbuffer. We need it for further shading ops.
-        ID3D11DepthStencilViewPtr depthBuffer = mGBuffer.GetDepthStencilView();
-
         mBackbuffer.ClearBackbuffer(mContext);
-        mBackbuffer.BindForShadingStage(mContext, depthBuffer);
+        mBackbuffer.BindForShadingStage(mContext);
         mGBuffer.BindForShadingStage(mContext);
 
         // ambient light
@@ -344,14 +341,14 @@ namespace JonsEngine
         // do all directional lights
         mDirectionalLightPass.BindForShading(mContext);
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
-            mDirectionalLightPass.Render(mContext, directionalLight.mLightColor, directionalLight.mLightDirection);
+            mDirectionalLightPass.Render(mContext, renderQueue, mMeshes, 70.0f, 1920.0f / 1080.0f, lighting.mCameraViewMatrix, directionalLight.mLightColor, directionalLight.mLightDirection);
 
         // do all point lights
         mPointLightPass.BindForShading(mContext);
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
             mGBuffer.ClearStencilBuffer(mContext);
-            mPointLightPass.Render(mContext, renderQueue, mMeshes, depthBuffer, pointLight);
+            mPointLightPass.Render(mContext, renderQueue, mMeshes, pointLight);
         }
 
         mContext->OMSetBlendState(NULL, NULL, 0xffffffff);
