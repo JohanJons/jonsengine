@@ -149,27 +149,13 @@ namespace JonsEngine
         context->PSSetShader(mPixelShader, NULL, NULL);
     }
 
-    void DX11DirectionalLightPass::Render(ID3D11DeviceContextPtr context, const Vec4& lightColor, const Vec3& lightDir)
+    void DX11DirectionalLightPass::Render(const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, ID3D11DeviceContextPtr context, const Vec4& lightColor, const Vec3& lightDir)
     {
         D3D11_VIEWPORT prevViewport;
         uint32_t numViewports = 1;
         context->RSGetViewports(&numViewports, &prevViewport);
 
         /*
-        // fill shadowmaps
-        mDirectionalShadowmap.BindForDrawing();
-        for (uint8_t cascadeIndex = 0; cascadeIndex < gNumShadowmapCascades; cascadeIndex++)
-        {
-            CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(nearDistArr[cascadeIndex], farDistArr[cascadeIndex], lighting.mCameraViewMatrix);
-
-            lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, directionalLight.mLightDirection);       // TODO: bounding box problems?
-            mDirectionalShadowmap.BindShadowmapCascade(cascadeIndex);
-            GeometryDepthPass(renderQueue, lightVPMatrices[cascadeIndex]);
-
-            lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex];
-            farDistArr[cascadeIndex] = -farDistArr[cascadeIndex];
-        }
-
         mAccumulationBuffer.BindForDrawing();
         GLCALL(glViewport(0, 0, (GLsizei)mWindowWidth, (GLsizei)mWindowHeight));
         DirLightLightingPass(directionalLight, lightVPMatrices, lighting.mCameraViewMatrix, farDistArr, lighting.mGamma, lighting.mScreenSize, debugShadowmapSplits);
@@ -177,23 +163,42 @@ namespace JonsEngine
         //
         // Shadow pass
         //
-        std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES> nearDistArr, farDistArr;
-        std::array<Mat4, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES> lightVPMatrices;
+        std::array<float, NUM_SHADOWMAP_CASCADES> nearDistArr, farDistArr;
+        std::array<Mat4, NUM_SHADOWMAP_CASCADES> lightVPMatrices;
 
         // TODO: precompute?
         CalculateShadowmapCascades(nearDistArr, farDistArr, Z_NEAR, Z_FAR);
 
         mNullPass.BindForDepthStencilPass(context);
         context->RSSetViewports(numViewports, &mShadowPassViewport);
+        context->OMSetDepthStencilState(NULL, 0);
+        
+        for (uint32_t cascadeIndex = 0; cascadeIndex < NUM_SHADOWMAP_CASCADES; cascadeIndex++)
+        {
+            context->OMSetRenderTargets(0, NULL, mShadowmapView.at(cascadeIndex));
+            context->ClearDepthStencilView(mShadowmapView.at(cascadeIndex), D3D11_CLEAR_DEPTH, 1.0f, 0);
+            
+            CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, nearDistArr[cascadeIndex], farDistArr[cascadeIndex], lighting.mCameraViewMatrix);
+            lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, directionalLight.mLightDirection);
+            mNullPass.RenderMeshes(context, renderQueue, meshes, lightVPMatrices[cascadeIndex]);
+
+            lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex];
+            farDistArr[cascadeIndex] = -farDistArr[cascadeIndex];
+        }
 
 
 
         //
         // Shading pass
         //
+        
+        // restore rendering to backbuffer
+        mBackbuffer.BindForShadingStage(context, gbufferDSV);
 
         // restore viewport
         context->RSSetViewports(numViewports, &prevViewport);
+        
+        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mShadowmapSRV.p);
 
         mConstantBuffer.SetData(DirectionalLightCBuffer(lightColor, lightDir), context, 0);
 

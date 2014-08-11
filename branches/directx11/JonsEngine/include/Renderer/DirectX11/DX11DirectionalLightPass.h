@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Renderer/RenderCommands.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11NullPass.h"
@@ -20,7 +21,7 @@ namespace JonsEngine
         ~DX11DirectionalLightPass();
 
         void BindForShading(ID3D11DeviceContextPtr context);
-        void Render(ID3D11DeviceContextPtr context, const Vec4& lightColor, const Vec3& lightDir);
+        void Render(const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, ID3D11DeviceContextPtr context, const Vec4& lightColor, const Vec3& lightDir);
 
 
     private:

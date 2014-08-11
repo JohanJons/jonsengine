@@ -193,6 +193,7 @@ namespace JonsEngine
         {
             context->OMSetRenderTargets(0, NULL, mShadowmapView.at(face));
             context->ClearDepthStencilView(mShadowmapView.at(face), D3D11_CLEAR_DEPTH, 1.0f, 0);
+            
             Mat4 lightViewMatrix = glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition + CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
             // TODO: precompute?
             Mat4 lightProjMatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, Z_FAR);
