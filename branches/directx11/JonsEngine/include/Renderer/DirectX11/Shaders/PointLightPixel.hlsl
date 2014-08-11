@@ -41,7 +41,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
 
     // shadowmapping
     float3 cubemapDir = (float3)(worldPosition - gLightPosition);
-    cubemapDir.z = -cubemapDir.z;       // TODO: remove unneccessary instruction somehow?
+    cubemapDir.z = -cubemapDir.z;       // TODO: any way to remove this extra instruction?
     float storedDepth = gShadowmap.Sample(gShadowmapSampler, cubemapDir).r;
     float visibility = 0.0;
     if (storedDepth + 0.0001 > VectorToDepthValue(cubemapDir))
