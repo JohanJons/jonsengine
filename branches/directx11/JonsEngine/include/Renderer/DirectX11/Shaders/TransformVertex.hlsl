@@ -1,7 +1,9 @@
-#ifndef NULL_VERTEX_HLSL
-#define NULL_VERTEX_HLSL
+#ifndef TRANSFORM_VERTEX_HLSL
+#define TRANSFORM_VERTEX_HLSL
 
-cbuffer NullConstants : register(b0)
+#include "Constants.hlsl"
+
+cbuffer TransformConstants : register(CBUFFER_REGISTER_TRANSFORM)
 {
     float4x4 gWVPMatrix;
 };

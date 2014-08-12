@@ -12,29 +12,30 @@
 
 namespace JonsEngine
 {
-    class DX11NullPass
+    class DX11VertexTransformPass
     {
     public:
-        DX11NullPass(ID3D11DevicePtr device);
-        ~DX11NullPass();
+        DX11VertexTransformPass(ID3D11DevicePtr device);
+        ~DX11VertexTransformPass();
 
-        void BindForDepthStencilPass(ID3D11DeviceContextPtr context);
+        void BindForTransformPass(ID3D11DeviceContextPtr context);
         void RenderMesh(ID3D11DeviceContextPtr context, DX11Mesh& mesh, const Mat4& wvpMatrix);
         void RenderMeshes(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix);
 
 
     private:
-        struct NullCBuffer
+        struct TransformCBuffer
         {
             Mat4 mWVPMatrix;
 
 
-            NullCBuffer(const Mat4& wvpMatrix) : mWVPMatrix(wvpMatrix)
+            TransformCBuffer(const Mat4& wvpMatrix) : mWVPMatrix(wvpMatrix)
             {
             }
         };
 
-        ID3D11VertexShaderPtr mNullVertexShader;
-        DX11ConstantBuffer<NullCBuffer> mNullCBuffer;
+        ID3D11VertexShaderPtr mVertexShader;
+        ID3D11InputLayoutPtr mInputLayout;
+        DX11ConstantBuffer<TransformCBuffer> mTransformCBuffer;
     };
 }

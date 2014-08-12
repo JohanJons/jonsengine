@@ -87,8 +87,8 @@ namespace JonsEngine
     }
 
 
-    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, uint32_t shadowmapSize) : mVertexShader(nullptr), mPixelShader(nullptr), mShadowmapTexture(nullptr), mNullPass(device),
-        mShadowmapSRV(nullptr), mBackbuffer(backbuffer), mConstantBuffer(device)
+    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, uint32_t shadowmapSize) : mShadowmapTexture(nullptr), mVertexShader(nullptr),
+        mPixelShader(nullptr), mVertexTransformPass(device), mShadowmapSRV(nullptr), mBackbuffer(backbuffer), mConstantBuffer(device, mConstantBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         // create shadowmap texture/view/srv
         D3D11_TEXTURE2D_DESC depthBufferDesc;
@@ -171,7 +171,7 @@ namespace JonsEngine
         // TODO: precompute?
         CalculateShadowmapCascades(nearDistArr, farDistArr, Z_NEAR, Z_FAR);
 
-       /* mNullPass.BindForDepthStencilPass(context);
+       /* mVertexTransformPass.BindForDepthStencilPass(context);
         context->RSSetViewports(numViewports, &mShadowPassViewport);
         context->OMSetDepthStencilState(NULL, 0);
         
@@ -182,7 +182,7 @@ namespace JonsEngine
             
             CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, nearDistArr[cascadeIndex], farDistArr[cascadeIndex], cameraViewMatrix);
             lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, lightDir);
-            mNullPass.RenderMeshes(context, renderQueue, meshes, lightVPMatrices[cascadeIndex]);
+            mVertexTransformPass.RenderMeshes(context, renderQueue, meshes, lightVPMatrices[cascadeIndex]);
 
             lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex];
             farDistArr[cascadeIndex] = -farDistArr[cascadeIndex];
@@ -202,7 +202,7 @@ namespace JonsEngine
         
         context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mShadowmapSRV.p);
 
-        mConstantBuffer.SetData(DirectionalLightCBuffer(lightColor, lightDir), context, 0);
+        mConstantBuffer.SetData(DirectionalLightCBuffer(lightColor, lightDir), context);
 
         context->Draw(3, 0);
     }

@@ -14,7 +14,7 @@ namespace JonsEngine
 
 
     DX11GBuffer::DX11GBuffer(ID3D11DevicePtr device, uint32_t textureWidth, uint32_t textureHeight) : mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr),
-        mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device)
+        mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device, mConstantBuffer.CONSTANT_BUFFER_SLOT_TRANSFORM)
     {
         // create gbuffer textures/rendertargets
         D3D11_TEXTURE2D_DESC textureDesc;
@@ -101,7 +101,7 @@ namespace JonsEngine
 
     void DX11GBuffer::SetConstantData(ID3D11DeviceContextPtr context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture)
     {
-        mConstantBuffer.SetData({wvpMatrix, worldMatrix, textureTilingFactor, hasDiffuseTexture, hasNormalTexture}, context, 0);
+        mConstantBuffer.SetData({ wvpMatrix, worldMatrix, textureTilingFactor, hasDiffuseTexture, hasNormalTexture }, context);
     }
 
     void DX11GBuffer::BindForGeometryStage(ID3D11DeviceContextPtr context)

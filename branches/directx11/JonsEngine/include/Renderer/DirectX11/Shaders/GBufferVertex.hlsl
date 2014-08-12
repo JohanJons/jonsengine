@@ -1,6 +1,8 @@
 #ifndef GBUFFER_VERTEX_HLSL
 #define GBUFFER_VERTEX_HLSL
 
+#include "Constants.hlsl"
+
 struct GBufferVSIn
 {
     float3 mPosition : POSITION;
@@ -20,7 +22,7 @@ struct GBufferVSOut
     float2 mTexcoord : TEXCOORD;
 };
 
-cbuffer GBufferConstants : register(b0)
+cbuffer GBufferConstants : register(CBUFFER_REGISTER_TRANSFORM)
 {
     float4x4 gWVPMatrix;
     float4x4 gWorldMatrix;

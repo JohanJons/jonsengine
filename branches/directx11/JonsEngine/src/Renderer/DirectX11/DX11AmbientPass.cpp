@@ -7,7 +7,7 @@
 
 namespace JonsEngine
 {
-    DX11AmbientPass::DX11AmbientPass(ID3D11DevicePtr device) : mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device)
+    DX11AmbientPass::DX11AmbientPass(ID3D11DevicePtr device) : mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device, mConstantBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         DXCALL(device->CreateVertexShader(gFullscreenTriangleVertexShader, sizeof(gFullscreenTriangleVertexShader), NULL, &mVertexShader));
         DXCALL(device->CreatePixelShader(gAmbientPixelShader, sizeof(gAmbientPixelShader), NULL, &mPixelShader));
@@ -28,7 +28,7 @@ namespace JonsEngine
         context->VSSetShader(mVertexShader, NULL, NULL);
         context->PSSetShader(mPixelShader, NULL, NULL);
 
-        mConstantBuffer.SetData(AmbientCBuffer(ambientLight), context, 0);
+        mConstantBuffer.SetData(AmbientCBuffer(ambientLight), context);
 
         context->Draw(3, 0);
     }

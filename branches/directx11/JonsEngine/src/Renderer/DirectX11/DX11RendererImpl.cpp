@@ -24,7 +24,22 @@ namespace JonsEngine
     };
 
 
-    void BindTexture2D(const std::vector<DX11TexturePtr>& textures, Logger& logger, const TextureID textureID, ID3D11DeviceContextPtr context, uint32_t textureSlot)
+    DX11Texture::SHADER_TEXTURE_SLOT GetShaderTextureSlot(TextureType textureType)
+    {
+        switch (textureType)
+        {
+            case TextureType::TEXTURE_TYPE_DIFFUSE:
+                return DX11Texture::SHADER_TEXTURE_SLOT_DIFFUSE;
+
+            case TextureType::TEXTURE_TYPE_NORMAL:
+                return DX11Texture::SHADER_TEXTURE_SLOT_NORMAL;
+
+            default:
+                return DX11Texture::SHADER_TEXTURE_SLOT_UNKNOWN;
+        };
+    }
+
+    void BindTexture2D(const std::vector<DX11TexturePtr>& textures, Logger& logger, const TextureID textureID, ID3D11DeviceContextPtr context)
     {
         auto texture = std::find_if(textures.begin(), textures.end(), [&](const DX11TexturePtr ptr) { return ptr->GetTextureID() == textureID; });
         if (texture == textures.end())
@@ -33,7 +48,7 @@ namespace JonsEngine
             throw std::runtime_error("Renderable TextureID out of range");
         }
 
-        (*texture)->Bind(context, textureSlot);
+        (*texture)->Bind(context);
     }
 
     LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
@@ -129,7 +144,7 @@ namespace JonsEngine
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
         mAnisotropicFiltering(settings.mAnisotropicFiltering), mShadowQuality(settings.mShadowQuality), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), 
         mBackbuffer(mDevice, mSwapchain, mGBuffer.GetDepthStencilView(), mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mAmbientPass(mDevice), mDirectionalLightPass(mDevice, mBackbuffer, ShadowQualityResolution(mShadowQuality)),
-        mPointLightPass(mDevice, mBackbuffer, ShadowQualityResolution(mShadowQuality)), mNullPass(mDevice), mTextureSampler(nullptr)
+        mPointLightPass(mDevice, mBackbuffer, ShadowQualityResolution(mShadowQuality)), mVertexTransformPass(mDevice), mTextureSampler(nullptr)
     {
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -202,7 +217,7 @@ namespace JonsEngine
     {
         auto allocator = mMemoryAllocator;
 
-        mTextures.emplace_back(DX11TexturePtr(allocator->AllocateObject<DX11Texture>(mDevice, mContext, textureData, textureWidth, textureHeight, textureType), [=](DX11Texture* texture) { allocator->DeallocateObject<DX11Texture>(texture); }));
+        mTextures.emplace_back(DX11TexturePtr(allocator->AllocateObject<DX11Texture>(mDevice, mContext, textureData, textureWidth, textureHeight, GetShaderTextureSlot(textureType)), [=](DX11Texture* texture) { allocator->DeallocateObject<DX11Texture>(texture); }));
 
         return mTextures.back()->GetTextureID();
     }
@@ -316,10 +331,10 @@ namespace JonsEngine
             const bool hasNormalTexture = renderable.mNormalTexture != INVALID_TEXTURE_ID;
 
             if (hasDiffuseTexture)
-                BindTexture2D(mTextures, mLogger, renderable.mDiffuseTexture, mContext, DX11Texture::SHADER_TEXTURE_SLOT_DIFFUSE);
+                BindTexture2D(mTextures, mLogger, renderable.mDiffuseTexture, mContext);
 
             if (hasNormalTexture)
-                BindTexture2D(mTextures, mLogger, renderable.mNormalTexture, mContext, DX11Texture::SHADER_TEXTURE_SLOT_NORMAL);
+                BindTexture2D(mTextures, mLogger, renderable.mNormalTexture, mContext);
 
             mGBuffer.SetConstantData(mContext, renderable.mWVPMatrix, renderable.mWorldMatrix, renderable.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
             (*meshIterator)->Draw(mContext);

@@ -36,21 +36,10 @@ namespace JonsEngine
     }
 
 
-    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, uint32_t shadowmapSize) : mShadingVertexShader(nullptr), mPixelShader(nullptr),
-        mInputLayout(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mShadowmapTexture(nullptr), mShadowmapSRV(nullptr), mSphereMesh(CreateSphereMesh(device)),
-        mBackbuffer(backbuffer), mNullPass(device), mPointLightCBuffer(device)
+    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, const uint32_t shadowmapSize) : 
+        mPixelShader(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mSphereMesh(CreateSphereMesh(device)), mBackbuffer(backbuffer), mVertexTransformPass(device),
+        mShadowmap(device, shadowmapSize, TEXTURE_CUBE_NUM_FACES, true), mPointLightCBuffer(device, mPointLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
-        D3D11_INPUT_ELEMENT_DESC inputDescription;
-        ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC));
-        inputDescription.SemanticName = "POSITION";
-        inputDescription.SemanticIndex = 0;
-        inputDescription.Format = DXGI_FORMAT_R32G32B32_FLOAT;
-        inputDescription.InputSlot = 0;
-        inputDescription.AlignedByteOffset = 0;
-        inputDescription.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-        inputDescription.InstanceDataStepRate = 0;
-        DXCALL(device->CreateInputLayout(&inputDescription, 1, gPointLightVertexShader, sizeof(gPointLightVertexShader), &mInputLayout));
-
         // rasterize for front-face culling due to light volumes
         D3D11_RASTERIZER_DESC rasterizerDesc;
         ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
@@ -111,49 +100,6 @@ namespace JonsEngine
         depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_EQUAL;
         DXCALL(device->CreateDepthStencilState(&depthStencilDesc, &mDSSShadingPass));
 
-        // create shadowmap texture/view/srv
-        D3D11_TEXTURE2D_DESC depthBufferDesc;
-        ZeroMemory(&depthBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
-        depthBufferDesc.ArraySize = TEXTURE_CUBE_NUM_FACES;
-        depthBufferDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-        depthBufferDesc.Width = shadowmapSize;
-        depthBufferDesc.Height = shadowmapSize;
-        depthBufferDesc.MipLevels = 1;
-        depthBufferDesc.SampleDesc.Count = 1;
-        depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-        depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
-        depthBufferDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
-        DXCALL(device->CreateTexture2D(&depthBufferDesc, NULL, &mShadowmapTexture));
-
-        D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-        ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
-        dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
-        dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
-        dsvDesc.Texture2DArray.ArraySize = 1;
-        for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
-        {
-            dsvDesc.Texture2DArray.FirstArraySlice = face;
-            DXCALL(device->CreateDepthStencilView(mShadowmapTexture, &dsvDesc, &mShadowmapView.at(face)));
-        }
-
-        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-        ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
-        srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
-        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-        srvDesc.TextureCube.MipLevels = 1;
-        DXCALL(device->CreateShaderResourceView(mShadowmapTexture, &srvDesc, &mShadowmapSRV));
-
-        // viewport used during shadow pass
-        ZeroMemory(&mShadowPassViewport, sizeof(D3D11_VIEWPORT));
-        mShadowPassViewport.TopLeftX = 0;
-        mShadowPassViewport.TopLeftY = 0;
-        mShadowPassViewport.Width = static_cast<float>(shadowmapSize);
-        mShadowPassViewport.Height = static_cast<float>(shadowmapSize);
-        mShadowPassViewport.MinDepth = 0.0f;
-        mShadowPassViewport.MaxDepth = 1.0f;
-
-        // shaders used
-        DXCALL(device->CreateVertexShader(gPointLightVertexShader, sizeof(gPointLightVertexShader), NULL, &mShadingVertexShader));
         DXCALL(device->CreatePixelShader(gPointLightPixelShader, sizeof(gPointLightPixelShader), NULL, &mPixelShader));
     }
 
@@ -164,8 +110,8 @@ namespace JonsEngine
 
     void DX11PointLightPass::BindForShading(ID3D11DeviceContextPtr context)
     {
-        context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        context->IASetInputLayout(mInputLayout);
+        // geometry transform vertex pass for stencil/shadow pass
+        mVertexTransformPass.BindForTransformPass(context);
     }
 
     void DX11PointLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight)
@@ -181,23 +127,21 @@ namespace JonsEngine
         // shadow pass
         //
 
-        // null pass for stencil/shadow pass
-        mNullPass.BindForDepthStencilPass(context);
+        // unbind any pixel shader
+        context->PSSetShader(NULL, NULL, NULL);
 
         // defaults to depth rendering/testing
         context->OMSetDepthStencilState(NULL, 0);
 
         context->RSSetState(mRSCullFront);
-        context->RSSetViewports(1, &mShadowPassViewport);
+        mShadowmap.SetViewport(context);
         for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
         {
-            context->OMSetRenderTargets(0, NULL, mShadowmapView.at(face));
-            context->ClearDepthStencilView(mShadowmapView.at(face), D3D11_CLEAR_DEPTH, 1.0f, 0);
-            
+            mShadowmap.BindForDrawing(context, face);
             Mat4 lightViewMatrix = glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition + CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
             // TODO: precompute?
             Mat4 lightProjMatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, Z_FAR);
-            mNullPass.RenderMeshes(context, renderQueue, meshes, lightProjMatrix * lightViewMatrix);
+            mVertexTransformPass.RenderMeshes(context, renderQueue, meshes, lightProjMatrix * lightViewMatrix);
         }
 
         //
@@ -213,20 +157,19 @@ namespace JonsEngine
         // restore screen viewport
         context->RSSetViewports(numViewports, &prevViewport);
 
-        mNullPass.RenderMesh(context, mSphereMesh, pointLight.mWVPMatrix);
+        mVertexTransformPass.RenderMesh(context, mSphereMesh, pointLight.mWVPMatrix);
 
         //
         // shading pass
         //
         context->OMSetDepthStencilState(mDSSShadingPass, 0);
         context->RSSetState(mRSCullFront);
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mShadowmapSRV.p);
+        mShadowmap.BindForReading(context);
 
-        context->VSSetShader(mShadingVertexShader, NULL, NULL);
         context->PSSetShader(mPixelShader, NULL, NULL);
 
-        mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mWVPMatrix, pointLight.mLightColor, Vec4(pointLight.mLightPosition, 1.0), pointLight.mLightIntensity, pointLight.mMaxDistance), context, 0);
-        mSphereMesh.Draw(context);
+        mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mLightColor, Vec4(pointLight.mLightPosition, 1.0), pointLight.mLightIntensity, pointLight.mMaxDistance), context);
+        mVertexTransformPass.RenderMesh(context, mSphereMesh, pointLight.mWVPMatrix);
 
         // restore state
         context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv.p);

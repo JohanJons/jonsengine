@@ -194,7 +194,10 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Backbuffer.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX11\DX11NullPass.cpp">
+    <ClCompile Include="src\Renderer\DirectX11\DX11Shadowmap.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
   </ItemGroup>
@@ -349,7 +352,10 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Backbuffer.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DX11NullPass.h">
+    <ClInclude Include="include\Renderer\DirectX11\DX11Shadowmap.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11VertexTransformPass.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
   </ItemGroup>
@@ -372,10 +378,10 @@
     <FxCompile Include="include\Renderer\DirectX11\Shaders\PointLightPixel.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="include\Renderer\DirectX11\Shaders\PointLightVertex.hlsl">
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\TransformVertex.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="include\Renderer\DirectX11\Shaders\NullVertex.hlsl">
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\Constants.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

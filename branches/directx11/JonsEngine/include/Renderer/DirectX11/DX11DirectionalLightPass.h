@@ -3,7 +3,7 @@
 #include "include/Renderer/RenderCommands.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/Renderer/DirectX11/DX11NullPass.h"
+#include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "include/Core/Types.h"
 
 #include <d3d11.h>
@@ -42,7 +42,7 @@ namespace JonsEngine
         D3D11_VIEWPORT mShadowPassViewport;
         ID3D11VertexShaderPtr mVertexShader;
         ID3D11PixelShaderPtr mPixelShader;
-        DX11NullPass mNullPass;
+        DX11VertexTransformPass mVertexTransformPass;
         DX11Backbuffer& mBackbuffer;
         DX11ConstantBuffer<DirectionalLightCBuffer> mConstantBuffer;
     };

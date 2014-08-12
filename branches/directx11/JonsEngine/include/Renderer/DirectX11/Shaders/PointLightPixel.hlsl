@@ -1,22 +1,21 @@
 #ifndef POINT_LIGHT_PIXEL_HLSL
 #define POINT_LIGHT_PIXEL_HLSL
 
-#include "FullscreenTriangleVertex.hlsl"
+#include "Constants.hlsl"
 
-cbuffer PointLightConstants : register(b0)
+cbuffer PointLightConstants : register(CBUFFER_REGISTER_PIXEL)
 {
-    float4x4 gLightWVPMatrix;
     float4 gLightColor;
     float4 gLightPosition;
     float gLightIntensity;
     float gMaxDistance;
 };
 
-Texture2D gPositionTexture : register(t0);
-Texture2D gDiffuseTexture : register(t1);
-Texture2D gNormalTexture : register(t2);
-TextureCube gShadowmap : register(t3);
-SamplerState gShadowmapSampler : register(s1);
+Texture2D gPositionTexture : register(TEXTURE_REGISTER_POSITION);
+Texture2D gDiffuseTexture : register(TEXTURE_REGISTER_DIFFUSE);
+Texture2D gNormalTexture : register(TEXTURE_REGISTER_NORMAL);
+TextureCube gShadowmap : register(TEXTURE_REGISTER_DEPTH);
+SamplerState gShadowmapSampler : register(SAMPLER_REGISTER_DEPTH);
 
 
 float VectorToDepthValue(float3 Vec)

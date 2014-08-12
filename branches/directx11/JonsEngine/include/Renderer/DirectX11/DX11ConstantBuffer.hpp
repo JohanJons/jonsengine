@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/DirectX11/Shaders/Constants.hlsl"
 
 #include <d3d11.h>
 #include <cstring>
@@ -11,7 +12,13 @@ namespace JonsEngine
     class DX11ConstantBuffer
     {
     public:
-        DX11ConstantBuffer(ID3D11DevicePtr device) : mConstantBuffer(nullptr)
+        enum CONSTANT_BUFFER_SLOT
+        {
+            CONSTANT_BUFFER_SLOT_TRANSFORM = CBUFFER_SLOT_TRANSFORM,
+            CONSTANT_BUFFER_SLOT_PIXEL = CBUFFER_SLOT_PIXEL
+        };
+
+        DX11ConstantBuffer(ID3D11DevicePtr device, const CONSTANT_BUFFER_SLOT cbufferSlot) : mConstantBuffer(nullptr), mConstantBufferSlot(cbufferSlot)
         {
             D3D11_BUFFER_DESC bufferDescription;
             ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
@@ -28,7 +35,7 @@ namespace JonsEngine
         }
 
 
-        void SetData(const ContentType& content, ID3D11DeviceContextPtr context, uint32_t bufferSlot)
+        void SetData(const ContentType& content, ID3D11DeviceContextPtr context)
         {
             D3D11_MAPPED_SUBRESOURCE mappedResource;
             ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
@@ -37,12 +44,13 @@ namespace JonsEngine
             std::memcpy(mappedResource.pData, &content, sizeof(ContentType));
             context->Unmap(mConstantBuffer, 0);
 
-            context->VSSetConstantBuffers(bufferSlot, 1, &mConstantBuffer.p);
-            context->PSSetConstantBuffers(bufferSlot, 1, &mConstantBuffer.p);
+            context->VSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
+            context->PSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
         }
 
 
     private:
         ID3D11BufferPtr mConstantBuffer;
+        const CONSTANT_BUFFER_SLOT mConstantBufferSlot;
     };
 }

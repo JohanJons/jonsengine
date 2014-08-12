@@ -2,13 +2,14 @@
 #define AMBIENT_PIXEL_HLSL
 
 #include "FullscreenTriangleVertex.hlsl"
+#include "Constants.hlsl"
 
-cbuffer AmbientConstants : register(b0)
+cbuffer AmbientConstants : register(CBUFFER_REGISTER_PIXEL)
 {
     float4 gAmbientLight;
 };
 
-Texture2D gDiffuseTexture : register(t1);
+Texture2D gDiffuseTexture : register(TEXTURE_REGISTER_DIFFUSE);
 
 
 float4 ps_main(float4 position : SV_Position) : SV_Target0

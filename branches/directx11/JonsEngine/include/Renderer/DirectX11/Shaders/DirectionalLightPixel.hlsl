@@ -2,15 +2,16 @@
 #define DIRECTIONAL_LIGHT_PIXEL_HLSL
 
 #include "FullscreenTriangleVertex.hlsl"
+#include "Constants.hlsl"
 
-cbuffer DirectionalLightConstants : register(b0)
+cbuffer DirectionalLightConstants : register(CBUFFER_REGISTER_PIXEL)
 {
     float4 gLightColor;
     float4 gLightDirection;
 };
 
-Texture2D gDiffuseTexture : register(t1);
-Texture2D gNormalTexture : register(t2);
+Texture2D gDiffuseTexture : register(TEXTURE_REGISTER_DIFFUSE);
+Texture2D gNormalTexture : register(TEXTURE_REGISTER_NORMAL);
 
 
 float4 ps_main(float4 position : SV_Position) : SV_Target0

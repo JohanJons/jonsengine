@@ -5,8 +5,6 @@
 #include <Windows.h>
 #include <d3d11.h>
 
-//static ID3D11Debug* dbg = nullptr;
-
 namespace JonsEngine
 {
     class DX11Context

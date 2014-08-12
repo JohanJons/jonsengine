@@ -10,9 +10,9 @@ struct GBufferPSOut
     float4 mNormal : SV_Target2;
 };
 
-Texture2D gDiffuseTexture : register(t1);
-Texture2D gNormalTexture : register(t2);
-SamplerState gSampler : register(s0);
+Texture2D gDiffuseTexture : register(TEXTURE_REGISTER_DIFFUSE);
+Texture2D gNormalTexture : register(TEXTURE_REGISTER_NORMAL);
+SamplerState gSampler : register(SAMPLER_REGISTER_GBUFFER);
 
 
 // needed due to float4x4 constructor is row-major
