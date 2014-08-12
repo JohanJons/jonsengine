@@ -1,10 +1,14 @@
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
 
 #include "include/Renderer/DirectX11/DX11Texture.h"
-#include "include/Renderer/DirectX11/Shaders/Compiled/NullVertex.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/TransformVertex.h"
 
 namespace JonsEngine
 {
+    // used to reset shadowmap from input to rendertarget
+    ID3D11ShaderResourceViewPtr const gNullSrv = nullptr;
+
+
     DX11Shadowmap::DX11Shadowmap(ID3D11DevicePtr device, const uint32_t shadowmapSize, const uint32_t numTextures, const bool isCubeTexture) : mShadowmapTexture(nullptr), mInputLayout(nullptr), mShadowmapSRV(nullptr)
     {
         mShadowmapViews.resize(numTextures);
@@ -18,7 +22,7 @@ namespace JonsEngine
         inputDescription.AlignedByteOffset = 0;
         inputDescription.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
         inputDescription.InstanceDataStepRate = 0;
-        DXCALL(device->CreateInputLayout(&inputDescription, 1, gNullVertexShader, sizeof(gNullVertexShader), &mInputLayout));
+        DXCALL(device->CreateInputLayout(&inputDescription, 1, gTransformVertexShader, sizeof(gTransformVertexShader), &mInputLayout));
 
         // create shadowmap texture/view/srv
         D3D11_TEXTURE2D_DESC depthBufferDesc;
@@ -81,12 +85,15 @@ namespace JonsEngine
     }
 
 
-    void DX11Shadowmap::SetViewport(ID3D11DeviceContextPtr context)
+    void DX11Shadowmap::BindForDrawing(ID3D11DeviceContextPtr context)
     {
         context->RSSetViewports(1, &mShadowPassViewport);
+
+        // unbind shadowmap as shader resource
+        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv.p);
     }
 
-    void DX11Shadowmap::BindForDrawing(ID3D11DeviceContextPtr context, const uint32_t depthViewIndex)
+    void DX11Shadowmap::BindDepthView(ID3D11DeviceContextPtr context, const uint32_t depthViewIndex)
     {
         context->OMSetRenderTargets(0, NULL, mShadowmapViews.at(depthViewIndex));
         context->ClearDepthStencilView(mShadowmapViews.at(depthViewIndex), D3D11_CLEAR_DEPTH, 1.0f, 0);

@@ -1,11 +1,7 @@
 #include "include/Renderer/DirectX11/DX11PointLightPass.h"
 
 #include "include/Renderer/Shapes.h"
-#include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11Backbuffer.h"
-#include "include/Renderer/DirectX11/Shaders/Compiled/NullVertex.h"
-#include "include/Renderer/DirectX11/Shaders/Compiled/PointLightVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/PointLightPixel.h"
 #include "include/Core/Utils/Math.h"
 #include "include/Core/Logging/Logger.h"
@@ -17,9 +13,6 @@ namespace JonsEngine
 
     const Vec3 CUBEMAP_UP_VECTORS[DX11PointLightPass::TEXTURE_CUBE_NUM_FACES] = { Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f),
                                                                                   Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f) };
-
-    // used to reset shadowmap from input to rendertarget
-    ID3D11ShaderResourceViewPtr const gNullSrv = nullptr;
 
 
     DX11Mesh CreateSphereMesh(ID3D11DevicePtr device)
@@ -36,8 +29,8 @@ namespace JonsEngine
     }
 
 
-    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, const uint32_t shadowmapSize) : 
-        mPixelShader(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mSphereMesh(CreateSphereMesh(device)), mBackbuffer(backbuffer), mVertexTransformPass(device),
+    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize) :
+        mPixelShader(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mSphereMesh(CreateSphereMesh(device)), mBackbuffer(backbuffer), mVertexTransformPass(vertexTransformPass),
         mShadowmap(device, shadowmapSize, TEXTURE_CUBE_NUM_FACES, true), mPointLightCBuffer(device, mPointLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         // rasterize for front-face culling due to light volumes
@@ -127,17 +120,17 @@ namespace JonsEngine
         // shadow pass
         //
 
-        // unbind any pixel shader
+        // unbind any set pixel shader
         context->PSSetShader(NULL, NULL, NULL);
 
         // defaults to depth rendering/testing
         context->OMSetDepthStencilState(NULL, 0);
 
         context->RSSetState(mRSCullFront);
-        mShadowmap.SetViewport(context);
+        mShadowmap.BindForDrawing(context);
         for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
         {
-            mShadowmap.BindForDrawing(context, face);
+            mShadowmap.BindDepthView(context, face);
             Mat4 lightViewMatrix = glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition + CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
             // TODO: precompute?
             Mat4 lightProjMatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, Z_FAR);
@@ -162,17 +155,19 @@ namespace JonsEngine
         //
         // shading pass
         //
+
         context->OMSetDepthStencilState(mDSSShadingPass, 0);
         context->RSSetState(mRSCullFront);
         mShadowmap.BindForReading(context);
 
+        // set point light pixel shader and its cbuffer
         context->PSSetShader(mPixelShader, NULL, NULL);
-
         mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mLightColor, Vec4(pointLight.mLightPosition, 1.0), pointLight.mLightIntensity, pointLight.mMaxDistance), context);
+
+        // run transform pass on sphere + point light shading pass
         mVertexTransformPass.RenderMesh(context, mSphereMesh, pointLight.mWVPMatrix);
 
         // restore state
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv.p);
         context->RSSetState(prevRasterizerState);
     }
 }

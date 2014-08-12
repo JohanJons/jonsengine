@@ -143,8 +143,8 @@ namespace JonsEngine
 
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
         mAnisotropicFiltering(settings.mAnisotropicFiltering), mShadowQuality(settings.mShadowQuality), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), 
-        mBackbuffer(mDevice, mSwapchain, mGBuffer.GetDepthStencilView(), mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mAmbientPass(mDevice), mDirectionalLightPass(mDevice, mBackbuffer, ShadowQualityResolution(mShadowQuality)),
-        mPointLightPass(mDevice, mBackbuffer, ShadowQualityResolution(mShadowQuality)), mVertexTransformPass(mDevice), mTextureSampler(nullptr)
+        mBackbuffer(mDevice, mSwapchain, mGBuffer.GetDepthStencilView(), mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mVertexTransformPass(mDevice), mFullscreenTrianglePass(mDevice), mAmbientPass(mDevice),
+        mDirectionalLightPass(mDevice, mBackbuffer, mFullscreenTrianglePass, ShadowQualityResolution(mShadowQuality)), mPointLightPass(mDevice, mBackbuffer, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)), mTextureSampler(nullptr)
     {
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;

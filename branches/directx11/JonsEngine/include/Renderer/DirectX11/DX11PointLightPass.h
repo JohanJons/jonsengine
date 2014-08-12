@@ -21,7 +21,7 @@ namespace JonsEngine
     public:
         const static uint32_t TEXTURE_CUBE_NUM_FACES = 6;
 
-        DX11PointLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, const uint32_t shadowmapSize);
+        DX11PointLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize);
         ~DX11PointLightPass();
 
         void BindForShading(ID3D11DeviceContextPtr context);
@@ -51,7 +51,7 @@ namespace JonsEngine
         ID3D11RasterizerStatePtr mRSNoCulling;
         DX11Mesh mSphereMesh;
         DX11Backbuffer& mBackbuffer;
-        DX11VertexTransformPass mVertexTransformPass;
+        DX11VertexTransformPass& mVertexTransformPass;
         DX11Shadowmap mShadowmap;
         DX11ConstantBuffer<PointLightCBuffer> mPointLightCBuffer;
     };

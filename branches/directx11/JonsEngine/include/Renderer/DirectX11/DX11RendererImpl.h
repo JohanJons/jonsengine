@@ -9,6 +9,7 @@
 #include "include/Renderer/DirectX11/DX11AmbientPass.h"
 #include "include/Renderer/DirectX11/DX11DirectionalLightPass.h"
 #include "include/Renderer/DirectX11/DX11PointLightPass.h"
+#include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/Types.h"
@@ -62,10 +63,11 @@ namespace JonsEngine
 
         DX11GBuffer mGBuffer;
         DX11Backbuffer mBackbuffer;
+        DX11VertexTransformPass mVertexTransformPass;
+        DX11FullscreenTrianglePass mFullscreenTrianglePass;
         DX11AmbientPass mAmbientPass;
         DX11DirectionalLightPass mDirectionalLightPass;
         DX11PointLightPass mPointLightPass;
-        DX11VertexTransformPass mVertexTransformPass;
         ID3D11RasterizerStatePtr mDefaultRasterizerState;
         ID3D11BlendStatePtr mBlendState;
         ID3D11SamplerStatePtr mTextureSampler;

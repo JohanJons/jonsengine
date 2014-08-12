@@ -4,7 +4,7 @@
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11Backbuffer.h"
-#include "include/Renderer/DirectX11/Shaders/Compiled/FullscreenTriangleVertex.h"
+#include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPixel.h"
 #include "include/Core/Utils/Math.h"
 
@@ -87,51 +87,9 @@ namespace JonsEngine
     }
 
 
-    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, uint32_t shadowmapSize) : mShadowmapTexture(nullptr), mVertexShader(nullptr),
-        mPixelShader(nullptr), mVertexTransformPass(device), mShadowmapSRV(nullptr), mBackbuffer(backbuffer), mConstantBuffer(device, mConstantBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
+    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, DX11FullscreenTrianglePass& fullscreenPass, uint32_t shadowmapSize) :
+        mPixelShader(nullptr), mBackbuffer(backbuffer), mFullscreenPass(fullscreenPass), mShadowmap(device, shadowmapSize, NUM_SHADOWMAP_CASCADES, false), mDirLightCBuffer(device, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
-        // create shadowmap texture/view/srv
-        D3D11_TEXTURE2D_DESC depthBufferDesc;
-        ZeroMemory(&depthBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
-        depthBufferDesc.ArraySize = NUM_SHADOWMAP_CASCADES;
-        depthBufferDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-        depthBufferDesc.Width = shadowmapSize;
-        depthBufferDesc.Height = shadowmapSize;
-        depthBufferDesc.MipLevels = 1;
-        depthBufferDesc.SampleDesc.Count = 1;
-        depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-        depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
-        DXCALL(device->CreateTexture2D(&depthBufferDesc, NULL, &mShadowmapTexture));
-
-        D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-        ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
-        dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
-        dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
-        dsvDesc.Texture2DArray.ArraySize = 1;
-        for (uint32_t face = 0; face < NUM_SHADOWMAP_CASCADES; face++)
-        {
-            dsvDesc.Texture2DArray.FirstArraySlice = face;
-            DXCALL(device->CreateDepthStencilView(mShadowmapTexture, &dsvDesc, &mShadowmapView.at(face)));
-        }
-
-        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-        ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
-        srvDesc.Format = DXGI_FORMAT_R32_FLOAT;
-        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
-        srvDesc.Texture2DArray.ArraySize = NUM_SHADOWMAP_CASCADES;
-        srvDesc.Texture2DArray.MipLevels = 1;
-        DXCALL(device->CreateShaderResourceView(mShadowmapTexture, &srvDesc, &mShadowmapSRV));
-
-        // viewport used during shadow pass
-        ZeroMemory(&mShadowPassViewport, sizeof(D3D11_VIEWPORT));
-        mShadowPassViewport.TopLeftX = 0;
-        mShadowPassViewport.TopLeftY = 0;
-        mShadowPassViewport.Width = static_cast<float>(shadowmapSize);
-        mShadowPassViewport.Height = static_cast<float>(shadowmapSize);
-        mShadowPassViewport.MinDepth = 0.0f;
-        mShadowPassViewport.MaxDepth = 1.0f;
-
-        DXCALL(device->CreateVertexShader(gFullscreenTriangleVertexShader, sizeof(gFullscreenTriangleVertexShader), NULL, &mVertexShader));
         DXCALL(device->CreatePixelShader(gDirectionalLightPixelShader, sizeof(gDirectionalLightPixelShader), NULL, &mPixelShader));
     }
 
@@ -142,13 +100,14 @@ namespace JonsEngine
 
     void DX11DirectionalLightPass::BindForShading(ID3D11DeviceContextPtr context)
     {
-        context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+        /*context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
         for (uint32_t index = 0; index < DX11Mesh::NUM_VERTEX_BUFFER_SLOTS; index++)
             context->IASetVertexBuffers(index, 0, NULL, 0, 0);
         context->IASetInputLayout(NULL);
 
         context->VSSetShader(mVertexShader, NULL, NULL);
-        context->PSSetShader(mPixelShader, NULL, NULL);
+        context->PSSetShader(mPixelShader, NULL, NULL);*/
+        mFullscreenPass.BindForFullscreenPass(context);
     }
 
     void DX11DirectionalLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Vec4& lightColor, const Vec3& lightDir)
@@ -165,6 +124,10 @@ namespace JonsEngine
         //
         // Shadow pass
         //
+
+        // unbind any set pixel shader
+        context->PSSetShader(NULL, NULL, NULL);
+
         std::array<float, NUM_SHADOWMAP_CASCADES> nearDistArr, farDistArr;
         std::array<Mat4, NUM_SHADOWMAP_CASCADES> lightVPMatrices;
 
@@ -194,16 +157,18 @@ namespace JonsEngine
         // Shading pass
         //
         
-        // restore rendering to backbuffer
+        // restore rendering to backbuffer and viewport
         mBackbuffer.BindForShadingStage(context);
-
-        // restore viewport
         context->RSSetViewports(numViewports, &prevViewport);
         
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mShadowmapSRV.p);
+        // bind shadowmap SRV for reading
+        mShadowmap.BindForReading(context);
 
-        mConstantBuffer.SetData(DirectionalLightCBuffer(lightColor, lightDir), context);
+        // set dir light cbuffer data and pixel shader
+        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightColor, lightDir), context);
+        context->PSSetShader(mPixelShader, NULL, NULL);
 
-        context->Draw(3, 0);
+        // run fullscreen pass + dir light shading pass
+        mFullscreenPass.RenderFullscreenTriangle(context);
     }
 }

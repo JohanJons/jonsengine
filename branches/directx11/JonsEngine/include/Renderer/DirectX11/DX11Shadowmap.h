@@ -14,8 +14,8 @@ namespace JonsEngine
         DX11Shadowmap(ID3D11DevicePtr device, const uint32_t shadowmapSize, const uint32_t numTextures, const bool isCubeTexture);
         ~DX11Shadowmap();
 
-        void SetViewport(ID3D11DeviceContextPtr context);
-        void BindForDrawing(ID3D11DeviceContextPtr context, const uint32_t depthViewIndex);
+        void BindForDrawing(ID3D11DeviceContextPtr context);
+        void BindDepthView(ID3D11DeviceContextPtr context, const uint32_t depthViewIndex);
         void BindForReading(ID3D11DeviceContextPtr context);
 
 

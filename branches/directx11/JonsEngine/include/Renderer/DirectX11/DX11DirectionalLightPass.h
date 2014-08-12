@@ -4,6 +4,7 @@
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
+#include "include/Renderer/DirectX11/DX11Shadowmap.h"
 #include "include/Core/Types.h"
 
 #include <d3d11.h>
@@ -11,13 +12,14 @@
 namespace JonsEngine
 {
     class DX11Backbuffer;
+    class DX11FullscreenTrianglePass;
 
     class DX11DirectionalLightPass
     {
     public:
-        static const uint32_t NUM_SHADOWMAP_CASCADES = 4;
+        const static uint32_t NUM_SHADOWMAP_CASCADES = 4;
 
-        DX11DirectionalLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, uint32_t shadowmapSize);
+        DX11DirectionalLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, DX11FullscreenTrianglePass& fullscreenPass, uint32_t shadowmapSize);
         ~DX11DirectionalLightPass();
 
         void BindForShading(ID3D11DeviceContextPtr context);
@@ -36,14 +38,10 @@ namespace JonsEngine
             }
         };
 
-        ID3D11Texture2DPtr mShadowmapTexture;
-        std::array<ID3D11DepthStencilViewPtr, NUM_SHADOWMAP_CASCADES> mShadowmapView;
-        ID3D11ShaderResourceViewPtr mShadowmapSRV;
-        D3D11_VIEWPORT mShadowPassViewport;
-        ID3D11VertexShaderPtr mVertexShader;
         ID3D11PixelShaderPtr mPixelShader;
-        DX11VertexTransformPass mVertexTransformPass;
         DX11Backbuffer& mBackbuffer;
-        DX11ConstantBuffer<DirectionalLightCBuffer> mConstantBuffer;
+        DX11FullscreenTrianglePass& mFullscreenPass;
+        DX11Shadowmap mShadowmap;
+        DX11ConstantBuffer<DirectionalLightCBuffer> mDirLightCBuffer;
     };
 }
