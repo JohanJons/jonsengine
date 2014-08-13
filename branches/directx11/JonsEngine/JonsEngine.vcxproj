@@ -139,6 +139,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11PointLightPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Renderer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11RendererImpl.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11Sampler.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Shadowmap.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Texture.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp" />

@@ -203,6 +203,9 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11FullscreenTrianglePass.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11Sampler.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">

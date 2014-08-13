@@ -14,7 +14,7 @@ namespace JonsEngine
         samplerDesc.MaxAnisotropy = mAnisotropicFiltering;
         samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
         samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-        DXCALL(mDevice->CreateSamplerState(&samplerDesc, &mShadowmapSampler));
+        DXCALL(device->CreateSamplerState(&samplerDesc, &mTextureSampler));
     }
     
     DX11Sampler::~DX11Sampler()
@@ -27,7 +27,7 @@ namespace JonsEngine
         context->PSSetSamplers(mSamplerSlot, 1, &mTextureSampler.p);
     }
     
-    void DX11Sampler::GetMaxAnisotropicFiltering() const
+    EngineSettings::Anisotropic DX11Sampler::GetMaxAnisotropicFiltering() const
     {
         return mAnisotropicFiltering;
     }

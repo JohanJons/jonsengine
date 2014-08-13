@@ -70,7 +70,7 @@ namespace JonsEngine
         DX11PointLightPass mPointLightPass;
         ID3D11RasterizerStatePtr mDefaultRasterizerState;
         ID3D11BlendStatePtr mBlendState;
-        std::unique_ptr<DX11Sampler> mModelSampler;
+        std::unique_ptr<DX11Sampler, std::function<void(DX11Sampler*)>> mModelSampler;
         DX11Sampler mShadowmapSampler;
 
         std::vector<DX11MeshPtr> mMeshes;

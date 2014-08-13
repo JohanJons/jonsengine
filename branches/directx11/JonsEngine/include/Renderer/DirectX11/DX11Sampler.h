@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/DirectX11/Shaders/Constants.hlsl"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Types.h"
 
@@ -21,7 +22,7 @@ namespace JonsEngine
         ~DX11Sampler();
         
         void BindSampler(ID3D11DeviceContextPtr context);
-        void GetMaxAnisotropicFiltering() const;
+        EngineSettings::Anisotropic GetMaxAnisotropicFiltering() const;
         
     
     private:

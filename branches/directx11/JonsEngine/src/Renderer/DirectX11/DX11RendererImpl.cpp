@@ -28,7 +28,7 @@ namespace JonsEngine
 
             default:
                 {
-                    JONS_LOG_ERROR(logger, "Bad TextureType provided");
+                    JONS_LOG_ERROR(Logger::GetRendererLogger(), "Bad TextureType provided");
                     throw std::runtime_error("Bad TextureType provided");
                 }
         };
@@ -139,7 +139,9 @@ namespace JonsEngine
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
         mShadowQuality(settings.mShadowQuality), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), 
         mBackbuffer(mDevice, mSwapchain, mGBuffer.GetDepthStencilView(), mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mVertexTransformPass(mDevice), mFullscreenTrianglePass(mDevice), mAmbientPass(mDevice),
-        mDirectionalLightPass(mDevice, mBackbuffer, mFullscreenTrianglePass, ShadowQualityResolution(mShadowQuality)), mPointLightPass(mDevice, mBackbuffer, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)), mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, DX11Sampler::SHADER_SAMPLER_SLOT_MODEL), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }), mShadowmapSampler(mDevice, 1, D3D11_FILTER_MIN_MAG_MIP_LINEAR, DX11Sampler::SHADER_SAMPLER_SLOT_DEPTH)
+        mDirectionalLightPass(mDevice, mBackbuffer, mFullscreenTrianglePass, ShadowQualityResolution(mShadowQuality)), mPointLightPass(mDevice, mBackbuffer, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
+        mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, DX11Sampler::SHADER_SAMPLER_SLOT_MODEL), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
+        mShadowmapSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_MIN_MAG_MIP_LINEAR, DX11Sampler::SHADER_SAMPLER_SLOT_DEPTH)
     {
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -215,12 +217,12 @@ namespace JonsEngine
 
     EngineSettings::Anisotropic DX11RendererImpl::GetAnisotropicFiltering() const
     {
-        return mModelSampler.GetMaxAnisotropicFiltering();
+        return mModelSampler->GetMaxAnisotropicFiltering();
     }
 
     void DX11RendererImpl::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
     {
-        mModelSampler.reset(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, aniostropic, D3D11_FILTER_ANISOTROPIC, DX11Sampler::SHADER_SAMPLER_SLOT_MODEL));
+        mModelSampler.reset(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, anisotropic, D3D11_FILTER_ANISOTROPIC, DX11Sampler::SHADER_SAMPLER_SLOT_MODEL));
     }
 
 
@@ -265,7 +267,7 @@ namespace JonsEngine
         viewport.MaxDepth = 1.0f;
         mContext->RSSetViewports(1, &viewport);
 
-        mModelSampler.BindSampler(mContext);
+        mModelSampler->BindSampler(mContext);
         mShadowmapSampler.BindSampler(mContext);
     }
 
