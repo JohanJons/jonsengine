@@ -21,8 +21,7 @@ namespace JonsEngine
             SHADER_TEXTURE_SLOT_POSITION = TEXTURE_SLOT_POSITION,
             SHADER_TEXTURE_SLOT_DIFFUSE = TEXTURE_SLOT_DIFFUSE,
             SHADER_TEXTURE_SLOT_NORMAL = TEXTURE_SLOT_NORMAL,
-            SHADER_TEXTURE_SLOT_DEPTH = TEXTURE_SLOT_DEPTH,
-            SHADER_TEXTURE_SLOT_UNKNOWN
+            SHADER_TEXTURE_SLOT_DEPTH = TEXTURE_SLOT_DEPTH
         };
 
         DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const uint32_t textureWidth, const uint32_t textureHeight, const SHADER_TEXTURE_SLOT textureSlot);

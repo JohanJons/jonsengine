@@ -11,6 +11,7 @@
 #include "include/Renderer/DirectX11/DX11PointLightPass.h"
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
+#include "include/Renderer/DirectX11/DX11Sampler.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
@@ -58,7 +59,6 @@ namespace JonsEngine
 
         Logger& mLogger;
         IMemoryAllocatorPtr mMemoryAllocator;
-        EngineSettings::Anisotropic mAnisotropicFiltering;
         EngineSettings::ShadowQuality mShadowQuality;
 
         DX11GBuffer mGBuffer;
@@ -70,8 +70,8 @@ namespace JonsEngine
         DX11PointLightPass mPointLightPass;
         ID3D11RasterizerStatePtr mDefaultRasterizerState;
         ID3D11BlendStatePtr mBlendState;
-        ID3D11SamplerStatePtr mTextureSampler;
-        ID3D11SamplerStatePtr mShadowmapSampler;
+        std::unique_ptr<DX11Sampler> mModelSampler;
+        DX11Sampler mShadowmapSampler;
 
         std::vector<DX11MeshPtr> mMeshes;
         std::vector<DX11TexturePtr> mTextures;
