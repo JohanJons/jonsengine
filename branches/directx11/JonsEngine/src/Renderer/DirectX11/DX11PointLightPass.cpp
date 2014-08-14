@@ -123,11 +123,9 @@ namespace JonsEngine
         // unbind any set pixel shader
         context->PSSetShader(NULL, NULL, NULL);
 
-        // defaults to depth rendering/testing
-        context->OMSetDepthStencilState(NULL, 0);
-
         context->RSSetState(mRSCullFront);
         mShadowmap.BindForDrawing(context);
+
         for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
         {
             mShadowmap.BindDepthView(context, face);

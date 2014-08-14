@@ -18,4 +18,5 @@ namespace JonsEngine
     const Mat4 gIdentityMatrix(1.0f);
 
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float ratio, const float zNear, const float zFar);
+    Mat4 OrthographicMatrix(const float left, const float right, const float top, const float bottom, const float zNear, const float zFar);
 }

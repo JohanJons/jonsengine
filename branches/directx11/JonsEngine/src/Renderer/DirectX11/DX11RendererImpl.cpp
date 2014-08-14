@@ -136,10 +136,14 @@ namespace JonsEngine
     }
 
 
-    DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), mLogger(logger), mMemoryAllocator(memoryAllocator),
-        mShadowQuality(settings.mShadowQuality), mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), 
-        mBackbuffer(mDevice, mSwapchain, mGBuffer.GetDepthStencilView(), mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), mVertexTransformPass(mDevice), mFullscreenTrianglePass(mDevice), mAmbientPass(mDevice),
-        mDirectionalLightPass(mDevice, mBackbuffer, mFullscreenTrianglePass, ShadowQualityResolution(mShadowQuality)), mPointLightPass(mDevice, mBackbuffer, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
+    DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), 
+        mLogger(logger), mMemoryAllocator(memoryAllocator),
+        mShadowQuality(settings.mShadowQuality),
+        mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), 
+        mBackbuffer(mDevice, mSwapchain, mGBuffer.GetDepthStencilView(), mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
+        mVertexTransformPass(mDevice), mFullscreenTrianglePass(mDevice), mAmbientPass(mDevice),
+        mDirectionalLightPass(mDevice, mBackbuffer, mFullscreenTrianglePass, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
+        mPointLightPass(mDevice, mBackbuffer, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
         mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, DX11Sampler::SHADER_SAMPLER_SLOT_MODEL), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
         mShadowmapSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_MIN_MAG_MIP_LINEAR, DX11Sampler::SHADER_SAMPLER_SLOT_DEPTH)
     {
@@ -326,6 +330,7 @@ namespace JonsEngine
         // do all directional lights
         mDirectionalLightPass.BindForShading(mContext);
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
+            // TODO: use real fov and screen size
             mDirectionalLightPass.Render(mContext, renderQueue, mMeshes, 70.0f, 1920.0f / 1080.0f, lighting.mCameraViewMatrix, directionalLight.mLightColor, directionalLight.mLightDirection);
 
         // do all point lights

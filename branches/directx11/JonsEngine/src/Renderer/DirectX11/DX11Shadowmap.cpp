@@ -91,6 +91,9 @@ namespace JonsEngine
 
         // unbind shadowmap as shader resource
         context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv.p);
+
+        // defaults to depth rendering/testing
+        context->OMSetDepthStencilState(NULL, 0);
     }
 
     void DX11Shadowmap::BindDepthView(ID3D11DeviceContextPtr context, const uint32_t depthViewIndex)

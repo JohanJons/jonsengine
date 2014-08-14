@@ -1,10 +1,10 @@
 #include "include/Renderer/DirectX11/DX11DirectionalLightPass.h"
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11Backbuffer.h"
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
+#include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPixel.h"
 #include "include/Core/Utils/Math.h"
 
@@ -54,7 +54,7 @@ namespace JonsEngine
 
     Mat4 CreateDirLightVPMatrix(const CameraFrustrum& cameraFrustrum, const Vec3& lightDir)
     {
-        Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, 1.0f, 0.0f));
+        Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
 
         Vec4 transf = lightViewMatrix * cameraFrustrum[0];
         float maxZ = transf.z, minZ = transf.z;
@@ -83,12 +83,13 @@ namespace JonsEngine
 
         Vec3 halfExtents((maxX - minX) * 0.5, (maxY - minY) * 0.5, (maxZ - minZ) * 0.5);
 
-        return glm::ortho(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.y) * viewMatrix;
+        return OrthographicMatrix(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.y) * viewMatrix;
     }
 
 
-    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, DX11FullscreenTrianglePass& fullscreenPass, uint32_t shadowmapSize) :
-        mPixelShader(nullptr), mBackbuffer(backbuffer), mFullscreenPass(fullscreenPass), mShadowmap(device, shadowmapSize, NUM_SHADOWMAP_CASCADES, false), mDirLightCBuffer(device, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
+    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize) :
+        mPixelShader(nullptr), mBackbuffer(backbuffer), mFullscreenPass(fullscreenPass), mVertexTransformPass(transformPass), mShadowmap(device, shadowmapSize, NUM_SHADOWMAP_CASCADES, false),
+        mDirLightCBuffer(device, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         DXCALL(device->CreatePixelShader(gDirectionalLightPixelShader, sizeof(gDirectionalLightPixelShader), NULL, &mPixelShader));
     }
@@ -100,14 +101,7 @@ namespace JonsEngine
 
     void DX11DirectionalLightPass::BindForShading(ID3D11DeviceContextPtr context)
     {
-        /*context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-        for (uint32_t index = 0; index < DX11Mesh::NUM_VERTEX_BUFFER_SLOTS; index++)
-            context->IASetVertexBuffers(index, 0, NULL, 0, 0);
-        context->IASetInputLayout(NULL);
-
-        context->VSSetShader(mVertexShader, NULL, NULL);
-        context->PSSetShader(mPixelShader, NULL, NULL);*/
-        mFullscreenPass.BindForFullscreenPass(context);
+        //mFullscreenPass.BindForFullscreenPass(context);
     }
 
     void DX11DirectionalLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Vec4& lightColor, const Vec3& lightDir)
@@ -116,11 +110,6 @@ namespace JonsEngine
         uint32_t numViewports = 1;
         context->RSGetViewports(&numViewports, &prevViewport);
 
-        /*
-        mAccumulationBuffer.BindForDrawing();
-        GLCALL(glViewport(0, 0, (GLsizei)mWindowWidth, (GLsizei)mWindowHeight));
-        DirLightLightingPass(directionalLight, lightVPMatrices, lighting.mCameraViewMatrix, farDistArr, lighting.mGamma, lighting.mScreenSize, debugShadowmapSplits);
-        */
         //
         // Shadow pass
         //
@@ -134,14 +123,12 @@ namespace JonsEngine
         // TODO: precompute?
         CalculateShadowmapCascades(nearDistArr, farDistArr, Z_NEAR, Z_FAR);
 
-       /* mVertexTransformPass.BindForDepthStencilPass(context);
-        context->RSSetViewports(numViewports, &mShadowPassViewport);
-        context->OMSetDepthStencilState(NULL, 0);
+        mVertexTransformPass.BindForTransformPass(context);
+        mShadowmap.BindForDrawing(context);
         
         for (uint32_t cascadeIndex = 0; cascadeIndex < NUM_SHADOWMAP_CASCADES; cascadeIndex++)
         {
-            context->OMSetRenderTargets(0, NULL, mShadowmapView.at(cascadeIndex));
-            context->ClearDepthStencilView(mShadowmapView.at(cascadeIndex), D3D11_CLEAR_DEPTH, 1.0f, 0);
+            mShadowmap.BindDepthView(context, cascadeIndex);
             
             CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, nearDistArr[cascadeIndex], farDistArr[cascadeIndex], cameraViewMatrix);
             lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, lightDir);
@@ -149,9 +136,7 @@ namespace JonsEngine
 
             lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex];
             farDistArr[cascadeIndex] = -farDistArr[cascadeIndex];
-        }*/
-
-
+        }
 
         //
         // Shading pass
@@ -164,8 +149,10 @@ namespace JonsEngine
         // bind shadowmap SRV for reading
         mShadowmap.BindForReading(context);
 
+        mFullscreenPass.BindForFullscreenPass(context);
+
         // set dir light cbuffer data and pixel shader
-        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightColor, lightDir), context);
+        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, cameraViewMatrix, farDistArr, lightColor, lightDir), context);
         context->PSSetShader(mPixelShader, NULL, NULL);
 
         // run fullscreen pass + dir light shading pass
