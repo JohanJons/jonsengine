@@ -2,7 +2,7 @@
 
 namespace JonsEngine
 {
-    DX11Sampler::DX11Sampler(ID3D11DevicePtr device, const EngineSettings::Anisotropic maxAnisotropy, const D3D11_FILTER filter, const SHADER_SAMPLER_SLOT samplerSlot) : 
+    DX11Sampler::DX11Sampler(ID3D11DevicePtr device, const EngineSettings::Anisotropic maxAnisotropy, const D3D11_FILTER filter, const D3D11_COMPARISON_FUNC comparison, const SHADER_SAMPLER_SLOT samplerSlot) : 
         mTextureSampler(nullptr), mAnisotropicFiltering(maxAnisotropy), mSamplerSlot(samplerSlot)
     {
         D3D11_SAMPLER_DESC samplerDesc;
@@ -12,7 +12,7 @@ namespace JonsEngine
         samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
         samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
         samplerDesc.MaxAnisotropy = mAnisotropicFiltering;
-        samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+        samplerDesc.ComparisonFunc = comparison;
         samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
         DXCALL(device->CreateSamplerState(&samplerDesc, &mTextureSampler));
     }
