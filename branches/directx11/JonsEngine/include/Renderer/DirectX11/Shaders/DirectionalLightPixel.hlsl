@@ -4,10 +4,12 @@
 #include "FullscreenTriangleVertex.hlsl"
 #include "Constants.hlsl"
 
+const float DEPTH_BIAS = 0.00005;
+const uint NUM_CASCADES = 4;
+
 cbuffer DirectionalLightConstants : register(CBUFFER_REGISTER_PIXEL)
 {
-    // 4 splits
-    float4x4 gSplitVPMatrices[4];
+    float4x4 gSplitVPMatrices[NUM_CASCADES];
     float4x4 gCameraViewMatrix;
     float4 gSplitDistances;
     float4 gLightColor;
@@ -38,10 +40,9 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
         index = 2;
 
     float3 projCoords = (float3)mul(gSplitVPMatrices[index], worldPos);
-    // substract depth bias
-    //projCoords.w = projCoords.z - 0.00005;
+    float viewDepth = projCoords.z - DEPTH_BIAS;
     projCoords.z = float(index);
-    float visibilty = gShadowmap.Sample(gShadowmapSampler, projCoords).r;
+    float visibilty = gShadowmap.Sample(gShadowmapSampler, projCoords, viewDepth).r;
 
     float angleNormal = clamp(dot(normal, gLightDirection), 0, 1);
 
