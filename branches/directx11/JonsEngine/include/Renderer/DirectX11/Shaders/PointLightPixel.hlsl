@@ -15,7 +15,7 @@ Texture2D gPositionTexture : register(TEXTURE_REGISTER_POSITION);
 Texture2D gDiffuseTexture : register(TEXTURE_REGISTER_DIFFUSE);
 Texture2D gNormalTexture : register(TEXTURE_REGISTER_NORMAL);
 TextureCube gShadowmap : register(TEXTURE_REGISTER_DEPTH);
-SamplerState gShadowmapSampler : register(SAMPLER_REGISTER_DEPTH);
+SamplerState gShadowmapSampler : register(SAMPLER_REGISTER_DEPTH_NO_COMPARE);
 
 
 float VectorToDepthValue(float3 Vec)

@@ -72,6 +72,7 @@ namespace JonsEngine
         ID3D11BlendStatePtr mBlendState;
         std::unique_ptr<DX11Sampler, std::function<void(DX11Sampler*)>> mModelSampler;
         DX11Sampler mShadowmapSampler;
+        DX11Sampler mShadowmapNoCompareSampler;
 
         std::vector<DX11MeshPtr> mMeshes;
         std::vector<DX11TexturePtr> mTextures;

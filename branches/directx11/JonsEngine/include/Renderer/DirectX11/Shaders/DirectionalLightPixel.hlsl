@@ -4,8 +4,8 @@
 #include "FullscreenTriangleVertex.hlsl"
 #include "Constants.hlsl"
 
-const float DEPTH_BIAS = 0.00005;
-const uint NUM_CASCADES = 4;
+#define DEPTH_BIAS 0.00005
+#define NUM_CASCADES 4
 
 cbuffer DirectionalLightConstants : register(CBUFFER_REGISTER_PIXEL)
 {
@@ -20,7 +20,7 @@ Texture2D gPositionTexture : register(TEXTURE_REGISTER_POSITION);
 Texture2D gDiffuseTexture : register(TEXTURE_REGISTER_DIFFUSE);
 Texture2D gNormalTexture : register(TEXTURE_REGISTER_NORMAL);
 Texture2DArray gShadowmap : register(TEXTURE_REGISTER_DEPTH);
-SamplerState gShadowmapSampler : register(SAMPLER_REGISTER_DEPTH);
+SamplerComparisonState gShadowmapSampler : register(SAMPLER_REGISTER_DEPTH);
 
 
 float4 ps_main(float4 position : SV_Position) : SV_Target0
@@ -42,7 +42,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
     float3 projCoords = (float3)mul(gSplitVPMatrices[index], worldPos);
     float viewDepth = projCoords.z - DEPTH_BIAS;
     projCoords.z = float(index);
-    float visibilty = gShadowmap.Sample(gShadowmapSampler, projCoords, viewDepth).r;
+    float visibilty = gShadowmap.SampleCmpLevelZero(gShadowmapSampler, projCoords, viewDepth);
 
     float angleNormal = clamp(dot(normal, gLightDirection), 0, 1);
 

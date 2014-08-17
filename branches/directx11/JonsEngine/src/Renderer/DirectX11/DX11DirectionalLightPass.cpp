@@ -83,7 +83,7 @@ namespace JonsEngine
 
         Vec3 halfExtents((maxX - minX) * 0.5, (maxY - minY) * 0.5, (maxZ - minZ) * 0.5);
 
-        return OrthographicMatrix(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.y) * viewMatrix;
+        return OrthographicMatrix(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.z) * viewMatrix;
     }
 
 
