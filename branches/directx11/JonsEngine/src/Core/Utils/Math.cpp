@@ -32,17 +32,6 @@ namespace JonsEngine
         ret[3][1] = (top + bottom) / (bottom - top);
         ret[3][2] = (zNear) / (zNear - zFar);
 
-        /*
-        ret[0][0] = static_cast<T>(2) / (right - left);
-        ret[1][1] = static_cast<T>(2) / (top - bottom);
-        ret[2][2] = -T(2) / (zFar - zNear);
-        ret[3][0] = -(right + left) / (right - left);
-        ret[3][1] = -(top + bottom) / (top - bottom);
-        ret[3][2] = -(zFar + zNear) / (zFar - zNear);
-        */
-		//return Result;
-        
-
         return ret;
     }
 }
