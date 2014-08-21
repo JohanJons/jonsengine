@@ -14,7 +14,7 @@ namespace JonsEngine
 
 
     DX11GBuffer::DX11GBuffer(ID3D11DevicePtr device, uint32_t textureWidth, uint32_t textureHeight) : mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr),
-        mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device, mConstantBuffer.CONSTANT_BUFFER_SLOT_TRANSFORM)
+        mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device, mConstantBuffer.CONSTANT_BUFFER_SLOT_VERTEX)
     {
         // create gbuffer textures/rendertargets
         D3D11_TEXTURE2D_DESC textureDesc;

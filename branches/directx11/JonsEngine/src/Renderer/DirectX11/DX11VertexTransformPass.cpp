@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    DX11VertexTransformPass::DX11VertexTransformPass(ID3D11DevicePtr device) : mTransformCBuffer(device, mTransformCBuffer.CONSTANT_BUFFER_SLOT_TRANSFORM)
+    DX11VertexTransformPass::DX11VertexTransformPass(ID3D11DevicePtr device) : mTransformCBuffer(device, mTransformCBuffer.CONSTANT_BUFFER_SLOT_VERTEX)
     {
         D3D11_INPUT_ELEMENT_DESC inputDescription;
         ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC));

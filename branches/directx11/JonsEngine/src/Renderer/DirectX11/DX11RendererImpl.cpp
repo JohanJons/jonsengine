@@ -214,7 +214,7 @@ namespace JonsEngine
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
         GeometryStage(renderQueue);
-        ShadingStage(renderQueue, lighting);
+        ShadingStage(renderQueue, lighting, debugExtra);
 
         DXCALL(mSwapchain->Present(0, 0));
     }
@@ -317,7 +317,7 @@ namespace JonsEngine
         }
     }
 
-    void DX11RendererImpl::ShadingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting)
+    void DX11RendererImpl::ShadingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugExtra)
     {
         mBackbuffer.ClearBackbuffer(mContext);
         mBackbuffer.BindForShadingStage(mContext);
@@ -333,7 +333,7 @@ namespace JonsEngine
         mDirectionalLightPass.BindForShading(mContext);
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
             // TODO: use real fov and screen size
-            mDirectionalLightPass.Render(mContext, renderQueue, mMeshes, 70.0f, 1920.0f / 1080.0f, lighting.mCameraViewMatrix, directionalLight.mLightColor, directionalLight.mLightDirection);
+            mDirectionalLightPass.Render(mContext, renderQueue, mMeshes, 70.0f, 1920.0f / 1080.0f, lighting.mCameraViewMatrix, directionalLight.mLightColor, directionalLight.mLightDirection, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
 
         // do all point lights
         mPointLightPass.BindForShading(mContext);

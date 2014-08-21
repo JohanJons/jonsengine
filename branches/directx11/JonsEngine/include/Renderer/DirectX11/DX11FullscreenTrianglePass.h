@@ -20,6 +20,5 @@ namespace JonsEngine
 
     private:
         ID3D11VertexShaderPtr mVertexShader;
-        ID3D11InputLayoutPtr mInputLayout;
     };
 }

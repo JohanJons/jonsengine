@@ -22,7 +22,7 @@ struct GBufferVSOut
     float2 mTexcoord : TEXCOORD;
 };
 
-cbuffer GBufferConstants : register(CBUFFER_REGISTER_TRANSFORM)
+cbuffer GBufferConstants : register(CBUFFER_REGISTER_VERTEX)
 {
     float4x4 gWVPMatrix;
     float4x4 gWorldMatrix;

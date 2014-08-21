@@ -4,7 +4,7 @@
 #include "FullscreenTriangleVertex.hlsl"
 #include "Constants.hlsl"
 
-#define DEPTH_BIAS 0.00005
+#define DEPTH_BIAS 0.005
 #define NUM_CASCADES 4
 
 cbuffer DirectionalLightConstants : register(CBUFFER_REGISTER_PIXEL)

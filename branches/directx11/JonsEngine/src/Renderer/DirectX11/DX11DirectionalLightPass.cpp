@@ -15,9 +15,9 @@ namespace JonsEngine
     typedef std::array<Vec4, 8> CameraFrustrum;
 
     const Mat4 gBiasMatrix(0.5f, 0.0f, 0.0f, 0.0f,
-                           0.0f, 0.5f, 0.0f, 0.0f,
-                           0.0f, 0.0f, 0.5f, 0.0f,
-                           0.5f, 0.5f, 0.5f, 1.0f);
+                           0.0f, -0.5f, 0.0f, 0.0f,
+                           0.0f, 0.0f, 1.0f, 0.0f,
+                           0.5f, 0.5f, 0.0f, 1.0f);
 
     void CalculateShadowmapCascades(std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES>& nearDistArr, std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES>& farDistArr, const float nearDist, const float farDist)
     {
@@ -35,13 +35,15 @@ namespace JonsEngine
         farDistArr[DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES - 1] = farDist;
     }
 
-    CameraFrustrum CalculateCameraFrustrum(const float fovDegrees, const float aspectRatio, const float minDist, const float maxDist, const Mat4& cameraViewMatrix)
+    CameraFrustrum CalculateCameraFrustrum(const float fovDegrees, const float aspectRatio, const float minDist, const float maxDist, const Mat4& cameraViewMatrix, Mat4& outFrustrumMat)
     {
         CameraFrustrum ret = { Vec4(1.0f, 1.0f, -1.0f, 1.0f), Vec4(1.0f, -1.0f, -1.0f, 1.0f), Vec4(-1.0f, -1.0f, -1.0f, 1.0f), Vec4(-1.0f, 1.0f, -1.0f, 1.0f),
                                Vec4(1.0f, -1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, -1.0f, 1.0f, 1.0f), };
 
         const Mat4 perspectiveMatrix = PerspectiveMatrixFov(fovDegrees, aspectRatio, minDist, maxDist);
         const Mat4 invMVP = glm::inverse(perspectiveMatrix * cameraViewMatrix);
+
+        outFrustrumMat = invMVP;
 
         for (Vec4& corner : ret)
         {
@@ -89,7 +91,7 @@ namespace JonsEngine
 
     DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize) :
         mPixelShader(nullptr), mBackbuffer(backbuffer), mFullscreenPass(fullscreenPass), mVertexTransformPass(transformPass), mShadowmap(device, shadowmapSize, NUM_SHADOWMAP_CASCADES, false),
-        mDirLightCBuffer(device, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
+        mFrustrumPass(device), mDirLightCBuffer(device, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         DXCALL(device->CreatePixelShader(gDirectionalLightPixelShader, sizeof(gDirectionalLightPixelShader), NULL, &mPixelShader));
     }
@@ -103,12 +105,15 @@ namespace JonsEngine
     {
         //mFullscreenPass.BindForFullscreenPass(context);
     }
+    bool gShowFrustrums = false;
+    static std::array<Mat4, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES> gfrustrumMatrices;
 
-    void DX11DirectionalLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Vec4& lightColor, const Vec3& lightDir)
+    void DX11DirectionalLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Vec4& lightColor, const Vec3& lightDir, const bool drawFrustrums)
     {
         D3D11_VIEWPORT prevViewport;
         uint32_t numViewports = 1;
         context->RSGetViewports(&numViewports, &prevViewport);
+
 
         //
         // Shadow pass
@@ -119,6 +124,7 @@ namespace JonsEngine
 
         std::array<float, NUM_SHADOWMAP_CASCADES> nearDistArr, farDistArr;
         std::array<Mat4, NUM_SHADOWMAP_CASCADES> lightVPMatrices;
+        std::array<Mat4, NUM_SHADOWMAP_CASCADES> frustrumMatrices;
 
         // TODO: precompute?
         CalculateShadowmapCascades(nearDistArr, farDistArr, Z_NEAR, Z_FAR);
@@ -130,7 +136,7 @@ namespace JonsEngine
         {
             mShadowmap.BindDepthView(context, cascadeIndex);
             
-            CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, nearDistArr[cascadeIndex], farDistArr[cascadeIndex], cameraViewMatrix);
+            CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, nearDistArr[cascadeIndex], farDistArr[cascadeIndex], cameraViewMatrix, frustrumMatrices[cascadeIndex]);
             lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, lightDir);
             mVertexTransformPass.RenderMeshes(context, renderQueue, meshes, lightVPMatrices[cascadeIndex]);
 
@@ -157,5 +163,24 @@ namespace JonsEngine
 
         // run fullscreen pass + dir light shading pass
         mFullscreenPass.RenderFullscreenTriangle(context);
+
+
+        // DEBUG
+        if (drawFrustrums && !gShowFrustrums)
+        {
+            gfrustrumMatrices = frustrumMatrices;
+
+            gShowFrustrums = true;
+        }
+
+        if (drawFrustrums)
+        {
+            mFrustrumPass.BindForFrustrumPass(context);
+            for (uint32_t cascadeIndex = 0; cascadeIndex < NUM_SHADOWMAP_CASCADES; cascadeIndex++)
+            {
+                mFrustrumPass.RenderFrustrum(context, gfrustrumMatrices[cascadeIndex], PerspectiveMatrixFov(70.0f, 1920.0f / 1080.0f, Z_NEAR, Z_FAR) * cameraViewMatrix, Vec4(1.0f, 1.0f, 0.0f, 1.0f));
+            }
+
+        }
     }
 }

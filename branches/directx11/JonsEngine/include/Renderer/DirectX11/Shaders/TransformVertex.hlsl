@@ -3,7 +3,7 @@
 
 #include "Constants.hlsl"
 
-cbuffer TransformConstants : register(CBUFFER_REGISTER_TRANSFORM)
+cbuffer TransformConstants : register(CBUFFER_REGISTER_VERTEX)
 {
     float4x4 gWVPMatrix;
 };

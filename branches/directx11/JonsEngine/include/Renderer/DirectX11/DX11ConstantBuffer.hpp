@@ -14,7 +14,7 @@ namespace JonsEngine
     public:
         enum CONSTANT_BUFFER_SLOT
         {
-            CONSTANT_BUFFER_SLOT_TRANSFORM = CBUFFER_SLOT_TRANSFORM,
+            CONSTANT_BUFFER_SLOT_VERTEX = CBUFFER_SLOT_VERTEX,
             CONSTANT_BUFFER_SLOT_PIXEL = CBUFFER_SLOT_PIXEL
         };
 
