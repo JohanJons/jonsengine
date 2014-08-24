@@ -37,7 +37,7 @@ namespace JonsEngine
 
     CameraFrustrum CalculateCameraFrustrum(const float fovDegrees, const float aspectRatio, const float minDist, const float maxDist, const Mat4& cameraViewMatrix, Mat4& outFrustrumMat)
     {
-        CameraFrustrum ret = { Vec4(1.0f, 1.0f, -1.0f, 1.0f), Vec4(1.0f, -1.0f, -1.0f, 1.0f), Vec4(-1.0f, -1.0f, -1.0f, 1.0f), Vec4(-1.0f, 1.0f, -1.0f, 1.0f),
+        CameraFrustrum ret = { Vec4(1.0f, -1.0f, 0.0f, 1.0f), Vec4(1.0f, 1.0f, 0.0f, 1.0f), Vec4(-1.0f, 1.0f, 0.0f, 1.0f), Vec4(-1.0f, -1.0f, 0.0f, 1.0f),
                                Vec4(1.0f, -1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, -1.0f, 1.0f, 1.0f), };
 
         const Mat4 perspectiveMatrix = PerspectiveMatrixFov(fovDegrees, aspectRatio, minDist, maxDist);
@@ -56,6 +56,11 @@ namespace JonsEngine
 
     Mat4 CreateDirLightVPMatrix(const CameraFrustrum& cameraFrustrum, const Vec3& lightDir)
     {
+        Vec4 frustumCenter(0.0f);
+        for (const Vec4& corner: cameraFrustrum)
+            frustumCenter += corner;
+        frustumCenter /= 8.0f;
+
         Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
 
         Vec4 transf = lightViewMatrix * cameraFrustrum[0];
@@ -90,10 +95,23 @@ namespace JonsEngine
 
 
     DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize) :
-        mPixelShader(nullptr), mBackbuffer(backbuffer), mFullscreenPass(fullscreenPass), mVertexTransformPass(transformPass), mShadowmap(device, shadowmapSize, NUM_SHADOWMAP_CASCADES, false),
+        mPixelShader(nullptr), mRSDepthClamp(nullptr), mBackbuffer(backbuffer), mFullscreenPass(fullscreenPass), mVertexTransformPass(transformPass), mShadowmap(device, shadowmapSize, NUM_SHADOWMAP_CASCADES, false),
         mFrustrumPass(device), mDirLightCBuffer(device, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         DXCALL(device->CreatePixelShader(gDirectionalLightPixelShader, sizeof(gDirectionalLightPixelShader), NULL, &mPixelShader));
+
+        // depth clamp to avoid meshes between frustrum split issues
+        D3D11_RASTERIZER_DESC rasterizerDesc;
+        ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
+        rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+        rasterizerDesc.CullMode = D3D11_CULL_BACK;
+        rasterizerDesc.FrontCounterClockwise = true;
+        rasterizerDesc.DepthBiasClamp = 1.0f;
+        rasterizerDesc.DepthClipEnable = false;
+        rasterizerDesc.ScissorEnable = false;
+        rasterizerDesc.MultisampleEnable = false;
+        rasterizerDesc.AntialiasedLineEnable = false;
+        DXCALL(device->CreateRasterizerState(&rasterizerDesc, &mRSDepthClamp));
     }
 
     DX11DirectionalLightPass::~DX11DirectionalLightPass()
@@ -111,8 +129,10 @@ namespace JonsEngine
     void DX11DirectionalLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Vec4& lightColor, const Vec3& lightDir, const bool drawFrustrums)
     {
         D3D11_VIEWPORT prevViewport;
+        ID3D11RasterizerStatePtr prevRS;
         uint32_t numViewports = 1;
         context->RSGetViewports(&numViewports, &prevViewport);
+        context->RSGetState(&prevRS);
 
 
         //
@@ -121,6 +141,9 @@ namespace JonsEngine
 
         // unbind any set pixel shader
         context->PSSetShader(NULL, NULL, NULL);
+
+        // depth clamp to avoid issues with meshes between splits
+        context->RSSetState(mRSDepthClamp);
 
         std::array<float, NUM_SHADOWMAP_CASCADES> nearDistArr, farDistArr;
         std::array<Mat4, NUM_SHADOWMAP_CASCADES> lightVPMatrices;
@@ -148,9 +171,10 @@ namespace JonsEngine
         // Shading pass
         //
         
-        // restore rendering to backbuffer and viewport
+        // restore rendering to backbuffer, rasterize state and viewport
         mBackbuffer.BindForShadingStage(context);
         context->RSSetViewports(numViewports, &prevViewport);
+        context->RSSetState(prevRS);
         
         // bind shadowmap SRV for reading
         mShadowmap.BindForReading(context);

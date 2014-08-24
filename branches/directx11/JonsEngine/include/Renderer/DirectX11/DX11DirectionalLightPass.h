@@ -46,6 +46,7 @@ namespace JonsEngine
         };
 
         ID3D11PixelShaderPtr mPixelShader;
+        ID3D11RasterizerStatePtr mRSDepthClamp;
         DX11Backbuffer& mBackbuffer;
         DX11FullscreenTrianglePass& mFullscreenPass;
         DX11VertexTransformPass& mVertexTransformPass;
