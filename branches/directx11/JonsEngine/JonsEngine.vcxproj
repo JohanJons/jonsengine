@@ -122,10 +122,6 @@
     <ClCompile Include="src\Core\Logging\StreamBuf.cpp" />
     <ClCompile Include="src\Core\Logging\Logger.cpp" />
     <ClCompile Include="src\Core\Memory\HeapAllocator.cpp" />
-    <ClCompile Include="src\Core\Threading\ConditionVariable.cpp" />
-    <ClCompile Include="src\Core\Threading\Mutex.cpp" />
-    <ClCompile Include="src\Core\Threading\Thread.cpp" />
-    <ClCompile Include="src\Core\Threading\ThreadPool.cpp" />
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
     <ClCompile Include="src\Core\Utils\Math.cpp" />
     <ClCompile Include="src\Core\Utils\Time.cpp" />
@@ -171,11 +167,6 @@
     <ClInclude Include="include\Core\Logging\LogManager.h" />
     <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
     <ClInclude Include="include\Core\Memory\IMemoryAllocator.h" />
-    <ClInclude Include="include\Core\Threading\ConditionVariable.h" />
-    <ClInclude Include="include\Core\Threading\Mutex.h" />
-    <ClInclude Include="include\Core\Threading\ScopedLock.h" />
-    <ClInclude Include="include\Core\Threading\Thread.h" />
-    <ClInclude Include="include\Core\Threading\ThreadPool.h" />
     <ClInclude Include="include\Core\Types.h" />
     <ClInclude Include="include\Core\Utils\Time.h" />
     <ClInclude Include="include\Core\Utils\Math.h" />

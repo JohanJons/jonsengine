@@ -45,12 +45,6 @@
     <Filter Include="Source Files\Core\Containers">
       <UniqueIdentifier>{2ea7e2ba-7c3b-45f7-9b1a-2371f7affaae}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Core\Threading">
-      <UniqueIdentifier>{18146542-e34f-41f3-ad55-3525c106ace0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Core\Threading">
-      <UniqueIdentifier>{11337b56-64ba-402e-8f60-0787d4a83572}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Scene">
       <UniqueIdentifier>{fce2f44c-457e-40fe-bda8-094020b98983}</UniqueIdentifier>
     </Filter>
@@ -94,18 +88,6 @@
     </ClCompile>
     <ClCompile Include="src\Core\Memory\HeapAllocator.cpp">
       <Filter>Source Files\Core\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Threading\Thread.cpp">
-      <Filter>Source Files\Core\Threading</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Threading\Mutex.cpp">
-      <Filter>Source Files\Core\Threading</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Threading\ThreadPool.cpp">
-      <Filter>Source Files\Core\Threading</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Threading\ConditionVariable.cpp">
-      <Filter>Source Files\Core\Threading</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Logging\LogManager.cpp">
       <Filter>Source Files\Core\Logging</Filter>
@@ -222,21 +204,6 @@
     </ClInclude>
     <ClInclude Include="include\Core\Memory\HeapAllocator.h">
       <Filter>Header Files\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Threading\Thread.h">
-      <Filter>Header Files\Core\Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Threading\Mutex.h">
-      <Filter>Header Files\Core\Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Threading\ConditionVariable.h">
-      <Filter>Header Files\Core\Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Threading\ThreadPool.h">
-      <Filter>Header Files\Core\Threading</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Threading\ScopedLock.h">
-      <Filter>Header Files\Core\Threading</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Containers\Vector.h">
       <Filter>Header Files\Core\Containers</Filter>

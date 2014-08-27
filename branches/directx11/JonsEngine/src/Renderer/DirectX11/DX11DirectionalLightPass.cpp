@@ -56,7 +56,17 @@ namespace JonsEngine
 
     Mat4 CreateDirLightVPMatrix(const CameraFrustrum& cameraFrustrum, const Vec3& lightDir)
     {
-        Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
+        Vec3 frustrumCenter(0.0f);
+        for (const Vec4& corner : cameraFrustrum)
+        {
+            frustrumCenter.x += corner.x;
+            frustrumCenter.y += corner.y;
+            frustrumCenter.z += corner.z;
+        }
+        frustrumCenter /= 8.0f;
+
+        Mat4 lightViewMatrix = glm::lookAt(frustrumCenter, frustrumCenter - glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
+        //Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
 
         Vec4 transf = lightViewMatrix * cameraFrustrum[0];
         float maxZ = transf.z, minZ = transf.z;
@@ -74,13 +84,13 @@ namespace JonsEngine
             if (transf.y < minY) minY = transf.y;
         }
 
-        lightViewMatrix[3][0] = -(minX + maxX) * 0.5f;
-        lightViewMatrix[3][1] = -(minY + maxY) * 0.5f;
-        lightViewMatrix[3][2] = -(minZ + maxZ) * 0.5f;
+        lightViewMatrix[3][0] = frustrumCenter.x + lightDir.x * minZ;
+        lightViewMatrix[3][1] = frustrumCenter.y + lightDir.y * minZ;
+        lightViewMatrix[3][2] = frustrumCenter.z + lightDir.z * minZ;
 
-        Vec3 halfExtents((maxX - minX) * 0.5, (maxY - minY) * 0.5, (maxZ - minZ) * 0.5);
+        Vec3 cascadeExtents((maxX - minX), (maxY - minY), (maxZ - minZ));
 
-        return OrthographicMatrix(-halfExtents.x, halfExtents.x, -halfExtents.y, halfExtents.y, halfExtents.z, -halfExtents.z) * lightViewMatrix;
+        return OrthographicMatrix(minX, maxX, maxY, minY, 0.0f, -cascadeExtents.z) * lightViewMatrix;
     }
 
 
