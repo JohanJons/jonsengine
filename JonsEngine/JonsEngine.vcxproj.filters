@@ -1,0 +1,386 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{68d50880-3b36-46e7-b2ce-670c81b0d80d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{5a494202-1728-4048-a253-a0de5440ecd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Logging">
+      <UniqueIdentifier>{a68ce750-d5ef-433a-a7b9-c6b7b87f1cd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Memory">
+      <UniqueIdentifier>{f9fdbb70-9e32-4b69-b412-2b72faf7d6b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Utils">
+      <UniqueIdentifier>{ab910717-264a-445e-8545-85e3e20a505b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Logging">
+      <UniqueIdentifier>{43bdffa5-ecf2-4b77-99bc-723680333003}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Memory">
+      <UniqueIdentifier>{13f874e1-d6ae-4407-a6fc-6717392ecbd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Utils">
+      <UniqueIdentifier>{05c56eae-62a1-484f-822e-7a6d9071a4ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Containers">
+      <UniqueIdentifier>{8f7619c7-3070-47dd-9384-05d95b47af54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thirdparty">
+      <UniqueIdentifier>{7b2a64d1-5223-4406-82fa-d4f188db9cc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Thirdparty\dlmalloc">
+      <UniqueIdentifier>{0815c268-49c7-420a-bc5b-abebc3b3dfbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Containers">
+      <UniqueIdentifier>{2ea7e2ba-7c3b-45f7-9b1a-2371f7affaae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Threading">
+      <UniqueIdentifier>{18146542-e34f-41f3-ad55-3525c106ace0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Threading">
+      <UniqueIdentifier>{11337b56-64ba-402e-8f60-0787d4a83572}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene">
+      <UniqueIdentifier>{fce2f44c-457e-40fe-bda8-094020b98983}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene">
+      <UniqueIdentifier>{e2cf9f2e-e660-493f-a134-7b8719c92e95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Window">
+      <UniqueIdentifier>{73877e1a-2dd6-480d-a49e-5b8940f92327}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Window\GLFW">
+      <UniqueIdentifier>{bbf77ad5-7e88-4706-a9c6-29d3583c5667}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Window">
+      <UniqueIdentifier>{e86184c8-2353-44b7-b5a4-064316bca867}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Window\GLFW">
+      <UniqueIdentifier>{bf67747f-5f71-4b4d-83f4-895839601cce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renderer">
+      <UniqueIdentifier>{ff44cc03-febf-440e-aeba-dc7ede80161e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renderer\OpenGL3">
+      <UniqueIdentifier>{90cc873a-fe54-43f4-a22f-d5642bbcb654}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Resources">
+      <UniqueIdentifier>{b836645f-6919-4b76-b7de-d4d337b4676e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Resources">
+      <UniqueIdentifier>{d1471368-acd6-4fac-ba6e-3f44c7798ad4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer">
+      <UniqueIdentifier>{a3d5ad5b-531b-4acc-884f-cf6a512e7c46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer\OpenGL3">
+      <UniqueIdentifier>{911dcb5c-05b8-4bfa-8f92-ae99563ab968}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renderer\OpenGL3\Shaders">
+      <UniqueIdentifier>{181a537f-a757-494e-af2f-ee41acccc8aa}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Core\Engine.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c">
+      <Filter>Thirdparty\dlmalloc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Memory\HeapAllocator.cpp">
+      <Filter>Source Files\Core\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Threading\Thread.cpp">
+      <Filter>Source Files\Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Threading\Mutex.cpp">
+      <Filter>Source Files\Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Threading\ThreadPool.cpp">
+      <Filter>Source Files\Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Threading\ConditionVariable.cpp">
+      <Filter>Source Files\Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Logging\LogManager.cpp">
+      <Filter>Source Files\Core\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Logging\Logger.cpp">
+      <Filter>Source Files\Core\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Scene.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\SceneManager.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\SceneNode.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\Shader.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\OpenGLRenderer.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\ResourceManifest.cpp">
+      <Filter>Source Files\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\JonsPackage.cpp">
+      <Filter>Source Files\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Model.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Camera.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\OpenGLTexture.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Material.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\Shapes.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\OpenGLMesh.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Window\GLFW\GLFWWindowManager.cpp">
+      <Filter>Source Files\Window\GLFW</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Logging\OutputStream.cpp">
+      <Filter>Source Files\Core\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Logging\StreamBuf.cpp">
+      <Filter>Source Files\Core\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Utils\Time.cpp">
+      <Filter>Source Files\Core\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\GBuffer.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\ShadingGeometry.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\DirectionalLight.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\PointLight.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\OpenGLUtils.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\DirectionalShadowmap.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\OmnidirectionalShadowmap.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\OpenGL3\AccumulationBuffer.cpp">
+      <Filter>Source Files\Renderer\OpenGL3</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Core\Engine.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h">
+      <Filter>Thirdparty\dlmalloc</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\EngineSettings.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Memory\HeapAllocator.h">
+      <Filter>Header Files\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Threading\Thread.h">
+      <Filter>Header Files\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Threading\Mutex.h">
+      <Filter>Header Files\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Threading\ConditionVariable.h">
+      <Filter>Header Files\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Threading\ThreadPool.h">
+      <Filter>Header Files\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Threading\ScopedLock.h">
+      <Filter>Header Files\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Containers\Vector.h">
+      <Filter>Header Files\Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Logging\LogManager.h">
+      <Filter>Header Files\Core\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Logging\Logger.h">
+      <Filter>Header Files\Core\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\Math.h">
+      <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\Camera.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\Scene.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\SceneManager.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\SceneNode.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shader.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLRenderer.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Types.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resources\ResourceManifest.h">
+      <Filter>Header Files\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resources\JonsPackage.h">
+      <Filter>Header Files\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\Model.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\EngineDefs.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Memory\IMemoryAllocator.h">
+      <Filter>Header Files\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\UniformBuffer.hpp">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLTexture.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\Material.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\Shapes.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLMesh.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Window\GLFW\GLFWWindowManager.h">
+      <Filter>Header Files\Window\GLFW</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Window\KeyCallback.h">
+      <Filter>Header Files\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Window\KeyDefinition.h">
+      <Filter>Header Files\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Window\MouseCallback.h">
+      <Filter>Header Files\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\RenderCommands.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Logging\StreamBuf.h">
+      <Filter>Header Files\Core\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Logging\OutputStream.h">
+      <Filter>Header Files\Core\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\Time.h">
+      <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\GBuffer.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\GeometryFragmentShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\GeometryVertexShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\DebugOptions.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\ShadingGeometry.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\DirectionalLight.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\PointLight.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\OpenGLUtils.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\NullFragmentShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\NullVertexShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightFragmentShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightVertexShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\UniformBufferDefinitions.hpp">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\ShaderProgram.hpp">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\AmbientLightFragmentShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\AmbientLightVertexShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\PointLightVertexShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\PointLightFragmentShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DepthFragmentShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DepthVertexShader.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\Shaders\DirLightFragmentShader_debug.h">
+      <Filter>Header Files\Renderer\OpenGL3\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\DirectionalShadowmap.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\OmnidirectionalShadowmap.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\OpenGL3\AccumulationBuffer.h">
+      <Filter>Header Files\Renderer\OpenGL3</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

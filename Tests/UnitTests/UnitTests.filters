@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Source Files\UnitTest">
+      <UniqueIdentifier>{bf112193-4404-4d0e-aaf1-122bd15cb335}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UnitTest\TestFixture">
+      <UniqueIdentifier>{376418fd-0b44-42af-abfc-d703f04c2f3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UnitTest\Core">
+      <UniqueIdentifier>{b01bbf91-5a78-4180-8fd7-b87fc72dd2e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UnitTest\Core\Containers">
+      <UniqueIdentifier>{ec304895-e439-4d46-8d53-b56832217986}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UnitTest\Core\Threading">
+      <UniqueIdentifier>{14366197-7df3-4270-9b7e-d1615b7e6657}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UnitTest\Scene">
+      <UniqueIdentifier>{ff85cd7d-2959-4241-9d8d-24e5e0bc30a7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="UnitTest\Core\Containers\VectorTest.h">
+      <Filter>Source Files\UnitTest\Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTest\Core\Threading\ConditionVariableTest.h">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTest\Core\Threading\MutexTest.h">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTest\Core\Threading\ThreadPoolTest.h">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTest\Core\Threading\ThreadTest.h">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTest\TestFixtures\RunningEngineFixture.h">
+      <Filter>Source Files\UnitTest\TestFixture</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTest\Scene\SceneManagerTest.h">
+      <Filter>Source Files\UnitTest\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTest\Scene\SceneTest.h">
+      <Filter>Source Files\UnitTest\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTest\Scene\SceneNodeTest.h">
+      <Filter>Source Files\UnitTest\Scene</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="UnitTest\Core\Containers\VectorTest.cpp">
+      <Filter>Source Files\UnitTest\Core\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTest\Core\Threading\ConditionVariableTest.cpp">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTest\Core\Threading\MutexTest.cpp">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTest\Core\Threading\ThreadPoolTest.cpp">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTest\Core\Threading\ThreadTest.cpp">
+      <Filter>Source Files\UnitTest\Core\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTest\Scene\SceneManagerTest.cpp">
+      <Filter>Source Files\UnitTest\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTest\TestFixtures\RunningEngineFixture.cpp">
+      <Filter>Source Files\UnitTest\TestFixture</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTest\Scene\SceneTest.cpp">
+      <Filter>Source Files\UnitTest\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTest\Scene\SceneNodeTest.cpp">
+      <Filter>Source Files\UnitTest\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
