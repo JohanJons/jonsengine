@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir>$(SolutionDir)/bin/$(Configuration)/$(Platform)/</OutDir>
+    <LibraryPath>$(SolutionDir)/bin/$(Configuration)/$(Platform)/;$(LibraryPath)</LibraryPath>
+    <IntDir>$(SolutionDir)/bin/$(Configuration)/$(Platform)/Temp/$(MSBuildProjectName)/</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>BOOST_ALL_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\glm;$(SolutionDir)\..\Thirdparty\boost_1_56_0;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>

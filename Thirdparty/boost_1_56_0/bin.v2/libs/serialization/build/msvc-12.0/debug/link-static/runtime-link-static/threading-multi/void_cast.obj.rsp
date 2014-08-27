@@ -1,0 +1,3 @@
+"libs\serialization\src\void_cast.cpp" -Fo"bin.v2\libs\serialization\build\msvc-12.0\debug\link-static\runtime-link-static\threading-multi\void_cast.obj"    -TP /Z7 /Od /Ob0 /W3 /GR /MTd /Zc:forScope /Zc:wchar_t /wd4675 /EHs -D_HAS_ITERATOR_DEBUGGING=0 /Gy -c 
+-DBOOST_ALL_NO_LIB=1 
+"-I."
