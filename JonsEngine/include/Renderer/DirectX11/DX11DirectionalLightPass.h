@@ -5,7 +5,6 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
-#include "include/Renderer/DirectX11/DX11FrustrumPass.h"
 #include "include/Core/Types.h"
 
 #include <d3d11.h>
@@ -51,7 +50,6 @@ namespace JonsEngine
         DX11FullscreenTrianglePass& mFullscreenPass;
         DX11VertexTransformPass& mVertexTransformPass;
         DX11Shadowmap mShadowmap;
-        DX11FrustrumPass mFrustrumPass;
         DX11ConstantBuffer<DirectionalLightCBuffer> mDirLightCBuffer;
     };
 }
