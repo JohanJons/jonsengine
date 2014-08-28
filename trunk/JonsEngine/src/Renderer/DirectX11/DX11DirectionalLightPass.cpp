@@ -96,7 +96,7 @@ namespace JonsEngine
 
     DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize) :
         mPixelShader(nullptr), mRSDepthClamp(nullptr), mBackbuffer(backbuffer), mFullscreenPass(fullscreenPass), mVertexTransformPass(transformPass), mShadowmap(device, shadowmapSize, NUM_SHADOWMAP_CASCADES, false),
-        mFrustrumPass(device), mDirLightCBuffer(device, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
+        mDirLightCBuffer(device, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         DXCALL(device->CreatePixelShader(gDirectionalLightPixelShader, sizeof(gDirectionalLightPixelShader), NULL, &mPixelShader));
 
@@ -187,24 +187,5 @@ namespace JonsEngine
 
         // run fullscreen pass + dir light shading pass
         mFullscreenPass.RenderFullscreenTriangle(context);
-
-
-        // DEBUG
-        if (drawFrustrums && !gShowFrustrums)
-        {
-            gfrustrumMatrices = frustrumMatrices;
-
-            gShowFrustrums = true;
-        }
-
-        if (drawFrustrums)
-        {
-            mFrustrumPass.BindForFrustrumPass(context);
-            for (uint32_t cascadeIndex = 0; cascadeIndex < NUM_SHADOWMAP_CASCADES; cascadeIndex++)
-            {
-                mFrustrumPass.RenderFrustrum(context, gfrustrumMatrices[cascadeIndex], PerspectiveMatrixFov(70.0f, 1920.0f / 1080.0f, Z_NEAR, Z_FAR) * cameraViewMatrix, Vec4(1.0f, 1.0f, 0.0f, 1.0f));
-            }
-
-        }
     }
 }
