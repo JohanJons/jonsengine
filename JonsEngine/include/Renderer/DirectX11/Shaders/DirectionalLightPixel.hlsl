@@ -40,6 +40,9 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
         index = 2;
 
     float3 projCoords = (float3)mul(gSplitVPMatrices[index], worldPos);
+    const float2 texelSize = 1.0 / float2(1024.0, 1024.0);
+    projCoords.xy = (floor(projCoords.xy / texelSize)) * texelSize;
+
     float viewDepth = projCoords.z - DEPTH_BIAS;
     projCoords.z = float(index);
     float visibilty = gShadowmap.SampleCmpLevelZero(gShadowmapSampler, projCoords, viewDepth);
