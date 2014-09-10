@@ -2,9 +2,9 @@
 #define DIRECTIONAL_LIGHT_PIXEL_HLSL
 
 #include "FullscreenTriangleVertex.hlsl"
-#include "Constants.hlsl"
+#include "Constants.h"
 
-#define DEPTH_BIAS 0.005
+#define DEPTH_BIAS 0.00005
 #define NUM_CASCADES 4
 
 cbuffer DirectionalLightConstants : register(CBUFFER_REGISTER_PIXEL)
@@ -14,6 +14,7 @@ cbuffer DirectionalLightConstants : register(CBUFFER_REGISTER_PIXEL)
     float4 gSplitDistances;
     float4 gLightColor;
     float4 gLightDirection;
+    float gShadowmapSize;
 };
 
 Texture2D gPositionTexture : register(TEXTURE_REGISTER_POSITION);
@@ -40,12 +41,19 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
         index = 2;
 
     float3 projCoords = (float3)mul(gSplitVPMatrices[index], worldPos);
-    const float2 texelSize = 1.0 / float2(1024.0, 1024.0);
+    const float2 texelSize = 1.0 / float2(gShadowmapSize, gShadowmapSize);
     projCoords.xy = (floor(projCoords.xy / texelSize)) * texelSize;
 
     float viewDepth = projCoords.z - DEPTH_BIAS;
     projCoords.z = float(index);
-    float visibilty = gShadowmap.SampleCmpLevelZero(gShadowmapSampler, projCoords, viewDepth);
+
+    float inc = 1.0 / gShadowmapSize;
+    float visibilty = 0.0;
+    visibilty += gShadowmap.SampleCmpLevelZero(gShadowmapSampler, projCoords + float3(inc, 0, 0), viewDepth);
+    visibilty += gShadowmap.SampleCmpLevelZero(gShadowmapSampler, projCoords - float3(inc, 0, 0), viewDepth);
+    visibilty += gShadowmap.SampleCmpLevelZero(gShadowmapSampler, projCoords + float3(0, inc, 0), viewDepth);
+    visibilty += gShadowmap.SampleCmpLevelZero(gShadowmapSampler, projCoords - float3(0, inc, 0), viewDepth);
+    visibilty /= 4;
 
     float angleNormal = clamp(dot(normal, gLightDirection), 0, 1);
 

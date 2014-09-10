@@ -145,8 +145,8 @@ namespace JonsEngine
         mDirectionalLightPass(mDevice, mBackbuffer, mFullscreenTrianglePass, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
         mPointLightPass(mDevice, mBackbuffer, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
         mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_MODEL), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
-        mShadowmapSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D11_COMPARISON_LESS, DX11Sampler::SHADER_SAMPLER_SLOT_DEPTH),
-        mShadowmapNoCompareSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_DEPTH_NO_CMP)
+        mShadowmapSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_DEPTH),
+        mShadowmapNoCompareSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_DEPTH_NO_CMP)
     {
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;

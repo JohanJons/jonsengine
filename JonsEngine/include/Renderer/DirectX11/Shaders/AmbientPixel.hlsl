@@ -2,7 +2,7 @@
 #define AMBIENT_PIXEL_HLSL
 
 #include "FullscreenTriangleVertex.hlsl"
-#include "Constants.hlsl"
+#include "Constants.h"
 
 cbuffer AmbientConstants : register(CBUFFER_REGISTER_PIXEL)
 {

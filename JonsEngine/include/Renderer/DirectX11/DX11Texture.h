@@ -1,7 +1,7 @@
 #pragma once
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/Renderer/DirectX11/Shaders/Constants.hlsl"
+#include "include/Renderer/DirectX11/Shaders/Constants.h"
 #include "include/Core/Types.h"
 
 #include <d3d11.h>
