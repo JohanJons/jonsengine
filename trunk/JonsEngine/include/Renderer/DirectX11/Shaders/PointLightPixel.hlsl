@@ -1,7 +1,7 @@
 #ifndef POINT_LIGHT_PIXEL_HLSL
 #define POINT_LIGHT_PIXEL_HLSL
 
-#include "Constants.hlsl"
+#include "Constants.h"
 
 cbuffer PointLightConstants : register(CBUFFER_REGISTER_PIXEL)
 {

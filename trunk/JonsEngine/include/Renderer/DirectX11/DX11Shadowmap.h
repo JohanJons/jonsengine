@@ -18,6 +18,8 @@ namespace JonsEngine
         void BindDepthView(ID3D11DeviceContextPtr context, const uint32_t depthViewIndex);
         void BindForReading(ID3D11DeviceContextPtr context);
 
+        uint32_t GetTextureSize() const;
+
 
     private:
         ID3D11Texture2DPtr mShadowmapTexture;

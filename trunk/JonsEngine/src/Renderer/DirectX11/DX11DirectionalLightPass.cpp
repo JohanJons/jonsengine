@@ -165,6 +165,9 @@ namespace JonsEngine
         // Shadow pass
         //
 
+        // unbind any set pixel shader
+        context->PSSetShader(NULL, NULL, NULL);
+
         // depth clamp to avoid issues with meshes between splits
         context->RSSetState(mRSDepthClamp);
 
@@ -204,7 +207,7 @@ namespace JonsEngine
         mFullscreenPass.BindForFullscreenPass(context);
 
         // set dir light cbuffer data and pixel shader
-        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, cameraViewMatrix, farDistArr, lightColor, lightDir), context);
+        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, cameraViewMatrix, farDistArr, lightColor, lightDir, static_cast<float>(mShadowmap.GetTextureSize())), context);
         context->PSSetShader(mPixelShader, NULL, NULL);
 
         // run fullscreen pass + dir light shading pass

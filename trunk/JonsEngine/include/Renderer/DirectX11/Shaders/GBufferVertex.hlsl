@@ -1,7 +1,7 @@
 #ifndef GBUFFER_VERTEX_HLSL
 #define GBUFFER_VERTEX_HLSL
 
-#include "Constants.hlsl"
+#include "Constants.h"
 
 struct GBufferVSIn
 {

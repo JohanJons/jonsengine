@@ -35,10 +35,13 @@ namespace JonsEngine
             std::array<float, NUM_SHADOWMAP_CASCADES> mSplitDistances;
             Vec4 mLightColor;
             Vec4 mLightDirection;
+            float mShadowmapSize;
+            float __padding[3];
 
 
-            DirectionalLightCBuffer(const std::array<Mat4, NUM_SHADOWMAP_CASCADES>& splitMatrices, const Mat4& cameraViewMatrix, const std::array<float, NUM_SHADOWMAP_CASCADES>& splitDistances, const Vec4& lightColor, const Vec3& lightDir) :
-                mSplitVPMatrices(splitMatrices), mCameraViewMatrix(cameraViewMatrix), mSplitDistances(splitDistances), mLightColor(lightColor), mLightDirection(Vec4(-lightDir, 0.0f))
+            DirectionalLightCBuffer(const std::array<Mat4, NUM_SHADOWMAP_CASCADES>& splitMatrices, const Mat4& cameraViewMatrix, const std::array<float, NUM_SHADOWMAP_CASCADES>& splitDistances,
+                                    const Vec4& lightColor, const Vec3& lightDir, const float shadowmapSize) :
+                                    mSplitVPMatrices(splitMatrices), mCameraViewMatrix(cameraViewMatrix), mSplitDistances(splitDistances), mLightColor(lightColor), mLightDirection(Vec4(-lightDir, 0.0f)), mShadowmapSize(shadowmapSize)
             {
             }
         };

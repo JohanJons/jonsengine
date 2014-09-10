@@ -106,4 +106,16 @@ namespace JonsEngine
     {
         context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mShadowmapSRV.p);
     }
+
+
+    uint32_t DX11Shadowmap::GetTextureSize() const
+    {
+        D3D11_TEXTURE2D_DESC depthBufferDesc;
+        ZeroMemory(&depthBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
+
+        mShadowmapTexture->GetDesc(&depthBufferDesc);
+
+        // same size for height/width
+        return depthBufferDesc.Width;
+    }
 }
