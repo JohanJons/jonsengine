@@ -32,6 +32,7 @@ namespace JonsEngine
         ~DX11Mesh();
 
         void Draw(ID3D11DeviceContextPtr context);
+
         MeshID GetMeshID() const;
 
 

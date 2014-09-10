@@ -28,6 +28,7 @@ namespace JonsEngine
         ~DX11Texture();
 
         void Bind(ID3D11DeviceContextPtr context);
+
         TextureID GetTextureID() const;
 
 

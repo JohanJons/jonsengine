@@ -35,15 +35,13 @@ namespace JonsEngine
         farDistArr[DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES - 1] = farDist;
     }
 
-    CameraFrustrum CalculateCameraFrustrum(const float fovDegrees, const float aspectRatio, const float minDist, const float maxDist, const Mat4& cameraViewMatrix, Mat4& outFrustrumMat)
+    CameraFrustrum CalculateCameraFrustrum(const float fovDegrees, const float aspectRatio, const float minDist, const float maxDist, const Mat4& cameraViewMatrix)
     {
         CameraFrustrum ret = { Vec4(1.0f, -1.0f, 0.0f, 1.0f), Vec4(1.0f, 1.0f, 0.0f, 1.0f), Vec4(-1.0f, 1.0f, 0.0f, 1.0f), Vec4(-1.0f, -1.0f, 0.0f, 1.0f),
                                Vec4(1.0f, -1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, -1.0f, 1.0f, 1.0f), };
 
         const Mat4 perspectiveMatrix = PerspectiveMatrixFov(fovDegrees, aspectRatio, minDist, maxDist);
         const Mat4 invMVP = glm::inverse(perspectiveMatrix * cameraViewMatrix);
-
-        outFrustrumMat = invMVP;
 
         for (Vec4& corner : ret)
         {
@@ -56,7 +54,7 @@ namespace JonsEngine
 
     Mat4 CreateDirLightVPMatrix(const CameraFrustrum& cameraFrustrum, const Vec3& lightDir)
     {
-        Vec3 frustrumCenter(0.0f);
+        /*Vec3 frustrumCenter(0.0f);
         for (const Vec4& corner : cameraFrustrum)
         {
             frustrumCenter.x += corner.x;
@@ -65,8 +63,43 @@ namespace JonsEngine
         }
         frustrumCenter /= 8.0f;
 
-        Mat4 lightViewMatrix = glm::lookAt(frustrumCenter, frustrumCenter - glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
+       /* Mat4 lightViewMatrix(1.0f);
+        lightViewMatrix[2] = -Vec4(lightDir, 0.0f);
+        lightViewMatrix[0] = Vec4(glm::normalize(glm::cross(Vec3(0.0f, -1.0f, 0.0f), Vec3(lightViewMatrix[2]))), 0.0f);
+        lightViewMatrix[1] = Vec4(glm::cross(Vec3(lightViewMatrix[2]), Vec3(lightViewMatrix[0])), 0.0f);
+
+        lightViewMatrix[3][0] = -glm::dot(frustrumCenter, Vec3(lightViewMatrix[0]));
+        lightViewMatrix[3][1] = -glm::dot(frustrumCenter, Vec3(lightViewMatrix[1]));
+        lightViewMatrix[3][2] = -glm::dot(frustrumCenter, Vec3(lightViewMatrix[2]));*/
+      //  Mat4 lightViewMatrix = glm::lookAt(frustrumCenter, frustrumCenter - glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
         //Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
+        //Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
+
+   /*     Vec4 transf = lightViewMatrix * cameraFrustrum[0];
+        float maxZ = transf.z, minZ = transf.z;
+        float maxX = transf.x, minX = transf.x;
+        float maxY = transf.y, minY = transf.y;
+        for (uint32_t i = 1; i < 8; i++)
+        {
+            transf = lightViewMatrix * cameraFrustrum[i];
+
+            if (transf.z > maxZ) maxZ = transf.z;
+            if (transf.z < minZ) minZ = transf.z;
+            if (transf.x > maxX) maxX = transf.x;
+            if (transf.x < minX) minX = transf.x;
+            if (transf.y > maxY) maxY = transf.y;
+            if (transf.y < minY) minY = transf.y;
+        }
+
+        lightViewMatrix[3][0] = frustrumCenter.x - lightDir.x * -minZ;
+        lightViewMatrix[3][1] = frustrumCenter.y - lightDir.y * -minZ;
+        lightViewMatrix[3][2] = frustrumCenter.z - lightDir.z * -minZ;
+
+        Vec3 cascadeExtents((maxX - minX) * 0.5f, (maxY - minY) * 0.5f, (maxZ - minZ) * 0.5f);
+
+        return OrthographicMatrix(-10.0f, 10.0f, 10.0f, -10.0f, 0.0f, -10.0f) * lightViewMatrix;*/
+
+        Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
 
         Vec4 transf = lightViewMatrix * cameraFrustrum[0];
         float maxZ = transf.z, minZ = transf.z;
@@ -84,13 +117,13 @@ namespace JonsEngine
             if (transf.y < minY) minY = transf.y;
         }
 
-        lightViewMatrix[3][0] = frustrumCenter.x + lightDir.x * minZ;
-        lightViewMatrix[3][1] = frustrumCenter.y + lightDir.y * minZ;
-        lightViewMatrix[3][2] = frustrumCenter.z + lightDir.z * minZ;
+        lightViewMatrix[3][0] = -(minX + maxX) * 0.5f;
+        lightViewMatrix[3][1] = -(minY + maxY) * 0.5f;
+        lightViewMatrix[3][2] = -(minZ + maxZ) * 0.5f;
 
-        Vec3 cascadeExtents((maxX - minX), (maxY - minY), (maxZ - minZ));
+        Vec3 halfExtents((maxX - minX) * 0.5, (maxY - minY) * 0.5, (maxZ - minZ) * 0.5);
 
-        return OrthographicMatrix(minX, maxX, maxY, minY, 0.0f, -cascadeExtents.z) * lightViewMatrix;
+        return OrthographicMatrix(-halfExtents.x, halfExtents.x, halfExtents.y, -halfExtents.y, halfExtents.z, -halfExtents.z) * lightViewMatrix;
     }
 
 
@@ -119,13 +152,6 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::BindForShading(ID3D11DeviceContextPtr context)
-    {
-        //mFullscreenPass.BindForFullscreenPass(context);
-    }
-    bool gShowFrustrums = false;
-    static std::array<Mat4, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES> gfrustrumMatrices;
-
     void DX11DirectionalLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Vec4& lightColor, const Vec3& lightDir, const bool drawFrustrums)
     {
         D3D11_VIEWPORT prevViewport;
@@ -139,15 +165,11 @@ namespace JonsEngine
         // Shadow pass
         //
 
-        // unbind any set pixel shader
-        context->PSSetShader(NULL, NULL, NULL);
-
         // depth clamp to avoid issues with meshes between splits
         context->RSSetState(mRSDepthClamp);
 
         std::array<float, NUM_SHADOWMAP_CASCADES> nearDistArr, farDistArr;
         std::array<Mat4, NUM_SHADOWMAP_CASCADES> lightVPMatrices;
-        std::array<Mat4, NUM_SHADOWMAP_CASCADES> frustrumMatrices;
 
         // TODO: precompute?
         CalculateShadowmapCascades(nearDistArr, farDistArr, Z_NEAR, Z_FAR);
@@ -159,7 +181,7 @@ namespace JonsEngine
         {
             mShadowmap.BindDepthView(context, cascadeIndex);
             
-            CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, nearDistArr[cascadeIndex], farDistArr[cascadeIndex], cameraViewMatrix, frustrumMatrices[cascadeIndex]);
+            CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, nearDistArr[cascadeIndex], farDistArr[cascadeIndex], cameraViewMatrix);
             lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, lightDir);
             mVertexTransformPass.RenderMeshes(context, renderQueue, meshes, lightVPMatrices[cascadeIndex]);
 

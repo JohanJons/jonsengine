@@ -330,7 +330,6 @@ namespace JonsEngine
         mContext->OMSetBlendState(mBlendState, NULL, 0xffffffff);
 
         // do all directional lights
-        mDirectionalLightPass.BindForShading(mContext);
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
             // TODO: use real fov and screen size
             mDirectionalLightPass.Render(mContext, renderQueue, mMeshes, 70.0f, 1920.0f / 1080.0f, lighting.mCameraViewMatrix, directionalLight.mLightColor, directionalLight.mLightDirection, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
