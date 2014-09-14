@@ -188,6 +188,9 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Sampler.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11PostProcessor.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -340,6 +343,9 @@
     <ClInclude Include="include\Renderer\DirectX11\Shaders\Constants.h">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11PostProcessor.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferPixel.hlsl">
@@ -361,6 +367,9 @@
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\TransformVertex.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\FXAAPixel.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

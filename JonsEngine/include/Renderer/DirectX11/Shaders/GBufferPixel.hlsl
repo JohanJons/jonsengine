@@ -12,7 +12,7 @@ struct GBufferPSOut
 
 Texture2D gDiffuseTexture : register(TEXTURE_REGISTER_DIFFUSE);
 Texture2D gNormalTexture : register(TEXTURE_REGISTER_NORMAL);
-SamplerState gSampler : register(SAMPLER_REGISTER_GBUFFER);
+SamplerState gSampler : register(SAMPLER_REGISTER_ANISOTROPIC);
 
 
 // needed due to float4x4 constructor is row-major

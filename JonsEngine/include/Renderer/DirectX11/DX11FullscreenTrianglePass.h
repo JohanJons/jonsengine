@@ -14,8 +14,7 @@ namespace JonsEngine
         DX11FullscreenTrianglePass(ID3D11DevicePtr device);
         ~DX11FullscreenTrianglePass();
 
-        void BindForFullscreenPass(ID3D11DeviceContextPtr context);
-        void RenderFullscreenTriangle(ID3D11DeviceContextPtr context);
+        void Render(ID3D11DeviceContextPtr context);
 
 
     private:

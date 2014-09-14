@@ -139,14 +139,18 @@ namespace JonsEngine
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), 
         mLogger(logger), mMemoryAllocator(memoryAllocator),
         mShadowQuality(settings.mShadowQuality),
+        mAntiAliasing(settings.mAntiAliasing),
         mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), 
         mBackbuffer(mDevice, mSwapchain, mGBuffer.GetDepthStencilView(), mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
-        mVertexTransformPass(mDevice), mFullscreenTrianglePass(mDevice), mAmbientPass(mDevice),
+        mVertexTransformPass(mDevice), 
+        mFullscreenTrianglePass(mDevice), 
+        mAmbientPass(mDevice),
         mDirectionalLightPass(mDevice, mBackbuffer, mFullscreenTrianglePass, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
         mPointLightPass(mDevice, mBackbuffer, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
-        mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_MODEL), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
-        mShadowmapSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_DEPTH),
-        mShadowmapNoCompareSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_DEPTH_NO_CMP)
+        mPostProcessor(mDevice, mFullscreenTrianglePass, GetBackbufferTextureDesc()),
+        mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
+        mShadowmapSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
+        mShadowmapNoCompareSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT)
     {
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -227,18 +231,18 @@ namespace JonsEngine
 
     void DX11RendererImpl::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
     {
-        mModelSampler.reset(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, anisotropic, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_MODEL));
+        mModelSampler.reset(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, anisotropic, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC));
     }
 
 
-    EngineSettings::MSAA DX11RendererImpl::GetMSAA() const
+    EngineSettings::AntiAliasing DX11RendererImpl::GetAntiAliasing() const
     {
-        return EngineSettings::MSAA_1X;
+        return mAntiAliasing;
     }
 
-    void DX11RendererImpl::SetMSAA(const EngineSettings::MSAA msaa)
+    void DX11RendererImpl::SetAntiAliasing(const EngineSettings::AntiAliasing aa)
     {
-
+        mAntiAliasing = aa;
     }
 
 
@@ -341,6 +345,9 @@ namespace JonsEngine
             mGBuffer.ClearStencilBuffer(mContext);
             mPointLightPass.Render(mContext, renderQueue, mMeshes, pointLight);
         }
+
+        if (mAntiAliasing == EngineSettings::ANTIALIASING_FXAA)
+            mPostProcessor.FXAAPass(mContext, mBackbuffer);
 
         mContext->OMSetBlendState(NULL, NULL, 0xffffffff);
     }

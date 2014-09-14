@@ -25,11 +25,21 @@ namespace JonsEngine
 
         ZeroMemory(&mSwapchainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
         DXCALL(mSwapchain->GetDesc(&mSwapchainDesc));
-        //mDevice->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&dbg));
     }
 
     DX11Context::~DX11Context()
     {
-        //dbg->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+    }
+
+
+    D3D11_TEXTURE2D_DESC DX11Context::GetBackbufferTextureDesc() const
+    {
+        D3D11_TEXTURE2D_DESC desc;
+
+        ID3D11Texture2DPtr backbuffer = nullptr;
+        DXCALL(mSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer));
+        backbuffer->GetDesc(&desc);
+
+        return desc;
     }
 }

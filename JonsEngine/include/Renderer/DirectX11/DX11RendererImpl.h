@@ -9,6 +9,7 @@
 #include "include/Renderer/DirectX11/DX11AmbientPass.h"
 #include "include/Renderer/DirectX11/DX11DirectionalLightPass.h"
 #include "include/Renderer/DirectX11/DX11PointLightPass.h"
+#include "include/Renderer/DirectX11/DX11PostProcessor.h"
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "include/Renderer/DirectX11/DX11Sampler.h"
@@ -43,8 +44,8 @@ namespace JonsEngine
         EngineSettings::Anisotropic GetAnisotropicFiltering() const;
         void SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic);
 
-        EngineSettings::MSAA GetMSAA() const;
-        void SetMSAA(const EngineSettings::MSAA msaa);
+        EngineSettings::AntiAliasing GetAntiAliasing() const;
+        void SetAntiAliasing(const EngineSettings::AntiAliasing aa);
 
         float GetZNear() const;
         float GetZFar() const;
@@ -60,6 +61,7 @@ namespace JonsEngine
         Logger& mLogger;
         IMemoryAllocatorPtr mMemoryAllocator;
         EngineSettings::ShadowQuality mShadowQuality;
+        EngineSettings::AntiAliasing mAntiAliasing;
 
         DX11GBuffer mGBuffer;
         DX11Backbuffer mBackbuffer;
@@ -68,6 +70,7 @@ namespace JonsEngine
         DX11AmbientPass mAmbientPass;
         DX11DirectionalLightPass mDirectionalLightPass;
         DX11PointLightPass mPointLightPass;
+        DX11PostProcessor mPostProcessor;
         ID3D11RasterizerStatePtr mDefaultRasterizerState;
         ID3D11BlendStatePtr mBlendState;
         std::unique_ptr<DX11Sampler, std::function<void(DX11Sampler*)>> mModelSampler;

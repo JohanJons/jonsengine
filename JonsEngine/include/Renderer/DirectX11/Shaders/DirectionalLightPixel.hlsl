@@ -21,7 +21,7 @@ Texture2D gPositionTexture : register(TEXTURE_REGISTER_POSITION);
 Texture2D gDiffuseTexture : register(TEXTURE_REGISTER_DIFFUSE);
 Texture2D gNormalTexture : register(TEXTURE_REGISTER_NORMAL);
 Texture2DArray gShadowmap : register(TEXTURE_REGISTER_DEPTH);
-SamplerComparisonState gShadowmapSampler : register(SAMPLER_REGISTER_DEPTH);
+SamplerComparisonState gShadowmapSampler : register(SAMPLER_REGISTER_POINT_COMPARE);
 
 
 float4 ps_main(float4 position : SV_Position) : SV_Target0

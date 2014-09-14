@@ -94,9 +94,9 @@ namespace JonsGame
             else if (evnt.mKey == Key::J)
                 mEngine->GetRenderer().SetAnisotropicFiltering(EngineSettings::ANISOTROPIC_16X);
             else if (evnt.mKey == Key::K)
-                mEngine->GetRenderer().SetMSAA(EngineSettings::MSAA_1X);
+                mEngine->GetRenderer().SetAntiAliasing(EngineSettings::ANTIALIASING_NONE);
             else if (evnt.mKey == Key::L)
-                mEngine->GetRenderer().SetMSAA(EngineSettings::MSAA_4X);
+                mEngine->GetRenderer().SetAntiAliasing(EngineSettings::ANTIALIASING_FXAA);
 
             // misc
             else if (evnt.mKey == Key::N)
