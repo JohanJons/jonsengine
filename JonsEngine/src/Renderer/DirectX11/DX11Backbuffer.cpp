@@ -8,12 +8,11 @@ namespace JonsEngine
 
 
     DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DepthStencilViewPtr depthBuffer, uint32_t textureWidth, uint32_t textureHeight) : 
-        mBackbuffer(nullptr), mDepthbuffer(depthBuffer), mDepthStencilState(nullptr)
+        mBackbufferTexture(nullptr), mBackbufferRTV(nullptr), mDepthbuffer(depthBuffer), mDepthStencilState(nullptr)
     {
         // backbuffer rendertarget setup
-        ID3D11Texture2DPtr backbuffer = nullptr;
-        DXCALL(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbuffer));
-        DXCALL(device->CreateRenderTargetView(backbuffer, NULL, &mBackbuffer));
+        DXCALL(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&mBackbufferTexture));
+        DXCALL(device->CreateRenderTargetView(mBackbufferTexture, NULL, &mBackbufferRTV));
 
         // depth stencil config used in shading stage
         D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
@@ -32,15 +31,19 @@ namespace JonsEngine
 
     void DX11Backbuffer::ClearBackbuffer(ID3D11DeviceContextPtr context)
     {
-        context->ClearRenderTargetView(mBackbuffer, gClearColor);
+        context->ClearRenderTargetView(mBackbufferRTV, gClearColor);
     }
 
     void DX11Backbuffer::BindForShadingStage(ID3D11DeviceContextPtr context)
     {
         // set backbuffer as rendertarget and bind gbuffer textures as texture inputs
-        context->OMSetRenderTargets(1, &mBackbuffer.p, mDepthbuffer);
+        context->OMSetRenderTargets(1, &mBackbufferRTV.p, mDepthbuffer);
 
         // disable further depth testing/writing
         context->OMSetDepthStencilState(mDepthStencilState, 0);
+    }
+
+    void DX11Backbuffer::CopyBackbufferTexture(ID3D11Texture2DPtr dest)
+    {
     }
 }
