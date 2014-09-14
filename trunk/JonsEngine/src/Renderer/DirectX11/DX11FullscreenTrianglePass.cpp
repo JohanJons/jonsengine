@@ -14,16 +14,13 @@ namespace JonsEngine
     }
 
 
-    void DX11FullscreenTrianglePass::BindForFullscreenPass(ID3D11DeviceContextPtr context)
+    void DX11FullscreenTrianglePass::Render(ID3D11DeviceContextPtr context)
     {
         context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
         context->IASetInputLayout(NULL);
 
         context->VSSetShader(mVertexShader, NULL, NULL);
-    }
 
-    void DX11FullscreenTrianglePass::RenderFullscreenTriangle(ID3D11DeviceContextPtr context)
-    {
         context->Draw(3, 0);
     }
 }

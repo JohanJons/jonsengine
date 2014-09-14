@@ -31,8 +31,8 @@ namespace JonsEngine
         EngineSettings::Anisotropic GetAnisotropicFiltering() const;
         void SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic);
 
-        EngineSettings::MSAA GetMSAA() const;
-        void SetMSAA(const EngineSettings::MSAA msaa);
+        EngineSettings::AntiAliasing GetAntiAliasing() const;
+        void SetAntiAliasing(const EngineSettings::AntiAliasing aa);
 
         float GetZNear() const;
         float GetZFar() const;

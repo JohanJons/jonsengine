@@ -14,9 +14,9 @@ namespace JonsEngine
     public:
         enum SHADER_SAMPLER_SLOT
         {
-            SHADER_SAMPLER_SLOT_MODEL = SAMPLER_SLOT_MODEL,
-            SHADER_SAMPLER_SLOT_DEPTH = SAMPLER_SLOT_DEPTH,
-            SHADER_SAMPLER_SLOT_DEPTH_NO_CMP = SAMPLER_SLOT_DEPTH_NO_COMPARE
+            SHADER_SAMPLER_SLOT_ANISOTROPIC = SAMPLER_SLOT_ANISOTROPIC,
+            SHADER_SAMPLER_SLOT_POINT = SAMPLER_SLOT_POINT,
+            SHADER_SAMPLER_SLOT_POINT_COMPARE = SAMPLER_SLOT_POINT_COMPARE
         };
     
         DX11Sampler(ID3D11DevicePtr device, const EngineSettings::Anisotropic maxAnisotropy, const D3D11_FILTER filter, const D3D11_COMPARISON_FUNC comparison, const SHADER_SAMPLER_SLOT samplerSlot);

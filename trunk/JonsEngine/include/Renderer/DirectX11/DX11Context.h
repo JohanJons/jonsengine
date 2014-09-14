@@ -13,6 +13,8 @@ namespace JonsEngine
         DX11Context(const HWND windowHandle);
         ~DX11Context();
 
+        D3D11_TEXTURE2D_DESC GetBackbufferTextureDesc() const;
+
 
     protected:
         const HWND mWindowHandle;

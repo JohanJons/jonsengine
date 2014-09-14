@@ -204,13 +204,11 @@ namespace JonsEngine
         // bind shadowmap SRV for reading
         mShadowmap.BindForReading(context);
 
-        mFullscreenPass.BindForFullscreenPass(context);
-
         // set dir light cbuffer data and pixel shader
         mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, cameraViewMatrix, farDistArr, lightColor, lightDir, static_cast<float>(mShadowmap.GetTextureSize())), context);
         context->PSSetShader(mPixelShader, NULL, NULL);
 
         // run fullscreen pass + dir light shading pass
-        mFullscreenPass.RenderFullscreenTriangle(context);
+        mFullscreenPass.Render(context);
     }
 }

@@ -43,14 +43,14 @@ namespace JonsEngine
     }
 
 
-    EngineSettings::MSAA DX11Renderer::GetMSAA() const
+    EngineSettings::AntiAliasing DX11Renderer::GetAntiAliasing() const
     {
-        return mImplementation->GetMSAA();
+        return mImplementation->GetAntiAliasing();
     }
 
-    void DX11Renderer::SetMSAA(const EngineSettings::MSAA msaa)
+    void DX11Renderer::SetAntiAliasing(const EngineSettings::AntiAliasing aa)
     {
-        mImplementation->SetMSAA(msaa);
+        mImplementation->SetAntiAliasing(aa);
     }
 
 
