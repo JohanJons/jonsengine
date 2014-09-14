@@ -22,6 +22,8 @@ namespace JonsEngine
 
     void DX11PostProcessor::FXAAPass(ID3D11DeviceContextPtr context, DX11Backbuffer& backbuffer)
     {
+
+
         context->PSSetShader(mFXAAPixelShader, NULL, NULL);
 
         mFullscreenPass.Render(context);

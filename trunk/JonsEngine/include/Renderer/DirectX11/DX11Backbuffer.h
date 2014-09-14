@@ -15,10 +15,12 @@ namespace JonsEngine
 
         void ClearBackbuffer(ID3D11DeviceContextPtr context);
         void BindForShadingStage(ID3D11DeviceContextPtr context);
+        void CopyBackbufferTexture(ID3D11Texture2DPtr dest);
 
 
     private:
-        ID3D11RenderTargetViewPtr mBackbuffer;
+        ID3D11Texture2DPtr mBackbufferTexture;
+        ID3D11RenderTargetViewPtr mBackbufferRTV;
         ID3D11DepthStencilViewPtr mDepthbuffer;
         ID3D11DepthStencilStatePtr mDepthStencilState;
     };
