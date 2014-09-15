@@ -15,7 +15,7 @@ namespace JonsEngine
 
         void ClearBackbuffer(ID3D11DeviceContextPtr context);
         void BindForShadingStage(ID3D11DeviceContextPtr context);
-        void CopyBackbufferTexture(ID3D11Texture2DPtr dest);
+        void CopyBackbufferTexture(ID3D11DeviceContextPtr context, ID3D11Texture2DPtr dest);
 
 
     private:

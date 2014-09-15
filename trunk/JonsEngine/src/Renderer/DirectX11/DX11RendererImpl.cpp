@@ -175,7 +175,7 @@ namespace JonsEngine
         blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
         blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-        DXCALL(mDevice->CreateBlendState(&blendDesc, &mBlendState));
+        DXCALL(mDevice->CreateBlendState(&blendDesc, &mAdditiveBlending));
 
         SetupContext(mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height);
 
@@ -330,13 +330,13 @@ namespace JonsEngine
         // ambient light
         mAmbientPass.Render(mContext, lighting.mAmbientLight);
 
-        // additive blending for further shading
-        mContext->OMSetBlendState(mBlendState, NULL, 0xffffffff);
+        // additive blending for adding lighting
+        mContext->OMSetBlendState(mAdditiveBlending, NULL, 0xffffffff);
 
         // do all directional lights
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
             // TODO: use real fov and screen size
-            mDirectionalLightPass.Render(mContext, renderQueue, mMeshes, 70.0f, 1920.0f / 1080.0f, lighting.mCameraViewMatrix, directionalLight.mLightColor, directionalLight.mLightDirection, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
+            mDirectionalLightPass.Render(mContext, renderQueue, mMeshes, 70.0f, mSwapchainDesc.BufferDesc.Width / static_cast<float>(mSwapchainDesc.BufferDesc.Height), lighting.mCameraViewMatrix, directionalLight.mLightColor, directionalLight.mLightDirection, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
 
         // do all point lights
         mPointLightPass.BindForShading(mContext);
@@ -346,9 +346,10 @@ namespace JonsEngine
             mPointLightPass.Render(mContext, renderQueue, mMeshes, pointLight);
         }
 
-        if (mAntiAliasing == EngineSettings::ANTIALIASING_FXAA)
-            mPostProcessor.FXAAPass(mContext, mBackbuffer);
-
+        // turn off blending for post processing
         mContext->OMSetBlendState(NULL, NULL, 0xffffffff);
+
+        if (mAntiAliasing == EngineSettings::ANTIALIASING_FXAA)
+            mPostProcessor.FXAAPass(mContext, mBackbuffer, Vec2(mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height));
     }
 }
