@@ -43,7 +43,8 @@ namespace JonsEngine
         context->OMSetDepthStencilState(mDepthStencilState, 0);
     }
 
-    void DX11Backbuffer::CopyBackbufferTexture(ID3D11Texture2DPtr dest)
+    void DX11Backbuffer::CopyBackbufferTexture(ID3D11DeviceContextPtr context, ID3D11Texture2DPtr dest)
     {
+        context->CopyResource(dest, mBackbufferTexture);
     }
 }
