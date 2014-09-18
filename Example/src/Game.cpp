@@ -152,7 +152,7 @@ namespace JonsGame
         nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
         nodeAlien->TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
 
-         // cube
+        // cube
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
         ModelPtr modelCube    = myScene->GetResourceManifest().LoadModel("cube", jonsPackage);
         modelCube->mSceneNode = nodeCube;
@@ -164,6 +164,12 @@ namespace JonsGame
         modelChair->mSceneNode = nodeChair;
         nodeChair->TranslateNode(Vec3(-8.0f, 0.5f, -4.0f));
         nodeChair->ScaleNode(Vec3(2.0f));
+
+        // house
+        SceneNodePtr nodeHouse = myScene->GetRootNode().CreateChildNode("nodeHouse");
+        ModelPtr modelHouse = myScene->GetResourceManifest().LoadModel("house", jonsPackage);
+        modelHouse->mSceneNode = nodeHouse;
+        nodeHouse->TranslateNode(Vec3(-7.0f, 0.5f, -15.0f));
         
         // point light
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
