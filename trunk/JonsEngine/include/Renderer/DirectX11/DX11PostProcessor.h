@@ -19,19 +19,19 @@ namespace JonsEngine
 
 
     private:
-        struct PostProcessorCBuffer
+        struct FXAACBuffer
         {
             Vec2 mScreenSize;
             float __padding[2];
 
 
-            PostProcessorCBuffer(const Vec2& screenSize) : mScreenSize(1.0f / screenSize.x, 1.0f / screenSize.y)
+            FXAACBuffer(const Vec2& screenSize) : mScreenSize(1.0f / screenSize.x, 1.0f / screenSize.y)
             {
             }
         };
 
         DX11FullscreenTrianglePass& mFullscreenPass;
-        DX11ConstantBuffer<PostProcessorCBuffer> mCBuffer;
+        DX11ConstantBuffer<FXAACBuffer> mFXAACBuffer;
         ID3D11Texture2DPtr mTexture;
         ID3D11ShaderResourceViewPtr mSRV;
         ID3D11RenderTargetViewPtr mRTV;
