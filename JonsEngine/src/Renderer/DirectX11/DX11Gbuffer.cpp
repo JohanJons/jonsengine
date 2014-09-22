@@ -2,6 +2,7 @@
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
+#include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/GBufferVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/GBufferPixel.h"
 
@@ -9,12 +10,9 @@ namespace JonsEngine
 {
     const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-    // used to reset gbuffer textures from input to rendertarget before geometry stage
-    ID3D11ShaderResourceViewPtr const gNullSrv = nullptr;
 
-
-    DX11GBuffer::DX11GBuffer(ID3D11DevicePtr device, uint32_t textureWidth, uint32_t textureHeight) : mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr),
-        mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device, mConstantBuffer.CONSTANT_BUFFER_SLOT_VERTEX)
+    DX11GBuffer::DX11GBuffer(ID3D11DevicePtr device, ID3D11DepthStencilViewPtr depthStencilView, uint32_t textureWidth, uint32_t textureHeight) :
+        mDepthStencilView(depthStencilView), mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device, mConstantBuffer.CONSTANT_BUFFER_SLOT_VERTEX)
     {
         // create gbuffer textures/rendertargets
         D3D11_TEXTURE2D_DESC textureDesc;
@@ -34,20 +32,6 @@ namespace JonsEngine
             DXCALL(device->CreateRenderTargetView(mTextures.at(index), NULL, &mRenderTargets.at(index)));
             DXCALL(device->CreateShaderResourceView(mTextures.at(index), NULL, &mShaderResourceViews.at(index)));
         }
-
-        // create depth buffer/view
-        D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
-        ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
-        depthStencilBufferDesc.ArraySize = 1;
-        depthStencilBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-        depthStencilBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        depthStencilBufferDesc.Width = textureWidth;
-        depthStencilBufferDesc.Height = textureHeight;
-        depthStencilBufferDesc.MipLevels = 1;
-        depthStencilBufferDesc.SampleDesc.Count = 1;
-        depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-        DXCALL(device->CreateTexture2D(&depthStencilBufferDesc, NULL, &mDepthStencilBuffer));
-        DXCALL(device->CreateDepthStencilView(mDepthStencilBuffer, NULL, &mDepthStencilView));
 
         // input layout
         D3D11_INPUT_ELEMENT_DESC inputDescription[DX11Mesh::NUM_VERTEX_BUFFER_SLOTS];
@@ -108,10 +92,12 @@ namespace JonsEngine
     {
         for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
         {
-            // unbind gbuffer texture as input, it is now rendertarget
+            // unbind gbuffer textures as input, it is now rendertarget
             context->PSSetShaderResources(index, 1, &gNullSrv.p);
             context->ClearRenderTargetView(mRenderTargets.at(index), gClearColor);
         }
+        // backbuffers depth texture might still be bound on input
+        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv.p);
         context->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
         // default == depth testing/writing on
@@ -125,20 +111,9 @@ namespace JonsEngine
         context->PSSetShader(mPixelShader, NULL, NULL);
     }
 
-    void DX11GBuffer::BindForShadingStage(ID3D11DeviceContextPtr context)
+    void DX11GBuffer::BindGeometryTextures(ID3D11DeviceContextPtr context)
     {
         for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
             context->PSSetShaderResources(index, 1, &mShaderResourceViews.at(index).p);
-    }
-
-    void DX11GBuffer::ClearStencilBuffer(ID3D11DeviceContextPtr context)
-    {
-        context->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_STENCIL, 1.0f, 0);
-    }
-
-
-    ID3D11DepthStencilViewPtr DX11GBuffer::GetDepthStencilView()
-    {
-        return mDepthStencilView;
     }
 }

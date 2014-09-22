@@ -46,4 +46,6 @@ namespace JonsEngine
     typedef CComPtr<ID3D11Texture2D> ID3D11Texture2DPtr;
     typedef CComPtr<ID3D11ShaderResourceView> ID3D11ShaderResourceViewPtr;
     typedef CComPtr<ID3D11InputLayout> ID3D11InputLayoutPtr;
+
+    static ID3D11ShaderResourceViewPtr gNullSrv = nullptr;
 }

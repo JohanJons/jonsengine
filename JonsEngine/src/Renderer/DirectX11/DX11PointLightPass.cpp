@@ -140,7 +140,7 @@ namespace JonsEngine
         //
 
         // restore rendering to the backbuffer
-        mBackbuffer.BindForShadingStage(context);
+        mBackbuffer.BindForShadingStage(context, false);
 
         context->OMSetDepthStencilState(mDSSStencilPass, 0);
         context->RSSetState(mRSNoCulling);

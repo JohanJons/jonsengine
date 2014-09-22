@@ -1,6 +1,7 @@
 #ifndef GBUFFER_PIXEL_HLSL
 #define GBUFFER_PIXEL_HLSL
 
+#include "Common.hlsl"
 #include "GBufferVertex.hlsl"
 
 struct GBufferPSOut
@@ -14,15 +15,6 @@ Texture2D gDiffuseTexture : register(TEXTURE_REGISTER_DIFFUSE);
 Texture2D gNormalTexture : register(TEXTURE_REGISTER_NORMAL);
 SamplerState gSampler : register(SAMPLER_REGISTER_ANISOTROPIC);
 
-
-// needed due to float4x4 constructor is row-major
-float4x4 CreateMatrixFromCols(float4 c0, float4 c1, float4 c2, float4 c3)
-{
-    return float4x4(c0.x, c1.x, c2.x, c3.x,
-                    c0.y, c1.y, c2.y, c3.y,
-                    c0.z, c1.z, c2.z, c3.z,
-                    c0.w, c1.w, c2.w, c3.w);
-}
 
 GBufferPSOut ps_main(GBufferVSOut input)
 {

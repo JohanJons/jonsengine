@@ -197,7 +197,7 @@ namespace JonsEngine
         //
         
         // restore rendering to backbuffer, rasterize state and viewport
-        mBackbuffer.BindForShadingStage(context);
+        mBackbuffer.BindForShadingStage(context, false);
         context->RSSetViewports(numViewports, &prevViewport);
         context->RSSetState(prevRS);
         

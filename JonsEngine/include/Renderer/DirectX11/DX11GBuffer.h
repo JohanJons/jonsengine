@@ -21,15 +21,12 @@ namespace JonsEngine
         };
 
 
-        DX11GBuffer(ID3D11DevicePtr device, uint32_t textureWidth, uint32_t textureHeight);
+        DX11GBuffer(ID3D11DevicePtr device, ID3D11DepthStencilViewPtr depthStencilView, uint32_t textureWidth, uint32_t textureHeight);
         ~DX11GBuffer();
 
         void SetConstantData(ID3D11DeviceContextPtr context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture);
         void BindForGeometryStage(ID3D11DeviceContextPtr context);
-        void BindForShadingStage(ID3D11DeviceContextPtr context);
-        void ClearStencilBuffer(ID3D11DeviceContextPtr context);
-
-        ID3D11DepthStencilViewPtr GetDepthStencilView();
+        void BindGeometryTextures(ID3D11DeviceContextPtr context);
 
 
     private:
@@ -52,7 +49,6 @@ namespace JonsEngine
         std::array<ID3D11Texture2DPtr, DX11GBuffer::GBUFFER_NUM_RENDERTARGETS> mTextures;
         std::array<ID3D11RenderTargetViewPtr, DX11GBuffer::GBUFFER_NUM_RENDERTARGETS> mRenderTargets;
         std::array<ID3D11ShaderResourceViewPtr, DX11GBuffer::GBUFFER_NUM_RENDERTARGETS> mShaderResourceViews;
-        ID3D11Texture2DPtr mDepthStencilBuffer;
         ID3D11DepthStencilViewPtr mDepthStencilView;
         ID3D11InputLayoutPtr mInputLayout;
         ID3D11VertexShaderPtr mVertexShader;

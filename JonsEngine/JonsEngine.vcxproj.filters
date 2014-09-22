@@ -378,5 +378,8 @@
     <FxCompile Include="include\Renderer\DirectX11\Shaders\SSAOPixel.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\Common.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

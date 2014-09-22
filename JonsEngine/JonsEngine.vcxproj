@@ -215,6 +215,9 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ps_main</EntryPointName>
     </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\Common.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\DirectionalLightPixel.hlsl">
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gDirectionalLightPixelShader</VariableName>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/include/Renderer/DirectX11/Shaders/Compiled/%(Filename).h</HeaderFileOutput>
@@ -263,7 +266,11 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ps_main</EntryPointName>
     </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\SSAOPixel.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ps_main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gSSAOPixelShader</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/include/Renderer/DirectX11/Shaders/Compiled/%(Filename).h</HeaderFileOutput>
     </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\TransformVertex.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">vs_main</EntryPointName>
