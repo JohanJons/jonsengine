@@ -140,11 +140,11 @@ namespace JonsEngine
         mLogger(logger), mMemoryAllocator(memoryAllocator),
         mShadowQuality(settings.mShadowQuality),
         mAntiAliasing(settings.mAntiAliasing),
-        mGBuffer(mDevice, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height), 
-        mBackbuffer(mDevice, mSwapchain, mGBuffer.GetDepthStencilView(), mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
+        mBackbuffer(mDevice, mSwapchain, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
+        mGBuffer(mDevice, mBackbuffer.GetDepthStencilView(), mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
         mVertexTransformPass(mDevice), 
         mFullscreenTrianglePass(mDevice), 
-        mAmbientPass(mDevice),
+        mAmbientPass(mDevice, mFullscreenTrianglePass),
         mDirectionalLightPass(mDevice, mBackbuffer, mFullscreenTrianglePass, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
         mPointLightPass(mDevice, mBackbuffer, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
         mPostProcessor(mDevice, mFullscreenTrianglePass, GetBackbufferTextureDesc()),
@@ -324,8 +324,8 @@ namespace JonsEngine
     void DX11RendererImpl::ShadingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugExtra)
     {
         mBackbuffer.ClearBackbuffer(mContext);
-        mBackbuffer.BindForShadingStage(mContext);
-        mGBuffer.BindForShadingStage(mContext);
+        mBackbuffer.BindForShadingStage(mContext, false);
+        mGBuffer.BindGeometryTextures(mContext);
 
         // ambient light
         mAmbientPass.Render(mContext, lighting.mAmbientLight);
@@ -342,7 +342,7 @@ namespace JonsEngine
         mPointLightPass.BindForShading(mContext);
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
-            mGBuffer.ClearStencilBuffer(mContext);
+            mBackbuffer.ClearStencilBuffer(mContext);
             mPointLightPass.Render(mContext, renderQueue, mMeshes, pointLight);
         }
 
@@ -351,5 +351,8 @@ namespace JonsEngine
 
         if (mAntiAliasing == EngineSettings::ANTIALIASING_FXAA)
             mPostProcessor.FXAAPass(mContext, mBackbuffer, Vec2(mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height));
+
+        mBackbuffer.BindForShadingStage(mContext, true);
+        mPostProcessor.SSAOPass(mContext, lighting.mCameraProjectionMatrix * lighting.mCameraViewMatrix, lighting.mCameraProjectionMatrix, lighting.mCameraViewMatrix, Vec2(mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height));
     }
 }

@@ -5,10 +5,6 @@
 
 namespace JonsEngine
 {
-    // used to reset shadowmap from input to rendertarget
-    ID3D11ShaderResourceViewPtr const gNullSrv = nullptr;
-
-
     DX11Shadowmap::DX11Shadowmap(ID3D11DevicePtr device, const uint32_t shadowmapSize, const uint32_t numTextures, const bool isCubeTexture) : mShadowmapTexture(nullptr), mInputLayout(nullptr), mShadowmapSRV(nullptr)
     {
         mShadowmapViews.resize(numTextures);

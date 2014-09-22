@@ -63,8 +63,8 @@ namespace JonsEngine
         EngineSettings::ShadowQuality mShadowQuality;
         EngineSettings::AntiAliasing mAntiAliasing;
 
-        DX11GBuffer mGBuffer;
         DX11Backbuffer mBackbuffer;
+        DX11GBuffer mGBuffer;
         DX11VertexTransformPass mVertexTransformPass;
         DX11FullscreenTrianglePass mFullscreenTrianglePass;
         DX11AmbientPass mAmbientPass;

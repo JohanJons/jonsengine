@@ -8,10 +8,12 @@
 
 namespace JonsEngine
 {
+    class DX11FullscreenTrianglePass;
+
     class DX11AmbientPass
     {
     public:
-        DX11AmbientPass(ID3D11DevicePtr device);
+        DX11AmbientPass(ID3D11DevicePtr device, DX11FullscreenTrianglePass& fullscreenPass);
         ~DX11AmbientPass();
 
         void Render(ID3D11DeviceContextPtr context, const Vec4& ambientLight);
@@ -28,7 +30,7 @@ namespace JonsEngine
             }
         };
 
-        ID3D11VertexShaderPtr mVertexShader;
+        DX11FullscreenTrianglePass& mFullscreenPass;
         ID3D11PixelShaderPtr mPixelShader;
         DX11ConstantBuffer<AmbientCBuffer> mConstantBuffer;
     };
