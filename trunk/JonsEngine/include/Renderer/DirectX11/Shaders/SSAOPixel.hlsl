@@ -42,32 +42,10 @@ Texture2D gNoiseTexture : register(TEXTURE_REGISTER_DIFFUSE);
 Texture2D gDepthTexture : register(TEXTURE_REGISTER_DEPTH);
 SamplerState gPointSampler : register(SAMPLER_REGISTER_POINT);
 
-float linearizeDepth(in float depth, in float4x4 projMatrix) {
-    return projMatrix[3][2] / (depth - projMatrix[2][2]);
-}
 
-float4 ssao(in float3x3 kernelBasis, in float3 originPos)
+float3 reconstructNormal(float3 positionWorldSpace)
 {
-    float occlusion = 0.0;
-    for (int i = 0; i < gKernelSize; i++)
-    {
-        float3 samplePos = mul(kernelBasis, gSSAOKernel[i]);
-        samplePos *= gRadius * originPos;
-
-        float4 offset = mul(gViewProjMatrix, float4(samplePos, 1.0));
-        offset.xy /= offset.w;
-        offset.xy = offset.xy * 0.5 + 0.5;
-
-        float depth = gDepthTexture.Sample(gPointSampler, offset.xy).r;
-        depth = linearizeDepth(depth, gProjMatrix);
-
-        //float rangeCheck = abs(originPos.z - depth) < gRadius ? 1.0 : 0.0;
-        occlusion += (depth <= samplePos.z ? 1.0 : 0.0);// *rangeCheck;
-
-    }
-    occlusion = 1.0 - (occlusion / float(gKernelSize));
-
-    return pow(occlusion, gSSAOPower);
+    return normalize(cross(ddx(positionWorldSpace), ddy(positionWorldSpace)));
 }
 
 float4 ps_main(float4 position : SV_Position) : SV_Target0
@@ -89,7 +67,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
     return float4(rvec, 1.0);*/
    // return ssao(kernelBasis, originPos);// gFinalTexture.Sample(gPointSampler, coords);//float4(1.0, 0.0, 1.0, 1.0);
     float3 originPos = gPositionTexture[uint2(position.xy)].xyz;
-    float3 normal = gNormalTexture[uint2(position.xy)].xyz;
+    float3 normal = reconstructNormal(originPos);//gNormalTexture[uint2(position.xy)].xyz;
 
     //originPos = mul(gViewMatrix, float4(originPos, 1.0)).xyz;
     //normal = mul(gViewMatrix, float4(normal, 0.0)).xyz;
