@@ -72,21 +72,49 @@ float4 ssao(in float3x3 kernelBasis, in float3 originPos)
 
 float4 ps_main(float4 position : SV_Position) : SV_Target0
 {
-    float2 coords = float2(1920.0, 1080.0) / float2(4.0, 4.0);
+   /* float2 coords = float2(gScreenSize.x, gScreenSize.y) / float2(4.0, 4.0);
     coords *= float2(position.x / gScreenSize.x, position.y / gScreenSize.y);
 
     float3 originPos = gPositionTexture[uint2(position.xy)].xyz;
     float3 normal = gNormalTexture[uint2(position.xy)].xyz;
 
-    //originPos = mul(gViewMatrix, float4(originPos, 1.0)).xyz;
-    //normal = mul(gViewMatrix, float4(normal, 0.0)).xyz;
+    originPos = mul(gViewMatrix, float4(originPos, 1.0)).xyz;
+    normal = mul(gViewMatrix, float4(normal, 0.0)).xyz;
 
     float3 rvec = gNoiseTexture.Sample(gPointSampler, coords).xyz; //texture(uNoiseTex, noiseTexCoords).rgb * 2.0 - 1.0;
     float3 tangent = normalize(rvec - normal * dot(rvec, normal));
     float3 bitangent = cross(tangent, normal);
     float3x3 kernelBasis = CreateMatrixFromCols(tangent, bitangent, normal);
 
-    return ssao(kernelBasis, originPos);// gFinalTexture.Sample(gPointSampler, coords);//float4(1.0, 0.0, 1.0, 1.0);
+    return float4(rvec, 1.0);*/
+   // return ssao(kernelBasis, originPos);// gFinalTexture.Sample(gPointSampler, coords);//float4(1.0, 0.0, 1.0, 1.0);
+    float3 originPos = gPositionTexture[uint2(position.xy)].xyz;
+    float3 normal = gNormalTexture[uint2(position.xy)].xyz;
+
+    //originPos = mul(gViewMatrix, float4(originPos, 1.0)).xyz;
+    //normal = mul(gViewMatrix, float4(normal, 0.0)).xyz;
+
+    float ambientOcclusion = 0.0;
+    const float2 filterRadius = float2(0.0052, 0.0093);
+    for (int i = 0; i < gKernelSize; i++)
+    {
+        float2 sampleTexCoords = position.xy / gScreenSize;
+        sampleTexCoords += gSSAOKernel[i].xy * filterRadius;
+
+        float3 samplePos = gPositionTexture.Sample(gPointSampler, sampleTexCoords).xyz;
+        //samplePos = mul(gViewMatrix, float4(samplePos, 1.0)).xyz;
+        float3 sampleDir = normalize(samplePos - originPos);
+
+        float NdotS = max(dot(normal, sampleDir), 0);
+        float VPdistSP = distance(originPos, samplePos);
+
+        float interp = 1.0 - smoothstep(5.0, 10.0, VPdistSP);
+
+        ambientOcclusion += (interp * NdotS);
+    }
+
+    return 1.0 - (ambientOcclusion / gKernelSize);
+    //return 1.0;
 }
 
 #endif
