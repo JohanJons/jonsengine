@@ -4,28 +4,13 @@
 #include "Constants.h"
 #include "Common.hlsl"
 
-static const float gKernelSize = 16.0;
-static const float gRadius = 1.5;
-static const float gSSAOPower = 2.0;
-static const float3 gSSAOKernel[gKernelSize] =
-{
-    float3(-0.0780436, 0.0558389, 0.0281286),
-    float3(0.034318, -0.0635879, 0.0741237),
-    float3(0.00230821, 0.0807279, 0.0805477),
-    float3(0.0124638, 0.117585, 0.0578601),
-    float3(0.093943, -0.0944602, 0.0816459),
-    float3(0.139348, -0.109816, 0.0618508),
-    float3(-0.181872, -0.129649, 0.0380075),
-    float3(0.240066, -0.0494057, 0.118559),
-    float3(0.115965, -0.0374714, 0.301286),
-    float3(-0.294819, -0.100726, 0.225789),
-    float3(-0.149652, 0.37459, 0.202967),
-    float3(0.261695, -0.292813, 0.349015),
-    float3(-0.37944, -0.425145, 0.206921),
-    float3(0.628994, -0.189387, 0.224343),
-    float3(-0.331257, -0.646864, 0.307335),
-    float3(-0.467004, 0.439687, 0.618459),
-};
+static const float gNumSamples = 11.0;
+static const float gRadius = 1.0;
+static const float gRadius2 = gRadius * gRadius;
+static const float gProjScale = 500.0;
+static const float gNumSpiralTurns = 7;
+static const float gBias = 0.0012;
+static const float gIntensity = 1.0;
 
 
 cbuffer SSAOCBuffer : register(CBUFFER_REGISTER_PIXEL)
@@ -38,8 +23,6 @@ cbuffer SSAOCBuffer : register(CBUFFER_REGISTER_PIXEL)
 
 Texture2D gPositionTexture : register(TEXTURE_REGISTER_POSITION);
 Texture2D gNormalTexture : register(TEXTURE_REGISTER_NORMAL);
-Texture2D gNoiseTexture : register(TEXTURE_REGISTER_DIFFUSE);
-Texture2D gDepthTexture : register(TEXTURE_REGISTER_DEPTH);
 SamplerState gPointSampler : register(SAMPLER_REGISTER_POINT);
 
 
@@ -48,51 +31,90 @@ float3 reconstructNormal(float3 positionWorldSpace)
     return normalize(cross(ddx(positionWorldSpace), ddy(positionWorldSpace)));
 }
 
+/** Read the camera - space position of the point at screen - space pixel ssP + unitOffset * ssR.Assumes length(unitOffset) == 1 */
+float3 getOffsetPosition(int2 ssC, float2 unitOffset, float ssR) {
+    // Derivation:
+    //  mipLevel = floor(log(ssR / MAX_OFFSET));
+
+    // TODO: mip levels
+    int mipLevel = 0; //TODO: clamp((int)floor(log2(ssR)) - LOG_MAX_OFFSET, 0, MAX_MIP_LEVEL);
+
+    int2 ssP = int2(ssR*unitOffset) + ssC;
+
+    float3 P = gPositionTexture[ssP].xyz;
+
+    // Divide coordinate by 2^mipLevel
+    //P = gPositionTexture.Load(int3(ssP >> mipLevel, mipLevel)).xyz;
+    P = mul(gViewMatrix, float4(P, 1.0)).xyz;
+
+    return P;
+}
+
+float2 tapLocation(int sampleNumber, float spinAngle, out float ssR)
+{
+    // Radius relative to ssR
+    float alpha = float(sampleNumber + 0.5) * (1.0 / gNumSamples);
+    float angle = alpha * (gNumSpiralTurns * 6.28) + spinAngle;
+
+    ssR = alpha;
+    return float2(cos(angle), sin(angle));
+}
+
+float sampleAO(uint2 screenSpacePos, float3 originPos, float3 normal, float ssDiskRadius, int tapIndex, float randomPatternRotationAngle)
+{
+    float ssR;
+    float2 unitOffset = tapLocation(tapIndex, randomPatternRotationAngle, ssR);
+    ssR *= ssDiskRadius;
+
+    // The occluding point in camera space
+    float3 Q = getOffsetPosition(screenSpacePos, unitOffset, ssR);
+
+    float3 v = Q - originPos;
+
+    float vv = dot(v, v);
+    float vn = dot(v, normal);
+
+    const float epsilon = 0.01;
+    float f = max(gRadius2 - vv, 0.0); 
+    
+    return f * f * f * max((vn - gBias) / (epsilon + vv), 0.0);
+}
+
 float4 ps_main(float4 position : SV_Position) : SV_Target0
 {
-   /* float2 coords = float2(gScreenSize.x, gScreenSize.y) / float2(4.0, 4.0);
-    coords *= float2(position.x / gScreenSize.x, position.y / gScreenSize.y);
+    uint2 screenSpacePos = (uint2)position.xy;
 
-    float3 originPos = gPositionTexture[uint2(position.xy)].xyz;
-    float3 normal = gNormalTexture[uint2(position.xy)].xyz;
-
+    float3 originPos = gPositionTexture[screenSpacePos].xyz;
     originPos = mul(gViewMatrix, float4(originPos, 1.0)).xyz;
+    float3 normal = gNormalTexture[screenSpacePos].xyz;//reconstructNormal(originPos);
     normal = mul(gViewMatrix, float4(normal, 0.0)).xyz;
 
-    float3 rvec = gNoiseTexture.Sample(gPointSampler, coords).xyz; //texture(uNoiseTex, noiseTexCoords).rgb * 2.0 - 1.0;
-    float3 tangent = normalize(rvec - normal * dot(rvec, normal));
-    float3 bitangent = cross(tangent, normal);
-    float3x3 kernelBasis = CreateMatrixFromCols(tangent, bitangent, normal);
+    // Hash function used in the HPG12 AlchemyAO paper
+    float randomPatternRotationAngle = (3 * screenSpacePos.x ^ screenSpacePos.y + screenSpacePos.x * screenSpacePos.y) * 10;
+    float ssDiskRadius = -gProjScale * gRadius / originPos.z;
 
-    return float4(rvec, 1.0);*/
-   // return ssao(kernelBasis, originPos);// gFinalTexture.Sample(gPointSampler, coords);//float4(1.0, 0.0, 1.0, 1.0);
-    float3 originPos = gPositionTexture[uint2(position.xy)].xyz;
-    float3 normal = reconstructNormal(originPos);//gNormalTexture[uint2(position.xy)].xyz;
-
-    //originPos = mul(gViewMatrix, float4(originPos, 1.0)).xyz;
-    //normal = mul(gViewMatrix, float4(normal, 0.0)).xyz;
-
-    float ambientOcclusion = 0.0;
-    const float2 filterRadius = float2(0.0052, 0.0093);
-    for (int i = 0; i < gKernelSize; i++)
+    float ao = 0.0;
+    for (int i = 0; i < gNumSamples; i++)
     {
-        float2 sampleTexCoords = position.xy / gScreenSize;
-        sampleTexCoords += gSSAOKernel[i].xy * filterRadius;
-
-        float3 samplePos = gPositionTexture.Sample(gPointSampler, sampleTexCoords).xyz;
-        //samplePos = mul(gViewMatrix, float4(samplePos, 1.0)).xyz;
-        float3 sampleDir = normalize(samplePos - originPos);
-
-        float NdotS = max(dot(normal, sampleDir), 0);
-        float VPdistSP = distance(originPos, samplePos);
-
-        float interp = 1.0 - smoothstep(5.0, 10.0, VPdistSP);
-
-        ambientOcclusion += (interp * NdotS);
+        ao += sampleAO(screenSpacePos, originPos, normal, ssDiskRadius, i, randomPatternRotationAngle);
     }
 
-    return 1.0 - (ambientOcclusion / gKernelSize);
-    //return 1.0;
+    //float temp = gRadius2 * gRadius;
+   // ao /= temp * temp;
+
+    float A = max(0.0, 1.0 - ao * gIntensity * (5.0 / gNumSamples));
+
+    // Bilateral box-filter over a quad for free, respecting depth edges
+    // (the difference that this makes is subtle)
+    if (abs(ddx(originPos.z)) < 0.02) {
+        A -= ddx(A) * ((screenSpacePos.x & 1) - 0.5);
+    }
+    if (abs(ddy(originPos.z)) < 0.02) {
+        A -= ddy(A) * ((screenSpacePos.y & 1) - 0.5);
+    }
+
+
+    return A;
 }
 
 #endif

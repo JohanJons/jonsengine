@@ -11,10 +11,8 @@ namespace JonsEngine
     class IMemoryAllocator;
     class SceneNode;
 
-    /* SceneNodePtr definition */
     typedef std::shared_ptr<SceneNode> SceneNodePtr;
 
-    /* SceneNode definition */
     class SceneNode
     {
     public:

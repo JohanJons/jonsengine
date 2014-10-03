@@ -6,17 +6,11 @@
 #include "include/Renderer/DirectX11/Shaders/Compiled/FXAAPixel.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/SSAOPixel.h"
 
-#include <random>
-
 namespace JonsEngine
 {
-    Vec4 noiseTexture[16];
-    ID3D11Texture2DPtr gTexture = nullptr;
-    ID3D11ShaderResourceViewPtr mShaderResourceView = nullptr;
-
     DX11PostProcessor::DX11PostProcessor(ID3D11DevicePtr device, DX11FullscreenTrianglePass& fullscreenPass, D3D11_TEXTURE2D_DESC backbufferTextureDesc) :
-        mFullscreenPass(fullscreenPass), mFXAACBuffer(device, mFXAACBuffer.CONSTANT_BUFFER_SLOT_PIXEL), mSSAOCBuffer(device, mSSAOCBuffer.CONSTANT_BUFFER_SLOT_PIXEL), mTexture(nullptr),
-        mSRV(nullptr), mRTV(nullptr), mFXAAPixelShader(nullptr), mSSAOPixelShader(nullptr)
+        mFullscreenPass(fullscreenPass), mBoxBlurPass(device, fullscreenPass), mFXAACBuffer(device, mFXAACBuffer.CONSTANT_BUFFER_SLOT_PIXEL), mSSAOCBuffer(device, mSSAOCBuffer.CONSTANT_BUFFER_SLOT_PIXEL),
+        mTexture(nullptr), mSRV(nullptr), mRTV(nullptr), mFXAAPixelShader(nullptr), mSSAOPixelShader(nullptr)
     {
         backbufferTextureDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
@@ -26,30 +20,13 @@ namespace JonsEngine
         DXCALL(device->CreatePixelShader(gFXAAPixelShader, sizeof(gFXAAPixelShader), NULL, &mFXAAPixelShader));
         DXCALL(device->CreatePixelShader(gSSAOPixelShader, sizeof(gSSAOPixelShader), NULL, &mSSAOPixelShader));
 
-
-
-        D3D11_TEXTURE2D_DESC textureDesc;
-        ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
-        textureDesc.Width = 4;
-        textureDesc.Height = 4;
-        textureDesc.ArraySize = 1;
-        textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-        textureDesc.SampleDesc.Count = 1;
-        textureDesc.Usage = D3D11_USAGE_DEFAULT;
-        textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-        DXCALL(device->CreateTexture2D(&textureDesc, NULL, &gTexture));
-        DXCALL(device->CreateShaderResourceView(gTexture, NULL, &mShaderResourceView));
-
-
-
-        std::random_device rd;
-        std::mt19937 e2(rd());
-        std::uniform_real_distribution<> dist(-1.0f, 1.0f);
-        for (int i = 0; i < 16; i++)
-        {
-            noiseTexture[i] = Vec4(dist(e2), dist(e2), 0.0f, 0.0f);
-            glm::normalize(noiseTexture[i]);
-        }
+        backbufferTextureDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+        DXCALL(device->CreateTexture2D(&backbufferTextureDesc, NULL, &mSAOTexture1));
+        DXCALL(device->CreateTexture2D(&backbufferTextureDesc, NULL, &mSAOTexture2));
+        DXCALL(device->CreateShaderResourceView(mSAOTexture1, NULL, &mSAOSRV1));
+        DXCALL(device->CreateShaderResourceView(mSAOTexture2, NULL, &mSAOSRV2));
+        DXCALL(device->CreateRenderTargetView(mSAOTexture1, NULL, &mSAORTV1));
+        DXCALL(device->CreateRenderTargetView(mSAOTexture2, NULL, &mSAORTV2));
     }
 
     DX11PostProcessor::~DX11PostProcessor()
@@ -70,13 +47,24 @@ namespace JonsEngine
 
     void DX11PostProcessor::SSAOPass(ID3D11DeviceContextPtr context, const Mat4& camViewProjMatrix, const Mat4& projMatrix, const Mat4& viewMatrix, const Vec2& screenSize)
     {
-        uint32_t sizeWidth = 4 * sizeof(float) * 4;
-        context->UpdateSubresource(gTexture, 0, NULL, &noiseTexture[0], sizeWidth, 0);
+        ID3D11RenderTargetViewPtr prevRTV = nullptr;
+        ID3D11DepthStencilViewPtr prevDSV = nullptr;
+        context->OMGetRenderTargets(1, &prevRTV, &prevDSV);
 
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DIFFUSE, 1, &mShaderResourceView.p);     // noise texture
+        // pass 1: render AO to texture
+        context->OMSetRenderTargets(1, &mSAORTV1.p, NULL);
         context->PSSetShader(mSSAOPixelShader, NULL, NULL);
         mSSAOCBuffer.SetData(SSAOCBuffer(camViewProjMatrix, projMatrix, viewMatrix, screenSize), context);
 
         mFullscreenPass.Render(context);
+
+        // pass 2: horizontal + vertical blur
+        // restore rendering previous render target
+        context->OMSetRenderTargets(1, &mSAORTV2.p, NULL);
+        mBoxBlurPass.Render(context, mSAOSRV1, Vec2(1.0f / screenSize.x, 0.0f));
+
+        context->OMSetRenderTargets(1, &prevRTV.p, prevDSV);
+        mBoxBlurPass.Render(context, mSAOSRV2, Vec2(0.0f, 1.0f / screenSize.y));
+
     }
 }

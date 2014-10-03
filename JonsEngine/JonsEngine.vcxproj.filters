@@ -191,6 +191,9 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11PostProcessor.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11BoxBlurPass.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -346,6 +349,9 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11PostProcessor.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11BoxBlurPass.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferPixel.hlsl">
@@ -379,6 +385,9 @@
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\Common.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\BoxBlurPixel.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

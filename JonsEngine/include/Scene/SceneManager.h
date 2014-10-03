@@ -8,7 +8,6 @@ namespace JonsEngine
     class IMemoryAllocator;
     class Scene;
 
-    /* SceneManager definition */
     class SceneManager
     {
     public:

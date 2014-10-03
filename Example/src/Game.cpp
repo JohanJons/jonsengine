@@ -145,22 +145,30 @@ namespace JonsGame
         mEngine->GetSceneManager().SetActiveScene("MyScene");
         JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
 
+        // sponza 
+     /*   SceneNodePtr nodeSponza = myScene->GetRootNode().CreateChildNode("sponza");
+        ModelPtr modelSponza = myScene->GetResourceManifest().LoadModel("sponza", jonsPackage);
+        modelSponza->mSceneNode = nodeSponza;
+        nodeSponza->ScaleNode(Vec3(0.1f));
+        //nodeSponza->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
+        nodeSponza->TranslateNode(Vec3(0.0f, 0.5f, -54.0f));
+        */
         // sectoid 
         SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
-        ModelPtr modelAlien    = myScene->GetResourceManifest().LoadModel("sectoid", jonsPackage);
+        ModelPtr modelAlien = myScene->GetResourceManifest().LoadModel("sectoid", jonsPackage);
         modelAlien->mSceneNode = nodeAlien;
         nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
         nodeAlien->TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
 
         // cube
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
-        ModelPtr modelCube    = myScene->GetResourceManifest().LoadModel("cube", jonsPackage);
+        ModelPtr modelCube = myScene->GetResourceManifest().LoadModel("cube", jonsPackage);
         modelCube->mSceneNode = nodeCube;
         nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
         
         // chair
         SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("nodeChair");
-        ModelPtr modelChair    = myScene->GetResourceManifest().LoadModel("chair", jonsPackage);
+        ModelPtr modelChair = myScene->GetResourceManifest().LoadModel("chair", jonsPackage);
         modelChair->mSceneNode = nodeChair;
         nodeChair->TranslateNode(Vec3(-8.0f, 0.5f, -4.0f));
         nodeChair->ScaleNode(Vec3(2.0f));
@@ -173,10 +181,10 @@ namespace JonsGame
         
         // point light
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
-        PointLightPtr movingLight    = myScene->CreatePointLight("MovingPointLight", nodeMovingLight);
-        movingLight->mMaxDistance    = 10.0f;
+        PointLightPtr movingLight = myScene->CreatePointLight("MovingPointLight", nodeMovingLight);
+        movingLight->mMaxDistance = 10.0f;
         movingLight->mLightIntensity = 2.0f;
-        movingLight->mLightColor     = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
+        movingLight->mLightColor = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
         nodeMovingLight->TranslateNode(Vec3(5.0f, 3.5f, -15.0f));
 
         // directional light
@@ -201,7 +209,7 @@ namespace JonsGame
         sphere->mSceneNode = nodeSphere;
         nodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
         
-        // move up camera*/
+        // move up camera
         myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
     }
 
