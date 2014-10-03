@@ -166,8 +166,8 @@ namespace JonsAssetImporter
                     {
                         // assume diffuse texture - could it be anything else?
                         PackageMaterial material;
-                        material.mName              = assetName != assetNames.end() ? *assetName : GetDefaultAssetName(MATERIAL, materialNum++);
-                        material.mDiffuseTexture    = ProcessTexture(asset, TEXTURE_TYPE_DIFFUSE);
+                        material.mName = assetName != assetNames.end() ? *assetName : GetDefaultAssetName(MATERIAL, materialNum++);
+                        material.mDiffuseTexture = ProcessTexture(asset, TEXTURE_TYPE_DIFFUSE);
                         material.mHasDiffuseTexture = true;
                         pkg->mMaterials.push_back(material);
 
@@ -205,7 +205,7 @@ namespace JonsAssetImporter
     /*
      * Parses all materials in 'scene' into 'pkg' and maps all assimp material indexes to jonspkg materials in 'materialMap'
      */
-    void AssetImporter::ProcessAssimpMaterials(const aiScene* scene, const boost::filesystem::path& assetPath, MaterialMap& materialMap, JonsPackagePtr pkg)
+    void AssetImporter::ProcessAssimpMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, JonsPackagePtr pkg)
     {
         if (!scene->HasMaterials())
             return;
@@ -219,13 +219,17 @@ namespace JonsAssetImporter
             if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0 && material->GetTexture(aiTextureType_DIFFUSE, 0, &assimpTexturePath) == aiReturn_SUCCESS)
             {
                 const boost::filesystem::path texturePath = std::string(assimpTexturePath.C_Str());
-                std::string fullTexturePath = assetPath.parent_path().string();
-                if (assetPath.has_parent_path())
+                
+                std::string fullTexturePath = ""; 
+                if (modelPath.has_parent_path())
+                {
+                    fullTexturePath.append(modelPath.parent_path().string());
                     fullTexturePath.append("/");
-                fullTexturePath.append(texturePath.filename().string());
-
+                }
+                fullTexturePath.append(texturePath.string());
+                
                 PackageTexture diffuseTexture(ProcessTexture(fullTexturePath, TEXTURE_TYPE_DIFFUSE));
-                pkgMaterial.mDiffuseTexture    = diffuseTexture;
+                pkgMaterial.mDiffuseTexture = diffuseTexture;
                 pkgMaterial.mHasDiffuseTexture = true;
             }
 
@@ -233,13 +237,17 @@ namespace JonsAssetImporter
                 (material->GetTextureCount(aiTextureType_HEIGHT) > 0 && material->GetTexture(aiTextureType_HEIGHT, 0, &assimpTexturePath) == aiReturn_SUCCESS))
             {
                 const boost::filesystem::path texturePath = std::string(assimpTexturePath.C_Str());
-                std::string fullTexturePath = assetPath.parent_path().string();
-                if (assetPath.has_parent_path())
+
+                std::string fullTexturePath = "";
+                if (modelPath.has_parent_path())
+                {
+                    fullTexturePath.append(modelPath.parent_path().string());
                     fullTexturePath.append("/");
-                fullTexturePath.append(texturePath.filename().string());
+                }
+                fullTexturePath.append(texturePath.string());
 
                 PackageTexture normalTexture(ProcessTexture(fullTexturePath, TEXTURE_TYPE_NORMAL));
-                pkgMaterial.mNormalTexture    = normalTexture;
+                pkgMaterial.mNormalTexture = normalTexture;
                 pkgMaterial.mHasNormalTexture = true;
             }
 
@@ -256,9 +264,9 @@ namespace JonsAssetImporter
             material->Get(AI_MATKEY_COLOR_SPECULAR, specularColor);
             material->Get(AI_MATKEY_COLOR_EMISSIVE, emissiveColor);
 
-            pkgMaterial.mName          = materialName.C_Str();
-            pkgMaterial.mDiffuseColor  = aiColor3DToJonsVec3(diffuseColor);
-            pkgMaterial.mAmbientColor  = aiColor3DToJonsVec3(ambientColor);
+            pkgMaterial.mName = materialName.C_Str();
+            pkgMaterial.mDiffuseColor = aiColor3DToJonsVec3(diffuseColor);
+            pkgMaterial.mAmbientColor = aiColor3DToJonsVec3(ambientColor);
             pkgMaterial.mSpecularColor = aiColor3DToJonsVec3(specularColor);
             pkgMaterial.mEmissiveColor = aiColor3DToJonsVec3(emissiveColor);
 
@@ -321,7 +329,7 @@ namespace JonsAssetImporter
             if (materialMap.find(m->mMaterialIndex) != materialMap.end()) 
             {
                 mesh.mMaterialIndex = materialMap.at(m->mMaterialIndex);
-                mesh.mHasMaterial   = true;
+                mesh.mHasMaterial = true;
             }
 
             // add mesh to collection
@@ -360,15 +368,15 @@ namespace JonsAssetImporter
         }
 
         FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(bitmap);
-        uint32_t bytesPerPixel          = FreeImage_GetBPP(bitmap) / 8;
-        uint32_t widthInPixels          = FreeImage_GetWidth(bitmap);
-        uint32_t heightInPixels         = FreeImage_GetHeight(bitmap);
+        uint32_t bytesPerPixel = FreeImage_GetBPP(bitmap) / 8;
+        uint32_t widthInPixels = FreeImage_GetWidth(bitmap);
+        uint32_t heightInPixels = FreeImage_GetHeight(bitmap);
 
         // should be OK now
-        texture.mName          = assetPath.filename().string();
-        texture.mTextureWidth  = widthInPixels;
+        texture.mName = assetPath.filename().string();
+        texture.mTextureWidth = widthInPixels;
         texture.mTextureHeight = heightInPixels;
-        texture.mTextureType   = textureType;
+        texture.mTextureType = textureType;
         // FreeImage implicitly converts image format to RGB/RGBA from BRG/BRGA
 
         for(unsigned y = 0; y < FreeImage_GetHeight(bitmap); y++) {
