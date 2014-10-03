@@ -2,6 +2,7 @@
 
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/DirectX11/DX11BoxBlurPass.h"
 #include "include/Core/Types.h"
 
 namespace JonsEngine
@@ -47,6 +48,7 @@ namespace JonsEngine
         };
 
         DX11FullscreenTrianglePass& mFullscreenPass;
+        DX11BoxBlurPass mBoxBlurPass;
         DX11ConstantBuffer<FXAACBuffer> mFXAACBuffer;
         DX11ConstantBuffer<SSAOCBuffer> mSSAOCBuffer;
         ID3D11Texture2DPtr mTexture;
@@ -54,5 +56,12 @@ namespace JonsEngine
         ID3D11RenderTargetViewPtr mRTV;
         ID3D11PixelShaderPtr mFXAAPixelShader;
         ID3D11PixelShaderPtr mSSAOPixelShader;
+
+        ID3D11Texture2DPtr mSAOTexture1;
+        ID3D11ShaderResourceViewPtr mSAOSRV1;
+        ID3D11RenderTargetViewPtr mSAORTV1;
+        ID3D11Texture2DPtr mSAOTexture2;
+        ID3D11ShaderResourceViewPtr mSAOSRV2;
+        ID3D11RenderTargetViewPtr mSAORTV2;
     };
 }

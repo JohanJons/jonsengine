@@ -20,7 +20,6 @@ namespace JonsEngine
     const uint8_t LatestMajorVersion = 0;
     const uint8_t LatestMinorVersion = 1;
 
-    /* PackageHeader definition */
     struct PackageHeader
     {
         std::string mSignature;
@@ -31,7 +30,6 @@ namespace JonsEngine
         PackageHeader();
     };
 
-    /* PackageMesh definition */
     struct PackageMesh
     {
         std::vector<float> mVertexData;
@@ -47,7 +45,6 @@ namespace JonsEngine
         PackageMesh();
     };
 
-    /* PackageTexture definition */
     struct PackageTexture
     {
         std::string mName;
@@ -60,7 +57,6 @@ namespace JonsEngine
         PackageTexture();
     };
 
-    /* PackageMaterial definition */
     struct PackageMaterial
     {
         std::string mName;
@@ -77,7 +73,6 @@ namespace JonsEngine
         PackageMaterial();
     };
 
-    /* PackageModel definition */
     struct PackageModel
     {
         std::string mName;
@@ -89,21 +84,17 @@ namespace JonsEngine
         PackageModel();
     };
 
-    /* JonsPackage definition */
     struct JonsPackage
     {
         PackageHeader mHeader;
         std::vector<PackageModel> mModels;
         std::vector<PackageMaterial> mMaterials;
 
-        const uint32_t mInternalID;
-
 
         JonsPackage();
     };
 
 
-     /* JonsPackagePtr definition */
     typedef std::shared_ptr<JonsPackage> JonsPackagePtr;
 
 
@@ -112,7 +103,6 @@ namespace JonsEngine
      */
     JonsPackagePtr ReadJonsPkg(const std::string& jonsPkgName);
     bool WriteJonsPkg(const std::string& jonsPkgName, const JonsPackagePtr jonsPkg);
-    std::string GetJonsPkgPath(const uint32_t internalPackageID);
 }
 
 

@@ -12,10 +12,8 @@ namespace JonsEngine
 {
     struct Model;
 
-    /* ModelPtr definition */
     typedef std::shared_ptr<Model> ModelPtr;
 
-    /* Model defintion */
     struct Model
     {
         const std::string mName;

@@ -9,10 +9,8 @@ namespace JonsEngine
 {
     struct DirectionalLight;
 
-    /* DirectionalLightPtr definition */
     typedef std::shared_ptr<DirectionalLight> DirectionalLightPtr;
 
-    /* DirectionalLight definition */
     struct DirectionalLight
     {
         const std::string mName;

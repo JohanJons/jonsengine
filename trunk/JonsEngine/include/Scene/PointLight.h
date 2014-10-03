@@ -10,10 +10,8 @@ namespace JonsEngine
 {
     struct PointLight;
 
-    /* PointLightPtr definition */
     typedef std::shared_ptr<PointLight> PointLightPtr;
 
-    /* PointLight definition */
     struct PointLight
     {
         const std::string mName;

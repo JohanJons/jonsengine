@@ -8,10 +8,8 @@ namespace JonsEngine
 {
     struct Material;
 
-    /* MaterialPtr definition */
     typedef std::shared_ptr<Material> MaterialPtr;
 
-    /* Material defintion */
     struct Material
     {
         const std::string mName;

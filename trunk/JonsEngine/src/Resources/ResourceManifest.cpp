@@ -79,8 +79,6 @@ namespace JonsEngine
         {
             auto allocator = mMemoryAllocator;
             ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(ProcessModel(*iter, jonsPkg)), [=](Model* model) { allocator->DeallocateObject(model); }));
-
-            mPackageAssetMap.insert(std::make_pair(jonsPkg->mInternalID , ptr->mName));
         }
 
         return ptr;
@@ -112,8 +110,6 @@ namespace JonsEngine
         {
             auto allocator = mMemoryAllocator;
             ptr = *mMaterials.insert(mMaterials.end(), MaterialPtr(allocator->AllocateObject<Material>(ProcessMaterial(*iter, jonsPkg)), [=](Material* material) { allocator->DeallocateObject(material); }));
-
-            mPackageAssetMap.insert(std::make_pair(jonsPkg->mInternalID, ptr->mName));
         }
 
         return ptr;

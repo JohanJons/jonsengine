@@ -4,9 +4,6 @@
 
 namespace JonsEngine
 {
-    /*
-     * Camera
-     */
     class Camera
     {
     public:

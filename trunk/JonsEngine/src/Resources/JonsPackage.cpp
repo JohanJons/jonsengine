@@ -9,10 +9,6 @@
 
 namespace JonsEngine
 {
-    uint32_t gCurrentJonsPackageID = 0;
-    std::map<uint32_t, std::string> gJonsPackageIDFileMap;
-
-
     PackageHeader::PackageHeader() : mSignature("jons"), mMajorVersion(LatestMajorVersion), mMinorVersion(LatestMinorVersion)
     {
     }
@@ -33,7 +29,7 @@ namespace JonsEngine
     {
     }
 
-    JonsPackage::JonsPackage() : mInternalID(gCurrentJonsPackageID++)
+    JonsPackage::JonsPackage()
     {
     }
 
@@ -42,8 +38,6 @@ namespace JonsEngine
     {
         std::ifstream jonsPkgStream(jonsPkgName.c_str(), std::ios::in | std::ios::binary);        // TODO: support opening of older resource packages
         JonsPackagePtr pkg(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<JonsPackage>(), std::bind(&HeapAllocator::DeallocateObject<JonsPackage>, &HeapAllocator::GetDefaultHeapAllocator(), std::placeholders::_1));
-
-        gJonsPackageIDFileMap.insert(std::make_pair(pkg->mInternalID, jonsPkgName));
 
         if (jonsPkgStream && jonsPkgStream.good() && jonsPkgStream.is_open())
         {
@@ -69,15 +63,5 @@ namespace JonsEngine
         }
         
         return ret;
-    }
-
-    std::string GetJonsPkgPath(const uint32_t internalPackageID)
-    {
-        auto iter = std::find_if(gJonsPackageIDFileMap.begin(), gJonsPackageIDFileMap.end(), [internalPackageID](std::pair<uint32_t, std::string> entry) { return entry.first == internalPackageID; });
-
-        if (iter != gJonsPackageIDFileMap.end())
-            return iter->second;
-        else
-            return std::string();
     }
 }

@@ -15,7 +15,6 @@ namespace JonsEngine
 {
     class IMemoryAllocator;
 
-    /* Scene definition */
     class Scene
     {
     public:

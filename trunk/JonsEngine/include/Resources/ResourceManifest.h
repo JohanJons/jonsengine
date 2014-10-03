@@ -14,7 +14,6 @@ namespace JonsEngine
 {
     class OpenGLRenderer;
 
-    /* ResourceManifest definition */
     class ResourceManifest
     {
     public:
@@ -42,7 +41,6 @@ namespace JonsEngine
         DX11Renderer& mRenderer;
         std::vector<ModelPtr> mModels;
         std::vector<MaterialPtr> mMaterials;
-        std::multimap<uint32_t, std::string> mPackageAssetMap;
     };
 
 
