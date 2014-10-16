@@ -208,6 +208,13 @@ namespace JonsGame
         sphere->mMaterial = myScene->GetResourceManifest().GetMaterial("checkers");
         sphere->mSceneNode = nodeSphere;
         nodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
+
+        // create a  second cube
+        SceneNodePtr nodeCube2 = myScene->GetRootNode().CreateChildNode("nodeCube2");
+        ModelPtr cube2 = myScene->GetResourceManifest().CreateCube("Cube2", 3);
+        cube2->mMaterial = myScene->GetResourceManifest().GetMaterial("checkers");
+        cube2->mSceneNode = nodeCube2;
+        nodeCube2->TranslateNode(Vec3(11.0f, 2.0f, -15.0f));
         
         // move up camera
         myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));

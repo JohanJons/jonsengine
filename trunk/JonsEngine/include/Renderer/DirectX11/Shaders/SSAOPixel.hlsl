@@ -5,11 +5,11 @@
 #include "Common.hlsl"
 
 static const float gNumSamples = 11.0;
-static const float gRadius = 1.0;
+static const float gRadius = 0.2;
 static const float gRadius2 = gRadius * gRadius;
 static const float gProjScale = 500.0;
 static const float gNumSpiralTurns = 7;
-static const float gBias = 0.0012;
+static const float gBias = 0.02;
 static const float gIntensity = 1.0;
 
 
@@ -99,10 +99,12 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
         ao += sampleAO(screenSpacePos, originPos, normal, ssDiskRadius, i, randomPatternRotationAngle);
     }
 
-    //float temp = gRadius2 * gRadius;
-   // ao /= temp * temp;
+    float temp = gRadius2 * gRadius;
+    ao /= temp * temp;
 
     float A = max(0.0, 1.0 - ao * gIntensity * (5.0 / gNumSamples));
+    //float A = 1.0 - ao / (4.0 * float(gNumSamples));
+    //A = clamp(pow(ao, 1.0 + gIntensity), 0.0, 1.0);
 
     // Bilateral box-filter over a quad for free, respecting depth edges
     // (the difference that this makes is subtle)

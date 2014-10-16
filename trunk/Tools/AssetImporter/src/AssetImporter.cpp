@@ -128,6 +128,24 @@ namespace JonsAssetImporter
         return mErrorLog;
     }
 
+#define flagsz ( \
+   aiProcess_CalcTangentSpace | \
+	aiProcess_GenNormals |  \
+	aiProcess_JoinIdenticalVertices |  \
+	aiProcess_ImproveCacheLocality |  \
+	aiProcess_LimitBoneWeights |  \
+	aiProcess_RemoveRedundantMaterials|  \
+	aiProcess_SplitLargeMeshes |  \
+	aiProcess_Triangulate					|  \
+	aiProcess_GenUVCoords                   |  \
+	aiProcess_SortByPType                   |  \
+	aiProcess_FindDegenerates               |  \
+	aiProcess_FindInvalidData               |  \
+    aiProcess_FindInstances                  |  \
+	aiProcess_ValidateDataStructure          |  \
+	aiProcess_OptimizeMeshes                 |  \
+    0)
+
 
     bool AssetImporter::Import(const std::string& packageName, const std::vector<boost::filesystem::path>& assets, const std::vector<std::string>& assetNames, Assimp::Importer importer)
     {
@@ -149,7 +167,7 @@ namespace JonsAssetImporter
             {
                 case MODEL:
                     {
-                        const aiScene* scene = importer.ReadFile(asset.string(), aiProcessPreset_TargetRealtime_MaxQuality);
+                        const aiScene* scene = importer.ReadFile(asset.string(), flagsz);
                         if(!scene)
                         {
                             Log("-JonsAssetImporter: Assimp parsing error: ");
@@ -246,9 +264,9 @@ namespace JonsAssetImporter
                 }
                 fullTexturePath.append(texturePath.string());
 
-                PackageTexture normalTexture(ProcessTexture(fullTexturePath, TEXTURE_TYPE_NORMAL));
-                pkgMaterial.mNormalTexture = normalTexture;
-                pkgMaterial.mHasNormalTexture = true;
+                //PackageTexture normalTexture(ProcessTexture(fullTexturePath, TEXTURE_TYPE_NORMAL));
+                //pkgMaterial.mNormalTexture = normalTexture;
+                //pkgMaterial.mHasNormalTexture = true;
             }
 
             aiString materialName;
