@@ -16,7 +16,7 @@ namespace JonsEngine
         DX11AmbientPass(ID3D11DevicePtr device, DX11FullscreenTrianglePass& fullscreenPass);
         ~DX11AmbientPass();
 
-        void Render(ID3D11DeviceContextPtr context, const Vec4& ambientLight);
+        void Render(ID3D11DeviceContextPtr context, const Vec4& ambientLight, const bool useSSAO);
 
 
     private:
@@ -33,5 +33,12 @@ namespace JonsEngine
         DX11FullscreenTrianglePass& mFullscreenPass;
         ID3D11PixelShaderPtr mPixelShader;
         DX11ConstantBuffer<AmbientCBuffer> mConstantBuffer;
+
+        ID3D11Texture2DPtr mSAOTexture1;
+        ID3D11ShaderResourceViewPtr mSAOSRV1;
+        ID3D11RenderTargetViewPtr mSAORTV1;
+        ID3D11Texture2DPtr mSAOTexture2;
+        ID3D11ShaderResourceViewPtr mSAOSRV2;
+        ID3D11RenderTargetViewPtr mSAORTV2;
     };
 }
