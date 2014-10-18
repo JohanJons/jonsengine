@@ -328,7 +328,7 @@ namespace JonsEngine
         mGBuffer.BindGeometryTextures(mContext);
 
         // ambient light
-        mAmbientPass.Render(mContext, lighting.mAmbientLight);
+        mAmbientPass.Render(mContext, lighting.mAmbientLight, true);
 
         // additive blending for adding lighting
         mContext->OMSetBlendState(mAdditiveBlending, NULL, 0xffffffff);

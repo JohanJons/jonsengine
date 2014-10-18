@@ -22,13 +22,12 @@ cbuffer SSAOCBuffer : register(CBUFFER_REGISTER_PIXEL)
 };
 
 Texture2D gPositionTexture : register(TEXTURE_REGISTER_POSITION);
-Texture2D gNormalTexture : register(TEXTURE_REGISTER_NORMAL);
 SamplerState gPointSampler : register(SAMPLER_REGISTER_POINT);
 
 
 float3 reconstructNormal(float3 positionWorldSpace)
 {
-    return normalize(cross(ddx(positionWorldSpace), ddy(positionWorldSpace)));
+    return normalize(cross(ddy(positionWorldSpace), ddx(positionWorldSpace)));
 }
 
 /** Read the camera - space position of the point at screen - space pixel ssP + unitOffset * ssR.Assumes length(unitOffset) == 1 */
@@ -85,8 +84,8 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
     uint2 screenSpacePos = (uint2)position.xy;
 
     float3 originPos = gPositionTexture[screenSpacePos].xyz;
+    float3 normal = reconstructNormal(originPos);
     originPos = mul(gViewMatrix, float4(originPos, 1.0)).xyz;
-    float3 normal = gNormalTexture[screenSpacePos].xyz;//reconstructNormal(originPos);
     normal = mul(gViewMatrix, float4(normal, 0.0)).xyz;
 
     // Hash function used in the HPG12 AlchemyAO paper
