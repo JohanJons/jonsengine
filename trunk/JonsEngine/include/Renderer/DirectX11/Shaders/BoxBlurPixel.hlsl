@@ -9,7 +9,7 @@ cbuffer BoxBlurConstants : register(CBUFFER_REGISTER_PIXEL)
     float2 gTexelSize;
 };
 
-Texture2D gRawAOTexture : register(TEXTURE_REGISTER_DIFFUSE);
+Texture2D gRawAOTexture : register(TEXTURE_REGISTER_EXTRA);
 
 static const uint NUM_SAMPLES = 7;
 

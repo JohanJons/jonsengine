@@ -13,7 +13,7 @@ cbuffer FXAACBuffer : register(CBUFFER_REGISTER_PIXEL)
     float2 gScreenSizeReciprocal;
 };
 
-Texture2D gFinalTexture : register(TEXTURE_REGISTER_DIFFUSE);
+Texture2D gFinalTexture : register(TEXTURE_REGISTER_EXTRA);
 SamplerState gPointSampler : register(SAMPLER_REGISTER_POINT);
 
 float4 ps_main(float4 position : SV_Position) : SV_Target0

@@ -15,10 +15,7 @@ static const float gIntensity = 1.0;
 
 cbuffer SSAOCBuffer : register(CBUFFER_REGISTER_PIXEL)
 {
-    float4x4 gViewProjMatrix;
-    float4x4 gProjMatrix;
     float4x4 gViewMatrix;
-    float2 gScreenSize;
 };
 
 Texture2D gPositionTexture : register(TEXTURE_REGISTER_POSITION);
@@ -84,9 +81,8 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
     uint2 screenSpacePos = (uint2)position.xy;
 
     float3 originPos = gPositionTexture[screenSpacePos].xyz;
-    float3 normal = reconstructNormal(originPos);
     originPos = mul(gViewMatrix, float4(originPos, 1.0)).xyz;
-    normal = mul(gViewMatrix, float4(normal, 0.0)).xyz;
+    float3 normal = reconstructNormal(originPos);
 
     // Hash function used in the HPG12 AlchemyAO paper
     float randomPatternRotationAngle = (3 * screenSpacePos.x ^ screenSpacePos.y + screenSpacePos.x * screenSpacePos.y) * 10;
@@ -102,8 +98,6 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
     ao /= temp * temp;
 
     float A = max(0.0, 1.0 - ao * gIntensity * (5.0 / gNumSamples));
-    //float A = 1.0 - ao / (4.0 * float(gNumSamples));
-    //A = clamp(pow(ao, 1.0 + gIntensity), 0.0, 1.0);
 
     // Bilateral box-filter over a quad for free, respecting depth edges
     // (the difference that this makes is subtle)
