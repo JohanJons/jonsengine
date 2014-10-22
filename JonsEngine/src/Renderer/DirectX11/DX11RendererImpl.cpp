@@ -136,18 +136,26 @@ namespace JonsEngine
     }
 
 
-    DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : DX11Context(GetActiveWindow()), 
-        mLogger(logger), mMemoryAllocator(memoryAllocator),
+    DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : 
+        DX11Context(GetActiveWindow()), 
+        mLogger(logger),
+        mMemoryAllocator(memoryAllocator),
         mShadowQuality(settings.mShadowQuality),
         mAntiAliasing(settings.mAntiAliasing),
+
+        // base passes
         mBackbuffer(mDevice, mSwapchain, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
         mGBuffer(mDevice, mBackbuffer.GetDepthStencilView(), mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
         mVertexTransformPass(mDevice), 
-        mFullscreenTrianglePass(mDevice), 
+        mFullscreenTrianglePass(mDevice),
+        mPostProcessor(mDevice, mFullscreenTrianglePass, GetBackbufferTextureDesc()),
+
+        // lighting passes
         mAmbientPass(mDevice, mFullscreenTrianglePass),
         mDirectionalLightPass(mDevice, mBackbuffer, mFullscreenTrianglePass, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
         mPointLightPass(mDevice, mBackbuffer, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
-        mPostProcessor(mDevice, mFullscreenTrianglePass, GetBackbufferTextureDesc()),
+
+        // samplers
         mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
         mShadowmapSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
         mShadowmapNoCompareSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT)
@@ -328,15 +336,15 @@ namespace JonsEngine
         mGBuffer.BindGeometryTextures(mContext);
 
         // ambient light
-        mAmbientPass.Render(mContext, lighting.mAmbientLight, true);
+        mAmbientPass.Render(mContext, lighting.mCameraViewMatrix, lighting.mAmbientLight, lighting.mScreenSize, true);
 
         // additive blending for adding lighting
         mContext->OMSetBlendState(mAdditiveBlending, NULL, 0xffffffff);
 
         // do all directional lights
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
-            // TODO: use real fov and screen size
-            mDirectionalLightPass.Render(mContext, renderQueue, mMeshes, 70.0f, mSwapchainDesc.BufferDesc.Width / static_cast<float>(mSwapchainDesc.BufferDesc.Height), lighting.mCameraViewMatrix, directionalLight.mLightColor, directionalLight.mLightDirection, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
+            // TODO: use real fov
+            mDirectionalLightPass.Render(mContext, renderQueue, mMeshes, 70.0f, lighting.mScreenSize.x / lighting.mScreenSize.y, lighting.mCameraViewMatrix, directionalLight.mLightColor, directionalLight.mLightDirection, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
 
         // do all point lights
         mPointLightPass.BindForShading(mContext);
@@ -352,7 +360,7 @@ namespace JonsEngine
         if (mAntiAliasing == EngineSettings::ANTIALIASING_FXAA)
             mPostProcessor.FXAAPass(mContext, mBackbuffer, Vec2(mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height));
 
-        mBackbuffer.BindForShadingStage(mContext, true);
-        mPostProcessor.SSAOPass(mContext, lighting.mCameraProjectionMatrix * lighting.mCameraViewMatrix, lighting.mCameraProjectionMatrix, lighting.mCameraViewMatrix, Vec2(mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height));
+        //mBackbuffer.BindForShadingStage(mContext, true);
+        //mPostProcessor.SSAOPass(mContext, lighting.mCameraProjectionMatrix * lighting.mCameraViewMatrix, lighting.mCameraProjectionMatrix, lighting.mCameraViewMatrix, Vec2(mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height));
     }
 }

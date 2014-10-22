@@ -13,10 +13,10 @@ namespace JonsEngine
     class DX11BoxBlurPass
     {
     public:
-        DX11BoxBlurPass(ID3D11DevicePtr device, DX11FullscreenTrianglePass& fullscreenPass);
+        DX11BoxBlurPass(ID3D11DevicePtr device, DX11FullscreenTrianglePass& fullscreenPass, const DXGI_FORMAT textureFormat);
         ~DX11BoxBlurPass();
 
-        void Render(ID3D11DeviceContextPtr context, ID3D11ShaderResourceViewPtr srv, const Vec2& texelScale);
+        void Render(ID3D11DeviceContextPtr context, ID3D11ShaderResourceViewPtr textureToBlur, const Vec2& screenSize);
 
 
     private:
@@ -34,5 +34,8 @@ namespace JonsEngine
         DX11FullscreenTrianglePass& mFullscreenPass;
         DX11ConstantBuffer<BoxBlurCBuffer> mBoxBlurCBuffer;
         ID3D11PixelShaderPtr mPixelShader;
+        ID3D11Texture2DPtr mBoxBlurTexture;
+        ID3D11ShaderResourceViewPtr mBoxBlurSRV;
+        ID3D11RenderTargetViewPtr mBoxBlurRTV;
     };
 }

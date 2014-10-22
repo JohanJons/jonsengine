@@ -17,7 +17,6 @@ namespace JonsEngine
         ~DX11PostProcessor();
 
         void FXAAPass(ID3D11DeviceContextPtr context, DX11Backbuffer& backbuffer, const Vec2& screenSize);
-        void SSAOPass(ID3D11DeviceContextPtr context, const Mat4& camViewProjMatrix, const Mat4& projMatrix, const Mat4& viewMatrix, const Vec2& screenSize);
 
 
     private:
@@ -32,36 +31,13 @@ namespace JonsEngine
             }
         };
 
-        struct SSAOCBuffer
-        {
-            Mat4 mCamViewProjMatrix;
-            Mat4 mProjMatrix;
-            Mat4 mViewMatrix;
-            Vec2 mScreenSize;
-            float __padding[2];
-
-
-            SSAOCBuffer(const Mat4& camViewProjMatrix, const Mat4& projMatrix, const Mat4& viewMatrix, const Vec2& screenSize) :
-                mCamViewProjMatrix(camViewProjMatrix), mProjMatrix(projMatrix), mViewMatrix(viewMatrix), mScreenSize(screenSize)
-            {
-            }
-        };
-
         DX11FullscreenTrianglePass& mFullscreenPass;
-        DX11BoxBlurPass mBoxBlurPass;
-        DX11ConstantBuffer<FXAACBuffer> mFXAACBuffer;
-        DX11ConstantBuffer<SSAOCBuffer> mSSAOCBuffer;
-        ID3D11Texture2DPtr mTexture;
-        ID3D11ShaderResourceViewPtr mSRV;
-        ID3D11RenderTargetViewPtr mRTV;
-        ID3D11PixelShaderPtr mFXAAPixelShader;
-        ID3D11PixelShaderPtr mSSAOPixelShader;
 
-        ID3D11Texture2DPtr mSAOTexture1;
-        ID3D11ShaderResourceViewPtr mSAOSRV1;
-        ID3D11RenderTargetViewPtr mSAORTV1;
-        ID3D11Texture2DPtr mSAOTexture2;
-        ID3D11ShaderResourceViewPtr mSAOSRV2;
-        ID3D11RenderTargetViewPtr mSAORTV2;
+        // fxaa
+        DX11ConstantBuffer<FXAACBuffer> mFXAACBuffer;
+        ID3D11Texture2DPtr mFXAABackbufferTexture;
+        ID3D11ShaderResourceViewPtr mFXAASRV;
+        ID3D11RenderTargetViewPtr mFXAARTV;
+        ID3D11PixelShaderPtr mFXAAPixelShader;
     };
 }
