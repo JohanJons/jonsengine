@@ -11,6 +11,7 @@ static const float gProjScale = 500.0;
 static const float gNumSpiralTurns = 7;
 static const float gBias = 0.02;
 static const float gIntensity = 1.0;
+static const float FAR_PLANE_Z = 100.0f; // TODO - variable
 
 
 cbuffer SSAOCBuffer : register(CBUFFER_REGISTER_PIXEL)
@@ -76,7 +77,7 @@ float sampleAO(uint2 screenSpacePos, float3 originPos, float3 normal, float ssDi
     return f * f * f * max((vn - gBias) / (epsilon + vv), 0.0);
 }
 
-float4 ps_main(float4 position : SV_Position) : SV_Target0
+float ps_main(float4 position : SV_Position) : SV_Target0
 {
     uint2 screenSpacePos = (uint2)position.xy;
 
@@ -107,7 +108,6 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
     if (abs(ddy(originPos.z)) < 0.02) {
         A -= ddy(A) * ((screenSpacePos.y & 1) - 0.5);
     }
-
 
     return A;
 }

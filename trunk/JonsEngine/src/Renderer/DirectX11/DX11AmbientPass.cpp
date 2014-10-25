@@ -10,7 +10,7 @@
 namespace JonsEngine
 {
     DX11AmbientPass::DX11AmbientPass(ID3D11DevicePtr device, DX11FullscreenTrianglePass& fullscreenPass) :
-        mFullscreenPass(fullscreenPass), mBoxBlurPass(device, mFullscreenPass, DXGI_FORMAT_R16_FLOAT), mAmbientPixelShader(nullptr), mAmbientCBuffer(device, mAmbientCBuffer.CONSTANT_BUFFER_SLOT_PIXEL),
+        mFullscreenPass(fullscreenPass), mBoxBlurPass(device, mFullscreenPass, DXGI_FORMAT_R8_UNORM), mAmbientPixelShader(nullptr), mAmbientCBuffer(device, mAmbientCBuffer.CONSTANT_BUFFER_SLOT_PIXEL),
         mSSAOCBuffer(device, mSSAOCBuffer.CONSTANT_BUFFER_SLOT_PIXEL), mSSAOTexture(nullptr), mSSAOSRV(nullptr), mSSAORTV(nullptr)
     {
         D3D11_TEXTURE2D_DESC ssaoTextureDesc;
@@ -18,7 +18,8 @@ namespace JonsEngine
         // TODO: real size
         ssaoTextureDesc.Width = 1920;
         ssaoTextureDesc.Height = 1080;
-        ssaoTextureDesc.Format = DXGI_FORMAT_R16_FLOAT;
+        // TODO: R8 enough? or R16? ...........
+        ssaoTextureDesc.Format = DXGI_FORMAT_R8_UNORM;
         ssaoTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
         ssaoTextureDesc.MipLevels = 1;
         ssaoTextureDesc.ArraySize = 1;
