@@ -14,7 +14,7 @@ Texture2D gRawAOTexture : register(TEXTURE_REGISTER_EXTRA);
 static const uint NUM_SAMPLES = 7;
 
 
-float4 ps_main(float4 position : SV_Position) : SV_Target0
+float ps_main(float4 position : SV_Position) : SV_Target0
 {
     float ret = 0.0;
 
@@ -26,7 +26,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
 
     ret /= NUM_SAMPLES;
 
-    return float4(ret, ret, ret, ret);
+    return ret;
 }
 
 #endif

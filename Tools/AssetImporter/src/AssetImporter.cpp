@@ -264,9 +264,9 @@ namespace JonsAssetImporter
                 }
                 fullTexturePath.append(texturePath.string());
 
-                //PackageTexture normalTexture(ProcessTexture(fullTexturePath, TEXTURE_TYPE_NORMAL));
-                //pkgMaterial.mNormalTexture = normalTexture;
-                //pkgMaterial.mHasNormalTexture = true;
+                PackageTexture normalTexture(ProcessTexture(fullTexturePath, TEXTURE_TYPE_NORMAL));
+                pkgMaterial.mNormalTexture = normalTexture;
+                pkgMaterial.mHasNormalTexture = true;
             }
 
             aiString materialName;
