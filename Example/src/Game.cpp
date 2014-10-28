@@ -85,6 +85,10 @@ namespace JonsGame
                 mDebugOptions.mRenderingMode = DebugOptions::RENDER_MODE_DIFFUSE;
             else if (evnt.mKey == Key::FIVE)
                 mDebugOptions.mRenderingMode = DebugOptions::RENDER_MODE_DEPTH;
+            else if (evnt.mKey == Key::U)
+                mEngine->GetRenderer().SetSSAO(false);
+            else if (evnt.mKey == Key::I)
+                mEngine->GetRenderer().SetSSAO(true);
             else if (evnt.mKey == Key::P)
                 mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_DRAW_LIGHTS);
             else if (evnt.mKey == Key::O)

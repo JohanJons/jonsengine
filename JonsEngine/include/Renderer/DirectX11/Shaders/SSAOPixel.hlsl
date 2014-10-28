@@ -5,7 +5,7 @@
 #include "Common.hlsl"
 
 static const float gNumSamples = 11.0;
-static const float gRadius = 0.2;
+static const float gRadius = 0.7;
 static const float gRadius2 = gRadius * gRadius;
 static const float gProjScale = 500.0;
 static const float gNumSpiralTurns = 7;

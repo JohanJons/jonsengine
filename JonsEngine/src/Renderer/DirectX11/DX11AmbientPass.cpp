@@ -1,9 +1,8 @@
 #include "include/Renderer/DirectX11/DX11AmbientPass.h"
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/Renderer/DirectX11/DX11Mesh.h"
+#include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
-#include "include/Renderer/DirectX11/DX11PostProcessor.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/AmbientPixel.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/SSAOPixel.h"
 
@@ -60,12 +59,13 @@ namespace JonsEngine
 
             // restore rendering to backbuffer
             context->OMSetRenderTargets(1, &prevRTV.p, prevDSV);
+            // set SSAO texture as SRV
+            context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &mSSAOSRV.p);
         }
-
 
         // pass 3: render ambient light
         context->PSSetShader(mAmbientPixelShader, NULL, NULL);
-        mAmbientCBuffer.SetData(AmbientCBuffer(ambientLight), context);
+        mAmbientCBuffer.SetData(AmbientCBuffer(ambientLight, useSSAO), context);
 
         mFullscreenPass.Render(context);
     }

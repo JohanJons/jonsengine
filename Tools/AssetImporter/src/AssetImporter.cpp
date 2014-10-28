@@ -128,25 +128,6 @@ namespace JonsAssetImporter
         return mErrorLog;
     }
 
-#define flagsz ( \
-   aiProcess_CalcTangentSpace | \
-	aiProcess_GenNormals |  \
-	aiProcess_JoinIdenticalVertices |  \
-	aiProcess_ImproveCacheLocality |  \
-	aiProcess_LimitBoneWeights |  \
-	aiProcess_RemoveRedundantMaterials|  \
-	aiProcess_SplitLargeMeshes |  \
-	aiProcess_Triangulate					|  \
-	aiProcess_GenUVCoords                   |  \
-	aiProcess_SortByPType                   |  \
-	aiProcess_FindDegenerates               |  \
-	aiProcess_FindInvalidData               |  \
-    aiProcess_FindInstances                  |  \
-	aiProcess_ValidateDataStructure          |  \
-	aiProcess_OptimizeMeshes                 |  \
-    0)
-
-
     bool AssetImporter::Import(const std::string& packageName, const std::vector<boost::filesystem::path>& assets, const std::vector<std::string>& assetNames, Assimp::Importer importer)
     {
         JonsPackagePtr pkg;// = ReadJonsPkg(packageName);   // TODO: support opening previous package
@@ -167,7 +148,7 @@ namespace JonsAssetImporter
             {
                 case MODEL:
                     {
-                        const aiScene* scene = importer.ReadFile(asset.string(), flagsz);
+                        const aiScene* scene = importer.ReadFile(asset.string(), aiProcessPreset_TargetRealtime_MaxQuality);
                         if(!scene)
                         {
                             Log("-JonsAssetImporter: Assimp parsing error: ");

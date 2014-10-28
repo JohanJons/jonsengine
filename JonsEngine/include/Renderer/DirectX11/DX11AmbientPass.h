@@ -24,9 +24,11 @@ namespace JonsEngine
         struct AmbientCBuffer
         {
             Vec4 mAmbientLight;
+            int mUseSSAO;
+            float __padding[3];
 
 
-            AmbientCBuffer(const Vec4& ambientLight) : mAmbientLight(ambientLight)
+            AmbientCBuffer(const Vec4& ambientLight, const bool useSSAO) : mAmbientLight(ambientLight), mUseSSAO(useSSAO)
             {
             }
         };

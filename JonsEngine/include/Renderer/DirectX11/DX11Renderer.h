@@ -34,6 +34,9 @@ namespace JonsEngine
         EngineSettings::AntiAliasing GetAntiAliasing() const;
         void SetAntiAliasing(const EngineSettings::AntiAliasing aa);
 
+        bool IsSSAOEnabled() const;
+        void SetSSAO(const bool useSSAO);
+
         float GetZNear() const;
         float GetZFar() const;
         uint32_t GetShadowmapResolution() const;

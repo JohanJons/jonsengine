@@ -47,6 +47,9 @@ namespace JonsEngine
         EngineSettings::AntiAliasing GetAntiAliasing() const;
         void SetAntiAliasing(const EngineSettings::AntiAliasing aa);
 
+        bool IsSSAOEnabled() const;
+        void SetSSAO(const bool useSSAO);
+
         float GetZNear() const;
         float GetZFar() const;
         uint32_t GetShadowmapResolution() const;
@@ -76,6 +79,7 @@ namespace JonsEngine
         std::unique_ptr<DX11Sampler, std::function<void(DX11Sampler*)>> mModelSampler;
         DX11Sampler mShadowmapSampler;
         DX11Sampler mShadowmapNoCompareSampler;
+        bool mSSAOEnabled;
 
         std::vector<DX11MeshPtr> mMeshes;
         std::vector<DX11TexturePtr> mTextures;
