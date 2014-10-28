@@ -107,7 +107,7 @@ namespace JonsEngine
         mVertexTransformPass.BindForTransformPass(context);
     }
 
-    void DX11PointLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight)
+    void DX11PointLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight, const float zFar, const float zNear)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
@@ -160,7 +160,7 @@ namespace JonsEngine
 
         // set point light pixel shader and its cbuffer
         context->PSSetShader(mPixelShader, NULL, NULL);
-        mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mLightColor, Vec4(pointLight.mLightPosition, 1.0), pointLight.mLightIntensity, pointLight.mMaxDistance), context);
+        mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mLightColor, Vec4(pointLight.mLightPosition, 1.0), pointLight.mLightIntensity, pointLight.mMaxDistance, zFar, zNear), context);
 
         // run transform pass on sphere + point light shading pass
         mVertexTransformPass.RenderMesh(context, mSphereMesh, pointLight.mWVPMatrix);

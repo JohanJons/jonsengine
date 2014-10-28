@@ -100,15 +100,6 @@ float ps_main(float4 position : SV_Position) : SV_Target0
 
     float A = max(0.0, 1.0 - ao * gIntensity * (5.0 / gNumSamples));
 
-    // Bilateral box-filter over a quad for free, respecting depth edges
-    // (the difference that this makes is subtle)
-    if (abs(ddx(originPos.z)) < 0.02) {
-        A -= ddx(A) * ((screenSpacePos.x & 1) - 0.5);
-    }
-    if (abs(ddy(originPos.z)) < 0.02) {
-        A -= ddy(A) * ((screenSpacePos.y & 1) - 0.5);
-    }
-
     return A;
 }
 
