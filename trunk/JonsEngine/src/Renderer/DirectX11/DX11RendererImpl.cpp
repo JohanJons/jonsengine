@@ -361,7 +361,7 @@ namespace JonsEngine
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
             mBackbuffer.ClearStencilBuffer(mContext);
-            mPointLightPass.Render(mContext, renderQueue, mMeshes, pointLight);
+            mPointLightPass.Render(mContext, renderQueue, mMeshes, pointLight, Z_FAR, Z_NEAR);
         }
 
         // turn off blending for post processing
