@@ -20,7 +20,6 @@ namespace JonsEngine
             SHADOW_QUALITY_MEDIUM,
             SHADOW_QUALITY_HIGH
         } mShadowQuality;
-
         enum Anisotropic {
             ANISOTROPIC_1X = 1,
             ANISOTROPIC_2X = 2,
@@ -28,11 +27,11 @@ namespace JonsEngine
             ANISOTROPIC_8X = 8,
             ANISOTROPIC_16X = 16
         } mAnisotropicFiltering;
-
         enum AntiAliasing {
             ANTIALIASING_NONE = 0,
             ANTIALIASING_FXAA = 1
         } mAntiAliasing;
+        bool mSSAOEnabled;
 
         // window settings
         std::string mWindowTitle;
@@ -47,7 +46,19 @@ namespace JonsEngine
 
 
     /* EngineSettings inlines */
-    inline EngineSettings::EngineSettings() : mAnisotropicFiltering(Anisotropic::ANISOTROPIC_16X), mShadowQuality(ShadowQuality::SHADOW_QUALITY_MEDIUM), mAntiAliasing(AntiAliasing::ANTIALIASING_FXAA), mWindowTitle("JonsEngine Game"), mWindowWidth(1920), mWindowHeight(1080), mFullscreen(false), mFOV(70.0f), mFrameLimit(0)
+    inline EngineSettings::EngineSettings() :
+        // render settings
+        mAnisotropicFiltering(Anisotropic::ANISOTROPIC_16X),
+        mShadowQuality(ShadowQuality::SHADOW_QUALITY_MEDIUM),
+        mAntiAliasing(AntiAliasing::ANTIALIASING_FXAA),
+        mSSAOEnabled(true),
+        // window settings
+        mWindowTitle("JonsEngine Game"),
+        mWindowWidth(1920),
+        mWindowHeight(1080),
+        mFullscreen(false),
+        mFOV(70.0f),
+        mFrameLimit(0)
     {
     }
 }

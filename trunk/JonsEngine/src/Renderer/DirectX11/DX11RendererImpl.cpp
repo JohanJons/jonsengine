@@ -142,23 +142,22 @@ namespace JonsEngine
         mMemoryAllocator(memoryAllocator),
         mShadowQuality(settings.mShadowQuality),
         mAntiAliasing(settings.mAntiAliasing),
-
         // base passes
         mBackbuffer(mDevice, mSwapchain, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
         mGBuffer(mDevice, mBackbuffer.GetDepthStencilView(), mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
         mVertexTransformPass(mDevice), 
         mFullscreenTrianglePass(mDevice),
         mPostProcessor(mDevice, mFullscreenTrianglePass, GetBackbufferTextureDesc()),
-
         // lighting passes
         mAmbientPass(mDevice, mFullscreenTrianglePass),
         mDirectionalLightPass(mDevice, mBackbuffer, mFullscreenTrianglePass, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
         mPointLightPass(mDevice, mBackbuffer, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
-
         // samplers
         mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
         mShadowmapSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
-        mShadowmapNoCompareSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT)
+        mShadowmapNoCompareSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT),
+        // misc
+        mSSAOEnabled(settings.mSSAOEnabled)
     {
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -254,6 +253,17 @@ namespace JonsEngine
     }
 
 
+    bool DX11RendererImpl::IsSSAOEnabled() const
+    {
+        return mSSAOEnabled;
+    }
+
+    void DX11RendererImpl::SetSSAO(const bool useSSAO)
+    {
+        mSSAOEnabled = useSSAO;
+    }
+
+
     float DX11RendererImpl::GetZNear() const
     {
         return Z_NEAR;
@@ -336,7 +346,7 @@ namespace JonsEngine
         mGBuffer.BindGeometryTextures(mContext);
 
         // ambient light
-        mAmbientPass.Render(mContext, lighting.mCameraViewMatrix, lighting.mAmbientLight, lighting.mScreenSize, true);
+        mAmbientPass.Render(mContext, lighting.mCameraViewMatrix, lighting.mAmbientLight, lighting.mScreenSize, mSSAOEnabled);
 
         // additive blending for adding lighting
         mContext->OMSetBlendState(mAdditiveBlending, NULL, 0xffffffff);

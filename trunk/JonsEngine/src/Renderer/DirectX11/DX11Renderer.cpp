@@ -54,6 +54,17 @@ namespace JonsEngine
     }
 
 
+    bool DX11Renderer::IsSSAOEnabled() const
+    {
+        return mImplementation->IsSSAOEnabled();
+    }
+
+    void DX11Renderer::SetSSAO(const bool useSSAO)
+    {
+        mImplementation->SetSSAO(useSSAO);
+    }
+
+
     float DX11Renderer::GetZNear() const
     {
         return mImplementation->GetZNear();
