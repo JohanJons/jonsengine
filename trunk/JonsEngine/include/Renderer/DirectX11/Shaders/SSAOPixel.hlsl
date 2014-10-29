@@ -11,7 +11,6 @@ static const float gProjScale = 500.0;
 static const float gNumSpiralTurns = 7;
 static const float gBias = 0.02;
 static const float gIntensity = 1.0;
-static const float FAR_PLANE_Z = 100.0f; // TODO - variable
 
 
 cbuffer SSAOCBuffer : register(CBUFFER_REGISTER_PIXEL)
