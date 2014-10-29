@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    bool CreateRectangleData(const float sizeX, const float sizeY, const float sizeZ, std::vector<float>& vertexData, std::vector<float>& normalData, std::vector<float>& texcoordData, std::vector<uint32_t>& indiceData)
+    bool CreateRectangleData(const float sizeX, const float sizeY, const float sizeZ, std::vector<float>& vertexData, std::vector<float>& normalData, std::vector<float>& texcoordData, std::vector<uint16_t>& indiceData)
     {
         const float X = sizeX / 2.0f;
         const float Y = sizeY / 2.0f;
@@ -43,12 +43,12 @@ namespace JonsEngine
         vertexData.insert(vertexData.begin(), cubeVertices, cubeVertices + (sizeof(cubeVertices) / sizeof(float)));
         normalData.insert(normalData.begin(), cubeNormals, cubeNormals + (sizeof(cubeNormals) / sizeof(float)));
         texcoordData.insert(texcoordData.begin(), cubeTexCoords, cubeTexCoords + (sizeof(cubeTexCoords) / sizeof(float)));
-        indiceData.insert(indiceData.begin(), cubeIndices, cubeIndices + (sizeof(cubeIndices) / sizeof(uint32_t)));
+        indiceData.insert(indiceData.begin(), cubeIndices, cubeIndices + (sizeof(cubeIndices) / sizeof(uint16_t)));
 
         return true;
     }
 
-    bool CreateSphereData(const float radius, const uint32_t rings, const uint32_t sectors, std::vector<float>& vertexData, std::vector<float>& normalData, std::vector<float>& texcoordData, std::vector<uint32_t>& indiceData)
+    bool CreateSphereData(const float radius, const uint32_t rings, const uint32_t sectors, std::vector<float>& vertexData, std::vector<float>& normalData, std::vector<float>& texcoordData, std::vector<uint16_t>& indiceData)
     {
         if (radius <= 0 || rings <= 0 || sectors <= 0)
             return false;

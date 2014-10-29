@@ -149,7 +149,7 @@ namespace JonsEngine
         mFullscreenTrianglePass(mDevice),
         mPostProcessor(mDevice, mFullscreenTrianglePass, GetBackbufferTextureDesc()),
         // lighting passes
-        mAmbientPass(mDevice, mFullscreenTrianglePass),
+        mAmbientPass(mDevice, mFullscreenTrianglePass, settings.mWindowWidth, settings.mWindowHeight),
         mDirectionalLightPass(mDevice, mBackbuffer, mFullscreenTrianglePass, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
         mPointLightPass(mDevice, mBackbuffer, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
         // samplers
@@ -204,7 +204,7 @@ namespace JonsEngine
     }
 
 
-    MeshID DX11RendererImpl::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData)
+    MeshID DX11RendererImpl::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint16_t>& indexData)
     {
         auto allocator = mMemoryAllocator;
 
@@ -354,7 +354,7 @@ namespace JonsEngine
         // do all directional lights
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
             // TODO: use real fov
-            mDirectionalLightPass.Render(mContext, renderQueue, mMeshes, 70.0f, lighting.mScreenSize.x / lighting.mScreenSize.y, lighting.mCameraViewMatrix, directionalLight.mLightColor, directionalLight.mLightDirection, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
+            mDirectionalLightPass.Render(mContext, renderQueue, mMeshes, lighting.mFOV, lighting.mScreenSize.x / lighting.mScreenSize.y, lighting.mCameraViewMatrix, directionalLight.mLightColor, directionalLight.mLightDirection, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
 
         // do all point lights
         mPointLightPass.BindForShading(mContext);

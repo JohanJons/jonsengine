@@ -37,7 +37,7 @@ namespace JonsEngine
         std::vector<float> mTexCoordsData;
         std::vector<float> mTangents;
         std::vector<float> mBitangents;
-        std::vector<uint32_t> mIndiceData;
+        std::vector<uint16_t> mIndiceData;
         uint16_t mMaterialIndex;
         bool mHasMaterial;
 

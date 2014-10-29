@@ -15,7 +15,7 @@ namespace JonsEngine
     }
 
 
-    MeshID DX11Renderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData)
+    MeshID DX11Renderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint16_t>& indexData)
     {
         return mImplementation->CreateMesh(vertexData, normalData, texCoords, tangents, bitangents, indexData);
     }

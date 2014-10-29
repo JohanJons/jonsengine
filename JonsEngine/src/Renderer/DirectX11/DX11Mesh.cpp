@@ -8,7 +8,7 @@ namespace JonsEngine
 
 
     DX11Mesh::DX11Mesh(ID3D11DevicePtr device, const std::vector<float>& vertexData, const std::vector<float>& normalData,
-        const std::vector<float>& texCoords, const std::vector<float>& tangentData, const std::vector<float>& bitangentData, const std::vector<uint32_t>& indexData) 
+        const std::vector<float>& texCoords, const std::vector<float>& tangentData, const std::vector<float>& bitangentData, const std::vector<uint16_t>& indexData)
         : mMeshID(gNextMeshID++), mNumIndices(indexData.size()), mVertexBuffer(nullptr), mTexcoordBuffer(nullptr), mIndexBuffer(nullptr)
     {
         // vertex buffer
@@ -78,7 +78,7 @@ namespace JonsEngine
         // index buffer
         ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
         bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-        bufferDescription.ByteWidth = indexData.size() * sizeof(uint32_t);
+        bufferDescription.ByteWidth = indexData.size() * sizeof(uint16_t);
         bufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
         ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
@@ -106,7 +106,7 @@ namespace JonsEngine
         if (mTexcoordBuffer)
             context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer.p, &texcoordSize, &offset);
 
-        context->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+        context->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
         context->DrawIndexed(mNumIndices, 0, 0);
     }
 

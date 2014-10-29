@@ -75,7 +75,7 @@ namespace JonsEngine
      
     RenderableLighting Engine::GetLightingInfo(const Mat4& projMatrix, const Mat4& viewMatrix, const Mat4& viewProjectionMatrix, const Vec4& ambientLight, const Vec3& cameraPosition, const std::vector<PointLightPtr>& pointLights, const std::vector<DirectionalLightPtr>& directionalLights)
     {
-        RenderableLighting lighting(viewMatrix, projMatrix, ambientLight, cameraPosition, Vec2(mWindow.GetScreenWidth(), mWindow.GetScreenHeight()));
+        RenderableLighting lighting(viewMatrix, projMatrix, ambientLight, cameraPosition, Vec2(mWindow.GetScreenWidth(), mWindow.GetScreenHeight()), mWindow.GetFOV());
 
         for (PointLightPtr pointLight : pointLights)
         {

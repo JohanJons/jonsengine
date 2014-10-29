@@ -28,7 +28,7 @@ namespace JonsEngine
 
 
         DX11Mesh(ID3D11DevicePtr device, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
-                 const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint32_t>& indexData);
+            const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint16_t>& indexData);
         ~DX11Mesh();
 
         void Draw(ID3D11DeviceContextPtr context);
@@ -38,7 +38,7 @@ namespace JonsEngine
 
     private:
         MeshID mMeshID;
-        uint32_t mNumIndices;
+        uint16_t mNumIndices;
 
         ID3D11BufferPtr mVertexBuffer;
         ID3D11BufferPtr mNormalBuffer;

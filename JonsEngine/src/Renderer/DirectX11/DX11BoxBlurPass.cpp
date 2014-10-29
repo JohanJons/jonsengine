@@ -6,13 +6,13 @@
 
 namespace JonsEngine
 {
-    DX11BoxBlurPass::DX11BoxBlurPass(ID3D11DevicePtr device, DX11FullscreenTrianglePass& fullscreenPass, const DXGI_FORMAT textureFormat) :
+    DX11BoxBlurPass::DX11BoxBlurPass(ID3D11DevicePtr device, DX11FullscreenTrianglePass& fullscreenPass, const DXGI_FORMAT textureFormat, const uint16_t screenWidth, const uint16_t screenHeight) :
         mFullscreenPass(fullscreenPass), mBoxBlurCBuffer(device, mBoxBlurCBuffer.CONSTANT_BUFFER_SLOT_PIXEL), mBoxBlurTexture(nullptr), mBoxBlurSRV(nullptr), mBoxBlurRTV(nullptr)
     {
         D3D11_TEXTURE2D_DESC blurTextureDesc;
         ZeroMemory(&blurTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
-        blurTextureDesc.Width = 1920;
-        blurTextureDesc.Height = 1080;
+        blurTextureDesc.Width = screenWidth;
+        blurTextureDesc.Height = screenHeight;
         blurTextureDesc.Format = textureFormat;
         blurTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
         blurTextureDesc.MipLevels = 1;
