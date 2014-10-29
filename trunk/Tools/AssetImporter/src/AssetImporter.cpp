@@ -7,6 +7,7 @@
 #include <assimp/scene.h>
 #include <assimp/mesh.h>
 #include <sstream>
+#include <cstdint>
 
 using namespace JonsEngine;
 
@@ -323,7 +324,15 @@ namespace JonsAssetImporter
             
             // index data
             for (unsigned int j = 0; j < m->mNumFaces; j++)
-                mesh.mIndiceData.insert(mesh.mIndiceData.end(), m->mFaces[j].mIndices, m->mFaces[j].mIndices + m->mFaces[j].mNumIndices);
+            {
+                // only dem triangles
+                assert(m->mFaces[j].mNumIndices == 3);
+                for (uint32_t index = 0; index < 3; index++)
+                {
+                    assert(m->mFaces[j].mIndices[index] <= UINT16_MAX);
+                    mesh.mIndiceData.push_back(m->mFaces[j].mIndices[index]);
+                }
+            }
 
             if (materialMap.find(m->mMaterialIndex) != materialMap.end()) 
             {

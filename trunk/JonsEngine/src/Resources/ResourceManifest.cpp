@@ -28,13 +28,13 @@ namespace JonsEngine
             return ptr;
 
         std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
-        std::vector<uint32_t> indiceData;
+        std::vector<uint16_t> indiceData;
         if (!CreateRectangleData(sizeX, sizeY, sizeZ, vertexData, normalData, texcoordData, indiceData))
             return ptr;
 
         auto allocator = mMemoryAllocator;
-        ptr            = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName), [=](Model* model) { allocator->DeallocateObject(model); }));
-        ptr->mMesh     = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData);
+        ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName), [=](Model* model) { allocator->DeallocateObject(model); }));
+        ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData);
 
         return ptr;
     }
@@ -54,7 +54,7 @@ namespace JonsEngine
             return ptr;
 
         std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
-        std::vector<uint32_t> indiceData;
+        std::vector<uint16_t> indiceData;
         if (!CreateSphereData(radius, rings, sectors, vertexData, normalData, texcoordData, indiceData))
             return ptr;
 

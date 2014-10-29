@@ -18,7 +18,7 @@ namespace JonsEngine
     DX11Mesh CreateSphereMesh(ID3D11DevicePtr device)
     {
         std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
-        std::vector<uint32_t> indiceData;
+        std::vector<uint16_t> indiceData;
         if (!CreateSphereData(1.0f, 12, 24, vertexData, normalData, texcoordData, indiceData))
         {
             JONS_LOG_ERROR(Logger::GetRendererLogger(), "Failed to create sphere for shading pass");

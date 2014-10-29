@@ -8,15 +8,15 @@
 
 namespace JonsEngine
 {
-    DX11AmbientPass::DX11AmbientPass(ID3D11DevicePtr device, DX11FullscreenTrianglePass& fullscreenPass) :
-        mFullscreenPass(fullscreenPass), mBoxBlurPass(device, mFullscreenPass, DXGI_FORMAT_R8_UNORM), mAmbientPixelShader(nullptr), mAmbientCBuffer(device, mAmbientCBuffer.CONSTANT_BUFFER_SLOT_PIXEL),
+    DX11AmbientPass::DX11AmbientPass(ID3D11DevicePtr device, DX11FullscreenTrianglePass& fullscreenPass, const uint16_t screenWidth, const uint16_t screenHeight) :
+        mFullscreenPass(fullscreenPass), mBoxBlurPass(device, mFullscreenPass, DXGI_FORMAT_R8_UNORM, screenWidth, screenHeight), mAmbientPixelShader(nullptr), mAmbientCBuffer(device, mAmbientCBuffer.CONSTANT_BUFFER_SLOT_PIXEL),
         mSSAOCBuffer(device, mSSAOCBuffer.CONSTANT_BUFFER_SLOT_PIXEL), mSSAOTexture(nullptr), mSSAOSRV(nullptr), mSSAORTV(nullptr)
     {
         D3D11_TEXTURE2D_DESC ssaoTextureDesc;
         ZeroMemory(&ssaoTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
         // TODO: real size
-        ssaoTextureDesc.Width = 1920;
-        ssaoTextureDesc.Height = 1080;
+        ssaoTextureDesc.Width = screenWidth;
+        ssaoTextureDesc.Height = screenHeight;
         // TODO: R8 enough? or R16? ...........
         ssaoTextureDesc.Format = DXGI_FORMAT_R8_UNORM;
         ssaoTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
