@@ -224,7 +224,7 @@ namespace JonsEngine
 
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
     {
-        GeometryStage(renderQueue);
+        GeometryStage(renderQueue, lighting.mCameraViewMatrix);
         ShadingStage(renderQueue, lighting, debugExtra);
 
         DXCALL(mSwapchain->Present(0, 0));
@@ -299,7 +299,7 @@ namespace JonsEngine
         mShadowmapNoCompareSampler.BindSampler(mContext);
     }
 
-    void DX11RendererImpl::GeometryStage(const RenderQueue& renderQueue)
+    void DX11RendererImpl::GeometryStage(const RenderQueue& renderQueue, const Mat4& viewMatrix)
     {
         mGBuffer.BindForGeometryStage(mContext);
 
@@ -334,7 +334,7 @@ namespace JonsEngine
             if (hasNormalTexture)
                 BindTexture2D(mTextures, mLogger, renderable.mNormalTexture, mContext);
 
-            mGBuffer.SetConstantData(mContext, renderable.mWVPMatrix, renderable.mWorldMatrix, renderable.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
+            mGBuffer.SetConstantData(mContext, renderable.mWVPMatrix, viewMatrix * renderable.mWorldMatrix, renderable.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
             (*meshIterator)->Draw(mContext);
         }
     }
@@ -346,22 +346,22 @@ namespace JonsEngine
         mGBuffer.BindGeometryTextures(mContext);
 
         // ambient light
-        mAmbientPass.Render(mContext, lighting.mCameraViewMatrix, lighting.mAmbientLight, lighting.mScreenSize, mSSAOEnabled);
+        mAmbientPass.Render(mContext, lighting.mAmbientLight, lighting.mScreenSize, mSSAOEnabled);
 
         // additive blending for adding lighting
         mContext->OMSetBlendState(mAdditiveBlending, NULL, 0xffffffff);
 
         // do all directional lights
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
-            // TODO: use real fov
-            mDirectionalLightPass.Render(mContext, renderQueue, mMeshes, lighting.mFOV, lighting.mScreenSize.x / lighting.mScreenSize.y, lighting.mCameraViewMatrix, directionalLight.mLightColor, directionalLight.mLightDirection, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
+            mDirectionalLightPass.Render(mContext, renderQueue, mMeshes, lighting.mFOV, lighting.mScreenSize.x / lighting.mScreenSize.y, lighting.mCameraViewMatrix, directionalLight.mLightColor, 
+                directionalLight.mLightDirection, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
 
         // do all point lights
         mPointLightPass.BindForShading(mContext);
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
             mBackbuffer.ClearStencilBuffer(mContext);
-            mPointLightPass.Render(mContext, renderQueue, mMeshes, pointLight, Z_FAR, Z_NEAR);
+            mPointLightPass.Render(mContext, renderQueue, mMeshes, pointLight, lighting.mCameraViewMatrix, Z_FAR, Z_NEAR);
         }
 
         // turn off blending for post processing
@@ -369,8 +369,5 @@ namespace JonsEngine
 
         if (mAntiAliasing == EngineSettings::ANTIALIASING_FXAA)
             mPostProcessor.FXAAPass(mContext, mBackbuffer, Vec2(mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height));
-
-        //mBackbuffer.BindForShadingStage(mContext, true);
-        //mPostProcessor.SSAOPass(mContext, lighting.mCameraProjectionMatrix * lighting.mCameraViewMatrix, lighting.mCameraProjectionMatrix, lighting.mCameraViewMatrix, Vec2(mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height));
     }
 }

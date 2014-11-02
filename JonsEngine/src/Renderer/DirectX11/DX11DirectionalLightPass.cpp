@@ -54,51 +54,6 @@ namespace JonsEngine
 
     Mat4 CreateDirLightVPMatrix(const CameraFrustrum& cameraFrustrum, const Vec3& lightDir)
     {
-        /*Vec3 frustrumCenter(0.0f);
-        for (const Vec4& corner : cameraFrustrum)
-        {
-            frustrumCenter.x += corner.x;
-            frustrumCenter.y += corner.y;
-            frustrumCenter.z += corner.z;
-        }
-        frustrumCenter /= 8.0f;
-
-       /* Mat4 lightViewMatrix(1.0f);
-        lightViewMatrix[2] = -Vec4(lightDir, 0.0f);
-        lightViewMatrix[0] = Vec4(glm::normalize(glm::cross(Vec3(0.0f, -1.0f, 0.0f), Vec3(lightViewMatrix[2]))), 0.0f);
-        lightViewMatrix[1] = Vec4(glm::cross(Vec3(lightViewMatrix[2]), Vec3(lightViewMatrix[0])), 0.0f);
-
-        lightViewMatrix[3][0] = -glm::dot(frustrumCenter, Vec3(lightViewMatrix[0]));
-        lightViewMatrix[3][1] = -glm::dot(frustrumCenter, Vec3(lightViewMatrix[1]));
-        lightViewMatrix[3][2] = -glm::dot(frustrumCenter, Vec3(lightViewMatrix[2]));*/
-      //  Mat4 lightViewMatrix = glm::lookAt(frustrumCenter, frustrumCenter - glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
-        //Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
-        //Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
-
-   /*     Vec4 transf = lightViewMatrix * cameraFrustrum[0];
-        float maxZ = transf.z, minZ = transf.z;
-        float maxX = transf.x, minX = transf.x;
-        float maxY = transf.y, minY = transf.y;
-        for (uint32_t i = 1; i < 8; i++)
-        {
-            transf = lightViewMatrix * cameraFrustrum[i];
-
-            if (transf.z > maxZ) maxZ = transf.z;
-            if (transf.z < minZ) minZ = transf.z;
-            if (transf.x > maxX) maxX = transf.x;
-            if (transf.x < minX) minX = transf.x;
-            if (transf.y > maxY) maxY = transf.y;
-            if (transf.y < minY) minY = transf.y;
-        }
-
-        lightViewMatrix[3][0] = frustrumCenter.x - lightDir.x * -minZ;
-        lightViewMatrix[3][1] = frustrumCenter.y - lightDir.y * -minZ;
-        lightViewMatrix[3][2] = frustrumCenter.z - lightDir.z * -minZ;
-
-        Vec3 cascadeExtents((maxX - minX) * 0.5f, (maxY - minY) * 0.5f, (maxZ - minZ) * 0.5f);
-
-        return OrthographicMatrix(-10.0f, 10.0f, 10.0f, -10.0f, 0.0f, -10.0f) * lightViewMatrix;*/
-
         Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
 
         Vec4 transf = lightViewMatrix * cameraFrustrum[0];
@@ -188,7 +143,7 @@ namespace JonsEngine
             lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, lightDir);
             mVertexTransformPass.RenderMeshes(context, renderQueue, meshes, lightVPMatrices[cascadeIndex]);
 
-            lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex];
+            lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex] * glm::inverse(cameraViewMatrix);
             farDistArr[cascadeIndex] = -farDistArr[cascadeIndex];
         }
 
@@ -204,8 +159,10 @@ namespace JonsEngine
         // bind shadowmap SRV for reading
         mShadowmap.BindForReading(context);
 
+        const Vec4 camLightDir = glm::normalize(cameraViewMatrix * Vec4(-lightDir, 0));
+
         // set dir light cbuffer data and pixel shader
-        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, cameraViewMatrix, farDistArr, lightColor, lightDir, static_cast<float>(mShadowmap.GetTextureSize())), context);
+        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, farDistArr, lightColor, camLightDir, static_cast<float>(mShadowmap.GetTextureSize())), context);
         context->PSSetShader(mPixelShader, NULL, NULL);
 
         // run fullscreen pass + dir light shading pass

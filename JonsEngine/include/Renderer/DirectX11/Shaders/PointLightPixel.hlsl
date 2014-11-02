@@ -6,7 +6,7 @@
 cbuffer PointLightConstants : register(CBUFFER_REGISTER_PIXEL)
 {
     float4 gLightColor;
-    float4 gLightPosition;
+    float4 gViewLightPosition;
     float gLightIntensity;
     float gMaxDistance;
     float gZFar;
@@ -35,13 +35,13 @@ float VectorToDepthValue(float3 Vec)
 
 float4 ps_main(float4 position : SV_Position) : SV_Target0
 {
-    float4 worldPosition = gPositionTexture[uint2(position.xy)];
+    float4 viewPosition = gPositionTexture[uint2(position.xy)];
     float4 diffuse = gDiffuseTexture[uint2(position.xy)];
     float3 normal = (float3)gNormalTexture[uint2(position.xy)];
-    float3 positionDiff = (float3)(gLightPosition - worldPosition);
+    float3 positionDiff = (float3)(gViewLightPosition - viewPosition);
 
     // shadowmapping
-    float3 cubemapDir = (float3)(worldPosition - gLightPosition);
+    float3 cubemapDir = (float3)(viewPosition - gViewLightPosition);
     cubemapDir.z = -cubemapDir.z;       // TODO: any way to remove this extra instruction?
     float storedDepth = gShadowmap.Sample(gShadowmapSampler, cubemapDir).r;
     float visibility = 0.0;
