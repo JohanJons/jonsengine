@@ -107,7 +107,7 @@ namespace JonsEngine
         mVertexTransformPass.BindForTransformPass(context);
     }
 
-    void DX11PointLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight, const float zFar, const float zNear)
+    void DX11PointLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight, const Mat4& viewMatrix, const float zFar, const float zNear)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
@@ -115,6 +115,8 @@ namespace JonsEngine
         uint32_t numViewports = 1;
         context->RSGetState(&prevRasterizerState);
         context->RSGetViewports(&numViewports, &prevViewport);
+        const Vec4 viewLightPositonV4 = viewMatrix * Vec4(pointLight.mLightPosition, 1.0);
+        const Vec3 viewLightPositonV3 = Vec3(viewLightPositonV4);
 
         //
         // shadow pass
@@ -129,10 +131,10 @@ namespace JonsEngine
         for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
         {
             mShadowmap.BindDepthView(context, face);
-            Mat4 lightViewMatrix = glm::lookAt(pointLight.mLightPosition, pointLight.mLightPosition + CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
+            Mat4 lightViewMatrix = glm::lookAt(viewLightPositonV3, viewLightPositonV3 + CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
             // TODO: precompute?
             Mat4 lightProjMatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, Z_FAR);
-            mVertexTransformPass.RenderMeshes(context, renderQueue, meshes, lightProjMatrix * lightViewMatrix);
+            mVertexTransformPass.RenderMeshes(context, renderQueue, meshes, lightProjMatrix * lightViewMatrix * viewMatrix);
         }
 
         //
@@ -160,7 +162,7 @@ namespace JonsEngine
 
         // set point light pixel shader and its cbuffer
         context->PSSetShader(mPixelShader, NULL, NULL);
-        mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mLightColor, Vec4(pointLight.mLightPosition, 1.0), pointLight.mLightIntensity, pointLight.mMaxDistance, zFar, zNear), context);
+        mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mLightColor, viewLightPositonV4, pointLight.mLightIntensity, pointLight.mMaxDistance, zFar, zNear), context);
 
         // run transform pass on sphere + point light shading pass
         mVertexTransformPass.RenderMesh(context, mSphereMesh, pointLight.mWVPMatrix);

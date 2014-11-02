@@ -12,19 +12,13 @@ static const float gNumSpiralTurns = 7;
 static const float gBias = 0.02;
 static const float gIntensity = 1.0;
 
-
-cbuffer SSAOCBuffer : register(CBUFFER_REGISTER_PIXEL)
-{
-    float4x4 gViewMatrix;
-};
-
 Texture2D gPositionTexture : register(TEXTURE_REGISTER_POSITION);
 SamplerState gPointSampler : register(SAMPLER_REGISTER_POINT);
 
 
-float3 reconstructNormal(float3 positionWorldSpace)
+float3 reconstructNormal(float3 positionViewSpace)
 {
-    return normalize(cross(ddy(positionWorldSpace), ddx(positionWorldSpace)));
+    return normalize(cross(ddy(positionViewSpace), ddx(positionViewSpace)));
 }
 
 /** Read the camera - space position of the point at screen - space pixel ssP + unitOffset * ssR.Assumes length(unitOffset) == 1 */
@@ -41,7 +35,7 @@ float3 getOffsetPosition(int2 ssC, float2 unitOffset, float ssR) {
 
     // Divide coordinate by 2^mipLevel
     //P = gPositionTexture.Load(int3(ssP >> mipLevel, mipLevel)).xyz;
-    P = mul(gViewMatrix, float4(P, 1.0)).xyz;
+    //P = mul(gViewMatrix, float4(P, 1.0)).xyz;
 
     return P;
 }
@@ -81,7 +75,7 @@ float ps_main(float4 position : SV_Position) : SV_Target0
     uint2 screenSpacePos = (uint2)position.xy;
 
     float3 originPos = gPositionTexture[screenSpacePos].xyz;
-    originPos = mul(gViewMatrix, float4(originPos, 1.0)).xyz;
+    //originPos = mul(gViewMatrix, float4(originPos, 1.0)).xyz;
     float3 normal = reconstructNormal(originPos);
 
     // Hash function used in the HPG12 AlchemyAO paper

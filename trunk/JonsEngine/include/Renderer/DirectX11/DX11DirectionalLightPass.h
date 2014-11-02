@@ -31,7 +31,6 @@ namespace JonsEngine
         struct DirectionalLightCBuffer
         {
             std::array<Mat4, NUM_SHADOWMAP_CASCADES> mSplitVPMatrices;
-            Mat4 mCameraViewMatrix;
             std::array<float, NUM_SHADOWMAP_CASCADES> mSplitDistances;
             Vec4 mLightColor;
             Vec4 mLightDirection;
@@ -39,9 +38,8 @@ namespace JonsEngine
             float __padding[3];
 
 
-            DirectionalLightCBuffer(const std::array<Mat4, NUM_SHADOWMAP_CASCADES>& splitMatrices, const Mat4& cameraViewMatrix, const std::array<float, NUM_SHADOWMAP_CASCADES>& splitDistances,
-                                    const Vec4& lightColor, const Vec3& lightDir, const float shadowmapSize) :
-                                    mSplitVPMatrices(splitMatrices), mCameraViewMatrix(cameraViewMatrix), mSplitDistances(splitDistances), mLightColor(lightColor), mLightDirection(Vec4(-lightDir, 0.0f)), mShadowmapSize(shadowmapSize)
+            DirectionalLightCBuffer(const std::array<Mat4, NUM_SHADOWMAP_CASCADES>& splitMatrices, const std::array<float, NUM_SHADOWMAP_CASCADES>& splitDistances, const Vec4& lightColor, const Vec4& lightDir, const float shadowmapSize) :
+                mSplitVPMatrices(splitMatrices), mSplitDistances(splitDistances), mLightColor(lightColor), mLightDirection(lightDir), mShadowmapSize(shadowmapSize)
             {
             }
         };
