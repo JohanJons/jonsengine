@@ -22,7 +22,6 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
 
     float2 coords = float2(position.x * gScreenSizeReciprocal.x, position.y * gScreenSizeReciprocal.y);
 
-    //return gFinalTexture.Sample(gPointSampler, coords);
     return FxaaPixelShader(
         coords,							        // FxaaFloat2 pos,
         FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsolePosPos,

@@ -81,15 +81,14 @@ namespace JonsEngine
         Mat4 mCameraProjectionMatrix;
         Vec4 mAmbientLight;
         Vec3 mCameraPosition;
-        Vec2 mScreenSize;
         float mFOV;
        
         std::vector<PointLight> mPointLights;
         std::vector<DirectionalLight> mDirectionalLights;
 
 
-        RenderableLighting(const Mat4& camViewMatrix,  const Mat4& camProjMatrix, const Vec4& ambientLight, const Vec3& cameraPosition, const Vec2& screenSize, const float fov) :
-            mCameraViewMatrix(camViewMatrix), mCameraProjectionMatrix(camProjMatrix), mScreenSize(screenSize), mCameraPosition(cameraPosition), mAmbientLight(ambientLight), mFOV(fov)
+        RenderableLighting(const Mat4& camViewMatrix,  const Mat4& camProjMatrix, const Vec4& ambientLight, const Vec3& cameraPosition, const float fov) :
+            mCameraViewMatrix(camViewMatrix), mCameraProjectionMatrix(camProjMatrix), mCameraPosition(cameraPosition), mAmbientLight(ambientLight), mFOV(fov)
         {
         }
     };

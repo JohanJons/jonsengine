@@ -6,9 +6,8 @@
 
 struct GBufferPSOut
 {
-    float4 mWorldPosition : SV_Target0;
-    float4 mDiffuse : SV_Target1;
-    float4 mNormal : SV_Target2;
+    float4 mDiffuse : SV_Target0;
+    float4 mNormal : SV_Target1;
 };
 
 Texture2D gDiffuseTexture : register(TEXTURE_REGISTER_DIFFUSE);
@@ -19,8 +18,6 @@ SamplerState gSampler : register(SAMPLER_REGISTER_ANISOTROPIC);
 GBufferPSOut ps_main(GBufferVSOut input)
 {
     GBufferPSOut output;
-
-    output.mWorldPosition = input.mWorldPosition;
 
     if (gHasDiffuseTexture)
         output.mDiffuse = gDiffuseTexture.Sample(gSampler, input.mTexcoord);

@@ -107,7 +107,8 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Vec4& lightColor, const Vec3& lightDir, const bool drawFrustrums)
+    void DX11DirectionalLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix,
+        const Mat4& invProjMatrix, const Vec4& lightColor, const Vec3& lightDir, const Vec2& screenSize, const bool drawFrustrums)
     {
         D3D11_VIEWPORT prevViewport;
         ID3D11RasterizerStatePtr prevRS;
@@ -152,7 +153,7 @@ namespace JonsEngine
         //
         
         // restore rendering to backbuffer, rasterize state and viewport
-        mBackbuffer.BindForShadingStage(context, false);
+        mBackbuffer.BindForShadingStage(context);
         context->RSSetViewports(numViewports, &prevViewport);
         context->RSSetState(prevRS);
         
@@ -162,7 +163,7 @@ namespace JonsEngine
         const Vec4 camLightDir = glm::normalize(cameraViewMatrix * Vec4(-lightDir, 0));
 
         // set dir light cbuffer data and pixel shader
-        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, farDistArr, lightColor, camLightDir, static_cast<float>(mShadowmap.GetTextureSize())), context);
+        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, invProjMatrix, farDistArr, lightColor, camLightDir, screenSize, static_cast<float>(mShadowmap.GetTextureSize())), context);
         context->PSSetShader(mPixelShader, NULL, NULL);
 
         // run fullscreen pass + dir light shading pass

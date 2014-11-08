@@ -107,7 +107,8 @@ namespace JonsEngine
         mVertexTransformPass.BindForTransformPass(context);
     }
 
-    void DX11PointLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight, const Mat4& viewMatrix, const float zFar, const float zNear)
+    void DX11PointLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight, const Mat4& viewMatrix, const Mat4& invProjMatrix,
+        const Vec2& screenSize, const float zFar, const float zNear)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
@@ -142,7 +143,7 @@ namespace JonsEngine
         //
 
         // restore rendering to the backbuffer
-        mBackbuffer.BindForShadingStage(context, false);
+        mBackbuffer.BindForShadingStage(context);
 
         context->OMSetDepthStencilState(mDSSStencilPass, 0);
         context->RSSetState(mRSNoCulling);
@@ -162,7 +163,7 @@ namespace JonsEngine
 
         // set point light pixel shader and its cbuffer
         context->PSSetShader(mPixelShader, NULL, NULL);
-        mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mLightColor, viewLightPositonV4, pointLight.mLightIntensity, pointLight.mMaxDistance, zFar, zNear), context);
+        mPointLightCBuffer.SetData(PointLightCBuffer(invProjMatrix, pointLight.mLightColor, viewLightPositonV4, screenSize, pointLight.mLightIntensity, pointLight.mMaxDistance, zFar, zNear), context);
 
         // run transform pass on sphere + point light shading pass
         mVertexTransformPass.RenderMesh(context, mSphereMesh, pointLight.mWVPMatrix);

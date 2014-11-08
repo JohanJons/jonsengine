@@ -10,7 +10,7 @@ namespace JonsEngine
 
 
     DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, uint32_t textureWidth, uint32_t textureHeight) : 
-        mBackbufferTexture(nullptr), mBackbufferRTV(nullptr), mDepthStencilBuffer(nullptr), mDepthStencilView(nullptr), mDepthSRV(nullptr), mDepthStencilState(nullptr)
+        mBackbufferTexture(nullptr), mBackbufferRTV(nullptr), mDepthStencilBuffer(nullptr), mDSV(nullptr), mDSVReadOnly(nullptr), mDepthSRV(nullptr), mDepthStencilState(nullptr)
     {
         // backbuffer rendertarget setup
         DXCALL(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&mBackbufferTexture));
@@ -40,7 +40,10 @@ namespace JonsEngine
         ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
         dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
         dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-        DXCALL(device->CreateDepthStencilView(mDepthStencilBuffer, &dsvDesc, &mDepthStencilView));
+        DXCALL(device->CreateDepthStencilView(mDepthStencilBuffer, &dsvDesc, &mDSV));
+
+        dsvDesc.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
+        DXCALL(device->CreateDepthStencilView(mDepthStencilBuffer, &dsvDesc, &mDSVReadOnly));
 
         // depth stencil config used in shading stage
         D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
@@ -64,24 +67,15 @@ namespace JonsEngine
 
     void DX11Backbuffer::ClearStencilBuffer(ID3D11DeviceContextPtr context)
     {
-        context->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_STENCIL, 1.0f, 0);
+        context->ClearDepthStencilView(mDSV, D3D11_CLEAR_STENCIL, 1.0f, 0);
     }
 
-    void DX11Backbuffer::BindForShadingStage(ID3D11DeviceContextPtr context, const bool useDepthAsSRV)
+    void DX11Backbuffer::BindForShadingStage(ID3D11DeviceContextPtr context)
     {
-        // set backbuffer as rendertarget
-        if (useDepthAsSRV)
-        {
-            context->OMSetRenderTargets(1, &mBackbufferRTV.p, NULL);
-            context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mDepthSRV.p);
-        }
-        else
-        {
-            context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv.p);
-            context->OMSetRenderTargets(1, &mBackbufferRTV.p, mDepthStencilView);
-        }
+        context->OMSetRenderTargets(1, &mBackbufferRTV.p, mDSVReadOnly);
+        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mDepthSRV.p);
 
-        // disable further depth testing/writing
+        // disable further depth writing
         context->OMSetDepthStencilState(mDepthStencilState, 0);
     }
 
@@ -93,6 +87,6 @@ namespace JonsEngine
 
     ID3D11DepthStencilViewPtr DX11Backbuffer::GetDepthStencilView()
     {
-        return mDepthStencilView;
+        return mDSV;
     }
 }
