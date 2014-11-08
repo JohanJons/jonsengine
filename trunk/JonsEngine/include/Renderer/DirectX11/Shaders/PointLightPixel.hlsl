@@ -2,25 +2,28 @@
 #define POINT_LIGHT_PIXEL_HLSL
 
 #include "Constants.h"
+#include "Common.hlsl"
 
 cbuffer PointLightConstants : register(CBUFFER_REGISTER_PIXEL)
 {
+    float4x4 gInvProjMatrix;
     float4 gLightColor;
     float4 gViewLightPosition;
+    float2 gScreenSize;
     float gLightIntensity;
     float gMaxDistance;
     float gZFar;
     float gZNear;
 };
 
-Texture2D gPositionTexture : register(TEXTURE_REGISTER_POSITION);
+Texture2D gDepthTexture : register(TEXTURE_REGISTER_DEPTH);
 Texture2D gDiffuseTexture : register(TEXTURE_REGISTER_DIFFUSE);
 Texture2D gNormalTexture : register(TEXTURE_REGISTER_NORMAL);
-TextureCube gShadowmap : register(TEXTURE_REGISTER_DEPTH);
+TextureCube gShadowmap : register(TEXTURE_REGISTER_EXTRA);
 SamplerState gShadowmapSampler : register(SAMPLER_REGISTER_POINT);
 
 
-float VectorToDepthValue(float3 Vec)
+float VectorToDepthValue(const float3 Vec)
 {
     float3 AbsVec = abs(Vec);
     float LocalZcomp = max(AbsVec.x, max(AbsVec.y, AbsVec.z));
@@ -35,7 +38,8 @@ float VectorToDepthValue(float3 Vec)
 
 float4 ps_main(float4 position : SV_Position) : SV_Target0
 {
-    float4 viewPosition = gPositionTexture[uint2(position.xy)];
+    float depth = gDepthTexture[uint2(position.xy)].r;
+    float4 viewPosition = float4(reconstructViewPosition(depth, float2(position.x / gScreenSize.x, position.y / gScreenSize.y), gInvProjMatrix), 1.0);
     float4 diffuse = gDiffuseTexture[uint2(position.xy)];
     float3 normal = (float3)gNormalTexture[uint2(position.xy)];
     float3 positionDiff = (float3)(gViewLightPosition - viewPosition);

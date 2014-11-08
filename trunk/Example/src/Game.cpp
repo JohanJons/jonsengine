@@ -7,13 +7,14 @@
 #include "include/Resources/ResourceManifest.h"
 
 #include "boost/bind.hpp"
-#include <Windows.h>
-#include <iostream>
-#include <string>
-#include <sstream>
 
 using namespace std;
 using namespace JonsEngine;
+
+/*
+ * Demo/interactive test of JonsEngine features
+ * Requires JonsEngine binary asset file (.jons) to load art resources - see AssetImporter project
+ */
 
 namespace JonsGame
 {
@@ -194,7 +195,7 @@ namespace JonsGame
         // directional light
         DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
         directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
-        directionalLight->mLightColor = Vec4(0.3f);
+        directionalLight->mLightColor = Vec4(0.4f);
 
         // ambient light
         myScene->SetAmbientLight(Vec4(0.05f));

@@ -12,7 +12,13 @@ static const float gNumSpiralTurns = 7;
 static const float gBias = 0.02;
 static const float gIntensity = 1.0;
 
-Texture2D gPositionTexture : register(TEXTURE_REGISTER_POSITION);
+cbuffer SSAOConstants : register(CBUFFER_REGISTER_PIXEL)
+{
+    float4x4 gInvProjMatrix;
+    float2 gScreenSize;
+};
+
+Texture2D gDepthTexture : register(TEXTURE_REGISTER_DEPTH);
 SamplerState gPointSampler : register(SAMPLER_REGISTER_POINT);
 
 
@@ -29,9 +35,10 @@ float3 getOffsetPosition(int2 ssC, float2 unitOffset, float ssR) {
     // TODO: mip levels
     int mipLevel = 0; //TODO: clamp((int)floor(log2(ssR)) - LOG_MAX_OFFSET, 0, MAX_MIP_LEVEL);
 
-    int2 ssP = int2(ssR*unitOffset) + ssC;
+    uint2 ssP = uint2(ssR*unitOffset) + ssC;
 
-    float3 P = gPositionTexture[ssP].xyz;
+    float depth = gDepthTexture[ssP].r;
+    float3 P = reconstructViewPosition(depth, float2(ssP.x / gScreenSize.x, ssP.y / gScreenSize.y), gInvProjMatrix);
 
     // Divide coordinate by 2^mipLevel
     //P = gPositionTexture.Load(int3(ssP >> mipLevel, mipLevel)).xyz;
@@ -74,8 +81,8 @@ float ps_main(float4 position : SV_Position) : SV_Target0
 {
     uint2 screenSpacePos = (uint2)position.xy;
 
-    float3 originPos = gPositionTexture[screenSpacePos].xyz;
-    //originPos = mul(gViewMatrix, float4(originPos, 1.0)).xyz;
+    float depth = gDepthTexture[screenSpacePos].r;
+    float3 originPos = reconstructViewPosition(depth, float2(screenSpacePos.x / gScreenSize.x, screenSpacePos.y / gScreenSize.y), gInvProjMatrix);
     float3 normal = reconstructNormal(originPos);
 
     // Hash function used in the HPG12 AlchemyAO paper
@@ -84,9 +91,7 @@ float ps_main(float4 position : SV_Position) : SV_Target0
 
     float ao = 0.0;
     for (int i = 0; i < gNumSamples; i++)
-    {
         ao += sampleAO(screenSpacePos, originPos, normal, ssDiskRadius, i, randomPatternRotationAngle);
-    }
 
     float temp = gRadius2 * gRadius;
     ao /= temp * temp;

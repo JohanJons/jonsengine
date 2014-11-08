@@ -10,11 +10,10 @@ namespace JonsEngine
 {
     DX11AmbientPass::DX11AmbientPass(ID3D11DevicePtr device, DX11FullscreenTrianglePass& fullscreenPass, const uint16_t screenWidth, const uint16_t screenHeight) :
         mFullscreenPass(fullscreenPass), mBoxBlurPass(device, mFullscreenPass, DXGI_FORMAT_R8_UNORM, screenWidth, screenHeight), mAmbientPixelShader(nullptr), mAmbientCBuffer(device, mAmbientCBuffer.CONSTANT_BUFFER_SLOT_PIXEL),
-        mSSAOTexture(nullptr), mSSAOSRV(nullptr), mSSAORTV(nullptr)
+        mSSAOCBuffer(device, mSSAOCBuffer.CONSTANT_BUFFER_SLOT_PIXEL), mSSAOTexture(nullptr), mSSAOSRV(nullptr), mSSAORTV(nullptr)
     {
         D3D11_TEXTURE2D_DESC ssaoTextureDesc;
         ZeroMemory(&ssaoTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
-        // TODO: real size
         ssaoTextureDesc.Width = screenWidth;
         ssaoTextureDesc.Height = screenHeight;
         // TODO: R8 enough? or R16? ...........
@@ -37,7 +36,7 @@ namespace JonsEngine
     }
 
 
-    void DX11AmbientPass::Render(ID3D11DeviceContextPtr context, const Vec4& ambientLight, const Vec2& screenSize, const bool useSSAO)
+    void DX11AmbientPass::Render(ID3D11DeviceContextPtr context, const Mat4& invProjMatrix, const Vec4& ambientLight, const Vec2& screenSize, const bool useSSAO)
     {
         if (useSSAO)
         {
@@ -48,7 +47,7 @@ namespace JonsEngine
             // pass 1: render AO to texture
             context->OMSetRenderTargets(1, &mSSAORTV.p, NULL);
             context->PSSetShader(mSSAOPixelShader, NULL, NULL);
-
+            mSSAOCBuffer.SetData(SSAOCBuffer(invProjMatrix, screenSize), context);
             mFullscreenPass.Render(context);
 
             // pass 2: horizontal + vertical blur

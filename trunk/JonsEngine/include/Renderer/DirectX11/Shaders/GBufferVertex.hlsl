@@ -15,7 +15,6 @@ struct GBufferVSIn
 struct GBufferVSOut
 {
     float4 mPosition : SV_POSITION;
-    float4 mWorldPosition : WORLD_POSITION;
     float4 mNormal : NORMAL;
     float4 mTangent : TANGENT;
     float4 mBitangent : BITANGENT;
@@ -37,7 +36,6 @@ GBufferVSOut vs_main(GBufferVSIn input)
     GBufferVSOut output;
 
     output.mPosition = mul(gWVPMatrix, float4(input.mPosition, 1.0f));
-    output.mWorldPosition = mul(gWorldMatrix, float4(input.mPosition, 1.0f));
     output.mNormal = mul(gWorldMatrix, float4(input.mNormal, 0.0f));
     output.mTangent = mul(gWorldMatrix, float4(input.mTangent, 0.0f));
     output.mBitangent = mul(gWorldMatrix, float4(input.mBitangent, 0.0f));

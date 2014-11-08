@@ -86,7 +86,7 @@ namespace JonsEngine
         context->RSSetViewports(1, &mShadowPassViewport);
 
         // unbind shadowmap as shader resource
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv.p);
+        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSrv.p);
 
         // defaults to depth rendering/testing
         context->OMSetDepthStencilState(NULL, 0);
@@ -100,7 +100,7 @@ namespace JonsEngine
 
     void DX11Shadowmap::BindForReading(ID3D11DeviceContextPtr context)
     {
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mShadowmapSRV.p);
+        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &mShadowmapSRV.p);
     }
 
 
