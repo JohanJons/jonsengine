@@ -21,17 +21,23 @@ namespace JonsEngine
         textureDesc.Height = textureHeight;
         textureDesc.ArraySize = 1;
         textureDesc.MipLevels = 1;
-        textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
         textureDesc.SampleDesc.Count = 1;
         textureDesc.Usage = D3D11_USAGE_DEFAULT;
         textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
         
-        for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
-        {
-            DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mTextures.at(index)));
-            DXCALL(device->CreateRenderTargetView(mTextures.at(index), NULL, &mRenderTargets.at(index)));
-            DXCALL(device->CreateShaderResourceView(mTextures.at(index), NULL, &mShaderResourceViews.at(index)));
-        }
+        // diffuse texture
+        uint32_t gbufferIndex = DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_DIFFUSE;
+        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mTextures.at(gbufferIndex)));
+        DXCALL(device->CreateRenderTargetView(mTextures.at(gbufferIndex), NULL, &mRenderTargets.at(gbufferIndex)));
+        DXCALL(device->CreateShaderResourceView(mTextures.at(gbufferIndex), NULL, &mShaderResourceViews.at(gbufferIndex)));
+
+        // normal texture
+        gbufferIndex = DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_NORMAL;
+        textureDesc.Format = DXGI_FORMAT_R16G16B16A16_SNORM;
+        DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mTextures.at(gbufferIndex)));
+        DXCALL(device->CreateRenderTargetView(mTextures.at(gbufferIndex), NULL, &mRenderTargets.at(gbufferIndex)));
+        DXCALL(device->CreateShaderResourceView(mTextures.at(gbufferIndex), NULL, &mShaderResourceViews.at(gbufferIndex)));
 
         // input layout
         D3D11_INPUT_ELEMENT_DESC inputDescription[DX11Mesh::NUM_VERTEX_BUFFER_SLOTS];
