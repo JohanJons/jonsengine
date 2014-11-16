@@ -9,17 +9,17 @@
 using namespace JonsAssetImporter;
 
 
-AssetImporter::Command ParseCommand(const std::string& command)
+Command ParseCommand(const std::string& command)
 {
     if (!command.compare("import"))
-        return AssetImporter::Command::IMPORT;
+        return Command::IMPORT;
     else
-        return AssetImporter::Command::UNKNOWN_COMMAND;
+        return Command::UNKNOWN;
 }
 
 int _tmain(int argc, _TCHAR* cmds[])
 {
-    AssetImporter::Command command(AssetImporter::Command::UNKNOWN_COMMAND);
+    Command command(Command::UNKNOWN);
     std::vector<std::string> parameters;
     int i = 0;
 
@@ -35,10 +35,12 @@ int _tmain(int argc, _TCHAR* cmds[])
     while (++i < argc)
         parameters.push_back(std::string(cmds[i]));
 
-    AssetImporter assetImporter;
-    assetImporter.ParseCommands(command, parameters);
-        
-    std::cout << assetImporter.GetErrorLog() << std::endl;
+    ParseResult result = ParseCommands(command, parameters);
+    
+    // echo to console
+    std::cout << result.mLog << std::endl;
+    if (!result.mSuccess)
+        std::cout << "-JonsAssetImporter: FAILED!" << std::endl;
 
-	return 0;
+    return result.mSuccess ? 0 : -1;
 }

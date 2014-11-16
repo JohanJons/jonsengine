@@ -12,10 +12,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AssetImporter.cpp" />
+    <ClCompile Include="src\Assimp.cpp" />
+    <ClCompile Include="src\FreeImage.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AssetImporter.h" />
+    <ClInclude Include="include\Assimp.h" />
+    <ClInclude Include="include\FreeImage.h" />
+    <ClInclude Include="include\Utils.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A697207F-4B50-48FD-A9DF-13EA47F5531A}</ProjectGuid>
