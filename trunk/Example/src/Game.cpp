@@ -18,7 +18,7 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mSunAngle(0.0f), mMoveSpeed(0.1f)
+    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mSunAngle(0.0f), mMoveSpeed(1.1f)
     {
     }
         
@@ -77,23 +77,11 @@ namespace JonsGame
 
             //  renderering
             else if (evnt.mKey == Key::ONE)
-                mDebugOptions.mRenderingMode = DebugOptions::RENDER_MODE_FULL;
-            else if (evnt.mKey == Key::TWO)
-                mDebugOptions.mRenderingMode = DebugOptions::RENDER_MODE_POSITIONS;
-            else if (evnt.mKey == Key::THREE)
-                mDebugOptions.mRenderingMode = DebugOptions::RENDER_MODE_NORMALS;
-            else if (evnt.mKey == Key::FOUR)
-                mDebugOptions.mRenderingMode = DebugOptions::RENDER_MODE_DIFFUSE;
-            else if (evnt.mKey == Key::FIVE)
-                mDebugOptions.mRenderingMode = DebugOptions::RENDER_MODE_DEPTH;
+                mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_DRAW_AABB);
             else if (evnt.mKey == Key::U)
                 mEngine->GetRenderer().SetSSAO(false);
             else if (evnt.mKey == Key::I)
                 mEngine->GetRenderer().SetSSAO(true);
-            else if (evnt.mKey == Key::P)
-                mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_DRAW_LIGHTS);
-            else if (evnt.mKey == Key::O)
-                mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS);
             else if (evnt.mKey == Key::H)
                 mEngine->GetRenderer().SetAnisotropicFiltering(EngineSettings::ANISOTROPIC_1X);
             else if (evnt.mKey == Key::J)
@@ -150,16 +138,19 @@ namespace JonsGame
         mEngine->GetSceneManager().SetActiveScene("MyScene");
         JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
 
+        // ambient light
+        myScene->SetAmbientLight(Vec4(0.55f));
+
         // sponza 
-     /*   SceneNodePtr nodeSponza = myScene->GetRootNode().CreateChildNode("sponza");
+        SceneNodePtr nodeSponza = myScene->GetRootNode().CreateChildNode("sponza");
         ModelPtr modelSponza = myScene->GetResourceManifest().LoadModel("sponza", jonsPackage);
         modelSponza->mSceneNode = nodeSponza;
         nodeSponza->ScaleNode(Vec3(0.1f));
         //nodeSponza->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
         nodeSponza->TranslateNode(Vec3(0.0f, 0.5f, -54.0f));
-        */
+        
         // sectoid 
-        SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
+      /*  SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
         ModelPtr modelAlien = myScene->GetResourceManifest().LoadModel("sectoid", jonsPackage);
         modelAlien->mSceneNode = nodeAlien;
         nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
@@ -196,9 +187,6 @@ namespace JonsGame
         DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
         directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
         directionalLight->mLightColor = Vec4(0.4f);
-
-        // ambient light
-        myScene->SetAmbientLight(Vec4(0.05f));
         
         // create a ground plane
         SceneNodePtr nodePlane = myScene->GetRootNode().CreateChildNode("nodePlane");
@@ -220,7 +208,7 @@ namespace JonsGame
         cube2->mMaterial = myScene->GetResourceManifest().GetMaterial("checkers");
         cube2->mSceneNode = nodeCube2;
         nodeCube2->TranslateNode(Vec3(11.0f, 2.0f, -15.0f));
-        
+        */
         // move up camera
         myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
     }

@@ -162,7 +162,8 @@ namespace JonsAssetImporter
                 assetName++;
         }
 
-        WriteJonsPkg(packageName, pkg);
+        if (ret)
+            WriteJonsPkg(packageName, pkg);
 
         return ret;
     }

@@ -25,9 +25,9 @@ namespace JonsEngine
     }
 
 
-    void DX11VertexTransformPass::BindForTransformPass(ID3D11DeviceContextPtr context)
+    void DX11VertexTransformPass::BindForTransformPass(ID3D11DeviceContextPtr context, const D3D_PRIMITIVE_TOPOLOGY primitiveTopology)
     {
-        context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        context->IASetPrimitiveTopology(primitiveTopology);
         context->IASetInputLayout(mInputLayout);
 
         context->VSSetShader(mVertexShader, NULL, NULL);
@@ -65,6 +65,35 @@ namespace JonsEngine
 
             mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * renderable.mWorldMatrix), context);
             (*meshIterator)->Draw(context);
+        }
+    }
+
+    void DX11VertexTransformPass::RenderAABBs(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix)
+    {
+        auto meshIterator = meshes.begin();
+        for (const Renderable& renderable : renderQueue)
+        {
+            if (renderable.mMesh == INVALID_MESH_ID)
+            {
+                JONS_LOG_ERROR(Logger::GetRendererLogger(), "Renderable MeshID is invalid");
+                throw std::runtime_error("Renderable MeshID is invalid");
+            }
+
+            if (renderable.mMesh < (*meshIterator)->GetMeshID())
+                continue;
+
+            while (renderable.mMesh >(*meshIterator)->GetMeshID())
+            {
+                meshIterator++;
+                if (meshIterator == meshes.end())
+                {
+                    JONS_LOG_ERROR(Logger::GetRendererLogger(), "Renderable MeshID out of range");
+                    throw std::runtime_error("Renderable MeshID out of range");
+                }
+            }
+
+            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * renderable.mWorldMatrix), context);
+            (*meshIterator)->DrawAABB(context);
         }
     }
 }

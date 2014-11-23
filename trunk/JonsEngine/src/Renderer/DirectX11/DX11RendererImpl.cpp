@@ -148,6 +148,7 @@ namespace JonsEngine
         mVertexTransformPass(mDevice), 
         mFullscreenTrianglePass(mDevice),
         mPostProcessor(mDevice, mFullscreenTrianglePass, GetBackbufferTextureDesc()),
+        mAABBPass(mDevice, mVertexTransformPass),
         // lighting passes
         mAmbientPass(mDevice, mFullscreenTrianglePass, settings.mWindowWidth, settings.mWindowHeight),
         mDirectionalLightPass(mDevice, mBackbuffer, mFullscreenTrianglePass, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
@@ -204,11 +205,12 @@ namespace JonsEngine
     }
 
 
-    MeshID DX11RendererImpl::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint16_t>& indexData)
+    MeshID DX11RendererImpl::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents,
+        const std::vector<float>& bitangents, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
     {
         auto allocator = mMemoryAllocator;
 
-        mMeshes.emplace_back(DX11MeshPtr(allocator->AllocateObject<DX11Mesh>(mDevice, vertexData, normalData, texCoords, tangents, bitangents, indexData), [=](DX11Mesh* mesh) { allocator->DeallocateObject<DX11Mesh>(mesh); }));
+        mMeshes.emplace_back(allocator->AllocateObject<DX11Mesh>(mDevice, vertexData, normalData, texCoords, tangents, bitangents, indexData, minBounds, maxBounds), [=](DX11Mesh* mesh) { allocator->DeallocateObject<DX11Mesh>(mesh); });
 
         return mMeshes.back()->GetMeshID();
     }
@@ -217,15 +219,18 @@ namespace JonsEngine
     {
         auto allocator = mMemoryAllocator;
 
-        mTextures.emplace_back(DX11TexturePtr(allocator->AllocateObject<DX11Texture>(mDevice, mContext, textureData, textureWidth, textureHeight, GetShaderTextureSlot(textureType)), [=](DX11Texture* texture) { allocator->DeallocateObject<DX11Texture>(texture); }));
+        mTextures.emplace_back(allocator->AllocateObject<DX11Texture>(mDevice, mContext, textureData, textureWidth, textureHeight, GetShaderTextureSlot(textureType)), [=](DX11Texture* texture) { allocator->DeallocateObject<DX11Texture>(texture); });
 
         return mTextures.back()->GetTextureID();
     }
 
-    void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
+    void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags)
     {
         GeometryStage(renderQueue, lighting.mCameraViewMatrix);
-        ShadingStage(renderQueue, lighting, debugExtra);
+        ShadingStage(renderQueue, lighting, debugFlags);
+
+        if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
+            mAABBPass.Render(mContext, renderQueue, mMeshes, lighting.mCameraProjectionMatrix * lighting.mCameraViewMatrix);
 
         DXCALL(mSwapchain->Present(0, 0));
     }
@@ -274,9 +279,9 @@ namespace JonsEngine
         return Z_FAR;
     }
 
-    uint32_t DX11RendererImpl::GetShadowmapResolution() const
+    EngineSettings::ShadowQuality DX11RendererImpl::GetShadowQuality() const
     {
-        return 1024;
+        return mShadowQuality;
     }
 
 

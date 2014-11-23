@@ -18,9 +18,10 @@ namespace JonsEngine
         DX11VertexTransformPass(ID3D11DevicePtr device);
         ~DX11VertexTransformPass();
 
-        void BindForTransformPass(ID3D11DeviceContextPtr context);
+        void BindForTransformPass(ID3D11DeviceContextPtr context, const D3D_PRIMITIVE_TOPOLOGY primitiveTopology);
         void RenderMesh(ID3D11DeviceContextPtr context, DX11Mesh& mesh, const Mat4& wvpMatrix);
         void RenderMeshes(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix);
+        void RenderAABBs(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix);
 
 
     private:

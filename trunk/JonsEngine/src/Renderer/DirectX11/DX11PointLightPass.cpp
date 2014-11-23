@@ -17,15 +17,18 @@ namespace JonsEngine
 
     DX11Mesh CreateSphereMesh(ID3D11DevicePtr device)
     {
+        const float radius = 1.0f;
+        const uint32_t rings = 12, sectors = 24;
+
         std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
         std::vector<uint16_t> indiceData;
-        if (!CreateSphereData(1.0f, 12, 24, vertexData, normalData, texcoordData, indiceData))
+        if (!CreateSphereData(radius, rings, sectors, vertexData, normalData, texcoordData, indiceData))
         {
             JONS_LOG_ERROR(Logger::GetRendererLogger(), "Failed to create sphere for shading pass");
             throw std::runtime_error("Failed to create sphere for shading pass");
         }
 
-        return DX11Mesh(device, vertexData, normalData, texcoordData, tangents, bitangents, indiceData);
+        return DX11Mesh(device, vertexData, normalData, texcoordData, tangents, bitangents, indiceData, Vec3(-radius, -radius, -radius), Vec3(radius, radius, radius));
     }
 
 
@@ -104,7 +107,7 @@ namespace JonsEngine
     void DX11PointLightPass::BindForShading(ID3D11DeviceContextPtr context)
     {
         // geometry transform vertex pass for stencil/shadow pass
-        mVertexTransformPass.BindForTransformPass(context);
+        mVertexTransformPass.BindForTransformPass(context, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
 
     void DX11PointLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight, const Mat4& viewMatrix, const Mat4& invProjMatrix,
@@ -112,9 +115,11 @@ namespace JonsEngine
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
+        ID3D11DepthStencilStatePtr prevDSState = nullptr;
         D3D11_VIEWPORT prevViewport;
         uint32_t numViewports = 1;
         context->RSGetState(&prevRasterizerState);
+        context->OMGetDepthStencilState(&prevDSState, 0);
         context->RSGetViewports(&numViewports, &prevViewport);
         const Vec4 viewLightPositonV4 = viewMatrix * Vec4(pointLight.mLightPosition, 1.0);
         const Vec3 viewLightPositonV3 = Vec3(viewLightPositonV4);
@@ -170,5 +175,6 @@ namespace JonsEngine
 
         // restore state
         context->RSSetState(prevRasterizerState);
+        context->OMSetDepthStencilState(prevDSState, 0);
     }
 }
