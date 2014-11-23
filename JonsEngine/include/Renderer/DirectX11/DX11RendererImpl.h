@@ -6,12 +6,13 @@
 #include "include/Renderer/DirectX11/DX11Context.h"
 #include "include/Renderer/DirectX11/DX11Backbuffer.h"
 #include "include/Renderer/DirectX11/DX11GBuffer.h"
+#include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
+#include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "include/Renderer/DirectX11/DX11AmbientPass.h"
 #include "include/Renderer/DirectX11/DX11DirectionalLightPass.h"
 #include "include/Renderer/DirectX11/DX11PointLightPass.h"
 #include "include/Renderer/DirectX11/DX11PostProcessor.h"
-#include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
-#include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
+#include "include/Renderer/DirectX11/DX11AABBPass.h"
 #include "include/Renderer/DirectX11/DX11Sampler.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/Types.h"
@@ -37,9 +38,10 @@ namespace JonsEngine
         DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator);
         ~DX11RendererImpl();
 
-        MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint16_t>& indexData);
+        MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents,
+            const std::vector<float>& bitangents, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds);
         TextureID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight);
-        void Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra);
+        void Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags);
 
         EngineSettings::Anisotropic GetAnisotropicFiltering() const;
         void SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic);
@@ -52,7 +54,7 @@ namespace JonsEngine
 
         float GetZNear() const;
         float GetZFar() const;
-        uint32_t GetShadowmapResolution() const;
+        EngineSettings::ShadowQuality GetShadowQuality() const;
 
 
     private:
@@ -74,6 +76,7 @@ namespace JonsEngine
         DX11DirectionalLightPass mDirectionalLightPass;
         DX11PointLightPass mPointLightPass;
         DX11PostProcessor mPostProcessor;
+        DX11AABBPass mAABBPass;
         ID3D11RasterizerStatePtr mDefaultRasterizerState;
         ID3D11BlendStatePtr mAdditiveBlending;
         std::unique_ptr<DX11Sampler, std::function<void(DX11Sampler*)>> mModelSampler;

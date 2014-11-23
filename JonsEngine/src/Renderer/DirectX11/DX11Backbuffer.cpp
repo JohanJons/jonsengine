@@ -48,7 +48,7 @@ namespace JonsEngine
         // depth stencil config used in shading stage
         D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
         ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
-        depthStencilDesc.DepthEnable = false;
+        depthStencilDesc.DepthEnable = true;
         depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
         depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
         depthStencilDesc.StencilEnable = false;

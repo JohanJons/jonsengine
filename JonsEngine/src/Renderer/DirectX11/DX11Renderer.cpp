@@ -15,9 +15,10 @@ namespace JonsEngine
     }
 
 
-    MeshID DX11Renderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint16_t>& indexData)
+    MeshID DX11Renderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents,
+        const std::vector<float>& bitangents, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
     {
-        return mImplementation->CreateMesh(vertexData, normalData, texCoords, tangents, bitangents, indexData);
+        return mImplementation->CreateMesh(vertexData, normalData, texCoords, tangents, bitangents, indexData, minBounds, maxBounds);
     }
 
     TextureID DX11Renderer::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
@@ -26,9 +27,9 @@ namespace JonsEngine
     }
 
 
-    void DX11Renderer::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra)
+    void DX11Renderer::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags)
     {
-        mImplementation->Render(renderQueue, lighting, debugMode, debugExtra);
+        mImplementation->Render(renderQueue, lighting, debugFlags);
     }
 
 
@@ -75,8 +76,8 @@ namespace JonsEngine
         return mImplementation->GetZFar();
     }
 
-    uint32_t DX11Renderer::GetShadowmapResolution() const
+    EngineSettings::ShadowQuality DX11Renderer::GetShadowQuality() const
     {
-        return mImplementation->GetShadowmapResolution();
+        return mImplementation->GetShadowQuality();
     }
 }

@@ -24,8 +24,7 @@ namespace JonsEngine
         if (ptr) 
             return ptr;
 
-        if (sizeX <= 0 || sizeY <= 0 || sizeZ <= 0)
-            return ptr;
+        assert(sizeX > 0 && sizeY > 0 && sizeZ > 0);
 
         std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
         std::vector<uint16_t> indiceData;
@@ -34,7 +33,11 @@ namespace JonsEngine
 
         auto allocator = mMemoryAllocator;
         ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName), [=](Model* model) { allocator->DeallocateObject(model); }));
-        ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData);
+
+        const float halfX = sizeX / 2.0f;
+        const float halfY = sizeY / 2.0f;
+        const float halfZ = sizeZ / 2.0f;
+        ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, Vec3(-halfX, -halfY, -halfZ), Vec3(halfX, halfY, halfZ));
 
         return ptr;
     }
@@ -50,8 +53,7 @@ namespace JonsEngine
         if (ptr)
             return ptr;
 
-        if (radius <= 0 || rings <= 0 || sectors <= 0)
-            return ptr;
+        assert(radius > 0 && rings > 0 && sectors > 0);
 
         std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
         std::vector<uint16_t> indiceData;
@@ -60,7 +62,7 @@ namespace JonsEngine
 
         auto allocator = mMemoryAllocator;
         ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName), [=](Model* model) { allocator->DeallocateObject(model); }));
-        ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData);
+        ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, Vec3(-radius, -radius, -radius), Vec3(radius, radius, radius));
 
         return ptr;
     }
@@ -78,7 +80,9 @@ namespace JonsEngine
         if (iter != jonsPkg->mModels.end())
         {
             auto allocator = mMemoryAllocator;
-            ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(ProcessModel(*iter, jonsPkg)), [=](Model* model) { allocator->DeallocateObject(model); }));
+            ModelPtr model = ModelPtr(allocator->AllocateObject<Model>(ProcessModel(*iter, jonsPkg)), [=](Model* model) { allocator->DeallocateObject(model); });
+
+            ptr = *mModels.insert(mModels.end(), model);
         }
 
         return ptr;
@@ -109,7 +113,9 @@ namespace JonsEngine
         if (iter != jonsPkg->mMaterials.end())
         {
             auto allocator = mMemoryAllocator;
-            ptr = *mMaterials.insert(mMaterials.end(), MaterialPtr(allocator->AllocateObject<Material>(ProcessMaterial(*iter, jonsPkg)), [=](Material* material) { allocator->DeallocateObject(material); }));
+            MaterialPtr material = MaterialPtr(allocator->AllocateObject<Material>(ProcessMaterial(*iter, jonsPkg)), [=](Material* material) { allocator->DeallocateObject(material); });
+
+            ptr = *mMaterials.insert(mMaterials.end(), material);
         }
 
         return ptr;
@@ -141,7 +147,7 @@ namespace JonsEngine
                 model.mMaterial = LoadMaterial(pkgMaterial.mName, jonsPkg);
             }
 
-            model.mMesh = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangents, mesh.mBitangents, mesh.mIndiceData);
+            model.mMesh = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangents, mesh.mBitangents, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
         }
 
         for(PackageModel& m : pkgModel.mChildren)

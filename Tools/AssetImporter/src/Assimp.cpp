@@ -26,11 +26,12 @@ namespace JonsAssetImporter
         }
 
         // process materials
-        MaterialMap materialMap;      // map scene material indexes to actual package material indexes
+        // map scene material indexes to actual package material indexes
+        MaterialMap materialMap;
         ProcessAssimpMaterials(scene, modelPath, materialMap, freeimageImporter, pkg);
 
         // process model hierarchy
-        PackageModel rootModel(ProcessAssimpModelGeometry(scene, scene->mRootNode, materialMap));
+        PackageModel rootModel(ProcessAssimpModelGeometry(scene, scene->mRootNode, materialMap, Vec3(0.0f), Vec3(0.0f)));
         rootModel.mName = modelName;
         pkg->mModels.push_back(rootModel);
 
@@ -108,7 +109,7 @@ namespace JonsAssetImporter
         }
     }
 
-    JonsEngine::PackageModel Assimp::ProcessAssimpModelGeometry(const aiScene* scene, const aiNode* node, const MaterialMap& materialMap)
+    JonsEngine::PackageModel Assimp::ProcessAssimpModelGeometry(const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, Vec3& modelMinBounds, Vec3& modelMaxBounds)
     {
         PackageModel model;
         model.mName = node->mName.C_Str();
@@ -118,6 +119,19 @@ namespace JonsAssetImporter
         {
             PackageMesh mesh;
             const aiMesh* m = scene->mMeshes[node->mMeshes[i]];
+
+            mesh.mVertexData.reserve(m->mNumVertices * 3);
+            mesh.mNormalData.reserve(m->mNumVertices * 3);
+            mesh.mTexCoordsData.reserve(m->mNumVertices * 2);
+            mesh.mTangents.reserve(m->mNumVertices * 3);
+            mesh.mBitangents.reserve(m->mNumVertices * 3);
+
+            mesh.mAABB.mMinBounds.x = m->mVertices[0].x;
+            mesh.mAABB.mMinBounds.y = m->mVertices[0].y;
+            mesh.mAABB.mMinBounds.z = m->mVertices[0].z;
+            mesh.mAABB.mMaxBounds.x = m->mVertices[0].x;
+            mesh.mAABB.mMaxBounds.y = m->mVertices[0].y;
+            mesh.mAABB.mMaxBounds.z = m->mVertices[0].z;
 
             // vertice, normal, texcoord, tangents and bitangents data
             for (unsigned int j = 0; j < m->mNumVertices; j++)
@@ -132,7 +146,7 @@ namespace JonsAssetImporter
                     mesh.mNormalData.push_back(m->mNormals[j].y);
                     mesh.mNormalData.push_back(m->mNormals[j].z);
                 }
-
+                
                 if (m->HasTextureCoords(0))
                 {
                     mesh.mTexCoordsData.push_back(m->mTextureCoords[0][j].x);
@@ -149,7 +163,17 @@ namespace JonsAssetImporter
                     mesh.mBitangents.push_back(m->mBitangents[j].y);
                     mesh.mBitangents.push_back(m->mBitangents[j].z);
                 }
+
+                // mesh AABB
+                if (m->mVertices[j].x > mesh.mAABB.mMaxBounds.x) mesh.mAABB.mMaxBounds.x = m->mVertices[j].x;
+                if (m->mVertices[j].x < mesh.mAABB.mMinBounds.x) mesh.mAABB.mMinBounds.x = m->mVertices[j].x;
+                if (m->mVertices[j].y > mesh.mAABB.mMaxBounds.y) mesh.mAABB.mMaxBounds.y = m->mVertices[j].y;
+                if (m->mVertices[j].y < mesh.mAABB.mMinBounds.y) mesh.mAABB.mMinBounds.y = m->mVertices[j].y;
+                if (m->mVertices[j].z > mesh.mAABB.mMaxBounds.z) mesh.mAABB.mMaxBounds.z = m->mVertices[j].z;
+                if (m->mVertices[j].z < mesh.mAABB.mMinBounds.z) mesh.mAABB.mMinBounds.z = m->mVertices[j].z;
             }
+
+            mesh.mIndiceData.reserve(m->mNumFaces * 3);
 
             // index data
             for (unsigned int j = 0; j < m->mNumFaces; j++)
@@ -169,12 +193,23 @@ namespace JonsAssetImporter
                 mesh.mHasMaterial = true;
             }
 
+            // model AABB
+            if (mesh.mAABB.mMaxBounds.x > modelMaxBounds.x) modelMaxBounds.x = mesh.mAABB.mMaxBounds.x;
+            if (mesh.mAABB.mMinBounds.x < modelMinBounds.x) modelMinBounds.x = mesh.mAABB.mMinBounds.x;
+            if (mesh.mAABB.mMaxBounds.y > modelMaxBounds.y) modelMaxBounds.y = mesh.mAABB.mMaxBounds.y;
+            if (mesh.mAABB.mMinBounds.y < modelMinBounds.y) modelMinBounds.y = mesh.mAABB.mMinBounds.y;
+            if (mesh.mAABB.mMaxBounds.z > modelMaxBounds.z) modelMaxBounds.z = mesh.mAABB.mMaxBounds.z;
+            if (mesh.mAABB.mMinBounds.z < modelMinBounds.z) modelMinBounds.z = mesh.mAABB.mMinBounds.z;
+
             // add mesh to collection
             model.mMeshes.push_back(mesh);
         }
 
         for (unsigned int i = 0; i < node->mNumChildren; i++)
-            model.mChildren.push_back(ProcessAssimpModelGeometry(scene, node->mChildren[i], materialMap));
+            model.mChildren.push_back(ProcessAssimpModelGeometry(scene, node->mChildren[i], materialMap, modelMinBounds, modelMaxBounds));
+
+        model.mAABB.mMinBounds = modelMinBounds;
+        model.mAABB.mMaxBounds = modelMaxBounds;
 
         return model;
     }

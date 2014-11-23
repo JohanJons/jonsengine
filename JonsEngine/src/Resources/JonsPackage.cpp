@@ -13,6 +13,10 @@ namespace JonsEngine
     {
     }
 
+    PackageAABB::PackageAABB() : mMinBounds(0.0f), mMaxBounds(0.0f)
+    {
+    }
+
     PackageModel::PackageModel() : mName(""), mTransform(1.0f)
     {
     }

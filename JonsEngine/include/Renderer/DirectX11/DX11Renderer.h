@@ -23,10 +23,11 @@ namespace JonsEngine
         DX11Renderer(const EngineSettings& settings, IMemoryAllocatorPtr memoryAllocator, Logger& logger);
         ~DX11Renderer();
 
-        MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint16_t>& indexData);
+        MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangents,
+            const std::vector<float>& bitangents, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds);
         TextureID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight);
 
-        void Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingMode debugMode, const DebugOptions::RenderingFlags debugExtra);
+        void Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags);
 
         EngineSettings::Anisotropic GetAnisotropicFiltering() const;
         void SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic);
@@ -39,7 +40,7 @@ namespace JonsEngine
 
         float GetZNear() const;
         float GetZFar() const;
-        uint32_t GetShadowmapResolution() const;
+        EngineSettings::ShadowQuality GetShadowQuality() const;
 
 
     private:

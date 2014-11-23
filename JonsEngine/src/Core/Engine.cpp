@@ -40,6 +40,9 @@ namespace JonsEngine
 
         if (activeScene)
         {
+            // reset render queue
+            mRenderQueue.clear();
+
             // update model matrix of all nodes in active scene
             activeScene->GetRootNode().UpdateModelMatrix(Mat4(1.0f));
 
@@ -48,29 +51,27 @@ namespace JonsEngine
             const Mat4 perspectiveMatrix = PerspectiveMatrixFov(mWindow.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer.GetZNear(), mRenderer.GetZFar());
             const Mat4 viewPerspectiveMatrix = perspectiveMatrix * viewMatrix;
 
-            // create the rendering queue and active lights
-            const RenderQueue renderQueue(CreateRenderQueue(activeScene->GetResourceManifest().GetAllModels(), viewPerspectiveMatrix));
+            // fill the rendering queue
+            FillRenderQueue(activeScene->GetResourceManifest().GetAllModels(), viewPerspectiveMatrix);
+
+            // get lighting info
             const RenderableLighting lighting(GetLightingInfo(perspectiveMatrix, viewMatrix, viewPerspectiveMatrix, activeScene->GetAmbientLight(), camera.Position(), activeScene->GetPointLights(), activeScene->GetDirectionalLights()));
 
             // render the scene
-            mRenderer.Render(renderQueue, lighting, debugOptions.mRenderingMode, debugOptions.mRenderingFlags);
+            mRenderer.Render(mRenderQueue, lighting, debugOptions.mRenderingFlags);
         }
     }
 
     
-    RenderQueue Engine::CreateRenderQueue(const std::vector<ModelPtr>& models, const Mat4& viewProjectionMatrix)
+    void Engine::FillRenderQueue(const std::vector<ModelPtr>& models, const Mat4& viewProjectionMatrix)
     {
-        RenderQueue renderQueue;
-
         for(ModelPtr model : models)
         {
             if (model && model->mSceneNode)
-                CreateModelRenderable(model.get(), viewProjectionMatrix, model->mSceneNode->GetNodeTransform(), model->mLightingEnabled, renderQueue);
+                CreateModelRenderable(model.get(), viewProjectionMatrix, model->mSceneNode->GetNodeTransform(), model->mLightingEnabled);
         }
 
-        std::sort(renderQueue.begin(), renderQueue.end(), [](const Renderable& smaller, const Renderable& larger) { return smaller.mMesh < larger.mMesh; });
-
-        return renderQueue;
+        std::sort(mRenderQueue.begin(), mRenderQueue.end(), [](const Renderable& smaller, const Renderable& larger) { return smaller.mMesh < larger.mMesh; });
     }
      
     RenderableLighting Engine::GetLightingInfo(const Mat4& projMatrix, const Mat4& viewMatrix, const Mat4& viewProjectionMatrix, const Vec4& ambientLight, const Vec3& cameraPosition, const std::vector<PointLightPtr>& pointLights, const std::vector<DirectionalLightPtr>& directionalLights)
@@ -92,7 +93,7 @@ namespace JonsEngine
     /*
      * Creates a render unit for model 'model' and all its children.
      */
-    void Engine::CreateModelRenderable(const Model* model, const Mat4& viewProjectionMatrix, const Mat4& nodeTransform, const bool lightingEnabled, RenderQueue& renderQueue)
+    void Engine::CreateModelRenderable(const Model* model, const Mat4& viewProjectionMatrix, const Mat4& nodeTransform, const bool lightingEnabled)
     {
         const Mat4 worldMatrix         = nodeTransform * model->mTransform;
         const Mat4 worldViewProjMatrix = viewProjectionMatrix * worldMatrix;
@@ -101,15 +102,15 @@ namespace JonsEngine
         {
             const MaterialPtr material(model->mMaterial);
             if (material)
-                renderQueue.emplace_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor, 
+                mRenderQueue.emplace_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor,
                                                     Vec4(material->mDiffuseColor, 1.0f), Vec4(material->mAmbientColor, 1.0f), Vec4(material->mSpecularColor, 1.0f), Vec4(material->mEmissiveColor, 1.0f),
                                                      material->mDiffuseTexture, material->mNormalTexture, lightingEnabled, material->mSpecularFactor));
             else
-                renderQueue.emplace_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, lightingEnabled));
+                mRenderQueue.emplace_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, lightingEnabled));
         }
 
         for(const Model& childModel : model->mChildren)
             // 'lightingEnabled' is passed on since it applies recursively on all children aswell
-            CreateModelRenderable(&childModel, viewProjectionMatrix, worldMatrix, lightingEnabled, renderQueue);
+            CreateModelRenderable(&childModel, viewProjectionMatrix, worldMatrix, lightingEnabled);
     }
 } 

@@ -30,6 +30,15 @@ namespace JonsEngine
         PackageHeader();
     };
 
+    struct PackageAABB
+    {
+        Vec3 mMinBounds;
+        Vec3 mMaxBounds;
+
+
+        PackageAABB();
+    };
+
     struct PackageMesh
     {
         std::vector<float> mVertexData;
@@ -40,6 +49,7 @@ namespace JonsEngine
         std::vector<uint16_t> mIndiceData;
         uint16_t mMaterialIndex;
         bool mHasMaterial;
+        PackageAABB mAABB;
 
 
         PackageMesh();
@@ -79,6 +89,7 @@ namespace JonsEngine
         std::vector<PackageModel> mChildren;
         std::vector<PackageMesh> mMeshes;
         Mat4 mTransform;
+        PackageAABB mAABB;
 
 
         PackageModel();
@@ -120,12 +131,20 @@ namespace boost
         }
 
         template<class Archive>
+        void serialize(Archive & ar, JonsEngine::PackageAABB& aabb, const unsigned int version)
+        {
+            ar & aabb.mMinBounds;
+            ar & aabb.mMaxBounds;
+        }
+
+        template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageModel& model, const unsigned int version)
         {
             ar & model.mName;
             ar & model.mChildren;
             ar & model.mMeshes;
             ar & model.mTransform;
+            ar & model.mAABB;
         }
 
         template<class Archive>
@@ -139,6 +158,7 @@ namespace boost
             ar & mesh.mIndiceData;
             ar & mesh.mMaterialIndex;
             ar & mesh.mHasMaterial;
+            ar & mesh.mAABB;
         }
 
         template<class Archive>

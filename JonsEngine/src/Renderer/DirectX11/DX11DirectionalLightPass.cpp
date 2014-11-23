@@ -133,7 +133,7 @@ namespace JonsEngine
         // TODO: precompute?
         CalculateShadowmapCascades(nearDistArr, farDistArr, Z_NEAR, Z_FAR);
 
-        mVertexTransformPass.BindForTransformPass(context);
+        mVertexTransformPass.BindForTransformPass(context, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         mShadowmap.BindForDrawing(context);
         
         for (uint32_t cascadeIndex = 0; cascadeIndex < NUM_SHADOWMAP_CASCADES; cascadeIndex++)
