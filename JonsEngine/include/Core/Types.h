@@ -30,4 +30,5 @@ namespace JonsEngine
     typedef glm::mat3 Mat3;
     typedef glm::mat4 Mat4;
     typedef glm::fquat Quaternion;
+    typedef glm::vec4 Plane;
 }

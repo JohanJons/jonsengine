@@ -6,6 +6,7 @@
 #include <fstream>
 #include <map>
 #include <functional>
+#include <limits>
 
 namespace JonsEngine
 {
@@ -13,7 +14,7 @@ namespace JonsEngine
     {
     }
 
-    PackageAABB::PackageAABB() : mMinBounds(0.0f), mMaxBounds(0.0f)
+    PackageAABB::PackageAABB() : mMinBounds(std::numeric_limits<float>::max()), mMaxBounds(std::numeric_limits<float>::lowest())
     {
     }
 

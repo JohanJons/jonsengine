@@ -40,7 +40,7 @@ namespace JonsEngine
 
 
     private:
-        void FillRenderQueue(const std::vector<ModelPtr>& models, const Mat4& viewProjectionMatrix);
+        void FillRenderQueue(const std::vector<ModelPtr>& allModels, const Mat4& viewProjectionMatrix);
         RenderableLighting GetLightingInfo(const Mat4& projMatrix, const Mat4& viewMatrix, const Mat4& viewProjectionMatrix, const Vec4& ambientLight, const Vec3& cameraPosition, const std::vector<PointLightPtr>& pointLights, const std::vector<DirectionalLightPtr>& directionalLights);
         void CreateModelRenderable(const Model* model, const Mat4& viewProjectionMatrix, const Mat4& nodeTransform, const bool lightingEnabled);
 
@@ -59,6 +59,6 @@ namespace JonsEngine
 
     /* Engine inlines */
     inline WindowManager& Engine::GetWindow()        { return mWindow; }
-    inline DX11Renderer& Engine::GetRenderer()    { return mRenderer; }
+    inline DX11Renderer& Engine::GetRenderer()       { return mRenderer; }
     inline SceneManager& Engine::GetSceneManager()   { return mSceneManager; }
 }

@@ -126,13 +126,6 @@ namespace JonsAssetImporter
             mesh.mTangents.reserve(m->mNumVertices * 3);
             mesh.mBitangents.reserve(m->mNumVertices * 3);
 
-            mesh.mAABB.mMinBounds.x = m->mVertices[0].x;
-            mesh.mAABB.mMinBounds.y = m->mVertices[0].y;
-            mesh.mAABB.mMinBounds.z = m->mVertices[0].z;
-            mesh.mAABB.mMaxBounds.x = m->mVertices[0].x;
-            mesh.mAABB.mMaxBounds.y = m->mVertices[0].y;
-            mesh.mAABB.mMaxBounds.z = m->mVertices[0].z;
-
             // vertice, normal, texcoord, tangents and bitangents data
             for (unsigned int j = 0; j < m->mNumVertices; j++)
             {
