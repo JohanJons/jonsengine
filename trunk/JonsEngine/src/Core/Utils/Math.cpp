@@ -1,9 +1,25 @@
-#include "include/Core/Types.h"
-
-#include <math.h>
+#include "include/Core/Utils/Math.h"
 
 namespace JonsEngine
 {
+    std::array<Plane, 6> GetFrustrumPlanes(const Mat4& viewProjMatrix)
+    {
+        std::array<Plane, 6> ret;
+
+        ret[0] = viewProjMatrix[3] + viewProjMatrix[0];
+        ret[1] = viewProjMatrix[3] - viewProjMatrix[0];
+        ret[2] = viewProjMatrix[3] - viewProjMatrix[1];
+        ret[3] = viewProjMatrix[3] + viewProjMatrix[1];
+        ret[4] = viewProjMatrix[2];
+        ret[5] = viewProjMatrix[3] - viewProjMatrix[2];
+
+        for (Plane& plane : ret)
+            plane = glm::normalize(plane);
+
+        return ret;
+    }
+
+
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float aspectRatio, const float zNear, const float zFar)
     {
         const float fovRadians = glm::radians(fovDegrees);

@@ -63,9 +63,9 @@ namespace JonsEngine
     }
 
     
-    void Engine::FillRenderQueue(const std::vector<ModelPtr>& models, const Mat4& viewProjectionMatrix)
+    void Engine::FillRenderQueue(const std::vector<ModelPtr>& allModels, const Mat4& viewProjectionMatrix)
     {
-        for(ModelPtr model : models)
+        for (ModelPtr model : allModels)
         {
             if (model && model->mSceneNode)
                 CreateModelRenderable(model.get(), viewProjectionMatrix, model->mSceneNode->GetNodeTransform(), model->mLightingEnabled);
