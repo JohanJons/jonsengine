@@ -4,7 +4,12 @@
 
 namespace JonsEngine
 {
-    Model::Model(const std::string& name) : mName(name), mHashedID(boost::hash_value(name)), mLightingEnabled(true), mMaterialTilingFactor(1.0f), mMesh(INVALID_MESH_ID)
+    Model::Model(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds) : mName(name), mHashedID(boost::hash_value(name)), mLightingEnabled(true), mMesh(INVALID_MESH_ID), mMaterialTilingFactor(1.0f),
+        mAABBCenter(0.5f * (minBounds + maxBounds)), mAABBExtent(0.5f * (maxBounds - minBounds))
+    {
+    }
+
+    Model::~Model()
     {
     }
 

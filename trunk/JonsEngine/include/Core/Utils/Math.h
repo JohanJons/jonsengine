@@ -18,7 +18,7 @@ namespace JonsEngine
 
     const Mat4 gIdentityMatrix(1.0f);
 
-    std::array<Plane, 6> GetFrustrumPlanes(const Mat4& viewProjMatrix);
+    bool DoesAABBIntersectViewFrustrum(const Vec3& aabbCenter, const Vec3& aabbExtent, const Mat4& WVPMatrix);
 
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float ratio, const float zNear, const float zFar);
     Mat4 OrthographicMatrix(const float left, const float right, const float top, const float bottom, const float zNear, const float zFar);

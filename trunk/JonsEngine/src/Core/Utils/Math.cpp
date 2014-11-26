@@ -2,21 +2,45 @@
 
 namespace JonsEngine
 {
-    std::array<Plane, 6> GetFrustrumPlanes(const Mat4& viewProjMatrix)
+    float signum(float val)
     {
-        std::array<Plane, 6> ret;
+        if (val > 0.0f) return 1.0f;
+        if (val < 0.0f) return -1.0f;
 
-        ret[0] = viewProjMatrix[3] + viewProjMatrix[0];
-        ret[1] = viewProjMatrix[3] - viewProjMatrix[0];
-        ret[2] = viewProjMatrix[3] - viewProjMatrix[1];
-        ret[3] = viewProjMatrix[3] + viewProjMatrix[1];
-        ret[4] = viewProjMatrix[2];
-        ret[5] = viewProjMatrix[3] - viewProjMatrix[2];
+        return 0.0f;
+    }
+
+
+    FrustrumPlanes GetFrustrumPlanes(const Mat4& WVPMatrix)
+    {
+        FrustrumPlanes ret;
+
+        ret[0] = WVPMatrix[3] + WVPMatrix[0];
+        ret[1] = WVPMatrix[3] - WVPMatrix[0];
+        ret[2] = WVPMatrix[3] - WVPMatrix[1];
+        ret[3] = WVPMatrix[3] + WVPMatrix[1];
+        ret[4] = WVPMatrix[2];
+        ret[5] = WVPMatrix[3] - WVPMatrix[2];
 
         for (Plane& plane : ret)
             plane = glm::normalize(plane);
 
         return ret;
+    }
+
+
+    bool DoesAABBIntersectViewFrustrum(const Vec3& aabbCenter, const Vec3& aabbExtent, const Mat4& WVPMatrix)
+    {
+        FrustrumPlanes planes = GetFrustrumPlanes(WVPMatrix);
+
+        for (const Plane& plane : planes)
+        {
+            Vec3 signFlip(signum(plane.x), signum(plane.y), signum(plane.z));
+            if (glm::dot(aabbCenter + aabbExtent * signFlip, Vec3(plane)) > -plane.w)
+                return true;
+        }
+
+        return false;
     }
 
 

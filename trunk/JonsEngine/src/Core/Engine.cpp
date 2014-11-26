@@ -21,7 +21,7 @@ namespace JonsEngine
                                                      mWindow(settings, mMemoryAllocator, mLog), 
                                                      mRenderer(settings, mMemoryAllocator, mLog),
                                                      mResourceManifest(mRenderer, mMemoryAllocator), 
-                                                     mSceneManager(mResourceManifest)
+                                                     mSceneManager()
     {
         JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
     }
@@ -44,7 +44,7 @@ namespace JonsEngine
             mRenderQueue.clear();
 
             // update model matrix of all nodes in active scene
-            activeScene->GetRootNode().UpdateModelMatrix(Mat4(1.0f));
+            activeScene->GetRootNode().UpdateModelMatrix(gIdentityMatrix);
 
             const Camera& camera = activeScene->GetSceneCamera();
             const Mat4 viewMatrix = camera.GetCameraTransform();
@@ -52,7 +52,8 @@ namespace JonsEngine
             const Mat4 viewPerspectiveMatrix = perspectiveMatrix * viewMatrix;
 
             // fill the rendering queue
-            FillRenderQueue(activeScene->GetResourceManifest().GetAllModels(), viewPerspectiveMatrix);
+            // TODO: only use active scene --> scene must have models list
+            FillRenderQueue(mResourceManifest.GetAllModels(), viewPerspectiveMatrix);
 
             // get lighting info
             const RenderableLighting lighting(GetLightingInfo(perspectiveMatrix, viewMatrix, viewPerspectiveMatrix, activeScene->GetAmbientLight(), camera.Position(), activeScene->GetPointLights(), activeScene->GetDirectionalLights()));
@@ -67,8 +68,16 @@ namespace JonsEngine
     {
         for (ModelPtr model : allModels)
         {
-            if (model && model->mSceneNode)
-                CreateModelRenderable(model.get(), viewProjectionMatrix, model->mSceneNode->GetNodeTransform(), model->mLightingEnabled);
+            if (!model || !model->mSceneNode)
+                continue;
+        
+            const Mat4 worldMatrix = model->mSceneNode->GetNodeTransform();
+            const Mat4 WVPMatrix = viewProjectionMatrix * worldMatrix;
+        
+            if (!DoesAABBIntersectViewFrustrum(model->mAABBCenter, model->mAABBExtent, WVPMatrix))
+                continue;
+        
+            CreateModelRenderable(model.get(), viewProjectionMatrix, model->mSceneNode->GetNodeTransform(), model->mLightingEnabled);
         }
 
         std::sort(mRenderQueue.begin(), mRenderQueue.end(), [](const Renderable& smaller, const Renderable& larger) { return smaller.mMesh < larger.mMesh; });
@@ -95,7 +104,8 @@ namespace JonsEngine
      */
     void Engine::CreateModelRenderable(const Model* model, const Mat4& viewProjectionMatrix, const Mat4& nodeTransform, const bool lightingEnabled)
     {
-        const Mat4 worldMatrix         = nodeTransform * model->mTransform;
+        // TODO: arguments....
+        const Mat4 worldMatrix = nodeTransform * model->mTransform;
         const Mat4 worldViewProjMatrix = viewProjectionMatrix * worldMatrix;
 
         if (model->mMesh != INVALID_MESH_ID)
@@ -112,5 +122,43 @@ namespace JonsEngine
         for(const Model& childModel : model->mChildren)
             // 'lightingEnabled' is passed on since it applies recursively on all children aswell
             CreateModelRenderable(&childModel, viewProjectionMatrix, worldMatrix, lightingEnabled);
+    }
+
+    void Engine::ParseVisibleModels(const FrustrumPlanes& planes, const std::vector<ModelPtr>& allModels)
+    {
+        //for (unsigned int iAABB = 0; iAABB < numAABBs; ++iAABB)
+        /*for (const ModelPtr model : allModels)
+        {
+            const Vector3f& aabbCenter = aabbList[iAABB].m_Center;
+            const Vector3f& aabbSize = aabbList[iAABB].m_Extent;
+
+            unsigned int result = INSIDE; // Assume that the aabb will be inside the frustum
+            for (unsigned int iPlane = 0; iPlane < 6; ++iPlane)
+            {
+                const Plane& frustumPlane = frustumPlanes[iPlane];
+                const Plane& absFrustumPlane = absFrustumPlanes[iPlane];
+
+                float d = aabbCenter.x * frustumPlane.nx +
+                    aabbCenter.y * frustumPlane.ny +
+                    aabbCenter.z * frustumPlane.nz;
+
+                float r = aabbSize.x * absFrustumPlane.nx +
+                    aabbSize.y * absFrustumPlane.ny +
+                    aabbSize.z * absFrustumPlane.nz;
+
+                float d_p_r = d + r + frustumPlane.d;
+                if (IsNegativeFloat(d_p_r))
+                {
+                    result = OUTSIDE;
+                    break;
+                }
+
+                float d_m_r = d - r + frustumPlane.d;
+                if (IsNegativeFloat(d_m_r))
+                    result = INTERSECT;
+            }
+
+            aabbState[iAABB] = result;
+        }*/
     }
 } 

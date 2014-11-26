@@ -10,12 +10,16 @@
 
 namespace JonsEngine
 {
-    struct Model;
-
-    typedef std::shared_ptr<Model> ModelPtr;
-
-    struct Model
+    class Model
     {
+    public:
+        Model(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds);
+        ~Model();
+
+        bool operator==(const Model& m);
+        bool operator==(const std::string& modelName);
+
+
         const std::string mName;
         const size_t mHashedID;
 
@@ -23,16 +27,14 @@ namespace JonsEngine
         MeshID mMesh;
         MaterialPtr mMaterial;
         Mat4 mTransform;
+        const Vec3 mAABBCenter;
+        const Vec3 mAABBExtent;
 
         bool mLightingEnabled;
         float mMaterialTilingFactor;
 
         SceneNodePtr mSceneNode;
-
-
-        Model(const std::string& name);
-
-        bool operator==(const Model& m);
-        bool operator==(const std::string& modelName);
     };
+
+    typedef std::shared_ptr<Model> ModelPtr;
 }

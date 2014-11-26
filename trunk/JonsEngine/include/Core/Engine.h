@@ -15,7 +15,7 @@ namespace JonsEngine
 {
     struct EngineSettings;
     struct DebugOptions;
-    struct Model;
+    class Model;
     class IMemoryAllocator;
     class Logger;
     class SceneNode;
@@ -36,6 +36,7 @@ namespace JonsEngine
 
         WindowManager& GetWindow();
         DX11Renderer& GetRenderer();
+        ResourceManifest& GetResourceManifest();
         SceneManager& GetSceneManager();
 
 
@@ -43,6 +44,7 @@ namespace JonsEngine
         void FillRenderQueue(const std::vector<ModelPtr>& allModels, const Mat4& viewProjectionMatrix);
         RenderableLighting GetLightingInfo(const Mat4& projMatrix, const Mat4& viewMatrix, const Mat4& viewProjectionMatrix, const Vec4& ambientLight, const Vec3& cameraPosition, const std::vector<PointLightPtr>& pointLights, const std::vector<DirectionalLightPtr>& directionalLights);
         void CreateModelRenderable(const Model* model, const Mat4& viewProjectionMatrix, const Mat4& nodeTransform, const bool lightingEnabled);
+        void ParseVisibleModels(const FrustrumPlanes& planes, const std::vector<ModelPtr>& allModels);
 
         Logger& mLog;
         IMemoryAllocatorPtr mMemoryAllocator;
@@ -54,11 +56,13 @@ namespace JonsEngine
         SceneManager mSceneManager;
 
         RenderQueue mRenderQueue;
+        std::vector<ModelPtr> mVisibleModels;
     };
 
 
     /* Engine inlines */
-    inline WindowManager& Engine::GetWindow()        { return mWindow; }
-    inline DX11Renderer& Engine::GetRenderer()       { return mRenderer; }
-    inline SceneManager& Engine::GetSceneManager()   { return mSceneManager; }
+    inline WindowManager& Engine::GetWindow()               { return mWindow; }
+    inline DX11Renderer& Engine::GetRenderer()              { return mRenderer; }
+    inline ResourceManifest& Engine::GetResourceManifest()  { return mResourceManifest; }
+    inline SceneManager& Engine::GetSceneManager()          { return mSceneManager; }
 }

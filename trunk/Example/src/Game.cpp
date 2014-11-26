@@ -139,42 +139,42 @@ namespace JonsGame
         JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
 
         // ambient light
-        myScene->SetAmbientLight(Vec4(0.55f));
+        myScene->SetAmbientLight(Vec4(1.0f));
 
         // sponza 
-        SceneNodePtr nodeSponza = myScene->GetRootNode().CreateChildNode("sponza");
-        ModelPtr modelSponza = myScene->GetResourceManifest().LoadModel("sponza", jonsPackage);
+     /*   SceneNodePtr nodeSponza = myScene->GetRootNode().CreateChildNode("sponza");
+        ModelPtr modelSponza = mEngine->GetResourceManifest().LoadModel("sponza", jonsPackage);
         modelSponza->mSceneNode = nodeSponza;
         nodeSponza->ScaleNode(Vec3(0.1f));
         //nodeSponza->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
         nodeSponza->TranslateNode(Vec3(0.0f, 0.5f, -54.0f));
-        
+        */
         // sectoid 
       /*  SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
-        ModelPtr modelAlien = myScene->GetResourceManifest().LoadModel("sectoid", jonsPackage);
+        ModelPtr modelAlien = mEngine->GetResourceManifest().LoadModel("sectoid", jonsPackage);
         modelAlien->mSceneNode = nodeAlien;
         nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
         nodeAlien->TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
 
         // cube
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
-        ModelPtr modelCube = myScene->GetResourceManifest().LoadModel("cube", jonsPackage);
+        ModelPtr modelCube = mEngine->GetResourceManifest().LoadModel("cube", jonsPackage);
         modelCube->mSceneNode = nodeCube;
         nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
         
         // chair
         SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("nodeChair");
-        ModelPtr modelChair = myScene->GetResourceManifest().LoadModel("chair", jonsPackage);
+        ModelPtr modelChair = mEngine->GetResourceManifest().LoadModel("chair", jonsPackage);
         modelChair->mSceneNode = nodeChair;
         nodeChair->TranslateNode(Vec3(-8.0f, 0.5f, -4.0f));
         nodeChair->ScaleNode(Vec3(2.0f));
-
+        */
         // house
         SceneNodePtr nodeHouse = myScene->GetRootNode().CreateChildNode("nodeHouse");
-        ModelPtr modelHouse = myScene->GetResourceManifest().LoadModel("house", jonsPackage);
+        ModelPtr modelHouse = mEngine->GetResourceManifest().LoadModel("house", jonsPackage);
         modelHouse->mSceneNode = nodeHouse;
         nodeHouse->TranslateNode(Vec3(-7.0f, 0.5f, -15.0f));
-        
+        /*
         // point light
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
         PointLightPtr movingLight = myScene->CreatePointLight("MovingPointLight", nodeMovingLight);
@@ -190,21 +190,21 @@ namespace JonsGame
         
         // create a ground plane
         SceneNodePtr nodePlane = myScene->GetRootNode().CreateChildNode("nodePlane");
-        ModelPtr plane = myScene->GetResourceManifest().CreateRectangle("GroundPlane", 64, 1.0, 64);
+        ModelPtr plane = mEngine->GetResourceManifest().CreateRectangle("GroundPlane", 64, 1.0, 64);
         plane->mMaterial = myScene->GetResourceManifest().LoadMaterial("checkers", jonsPackage);
         plane->mSceneNode = nodePlane;
         plane->mMaterialTilingFactor = 64.0f;
 
         // create a sphere
         SceneNodePtr nodeSphere = myScene->GetRootNode().CreateChildNode("nodeSphere");
-        ModelPtr sphere = myScene->GetResourceManifest().CreateSphere("Sphere", 1.0f, 12, 24);
+        ModelPtr sphere = mEngine->GetResourceManifest().CreateSphere("Sphere", 1.0f, 12, 24);
         sphere->mMaterial = myScene->GetResourceManifest().GetMaterial("checkers");
         sphere->mSceneNode = nodeSphere;
         nodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
 
         // create a  second cube
         SceneNodePtr nodeCube2 = myScene->GetRootNode().CreateChildNode("nodeCube2");
-        ModelPtr cube2 = myScene->GetResourceManifest().CreateCube("Cube2", 3);
+        ModelPtr cube2 = mEngine->GetResourceManifest().CreateCube("Cube2", 3);
         cube2->mMaterial = myScene->GetResourceManifest().GetMaterial("checkers");
         cube2->mSceneNode = nodeCube2;
         nodeCube2->TranslateNode(Vec3(11.0f, 2.0f, -15.0f));

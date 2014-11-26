@@ -4,7 +4,7 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include <vector>
+#include <array>
 
 namespace JonsEngine
 {
@@ -31,4 +31,5 @@ namespace JonsEngine
     typedef glm::mat4 Mat4;
     typedef glm::fquat Quaternion;
     typedef glm::vec4 Plane;
+    typedef std::array<Plane, 6> FrustrumPlanes;
 }
