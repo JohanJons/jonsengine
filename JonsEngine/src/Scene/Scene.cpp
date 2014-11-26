@@ -8,8 +8,8 @@
 
 namespace JonsEngine
 {
-    Scene::Scene(const std::string& sceneName, ResourceManifest& resManifest) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mRootNode("Root"), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), 
-                                                                                mAmbientLight(0.2f), mResourceManifest(resManifest)
+    Scene::Scene(const std::string& sceneName) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mRootNode("Root"), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), 
+                                                                                mAmbientLight(0.2f)
     {
     }
 

@@ -6,7 +6,7 @@
 
 namespace JonsEngine
 {
-    SceneManager::SceneManager(ResourceManifest& resManifest) : mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mActiveScene(nullptr), mResourceManifest(resManifest)
+    SceneManager::SceneManager() : mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mActiveScene(nullptr)
     {
     }
 
@@ -22,7 +22,7 @@ namespace JonsEngine
         
         if (iter == mScenes.end())
         {
-            mScenes.emplace_back(mMemoryAllocator.AllocateObject<Scene, const std::string&, ResourceManifest&>(sceneName, mResourceManifest));
+            mScenes.emplace_back(mMemoryAllocator.AllocateObject<Scene, const std::string&>(sceneName));
 
             return mScenes.back();
         }

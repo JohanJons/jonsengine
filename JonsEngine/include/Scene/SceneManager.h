@@ -4,14 +4,13 @@
 
 namespace JonsEngine
 {
-    class ResourceManifest;
     class IMemoryAllocator;
     class Scene;
 
     class SceneManager
     {
     public:
-        SceneManager(ResourceManifest& resManifest);
+        SceneManager();
         ~SceneManager();
 
         Scene* CreateScene(const std::string& sceneName);
@@ -29,7 +28,6 @@ namespace JonsEngine
         std::vector<Scene*> mScenes;
         Scene* mActiveScene;
 
-        ResourceManifest& mResourceManifest;
         IMemoryAllocator& mMemoryAllocator;
     };
 

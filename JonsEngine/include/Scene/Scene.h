@@ -18,7 +18,7 @@ namespace JonsEngine
     class Scene
     {
     public:
-        Scene(const std::string& sceneName, ResourceManifest& resManifest);
+        Scene(const std::string& sceneName);
         ~Scene();
 
         PointLightPtr CreatePointLight(const std::string& lightName, const SceneNodePtr node);
@@ -35,9 +35,6 @@ namespace JonsEngine
 
         void SetAmbientLight(const Vec4& ambientLight);
         const Vec4& GetAmbientLight() const;
-
-        const ResourceManifest& GetResourceManifest() const;
-        ResourceManifest& GetResourceManifest();
 
         Camera& GetSceneCamera();
         const Camera& GetSceneCamera() const;
@@ -58,14 +55,11 @@ namespace JonsEngine
         std::vector<PointLightPtr> mPointLights;
         std::vector<DirectionalLightPtr> mDirectionalLights;
 
-        ResourceManifest& mResourceManifest;
         IMemoryAllocator& mMemoryAllocator;
     };
 
 
     /* Scene inlines */
-    inline const ResourceManifest& Scene::GetResourceManifest() const      { return mResourceManifest; }
-    inline ResourceManifest& Scene::GetResourceManifest()                  { return mResourceManifest; }
     inline Camera& Scene::GetSceneCamera()                                 { return mSceneCamera;      }
     inline const Camera& Scene::GetSceneCamera() const                     { return mSceneCamera;      }
     inline SceneNode& Scene::GetRootNode()                                 { return mRootNode;         }

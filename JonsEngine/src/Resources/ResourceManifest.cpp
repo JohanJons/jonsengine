@@ -32,12 +32,15 @@ namespace JonsEngine
             return ptr;
 
         auto allocator = mMemoryAllocator;
-        ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName), [=](Model* model) { allocator->DeallocateObject(model); }));
 
         const float halfX = sizeX / 2.0f;
         const float halfY = sizeY / 2.0f;
         const float halfZ = sizeZ / 2.0f;
-        ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, Vec3(-halfX, -halfY, -halfZ), Vec3(halfX, halfY, halfZ));
+        Vec3 minBounds(-halfX, -halfY, -halfZ);
+        Vec3 maxBounds(halfX, halfY, halfZ);
+
+        ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName, minBounds, maxBounds), [=](Model* model) { allocator->DeallocateObject(model); }));
+        ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
 
         return ptr;
     }
@@ -61,8 +64,12 @@ namespace JonsEngine
             return ptr;
 
         auto allocator = mMemoryAllocator;
-        ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName), [=](Model* model) { allocator->DeallocateObject(model); }));
-        ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, Vec3(-radius, -radius, -radius), Vec3(radius, radius, radius));
+
+        Vec3 minBounds(-radius, -radius, -radius);
+        Vec3 maxBounds(radius, radius, radius);
+
+        ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName, minBounds, maxBounds), [=](Model* model) { allocator->DeallocateObject(model); }));
+        ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
 
         return ptr;
     }
@@ -136,10 +143,10 @@ namespace JonsEngine
 
     Model ResourceManifest::ProcessModel(PackageModel& pkgModel, const JonsPackagePtr jonsPkg)
     {
-        Model model(pkgModel.mName);
+        Model model(pkgModel.mName, pkgModel.mAABB.mMinBounds, pkgModel.mAABB.mMaxBounds);
         model.mTransform = pkgModel.mTransform;
             
-        for(PackageMesh& mesh : pkgModel.mMeshes)
+        for (PackageMesh& mesh : pkgModel.mMeshes)
         {
             if (mesh.mHasMaterial)
             {
