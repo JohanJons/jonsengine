@@ -39,7 +39,7 @@ namespace JonsEngine
         Vec3 minBounds(-halfX, -halfY, -halfZ);
         Vec3 maxBounds(halfX, halfY, halfZ);
 
-        ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName, minBounds, maxBounds), [=](Model* model) { allocator->DeallocateObject(model); }));
+        ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds), [=](Model* model) { allocator->DeallocateObject(model); }));
         ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
 
         return ptr;
@@ -68,7 +68,7 @@ namespace JonsEngine
         Vec3 minBounds(-radius, -radius, -radius);
         Vec3 maxBounds(radius, radius, radius);
 
-        ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName, minBounds, maxBounds), [=](Model* model) { allocator->DeallocateObject(model); }));
+        ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds), [=](Model* model) { allocator->DeallocateObject(model); }));
         ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
 
         return ptr;
@@ -143,8 +143,7 @@ namespace JonsEngine
 
     Model ResourceManifest::ProcessModel(PackageModel& pkgModel, const JonsPackagePtr jonsPkg)
     {
-        Model model(pkgModel.mName, pkgModel.mAABB.mMinBounds, pkgModel.mAABB.mMaxBounds);
-        model.mTransform = pkgModel.mTransform;
+        Model model(pkgModel.mName, pkgModel.mTransform, pkgModel.mAABB.mMinBounds, pkgModel.mAABB.mMaxBounds);
             
         for (PackageMesh& mesh : pkgModel.mMeshes)
         {

@@ -9,7 +9,7 @@
 namespace JonsEngine
 {
     Scene::Scene(const std::string& sceneName) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mRootNode("Root"), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), 
-                                                                                mAmbientLight(0.2f)
+                                                 mAmbientLight(0.2f)
     {
     }
 
@@ -18,22 +18,22 @@ namespace JonsEngine
     }
 
 
-
     PointLightPtr Scene::CreatePointLight(const std::string& lightName, const SceneNodePtr node)
     {
         mPointLights.emplace_back(mMemoryAllocator.AllocateObject<PointLight>(lightName, node), std::bind(&HeapAllocator::DeallocateObject<PointLight>, &mMemoryAllocator, std::placeholders::_1));
 
         return mPointLights.back();
     }
-
-    DirectionalLightPtr Scene::CreateDirectionalLight(const std::string& lightName)
+    
+    void Scene::DeletePointLight(const std::string& lightName)
     {
-        mDirectionalLights.emplace_back(mMemoryAllocator.AllocateObject<DirectionalLight>(lightName), std::bind(&HeapAllocator::DeallocateObject<DirectionalLight>, &mMemoryAllocator, std::placeholders::_1));
+        size_t hashedID = boost::hash_value(lightName);
+        auto iter = std::find_if(mPointLights.begin(), mPointLights.end(), [hashedID](const PointLightPtr light) { return light->mHashedID == hashedID; });
 
-        return mDirectionalLights.back();
+        if (iter != mPointLights.end())
+            mPointLights.erase(iter);
     }
-
-
+    
     PointLightPtr Scene::GetPointLight(const std::string& lightName)
     {
         PointLightPtr ret;
@@ -46,7 +46,29 @@ namespace JonsEngine
 
         return ret;
     }
+   
+    const std::vector<PointLightPtr>& Scene::GetPointLights() const
+    {
+        return mPointLights;
+    }
+    
 
+    DirectionalLightPtr Scene::CreateDirectionalLight(const std::string& lightName)
+    {
+        mDirectionalLights.emplace_back(mMemoryAllocator.AllocateObject<DirectionalLight>(lightName), std::bind(&HeapAllocator::DeallocateObject<DirectionalLight>, &mMemoryAllocator, std::placeholders::_1));
+
+        return mDirectionalLights.back();
+    }
+    
+    void Scene::DeleteDirectionalLight(const std::string& lightName)
+    {
+        size_t hashedID = boost::hash_value(lightName);
+        auto iter = std::find_if(mDirectionalLights.begin(), mDirectionalLights.end(), [hashedID](const DirectionalLightPtr light) { return light->mHashedID == hashedID; });
+
+        if (iter != mDirectionalLights.end())
+            mDirectionalLights.erase(iter);
+    }
+    
     DirectionalLightPtr Scene::GetDirectionalLight(const std::string& lightName)
     {
         DirectionalLightPtr ret;
@@ -60,35 +82,11 @@ namespace JonsEngine
         return ret;
     }
 
-
-    const std::vector<PointLightPtr>& Scene::GetPointLights() const
-    {
-        return mPointLights;
-    }
-
     const std::vector<DirectionalLightPtr>& Scene::GetDirectionalLights() const
     {
         return mDirectionalLights;
     }
-
-    void Scene::DeletePointLight(const std::string& lightName)
-    {
-        size_t hashedID = boost::hash_value(lightName);
-        auto iter = std::find_if(mPointLights.begin(), mPointLights.end(), [hashedID](const PointLightPtr light) { return light->mHashedID == hashedID; });
-
-        if (iter != mPointLights.end())
-            mPointLights.erase(iter);
-    }
-
-    void Scene::DeleteDirectionalLight(const std::string& lightName)
-    {
-        size_t hashedID = boost::hash_value(lightName);
-        auto iter = std::find_if(mDirectionalLights.begin(), mDirectionalLights.end(), [hashedID](const DirectionalLightPtr light) { return light->mHashedID == hashedID; });
-
-        if (iter != mDirectionalLights.end())
-            mDirectionalLights.erase(iter);
-    }
-
+    
 
     void Scene::SetAmbientLight(const Vec4& ambientLight)
     {

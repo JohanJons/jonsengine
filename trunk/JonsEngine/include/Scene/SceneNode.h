@@ -47,7 +47,7 @@ namespace JonsEngine
         std::vector<SceneNodePtr> mChildNodes;
         IMemoryAllocator& mMemoryAllocator;
 
-        // components
+        // base components
         Mat4 mModelMatrix;
         Quaternion mOrientation;
         Vec3 mScale;

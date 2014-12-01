@@ -13,8 +13,14 @@ namespace JonsEngine
     class Model
     {
     public:
-        Model(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds);
+        Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds);
         ~Model();
+
+        Mat4 Transform(const Mat4& transformationMatrix);
+
+        const Mat4& GetTransformMatrix() const;
+        const Vec3& GetAABBCenter() const;
+        const Vec3& GetAABBExtent() const;
 
         bool operator==(const Model& m);
         bool operator==(const std::string& modelName);
@@ -26,14 +32,17 @@ namespace JonsEngine
         std::vector<Model> mChildren;
         MeshID mMesh;
         MaterialPtr mMaterial;
-        Mat4 mTransform;
-        const Vec3 mAABBCenter;
-        const Vec3 mAABBExtent;
 
         bool mLightingEnabled;
         float mMaterialTilingFactor;
 
         SceneNodePtr mSceneNode;
+
+        
+    private:
+        Mat4 mTransform;
+        Vec3 mAABBCenter;
+        Vec3 mAABBExtent;
     };
 
     typedef std::shared_ptr<Model> ModelPtr;
