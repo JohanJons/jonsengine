@@ -15,10 +15,10 @@ namespace JonsEngine
     /*
      * Contains various math utilities
      */
-
+     
     const Mat4 gIdentityMatrix(1.0f);
 
-    bool DoesAABBIntersectViewFrustrum(const Vec3& aabbCenter, const Vec3& aabbExtent, const Mat4& WVPMatrix);
+    bool isAABBInFrustumReference(const Vec3& center, const Vec3& extent, const Mat4& frustumMatrix);
 
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float ratio, const float zNear, const float zFar);
     Mat4 OrthographicMatrix(const float left, const float right, const float top, const float bottom, const float zNear, const float zFar);

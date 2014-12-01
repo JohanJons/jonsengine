@@ -5,8 +5,6 @@
 #include "include/Scene/PointLight.h"
 #include "include/Scene/DirectionalLight.h"
 #include "include/Scene/Model.h"
-#include "include/Resources/JonsPackage.h"
-#include "include/Resources/ResourceManifest.h"
 
 #include <string>
 #include <vector>
@@ -20,18 +18,16 @@ namespace JonsEngine
     public:
         Scene(const std::string& sceneName);
         ~Scene();
-
+        
         PointLightPtr CreatePointLight(const std::string& lightName, const SceneNodePtr node);
-        DirectionalLightPtr CreateDirectionalLight(const std::string& lightName);
-
-        PointLightPtr Scene::GetPointLight(const std::string& lightName);
-        DirectionalLightPtr Scene::GetDirectionalLight(const std::string& lightName);
-
-        const std::vector<PointLightPtr>& GetPointLights() const;
-        const std::vector<DirectionalLightPtr>& GetDirectionalLights() const;
-
         void DeletePointLight(const std::string& lightName);
+        PointLightPtr Scene::GetPointLight(const std::string& lightName);
+        const std::vector<PointLightPtr>& GetPointLights() const;
+        
+        DirectionalLightPtr CreateDirectionalLight(const std::string& lightName);
         void DeleteDirectionalLight(const std::string& lightName);
+        DirectionalLightPtr Scene::GetDirectionalLight(const std::string& lightName);
+        const std::vector<DirectionalLightPtr>& GetDirectionalLights() const;
 
         void SetAmbientLight(const Vec4& ambientLight);
         const Vec4& GetAmbientLight() const;

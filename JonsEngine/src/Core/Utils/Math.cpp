@@ -1,48 +1,48 @@
 #include "include/Core/Utils/Math.h"
 
+#include <cmath>
+
 namespace JonsEngine
 {
-    float signum(float val)
-    {
-        if (val > 0.0f) return 1.0f;
-        if (val < 0.0f) return -1.0f;
+    /*
+     * Returns worldspace frustrum planes
+     */
 
-        return 0.0f;
+    bool extentSignedTest(const Vec4& p, const Vec3& center, const Vec3& extent)
+    {
+        return (glm::dot(Vec3(p), center) + glm::dot(glm::abs(Vec3(p)), extent) < -p.w);
     }
 
-
-    FrustrumPlanes GetFrustrumPlanes(const Mat4& WVPMatrix)
+    bool isAABBInFrustumReference(const Vec3& center, const Vec3& extent, const Mat4& frustumMatrix)
     {
-        FrustrumPlanes ret;
+        const Vec4 rowX(frustumMatrix[0].x, frustumMatrix[1].x, frustumMatrix[2].x, frustumMatrix[3].x);
+        const Vec4 rowY(frustumMatrix[0].y, frustumMatrix[1].y, frustumMatrix[2].y, frustumMatrix[3].y);
+        const Vec4 rowZ(frustumMatrix[0].z, frustumMatrix[1].z, frustumMatrix[2].z, frustumMatrix[3].z);
+        const Vec4 rowW(frustumMatrix[0].w, frustumMatrix[1].w, frustumMatrix[2].w, frustumMatrix[3].w);
 
-        ret[0] = WVPMatrix[3] + WVPMatrix[0];
-        ret[1] = WVPMatrix[3] - WVPMatrix[0];
-        ret[2] = WVPMatrix[3] - WVPMatrix[1];
-        ret[3] = WVPMatrix[3] + WVPMatrix[1];
-        ret[4] = WVPMatrix[2];
-        ret[5] = WVPMatrix[3] - WVPMatrix[2];
+        // Left and right planes              
+        if (extentSignedTest(rowW + rowX, center, extent))
+            return false;
 
-        for (Plane& plane : ret)
-            plane = glm::normalize(plane);
+        if (extentSignedTest(rowW - rowX, center, extent))
+            return false;
 
-        return ret;
+        // Bottom and top planes
+        if (extentSignedTest(rowW + rowY, center, extent))
+            return false;
+
+        if (extentSignedTest(rowW - rowY, center, extent))
+            return false;
+
+        // Near and far planes
+        if (extentSignedTest(rowW + rowZ, center, extent))
+            return false;
+
+        if (extentSignedTest(rowW - rowZ, center, extent))
+            return false;
+
+        return true;
     }
-
-
-    bool DoesAABBIntersectViewFrustrum(const Vec3& aabbCenter, const Vec3& aabbExtent, const Mat4& WVPMatrix)
-    {
-        FrustrumPlanes planes = GetFrustrumPlanes(WVPMatrix);
-
-        for (const Plane& plane : planes)
-        {
-            Vec3 signFlip(signum(plane.x), signum(plane.y), signum(plane.z));
-            if (glm::dot(aabbCenter + aabbExtent * signFlip, Vec3(plane)) > -plane.w)
-                return true;
-        }
-
-        return false;
-    }
-
 
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float aspectRatio, const float zNear, const float zFar)
     {
