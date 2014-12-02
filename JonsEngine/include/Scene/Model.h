@@ -16,9 +16,6 @@ namespace JonsEngine
         Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds);
         ~Model();
 
-        Mat4 Transform(const Mat4& transformationMatrix);
-
-        const Mat4& GetTransformMatrix() const;
         const Vec3& GetAABBCenter() const;
         const Vec3& GetAABBExtent() const;
 
@@ -40,7 +37,6 @@ namespace JonsEngine
 
         
     private:
-        Mat4 mTransform;
         Vec3 mAABBCenter;
         Vec3 mAABBExtent;
     };
