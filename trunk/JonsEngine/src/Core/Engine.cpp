@@ -66,6 +66,8 @@ namespace JonsEngine
     void Engine::FillRenderQueue(const std::vector<ModelPtr>& allModels, const Mat4& viewProjectionMatrix)
     {
         // TODO: not very cache-friendly
+        // this could be a CPU-hotspot for complex scenes
+        /*FrustrumIntersection aabbIntersection(FRUSTRUM_INTERSECTION_INSIDE);
         for (ModelPtr model : allModels)
         {
             if (!model || !model->mSceneNode)
@@ -73,11 +75,16 @@ namespace JonsEngine
         
             const Mat4& nodeTransform = model->mSceneNode->GetNodeTransform();
 
-            if (!isAABBInFrustumReference(model->GetAABBCenter(), model->GetAABBExtent(), viewProjectionMatrix * nodeTransform * model->GetTransformMatrix()))
+            aabbIntersection = IsAABBInFrustum(model->GetAABBCenter(), model->GetAABBExtent(), viewProjectionMatrix * nodeTransform * model->GetTransformMatrix());
+            if (aabbIntersection == FRUSTRUM_INTERSECTION_OUTSIDE)
                 continue;
+				
+			if (aabbIntersection == FRUSTRUM_INTERSECTION_PARTIAL)
+				continue;
 
             CreateModelRenderable(model.get(), viewProjectionMatrix, nodeTransform, model->mLightingEnabled);
-        }
+        }*/
+		CullModels(allModels, viewProjectionMatrix, Mat4(1.0f));
 
         std::sort(mRenderQueue.begin(), mRenderQueue.end(), [](const Renderable& smaller, const Renderable& larger) { return smaller.mMesh < larger.mMesh; });
     }
@@ -97,6 +104,37 @@ namespace JonsEngine
 
         return lighting;
     }
+	
+    void Engine::CullModels(const std::vector<ModelPtr>& allModels, const Mat4& viewProjectionMatrix, const Mat4& parentTransform)
+	{
+		// TODO: not very cache-friendly
+        // this could be a CPU-hotspot for complex scenes
+        FrustrumIntersection aabbIntersection(FRUSTRUM_INTERSECTION_INSIDE);
+		for (const ModelPtr model : allModels)
+		{
+			if (!model)
+                continue;
+			
+            Mat4 worldMatrix = parentTransform;
+			if (model->mSceneNode)
+                worldMatrix *= model->mSceneNode->GetNodeTransform();
+            const Mat4 worldViewProjMatrix = viewProjectionMatrix * worldMatrix;
+
+            aabbIntersection = IsAABBInFrustum(model->GetAABBCenter(), model->GetAABBExtent(), worldViewProjMatrix);
+            if (aabbIntersection == FRUSTRUM_INTERSECTION_OUTSIDE)
+                continue;
+				
+			//if (aabbIntersection == FRUSTRUM_INTERSECTION_PARTIAL) {
+            //    CullModels(model->mChildren, viewProjectionMatrix, modelTransform);
+			//}
+			//else {
+			    
+			//}
+
+            CreateModelRenderable(model.get(), viewProjectionMatrix, worldMatrix, model->mLightingEnabled);
+		}
+	
+	}
 
     /*
      * Creates a render unit for model 'model' and all its children.
@@ -104,7 +142,7 @@ namespace JonsEngine
     void Engine::CreateModelRenderable(const Model* model, const Mat4& viewProjectionMatrix, const Mat4& nodeTransform, const bool lightingEnabled)
     {
         // TODO: arguments....
-        const Mat4 worldMatrix = nodeTransform * model->GetTransformMatrix();
+        const Mat4 worldMatrix = nodeTransform;
         const Mat4 worldViewProjMatrix = viewProjectionMatrix * worldMatrix;
 
         if (model->mMesh != INVALID_MESH_ID)

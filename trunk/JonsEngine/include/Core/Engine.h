@@ -44,7 +44,7 @@ namespace JonsEngine
         void FillRenderQueue(const std::vector<ModelPtr>& allModels, const Mat4& viewProjectionMatrix);
         RenderableLighting GetLightingInfo(const Mat4& projMatrix, const Mat4& viewMatrix, const Mat4& viewProjectionMatrix, const Vec4& ambientLight, const Vec3& cameraPosition, const std::vector<PointLightPtr>& pointLights, const std::vector<DirectionalLightPtr>& directionalLights);
         void CreateModelRenderable(const Model* model, const Mat4& viewProjectionMatrix, const Mat4& nodeTransform, const bool lightingEnabled);
-        void ParseVisibleModels(const FrustrumPlanes& planes, const std::vector<ModelPtr>& allModels);
+        void CullModels(const std::vector<ModelPtr>& allModels, const Mat4& viewProjectionMatrix, const Mat4& parentTransform);
 
         Logger& mLog;
         IMemoryAllocatorPtr mMemoryAllocator;

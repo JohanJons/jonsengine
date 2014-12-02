@@ -8,40 +8,30 @@ namespace JonsEngine
      * Returns worldspace frustrum planes
      */
 
-    bool extentSignedTest(const Vec4& p, const Vec3& center, const Vec3& extent)
-    {
-        return (glm::dot(Vec3(p), center) + glm::dot(glm::abs(Vec3(p)), extent) < -p.w);
-    }
-
-    bool isAABBInFrustumReference(const Vec3& center, const Vec3& extent, const Mat4& frustumMatrix)
+    FrustrumIntersection IsAABBInFrustum(const Vec3& center, const Vec3& extent, const Mat4& frustumMatrix)
     {
         const Vec4 rowX(frustumMatrix[0].x, frustumMatrix[1].x, frustumMatrix[2].x, frustumMatrix[3].x);
         const Vec4 rowY(frustumMatrix[0].y, frustumMatrix[1].y, frustumMatrix[2].y, frustumMatrix[3].y);
         const Vec4 rowZ(frustumMatrix[0].z, frustumMatrix[1].z, frustumMatrix[2].z, frustumMatrix[3].z);
         const Vec4 rowW(frustumMatrix[0].w, frustumMatrix[1].w, frustumMatrix[2].w, frustumMatrix[3].w);
 
-        // Left and right planes              
-        if (extentSignedTest(rowW + rowX, center, extent))
-            return false;
-
-        if (extentSignedTest(rowW - rowX, center, extent))
-            return false;
-
-        // Bottom and top planes
-        if (extentSignedTest(rowW + rowY, center, extent))
-            return false;
-
-        if (extentSignedTest(rowW - rowY, center, extent))
-            return false;
-
-        // Near and far planes
-        if (extentSignedTest(rowW + rowZ, center, extent))
-            return false;
-
-        if (extentSignedTest(rowW - rowZ, center, extent))
-            return false;
-
-        return true;
+        FrustrumIntersection ret(FRUSTRUM_INTERSECTION_INSIDE);
+        
+        // left, right, bottom, top, near, far planes
+        std::array<Vec4, 6> planes = { rowW + rowX, rowW - rowX, rowW + rowY, rowW - rowY, rowW + rowZ, rowW - rowZ };
+        float d = 0.0f, r = 0.0f;
+        for (const Vec4& plane : planes)
+        {
+            d = glm::dot(Vec3(plane), center);
+            r = glm::dot(glm::abs(Vec3(plane)), extent);
+            
+            if (d + r > -plane.w)
+                ret = FRUSTRUM_INTERSECTION_PARTIAL;
+            if (d + r < -plane.w)
+                return FRUSTRUM_INTERSECTION_OUTSIDE;
+        }
+        
+        return ret;
     }
 
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float aspectRatio, const float zNear, const float zFar)
