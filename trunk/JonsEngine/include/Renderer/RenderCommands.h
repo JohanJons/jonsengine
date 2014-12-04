@@ -20,25 +20,24 @@ namespace JonsEngine
 
         TextureID mDiffuseTexture;
         TextureID mNormalTexture;
-        bool mLightingEnabled;
         float mSpecularFactor;
 
 
-        Renderable(const MeshID mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix, const bool lightingEnabled)
+        Renderable(const MeshID mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix)
             :
             Renderable(mesh, wvpMatrix, worldMatrix, 1.0f, Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(0.0f, 0.0f, 0.0f, 0.0f),
-                       INVALID_TEXTURE_ID, INVALID_TEXTURE_ID, lightingEnabled, 0.02f)
+                       INVALID_TEXTURE_ID, INVALID_TEXTURE_ID, 0.02f)
         {
 
         }
 
         Renderable(const MeshID mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor,
             const Vec4& diffuseColor, const Vec4& ambientColor, const Vec4& specularColor, const Vec4& emissiveColor,
-            const TextureID diffuseTexture, const TextureID normalTexture, const bool lightingEnabled, const float specularFactor)
+            const TextureID diffuseTexture, const TextureID normalTexture, const float specularFactor)
             :
             mMesh(mesh), mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix), mTextureTilingFactor(textureTilingFactor),
             mDiffuseColor(diffuseColor), mAmbientColor(ambientColor), mSpecularColor(specularColor), mEmissiveColor(emissiveColor),
-            mDiffuseTexture(diffuseTexture), mNormalTexture(normalTexture), mLightingEnabled(lightingEnabled), mSpecularFactor(specularFactor)
+            mDiffuseTexture(diffuseTexture), mNormalTexture(normalTexture), mSpecularFactor(specularFactor)
         {
 
         }

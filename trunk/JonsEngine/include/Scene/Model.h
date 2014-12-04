@@ -10,6 +10,10 @@
 
 namespace JonsEngine
 {
+    class Model;
+
+    typedef std::shared_ptr<Model> ModelPtr;
+
     class Model
     {
     public:
@@ -26,13 +30,11 @@ namespace JonsEngine
         const std::string mName;
         const size_t mHashedID;
 
-        std::vector<Model> mChildren;
         MeshID mMesh;
         MaterialPtr mMaterial;
-
-        bool mLightingEnabled;
         float mMaterialTilingFactor;
 
+        std::vector<ModelPtr> mChildren;
         SceneNodePtr mSceneNode;
 
         
@@ -40,6 +42,4 @@ namespace JonsEngine
         Vec3 mAABBCenter;
         Vec3 mAABBExtent;
     };
-
-    typedef std::shared_ptr<Model> ModelPtr;
 }

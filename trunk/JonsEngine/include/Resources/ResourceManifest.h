@@ -34,7 +34,7 @@ namespace JonsEngine
 
 
     private:
-        Model ProcessModel(PackageModel& pkgModel, const JonsPackagePtr jonsPkg);
+        ModelPtr ProcessModel(PackageModel& pkgModel, const JonsPackagePtr jonsPkg);
         Material ProcessMaterial(PackageMaterial& pkgMaterial, const JonsPackagePtr jonsPkg);
 
         IMemoryAllocatorPtr mMemoryAllocator;

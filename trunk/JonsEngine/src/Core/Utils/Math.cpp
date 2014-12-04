@@ -4,10 +4,6 @@
 
 namespace JonsEngine
 {
-    /*
-     * Returns worldspace frustrum planes
-     */
-
     FrustrumIntersection IsAABBInFrustum(const Vec3& center, const Vec3& extent, const Mat4& frustumMatrix)
     {
         const Vec4 rowX(frustumMatrix[0].x, frustumMatrix[1].x, frustumMatrix[2].x, frustumMatrix[3].x);
