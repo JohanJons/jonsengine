@@ -87,7 +87,7 @@ namespace JonsEngine
         if (iter != jonsPkg->mModels.end())
         {
             auto allocator = mMemoryAllocator;
-            ModelPtr model = ModelPtr(allocator->AllocateObject<Model>(ProcessModel(*iter, jonsPkg)), [=](Model* model) { allocator->DeallocateObject(model); });
+            ModelPtr model(ProcessModel(*iter, jonsPkg));
 
             ptr = *mModels.insert(mModels.end(), model);
         }
@@ -141,23 +141,25 @@ namespace JonsEngine
     }
 
 
-    Model ResourceManifest::ProcessModel(PackageModel& pkgModel, const JonsPackagePtr jonsPkg)
+    ModelPtr ResourceManifest::ProcessModel(PackageModel& pkgModel, const JonsPackagePtr jonsPkg)
     {
-        Model model(pkgModel.mName, pkgModel.mTransform, pkgModel.mAABB.mMinBounds, pkgModel.mAABB.mMaxBounds);
-            
+        //ModelPtr model(Model(pkgModel.mName, pkgModel.mTransform, pkgModel.mAABB.mMinBounds, pkgModel.mAABB.mMaxBounds));
+        auto allocator = mMemoryAllocator;
+        ModelPtr model(allocator->AllocateObject<Model>(pkgModel.mName, pkgModel.mTransform, pkgModel.mAABB.mMinBounds, pkgModel.mAABB.mMaxBounds), [=](Model* model) { allocator->DeallocateObject(model); });
+
         for (PackageMesh& mesh : pkgModel.mMeshes)
         {
             if (mesh.mHasMaterial)
             {
                 PackageMaterial& pkgMaterial = jonsPkg->mMaterials.at(mesh.mMaterialIndex);
-                model.mMaterial = LoadMaterial(pkgMaterial.mName, jonsPkg);
+                model->mMaterial = LoadMaterial(pkgMaterial.mName, jonsPkg);
             }
 
-            model.mMesh = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangents, mesh.mBitangents, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
+            model->mMesh = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangents, mesh.mBitangents, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
         }
 
         for(PackageModel& m : pkgModel.mChildren)
-            model.mChildren.emplace_back(ProcessModel(m, jonsPkg));
+            model->mChildren.emplace_back(ProcessModel(m, jonsPkg));
 
         return model;
     }
