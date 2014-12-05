@@ -105,7 +105,7 @@ namespace JonsEngine
             if (aabbIntersection == FRUSTRUM_INTERSECTION_OUTSIDE)
                 continue;
             
-            if (aabbIntersection == FRUSTRUM_INTERSECTION_PARTIAL && model->mMesh != INVALID_MESH_ID)
+            if ((aabbIntersection == FRUSTRUM_INTERSECTION_INSIDE || (aabbIntersection == FRUSTRUM_INTERSECTION_PARTIAL && model->mChildren.empty())) && model->mMesh != INVALID_MESH_ID)
             {
                 const MaterialPtr material(model->mMaterial);
                 if (material)
@@ -116,7 +116,8 @@ namespace JonsEngine
                     mRenderQueue.emplace_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix));
             }
             
-            CullModels(model->mChildren, viewProjectionMatrix, worldMatrix);
+            if (!model->mChildren.empty())
+                CullModels(model->mChildren, viewProjectionMatrix, worldMatrix);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace JonsEngine
             d = glm::dot(Vec3(plane), center);
             r = glm::dot(glm::abs(Vec3(plane)), extent);
             
-            if (d + r > -plane.w)
+            if (d - r < -plane.w)
                 ret = FRUSTRUM_INTERSECTION_PARTIAL;
             if (d + r < -plane.w)
                 return FRUSTRUM_INTERSECTION_OUTSIDE;
