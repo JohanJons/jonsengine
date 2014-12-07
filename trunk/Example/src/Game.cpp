@@ -140,7 +140,7 @@ namespace JonsGame
 
         // ambient light
         myScene->SetAmbientLight(Vec4(1.0f));
-
+        /*
         // sponza 
         SceneNodePtr nodeSponza = myScene->GetRootNode().CreateChildNode("sponza");
         ModelPtr modelSponza = mEngine->GetResourceManifest().LoadModel("sponza", jonsPackage);
@@ -170,7 +170,7 @@ namespace JonsGame
         nodeChair->ScaleNode(Vec3(2.0f));
         */
         // house
-       /* SceneNodePtr nodeHouse = myScene->GetRootNode().CreateChildNode("nodeHouse");
+        SceneNodePtr nodeHouse = myScene->GetRootNode().CreateChildNode("nodeHouse");
         ModelPtr modelHouse = mEngine->GetResourceManifest().LoadModel("house", jonsPackage);
         modelHouse->mSceneNode = nodeHouse;
         nodeHouse->TranslateNode(Vec3(-7.0f, 0.5f, -15.0f));

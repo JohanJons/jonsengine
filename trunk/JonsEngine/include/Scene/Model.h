@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Scene/SceneNode.h"
+#include "include/Scene/ModelNode.h"
 #include "include/Scene/Material.h"
 #include "include/Core/Types.h"
 
@@ -30,11 +31,7 @@ namespace JonsEngine
         const std::string mName;
         const size_t mHashedID;
 
-        MeshID mMesh;
-        MaterialPtr mMaterial;
-        float mMaterialTilingFactor;
-
-        std::vector<ModelPtr> mChildren;
+        std::vector<ModelNode> mNodes;
         SceneNodePtr mSceneNode;
 
         

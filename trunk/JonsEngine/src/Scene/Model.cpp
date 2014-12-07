@@ -7,8 +7,7 @@
 namespace JonsEngine
 {
     Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds) : 
-        mName(name), mHashedID(boost::hash_value(name)), mMesh(INVALID_MESH_ID), mMaterialTilingFactor(1.0f),
-        mAABBCenter(0.5f * (minBounds + maxBounds)), mAABBExtent(0.5f * (maxBounds - minBounds))
+        mName(name), mHashedID(boost::hash_value(name)), mAABBCenter(0.5f * (minBounds + maxBounds)), mAABBExtent(0.5f * (maxBounds - minBounds))
     {
         // TODO: remove in future - not certain if assimp can send their own transforms
         assert(initialTransform == gIdentityMatrix);

@@ -40,7 +40,13 @@ namespace JonsEngine
         Vec3 maxBounds(halfX, halfY, halfZ);
 
         ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds), [=](Model* model) { allocator->DeallocateObject(model); }));
-        ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
+
+        const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
+        Mesh mesh("RectangleMesh", minBounds, maxBounds, meshID, nullptr);
+        ModelNode node("RectangleNode", Mat4(1.0f), minBounds, maxBounds);
+
+        node.mMeshes.emplace_back(mesh);
+        ptr->mNodes.emplace_back(node);
 
         return ptr;
     }
@@ -69,7 +75,13 @@ namespace JonsEngine
         Vec3 maxBounds(radius, radius, radius);
 
         ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds), [=](Model* model) { allocator->DeallocateObject(model); }));
-        ptr->mMesh = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
+        
+        const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
+        Mesh mesh("SphereMesh", minBounds, maxBounds, meshID, nullptr);
+        ModelNode node("SphereNode", Mat4(1.0f), minBounds, maxBounds);
+
+        node.mMeshes.emplace_back(mesh);
+        ptr->mNodes.emplace_back(node);
 
         return ptr;
     }
@@ -141,30 +153,56 @@ namespace JonsEngine
     }
 
 
-    ModelPtr ResourceManifest::ProcessModel(PackageModel& pkgModel, const JonsPackagePtr jonsPkg)
+    ModelPtr ResourceManifest::ProcessModel(const PackageModel& pkgModel, const JonsPackagePtr jonsPkg)
     {
-        //ModelPtr model(Model(pkgModel.mName, pkgModel.mTransform, pkgModel.mAABB.mMinBounds, pkgModel.mAABB.mMaxBounds));
         auto allocator = mMemoryAllocator;
         ModelPtr model(allocator->AllocateObject<Model>(pkgModel.mName, pkgModel.mTransform, pkgModel.mAABB.mMinBounds, pkgModel.mAABB.mMaxBounds), [=](Model* model) { allocator->DeallocateObject(model); });
 
-        for (PackageMesh& mesh : pkgModel.mMeshes)
-        {
-            if (mesh.mHasMaterial)
-            {
-                PackageMaterial& pkgMaterial = jonsPkg->mMaterials.at(mesh.mMaterialIndex);
-                model->mMaterial = LoadMaterial(pkgMaterial.mName, jonsPkg);
-            }
+        for (const PackageNode& node : pkgModel.mNodes)
+            model->mNodes.emplace_back(ProcessModelNode(node, jonsPkg));
 
-            model->mMesh = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangents, mesh.mBitangents, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
-        }
 
-        for(PackageModel& m : pkgModel.mChildren)
-            model->mChildren.emplace_back(ProcessModel(m, jonsPkg));
+
+      //      if (mesh.mHasMaterial)
+      //      {
+      //          PackageMaterial& pkgMaterial = jonsPkg->mMaterials.at(mesh.mMaterialIndex);
+      //          model->mMaterial = LoadMaterial(pkgMaterial.mName, jonsPkg);
+       //     }
+
+       //     model->mMesh = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangents, mesh.mBitangents, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
+
+     //   for(PackageModel& m : pkgModel.mChildren)
+     //       model->mChildren.emplace_back(ProcessModel(m, jonsPkg));
 
         return model;
     }
 
-    Material ResourceManifest::ProcessMaterial(PackageMaterial& pkgMaterial, const JonsPackagePtr jonsPkg)
+    ModelNode ResourceManifest::ProcessModelNode(const PackageNode& pkgNode, const JonsPackagePtr jonsPkg)
+    {
+        ModelNode node(pkgNode.mName, pkgNode.mTransform, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds);
+
+        for (const PackageMesh& mesh : pkgNode.mMeshes)
+            node.mMeshes.emplace_back(ProcessMesh(mesh, jonsPkg));
+
+        return node;
+    }
+
+    Mesh ResourceManifest::ProcessMesh(const PackageMesh& pkgMesh, const JonsPackagePtr jonsPkg)
+    {
+        const MeshID meshID = mRenderer.CreateMesh(pkgMesh.mVertexData, pkgMesh.mNormalData, pkgMesh.mTexCoordsData, pkgMesh.mTangents, pkgMesh.mBitangents, pkgMesh.mIndiceData,
+            pkgMesh.mAABB.mMinBounds, pkgMesh.mAABB.mMaxBounds);
+
+        MaterialPtr material(nullptr);
+        if (pkgMesh.mHasMaterial)
+        {
+            PackageMaterial& pkgMaterial = jonsPkg->mMaterials.at(pkgMesh.mMaterialIndex);
+            material = LoadMaterial(pkgMaterial.mName, jonsPkg);
+        }
+
+        return Mesh(pkgMesh.mName, pkgMesh.mAABB.mMinBounds, pkgMesh.mAABB.mMaxBounds, meshID, material);
+    }
+
+    Material ResourceManifest::ProcessMaterial(const PackageMaterial& pkgMaterial, const JonsPackagePtr jonsPkg)
     {
         TextureID diffuseTexture = INVALID_TEXTURE_ID;
         TextureID normalTexture  = INVALID_TEXTURE_ID;

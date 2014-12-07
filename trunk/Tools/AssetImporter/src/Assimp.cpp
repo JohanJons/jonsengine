@@ -1,11 +1,37 @@
 #include "include/Assimp.h"
 
+#include "include/Core/Utils/Math.h"
 #include "include/FreeImage.h"
+
+#include <limits>
 
 using namespace JonsEngine;
 
 namespace JonsAssetImporter
 {
+    JonsEngine::Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat)
+    {
+        Mat4 jMat;
+
+        jMat[0][0] = aiMat.a1; jMat[0][1] = aiMat.b1; jMat[0][2] = aiMat.c1; jMat[0][3] = aiMat.d1;
+        jMat[1][0] = aiMat.a2; jMat[1][1] = aiMat.b2; jMat[1][2] = aiMat.c2; jMat[1][3] = aiMat.d2;
+        jMat[2][0] = aiMat.a3; jMat[2][1] = aiMat.b3; jMat[2][2] = aiMat.c3; jMat[2][3] = aiMat.d3;
+        jMat[3][0] = aiMat.a4; jMat[3][1] = aiMat.b4; jMat[3][2] = aiMat.c4; jMat[3][3] = aiMat.d4;
+
+        return jMat;
+    }
+
+    JonsEngine::Vec3 aiColor3DToJonsVec3(const aiColor3D& color)
+    {
+        return Vec3(color.r, color.g, color.b);
+    }
+
+    JonsEngine::Vec3 aiVec3ToJonsVec3(const aiVector3D& vec)
+    {
+        return Vec3(vec.x, vec.y, vec.z);
+    }
+
+
     Assimp::Assimp()
     {
     }
@@ -31,7 +57,7 @@ namespace JonsAssetImporter
         ProcessAssimpMaterials(scene, modelPath, materialMap, freeimageImporter, pkg);
 
         // process model hierarchy
-        PackageModel rootModel(ProcessAssimpModelGeometry(scene, scene->mRootNode, materialMap, Vec3(0.0f), Vec3(0.0f)));
+        PackageModel rootModel(ProcessAssimpModelGeometry(scene, scene->mRootNode, materialMap));
         rootModel.mName = modelName;
         pkg->mModels.push_back(rootModel);
 
@@ -43,7 +69,7 @@ namespace JonsAssetImporter
         if (!scene->HasMaterials())
             return;
 
-        for (unsigned int i = 0; i < scene->mNumMaterials; i++)
+        for (uint32_t i = 0; i < scene->mNumMaterials; i++)
         {
             const aiMaterial* material = scene->mMaterials[i];
             PackageMaterial pkgMaterial;
@@ -109,119 +135,114 @@ namespace JonsAssetImporter
         }
     }
 
-    JonsEngine::PackageModel Assimp::ProcessAssimpModelGeometry(const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, Vec3& modelMinBounds, Vec3& modelMaxBounds)
+    JonsEngine::PackageModel Assimp::ProcessAssimpModelGeometry(const aiScene* scene, const aiNode* node, const MaterialMap& materialMap)
     {
         PackageModel model;
         model.mName = node->mName.C_Str();
         model.mTransform = aiMat4ToJonsMat4(node->mTransformation);
 
-        for (unsigned int i = 0; i < node->mNumMeshes; i++)
-        {
-            PackageMesh mesh;
-            const aiMesh* m = scene->mMeshes[node->mMeshes[i]];
+        // assume root node has no meshes
+        assert(scene->mRootNode->mMeshes == nullptr);
 
-            mesh.mVertexData.reserve(m->mNumVertices * 3);
-            mesh.mNormalData.reserve(m->mNumVertices * 3);
-            mesh.mTexCoordsData.reserve(m->mNumVertices * 2);
-            mesh.mTangents.reserve(m->mNumVertices * 3);
-            mesh.mBitangents.reserve(m->mNumVertices * 3);
+        for (uint32_t i = 0; i < node->mNumChildren; i++)
+            model.mNodes.emplace_back(ProcessAssimpNode(scene, node->mChildren[i], materialMap, model.mAABB.mMinBounds, model.mAABB.mMaxBounds));
 
-            // vertice, normal, texcoord, tangents and bitangents data
-            for (unsigned int j = 0; j < m->mNumVertices; j++)
-            {
-                mesh.mVertexData.push_back(m->mVertices[j].x);
-                mesh.mVertexData.push_back(m->mVertices[j].y);
-                mesh.mVertexData.push_back(m->mVertices[j].z);
-
-                if (m->HasNormals())
-                {
-                    mesh.mNormalData.push_back(m->mNormals[j].x);
-                    mesh.mNormalData.push_back(m->mNormals[j].y);
-                    mesh.mNormalData.push_back(m->mNormals[j].z);
-                }
-                
-                if (m->HasTextureCoords(0))
-                {
-                    mesh.mTexCoordsData.push_back(m->mTextureCoords[0][j].x);
-                    mesh.mTexCoordsData.push_back(m->mTextureCoords[0][j].y);
-                }
-
-                if (m->HasTangentsAndBitangents())
-                {
-                    mesh.mTangents.push_back(m->mTangents[j].x);
-                    mesh.mTangents.push_back(m->mTangents[j].y);
-                    mesh.mTangents.push_back(m->mTangents[j].z);
-
-                    mesh.mBitangents.push_back(m->mBitangents[j].x);
-                    mesh.mBitangents.push_back(m->mBitangents[j].y);
-                    mesh.mBitangents.push_back(m->mBitangents[j].z);
-                }
-
-                // mesh AABB
-                if (m->mVertices[j].x > mesh.mAABB.mMaxBounds.x) mesh.mAABB.mMaxBounds.x = m->mVertices[j].x;
-                if (m->mVertices[j].x < mesh.mAABB.mMinBounds.x) mesh.mAABB.mMinBounds.x = m->mVertices[j].x;
-                if (m->mVertices[j].y > mesh.mAABB.mMaxBounds.y) mesh.mAABB.mMaxBounds.y = m->mVertices[j].y;
-                if (m->mVertices[j].y < mesh.mAABB.mMinBounds.y) mesh.mAABB.mMinBounds.y = m->mVertices[j].y;
-                if (m->mVertices[j].z > mesh.mAABB.mMaxBounds.z) mesh.mAABB.mMaxBounds.z = m->mVertices[j].z;
-                if (m->mVertices[j].z < mesh.mAABB.mMinBounds.z) mesh.mAABB.mMinBounds.z = m->mVertices[j].z;
-            }
-
-            mesh.mIndiceData.reserve(m->mNumFaces * 3);
-
-            // index data
-            for (unsigned int j = 0; j < m->mNumFaces; j++)
-            {
-                // only dem triangles
-                assert(m->mFaces[j].mNumIndices == 3);
-                for (uint32_t index = 0; index < 3; index++)
-                {
-                    assert(m->mFaces[j].mIndices[index] <= UINT16_MAX);
-                    mesh.mIndiceData.push_back(m->mFaces[j].mIndices[index]);
-                }
-            }
-
-            if (materialMap.find(m->mMaterialIndex) != materialMap.end())
-            {
-                mesh.mMaterialIndex = materialMap.at(m->mMaterialIndex);
-                mesh.mHasMaterial = true;
-            }
-
-            // model AABB
-            if (mesh.mAABB.mMaxBounds.x > modelMaxBounds.x) modelMaxBounds.x = mesh.mAABB.mMaxBounds.x;
-            if (mesh.mAABB.mMinBounds.x < modelMinBounds.x) modelMinBounds.x = mesh.mAABB.mMinBounds.x;
-            if (mesh.mAABB.mMaxBounds.y > modelMaxBounds.y) modelMaxBounds.y = mesh.mAABB.mMaxBounds.y;
-            if (mesh.mAABB.mMinBounds.y < modelMinBounds.y) modelMinBounds.y = mesh.mAABB.mMinBounds.y;
-            if (mesh.mAABB.mMaxBounds.z > modelMaxBounds.z) modelMaxBounds.z = mesh.mAABB.mMaxBounds.z;
-            if (mesh.mAABB.mMinBounds.z < modelMinBounds.z) modelMinBounds.z = mesh.mAABB.mMinBounds.z;
-
-            // add mesh to collection
-            model.mMeshes.push_back(mesh);
-        }
-
-        for (unsigned int i = 0; i < node->mNumChildren; i++)
-            model.mChildren.push_back(ProcessAssimpModelGeometry(scene, node->mChildren[i], materialMap, modelMinBounds, modelMaxBounds));
-
-        model.mAABB.mMinBounds = modelMinBounds;
-        model.mAABB.mMaxBounds = modelMaxBounds;
+        //model.mAABB.mMinBounds = modelMinBounds;
+        //model.mAABB.mMaxBounds = modelMaxBounds;
 
         return model;
     }
 
-
-    JonsEngine::Mat4 Assimp::aiMat4ToJonsMat4(const aiMatrix4x4& aiMat)
+    JonsEngine::PackageNode Assimp::ProcessAssimpNode(const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, JonsEngine::Vec3& parentMinBounds, JonsEngine::Vec3& parentMaxBounds)
     {
-        Mat4 jMat;
+        PackageNode pkgNode;
+        pkgNode.mName = node->mName.C_Str();
+        pkgNode.mTransform = aiMat4ToJonsMat4(node->mTransformation);
 
-        jMat[0][0] = aiMat.a1; jMat[0][1] = aiMat.b1; jMat[0][2] = aiMat.c1; jMat[0][3] = aiMat.d1;
-        jMat[1][0] = aiMat.a2; jMat[1][1] = aiMat.b2; jMat[1][2] = aiMat.c2; jMat[1][3] = aiMat.d2;
-        jMat[2][0] = aiMat.a3; jMat[2][1] = aiMat.b3; jMat[2][2] = aiMat.c3; jMat[2][3] = aiMat.d3;
-        jMat[3][0] = aiMat.a4; jMat[3][1] = aiMat.b4; jMat[3][2] = aiMat.c4; jMat[3][3] = aiMat.d4;
+        for (uint32_t i = 0; i < node->mNumMeshes; i++)
+            pkgNode.mMeshes.emplace_back(ProcessAssimpMesh(scene->mMeshes[node->mMeshes[i]], materialMap, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds));
 
-        return jMat;
+        for (uint32_t i = 0; i < node->mNumChildren; i++)
+            pkgNode.mChildNodes.emplace_back(ProcessAssimpNode(scene, node->mChildren[i], materialMap, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds));
+
+        parentMinBounds = MinVal(parentMinBounds, pkgNode.mAABB.mMinBounds);
+        parentMaxBounds = MaxVal(parentMaxBounds, pkgNode.mAABB.mMaxBounds);
+
+        return pkgNode;
     }
 
-    JonsEngine::Vec3 Assimp::aiColor3DToJonsVec3(const aiColor3D& color)
+    JonsEngine::PackageMesh Assimp::ProcessAssimpMesh(const aiMesh* m, const MaterialMap& materialMap, JonsEngine::Vec3& nodeMinBounds, JonsEngine::Vec3& nodeMaxBounds)
     {
-        return Vec3(color.r, color.g, color.b);
+        PackageMesh pkgMesh;
+        pkgMesh.mName = m->mName.C_Str();
+
+        pkgMesh.mVertexData.reserve(m->mNumVertices * 3);
+        pkgMesh.mNormalData.reserve(m->mNumVertices * 3);
+        pkgMesh.mTexCoordsData.reserve(m->mNumVertices * 2);
+        pkgMesh.mTangents.reserve(m->mNumVertices * 3);
+        pkgMesh.mBitangents.reserve(m->mNumVertices * 3);
+
+        // vertice, normal, texcoord, tangents and bitangents data
+        for (unsigned int j = 0; j < m->mNumVertices; j++)
+        {
+            pkgMesh.mVertexData.push_back(m->mVertices[j].x);
+            pkgMesh.mVertexData.push_back(m->mVertices[j].y);
+            pkgMesh.mVertexData.push_back(m->mVertices[j].z);
+
+            if (m->HasNormals())
+            {
+                pkgMesh.mNormalData.push_back(m->mNormals[j].x);
+                pkgMesh.mNormalData.push_back(m->mNormals[j].y);
+                pkgMesh.mNormalData.push_back(m->mNormals[j].z);
+            }
+
+            if (m->HasTextureCoords(0))
+            {
+                pkgMesh.mTexCoordsData.push_back(m->mTextureCoords[0][j].x);
+                pkgMesh.mTexCoordsData.push_back(m->mTextureCoords[0][j].y);
+            }
+
+            if (m->HasTangentsAndBitangents())
+            {
+                pkgMesh.mTangents.push_back(m->mTangents[j].x);
+                pkgMesh.mTangents.push_back(m->mTangents[j].y);
+                pkgMesh.mTangents.push_back(m->mTangents[j].z);
+
+                pkgMesh.mBitangents.push_back(m->mBitangents[j].x);
+                pkgMesh.mBitangents.push_back(m->mBitangents[j].y);
+                pkgMesh.mBitangents.push_back(m->mBitangents[j].z);
+            }
+
+            // mesh AABB
+            const Vec3 vertex = aiVec3ToJonsVec3(m->mVertices[j]);
+            pkgMesh.mAABB.mMinBounds = MinVal(pkgMesh.mAABB.mMinBounds, vertex);
+            pkgMesh.mAABB.mMaxBounds = MaxVal(pkgMesh.mAABB.mMaxBounds, vertex);
+        }
+
+        pkgMesh.mIndiceData.reserve(m->mNumFaces * 3);
+
+        // index data
+        for (uint32_t j = 0; j < m->mNumFaces; j++)
+        {
+            // only dem triangles
+            assert(m->mFaces[j].mNumIndices == 3);
+            for (uint32_t index = 0; index < 3; index++)
+            {
+                assert(m->mFaces[j].mIndices[index] <= UINT16_MAX);
+                pkgMesh.mIndiceData.push_back(m->mFaces[j].mIndices[index]);
+            }
+        }
+
+        if (materialMap.find(m->mMaterialIndex) != materialMap.end())
+        {
+            pkgMesh.mMaterialIndex = materialMap.at(m->mMaterialIndex);
+            pkgMesh.mHasMaterial = true;
+        }
+
+        // node AABB
+        nodeMinBounds = MinVal(nodeMinBounds, pkgMesh.mAABB.mMinBounds);
+        nodeMaxBounds = MaxVal(nodeMaxBounds, pkgMesh.mAABB.mMaxBounds);
+
+        return pkgMesh;
     }
 }
