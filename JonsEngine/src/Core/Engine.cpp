@@ -44,6 +44,7 @@ namespace JonsEngine
             mRenderQueue.clear();
 
             // update model matrix of all nodes in active scene
+            // TODO: only on change in scene node
             activeScene->GetRootNode().UpdateModelMatrix(gIdentityMatrix);
 
             const Camera& camera = activeScene->GetSceneCamera();
@@ -67,12 +68,15 @@ namespace JonsEngine
     {
         for (const ModelPtr model : allModels)
         {
-            for (const ModelNode& node : model->mNodes)
-                CullMeshes(node, viewProjectionMatrix);
-        }
+            if (!model->mSceneNode)
+                continue;
 
-        // DEBUGGING
-        int size = mRenderQueue.size();
+            for (const ModelNode& node : model->mNodes)
+            {
+                const Mat4& worldMatrix = model->mSceneNode->GetNodeTransform();
+                CullMeshes(node, viewProjectionMatrix * worldMatrix, worldMatrix);
+            }
+        }
 
         std::sort(mRenderQueue.begin(), mRenderQueue.end(), [](const Renderable& smaller, const Renderable& larger) { return smaller.mMesh < larger.mMesh; });
     }
@@ -93,42 +97,38 @@ namespace JonsEngine
         return lighting;
     }
 
-    void Engine::CullMeshes(const ModelNode& node, const Mat4& viewProjectionMatrix)
+    void Engine::CullMeshes(const ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
-        Mat4 worldMatrix = node.GetTransformMatrix();
-        Mat4 worldViewProjMatrix = viewProjectionMatrix * worldMatrix;
-        FrustrumIntersection nodeAABBIntersection(FRUSTRUM_INTERSECTION_INSIDE);
+        const Mat4 localWVPMatrix = wvpMatrix * node.GetTransformMatrix();
 
         // test node frustrum
-        nodeAABBIntersection = IsAABBInFrustum(node.GetAABBCenter(), node.GetAABBExtent(), worldViewProjMatrix);
+        FrustrumIntersection nodeAABBIntersection = IsAABBInFrustum(node.GetAABBCenter(), node.GetAABBExtent(), localWVPMatrix);
         switch (nodeAABBIntersection)
         {
             // if partially inside, recursively test all meshes and child nodes
             case FRUSTRUM_INTERSECTION_PARTIAL:
             {
-                Mat4 worldMatrix = node.GetTransformMatrix();
-                const Mat4 worldViewProjMatrix = viewProjectionMatrix * worldMatrix;
                 FrustrumIntersection meshAABBIntersection(FRUSTRUM_INTERSECTION_INSIDE);
 
                 for (const Mesh& mesh : node.mMeshes)
                 {
-                    meshAABBIntersection = IsAABBInFrustum(mesh.GetAABBCenter(), mesh.GetAABBExtent(), worldViewProjMatrix);
+                    meshAABBIntersection = IsAABBInFrustum(mesh.GetAABBCenter(), mesh.GetAABBExtent(), localWVPMatrix);
                     if (meshAABBIntersection == FRUSTRUM_INTERSECTION_OUTSIDE)
                         continue;
 
                     if (meshAABBIntersection == FRUSTRUM_INTERSECTION_INSIDE || meshAABBIntersection == FRUSTRUM_INTERSECTION_PARTIAL)
-                        AddMesh(mesh, worldViewProjMatrix, worldMatrix);
+                        AddMesh(mesh, wvpMatrix, worldMatrix);
                 }
 
                 for (const ModelNode& node : node.mChildNodes)
-                    CullMeshes(node, viewProjectionMatrix);
+                    CullMeshes(node, wvpMatrix, worldMatrix);
 
                 break;
             }
 
             case FRUSTRUM_INTERSECTION_INSIDE:
             {
-                AddAllMeshes(node, viewProjectionMatrix);
+                AddAllMeshes(node, wvpMatrix, worldMatrix);
                 break;
             }
 
@@ -138,16 +138,15 @@ namespace JonsEngine
         }
     }
 
-    void Engine::AddAllMeshes(const ModelNode& node, const Mat4& viewProjectionMatrix)
+    void Engine::AddAllMeshes(const ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
-        Mat4 worldMatrix = node.GetTransformMatrix();
-        Mat4 worldViewProjMatrix = viewProjectionMatrix * worldMatrix;
+        const Mat4 localWVPMatrix = wvpMatrix * node.GetTransformMatrix();
 
         for (const Mesh& mesh : node.mMeshes)
-            AddMesh(mesh, worldViewProjMatrix, worldMatrix);
+            AddMesh(mesh, localWVPMatrix, worldMatrix);
 
         for (const ModelNode& node : node.mChildNodes)
-            AddAllMeshes(node, viewProjectionMatrix);
+            AddAllMeshes(node, wvpMatrix, worldMatrix);
     }
 
     void Engine::AddMesh(const Mesh& mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix)
