@@ -3,6 +3,8 @@
 #include "include/Resources/JonsPackage.h"
 #include "include/Core/Memory/IMemoryAllocator.h"
 #include "include/Scene/Model.h"
+#include "include/Scene/ModelNode.h"
+#include "include/Scene/Mesh.h"
 #include "include/Scene/Material.h"
 #include "include/Renderer/DirectX11/DX11Renderer.h"
 #include "include/Renderer/Shapes.h"
@@ -34,8 +36,10 @@ namespace JonsEngine
 
 
     private:
-        ModelPtr ProcessModel(PackageModel& pkgModel, const JonsPackagePtr jonsPkg);
-        Material ProcessMaterial(PackageMaterial& pkgMaterial, const JonsPackagePtr jonsPkg);
+        ModelPtr ProcessModel(const PackageModel& pkgModel, const JonsPackagePtr jonsPkg);
+        ModelNode ProcessModelNode(const PackageNode& pkgNode, const JonsPackagePtr jonsPkg);
+        Mesh ProcessMesh(const PackageMesh& pkgMesh, const JonsPackagePtr jonsPkg);
+        Material ProcessMaterial(const PackageMaterial& pkgMaterial, const JonsPackagePtr jonsPkg);
 
         IMemoryAllocatorPtr mMemoryAllocator;
         DX11Renderer& mRenderer;

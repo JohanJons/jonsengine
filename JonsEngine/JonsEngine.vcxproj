@@ -148,7 +148,9 @@
     <ClCompile Include="src\Scene\Camera.cpp" />
     <ClCompile Include="src\Scene\DirectionalLight.cpp" />
     <ClCompile Include="src\Scene\Material.cpp" />
+    <ClCompile Include="src\Scene\Mesh.cpp" />
     <ClCompile Include="src\Scene\Model.cpp" />
+    <ClCompile Include="src\Scene\ModelNode.cpp" />
     <ClCompile Include="src\Scene\PointLight.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneManager.cpp" />
@@ -200,7 +202,9 @@
     <ClInclude Include="include\Scene\Camera.h" />
     <ClInclude Include="include\Scene\DirectionalLight.h" />
     <ClInclude Include="include\Scene\Material.h" />
+    <ClInclude Include="include\Scene\Mesh.h" />
     <ClInclude Include="include\Scene\Model.h" />
+    <ClInclude Include="include\Scene\ModelNode.h" />
     <ClInclude Include="include\Scene\PointLight.h" />
     <ClInclude Include="include\Scene\Scene.h" />
     <ClInclude Include="include\Scene\SceneManager.h" />

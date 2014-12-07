@@ -41,6 +41,9 @@ namespace JonsEngine
 
     struct PackageMesh
     {
+        std::string mName;
+        PackageAABB mAABB;
+
         std::vector<float> mVertexData;
         std::vector<float> mNormalData;
         std::vector<float> mTexCoordsData;
@@ -49,10 +52,21 @@ namespace JonsEngine
         std::vector<uint16_t> mIndiceData;
         uint16_t mMaterialIndex;
         bool mHasMaterial;
-        PackageAABB mAABB;
 
 
         PackageMesh();
+    };
+
+    struct PackageNode
+    {
+        std::string mName;
+        PackageAABB mAABB;
+        Mat4 mTransform;
+        std::vector<PackageMesh> mMeshes;
+        std::vector<PackageNode> mChildNodes;
+
+
+        PackageNode();
     };
 
     struct PackageTexture
@@ -86,10 +100,9 @@ namespace JonsEngine
     struct PackageModel
     {
         std::string mName;
-        std::vector<PackageModel> mChildren;
-        std::vector<PackageMesh> mMeshes;
-        Mat4 mTransform;
         PackageAABB mAABB;
+        Mat4 mTransform;
+        std::vector<PackageNode> mNodes;
 
 
         PackageModel();
@@ -138,18 +151,11 @@ namespace boost
         }
 
         template<class Archive>
-        void serialize(Archive & ar, JonsEngine::PackageModel& model, const unsigned int version)
-        {
-            ar & model.mName;
-            ar & model.mChildren;
-            ar & model.mMeshes;
-            ar & model.mTransform;
-            ar & model.mAABB;
-        }
-
-        template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageMesh& mesh, const unsigned int version)
         {
+            ar & mesh.mName;
+            ar & mesh.mAABB;
+
             ar & mesh.mVertexData;
             ar & mesh.mNormalData;
             ar & mesh.mTexCoordsData;
@@ -158,7 +164,16 @@ namespace boost
             ar & mesh.mIndiceData;
             ar & mesh.mMaterialIndex;
             ar & mesh.mHasMaterial;
-            ar & mesh.mAABB;
+        }
+
+        template<class Archive>
+        void serialize(Archive & ar, JonsEngine::PackageNode& node, const unsigned int version)
+        {
+            ar & node.mName;
+            ar & node.mAABB;
+            ar & node.mTransform;
+            ar & node.mMeshes;
+            ar & node.mChildNodes;
         }
 
         template<class Archive>
@@ -183,6 +198,15 @@ namespace boost
             ar & material.mAmbientColor;
             ar & material.mSpecularColor;
             ar & material.mEmissiveColor;
+        }
+
+        template<class Archive>
+        void serialize(Archive & ar, JonsEngine::PackageModel& model, const unsigned int version)
+        {
+            ar & model.mName;
+            ar & model.mAABB;
+            ar & model.mTransform;
+            ar & model.mNodes;
         }
 
         template<class Archive>

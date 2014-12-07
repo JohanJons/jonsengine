@@ -18,11 +18,15 @@ namespace JonsEngine
     {
     }
 
-    PackageModel::PackageModel() : mName(""), mTransform(1.0f)
+    PackageMesh::PackageMesh() : mMaterialIndex(0), mHasMaterial(false)
     {
     }
 
-    PackageMesh::PackageMesh() : mMaterialIndex(0), mHasMaterial(false)
+    PackageNode::PackageNode() : mName(""), mTransform(1.0f)
+    {
+    }
+
+    PackageModel::PackageModel() : mName(""), mTransform(1.0f)
     {
     }
 

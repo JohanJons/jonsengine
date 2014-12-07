@@ -65,7 +65,14 @@ namespace JonsEngine
 
     void Engine::FillRenderQueue(const std::vector<ModelPtr>& allModels, const Mat4& viewProjectionMatrix)
     {
-        CullModels(allModels, viewProjectionMatrix, Mat4(1.0f));
+        for (const ModelPtr model : allModels)
+        {
+            for (const ModelNode& node : model->mNodes)
+                CullMeshes(node, viewProjectionMatrix);
+        }
+
+        // DEBUGGING
+        int size = mRenderQueue.size();
 
         std::sort(mRenderQueue.begin(), mRenderQueue.end(), [](const Renderable& smaller, const Renderable& larger) { return smaller.mMesh < larger.mMesh; });
     }
@@ -86,38 +93,71 @@ namespace JonsEngine
         return lighting;
     }
 
-    void Engine::CullModels(const std::vector<ModelPtr>& allModels, const Mat4& viewProjectionMatrix, const Mat4& parentTransform)
+    void Engine::CullMeshes(const ModelNode& node, const Mat4& viewProjectionMatrix)
     {
-        // TODO: not very cache-friendly
-        // this could be a CPU-hotspot for complex scenes
-        FrustrumIntersection aabbIntersection(FRUSTRUM_INTERSECTION_INSIDE);
-        for (const ModelPtr model : allModels)
-        {
-            if (!model)
-                continue;
-            
-            Mat4 worldMatrix = parentTransform;
-            if (model->mSceneNode)
-                worldMatrix *= model->mSceneNode->GetNodeTransform();
-            const Mat4 worldViewProjMatrix = viewProjectionMatrix * worldMatrix;
+        Mat4 worldMatrix = node.GetTransformMatrix();
+        Mat4 worldViewProjMatrix = viewProjectionMatrix * worldMatrix;
+        FrustrumIntersection nodeAABBIntersection(FRUSTRUM_INTERSECTION_INSIDE);
 
-            aabbIntersection = IsAABBInFrustum(model->GetAABBCenter(), model->GetAABBExtent(), worldViewProjMatrix);
-            if (aabbIntersection == FRUSTRUM_INTERSECTION_OUTSIDE)
-                continue;
-            
-            if ((aabbIntersection == FRUSTRUM_INTERSECTION_INSIDE || (aabbIntersection == FRUSTRUM_INTERSECTION_PARTIAL && model->mChildren.empty())) && model->mMesh != INVALID_MESH_ID)
+        // test node frustrum
+        nodeAABBIntersection = IsAABBInFrustum(node.GetAABBCenter(), node.GetAABBExtent(), worldViewProjMatrix);
+        switch (nodeAABBIntersection)
+        {
+            // if partially inside, recursively test all meshes and child nodes
+            case FRUSTRUM_INTERSECTION_PARTIAL:
             {
-                const MaterialPtr material(model->mMaterial);
-                if (material)
-                    mRenderQueue.emplace_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix, model->mMaterialTilingFactor,
-                                                        Vec4(material->mDiffuseColor, 1.0f), Vec4(material->mAmbientColor, 1.0f), Vec4(material->mSpecularColor, 1.0f), Vec4(material->mEmissiveColor, 1.0f),
-                                                         material->mDiffuseTexture, material->mNormalTexture, material->mSpecularFactor));
-                else
-                    mRenderQueue.emplace_back(Renderable(model->mMesh, worldViewProjMatrix, worldMatrix));
+                Mat4 worldMatrix = node.GetTransformMatrix();
+                const Mat4 worldViewProjMatrix = viewProjectionMatrix * worldMatrix;
+                FrustrumIntersection meshAABBIntersection(FRUSTRUM_INTERSECTION_INSIDE);
+
+                for (const Mesh& mesh : node.mMeshes)
+                {
+                    meshAABBIntersection = IsAABBInFrustum(mesh.GetAABBCenter(), mesh.GetAABBExtent(), worldViewProjMatrix);
+                    if (meshAABBIntersection == FRUSTRUM_INTERSECTION_OUTSIDE)
+                        continue;
+
+                    if (meshAABBIntersection == FRUSTRUM_INTERSECTION_INSIDE || meshAABBIntersection == FRUSTRUM_INTERSECTION_PARTIAL)
+                        AddMesh(mesh, worldViewProjMatrix, worldMatrix);
+                }
+
+                for (const ModelNode& node : node.mChildNodes)
+                    CullMeshes(node, viewProjectionMatrix);
+
+                break;
             }
-            
-            if (!model->mChildren.empty())
-                CullModels(model->mChildren, viewProjectionMatrix, worldMatrix);
+
+            case FRUSTRUM_INTERSECTION_INSIDE:
+            {
+                AddAllMeshes(node, viewProjectionMatrix);
+                break;
+            }
+
+            case FRUSTRUM_INTERSECTION_OUTSIDE:
+            default:
+                break;
         }
+    }
+
+    void Engine::AddAllMeshes(const ModelNode& node, const Mat4& viewProjectionMatrix)
+    {
+        Mat4 worldMatrix = node.GetTransformMatrix();
+        Mat4 worldViewProjMatrix = viewProjectionMatrix * worldMatrix;
+
+        for (const Mesh& mesh : node.mMeshes)
+            AddMesh(mesh, worldViewProjMatrix, worldMatrix);
+
+        for (const ModelNode& node : node.mChildNodes)
+            AddAllMeshes(node, viewProjectionMatrix);
+    }
+
+    void Engine::AddMesh(const Mesh& mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix)
+    {
+        const MaterialPtr material(mesh.mMaterial);
+        if (material)
+            mRenderQueue.emplace_back(Renderable(mesh.mMeshID, wvpMatrix, worldMatrix, mesh.mMaterialTilingFactor,
+            Vec4(material->mDiffuseColor, 1.0f), Vec4(material->mAmbientColor, 1.0f), Vec4(material->mSpecularColor, 1.0f), Vec4(material->mEmissiveColor, 1.0f),
+            material->mDiffuseTexture, material->mNormalTexture, material->mSpecularFactor));
+        else
+            mRenderQueue.emplace_back(Renderable(mesh.mMeshID, wvpMatrix, worldMatrix));
     }
 }

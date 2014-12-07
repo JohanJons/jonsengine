@@ -43,7 +43,9 @@ namespace JonsEngine
     private:
         void FillRenderQueue(const std::vector<ModelPtr>& allModels, const Mat4& viewProjectionMatrix);
         RenderableLighting GetLightingInfo(const Mat4& projMatrix, const Mat4& viewMatrix, const Mat4& viewProjectionMatrix, const Vec4& ambientLight, const Vec3& cameraPosition, const std::vector<PointLightPtr>& pointLights, const std::vector<DirectionalLightPtr>& directionalLights);
-        void CullModels(const std::vector<ModelPtr>& allModels, const Mat4& viewProjectionMatrix, const Mat4& parentTransform);
+        void CullMeshes(const ModelNode& node, const Mat4& viewProjectionMatrix);
+        void AddAllMeshes(const ModelNode& node, const Mat4& viewProjectionMatrix);
+        void AddMesh(const Mesh& mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix);
 
         Logger& mLog;
         IMemoryAllocatorPtr mMemoryAllocator;
