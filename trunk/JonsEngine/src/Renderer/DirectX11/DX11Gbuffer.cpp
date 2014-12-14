@@ -11,8 +11,8 @@ namespace JonsEngine
     const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
-    DX11GBuffer::DX11GBuffer(ID3D11DevicePtr device, ID3D11DepthStencilViewPtr depthStencilView, uint32_t textureWidth, uint32_t textureHeight) :
-        mDepthStencilView(depthStencilView), mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device, mConstantBuffer.CONSTANT_BUFFER_SLOT_VERTEX)
+    DX11GBuffer::DX11GBuffer(ID3D11DevicePtr device, ID3D11DepthStencilViewPtr lightAccumDSV, uint32_t textureWidth, uint32_t textureHeight) :
+        mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device, mConstantBuffer.CONSTANT_BUFFER_SLOT_VERTEX), mDSV(lightAccumDSV)
     {
         // create gbuffer textures/rendertargets
         D3D11_TEXTURE2D_DESC textureDesc;
@@ -27,7 +27,7 @@ namespace JonsEngine
         
         // diffuse texture
         uint32_t gbufferIndex = DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_DIFFUSE;
-        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        textureDesc.Format = DXGI_FORMAT_R16G16B16A16_UNORM;
         DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mTextures.at(gbufferIndex)));
         DXCALL(device->CreateRenderTargetView(mTextures.at(gbufferIndex), NULL, &mRenderTargets.at(gbufferIndex)));
         DXCALL(device->CreateShaderResourceView(mTextures.at(gbufferIndex), NULL, &mShaderResourceViews.at(gbufferIndex)));
@@ -104,11 +104,11 @@ namespace JonsEngine
         }
         // backbuffers depth texture might still be bound on input
         context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv.p);
-        context->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+        context->ClearDepthStencilView(mDSV, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
         // default == depth testing/writing on
         context->OMSetDepthStencilState(NULL, 0);
-        context->OMSetRenderTargets(DX11GBuffer::GBUFFER_NUM_RENDERTARGETS, &(mRenderTargets.begin()->p), mDepthStencilView);
+        context->OMSetRenderTargets(DX11GBuffer::GBUFFER_NUM_RENDERTARGETS, &(mRenderTargets.begin()->p), mDSV);
         context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         context->IASetInputLayout(mInputLayout);

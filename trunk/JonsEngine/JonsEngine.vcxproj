@@ -133,6 +133,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11DirectionalLightPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11FullscreenTrianglePass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Gbuffer.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11LightAccumulationbuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Mesh.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11PointLightPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11PostProcessor.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11DirectionalLightPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11FullscreenTrianglePass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11GBuffer.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11LightAccumulationbuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Mesh.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11PointLightPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11PostProcessor.h" />
@@ -286,6 +288,13 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gSimpleColorPixelShader</VariableName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\SimpleTexturePixel.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ps_main</EntryPointName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/include/Renderer/DirectX11/Shaders/Compiled/%(Filename).h</HeaderFileOutput>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gSimpleTexturePixelShader</VariableName>
     </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\SSAOPixel.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ps_main</EntryPointName>

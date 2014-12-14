@@ -5,6 +5,7 @@
 #include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11Context.h"
 #include "include/Renderer/DirectX11/DX11Backbuffer.h"
+#include "include/Renderer/DirectX11/DX11LightAccumulationbuffer.h"
 #include "include/Renderer/DirectX11/DX11GBuffer.h"
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
@@ -61,17 +62,19 @@ namespace JonsEngine
         static LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
         void SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight);
         void GeometryStage(const RenderQueue& renderQueue, const Mat4& viewMatrix);
-        void ShadingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugExtra);
+        void LightingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags);
+        void PostProcessingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags);
 
         Logger& mLogger;
         IMemoryAllocatorPtr mMemoryAllocator;
         EngineSettings::ShadowQuality mShadowQuality;
         EngineSettings::AntiAliasing mAntiAliasing;
 
-        DX11Backbuffer mBackbuffer;
-        DX11GBuffer mGBuffer;
         DX11VertexTransformPass mVertexTransformPass;
         DX11FullscreenTrianglePass mFullscreenTrianglePass;
+        DX11LightAccumulationbuffer mLightingAccBuffer;
+        DX11Backbuffer mBackbuffer;
+        DX11GBuffer mGBuffer;
         DX11AmbientPass mAmbientPass;
         DX11DirectionalLightPass mDirectionalLightPass;
         DX11PointLightPass mPointLightPass;

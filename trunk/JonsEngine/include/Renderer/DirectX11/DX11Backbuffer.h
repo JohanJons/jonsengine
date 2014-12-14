@@ -7,27 +7,29 @@
 
 namespace JonsEngine
 {
+    class DX11FullscreenTrianglePass;
+    class DX11LightAccumulationbuffer;
+
     class DX11Backbuffer
     {
     public:
-        DX11Backbuffer(ID3D11DevicePtr context, IDXGISwapChainPtr swapchain, uint32_t textureWidth, uint32_t textureHeight);
+        DX11Backbuffer(ID3D11DevicePtr context, IDXGISwapChainPtr swapchain, DX11FullscreenTrianglePass& fullscreenPass, DX11LightAccumulationbuffer& lightAccumBuffer);
         ~DX11Backbuffer();
 
+        void FillBackbuffer(ID3D11DeviceContextPtr context, const bool convertToSRGB);
+        
         void ClearBackbuffer(ID3D11DeviceContextPtr context);
-        void ClearStencilBuffer(ID3D11DeviceContextPtr context);
-        void BindForShadingStage(ID3D11DeviceContextPtr context);
         void CopyBackbufferTexture(ID3D11DeviceContextPtr context, ID3D11Texture2DPtr dest);
-
-        ID3D11DepthStencilViewPtr GetDepthStencilView();
 
 
     private:
         ID3D11Texture2DPtr mBackbufferTexture;
-        ID3D11RenderTargetViewPtr mBackbufferRTV;
-        ID3D11Texture2DPtr mDepthStencilBuffer;
-        ID3D11DepthStencilViewPtr mDSV;
-        ID3D11DepthStencilViewPtr mDSVReadOnly;
-        ID3D11ShaderResourceViewPtr mDepthSRV;
-        ID3D11DepthStencilStatePtr mDepthStencilState;
+        // for sRGB post-processing rendering to the backbuffer
+        ID3D11RenderTargetViewPtr mRTV;
+        // used to write from accumulationbuffer to backbuffer; performs linear->sRGB conversion automatically
+        ID3D11RenderTargetViewPtr mRTV_SRGB;
+        ID3D11PixelShaderPtr mPixelShader;
+        DX11FullscreenTrianglePass& mFullscreenPass;
+        DX11LightAccumulationbuffer& mLightAccumulationBuffer;
     };
 }
