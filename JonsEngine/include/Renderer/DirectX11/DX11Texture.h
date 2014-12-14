@@ -25,7 +25,8 @@ namespace JonsEngine
             NUM_SHADER_TEXTURE_SLOTS
         };
 
-        DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const uint32_t textureWidth, const uint32_t textureHeight, const SHADER_TEXTURE_SLOT textureSlot);
+        DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const uint32_t textureWidth, const uint32_t textureHeight,
+            const SHADER_TEXTURE_SLOT textureSlot, const bool isSRGB);
         ~DX11Texture();
 
         void Bind(ID3D11DeviceContextPtr context);

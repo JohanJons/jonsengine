@@ -142,7 +142,7 @@ namespace JonsGame
         myScene->SetAmbientLight(Vec4(1.0f));
         
         // sponza 
-        SceneNodePtr nodeSponza = myScene->GetRootNode().CreateChildNode("sponza");
+     /*   SceneNodePtr nodeSponza = myScene->GetRootNode().CreateChildNode("sponza");
         ModelPtr modelSponza = mEngine->GetResourceManifest().LoadModel("sponza", jonsPackage);
         modelSponza->mSceneNode = nodeSponza;
         nodeSponza->ScaleNode(Vec3(0.1f));
@@ -150,12 +150,12 @@ namespace JonsGame
         nodeSponza->TranslateNode(Vec3(0.0f, 0.5f, -54.0f));
         
         // sectoid 
-      /*  SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
+        SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
         ModelPtr modelAlien = mEngine->GetResourceManifest().LoadModel("sectoid", jonsPackage);
         modelAlien->mSceneNode = nodeAlien;
         nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
         nodeAlien->TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
-
+        /*
         // cube
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
         ModelPtr modelCube = mEngine->GetResourceManifest().LoadModel("cube", jonsPackage);
@@ -187,14 +187,14 @@ namespace JonsGame
         DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
         directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
         directionalLight->mLightColor = Vec4(0.4f);
-        
+        */
         // create a ground plane
         SceneNodePtr nodePlane = myScene->GetRootNode().CreateChildNode("nodePlane");
         ModelPtr plane = mEngine->GetResourceManifest().CreateRectangle("GroundPlane", 64, 1.0, 64);
-        plane->mMaterial = myScene->GetResourceManifest().LoadMaterial("checkers", jonsPackage);
+        plane->mNodes[0].mMeshes[0].mMaterial = mEngine->GetResourceManifest().LoadMaterial("checkers", jonsPackage);
         plane->mSceneNode = nodePlane;
-        plane->mMaterialTilingFactor = 64.0f;
-
+        plane->mNodes[0].mMeshes[0].mMaterialTilingFactor = 64.0f;
+        /*
         // create a sphere
         SceneNodePtr nodeSphere = myScene->GetRootNode().CreateChildNode("nodeSphere");
         ModelPtr sphere = mEngine->GetResourceManifest().CreateSphere("Sphere", 1.0f, 12, 24);

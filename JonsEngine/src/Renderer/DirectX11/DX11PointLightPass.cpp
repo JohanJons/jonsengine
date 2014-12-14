@@ -1,7 +1,7 @@
 #include "include/Renderer/DirectX11/DX11PointLightPass.h"
 
 #include "include/Renderer/Shapes.h"
-#include "include/Renderer/DirectX11/DX11Backbuffer.h"
+#include "include/Renderer/DirectX11/DX11LightAccumulationbuffer.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/PointLightPixel.h"
 #include "include/Core/Utils/Math.h"
 #include "include/Core/Logging/Logger.h"
@@ -32,8 +32,8 @@ namespace JonsEngine
     }
 
 
-    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize) :
-        mPixelShader(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mSphereMesh(CreateSphereMesh(device)), mBackbuffer(backbuffer), mVertexTransformPass(vertexTransformPass),
+    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, DX11LightAccumulationbuffer& backbuffer, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize) :
+        mPixelShader(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mSphereMesh(CreateSphereMesh(device)), mLightAccumBuffer(backbuffer), mVertexTransformPass(vertexTransformPass),
         mShadowmap(device, shadowmapSize, TEXTURE_CUBE_NUM_FACES, true), mPointLightCBuffer(device, mPointLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         // rasterize for front-face culling due to light volumes
@@ -148,7 +148,7 @@ namespace JonsEngine
         //
 
         // restore rendering to the backbuffer
-        mBackbuffer.BindForShadingStage(context);
+        mLightAccumBuffer.BindForLightingStage(context);
 
         context->OMSetDepthStencilState(mDSSStencilPass, 0);
         context->RSSetState(mRSNoCulling);

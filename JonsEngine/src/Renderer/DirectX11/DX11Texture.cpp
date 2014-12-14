@@ -7,7 +7,7 @@ namespace JonsEngine
     static TextureID gNextTextureID = 1;
 
 
-    DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const uint32_t textureWidth, const uint32_t textureHeight, const SHADER_TEXTURE_SLOT textureSlot) :
+    DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const uint32_t textureWidth, const uint32_t textureHeight, const SHADER_TEXTURE_SLOT textureSlot, const bool isSRGB) :
         mTexture(nullptr), mShaderResourceView(nullptr), mTextureID(gNextTextureID++), mShaderTextureSlot(textureSlot)
     {
         // create texture
@@ -16,7 +16,10 @@ namespace JonsEngine
         textureDesc.Width = textureWidth;
         textureDesc.Height = textureHeight;
         textureDesc.ArraySize = 1;
-        textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        if (isSRGB)
+            textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        else
+            textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         textureDesc.SampleDesc.Count = 1;
         textureDesc.Usage = D3D11_USAGE_DEFAULT;
         textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;

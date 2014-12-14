@@ -2,7 +2,7 @@
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Texture.h"
-#include "include/Renderer/DirectX11/DX11Backbuffer.h"
+#include "include/Renderer/DirectX11/DX11LightAccumulationbuffer.h"
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPixel.h"
@@ -82,8 +82,8 @@ namespace JonsEngine
     }
 
 
-    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, DX11Backbuffer& backbuffer, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize) :
-        mPixelShader(nullptr), mRSDepthClamp(nullptr), mBackbuffer(backbuffer), mFullscreenPass(fullscreenPass), mVertexTransformPass(transformPass), mShadowmap(device, shadowmapSize, NUM_SHADOWMAP_CASCADES, false),
+    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, DX11LightAccumulationbuffer& backbuffer, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize) :
+        mPixelShader(nullptr), mRSDepthClamp(nullptr), mLightingAccBuffer(backbuffer), mFullscreenPass(fullscreenPass), mVertexTransformPass(transformPass), mShadowmap(device, shadowmapSize, NUM_SHADOWMAP_CASCADES, false),
         mDirLightCBuffer(device, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         DXCALL(device->CreatePixelShader(gDirectionalLightPixelShader, sizeof(gDirectionalLightPixelShader), NULL, &mPixelShader));
@@ -153,7 +153,7 @@ namespace JonsEngine
         //
         
         // restore rendering to backbuffer, rasterize state and viewport
-        mBackbuffer.BindForShadingStage(context);
+        mLightingAccBuffer.BindForLightingStage(context);
         context->RSSetViewports(numViewports, &prevViewport);
         context->RSSetState(prevRS);
         
