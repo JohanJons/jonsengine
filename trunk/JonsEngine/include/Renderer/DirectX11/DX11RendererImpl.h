@@ -4,8 +4,7 @@
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11Context.h"
-#include "include/Renderer/DirectX11/DX11Backbuffer.h"
-#include "include/Renderer/DirectX11/DX11LightAccumulationbuffer.h"
+#include "include/Renderer/DirectX11/DX11Pipeline.h"
 #include "include/Renderer/DirectX11/DX11GBuffer.h"
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
@@ -72,8 +71,9 @@ namespace JonsEngine
 
         DX11VertexTransformPass mVertexTransformPass;
         DX11FullscreenTrianglePass mFullscreenTrianglePass;
-        DX11LightAccumulationbuffer mLightingAccBuffer;
-        DX11Backbuffer mBackbuffer;
+        //DX11LightAccumulationbuffer mLightingAccBuffer;
+        //DX11Backbuffer mBackbuffer;
+        DX11Pipeline mPipeline;
         DX11GBuffer mGBuffer;
         DX11AmbientPass mAmbientPass;
         DX11DirectionalLightPass mDirectionalLightPass;
