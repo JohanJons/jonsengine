@@ -206,6 +206,9 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11LightAccumulationbuffer.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11Pipeline.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -374,6 +377,9 @@
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11LightAccumulationbuffer.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11Pipeline.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
   </ItemGroup>
