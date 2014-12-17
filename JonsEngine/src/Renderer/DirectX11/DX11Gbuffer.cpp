@@ -25,7 +25,7 @@ namespace JonsEngine
         textureDesc.Usage = D3D11_USAGE_DEFAULT;
         textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
         
-        // diffuse texture
+        // color texture
         uint32_t gbufferIndex = DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_DIFFUSE;
         textureDesc.Format = DXGI_FORMAT_R16G16B16A16_UNORM;
         DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mTextures.at(gbufferIndex)));
