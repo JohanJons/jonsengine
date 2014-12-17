@@ -12,7 +12,7 @@
 
 namespace JonsEngine
 {
-    class DX11LightAccumulationbuffer;
+    class DX11Pipeline;
     class DX11FullscreenTrianglePass;
     class DX11VertexTransformPass;
 
@@ -21,7 +21,7 @@ namespace JonsEngine
     public:
         const static uint32_t NUM_SHADOWMAP_CASCADES = 4;
 
-        DX11DirectionalLightPass(ID3D11DevicePtr device, DX11LightAccumulationbuffer& backbuffer, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize);
+        DX11DirectionalLightPass(ID3D11DevicePtr device, DX11Pipeline& pipeline, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize);
         ~DX11DirectionalLightPass();
 
         void Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invProjMatrix,
@@ -49,7 +49,7 @@ namespace JonsEngine
 
         ID3D11PixelShaderPtr mPixelShader;
         ID3D11RasterizerStatePtr mRSDepthClamp;
-        DX11LightAccumulationbuffer& mLightingAccBuffer;
+        DX11Pipeline& mPipeline;
         DX11FullscreenTrianglePass& mFullscreenPass;
         DX11VertexTransformPass& mVertexTransformPass;
         DX11Shadowmap mShadowmap;
