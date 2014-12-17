@@ -153,8 +153,8 @@ namespace JonsEngine
         mAABBPass(mDevice, mVertexTransformPass),
         // lighting passes
         mAmbientPass(mDevice, mFullscreenTrianglePass, mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),
-        mDirectionalLightPass(mDevice, mLightingAccBuffer, mFullscreenTrianglePass, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
-        mPointLightPass(mDevice, mLightingAccBuffer, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
+        mDirectionalLightPass(mDevice, mPipeline, mFullscreenTrianglePass, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
+        mPointLightPass(mDevice, mPipeline, mVertexTransformPass, ShadowQualityResolution(mShadowQuality)),
         // samplers
         mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
         mShadowmapSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
