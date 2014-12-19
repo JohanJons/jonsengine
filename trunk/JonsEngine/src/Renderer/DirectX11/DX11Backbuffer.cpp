@@ -12,8 +12,7 @@ namespace JonsEngine
     const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
-    DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, DX11FullscreenTrianglePass& fullscreenPass, DX11LightAccumulationbuffer& lightAccumBuffer) :
-        mBackbufferTexture(nullptr), mRTV(nullptr), mRTV_SRGB(nullptr), mPixelShader(nullptr), mFullscreenPass(fullscreenPass), mLightAccumulationBuffer(lightAccumBuffer)
+    DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, IDXGISwapChainPtr swapchain) : mBackbufferTexture(nullptr), mRTV(nullptr), mRTV_SRGB(nullptr)
     {
         // backbuffer rendertarget setup
         DXCALL(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&mBackbufferTexture));
@@ -30,7 +29,7 @@ namespace JonsEngine
         DXCALL(device->CreateRenderTargetView(mBackbufferTexture, &rtvDesc, &mRTV_SRGB));
 
         // pixelshader that will output lightAccumBuffer to backbuffer
-        DXCALL(device->CreatePixelShader(gSimpleTexturePixelShader, sizeof(gSimpleTexturePixelShader), NULL, &mPixelShader));
+        //DXCALL(device->CreatePixelShader(gSimpleTexturePixelShader, sizeof(gSimpleTexturePixelShader), NULL, &mPixelShader));
     }
 
     DX11Backbuffer::~DX11Backbuffer()
@@ -50,10 +49,10 @@ namespace JonsEngine
         else
             context->OMSetRenderTargets(1, &mRTV.p, NULL);
 
-        mLightAccumulationBuffer.BindForReading(context);
-        context->PSSetShader(mPixelShader, NULL, NULL);
+        // ...... mLightAccumulationBuffer.BindForReading(context);
+        //context->PSSetShader(mPixelShader, NULL, NULL);
         
-        mFullscreenPass.Render(context);
+        // ...... mFullscreenPass.Render(context);
     }
 
     void DX11Backbuffer::CopyBackbufferTexture(ID3D11DeviceContextPtr context, ID3D11Texture2DPtr dest)

@@ -145,7 +145,7 @@ namespace JonsEngine
         // base
         mVertexTransformPass(mDevice),
         mFullscreenTrianglePass(mDevice),
-        mPipeline(mDevice, GetBackbufferTextureDesc()),
+        mPipeline(mDevice, mSwapchain, GetBackbufferTextureDesc()),
         //mLightingAccBuffer(mDevice, GetBackbufferTextureDesc()),
         //mBackbuffer(mDevice, mSwapchain, mFullscreenTrianglePass, mLightingAccBuffer),
         //mGBuffer(mDevice, mLightingAccBuffer.GetDepthStencilView(), mSwapchainDesc.BufferDesc.Width, mSwapchainDesc.BufferDesc.Height),

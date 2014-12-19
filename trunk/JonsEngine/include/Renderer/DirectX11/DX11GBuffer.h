@@ -20,7 +20,7 @@ namespace JonsEngine
         };
 
 
-        DX11GBuffer(ID3D11DevicePtr device, ID3D11DepthStencilViewPtr lightAccumDSV, uint32_t textureWidth, uint32_t textureHeight);
+        DX11GBuffer(ID3D11DevicePtr device, ID3D11DepthStencilViewPtr lightAccumDSV, D3D11_TEXTURE2D_DESC backbufferTextureDesc);
         ~DX11GBuffer();
 
         void SetConstantData(ID3D11DeviceContextPtr context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture);
