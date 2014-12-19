@@ -7,13 +7,10 @@
 
 namespace JonsEngine
 {
-    class DX11FullscreenTrianglePass;
-    class DX11LightAccumulationbuffer;
-
     class DX11Backbuffer
     {
     public:
-        DX11Backbuffer(ID3D11DevicePtr context, IDXGISwapChainPtr swapchain, DX11FullscreenTrianglePass& fullscreenPass, DX11LightAccumulationbuffer& lightAccumBuffer);
+        DX11Backbuffer(ID3D11DevicePtr context, IDXGISwapChainPtr swapchain);
         ~DX11Backbuffer();
 
         void FillBackbuffer(ID3D11DeviceContextPtr context, const bool convertToSRGB);
@@ -28,8 +25,5 @@ namespace JonsEngine
         ID3D11RenderTargetViewPtr mRTV;
         // used to write from accumulationbuffer to backbuffer; performs linear->sRGB conversion automatically
         ID3D11RenderTargetViewPtr mRTV_SRGB;
-        ID3D11PixelShaderPtr mPixelShader;
-        DX11FullscreenTrianglePass& mFullscreenPass;
-        DX11LightAccumulationbuffer& mLightAccumulationBuffer;
     };
 }

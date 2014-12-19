@@ -13,11 +13,13 @@ namespace JonsEngine
     class DX11Pipeline
     {
     public:
-        DX11Pipeline(ID3D11DevicePtr device, D3D11_TEXTURE2D_DESC backbufferTextureDesc);
+        DX11Pipeline(ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, D3D11_TEXTURE2D_DESC backbufferTextureDesc);
         ~DX11Pipeline();
 
 
     private:
+        ID3D11DepthStencilViewPtr mSharedDSV;
+    
         DX11Backbuffer mBackbuffer;
         DX11LightAccumulationbuffer mLightAccbuffer;
         DX11GBuffer mGBuffer;
