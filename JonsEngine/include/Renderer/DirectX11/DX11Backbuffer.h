@@ -10,16 +10,18 @@ namespace JonsEngine
     class DX11Backbuffer
     {
     public:
-        DX11Backbuffer(ID3D11DevicePtr context, IDXGISwapChainPtr swapchain);
+        DX11Backbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDXGISwapChainPtr swapchain);
         ~DX11Backbuffer();
 
-        void FillBackbuffer(ID3D11DeviceContextPtr context, const bool convertToSRGB);
+        void FillBackbuffer(ID3D11Texture2DPtr src, const bool convertToSRGB);
+        void CopyBackbuffer(ID3D11Texture2DPtr dest);
         
-        void ClearBackbuffer(ID3D11DeviceContextPtr context);
-        void CopyBackbufferTexture(ID3D11DeviceContextPtr context, ID3D11Texture2DPtr dest);
+        void ClearBackbuffer(const DX11Color& clearColor);
 
 
     private:
+        ID3D11DeviceContextPtr mContext;
+
         ID3D11Texture2DPtr mBackbufferTexture;
         // for sRGB post-processing rendering to the backbuffer
         ID3D11RenderTargetViewPtr mRTV;

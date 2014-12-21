@@ -12,7 +12,8 @@ namespace JonsEngine
     const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
-    DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, IDXGISwapChainPtr swapchain) : mBackbufferTexture(nullptr), mRTV(nullptr), mRTV_SRGB(nullptr)
+    DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDXGISwapChainPtr swapchain) :
+        mContext(context), mBackbufferTexture(nullptr), mRTV(nullptr), mRTV_SRGB(nullptr)
     {
         // backbuffer rendertarget setup
         DXCALL(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&mBackbufferTexture));
@@ -37,26 +38,28 @@ namespace JonsEngine
     }
 
 
-    void DX11Backbuffer::ClearBackbuffer(ID3D11DeviceContextPtr context)
-    {
-        context->ClearRenderTargetView(mRTV, gClearColor);
-    }
-
-    void DX11Backbuffer::FillBackbuffer(ID3D11DeviceContextPtr context, const bool convertToSRGB)
+    void DX11Backbuffer::FillBackbuffer(ID3D11Texture2DPtr src, const bool convertToSRGB)
     {
         if (convertToSRGB)
-            context->OMSetRenderTargets(1, &mRTV_SRGB.p, NULL);
+            mContext->OMSetRenderTargets(1, &mRTV_SRGB.p, NULL);
         else
-            context->OMSetRenderTargets(1, &mRTV.p, NULL);
+            mContext->OMSetRenderTargets(1, &mRTV.p, NULL);
 
+        mContext->CopyResource(mBackbufferTexture, src);
         // ...... mLightAccumulationBuffer.BindForReading(context);
         //context->PSSetShader(mPixelShader, NULL, NULL);
-        
+
         // ...... mFullscreenPass.Render(context);
     }
 
-    void DX11Backbuffer::CopyBackbufferTexture(ID3D11DeviceContextPtr context, ID3D11Texture2DPtr dest)
+    void DX11Backbuffer::CopyBackbuffer(ID3D11Texture2DPtr dest)
     {
-        context->CopyResource(dest, mBackbufferTexture);
+        mContext->CopyResource(dest, mBackbufferTexture);
+    }
+
+
+    void DX11Backbuffer::ClearBackbuffer(const DX11Color& clearColor)
+    {
+        mContext->ClearRenderTargetView(mRTV, &clearColor[0]);
     }
 }

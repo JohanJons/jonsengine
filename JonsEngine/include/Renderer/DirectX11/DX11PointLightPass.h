@@ -14,20 +14,20 @@
 
 namespace JonsEngine
 {
-    class DX11Pipeline;
+    class DX11LightAccumulationbuffer;
 
     class DX11PointLightPass
     {
     public:
         const static uint32_t TEXTURE_CUBE_NUM_FACES = 6;
 
-        DX11PointLightPass(ID3D11DevicePtr device, DX11Pipeline& backbuffer, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize);
+        DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11LightAccumulationbuffer& lightAccBuffer, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize);
         ~DX11PointLightPass();
 
-        void Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight, const Mat4& viewMatrix, const Mat4& invProjMatrix,
+        void Render(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight, const Mat4& viewMatrix, const Mat4& invProjMatrix,
             const Vec2& screenSize, const float zFar, const float zNear);
 
-        void BindForShading(ID3D11DeviceContextPtr context);
+        void BindForShading();
 
 
     private:
@@ -50,13 +50,15 @@ namespace JonsEngine
             }
         };
 
+        ID3D11DeviceContextPtr mContext;
         ID3D11PixelShaderPtr mPixelShader;
         ID3D11DepthStencilStatePtr mDSSStencilPass;
         ID3D11DepthStencilStatePtr mDSSShadingPass;
         ID3D11RasterizerStatePtr mRSCullFront;
         ID3D11RasterizerStatePtr mRSNoCulling;
+
         DX11Mesh mSphereMesh;
-        DX11Pipeline& mPipeline;
+        DX11LightAccumulationbuffer& mLightAccBuffer;
         DX11VertexTransformPass& mVertexTransformPass;
         DX11Shadowmap mShadowmap;
         DX11ConstantBuffer<PointLightCBuffer> mPointLightCBuffer;

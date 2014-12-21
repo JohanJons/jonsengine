@@ -26,7 +26,7 @@ namespace JonsEngine
 
     void DX11PostProcessor::FXAAPass(ID3D11DeviceContextPtr context, DX11Backbuffer& backbuffer, const Vec2& screenSize)
     {
-        backbuffer.CopyBackbufferTexture(context, mFXAABackbufferTexture);
+        backbuffer.CopyBackbuffer(mFXAABackbufferTexture);
 
         context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &mFXAASRV.p);
         context->PSSetShader(mFXAAPixelShader, NULL, NULL);
