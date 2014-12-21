@@ -31,13 +31,14 @@ namespace JonsEngine
         mDepthStencilState(nullptr),
         mAdditiveBlending(nullptr),
         
-        mBackbuffer(device, mContext, mSwapchain),
-        mLightAccbuffer(device, mContext, backbufferTextureDesc),
-        mGBuffer(device, mContext, backbufferTextureDesc),
-
         mAABBPass(device, mVertexTransformPass),
         mVertexTransformPass(device),
         mFullscreenTrianglePass(device),
+
+        mBackbuffer(device, mContext, mSwapchain, mFullscreenTrianglePass),
+        mLightAccbuffer(device, mContext, backbufferTextureDesc),
+        mGBuffer(device, mContext, backbufferTextureDesc),
+
         mAmbientPass(device, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mDirectionalLightPass(device, mContext, mLightAccbuffer, mFullscreenTrianglePass, mVertexTransformPass, shadowmapResolution),
         mPointLightPass(device, mContext, mLightAccbuffer, mVertexTransformPass, shadowmapResolution),
@@ -192,6 +193,9 @@ namespace JonsEngine
     {
         // flip from lightAccumulatorBuffer --> backbuffer
         mBackbuffer.FillBackbuffer(mLightAccbuffer.GetLightAccumulationBuffer(), true);
+
+        // post-processing done in sRGB space
+        mBackbuffer.BindForDrawing();
 
         // FXAA done in sRGB space
         if (AA == EngineSettings::ANTIALIASING_FXAA)

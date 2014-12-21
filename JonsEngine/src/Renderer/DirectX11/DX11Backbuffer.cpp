@@ -3,7 +3,6 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
-#include "include/Renderer/DirectX11/DX11LightAccumulationbuffer.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/SimpleTexturePixel.h"
 
 
@@ -12,8 +11,8 @@ namespace JonsEngine
     const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
-    DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDXGISwapChainPtr swapchain) :
-        mContext(context), mBackbufferTexture(nullptr), mRTV(nullptr), mRTV_SRGB(nullptr)
+    DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDXGISwapChainPtr swapchain, DX11FullscreenTrianglePass& fullscreenPass) :
+        mContext(context), mBackbufferTexture(nullptr), mRTV(nullptr), mRTV_SRGB(nullptr), mFullscreenPass(fullscreenPass)
     {
         // backbuffer rendertarget setup
         DXCALL(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&mBackbufferTexture));
@@ -30,7 +29,7 @@ namespace JonsEngine
         DXCALL(device->CreateRenderTargetView(mBackbufferTexture, &rtvDesc, &mRTV_SRGB));
 
         // pixelshader that will output lightAccumBuffer to backbuffer
-        //DXCALL(device->CreatePixelShader(gSimpleTexturePixelShader, sizeof(gSimpleTexturePixelShader), NULL, &mPixelShader));
+        DXCALL(device->CreatePixelShader(gSimpleTexturePixelShader, sizeof(gSimpleTexturePixelShader), NULL, &mPixelShader))
     }
 
     DX11Backbuffer::~DX11Backbuffer()
@@ -38,23 +37,26 @@ namespace JonsEngine
     }
 
 
-    void DX11Backbuffer::FillBackbuffer(ID3D11Texture2DPtr src, const bool convertToSRGB)
+    void DX11Backbuffer::FillBackbuffer(ID3D11ShaderResourceViewPtr lightAccumSRV, const bool convertToSRGB)
     {
         if (convertToSRGB)
             mContext->OMSetRenderTargets(1, &mRTV_SRGB.p, NULL);
         else
             mContext->OMSetRenderTargets(1, &mRTV.p, NULL);
 
-        mContext->CopyResource(mBackbufferTexture, src);
-        // ...... mLightAccumulationBuffer.BindForReading(context);
-        //context->PSSetShader(mPixelShader, NULL, NULL);
-
-        // ...... mFullscreenPass.Render(context);
+        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &lightAccumSRV.p);
+        mContext->PSSetShader(mPixelShader, NULL, NULL);
+        mFullscreenPass.Render(mContext);
     }
 
     void DX11Backbuffer::CopyBackbuffer(ID3D11Texture2DPtr dest)
     {
         mContext->CopyResource(dest, mBackbufferTexture);
+    }
+
+    void DX11Backbuffer::BindForDrawing()
+    {
+        mContext->OMSetRenderTargets(1, &mRTV.p, NULL);
     }
 
 
