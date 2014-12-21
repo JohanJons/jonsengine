@@ -16,7 +16,7 @@ namespace JonsEngine
         DX11AABBPass(ID3D11DevicePtr device, DX11VertexTransformPass& vertexTransformPass);
         ~DX11AABBPass();
 
-        void Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix);
+        void Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix);
 
 
     private:

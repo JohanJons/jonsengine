@@ -16,7 +16,7 @@ namespace JonsEngine
     }
 
 
-    void DX11AABBPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix)
+    void DX11AABBPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix)
     {
         context->PSSetShader(mPixelShader, NULL, NULL);
         mVertexTransformPass.BindForTransformPass(context, D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);

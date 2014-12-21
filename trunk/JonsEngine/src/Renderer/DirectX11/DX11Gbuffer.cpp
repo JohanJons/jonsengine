@@ -11,8 +11,8 @@ namespace JonsEngine
     const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
-    DX11GBuffer::DX11GBuffer(ID3D11DevicePtr device, ID3D11DepthStencilViewPtr lightAccumDSV, D3D11_TEXTURE2D_DESC backbufferTextureDesc) :
-        mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device, mConstantBuffer.CONSTANT_BUFFER_SLOT_VERTEX), mDSV(lightAccumDSV)
+    DX11GBuffer::DX11GBuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc) :
+        mContext(context), mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device, mConstantBuffer.CONSTANT_BUFFER_SLOT_VERTEX)
     {
         backbufferTextureDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
         
@@ -80,37 +80,37 @@ namespace JonsEngine
     }
 
 
-    void DX11GBuffer::SetConstantData(ID3D11DeviceContextPtr context, const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture)
+    void DX11GBuffer::SetConstantData(const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture)
     {
-        mConstantBuffer.SetData({ wvpMatrix, worldMatrix, textureTilingFactor, hasDiffuseTexture, hasNormalTexture }, context);
+        mConstantBuffer.SetData({ wvpMatrix, worldMatrix, textureTilingFactor, hasDiffuseTexture, hasNormalTexture }, mContext);
     }
 
-    void DX11GBuffer::BindForGeometryStage(ID3D11DeviceContextPtr context)
+    void DX11GBuffer::BindForGeometryStage(ID3D11DepthStencilViewPtr dsv)
     {
         for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
         {
             // unbind gbuffer textures as input, it is now rendertarget
-            context->PSSetShaderResources(index, 1, &gNullSrv.p);
-            context->ClearRenderTargetView(mRenderTargets.at(index), gClearColor);
+            mContext->PSSetShaderResources(index, 1, &gNullSrv.p);
+            mContext->ClearRenderTargetView(mRenderTargets.at(index), gClearColor);
         }
         // backbuffers depth texture might still be bound on input
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv.p);
-        context->ClearDepthStencilView(mDSV, D3D11_CLEAR_DEPTH, 1.0f, 0);
+        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv.p);
+        mContext->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
         // default == depth testing/writing on
-        context->OMSetDepthStencilState(NULL, 0);
-        context->OMSetRenderTargets(DX11GBuffer::GBUFFER_NUM_RENDERTARGETS, &(mRenderTargets.begin()->p), mDSV);
-        context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        mContext->OMSetDepthStencilState(NULL, 0);
+        mContext->OMSetRenderTargets(DX11GBuffer::GBUFFER_NUM_RENDERTARGETS, &(mRenderTargets.begin()->p), dsv);
+        mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        context->IASetInputLayout(mInputLayout);
+        mContext->IASetInputLayout(mInputLayout);
 
-        context->VSSetShader(mVertexShader, NULL, NULL);
-        context->PSSetShader(mPixelShader, NULL, NULL);
+        mContext->VSSetShader(mVertexShader, NULL, NULL);
+        mContext->PSSetShader(mPixelShader, NULL, NULL);
     }
 
-    void DX11GBuffer::BindGeometryTextures(ID3D11DeviceContextPtr context)
+    void DX11GBuffer::BindGeometryTextures()
     {
         for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
-            context->PSSetShaderResources(index, 1, &mShaderResourceViews.at(index).p);
+            mContext->PSSetShaderResources(index, 1, &mShaderResourceViews.at(index).p);
     }
 }

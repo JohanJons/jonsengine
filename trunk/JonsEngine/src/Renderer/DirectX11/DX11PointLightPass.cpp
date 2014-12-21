@@ -32,8 +32,8 @@ namespace JonsEngine
     }
 
 
-    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, DX11LightAccumulationbuffer& backbuffer, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize) :
-        mPixelShader(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mSphereMesh(CreateSphereMesh(device)), mLightAccumBuffer(backbuffer), mVertexTransformPass(vertexTransformPass),
+    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11LightAccumulationbuffer& lightAccBuffer, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize) :
+        mContext(context), mPixelShader(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mSphereMesh(CreateSphereMesh(device)), mLightAccBuffer(lightAccBuffer), mVertexTransformPass(vertexTransformPass),
         mShadowmap(device, shadowmapSize, TEXTURE_CUBE_NUM_FACES, true), mPointLightCBuffer(device, mPointLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         // rasterize for front-face culling due to light volumes
@@ -104,43 +104,47 @@ namespace JonsEngine
     }
 
 
-    void DX11PointLightPass::BindForShading(ID3D11DeviceContextPtr context)
+    void DX11PointLightPass::BindForShading()
     {
         // geometry transform vertex pass for stencil/shadow pass
-        mVertexTransformPass.BindForTransformPass(context, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        mVertexTransformPass.BindForTransformPass(mContext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
 
-    void DX11PointLightPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight, const Mat4& viewMatrix, const Mat4& invProjMatrix,
+    void DX11PointLightPass::Render(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight, const Mat4& viewMatrix, const Mat4& invProjMatrix,
         const Vec2& screenSize, const float zFar, const float zNear)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
         ID3D11DepthStencilStatePtr prevDSState = nullptr;
+        ID3D11RenderTargetViewPtr prevRTV = nullptr;
+        ID3D11DepthStencilViewPtr prevDSV = nullptr;
         D3D11_VIEWPORT prevViewport;
         uint32_t numViewports = 1;
-        context->RSGetState(&prevRasterizerState);
-        context->OMGetDepthStencilState(&prevDSState, 0);
-        context->RSGetViewports(&numViewports, &prevViewport);
+        mContext->RSGetState(&prevRasterizerState);
+        mContext->OMGetDepthStencilState(&prevDSState, 0);
+        mContext->OMGetRenderTargets(1, &prevRTV, &prevDSV);
+        mContext->RSGetViewports(&numViewports, &prevViewport);
         const Vec4 viewLightPositonV4 = viewMatrix * Vec4(pointLight.mLightPosition, 1.0);
         const Vec3 viewLightPositonV3 = Vec3(viewLightPositonV4);
+
 
         //
         // shadow pass
         //
 
         // unbind any set pixel shader
-        context->PSSetShader(NULL, NULL, NULL);
+        mContext->PSSetShader(NULL, NULL, NULL);
 
-        context->RSSetState(mRSCullFront);
-        mShadowmap.BindForDrawing(context);
+        mContext->RSSetState(mRSCullFront);
+        mShadowmap.BindForDrawing(mContext);
 
         for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
         {
-            mShadowmap.BindDepthView(context, face);
+            mShadowmap.BindDepthView(mContext, face);
             Mat4 lightViewMatrix = glm::lookAt(viewLightPositonV3, viewLightPositonV3 + CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
             // TODO: precompute?
             Mat4 lightProjMatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, Z_FAR);
-            mVertexTransformPass.RenderMeshes(context, renderQueue, meshes, lightProjMatrix * lightViewMatrix * viewMatrix);
+            mVertexTransformPass.RenderMeshes(mContext, renderQueue, meshes, lightProjMatrix * lightViewMatrix * viewMatrix);
         }
 
         //
@@ -148,33 +152,33 @@ namespace JonsEngine
         //
 
         // restore rendering to the backbuffer
-        mLightAccumBuffer.BindForLightingStage(context);
-
-        context->OMSetDepthStencilState(mDSSStencilPass, 0);
-        context->RSSetState(mRSNoCulling);
+        //mLightAccBuffer.BindForLightingStage();
+        mContext->OMSetRenderTargets(1, &prevRTV.p, prevDSV);
+        mContext->OMSetDepthStencilState(mDSSStencilPass, 0);
+        mContext->RSSetState(mRSNoCulling);
 
         // restore screen viewport
-        context->RSSetViewports(numViewports, &prevViewport);
+        mContext->RSSetViewports(numViewports, &prevViewport);
 
-        mVertexTransformPass.RenderMesh(context, mSphereMesh, pointLight.mWVPMatrix);
+        mVertexTransformPass.RenderMesh(mContext, mSphereMesh, pointLight.mWVPMatrix);
 
         //
         // shading pass
         //
 
-        context->OMSetDepthStencilState(mDSSShadingPass, 0);
-        context->RSSetState(mRSCullFront);
-        mShadowmap.BindForReading(context);
+        mContext->OMSetDepthStencilState(mDSSShadingPass, 0);
+        mContext->RSSetState(mRSCullFront);
+        mShadowmap.BindForReading(mContext);
 
         // set point light pixel shader and its cbuffer
-        context->PSSetShader(mPixelShader, NULL, NULL);
-        mPointLightCBuffer.SetData(PointLightCBuffer(invProjMatrix, pointLight.mLightColor, viewLightPositonV4, screenSize, pointLight.mLightIntensity, pointLight.mMaxDistance, zFar, zNear), context);
+        mContext->PSSetShader(mPixelShader, NULL, NULL);
+        mPointLightCBuffer.SetData(PointLightCBuffer(invProjMatrix, pointLight.mLightColor, viewLightPositonV4, screenSize, pointLight.mLightIntensity, pointLight.mMaxDistance, zFar, zNear), mContext);
 
         // run transform pass on sphere + point light shading pass
-        mVertexTransformPass.RenderMesh(context, mSphereMesh, pointLight.mWVPMatrix);
+        mVertexTransformPass.RenderMesh(mContext, mSphereMesh, pointLight.mWVPMatrix);
 
         // restore state
-        context->RSSetState(prevRasterizerState);
-        context->OMSetDepthStencilState(prevDSState, 0);
+        mContext->RSSetState(prevRasterizerState);
+        mContext->OMSetDepthStencilState(prevDSState, 0);
     }
 }

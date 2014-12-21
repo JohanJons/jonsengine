@@ -7,11 +7,14 @@
 #include <atlbase.h>
 #include <sstream>
 #include <exception>
+#include <array>
 
 namespace JonsEngine
 {
     const float Z_NEAR = 0.1f;
     const float Z_FAR = 100.0f;
+
+    typedef std::array<float, 4> DX11Color;
 
 
     #ifdef _DEBUG

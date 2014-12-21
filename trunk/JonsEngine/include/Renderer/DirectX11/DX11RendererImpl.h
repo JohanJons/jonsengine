@@ -6,13 +6,6 @@
 #include "include/Renderer/DirectX11/DX11Context.h"
 #include "include/Renderer/DirectX11/DX11Pipeline.h"
 #include "include/Renderer/DirectX11/DX11GBuffer.h"
-#include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
-#include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
-#include "include/Renderer/DirectX11/DX11AmbientPass.h"
-#include "include/Renderer/DirectX11/DX11DirectionalLightPass.h"
-#include "include/Renderer/DirectX11/DX11PointLightPass.h"
-#include "include/Renderer/DirectX11/DX11PostProcessor.h"
-#include "include/Renderer/DirectX11/DX11AABBPass.h"
 #include "include/Renderer/DirectX11/DX11Sampler.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/Types.h"
@@ -60,28 +53,14 @@ namespace JonsEngine
     private:
         static LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
         void SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight);
-        void GeometryStage(const RenderQueue& renderQueue, const Mat4& viewMatrix);
-        void LightingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags);
-        void PostProcessingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags);
 
         Logger& mLogger;
         IMemoryAllocatorPtr mMemoryAllocator;
         EngineSettings::ShadowQuality mShadowQuality;
         EngineSettings::AntiAliasing mAntiAliasing;
 
-        DX11VertexTransformPass mVertexTransformPass;
-        DX11FullscreenTrianglePass mFullscreenTrianglePass;
-        //DX11LightAccumulationbuffer mLightingAccBuffer;
-        //DX11Backbuffer mBackbuffer;
         DX11Pipeline mPipeline;
-        DX11GBuffer mGBuffer;
-        DX11AmbientPass mAmbientPass;
-        DX11DirectionalLightPass mDirectionalLightPass;
-        DX11PointLightPass mPointLightPass;
-        DX11PostProcessor mPostProcessor;
-        DX11AABBPass mAABBPass;
         ID3D11RasterizerStatePtr mDefaultRasterizerState;
-        ID3D11BlendStatePtr mAdditiveBlending;
         std::unique_ptr<DX11Sampler, std::function<void(DX11Sampler*)>> mModelSampler;
         DX11Sampler mShadowmapSampler;
         DX11Sampler mShadowmapNoCompareSampler;

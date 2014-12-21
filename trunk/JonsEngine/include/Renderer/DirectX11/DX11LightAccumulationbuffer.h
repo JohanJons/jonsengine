@@ -10,26 +10,23 @@ namespace JonsEngine
     class DX11LightAccumulationbuffer
     {
     public:
-        DX11LightAccumulationbuffer(ID3D11DevicePtr device, D3D11_TEXTURE2D_DESC backbufferTextureDesc);
+        DX11LightAccumulationbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc);
         ~DX11LightAccumulationbuffer();
 
-        void BindForReading(ID3D11DeviceContextPtr context);
-        void BindForLightingStage(ID3D11DeviceContextPtr context);
+        void BindForReading();
+        void BindForDrawing(ID3D11DepthStencilViewPtr dsv);
 
-        void ClearAccumulationBuffer(ID3D11DeviceContextPtr context);
-        void ClearStencilBuffer(ID3D11DeviceContextPtr context);
+        void ClearAccumulationBuffer();
+        void ClearStencilBuffer();
 
-        ID3D11DepthStencilViewPtr GetDepthStencilView();
+        ID3D11Texture2DPtr GetLightAccumulationBuffer();
 
 
     private:
+        ID3D11DeviceContextPtr mContext;
+
         ID3D11Texture2DPtr mAccumulationTexture;
         ID3D11RenderTargetViewPtr mRTV;
         ID3D11ShaderResourceViewPtr mSRV;
-        ID3D11Texture2DPtr mDepthStencilBuffer;
-        ID3D11DepthStencilViewPtr mDSV;
-        ID3D11DepthStencilViewPtr mDSVReadOnly;
-        ID3D11ShaderResourceViewPtr mDepthSRV;
-        ID3D11DepthStencilStatePtr mDepthStencilState;
     };
 }
