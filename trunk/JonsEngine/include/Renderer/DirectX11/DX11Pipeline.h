@@ -47,13 +47,13 @@ namespace JonsEngine
         ID3D11DepthStencilStatePtr mDepthStencilState;
         ID3D11BlendStatePtr mAdditiveBlending;
     
-        DX11Backbuffer mBackbuffer;
-        DX11LightAccumulationbuffer mLightAccbuffer;
-        DX11GBuffer mGBuffer;
-
         DX11AABBPass mAABBPass;
         DX11VertexTransformPass mVertexTransformPass;
         DX11FullscreenTrianglePass mFullscreenTrianglePass;
+
+        DX11Backbuffer mBackbuffer;
+        DX11LightAccumulationbuffer mLightAccbuffer;
+        DX11GBuffer mGBuffer;
 
         DX11AmbientPass mAmbientPass;
         DX11DirectionalLightPass mDirectionalLightPass;

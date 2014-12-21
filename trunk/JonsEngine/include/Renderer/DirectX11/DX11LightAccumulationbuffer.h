@@ -13,13 +13,12 @@ namespace JonsEngine
         DX11LightAccumulationbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc);
         ~DX11LightAccumulationbuffer();
 
-        void BindForReading();
         void BindForDrawing(ID3D11DepthStencilViewPtr dsv);
 
         void ClearAccumulationBuffer();
         void ClearStencilBuffer();
 
-        ID3D11Texture2DPtr GetLightAccumulationBuffer();
+        ID3D11ShaderResourceViewPtr GetLightAccumulationBuffer();
 
 
     private:

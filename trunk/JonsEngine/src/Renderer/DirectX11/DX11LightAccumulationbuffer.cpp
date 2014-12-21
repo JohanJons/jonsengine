@@ -25,11 +25,6 @@ namespace JonsEngine
     }
 
 
-    void DX11LightAccumulationbuffer::BindForReading()
-    {
-        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &mSRV.p);
-    }
-
     void DX11LightAccumulationbuffer::BindForDrawing(ID3D11DepthStencilViewPtr dsv)
     {
         mContext->OMSetRenderTargets(1, &mRTV.p, dsv);
@@ -42,8 +37,8 @@ namespace JonsEngine
     }
 
 
-    ID3D11Texture2DPtr DX11LightAccumulationbuffer::GetLightAccumulationBuffer()
+    ID3D11ShaderResourceViewPtr DX11LightAccumulationbuffer::GetLightAccumulationBuffer()
     {
-        return mAccumulationTexture;
+        return mSRV;
     }
 }
