@@ -30,6 +30,7 @@ namespace JonsEngine
 
         const std::string mName;
         const size_t mHashedID;
+        const Mat4 mInitialTransform;
 
         std::vector<ModelNode> mNodes;
         SceneNodePtr mSceneNode;

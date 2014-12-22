@@ -147,9 +147,6 @@ namespace JonsAssetImporter
         for (uint32_t i = 0; i < node->mNumChildren; i++)
             model.mNodes.emplace_back(ProcessAssimpNode(scene, node->mChildren[i], materialMap, model.mAABB.mMinBounds, model.mAABB.mMaxBounds));
 
-        //model.mAABB.mMinBounds = modelMinBounds;
-        //model.mAABB.mMaxBounds = modelMaxBounds;
-
         return model;
     }
 

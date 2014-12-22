@@ -2,7 +2,7 @@
 
 #define FXAA_PC 1
 #define FXAA_HLSL_5 1
-#define FXAA_QUALITY__PRESET 25
+#define FXAA_QUALITY__PRESET 29
 #define FXAA_GREEN_AS_LUMA 1
 
 #include "FXAA.hlsl"
