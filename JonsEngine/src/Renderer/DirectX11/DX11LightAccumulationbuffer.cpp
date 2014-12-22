@@ -13,6 +13,7 @@ namespace JonsEngine
         mContext(context), mAccumulationTexture(nullptr), mRTV(nullptr), mSRV(nullptr)
     {
         backbufferTextureDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+        backbufferTextureDesc.Format = DXGI_FORMAT_R16G16B16A16_UNORM;
 
         // create acc texture/rtv/srv
         DXCALL(device->CreateTexture2D(&backbufferTextureDesc, NULL, &mAccumulationTexture));

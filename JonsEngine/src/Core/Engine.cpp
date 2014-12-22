@@ -73,7 +73,7 @@ namespace JonsEngine
 
             for (const ModelNode& node : model->mNodes)
             {
-                const Mat4& worldMatrix = model->mSceneNode->GetNodeTransform();
+                const Mat4& worldMatrix = model->mSceneNode->GetNodeTransform() * model->mInitialTransform;
                 CullMeshes(node, viewProjectionMatrix * worldMatrix, worldMatrix);
             }
         }
