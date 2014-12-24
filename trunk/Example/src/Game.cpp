@@ -182,11 +182,11 @@ namespace JonsGame
         movingLight->mLightIntensity = 2.0f;
         movingLight->mLightColor = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
         nodeMovingLight->TranslateNode(Vec3(5.0f, 3.5f, -15.0f));
-
+        
         // directional light
         DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
         directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
-        directionalLight->mLightColor = Vec4(0.5f);
+        directionalLight->mLightColor = Vec4(0.25f);
         
         // create a ground plane
         SceneNodePtr nodePlane = myScene->GetRootNode().CreateChildNode("nodePlane");
