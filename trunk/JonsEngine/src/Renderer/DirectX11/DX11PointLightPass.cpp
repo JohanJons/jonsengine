@@ -32,8 +32,8 @@ namespace JonsEngine
     }
 
 
-    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11LightAccumulationbuffer& lightAccBuffer, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize) :
-        mContext(context), mPixelShader(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mSphereMesh(CreateSphereMesh(device)), mLightAccBuffer(lightAccBuffer), mVertexTransformPass(vertexTransformPass),
+    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize) :
+        mContext(context), mPixelShader(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mSphereMesh(CreateSphereMesh(device)), mVertexTransformPass(vertexTransformPass),
         mShadowmap(device, shadowmapSize, TEXTURE_CUBE_NUM_FACES, true), mPointLightCBuffer(device, mPointLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         // rasterize for front-face culling due to light volumes
@@ -151,8 +151,7 @@ namespace JonsEngine
         // stencil pass
         //
 
-        // restore rendering to the backbuffer
-        //mLightAccBuffer.BindForLightingStage();
+        // restore rendering to the light acc. buffer
         mContext->OMSetRenderTargets(1, &prevRTV.p, prevDSV);
         mContext->OMSetDepthStencilState(mDSSStencilPass, 0);
         mContext->RSSetState(mRSNoCulling);

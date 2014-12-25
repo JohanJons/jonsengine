@@ -194,7 +194,7 @@ namespace JonsEngine
         // flip from lightAccumulatorBuffer --> backbuffer
         mBackbuffer.FillBackbuffer(mLightAccbuffer.GetLightAccumulationBuffer(), true);
 
-        // post-processing done in sRGB space
+        //  post-processing done in sRGB space
         mBackbuffer.BindForDrawing();
 
         // FXAA done in sRGB space

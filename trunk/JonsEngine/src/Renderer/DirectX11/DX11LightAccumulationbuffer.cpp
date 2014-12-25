@@ -31,7 +31,6 @@ namespace JonsEngine
         mContext->OMSetRenderTargets(1, &mRTV.p, dsv);
     }
 
-
     void DX11LightAccumulationbuffer::ClearAccumulationBuffer()
     {
         mContext->ClearRenderTargetView(mRTV, gClearColor);
