@@ -14,9 +14,7 @@ namespace JonsEngine
         ~DX11LightAccumulationbuffer();
 
         void BindForDrawing(ID3D11DepthStencilViewPtr dsv);
-
         void ClearAccumulationBuffer();
-        void ClearStencilBuffer();
 
         ID3D11ShaderResourceViewPtr GetLightAccumulationBuffer();
 
