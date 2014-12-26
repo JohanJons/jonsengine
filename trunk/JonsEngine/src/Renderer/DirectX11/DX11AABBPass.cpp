@@ -6,7 +6,8 @@
 
 namespace JonsEngine
 {
-    DX11AABBPass::DX11AABBPass(ID3D11DevicePtr device, DX11VertexTransformPass& vertexTransformPass) : mVertexTransformPass(vertexTransformPass), mPixelShader(nullptr)
+    DX11AABBPass::DX11AABBPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass) : 
+        mContext(context), mPixelShader(nullptr), mVertexTransformPass(vertexTransformPass)
     {
         DXCALL(device->CreatePixelShader(gSimpleColorPixelShader, sizeof(gSimpleColorPixelShader), NULL, &mPixelShader));
     }
@@ -16,11 +17,11 @@ namespace JonsEngine
     }
 
 
-    void DX11AABBPass::Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix)
+    void DX11AABBPass::Render(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix)
     {
-        context->PSSetShader(mPixelShader, NULL, NULL);
-        mVertexTransformPass.BindForTransformPass(context, D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+        mContext->PSSetShader(mPixelShader, NULL, NULL);
+        mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
-        mVertexTransformPass.RenderAABBs(context, renderQueue, meshes, viewProjectionMatrix);
+        mVertexTransformPass.RenderAABBs(renderQueue, meshes, viewProjectionMatrix);
     }
 }

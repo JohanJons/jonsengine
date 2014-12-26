@@ -11,9 +11,10 @@ namespace JonsEngine
     const std::array<uint16_t, 16> gAABBIndices = { 0, 1, 2, 3, 0, 5, 4, 3, 2, 7, 4, 7, 6, 5, 6, 1 };
 
 
-    DX11Mesh::DX11Mesh(ID3D11DevicePtr device, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
+    DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
         const std::vector<float>& tangentData, const std::vector<float>& bitangentData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
-        : mMeshID(gNextMeshID++), mNumVertices(vertexData.size()), mNumIndices(indexData.size()), mVertexBuffer(nullptr), mTexcoordBuffer(nullptr), mIndexBuffer(nullptr)
+        : 
+        mContext(context), mVertexBuffer(nullptr), mNormalBuffer(nullptr), mTangentBuffer(nullptr), mBitangentBuffer(nullptr), mTexcoordBuffer(nullptr), mIndexBuffer(nullptr), mMeshID(gNextMeshID++), mNumVertices(vertexData.size()), mNumIndices(indexData.size())
     {
         // vertex buffer
         // use a temporary vector to merge vertices and AABB points
@@ -110,29 +111,29 @@ namespace JonsEngine
     }
 
 
-    void DX11Mesh::Draw(ID3D11DeviceContextPtr context)
+    void DX11Mesh::Draw()
     {
         const uint32_t vertexSize = sizeof(float) * 3;
         const uint32_t offset = 0;
 
-        context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_VERTICES, 1, &mVertexBuffer.p, &vertexSize, &offset);
+        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_VERTICES, 1, &mVertexBuffer.p, &vertexSize, &offset);
         if (mNormalBuffer)
-            context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer.p, &vertexSize, &offset);
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer.p, &vertexSize, &offset);
         if (mTangentBuffer)
-            context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer.p, &vertexSize, &offset);
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer.p, &vertexSize, &offset);
         if (mBitangentBuffer)
-            context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BITANGENTS, 1, &mBitangentBuffer.p, &vertexSize, &offset);
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BITANGENTS, 1, &mBitangentBuffer.p, &vertexSize, &offset);
         if (mTexcoordBuffer)
         {
             const uint32_t texcoordSize = sizeof(float) * 2;
-            context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer.p, &texcoordSize, &offset);
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer.p, &texcoordSize, &offset);
         }
 
-        context->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-        context->DrawIndexed(mNumIndices, 0, 0);
+        mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+        mContext->DrawIndexed(mNumIndices, 0, 0);
     }
 
-    void DX11Mesh::DrawAABB(ID3D11DeviceContextPtr context)
+    void DX11Mesh::DrawAABB()
     {
         // AABB vertices are offset into the mesh vertex buffer
         const uint32_t vertexSize = 3 * sizeof(float);
@@ -140,9 +141,9 @@ namespace JonsEngine
         const uint32_t offset = mNumVertices * sizeof(float);
         const uint32_t numAABBPoints = gAABBIndices.size();
 
-        context->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_VERTICES, 1, &mVertexBuffer.p, &vertexSize, &offset);
-        context->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, mNumIndices * sizeof(uint16_t));
-        context->DrawIndexed(numAABBPoints, 0, 0);
+        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_VERTICES, 1, &mVertexBuffer.p, &vertexSize, &offset);
+        mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, mNumIndices * sizeof(uint16_t));
+        mContext->DrawIndexed(numAABBPoints, 0, 0);
     }
 
     MeshID DX11Mesh::GetMeshID() const

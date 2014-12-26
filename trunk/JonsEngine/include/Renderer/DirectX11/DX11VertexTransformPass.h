@@ -15,13 +15,13 @@ namespace JonsEngine
     class DX11VertexTransformPass
     {
     public:
-        DX11VertexTransformPass(ID3D11DevicePtr device);
+        DX11VertexTransformPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context);
         ~DX11VertexTransformPass();
 
-        void BindForTransformPass(ID3D11DeviceContextPtr context, const D3D_PRIMITIVE_TOPOLOGY primitiveTopology);
-        void RenderMesh(ID3D11DeviceContextPtr context, DX11Mesh& mesh, const Mat4& wvpMatrix);
-        void RenderMeshes(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix);
-        void RenderAABBs(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix);
+        void BindForTransformPass(const D3D_PRIMITIVE_TOPOLOGY primitiveTopology);
+        void RenderMesh(DX11Mesh& mesh, const Mat4& wvpMatrix);
+        void RenderMeshes(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix);
+        void RenderAABBs(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix);
 
 
     private:
@@ -35,8 +35,10 @@ namespace JonsEngine
             }
         };
 
+        ID3D11DeviceContextPtr mContext;
         ID3D11VertexShaderPtr mVertexShader;
         ID3D11InputLayoutPtr mInputLayout;
+
         DX11ConstantBuffer<TransformCBuffer> mTransformCBuffer;
     };
 }

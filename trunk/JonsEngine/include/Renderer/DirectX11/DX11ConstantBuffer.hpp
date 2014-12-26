@@ -18,7 +18,8 @@ namespace JonsEngine
             CONSTANT_BUFFER_SLOT_PIXEL = CBUFFER_SLOT_PIXEL
         };
 
-        DX11ConstantBuffer(ID3D11DevicePtr device, const CONSTANT_BUFFER_SLOT cbufferSlot) : mConstantBuffer(nullptr), mConstantBufferSlot(cbufferSlot)
+        DX11ConstantBuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const CONSTANT_BUFFER_SLOT cbufferSlot) :
+            mContext(context), mConstantBuffer(nullptr), mConstantBufferSlot(cbufferSlot)
         {
             D3D11_BUFFER_DESC bufferDescription;
             ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
@@ -35,21 +36,22 @@ namespace JonsEngine
         }
 
 
-        void SetData(const ContentType& content, ID3D11DeviceContextPtr context)
+        void SetData(const ContentType& content)
         {
             D3D11_MAPPED_SUBRESOURCE mappedResource;
             ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 
-            DXCALL(context->Map(mConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+            DXCALL(mContext->Map(mConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
             std::memcpy(mappedResource.pData, &content, sizeof(ContentType));
-            context->Unmap(mConstantBuffer, 0);
+            mContext->Unmap(mConstantBuffer, 0);
 
-            context->VSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
-            context->PSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
+            mContext->VSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
+            mContext->PSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
         }
 
 
     private:
+        ID3D11DeviceContextPtr mContext;
         ID3D11BufferPtr mConstantBuffer;
         const CONSTANT_BUFFER_SLOT mConstantBufferSlot;
     };

@@ -29,12 +29,13 @@ namespace JonsEngine
             const SHADER_TEXTURE_SLOT textureSlot, const bool isSRGB);
         ~DX11Texture();
 
-        void Bind(ID3D11DeviceContextPtr context);
+        void Bind();
 
         TextureID GetTextureID() const;
 
 
     private:
+        ID3D11DeviceContextPtr mContext;
         ID3D11Texture2DPtr mTexture;
         ID3D11ShaderResourceViewPtr mShaderResourceView;
         TextureID mTextureID;

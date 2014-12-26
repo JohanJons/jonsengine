@@ -6,8 +6,8 @@
 
 namespace JonsEngine
 {
-    DX11BoxBlurPass::DX11BoxBlurPass(ID3D11DevicePtr device, DX11FullscreenTrianglePass& fullscreenPass, const DXGI_FORMAT textureFormat, const uint16_t screenWidth, const uint16_t screenHeight) :
-        mFullscreenPass(fullscreenPass), mBoxBlurCBuffer(device, mBoxBlurCBuffer.CONSTANT_BUFFER_SLOT_PIXEL), mBoxBlurTexture(nullptr), mBoxBlurSRV(nullptr), mBoxBlurRTV(nullptr)
+    DX11BoxBlurPass::DX11BoxBlurPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const DXGI_FORMAT textureFormat, const uint16_t screenWidth, const uint16_t screenHeight) :
+        mContext(context), mPixelShader(nullptr), mBoxBlurTexture(nullptr), mBoxBlurSRV(nullptr), mBoxBlurRTV(nullptr), mFullscreenPass(fullscreenPass), mBoxBlurCBuffer(device, context, mBoxBlurCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         D3D11_TEXTURE2D_DESC blurTextureDesc;
         ZeroMemory(&blurTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
@@ -31,28 +31,28 @@ namespace JonsEngine
     }
 
 
-    void DX11BoxBlurPass::Render(ID3D11DeviceContextPtr context, ID3D11ShaderResourceViewPtr textureToBlur, const Vec2& screenSize)
+    void DX11BoxBlurPass::Render(ID3D11ShaderResourceViewPtr textureToBlur, const Vec2& screenSize)
     {
         ID3D11RenderTargetViewPtr prevRTV = nullptr;
         ID3D11DepthStencilViewPtr prevDSV = nullptr;
-        context->OMGetRenderTargets(1, &prevRTV, &prevDSV);
+        mContext->OMGetRenderTargets(1, &prevRTV, &prevDSV);
 
-        context->PSSetShader(mPixelShader, NULL, NULL);
+        mContext->PSSetShader(mPixelShader, NULL, NULL);
 
         // horizontal pass
-        context->OMSetRenderTargets(1, &mBoxBlurRTV.p, NULL);
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &textureToBlur.p);
-        mBoxBlurCBuffer.SetData(BoxBlurCBuffer(Vec2(1.0f / screenSize.x, 0.0f)), context);
+        mContext->OMSetRenderTargets(1, &mBoxBlurRTV.p, NULL);
+        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &textureToBlur.p);
+        mBoxBlurCBuffer.SetData(BoxBlurCBuffer(Vec2(1.0f / screenSize.x, 0.0f)));
 
-        mFullscreenPass.Render(context);
+        mFullscreenPass.Render();
 
         // vertical pass
         // first set extra slot to null to avoid dx warnings
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSrv.p);
-        context->OMSetRenderTargets(1, &prevRTV.p, prevDSV);
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &mBoxBlurSRV.p);
-        mBoxBlurCBuffer.SetData(BoxBlurCBuffer(Vec2(0.0f, 1.0f / screenSize.y)), context);
+        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSrv.p);
+        mContext->OMSetRenderTargets(1, &prevRTV.p, prevDSV);
+        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &mBoxBlurSRV.p);
+        mBoxBlurCBuffer.SetData(BoxBlurCBuffer(Vec2(0.0f, 1.0f / screenSize.y)));
 
-        mFullscreenPass.Render(context);
+        mFullscreenPass.Render();
     }
 }

@@ -1,11 +1,10 @@
 #pragma once
 
-#include "include/Renderer/RenderCommands.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
+#include "include/Renderer/RenderCommands.h"
 #include "include/Core/Types.h"
 
 #include <d3d11.h>
@@ -14,6 +13,8 @@
 
 namespace JonsEngine
 {
+    class DX11VertexTransformPass;
+
     class DX11PointLightPass
     {
     public:

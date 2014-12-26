@@ -13,14 +13,16 @@ namespace JonsEngine
     class DX11AABBPass
     {
     public:
-        DX11AABBPass(ID3D11DevicePtr device, DX11VertexTransformPass& vertexTransformPass);
+        DX11AABBPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass);
         ~DX11AABBPass();
 
-        void Render(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix);
+        void Render(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix);
 
 
     private:
-        DX11VertexTransformPass& mVertexTransformPass;
+        ID3D11DeviceContextPtr mContext;
         ID3D11PixelShaderPtr mPixelShader;
+
+        DX11VertexTransformPass& mVertexTransformPass;
     };
 }

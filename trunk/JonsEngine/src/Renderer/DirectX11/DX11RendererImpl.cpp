@@ -175,7 +175,7 @@ namespace JonsEngine
     {
         auto allocator = mMemoryAllocator;
 
-        mMeshes.emplace_back(allocator->AllocateObject<DX11Mesh>(mDevice, vertexData, normalData, texCoords, tangents, bitangents, indexData, minBounds, maxBounds), [=](DX11Mesh* mesh) { allocator->DeallocateObject<DX11Mesh>(mesh); });
+        mMeshes.emplace_back(allocator->AllocateObject<DX11Mesh>(mDevice, mContext, vertexData, normalData, texCoords, tangents, bitangents, indexData, minBounds, maxBounds), [=](DX11Mesh* mesh) { allocator->DeallocateObject<DX11Mesh>(mesh); });
 
         return mMeshes.back()->GetMeshID();
     }

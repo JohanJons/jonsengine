@@ -8,7 +8,7 @@ namespace JonsEngine
 
 
     DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const uint32_t textureWidth, const uint32_t textureHeight, const SHADER_TEXTURE_SLOT textureSlot, const bool isSRGB) :
-        mTexture(nullptr), mShaderResourceView(nullptr), mTextureID(gNextTextureID++), mShaderTextureSlot(textureSlot)
+        mContext(context), mTexture(nullptr), mShaderResourceView(nullptr), mTextureID(gNextTextureID++), mShaderTextureSlot(textureSlot)
     {
         // create texture
         D3D11_TEXTURE2D_DESC textureDesc;
@@ -45,9 +45,9 @@ namespace JonsEngine
     }
 
 
-    void DX11Texture::Bind(ID3D11DeviceContextPtr context)
+    void DX11Texture::Bind()
     {
-        context->PSSetShaderResources(mShaderTextureSlot, 1, &mShaderResourceView.p);
+        mContext->PSSetShaderResources(mShaderTextureSlot, 1, &mShaderResourceView.p);
     }
 
     TextureID DX11Texture::GetTextureID() const

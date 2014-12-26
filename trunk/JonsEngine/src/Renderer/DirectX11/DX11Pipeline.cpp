@@ -8,7 +8,7 @@ namespace JonsEngine
 {
     const DX11Color gClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-    void BindTexture2D(const std::vector<DX11TexturePtr>& textures, Logger& logger, const TextureID textureID, ID3D11DeviceContextPtr context)
+    void BindTexture2D(const std::vector<DX11TexturePtr>& textures, Logger& logger, const TextureID textureID)
     {
         auto texture = std::find_if(textures.begin(), textures.end(), [&](const DX11TexturePtr ptr) { return ptr->GetTextureID() == textureID; });
         if (texture == textures.end())
@@ -17,7 +17,7 @@ namespace JonsEngine
             throw std::runtime_error("Renderable TextureID out of range");
         }
 
-        (*texture)->Bind(context);
+        (*texture)->Bind();
     }
 
 
@@ -31,18 +31,18 @@ namespace JonsEngine
         mDepthStencilState(nullptr),
         mAdditiveBlending(nullptr),
         
-        mAABBPass(device, mVertexTransformPass),
-        mVertexTransformPass(device),
-        mFullscreenTrianglePass(device),
+        mAABBPass(device, context, mVertexTransformPass),
+        mVertexTransformPass(device, context),
+        mFullscreenTrianglePass(device, context),
 
         mBackbuffer(device, mContext, mSwapchain, mFullscreenTrianglePass),
         mLightAccbuffer(device, mContext, backbufferTextureDesc),
         mGBuffer(device, mContext, backbufferTextureDesc),
 
-        mAmbientPass(device, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-        mDirectionalLightPass(device, mContext, mLightAccbuffer, mFullscreenTrianglePass, mVertexTransformPass, shadowmapResolution),
-        mPointLightPass(device, mContext, mLightAccbuffer, mVertexTransformPass, shadowmapResolution),
-        mPostProcessor(device, mFullscreenTrianglePass, backbufferTextureDesc),
+        mAmbientPass(device, context, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
+        mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, shadowmapResolution),
+        mPointLightPass(device, mContext, mVertexTransformPass, shadowmapResolution),
+        mPostProcessor(device, context, mFullscreenTrianglePass, backbufferTextureDesc),
 
         mScreenSize(backbufferTextureDesc.Width, backbufferTextureDesc.Height)
     {
@@ -144,13 +144,13 @@ namespace JonsEngine
             const bool hasNormalTexture = renderable.mNormalTexture != INVALID_TEXTURE_ID;
 
             if (hasDiffuseTexture)
-                BindTexture2D(textures, mLogger, renderable.mDiffuseTexture, mContext);
+                BindTexture2D(textures, mLogger, renderable.mDiffuseTexture);
 
             if (hasNormalTexture)
-                BindTexture2D(textures, mLogger, renderable.mNormalTexture, mContext);
+                BindTexture2D(textures, mLogger, renderable.mNormalTexture);
 
             mGBuffer.SetConstantData(renderable.mWVPMatrix, viewMatrix * renderable.mWorldMatrix, renderable.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
-            (*meshIterator)->Draw(mContext);
+            (*meshIterator)->Draw();
         }
     }
 
@@ -167,7 +167,7 @@ namespace JonsEngine
         const Mat4 invProjMatrix = glm::inverse(lighting.mCameraProjectionMatrix);
 
         // ambient light
-        mAmbientPass.Render(mContext, invProjMatrix, lighting.mAmbientLight, mScreenSize, SSAOEnabled);
+        mAmbientPass.Render(invProjMatrix, lighting.mAmbientLight, mScreenSize, SSAOEnabled);
 
         // additive blending for adding lighting
         mContext->OMSetBlendState(mAdditiveBlending, NULL, 0xffffffff);
@@ -199,9 +199,9 @@ namespace JonsEngine
 
         // FXAA done in sRGB space
         if (AA == EngineSettings::ANTIALIASING_FXAA)
-            mPostProcessor.FXAAPass(mContext, mBackbuffer, mScreenSize);
+            mPostProcessor.FXAAPass(mBackbuffer, mScreenSize);
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
-            mAABBPass.Render(mContext, renderQueue, meshes, lighting.mCameraProjectionMatrix * lighting.mCameraViewMatrix);
+            mAABBPass.Render(renderQueue, meshes, lighting.mCameraProjectionMatrix * lighting.mCameraViewMatrix);
     }
 }

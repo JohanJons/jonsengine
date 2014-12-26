@@ -82,9 +82,9 @@ namespace JonsEngine
     }
 
 
-    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11LightAccumulationbuffer& lightAccBuffer, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize) :
-        mContext(context), mPixelShader(nullptr), mRSDepthClamp(nullptr), mLightAccBuffer(lightAccBuffer), mFullscreenPass(fullscreenPass), mVertexTransformPass(transformPass), mShadowmap(device, shadowmapSize, NUM_SHADOWMAP_CASCADES, false),
-        mDirLightCBuffer(device, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
+    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize) :
+        mContext(context), mPixelShader(nullptr), mRSDepthClamp(nullptr), mFullscreenPass(fullscreenPass), mVertexTransformPass(transformPass), mShadowmap(device, context, shadowmapSize, NUM_SHADOWMAP_CASCADES, false),
+        mDirLightCBuffer(device, context, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         DXCALL(device->CreatePixelShader(gDirectionalLightPixelShader, sizeof(gDirectionalLightPixelShader), NULL, &mPixelShader));
 
@@ -137,16 +137,16 @@ namespace JonsEngine
         // TODO: precompute?
         CalculateShadowmapCascades(nearDistArr, farDistArr, Z_NEAR, Z_FAR);
 
-        mVertexTransformPass.BindForTransformPass(mContext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        mShadowmap.BindForDrawing(mContext);
+        mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        mShadowmap.BindForDrawing();
         
         for (uint32_t cascadeIndex = 0; cascadeIndex < NUM_SHADOWMAP_CASCADES; cascadeIndex++)
         {
-            mShadowmap.BindDepthView(mContext, cascadeIndex);
+            mShadowmap.BindDepthView(cascadeIndex);
             
             CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, nearDistArr[cascadeIndex], farDistArr[cascadeIndex], cameraViewMatrix);
             lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, lightDir);
-            mVertexTransformPass.RenderMeshes(mContext, renderQueue, meshes, lightVPMatrices[cascadeIndex]);
+            mVertexTransformPass.RenderMeshes(renderQueue, meshes, lightVPMatrices[cascadeIndex]);
 
             lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex] * glm::inverse(cameraViewMatrix);
             farDistArr[cascadeIndex] = -farDistArr[cascadeIndex];
@@ -163,15 +163,15 @@ namespace JonsEngine
         mContext->RSSetState(prevRS);
         
         // bind shadowmap SRV for reading
-        mShadowmap.BindForReading(mContext);
+        mShadowmap.BindForReading();
 
         const Vec4 camLightDir = glm::normalize(cameraViewMatrix * Vec4(-lightDir, 0));
 
         // set dir light cbuffer data and pixel shader
-        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, invProjMatrix, farDistArr, lightColor, camLightDir, screenSize, static_cast<float>(mShadowmap.GetTextureSize())), mContext);
+        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, invProjMatrix, farDistArr, lightColor, camLightDir, screenSize, static_cast<float>(mShadowmap.GetTextureSize())));
         mContext->PSSetShader(mPixelShader, NULL, NULL);
 
         // run fullscreen pass + dir light shading pass
-        mFullscreenPass.Render(mContext);
+        mFullscreenPass.Render();
     }
 }

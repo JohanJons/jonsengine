@@ -11,13 +11,14 @@ namespace JonsEngine
     class DX11FullscreenTrianglePass
     {
     public:
-        DX11FullscreenTrianglePass(ID3D11DevicePtr device);
+        DX11FullscreenTrianglePass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context);
         ~DX11FullscreenTrianglePass();
 
-        void Render(ID3D11DeviceContextPtr context);
+        void Render();
 
 
     private:
+        ID3D11DeviceContextPtr mContext;
         ID3D11VertexShaderPtr mVertexShader;
     };
 }
