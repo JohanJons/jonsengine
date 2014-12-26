@@ -11,21 +11,23 @@ namespace JonsEngine
     class DX11Shadowmap
     {
     public:
-        DX11Shadowmap(ID3D11DevicePtr device, const uint32_t shadowmapSize, const uint32_t numTextures, const bool isCubeTexture);
+        DX11Shadowmap(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const uint32_t shadowmapSize, const uint32_t numTextures, const bool isCubeTexture);
         ~DX11Shadowmap();
 
-        void BindForDrawing(ID3D11DeviceContextPtr context);
-        void BindDepthView(ID3D11DeviceContextPtr context, const uint32_t depthViewIndex);
-        void BindForReading(ID3D11DeviceContextPtr context);
+        void BindForDrawing();
+        void BindDepthView(const uint32_t depthViewIndex);
+        void BindForReading();
 
         uint32_t GetTextureSize() const;
 
 
     private:
+        ID3D11DeviceContextPtr mContext;
         ID3D11Texture2DPtr mShadowmapTexture;
         ID3D11InputLayoutPtr mInputLayout;
-        std::vector<ID3D11DepthStencilViewPtr> mShadowmapViews;
         ID3D11ShaderResourceViewPtr mShadowmapSRV;
+
+        std::vector<ID3D11DepthStencilViewPtr> mShadowmapViews;
         D3D11_VIEWPORT mShadowPassViewport;
     };
 }

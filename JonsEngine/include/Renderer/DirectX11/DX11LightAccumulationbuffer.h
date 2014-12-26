@@ -21,7 +21,6 @@ namespace JonsEngine
 
     private:
         ID3D11DeviceContextPtr mContext;
-
         ID3D11Texture2DPtr mAccumulationTexture;
         ID3D11RenderTargetViewPtr mRTV;
         ID3D11ShaderResourceViewPtr mSRV;

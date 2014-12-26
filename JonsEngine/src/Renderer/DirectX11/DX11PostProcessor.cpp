@@ -8,8 +8,8 @@
 
 namespace JonsEngine
 {
-    DX11PostProcessor::DX11PostProcessor(ID3D11DevicePtr device, DX11FullscreenTrianglePass& fullscreenPass, D3D11_TEXTURE2D_DESC backbufferTextureDesc) :
-        mFullscreenPass(fullscreenPass), mFXAACBuffer(device, mFXAACBuffer.CONSTANT_BUFFER_SLOT_PIXEL), mFXAABackbufferTexture(nullptr), mFXAARTV(nullptr), mFXAASRV(nullptr), mFXAAPixelShader(nullptr)
+    DX11PostProcessor::DX11PostProcessor(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, D3D11_TEXTURE2D_DESC backbufferTextureDesc) :
+        mContext(context), mFullscreenPass(fullscreenPass), mFXAACBuffer(device, context, mFXAACBuffer.CONSTANT_BUFFER_SLOT_PIXEL), mFXAABackbufferTexture(nullptr), mFXAARTV(nullptr), mFXAASRV(nullptr), mFXAAPixelShader(nullptr)
     {
         backbufferTextureDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
@@ -24,14 +24,14 @@ namespace JonsEngine
     }
 
 
-    void DX11PostProcessor::FXAAPass(ID3D11DeviceContextPtr context, DX11Backbuffer& backbuffer, const Vec2& screenSize)
+    void DX11PostProcessor::FXAAPass(DX11Backbuffer& backbuffer, const Vec2& screenSize)
     {
         backbuffer.CopyBackbuffer(mFXAABackbufferTexture);
 
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &mFXAASRV.p);
-        context->PSSetShader(mFXAAPixelShader, NULL, NULL);
-        mFXAACBuffer.SetData(FXAACBuffer(screenSize), context);
+        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &mFXAASRV.p);
+        mContext->PSSetShader(mFXAAPixelShader, NULL, NULL);
+        mFXAACBuffer.SetData(FXAACBuffer(screenSize));
 
-        mFullscreenPass.Render(context);
+        mFullscreenPass.Render();
     }
 }

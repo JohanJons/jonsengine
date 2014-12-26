@@ -46,7 +46,7 @@ namespace JonsEngine
 
         mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &lightAccumSRV.p);
         mContext->PSSetShader(mPixelShader, NULL, NULL);
-        mFullscreenPass.Render(mContext);
+        mFullscreenPass.Render();
     }
 
     void DX11Backbuffer::CopyBackbuffer(ID3D11Texture2DPtr dest)

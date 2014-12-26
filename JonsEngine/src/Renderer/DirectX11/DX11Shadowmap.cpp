@@ -5,7 +5,8 @@
 
 namespace JonsEngine
 {
-    DX11Shadowmap::DX11Shadowmap(ID3D11DevicePtr device, const uint32_t shadowmapSize, const uint32_t numTextures, const bool isCubeTexture) : mShadowmapTexture(nullptr), mInputLayout(nullptr), mShadowmapSRV(nullptr)
+    DX11Shadowmap::DX11Shadowmap(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const uint32_t shadowmapSize, const uint32_t numTextures, const bool isCubeTexture) :
+        mContext(context), mShadowmapTexture(nullptr), mInputLayout(nullptr), mShadowmapSRV(nullptr)
     {
         mShadowmapViews.resize(numTextures);
 
@@ -81,26 +82,26 @@ namespace JonsEngine
     }
 
 
-    void DX11Shadowmap::BindForDrawing(ID3D11DeviceContextPtr context)
+    void DX11Shadowmap::BindForDrawing()
     {
-        context->RSSetViewports(1, &mShadowPassViewport);
+        mContext->RSSetViewports(1, &mShadowPassViewport);
 
         // unbind shadowmap as shader resource
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSrv.p);
+        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSrv.p);
 
         // defaults to depth rendering/testing
-        context->OMSetDepthStencilState(NULL, 0);
+        mContext->OMSetDepthStencilState(NULL, 0);
     }
 
-    void DX11Shadowmap::BindDepthView(ID3D11DeviceContextPtr context, const uint32_t depthViewIndex)
+    void DX11Shadowmap::BindDepthView(const uint32_t depthViewIndex)
     {
-        context->OMSetRenderTargets(0, NULL, mShadowmapViews.at(depthViewIndex));
-        context->ClearDepthStencilView(mShadowmapViews.at(depthViewIndex), D3D11_CLEAR_DEPTH, 1.0f, 0);
+        mContext->OMSetRenderTargets(0, NULL, mShadowmapViews.at(depthViewIndex));
+        mContext->ClearDepthStencilView(mShadowmapViews.at(depthViewIndex), D3D11_CLEAR_DEPTH, 1.0f, 0);
     }
 
-    void DX11Shadowmap::BindForReading(ID3D11DeviceContextPtr context)
+    void DX11Shadowmap::BindForReading()
     {
-        context->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &mShadowmapSRV.p);
+        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &mShadowmapSRV.p);
     }
 
 

@@ -27,26 +27,27 @@ namespace JonsEngine
         };
 
 
-        DX11Mesh(ID3D11DevicePtr device, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
+        DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
             const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds);
         ~DX11Mesh();
 
-        void Draw(ID3D11DeviceContextPtr context);
-        void DrawAABB(ID3D11DeviceContextPtr context);
+        void Draw();
+        void DrawAABB();
 
         MeshID GetMeshID() const;
 
 
     private:
-        MeshID mMeshID;
-        uint32_t mNumVertices;
-        uint16_t mNumIndices;
-
+        ID3D11DeviceContextPtr mContext;
         ID3D11BufferPtr mVertexBuffer;
         ID3D11BufferPtr mNormalBuffer;
         ID3D11BufferPtr mTangentBuffer;
         ID3D11BufferPtr mBitangentBuffer;
         ID3D11BufferPtr mTexcoordBuffer;
         ID3D11BufferPtr mIndexBuffer;
+
+        MeshID mMeshID;
+        uint32_t mNumVertices;
+        uint16_t mNumIndices;
     };
 }

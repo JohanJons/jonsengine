@@ -13,10 +13,10 @@ namespace JonsEngine
     class DX11PostProcessor
     {
     public:
-        DX11PostProcessor(ID3D11DevicePtr device, DX11FullscreenTrianglePass& fullscreenPass, D3D11_TEXTURE2D_DESC backbufferTextureDesc);
+        DX11PostProcessor(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, D3D11_TEXTURE2D_DESC backbufferTextureDesc);
         ~DX11PostProcessor();
 
-        void FXAAPass(ID3D11DeviceContextPtr context, DX11Backbuffer& backbuffer, const Vec2& screenSize);
+        void FXAAPass(DX11Backbuffer& backbuffer, const Vec2& screenSize);
 
 
     private:
@@ -31,6 +31,7 @@ namespace JonsEngine
             }
         };
 
+        ID3D11DeviceContextPtr mContext;
         DX11FullscreenTrianglePass& mFullscreenPass;
 
         // fxaa

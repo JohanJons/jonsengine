@@ -1,7 +1,7 @@
 #include "include/Renderer/DirectX11/DX11PointLightPass.h"
 
 #include "include/Renderer/Shapes.h"
-#include "include/Renderer/DirectX11/DX11LightAccumulationbuffer.h"
+#include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/PointLightPixel.h"
 #include "include/Core/Utils/Math.h"
 #include "include/Core/Logging/Logger.h"
@@ -15,7 +15,7 @@ namespace JonsEngine
                                                                                   Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f) };
 
 
-    DX11Mesh CreateSphereMesh(ID3D11DevicePtr device)
+    DX11Mesh CreateSphereMesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context)
     {
         const float radius = 1.0f;
         const uint32_t rings = 12, sectors = 24;
@@ -28,13 +28,13 @@ namespace JonsEngine
             throw std::runtime_error("Failed to create sphere for shading pass");
         }
 
-        return DX11Mesh(device, vertexData, normalData, texcoordData, tangents, bitangents, indiceData, Vec3(-radius, -radius, -radius), Vec3(radius, radius, radius));
+        return DX11Mesh(device, context, vertexData, normalData, texcoordData, tangents, bitangents, indiceData, Vec3(-radius, -radius, -radius), Vec3(radius, radius, radius));
     }
 
 
     DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize) :
-        mContext(context), mPixelShader(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mSphereMesh(CreateSphereMesh(device)), mVertexTransformPass(vertexTransformPass),
-        mShadowmap(device, shadowmapSize, TEXTURE_CUBE_NUM_FACES, true), mPointLightCBuffer(device, mPointLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
+        mContext(context), mPixelShader(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mSphereMesh(CreateSphereMesh(device, context)), mVertexTransformPass(vertexTransformPass),
+        mShadowmap(device, context, shadowmapSize, TEXTURE_CUBE_NUM_FACES, true), mPointLightCBuffer(device, context, mPointLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         // rasterize for front-face culling due to light volumes
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -107,7 +107,7 @@ namespace JonsEngine
     void DX11PointLightPass::BindForShading()
     {
         // geometry transform vertex pass for stencil/shadow pass
-        mVertexTransformPass.BindForTransformPass(mContext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
 
     void DX11PointLightPass::Render(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight, const Mat4& viewMatrix, const Mat4& invProjMatrix,
@@ -136,15 +136,15 @@ namespace JonsEngine
         mContext->PSSetShader(NULL, NULL, NULL);
 
         mContext->RSSetState(mRSCullFront);
-        mShadowmap.BindForDrawing(mContext);
+        mShadowmap.BindForDrawing();
 
         for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
         {
-            mShadowmap.BindDepthView(mContext, face);
+            mShadowmap.BindDepthView(face);
             Mat4 lightViewMatrix = glm::lookAt(viewLightPositonV3, viewLightPositonV3 + CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
             // TODO: precompute?
             Mat4 lightProjMatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, Z_FAR);
-            mVertexTransformPass.RenderMeshes(mContext, renderQueue, meshes, lightProjMatrix * lightViewMatrix * viewMatrix);
+            mVertexTransformPass.RenderMeshes(renderQueue, meshes, lightProjMatrix * lightViewMatrix * viewMatrix);
         }
 
         //
@@ -159,7 +159,7 @@ namespace JonsEngine
         // restore screen viewport
         mContext->RSSetViewports(numViewports, &prevViewport);
 
-        mVertexTransformPass.RenderMesh(mContext, mSphereMesh, pointLight.mWVPMatrix);
+        mVertexTransformPass.RenderMesh(mSphereMesh, pointLight.mWVPMatrix);
 
         //
         // shading pass
@@ -167,14 +167,14 @@ namespace JonsEngine
 
         mContext->OMSetDepthStencilState(mDSSShadingPass, 0);
         mContext->RSSetState(mRSCullFront);
-        mShadowmap.BindForReading(mContext);
+        mShadowmap.BindForReading();
 
         // set point light pixel shader and its cbuffer
         mContext->PSSetShader(mPixelShader, NULL, NULL);
-        mPointLightCBuffer.SetData(PointLightCBuffer(invProjMatrix, pointLight.mLightColor, viewLightPositonV4, screenSize, pointLight.mLightIntensity, pointLight.mMaxDistance, zFar, zNear), mContext);
+        mPointLightCBuffer.SetData(PointLightCBuffer(invProjMatrix, pointLight.mLightColor, viewLightPositonV4, screenSize, pointLight.mLightIntensity, pointLight.mMaxDistance, zFar, zNear));
 
         // run transform pass on sphere + point light shading pass
-        mVertexTransformPass.RenderMesh(mContext, mSphereMesh, pointLight.mWVPMatrix);
+        mVertexTransformPass.RenderMesh(mSphereMesh, pointLight.mWVPMatrix);
 
         // restore state
         mContext->RSSetState(prevRasterizerState);

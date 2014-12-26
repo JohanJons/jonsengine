@@ -4,7 +4,8 @@
 
 namespace JonsEngine
 {
-    DX11VertexTransformPass::DX11VertexTransformPass(ID3D11DevicePtr device) : mTransformCBuffer(device, mTransformCBuffer.CONSTANT_BUFFER_SLOT_VERTEX)
+    DX11VertexTransformPass::DX11VertexTransformPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context) :
+        mContext(context), mTransformCBuffer(device, context, mTransformCBuffer.CONSTANT_BUFFER_SLOT_VERTEX)
     {
         D3D11_INPUT_ELEMENT_DESC inputDescription;
         ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC));
@@ -25,21 +26,21 @@ namespace JonsEngine
     }
 
 
-    void DX11VertexTransformPass::BindForTransformPass(ID3D11DeviceContextPtr context, const D3D_PRIMITIVE_TOPOLOGY primitiveTopology)
+    void DX11VertexTransformPass::BindForTransformPass(const D3D_PRIMITIVE_TOPOLOGY primitiveTopology)
     {
-        context->IASetPrimitiveTopology(primitiveTopology);
-        context->IASetInputLayout(mInputLayout);
+        mContext->IASetPrimitiveTopology(primitiveTopology);
+        mContext->IASetInputLayout(mInputLayout);
 
-        context->VSSetShader(mVertexShader, NULL, NULL);
+        mContext->VSSetShader(mVertexShader, NULL, NULL);
     }
 
-    void DX11VertexTransformPass::RenderMesh(ID3D11DeviceContextPtr context, DX11Mesh& mesh, const Mat4& wvpMatrix)
+    void DX11VertexTransformPass::RenderMesh(DX11Mesh& mesh, const Mat4& wvpMatrix)
     {
-        mTransformCBuffer.SetData(TransformCBuffer(wvpMatrix), context);
-        mesh.Draw(context);
+        mTransformCBuffer.SetData(TransformCBuffer(wvpMatrix));
+        mesh.Draw();
     }
 
-    void DX11VertexTransformPass::RenderMeshes(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix)
+    void DX11VertexTransformPass::RenderMeshes(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix)
     {
         auto meshIterator = meshes.begin();
         for (const Renderable& renderable : renderQueue)
@@ -63,12 +64,12 @@ namespace JonsEngine
                 }
             }
 
-            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * renderable.mWorldMatrix), context);
-            (*meshIterator)->Draw(context);
+            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * renderable.mWorldMatrix));
+            (*meshIterator)->Draw();
         }
     }
 
-    void DX11VertexTransformPass::RenderAABBs(ID3D11DeviceContextPtr context, const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix)
+    void DX11VertexTransformPass::RenderAABBs(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix)
     {
         auto meshIterator = meshes.begin();
         for (const Renderable& renderable : renderQueue)
@@ -92,8 +93,8 @@ namespace JonsEngine
                 }
             }
 
-            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * renderable.mWorldMatrix), context);
-            (*meshIterator)->DrawAABB(context);
+            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * renderable.mWorldMatrix));
+            (*meshIterator)->DrawAABB();
         }
     }
 }
