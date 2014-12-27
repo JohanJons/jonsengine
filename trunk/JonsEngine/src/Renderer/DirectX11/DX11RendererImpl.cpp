@@ -132,9 +132,9 @@ namespace JonsEngine
         mAntiAliasing(settings.mAntiAliasing),
         mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), ShadowQualityResolution(settings.mShadowQuality)),
         // samplers
-        mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
-        mShadowmapSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
-        mShadowmapNoCompareSampler(mDevice, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT),
+        mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, mContext, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
+        mShadowmapSampler(mDevice, mContext, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
+        mShadowmapNoCompareSampler(mDevice, mContext, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT),
         // misc
         mSSAOEnabled(settings.mSSAOEnabled)
     {
@@ -210,7 +210,7 @@ namespace JonsEngine
 
     void DX11RendererImpl::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
     {
-        mModelSampler.reset(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, anisotropic, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC));
+        mModelSampler.reset(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, mContext, anisotropic, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC));
     }
 
 
@@ -266,8 +266,8 @@ namespace JonsEngine
         viewport.MaxDepth = 1.0f;
         mContext->RSSetViewports(1, &viewport);
 
-        mModelSampler->BindSampler(mContext);
-        mShadowmapSampler.BindSampler(mContext);
-        mShadowmapNoCompareSampler.BindSampler(mContext);
+        mModelSampler->BindSampler();
+        mShadowmapSampler.BindSampler();
+        mShadowmapNoCompareSampler.BindSampler();
     }
 }

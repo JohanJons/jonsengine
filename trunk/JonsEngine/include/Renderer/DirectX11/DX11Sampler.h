@@ -19,15 +19,17 @@ namespace JonsEngine
             SHADER_SAMPLER_SLOT_POINT_COMPARE = SAMPLER_SLOT_POINT_COMPARE
         };
     
-        DX11Sampler(ID3D11DevicePtr device, const EngineSettings::Anisotropic maxAnisotropy, const D3D11_FILTER filter, const D3D11_COMPARISON_FUNC comparison, const SHADER_SAMPLER_SLOT samplerSlot);
+        DX11Sampler(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const EngineSettings::Anisotropic maxAnisotropy, const D3D11_FILTER filter, const D3D11_COMPARISON_FUNC comparison, const SHADER_SAMPLER_SLOT samplerSlot);
         ~DX11Sampler();
         
-        void BindSampler(ID3D11DeviceContextPtr context);
+        void BindSampler();
         EngineSettings::Anisotropic GetMaxAnisotropicFiltering() const;
         
     
     private:
+        ID3D11DeviceContextPtr mContext;
         ID3D11SamplerStatePtr mTextureSampler;
+
         const EngineSettings::Anisotropic mAnisotropicFiltering;
         const SHADER_SAMPLER_SLOT mSamplerSlot;
     };
