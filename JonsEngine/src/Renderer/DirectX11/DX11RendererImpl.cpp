@@ -130,7 +130,7 @@ namespace JonsEngine
         mMemoryAllocator(memoryAllocator),
         mShadowQuality(settings.mShadowQuality),
         mAntiAliasing(settings.mAntiAliasing),
-        mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), ShadowQualityResolution(settings.mShadowQuality)),
+        mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), ShadowQualityResolution(settings.mShadowQuality), mMeshes, mTextures),
         // samplers
         mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, mContext, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
         mShadowmapSampler(mDevice, mContext, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
@@ -175,9 +175,11 @@ namespace JonsEngine
     {
         auto allocator = mMemoryAllocator;
 
-        mMeshes.emplace_back(allocator->AllocateObject<DX11Mesh>(mDevice, mContext, vertexData, normalData, texCoords, tangents, bitangents, indexData, minBounds, maxBounds), [=](DX11Mesh* mesh) { allocator->DeallocateObject<DX11Mesh>(mesh); });
+        //mMeshes.emplace_back(allocator->AllocateObject<DX11Mesh>(mDevice, mContext, vertexData, normalData, texCoords, tangents, bitangents, indexData, minBounds, maxBounds), [=](DX11Mesh* mesh) { allocator->DeallocateObject<DX11Mesh>(mesh); });
 
-        return mMeshes.back()->GetMeshID();
+        //return mMeshes.back()->GetMeshID();
+
+        return mMeshes.AddItem(mDevice, mContext, vertexData, normalData, texCoords, tangents, bitangents, indexData, minBounds, maxBounds);
     }
 
     TextureID DX11RendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
@@ -186,18 +188,20 @@ namespace JonsEngine
 
         const bool isSRGB = (textureType == TextureType::TEXTURE_TYPE_DIFFUSE);
 
-        mTextures.emplace_back(allocator->AllocateObject<DX11Texture>(mDevice, mContext, textureData, textureWidth, textureHeight, GetShaderTextureSlot(textureType), isSRGB), [=](DX11Texture* texture) { allocator->DeallocateObject<DX11Texture>(texture); });
+        return mTextures.AddItem(mDevice, mContext, textureData, textureWidth, textureHeight, GetShaderTextureSlot(textureType), isSRGB);
 
-        return mTextures.back()->GetTextureID();
+        //mTextures.emplace_back(allocator->AllocateObject<DX11Texture>(mDevice, mContext, textureData, textureWidth, textureHeight, GetShaderTextureSlot(textureType), isSRGB), [=](DX11Texture* texture) { allocator->DeallocateObject<DX11Texture>(texture); });
+
+        //return mTextures.back()->GetTextureID();
     }
 
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags)
     {
         mPipeline.BeginFrame();
 
-        mPipeline.GeometryStage(renderQueue, mMeshes, mTextures, lighting.mCameraViewMatrix);
-        mPipeline.LightingStage(renderQueue, mMeshes, lighting, debugFlags, mSSAOEnabled);
-        mPipeline.PostProcessingStage(renderQueue, mMeshes, lighting, debugFlags, mAntiAliasing);
+        mPipeline.GeometryStage(renderQueue, lighting.mCameraViewMatrix);
+        mPipeline.LightingStage(renderQueue, lighting, debugFlags, mSSAOEnabled);
+        mPipeline.PostProcessingStage(renderQueue, lighting, debugFlags, mAntiAliasing);
 
         mPipeline.EndFrame();
     }

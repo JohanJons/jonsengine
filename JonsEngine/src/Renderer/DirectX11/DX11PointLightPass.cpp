@@ -33,8 +33,14 @@ namespace JonsEngine
 
 
     DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize) :
-        mContext(context), mPixelShader(nullptr), mDSSStencilPass(nullptr), mDSSShadingPass(nullptr), mSphereMesh(CreateSphereMesh(device, context)), mVertexTransformPass(vertexTransformPass),
-        mShadowmap(device, context, shadowmapSize, TEXTURE_CUBE_NUM_FACES, true), mPointLightCBuffer(device, context, mPointLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
+        mContext(context),
+        mPixelShader(nullptr),
+        mDSSStencilPass(nullptr),
+        mDSSShadingPass(nullptr),
+        mSphereMesh(CreateSphereMesh(device, context)),
+        mVertexTransformPass(vertexTransformPass),
+        mShadowmap(device, context, shadowmapSize, TEXTURE_CUBE_NUM_FACES, true),
+        mPointLightCBuffer(device, context, mPointLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         // rasterize for front-face culling due to light volumes
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -110,8 +116,7 @@ namespace JonsEngine
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
 
-    void DX11PointLightPass::Render(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight, const Mat4& viewMatrix, const Mat4& invProjMatrix,
-        const Vec2& screenSize, const float zFar, const float zNear)
+    void DX11PointLightPass::Render(const RenderQueue& renderQueue, const RenderableLighting::PointLight& pointLight, const Mat4& viewMatrix, const Mat4& invProjMatrix, const Vec2& screenSize, const float zFar, const float zNear)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
@@ -144,7 +149,7 @@ namespace JonsEngine
             Mat4 lightViewMatrix = glm::lookAt(viewLightPositonV3, viewLightPositonV3 + CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
             // TODO: precompute?
             Mat4 lightProjMatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, Z_FAR);
-            mVertexTransformPass.RenderMeshes(renderQueue, meshes, lightProjMatrix * lightViewMatrix * viewMatrix);
+            mVertexTransformPass.RenderMeshes(renderQueue, lightProjMatrix * lightViewMatrix * viewMatrix);
         }
 
         //

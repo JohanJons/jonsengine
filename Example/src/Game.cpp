@@ -134,8 +134,13 @@ namespace JonsGame
 
     void Game::SetupScene()
     {
-        Scene* myScene = mEngine->GetSceneManager().CreateScene("MyScene");
-        mEngine->GetSceneManager().SetActiveScene("MyScene");
+        ActorPtr actor();
+
+
+
+
+
+        Scene* myScene = mEngine->GetSceneManager().GetActiveScene();
         JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
 
         // ambient light

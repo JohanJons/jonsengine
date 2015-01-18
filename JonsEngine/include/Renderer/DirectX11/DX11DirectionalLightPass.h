@@ -6,6 +6,7 @@
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
 #include "include/Renderer/RenderCommands.h"
 #include "include/Core/Types.h"
+#include "include/Core/Containers/IDMap.h"
 
 #include <d3d11.h>
 #include <array>
@@ -20,10 +21,11 @@ namespace JonsEngine
     public:
         const static uint32_t NUM_SHADOWMAP_CASCADES = 4;
 
-        DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize);
+        DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize,
+            const IDMap<DX11Mesh>& meshMap);
         ~DX11DirectionalLightPass();
 
-        void Render(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invProjMatrix,
+        void Render(const RenderQueue& renderQueue, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invProjMatrix,
             const Vec4& lightColor, const Vec3& lightDir, const Vec2& screenSize, const bool drawFrustrums);
 
 
@@ -54,5 +56,7 @@ namespace JonsEngine
         DX11VertexTransformPass& mVertexTransformPass;
         DX11Shadowmap mShadowmap;
         DX11ConstantBuffer<DirectionalLightCBuffer> mDirLightCBuffer;
+
+        const IDMap<DX11Mesh>& mMeshMap;
     };
 }

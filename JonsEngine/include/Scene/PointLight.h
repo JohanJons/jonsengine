@@ -5,15 +5,19 @@
 
 #include <string>
 #include <memory>
+#include <functional>
 
 namespace JonsEngine
 {
-    struct PointLight;
-
-    typedef std::shared_ptr<PointLight> PointLightPtr;
-
-    struct PointLight
+    class PointLight
     {
+    public:
+        PointLight(const std::string& name, SceneNodePtr node);
+
+        bool operator==(const PointLight& light);
+        bool operator==(const std::string& lightName);
+
+
         const std::string mName;
         const size_t mHashedID;
         SceneNodePtr mSceneNode;
@@ -21,11 +25,7 @@ namespace JonsEngine
         Vec4 mLightColor;
         float mLightIntensity;
         float mMaxDistance;
-
-
-        PointLight(const std::string& name, SceneNodePtr node);
-
-        bool operator==(const PointLight& light);
-        bool operator==(const std::string& lightName);
     };
+
+    typedef std::unique_ptr<PointLight, std::function<void(PointLight*)>> PointLightPtr;
 }

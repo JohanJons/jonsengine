@@ -21,6 +21,8 @@ namespace JonsEngine
 
         Mat4 GetCameraTransform() const;
 
+        float mFOV;
+
 
     public:
         Vec3 mTranslation;

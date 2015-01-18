@@ -69,8 +69,8 @@ namespace JonsEngine
 
 
     WindowManagerImpl::WindowManagerImpl(const EngineSettings& engineSettings, Logger& logger) : mLogger(logger), mWindowTitle(engineSettings.mWindowTitle), mScreenWidth(engineSettings.mWindowWidth), mScreenHeight(engineSettings.mWindowHeight),
-        mShowMouseCursor(false), mFullscreen(false), mFOV(engineSettings.mFOV), mRelativePosX(0), mRelativePosY(0),
-		mMouseButtonCallback(nullptr), mMousePositionCallback(nullptr), mKeyCallback(nullptr), mInstanceHandle(GetModuleHandle(NULL)), mWindowHandle(nullptr)
+        mShowMouseCursor(false), mFullscreen(false), mRelativePosX(0), mRelativePosY(0), mMouseButtonCallback(nullptr), mMousePositionCallback(nullptr), mKeyCallback(nullptr),
+        mInstanceHandle(GetModuleHandle(NULL)), mWindowHandle(nullptr)
     {
         // Register class
         WNDCLASSEX wcex;
@@ -250,11 +250,6 @@ namespace JonsEngine
         UpdateWindow(mWindowHandle);
     }
 
-    void WindowManagerImpl::SetFOV(const float FOV)
-    {
-        mFOV = FOV;
-    }
-
     bool WindowManagerImpl::GetFullscreen() const
     {
         return mFullscreen;
@@ -278,11 +273,6 @@ namespace JonsEngine
     bool WindowManagerImpl::GetShowMouseCursor() const
     {
         return mShowMouseCursor;
-    }
-
-    float WindowManagerImpl::GetFOV() const
-    {
-        return mFOV;
     }
 
 

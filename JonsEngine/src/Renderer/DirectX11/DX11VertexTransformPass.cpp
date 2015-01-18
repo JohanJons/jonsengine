@@ -4,8 +4,8 @@
 
 namespace JonsEngine
 {
-    DX11VertexTransformPass::DX11VertexTransformPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context) :
-        mContext(context), mTransformCBuffer(device, context, mTransformCBuffer.CONSTANT_BUFFER_SLOT_VERTEX)
+    DX11VertexTransformPass::DX11VertexTransformPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const IDMap<DX11Mesh>& meshMap) :
+        mContext(context), mTransformCBuffer(device, context, mTransformCBuffer.CONSTANT_BUFFER_SLOT_VERTEX), mMeshMap(meshMap)
     {
         D3D11_INPUT_ELEMENT_DESC inputDescription;
         ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC));
@@ -40,61 +40,21 @@ namespace JonsEngine
         mesh.Draw();
     }
 
-    void DX11VertexTransformPass::RenderMeshes(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix)
+    void DX11VertexTransformPass::RenderMeshes(const RenderQueue& renderQueue, const Mat4& viewProjectionMatrix)
     {
-        auto meshIterator = meshes.begin();
-        for (const Renderable& renderable : renderQueue)
+        for (const RenderableModel& model : renderQueue.mCamera)
         {
-            if (renderable.mMesh == INVALID_MESH_ID)
-            {
-                JONS_LOG_ERROR(Logger::GetRendererLogger(), "Renderable MeshID is invalid");
-                throw std::runtime_error("Renderable MeshID is invalid");
-            }
-
-            if (renderable.mMesh < (*meshIterator)->GetMeshID())
-                continue;
-
-            while (renderable.mMesh >(*meshIterator)->GetMeshID())
-            {
-                meshIterator++;
-                if (meshIterator == meshes.end())
-                {
-                    JONS_LOG_ERROR(Logger::GetRendererLogger(), "Renderable MeshID out of range");
-                    throw std::runtime_error("Renderable MeshID out of range");
-                }
-            }
-
-            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * renderable.mWorldMatrix));
-            (*meshIterator)->Draw();
+            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * model.mMesh.mWorldMatrix));
+            mMeshMap.GetItem(model.mMesh.mMeshID).Draw();
         }
     }
 
-    void DX11VertexTransformPass::RenderAABBs(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix)
+    void DX11VertexTransformPass::RenderAABBs(const RenderQueue& renderQueue, const Mat4& viewProjectionMatrix)
     {
-        auto meshIterator = meshes.begin();
-        for (const Renderable& renderable : renderQueue)
+        for (const RenderableModel& model : renderQueue.mCamera)
         {
-            if (renderable.mMesh == INVALID_MESH_ID)
-            {
-                JONS_LOG_ERROR(Logger::GetRendererLogger(), "Renderable MeshID is invalid");
-                throw std::runtime_error("Renderable MeshID is invalid");
-            }
-
-            if (renderable.mMesh < (*meshIterator)->GetMeshID())
-                continue;
-
-            while (renderable.mMesh >(*meshIterator)->GetMeshID())
-            {
-                meshIterator++;
-                if (meshIterator == meshes.end())
-                {
-                    JONS_LOG_ERROR(Logger::GetRendererLogger(), "Renderable MeshID out of range");
-                    throw std::runtime_error("Renderable MeshID out of range");
-                }
-            }
-
-            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * renderable.mWorldMatrix));
-            (*meshIterator)->DrawAABB();
+            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * model.mMesh.mWorldMatrix));
+            mMeshMap.GetItem(model.mMesh.mMeshID).DrawAABB();
         }
     }
 }

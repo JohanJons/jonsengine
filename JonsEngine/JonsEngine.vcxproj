@@ -144,9 +144,11 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Shadowmap.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Texture.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp" />
+    <ClCompile Include="src\Renderer\RenderQueue.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
+    <ClCompile Include="src\Scene\Actor.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
     <ClCompile Include="src\Scene\DirectionalLight.cpp" />
     <ClCompile Include="src\Scene\Material.cpp" />
@@ -162,6 +164,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
+    <ClInclude Include="include\Core\Containers\IDMap.h" />
     <ClInclude Include="include\Core\Containers\Vector.h" />
     <ClInclude Include="include\Core\DebugOptions.h" />
     <ClInclude Include="include\Core\Engine.h" />
@@ -191,6 +194,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Pipeline.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11PointLightPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11PostProcessor.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11Renderable.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Renderer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11RendererImpl.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Sampler.h" />
@@ -200,9 +204,11 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11VertexTransformPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\Shaders\Constants.h" />
     <ClInclude Include="include\Renderer\RenderCommands.h" />
+    <ClInclude Include="include\Renderer\RenderQueue.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />
     <ClInclude Include="include\Resources\ResourceManifest.h" />
+    <ClInclude Include="include\Scene\Actor.h" />
     <ClInclude Include="include\Scene\Camera.h" />
     <ClInclude Include="include\Scene\DirectionalLight.h" />
     <ClInclude Include="include\Scene\Material.h" />

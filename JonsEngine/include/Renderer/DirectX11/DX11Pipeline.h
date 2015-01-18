@@ -17,6 +17,7 @@
 #include "include/Core/DebugOptions.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Types.h"
+#include "include/Core/Containers/IDMap.h"
 
 #include <d3d11.h>
 
@@ -25,15 +26,16 @@ namespace JonsEngine
     class DX11Pipeline
     {
     public:
-        DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const uint32_t shadowmapResolution);
+        DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const uint32_t shadowmapResolution,
+            const IDMap<DX11Mesh>& meshMap, const IDMap<DX11Texture>& textureMap);
         ~DX11Pipeline();
 
         void BeginFrame();
         void EndFrame();
 
-        void GeometryStage(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const std::vector<DX11TexturePtr>& textures, const Mat4& viewMatrix);
-        void LightingStage(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags, const bool SSAOEnabled);
-        void PostProcessingStage(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA);
+        void GeometryStage(const RenderQueue& renderQueue, const Mat4& viewMatrix);
+        void LightingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags, const bool SSAOEnabled);
+        void PostProcessingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA);
 
 
     private:
@@ -61,5 +63,7 @@ namespace JonsEngine
         DX11PostProcessor mPostProcessor;
 
         const Vec2 mScreenSize;
+        const IDMap<DX11Mesh>& mMeshMap;
+        const IDMap<DX11Texture>& mTextureMap;
     };
 }

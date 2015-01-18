@@ -8,20 +8,10 @@ namespace JonsEngine
 {
     const DX11Color gClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-    void BindTexture2D(const std::vector<DX11TexturePtr>& textures, Logger& logger, const TextureID textureID)
-    {
-        auto texture = std::find_if(textures.begin(), textures.end(), [&](const DX11TexturePtr ptr) { return ptr->GetTextureID() == textureID; });
-        if (texture == textures.end())
-        {
-            JONS_LOG_ERROR(logger, "Renderable TextureID out of range");
-            throw std::runtime_error("Renderable TextureID out of range");
-        }
 
-        (*texture)->Bind();
-    }
+    DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const uint32_t shadowmapResolution,
+        const IDMap<DX11Mesh>& meshMap, const IDMap<DX11Texture>& textureMap) :
 
-
-    DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const uint32_t shadowmapResolution) :
         mLogger(logger),
         mSwapchain(swapchain),
         mContext(context),
@@ -40,11 +30,13 @@ namespace JonsEngine
         mGBuffer(device, mContext, backbufferTextureDesc),
 
         mAmbientPass(device, context, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-        mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, shadowmapResolution),
-        mPointLightPass(device, mContext, mVertexTransformPass, shadowmapResolution),
+        mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, shadowmapResolution, meshMap),
+        mPointLightPass(device, mContext, mVertexTransformPass, shadowmapResolution, meshMap),
         mPostProcessor(device, context, mFullscreenTrianglePass, backbufferTextureDesc),
 
-        mScreenSize(backbufferTextureDesc.Width, backbufferTextureDesc.Height)
+        mScreenSize(backbufferTextureDesc.Width, backbufferTextureDesc.Height),
+        mMeshMap(meshMap),
+        mTextureMap(textureMap)
     {
         // create depth buffer/view/srv
         D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
@@ -114,47 +106,29 @@ namespace JonsEngine
     }
 
 
-    void DX11Pipeline::GeometryStage(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const std::vector<DX11TexturePtr>& textures, const Mat4& viewMatrix)
+    void DX11Pipeline::GeometryStage(const RenderQueue& renderQueue, const Mat4& viewMatrix)
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-        auto meshIterator = meshes.begin();
-        for (const Renderable& renderable : renderQueue)
+        for (const RenderableModel& model : renderQueue.mCamera)
         {
-            if (renderable.mMesh == INVALID_MESH_ID)
-            {
-                JONS_LOG_ERROR(mLogger, "Renderable MeshID is invalid");
-                throw std::runtime_error("Renderable MeshID is invalid");
-            }
+            assert(model.mMesh.mMeshID != INVALID_MESH_ID);
 
-            if (renderable.mMesh < (*meshIterator)->GetMeshID())
-                continue;
-
-            while (renderable.mMesh >(*meshIterator)->GetMeshID())
-            {
-                meshIterator++;
-                if (meshIterator == meshes.end())
-                {
-                    JONS_LOG_ERROR(mLogger, "Renderable MeshID out of range");
-                    throw std::runtime_error("Renderable MeshID out of range");
-                }
-            }
-
-            const bool hasDiffuseTexture = renderable.mDiffuseTexture != INVALID_TEXTURE_ID;
-            const bool hasNormalTexture = renderable.mNormalTexture != INVALID_TEXTURE_ID;
+            const bool hasDiffuseTexture = model.mMaterial.mDiffuseTextureID != INVALID_TEXTURE_ID;
+            const bool hasNormalTexture = model.mMaterial.mNormalTextureID != INVALID_TEXTURE_ID;
 
             if (hasDiffuseTexture)
-                BindTexture2D(textures, mLogger, renderable.mDiffuseTexture);
+                mTextureMap.GetItem(model.mMaterial.mDiffuseTextureID).Bind();
 
             if (hasNormalTexture)
-                BindTexture2D(textures, mLogger, renderable.mNormalTexture);
+                mTextureMap.GetItem(model.mMaterial.mNormalTextureID).Bind();
 
-            mGBuffer.SetConstantData(renderable.mWVPMatrix, viewMatrix * renderable.mWorldMatrix, renderable.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
-            (*meshIterator)->Draw();
+            mGBuffer.SetConstantData(model.mMesh.mWVPMatrix, viewMatrix * model.mMesh.mWorldMatrix, model.mMaterial.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
+            mMeshMap.GetItem(model.mMesh.mMeshID).Draw();
         }
     }
 
-    void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugExtra, const bool SSAOEnabled)
+    void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugExtra, const bool SSAOEnabled)
     {
         mLightAccbuffer.ClearAccumulationBuffer();
         mLightAccbuffer.BindForDrawing(mDSVReadOnly);
@@ -174,7 +148,7 @@ namespace JonsEngine
 
         // do all directional lights
         for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
-            mDirectionalLightPass.Render(renderQueue, meshes, lighting.mFOV, mScreenSize.x / mScreenSize.y, lighting.mCameraViewMatrix, invProjMatrix, directionalLight.mLightColor,
+            mDirectionalLightPass.Render(renderQueue, lighting.mFOV, mScreenSize.x / mScreenSize.y, lighting.mCameraViewMatrix, invProjMatrix, directionalLight.mLightColor,
                 directionalLight.mLightDirection, mScreenSize, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
 
         // do all point lights
@@ -182,14 +156,14 @@ namespace JonsEngine
         for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
         {
             mContext->ClearDepthStencilView(mDSV, D3D11_CLEAR_STENCIL, 1.0f, 0);
-            mPointLightPass.Render(renderQueue, meshes, pointLight, lighting.mCameraViewMatrix, invProjMatrix, mScreenSize, Z_FAR, Z_NEAR);
+            mPointLightPass.Render(renderQueue, pointLight, lighting.mCameraViewMatrix, invProjMatrix, mScreenSize, Z_FAR, Z_NEAR);
         }
 
         // turn off blending
         mContext->OMSetBlendState(NULL, NULL, 0xffffffff);
     }
 
-    void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA)
+    void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA)
     {
         // flip from lightAccumulatorBuffer --> backbuffer
         mBackbuffer.FillBackbuffer(mLightAccbuffer.GetLightAccumulationBuffer(), true);
@@ -202,6 +176,6 @@ namespace JonsEngine
             mPostProcessor.FXAAPass(mBackbuffer, mScreenSize);
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
-            mAABBPass.Render(renderQueue, meshes, lighting.mCameraProjectionMatrix * lighting.mCameraViewMatrix);
+            mAABBPass.Render(renderQueue, lighting.mCameraProjectionMatrix * lighting.mCameraViewMatrix);
     }
 }

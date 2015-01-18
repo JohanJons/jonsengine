@@ -21,7 +21,7 @@ namespace JonsEngine
                                                      mWindow(settings, mMemoryAllocator, mLog), 
                                                      mRenderer(settings, mMemoryAllocator, mLog),
                                                      mResourceManifest(mRenderer, mMemoryAllocator), 
-                                                     mSceneManager()
+                                                     mSceneManager(settings)
     {
         JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
     }
@@ -41,7 +41,7 @@ namespace JonsEngine
         if (activeScene)
         {
             // reset render queue
-            mRenderQueue.clear();
+            mRenderQueue.Clear();
 
             // update model matrix of all nodes in active scene
             // TODO: only on change in scene node
@@ -66,6 +66,7 @@ namespace JonsEngine
 
     void Engine::FillRenderQueue(const std::vector<ModelPtr>& allModels, const Mat4& viewProjectionMatrix)
     {
+        // fill camera models
         for (const ModelPtr model : allModels)
         {
             if (!model->mSceneNode)
@@ -153,10 +154,10 @@ namespace JonsEngine
     {
         const MaterialPtr material(mesh.mMaterial);
         if (material)
-            mRenderQueue.emplace_back(Renderable(mesh.mMeshID, wvpMatrix, worldMatrix, mesh.mMaterialTilingFactor,
+            mRenderQueue.mCameraModels.emplace_back(Renderable(mesh.mMeshID, wvpMatrix, worldMatrix, mesh.mMaterialTilingFactor,
             Vec4(material->mDiffuseColor, 1.0f), Vec4(material->mAmbientColor, 1.0f), Vec4(material->mSpecularColor, 1.0f), Vec4(material->mEmissiveColor, 1.0f),
             material->mDiffuseTexture, material->mNormalTexture, material->mSpecularFactor));
         else
-            mRenderQueue.emplace_back(Renderable(mesh.mMeshID, wvpMatrix, worldMatrix));
+            mRenderQueue.mCameraModels.emplace_back(Renderable(mesh.mMeshID, wvpMatrix, worldMatrix));
     }
 }
