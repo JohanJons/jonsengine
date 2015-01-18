@@ -42,14 +42,12 @@ namespace JonsEngine
         void SetFullscreen(bool fullscreen);
         void SetScreenResolution(const uint32_t width, const uint32_t height);
         void SetWindowTitle(const std::string& windowTitle);
-        void SetFOV(const float FOV);
 
         bool GetFullscreen() const;
         uint32_t GetScreenWidth() const;
         uint32_t GetScreenHeight() const;
         const std::string& GetWindowTitle() const;
         bool GetShowMouseCursor() const;
-        float GetFOV() const;
 
 
     private:

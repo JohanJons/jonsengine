@@ -4,8 +4,9 @@
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
-#include "include/Renderer/RenderCommands.h"
+#include "include/Renderer/RenderQueue.h"
 #include "include/Core/Types.h"
+#include "include/Core/Containers/IDMap.h"
 
 #include <d3d11.h>
 #include <vector>
@@ -23,7 +24,7 @@ namespace JonsEngine
         DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize);
         ~DX11PointLightPass();
 
-        void Render(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const RenderableLighting::PointLight& pointLight, const Mat4& viewMatrix, const Mat4& invProjMatrix,
+        void Render(const RenderQueue& renderQueue, const RenderableLighting::PointLight& pointLight, const Mat4& viewMatrix, const Mat4& invProjMatrix,
             const Vec2& screenSize, const float zFar, const float zNear);
 
         void BindForShading();

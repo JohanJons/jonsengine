@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    Camera::Camera() : mTranslation(0.0f), mHorizontalAngle(0.0f), mVerticalAngle(0.0f)
+    Camera::Camera() : mTranslation(0.0f), mHorizontalAngle(0.0f), mVerticalAngle(0.0f), mFOV(70.0f)
     {
     }
         

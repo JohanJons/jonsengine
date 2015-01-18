@@ -76,10 +76,6 @@ namespace JonsEngine
         mImplementation->SetWindowTitle(windowTitle);
     }
 
-    void WindowManager::SetFOV(const float FOV)
-    {
-        mImplementation->SetFOV(FOV);
-    }
 
     bool WindowManager::GetFullscreen() const
     {
@@ -104,10 +100,5 @@ namespace JonsEngine
     bool WindowManager::GetShowMouseCursor() const
     {
         return mImplementation->GetShowMouseCursor();
-    }
-
-    float WindowManager::GetFOV() const
-    {
-        return mImplementation->GetFOV();
     }
 }

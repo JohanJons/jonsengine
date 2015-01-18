@@ -8,7 +8,7 @@
 #include "include/Resources/ResourceManifest.h"
 #include "include/Window/WindowManager.h"
 #include "include/Renderer/DirectX11/DX11Renderer.h"
-#include "include/Renderer/RenderCommands.h"
+#include "include/Renderer/RenderQueue.h"
 
 
 namespace JonsEngine

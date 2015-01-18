@@ -43,8 +43,6 @@ namespace JonsEngine
         }
     };
 
-    typedef std::vector<Renderable> RenderQueue;
-
 
     struct RenderableLighting
     {

@@ -1,73 +1,45 @@
 #include "include/Scene/SceneManager.h"
 #include "include/Scene/Scene.h"
 #include "include/Core/Memory/HeapAllocator.h"
+#include "include/Core/EngineSettings.h"
 
 #include <algorithm>
 
 namespace JonsEngine
 {
-    SceneManager::SceneManager() : mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mActiveScene(nullptr)
+    SceneManager::SceneManager() : mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mActiveScene(CreateScene("DefaultScene"))
     {
     }
 
     SceneManager::~SceneManager()
     {
-        for(Scene* scene : mScenes)
-            mMemoryAllocator.DeallocateObject(scene);
     }
+
 
     Scene* SceneManager::CreateScene(const std::string& sceneName)
     {
-        auto iter = std::find_if(mScenes.begin(), mScenes.end(), [sceneName](const Scene* scene) { return scene->GetSceneName() == sceneName; });
-        
+        auto iter = std::find_if(mScenes.begin(), mScenes.end(), [sceneName](const ScenePtr& scene) { return scene->mName == sceneName; });
+
         if (iter == mScenes.end())
         {
-            mScenes.emplace_back(mMemoryAllocator.AllocateObject<Scene, const std::string&>(sceneName));
+            mScenes.emplace_back(mMemoryAllocator.AllocateObject<Scene, const std::string&>(sceneName), std::bind(&HeapAllocator::DeallocateObject<Scene>, &mMemoryAllocator, std::placeholders::_1));
 
-            return mScenes.back();
+            return mScenes.back().get();
         }
         else
-            return nullptr;
-    }
-
-    void SceneManager::DeleteScene(const std::string& sceneName)
-    {
-        auto iter = std::find_if(mScenes.begin(), mScenes.end(), [sceneName](const Scene* scene) { return scene->GetSceneName() == sceneName; });
-
-        if (iter != mScenes.end())
-        {
-            if (mActiveScene && *mActiveScene == sceneName)
-                mActiveScene = nullptr;
-
-            mMemoryAllocator.DeallocateObject(*iter);
-            mScenes.erase(iter);
-        }
+            return iter->get();
     }
 
     void SceneManager::DeleteScene(Scene* scene)
     {
-        auto iter = std::find(mScenes.begin(), mScenes.end(), scene);
+        auto iter = std::find_if(mScenes.begin(), mScenes.end(), [scene](const ScenePtr& storedScene) { return storedScene.get() == scene; });
 
         if (iter != mScenes.end())
-        {
-            if (mActiveScene && *scene == *mActiveScene)
-                mActiveScene = nullptr;
-
-            mMemoryAllocator.DeallocateObject(*iter);
             mScenes.erase(iter);
-        }
-    }
-        
-    Scene* SceneManager::FindScene(const std::string& sceneName)
-    {
-        auto iter = std::find_if(mScenes.begin(), mScenes.end(), [sceneName](const Scene* scene) { return scene->GetSceneName() == sceneName; });
-        
-        return iter != mScenes.end() ? *iter : nullptr;
     }
 
-
-    void SceneManager::SetActiveScene(const std::string& sceneName)
+    const std::vector<ScenePtr>& SceneManager::GetAllScenes() const
     {
-        mActiveScene = FindScene(sceneName);
+        return mScenes;
     }
 }

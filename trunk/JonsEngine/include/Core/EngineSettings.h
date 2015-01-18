@@ -38,7 +38,6 @@ namespace JonsEngine
         uint16_t mWindowWidth;
         uint16_t mWindowHeight;
         bool mFullscreen;
-        float mFOV;
         uint16_t mFrameLimit;
 
         EngineSettings();
@@ -57,7 +56,6 @@ namespace JonsEngine
         mWindowWidth(1920),
         mWindowHeight(1080),
         mFullscreen(false),
-        mFOV(70.0f),
         mFrameLimit(0)
     {
     }

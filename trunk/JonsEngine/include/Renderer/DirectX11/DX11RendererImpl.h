@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/Renderer/RenderCommands.h"
+#include "include/Renderer/RenderQueue.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11Context.h"
@@ -11,6 +11,7 @@
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Memory/HeapAllocator.h"
+#include "include/Core/Containers/IDMap.h"
 #include "include/Core/DebugOptions.h"
 
 #include <windows.h>
@@ -66,7 +67,9 @@ namespace JonsEngine
         DX11Sampler mShadowmapNoCompareSampler;
         bool mSSAOEnabled;
 
-        std::vector<DX11MeshPtr> mMeshes;
-        std::vector<DX11TexturePtr> mTextures;
+        //std::vector<DX11MeshPtr> mMeshes;
+        //std::vector<DX11TexturePtr> mTextures;
+        IDMap<DX11Mesh> mMeshes;
+        IDMap<DX11Texture> mTextures;
     };
 }

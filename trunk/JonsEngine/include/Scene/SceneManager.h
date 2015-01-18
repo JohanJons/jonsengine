@@ -1,11 +1,14 @@
 #pragma once
 
+#include "include/Scene/Scene.h"
+
 #include <vector>
+#include <memory>
 
 namespace JonsEngine
 {
     class IMemoryAllocator;
-    class Scene;
+    struct EngineSettings;
 
     class SceneManager
     {
@@ -14,26 +17,16 @@ namespace JonsEngine
         ~SceneManager();
 
         Scene* CreateScene(const std::string& sceneName);
-        void DeleteScene(const std::string& sceneName);
         void DeleteScene(Scene* scene);
-        Scene* FindScene(const std::string& sceneName);
+        const std::vector<ScenePtr>& GetAllScenes() const;
 
-        Scene* GetActiveScene() const;
-        const std::vector<Scene*>& GetAllScenes() const;
-        bool HasActiveScene() const;
-        void SetActiveScene(const std::string& sceneName);
+
+        Scene* mActiveScene;
 
 
     private:
-        std::vector<Scene*> mScenes;
-        Scene* mActiveScene;
-
         IMemoryAllocator& mMemoryAllocator;
+
+        std::vector<ScenePtr> mScenes;
     };
-
-
-    /* SceneManager inlines */
-    inline Scene* SceneManager::GetActiveScene() const                      { return mActiveScene;            }  
-    inline const std::vector<Scene*>& SceneManager::GetAllScenes() const    { return mScenes;                 }
-    inline bool SceneManager::HasActiveScene() const                        { return mActiveScene != nullptr; }
 }

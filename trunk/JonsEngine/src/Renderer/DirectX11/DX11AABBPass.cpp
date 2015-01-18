@@ -6,7 +6,7 @@
 
 namespace JonsEngine
 {
-    DX11AABBPass::DX11AABBPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass) : 
+    DX11AABBPass::DX11AABBPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass) :
         mContext(context), mPixelShader(nullptr), mVertexTransformPass(vertexTransformPass)
     {
         DXCALL(device->CreatePixelShader(gSimpleColorPixelShader, sizeof(gSimpleColorPixelShader), NULL, &mPixelShader));
@@ -17,11 +17,11 @@ namespace JonsEngine
     }
 
 
-    void DX11AABBPass::Render(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const Mat4& viewProjectionMatrix)
+    void DX11AABBPass::Render(const RenderQueue& renderQueue, const Mat4& viewProjectionMatrix)
     {
         mContext->PSSetShader(mPixelShader, NULL, NULL);
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
-        mVertexTransformPass.RenderAABBs(renderQueue, meshes, viewProjectionMatrix);
+        mVertexTransformPass.RenderAABBs(renderQueue, viewProjectionMatrix);
     }
 }
