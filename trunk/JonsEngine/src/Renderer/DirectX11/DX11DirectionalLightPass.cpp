@@ -19,7 +19,7 @@ namespace JonsEngine
                            0.0f, 0.0f, 1.0f, 0.0f,
                            0.5f, 0.5f, 0.0f, 1.0f);
 
-    void CalculateShadowmapCascades(std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES>& nearDistArr, std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES>& farDistArr, const float nearDist, const float farDist)
+    void CalculateShadowmapCascades(std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES>& nearDistArr, std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES>& farDistArr, const float nearDist, const  float farDist)
     {
         const float splitWeight = 0.75f;
         const float ratio = nearDist / farDist;
@@ -83,7 +83,12 @@ namespace JonsEngine
 
 
     DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize) :
-        mContext(context), mPixelShader(nullptr), mRSDepthClamp(nullptr), mFullscreenPass(fullscreenPass), mVertexTransformPass(transformPass), mShadowmap(device, context, shadowmapSize, NUM_SHADOWMAP_CASCADES, false),
+        mContext(context),
+        mPixelShader(nullptr),
+        mRSDepthClamp(nullptr),
+        mFullscreenPass(fullscreenPass),
+        mVertexTransformPass(transformPass),
+        mShadowmap(device, context, shadowmapSize, NUM_SHADOWMAP_CASCADES, false),
         mDirLightCBuffer(device, context, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         DXCALL(device->CreatePixelShader(gDirectionalLightPixelShader, sizeof(gDirectionalLightPixelShader), NULL, &mPixelShader));
@@ -107,8 +112,8 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::Render(const RenderQueue& renderQueue, const std::vector<DX11MeshPtr>& meshes, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix,
-        const Mat4& invProjMatrix, const Vec4& lightColor, const Vec3& lightDir, const Vec2& screenSize, const bool drawFrustrums)
+    void DX11DirectionalLightPass::Render(const RenderQueue& renderQueue, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invProjMatrix, const Vec4& lightColor, const Vec3& lightDir,
+        const Vec2& screenSize, const bool drawFrustrums)
     {
         // preserve current state
         D3D11_VIEWPORT prevViewport;
@@ -146,7 +151,7 @@ namespace JonsEngine
             
             CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, nearDistArr[cascadeIndex], farDistArr[cascadeIndex], cameraViewMatrix);
             lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, lightDir);
-            mVertexTransformPass.RenderMeshes(renderQueue, meshes, lightVPMatrices[cascadeIndex]);
+            mVertexTransformPass.RenderMeshes(renderQueue, lightVPMatrices[cascadeIndex]);
 
             lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex] * glm::inverse(cameraViewMatrix);
             farDistArr[cascadeIndex] = -farDistArr[cascadeIndex];
