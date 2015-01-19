@@ -175,10 +175,6 @@ namespace JonsEngine
     {
         auto allocator = mMemoryAllocator;
 
-        //mMeshes.emplace_back(allocator->AllocateObject<DX11Mesh>(mDevice, mContext, vertexData, normalData, texCoords, tangents, bitangents, indexData, minBounds, maxBounds), [=](DX11Mesh* mesh) { allocator->DeallocateObject<DX11Mesh>(mesh); });
-
-        //return mMeshes.back()->GetMeshID();
-
         return mMeshes.AddItem(mDevice, mContext, vertexData, normalData, texCoords, tangents, bitangents, indexData, minBounds, maxBounds);
     }
 
@@ -189,10 +185,6 @@ namespace JonsEngine
         const bool isSRGB = (textureType == TextureType::TEXTURE_TYPE_DIFFUSE);
 
         return mTextures.AddItem(mDevice, mContext, textureData, textureWidth, textureHeight, GetShaderTextureSlot(textureType), isSRGB);
-
-        //mTextures.emplace_back(allocator->AllocateObject<DX11Texture>(mDevice, mContext, textureData, textureWidth, textureHeight, GetShaderTextureSlot(textureType), isSRGB), [=](DX11Texture* texture) { allocator->DeallocateObject<DX11Texture>(texture); });
-
-        //return mTextures.back()->GetTextureID();
     }
 
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags)
