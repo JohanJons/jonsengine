@@ -22,7 +22,7 @@ namespace JonsEngine
         mAdditiveBlending(nullptr),
         
         mAABBPass(device, context, mVertexTransformPass),
-        mVertexTransformPass(device, context),
+        mVertexTransformPass(device, context, meshMap),
         mFullscreenTrianglePass(device, context),
 
         mBackbuffer(device, mContext, mSwapchain, mFullscreenTrianglePass),
@@ -30,8 +30,8 @@ namespace JonsEngine
         mGBuffer(device, mContext, backbufferTextureDesc),
 
         mAmbientPass(device, context, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-        mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, shadowmapResolution, meshMap),
-        mPointLightPass(device, mContext, mVertexTransformPass, shadowmapResolution, meshMap),
+        mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, shadowmapResolution),
+        mPointLightPass(device, mContext, mVertexTransformPass, shadowmapResolution),
         mPostProcessor(device, context, mFullscreenTrianglePass, backbufferTextureDesc),
 
         mScreenSize(backbufferTextureDesc.Width, backbufferTextureDesc.Height),
@@ -106,7 +106,7 @@ namespace JonsEngine
     }
 
 
-    void DX11Pipeline::GeometryStage(const RenderQueue& renderQueue, const Mat4& viewMatrix)
+    void DX11Pipeline::GeometryStage(const RenderQueue& renderQueue)
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
@@ -123,12 +123,12 @@ namespace JonsEngine
             if (hasNormalTexture)
                 mTextureMap.GetItem(model.mMaterial.mNormalTextureID).Bind();
 
-            mGBuffer.SetConstantData(model.mMesh.mWVPMatrix, viewMatrix * model.mMesh.mWorldMatrix, model.mMaterial.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
+            mGBuffer.SetConstantData(model.mMesh.mWVPMatrix, renderQueue.mCameraViewMatrix * model.mMesh.mWorldMatrix, model.mMaterial.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
             mMeshMap.GetItem(model.mMesh.mMeshID).Draw();
         }
     }
 
-    void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugExtra, const bool SSAOEnabled)
+    void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugExtra, const bool SSAOEnabled)
     {
         mLightAccbuffer.ClearAccumulationBuffer();
         mLightAccbuffer.BindForDrawing(mDSVReadOnly);
@@ -138,17 +138,17 @@ namespace JonsEngine
         // disable further depth writing
         mContext->OMSetDepthStencilState(mDepthStencilState, 0);
 
-        const Mat4 invProjMatrix = glm::inverse(lighting.mCameraProjectionMatrix);
+        const Mat4 invProjMatrix = glm::inverse(renderQueue.mCameraProjectionMatrix);
 
         // ambient light
-        mAmbientPass.Render(invProjMatrix, lighting.mAmbientLight, mScreenSize, SSAOEnabled);
+        mAmbientPass.Render(invProjMatrix, renderQueue.mAmbientLight, mScreenSize, SSAOEnabled);
 
         // additive blending for adding lighting
         mContext->OMSetBlendState(mAdditiveBlending, NULL, 0xffffffff);
 
         // do all directional lights
-        for (const RenderableLighting::DirectionalLight& directionalLight : lighting.mDirectionalLights)
-            mDirectionalLightPass.Render(renderQueue, lighting.mFOV, mScreenSize.x / mScreenSize.y, lighting.mCameraViewMatrix, invProjMatrix, directionalLight.mLightColor,
+        for (const RenderableLighting::DirectionalLight& directionalLight : renderQueue.mDirectionalLights)
+            mDirectionalLightPass.Render(renderQueue, renderQueue.mFOV, mScreenSize.x / mScreenSize.y, renderQueue.mCameraViewMatrix, invProjMatrix, directionalLight.mLightColor,
                 directionalLight.mLightDirection, mScreenSize, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
 
         // do all point lights
@@ -163,7 +163,7 @@ namespace JonsEngine
         mContext->OMSetBlendState(NULL, NULL, 0xffffffff);
     }
 
-    void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA)
+    void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA)
     {
         // flip from lightAccumulatorBuffer --> backbuffer
         mBackbuffer.FillBackbuffer(mLightAccbuffer.GetLightAccumulationBuffer(), true);

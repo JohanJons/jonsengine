@@ -187,13 +187,13 @@ namespace JonsEngine
         return mTextures.AddItem(mDevice, mContext, textureData, textureWidth, textureHeight, GetShaderTextureSlot(textureType), isSRGB);
     }
 
-    void DX11RendererImpl::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags)
+    void DX11RendererImpl::Render(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags)
     {
         mPipeline.BeginFrame();
 
-        mPipeline.GeometryStage(renderQueue, lighting.mCameraViewMatrix);
-        mPipeline.LightingStage(renderQueue, lighting, debugFlags, mSSAOEnabled);
-        mPipeline.PostProcessingStage(renderQueue, lighting, debugFlags, mAntiAliasing);
+        mPipeline.GeometryStage(renderQueue);
+        mPipeline.LightingStage(renderQueue, debugFlags, mSSAOEnabled);
+        mPipeline.PostProcessingStage(renderQueue, debugFlags, mAntiAliasing);
 
         mPipeline.EndFrame();
     }

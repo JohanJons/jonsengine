@@ -33,9 +33,9 @@ namespace JonsEngine
         void BeginFrame();
         void EndFrame();
 
-        void GeometryStage(const RenderQueue& renderQueue, const Mat4& viewMatrix);
-        void LightingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags, const bool SSAOEnabled);
-        void PostProcessingStage(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA);
+        void GeometryStage(const RenderQueue& renderQueue);
+        void LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const bool SSAOEnabled);
+        void PostProcessingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA);
 
 
     private:

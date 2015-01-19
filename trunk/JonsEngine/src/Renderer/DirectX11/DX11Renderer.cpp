@@ -27,9 +27,9 @@ namespace JonsEngine
     }
 
 
-    void DX11Renderer::Render(const RenderQueue& renderQueue, const RenderableLighting& lighting, const DebugOptions::RenderingFlags debugFlags)
+    void DX11Renderer::Render(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags)
     {
-        mImplementation->Render(renderQueue, lighting, debugFlags);
+        mImplementation->Render(renderQueue, debugFlags);
     }
 
 
