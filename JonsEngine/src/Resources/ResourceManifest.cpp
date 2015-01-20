@@ -46,7 +46,7 @@ namespace JonsEngine
         ModelNode node("RectangleNode", Mat4(1.0f), minBounds, maxBounds);
 
         node.mMeshes.emplace_back(mesh);
-        ptr->mNodes.emplace_back(node);
+        ptr->GetModelNodes().emplace_back(node);
 
         return ptr;
     }
@@ -81,7 +81,7 @@ namespace JonsEngine
         ModelNode node("SphereNode", Mat4(1.0f), minBounds, maxBounds);
 
         node.mMeshes.emplace_back(mesh);
-        ptr->mNodes.emplace_back(node);
+        ptr->GetModelNodes().emplace_back(node);
 
         return ptr;
     }
@@ -110,8 +110,7 @@ namespace JonsEngine
     ModelPtr ResourceManifest::GetModel(const std::string& modelName)
     {
         ModelPtr ptr;
-        size_t hashedName = boost::hash_value(modelName);
-        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), [hashedName](const ModelPtr model) { return model->mHashedID == hashedName; });
+        std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), [modelName](const ModelPtr model) { return *model == modelName; });
 
         if (iter != mModels.end())
             ptr = *iter;
@@ -143,8 +142,7 @@ namespace JonsEngine
     MaterialPtr ResourceManifest::GetMaterial(const std::string& materialName)
     {
         MaterialPtr ptr;
-        size_t hashedName = boost::hash_value(materialName);
-        auto iter = std::find_if(mMaterials.begin(), mMaterials.end(), [hashedName](const MaterialPtr material) { return material->mHashedID == hashedName; });
+        auto iter = std::find_if(mMaterials.begin(), mMaterials.end(), [materialName](const MaterialPtr material) { return *material == materialName; });
 
         if (iter != mMaterials.end())
             ptr = *iter;
@@ -159,7 +157,7 @@ namespace JonsEngine
         ModelPtr model(allocator->AllocateObject<Model>(pkgModel.mName, pkgModel.mTransform, pkgModel.mAABB.mMinBounds, pkgModel.mAABB.mMaxBounds), [=](Model* model) { allocator->DeallocateObject(model); });
 
         for (const PackageNode& node : pkgModel.mNodes)
-            model->mNodes.emplace_back(ProcessModelNode(node, jonsPkg));
+            model->GetModelNodes().emplace_back(ProcessModelNode(node, jonsPkg));
 
 
 
