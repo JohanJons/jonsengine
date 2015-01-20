@@ -116,7 +116,7 @@ namespace JonsEngine
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
 
-    void DX11PointLightPass::Render(const RenderQueue& renderQueue, const RenderableLighting::PointLight& pointLight, const Mat4& viewMatrix, const Mat4& invProjMatrix, const Vec2& screenSize, const float zFar, const float zNear)
+    void DX11PointLightPass::Render(const RenderQueue& renderQueue, const Mat4& viewMatrix, const Mat4& invProjMatrix, const Vec2& screenSize, const float zFar, const float zNear)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;

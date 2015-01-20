@@ -31,6 +31,7 @@ namespace JonsEngine
 		SceneNodePtr GetSceneNode();
 
 		const std::string& GetName() const;
+        const size_t GetHashedName() const;
 		const Mat4& GetInitialTransform() const;
 		std::vector<ModelNode>& GetModelNodes();
 

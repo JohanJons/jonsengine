@@ -53,6 +53,11 @@ namespace JonsEngine
 	{
 		return mName;
 	}
+
+    const size_t Model::GetHashedName() const
+    {
+        return mHashedID;
+    }
 		
 	const Mat4& Model::GetInitialTransform() const
 	{

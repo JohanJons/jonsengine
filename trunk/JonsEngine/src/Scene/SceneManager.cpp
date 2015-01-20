@@ -18,7 +18,7 @@ namespace JonsEngine
 
     Scene* SceneManager::CreateScene(const std::string& sceneName)
     {
-        auto iter = std::find_if(mScenes.begin(), mScenes.end(), [sceneName](const ScenePtr& scene) { return scene->mName == sceneName; });
+        auto iter = std::find_if(mScenes.begin(), mScenes.end(), [sceneName](const ScenePtr& scene) { return scene->GetSceneName() == sceneName; });
 
         if (iter == mScenes.end())
         {

@@ -13,7 +13,6 @@
 #include "include/Renderer/DirectX11/DX11DirectionalLightPass.h"
 #include "include/Renderer/DirectX11/DX11PointLightPass.h"
 #include "include/Renderer/DirectX11/DX11PostProcessor.h"
-#include "include/Renderer/RenderCommands.h"
 #include "include/Core/DebugOptions.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Types.h"
