@@ -41,16 +41,23 @@ namespace JonsEngine
         DirectionalLight* GetDirectionalLight(const std::string& lightName);
         const std::vector<DirectionalLightPtr>& GetDirectionalLights() const;
 
+		void SetAmbientLight(const Vec4& ambientLight);
+        const Vec4& GetAmbientLight() const;
 
-        const std::string mName;
-        const size_t mHashedID;
-
-        Camera mSceneCamera;
-        SceneNode mRootNode;
-        Vec4 mAmbientLight;
+        Camera& GetSceneCamera();
+        const Camera& GetSceneCamera() const;
+        SceneNode& GetRootNode();
+        const std::string& GetSceneName() const;
 
 
     private:
+		const std::string mName;
+        const size_t mHashedID;
+
+		Camera mSceneCamera;
+        SceneNode mRootNode;
+        Vec4 mAmbientLight;
+
         std::vector<ActorPtr> mActors;
         std::vector<PointLightPtr> mPointLights;
         std::vector<DirectionalLightPtr> mDirectionalLights;

@@ -18,6 +18,9 @@ namespace JonsEngine
     public:
         SceneNode(const std::string& nodeName);
         ~SceneNode();
+		
+        bool operator==(const SceneNode& s1);
+        bool operator==(const std::string& nodeName);
 
         SceneNodePtr CreateChildNode(const std::string& nodeName);
         SceneNodePtr FindChildNode(const std::string& nodeName);
@@ -35,9 +38,6 @@ namespace JonsEngine
         const Mat4& GetNodeTransform() const;
         const std::string& GetNodeName() const;
         const std::vector<SceneNodePtr>& GetChildNodes() const;
-
-        bool operator==(const SceneNode& s1);
-        bool operator==(const std::string& nodeName);
 
 
     private:

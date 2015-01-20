@@ -21,23 +21,29 @@ namespace JonsEngine
         Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds);
         ~Model();
 
+		bool operator==(const Model& m);
+        bool operator==(const std::string& modelName);
+
         const Vec3& GetAABBCenter() const;
         const Vec3& GetAABBExtent() const;
 
-        bool operator==(const Model& m);
-        bool operator==(const std::string& modelName);
+		void SetSceneNode(SceneNodePtr node);
+		SceneNodePtr GetSceneNode();
 
-
-        const std::string mName;
-        const size_t mHashedID;
-        const Mat4 mInitialTransform;
-
-        std::vector<ModelNode> mNodes;
-        SceneNodePtr mSceneNode;
+		const std::string& GetName() const;
+		const Mat4& GetInitialTransform() const;
+		std::vector<ModelNode>& GetModelNodes();
 
         
     private:
+		const std::string mName;
+        const size_t mHashedID;
+        const Mat4 mInitialTransform;
+
         Vec3 mAABBCenter;
         Vec3 mAABBExtent;
+
+		std::vector<ModelNode> mNodes;
+        SceneNodePtr mSceneNode;
     };
 }

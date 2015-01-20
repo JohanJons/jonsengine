@@ -20,13 +20,14 @@ namespace JonsEngine
         void DeleteScene(Scene* scene);
         const std::vector<ScenePtr>& GetAllScenes() const;
 
-
-        Scene* mActiveScene;
+		Scene* GetActiveScene() const;
+        void SetActiveScene(const std::string& sceneName);
 
 
     private:
         IMemoryAllocator& mMemoryAllocator;
 
+		Scene* mActiveScene;
         std::vector<ScenePtr> mScenes;
     };
 }

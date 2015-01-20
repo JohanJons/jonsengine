@@ -17,6 +17,17 @@ namespace JonsEngine
     }
 
 
+	bool SceneNode::operator==(const SceneNode& s1)
+    {
+        return mHashedID == s1.mHashedID;
+    }
+        
+    bool SceneNode::operator==(const std::string& nodeName)
+    {
+        return mHashedID == boost::hash_value(nodeName);
+    }
+
+
     SceneNodePtr SceneNode::CreateChildNode(const std::string& nodeName)
     {
         mChildNodes.emplace_back(SceneNodePtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<SceneNode, const std::string&>(nodeName), std::bind(&HeapAllocator::DeallocateObject<SceneNode>, &HeapAllocator::GetDefaultHeapAllocator(), std::placeholders::_1)));
@@ -129,16 +140,5 @@ namespace JonsEngine
         position += mTranslation;
 
         return position;
-    }
-
-
-    bool SceneNode::operator==(const SceneNode& s1)
-    {
-        return mHashedID == s1.mHashedID;
-    }
-        
-    bool SceneNode::operator==(const std::string& nodeName)
-    {
-        return mHashedID == boost::hash_value(nodeName);
     }
 }

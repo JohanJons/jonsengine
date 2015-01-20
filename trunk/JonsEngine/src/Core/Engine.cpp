@@ -39,15 +39,15 @@ namespace JonsEngine
         // reset render queue
         mRenderQueue.Clear();
 
-        Scene* activeScene = mSceneManager.mActiveScene;
+		Scene* activeScene = mSceneManager.GetActiveScene();
 
         // update model matrix of all nodes in active scene
         // TODO: only on change in scene node
-        activeScene->mRootNode.UpdateModelMatrix(gIdentityMatrix);
+		activeScene->GetRootNode().UpdateModelMatrix(gIdentityMatrix);
 
-        const Camera& camera = activeScene->mSceneCamera;
+		const Camera& camera = activeScene->GetSceneCamera();
         const Mat4 viewMatrix = camera.GetCameraTransform();
-        const Mat4 perspectiveMatrix = PerspectiveMatrixFov(camera.mFOV, mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer.GetZNear(), mRenderer.GetZFar());
+		const Mat4 perspectiveMatrix = PerspectiveMatrixFov(camera.GetFOV(), mWindow.GetScreenWidth() / (float)mWindow.GetScreenHeight(), mRenderer.GetZNear(), mRenderer.GetZFar());
         const Mat4 viewPerspectiveMatrix = perspectiveMatrix * viewMatrix;
 
         // get renderqueue from scene

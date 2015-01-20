@@ -194,7 +194,6 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Pipeline.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11PointLightPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11PostProcessor.h" />
-    <ClInclude Include="include\Renderer\DirectX11\DX11Renderable.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Renderer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11RendererImpl.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Sampler.h" />
@@ -203,7 +202,6 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11VertexTransformPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\Shaders\Constants.h" />
-    <ClInclude Include="include\Renderer\RenderCommands.h" />
     <ClInclude Include="include\Renderer\RenderQueue.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />

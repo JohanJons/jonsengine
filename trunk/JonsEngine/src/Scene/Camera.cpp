@@ -62,4 +62,15 @@ namespace JonsEngine
     {
         return Orientation() * glm::translate(Mat4(1.0f), -mTranslation);    // TODO: gimbal lock?
     }
+
+
+	void Camera::SetFOV(const float fov)
+	{
+		mFOV = fov;
+	}
+		
+	float Camera::GetFOV() const
+	{
+		return mFOV;
+	}
 }
