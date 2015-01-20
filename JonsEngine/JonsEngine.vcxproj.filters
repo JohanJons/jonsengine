@@ -286,9 +286,6 @@
     <ClInclude Include="include\Window\MouseCallback.h">
       <Filter>Header Files\Window</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\RenderCommands.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Logging\StreamBuf.h">
       <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
@@ -393,9 +390,6 @@
     </ClInclude>
     <ClInclude Include="include\Scene\Actor.h">
       <Filter>Header Files\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DX11Renderable.h">
-      <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Containers\IDMap.h">
       <Filter>Header Files\Core\Containers</Filter>

@@ -16,6 +16,17 @@ namespace JonsEngine
     }
 
 
+	bool Model::operator==(const Model& m1)
+    {
+        return mHashedID == m1.mHashedID;
+    }
+        
+    bool Model::operator==(const std::string& modelName)
+    {
+        return mHashedID == boost::hash_value(modelName);
+    }
+
+
     const Vec3& Model::GetAABBCenter() const
     {
         return mAABBCenter;
@@ -27,13 +38,29 @@ namespace JonsEngine
     }
 
 
-    bool Model::operator==(const Model& m1)
-    {
-        return mHashedID == m1.mHashedID;
-    }
-        
-    bool Model::operator==(const std::string& modelName)
-    {
-        return mHashedID == boost::hash_value(modelName);
-    }
+	void Model::SetSceneNode(SceneNodePtr node)
+	{
+		mSceneNode = node;
+	}
+		
+	SceneNodePtr Model::GetSceneNode()
+	{
+		return mSceneNode;
+	}
+
+		
+	const std::string& Model::GetName() const
+	{
+		return mName;
+	}
+		
+	const Mat4& Model::GetInitialTransform() const
+	{
+		return mInitialTransform;
+	}
+		
+	std::vector<ModelNode>& Model::GetModelNodes()
+	{
+		return mNodes;
+	}
 }

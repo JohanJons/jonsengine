@@ -21,12 +21,14 @@ namespace JonsEngine
 
         Mat4 GetCameraTransform() const;
 
-        float mFOV;
+        void SetFOV(const float fov);
+		float GetFOV() const;
 
 
     public:
         Vec3 mTranslation;
         float mHorizontalAngle;
         float mVerticalAngle;
+		float mFOV;
     };
 }

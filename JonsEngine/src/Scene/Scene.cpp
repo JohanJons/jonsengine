@@ -187,4 +187,31 @@ namespace JonsEngine
     {
         return mDirectionalLights;
     }
+
+
+	void Scene::SetAmbientLight(const Vec4& ambientLight)
+    {
+        mAmbientLight = ambientLight;
+    }
+
+    const Vec4& Scene::GetAmbientLight() const
+    {
+        return mAmbientLight;
+    }
+
+
+	Camera& Scene::GetSceneCamera()
+	{ 
+		return mSceneCamera;
+	}
+
+    SceneNode& Scene::GetRootNode()
+	{ 
+		return mRootNode;
+	}
+
+    const std::string& Scene::GetSceneName() const
+	{ 
+		return mName;
+	}
 }
