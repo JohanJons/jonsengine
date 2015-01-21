@@ -40,21 +40,21 @@ namespace JonsEngine
         mesh.Draw();
     }
 
-    void DX11VertexTransformPass::RenderMeshes(const RenderQueue& renderQueue, const Mat4& viewProjectionMatrix)
+    void DX11VertexTransformPass::RenderMeshes(const RenderableMeshes& meshes, const Mat4& viewProjectionMatrix)
     {
-        for (const RenderableModel& model : renderQueue.mCamera)
+        for (const RenderableMesh& mesh : meshes)
         {
-            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * model.mMesh.mWorldMatrix));
-            mMeshMap.GetItem(model.mMesh.mMeshID).Draw();
+            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mWorldMatrix));
+            mMeshMap.GetItem(mesh.mMeshID).Draw();
         }
     }
 
-    void DX11VertexTransformPass::RenderAABBs(const RenderQueue& renderQueue, const Mat4& viewProjectionMatrix)
+    void DX11VertexTransformPass::RenderAABBs(const RenderableMeshes& meshes, const Mat4& viewProjectionMatrix)
     {
-        for (const RenderableModel& model : renderQueue.mCamera)
+        for (const RenderableMesh& mesh : meshes)
         {
-            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * model.mMesh.mWorldMatrix));
-            mMeshMap.GetItem(model.mMesh.mMeshID).DrawAABB();
+            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mWorldMatrix));
+            mMeshMap.GetItem(mesh.mMeshID).DrawAABB();
         }
     }
 }

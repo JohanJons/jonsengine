@@ -17,6 +17,8 @@ namespace JonsEngine
         Mat4 mWVPMatrix;
         Mat4 mWorldMatrix;
     };
+    
+    typedef std::vector<RenderableMesh> RenderableMeshes;
 
     struct RenderableMaterial
     {
@@ -36,14 +38,18 @@ namespace JonsEngine
         RenderableMesh mMesh;
         RenderableMaterial mMaterial;
     };
+    
+    typedef std::vector<RenderableModel> RenderableModels;
 
     struct RenderableDirLight
     {
         Vec4 mLightColor;
         Vec3 mLightDirection;
 
-        std::vector<RenderableMesh> mMeshes;
+        RenderableMeshes mMeshes;
     };
+    
+    typedef std::vector<RenderableDirLight> RenderableDirLights;
 
     struct RenderablePointLight
     {
@@ -55,8 +61,10 @@ namespace JonsEngine
         float mLightIntensity;
         float mMaxDistance;
 
-        std::vector<RenderableMesh> mMeshes;
+        RenderableMeshes mMeshes;
     };
+    
+    typedef std::vector<RenderablePointLight> RenderablePointLights;
 
     struct RenderQueue
     {
@@ -70,8 +78,8 @@ namespace JonsEngine
         float mFOV;
 
         // TODO: more than one camera?
-        std::vector<RenderableModel> mCamera;
-        std::vector<RenderableDirLight> mDirectionalLights;
-        std::vector<RenderablePointLight> mPointLights;
+        RenderableModels mVisibleModels;
+        RenderableDirLights mDirectionalLights;
+        RenderablePointLights mPointLights;
     };
 }

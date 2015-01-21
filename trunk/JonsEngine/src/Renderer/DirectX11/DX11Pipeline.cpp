@@ -147,13 +147,13 @@ namespace JonsEngine
         mContext->OMSetBlendState(mAdditiveBlending, NULL, 0xffffffff);
 
         // do all directional lights
-        for (const RenderableLighting::DirectionalLight& directionalLight : renderQueue.mDirectionalLights)
+        for (const RenderableDirLight& directionalLight : renderQueue.mDirectionalLights)
             mDirectionalLightPass.Render(renderQueue, renderQueue.mFOV, mScreenSize.x / mScreenSize.y, renderQueue.mCameraViewMatrix, invProjMatrix, directionalLight.mLightColor,
                 directionalLight.mLightDirection, mScreenSize, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
 
         // do all point lights
         mPointLightPass.BindForShading();
-        for (const RenderableLighting::PointLight& pointLight : lighting.mPointLights)
+        for (const RenderablePointLight& pointLight : renderQueue.mPointLights)
         {
             mContext->ClearDepthStencilView(mDSV, D3D11_CLEAR_STENCIL, 1.0f, 0);
             mPointLightPass.Render(renderQueue, pointLight, lighting.mCameraViewMatrix, invProjMatrix, mScreenSize, Z_FAR, Z_NEAR);
