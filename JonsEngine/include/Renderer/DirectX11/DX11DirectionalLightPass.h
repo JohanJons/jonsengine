@@ -23,7 +23,7 @@ namespace JonsEngine
         DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize);
         ~DX11DirectionalLightPass();
 
-        void Render(const RenderQueue& renderQueue, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invProjMatrix,
+        void Render(const RenderQueue& renderQueue, const RenderablePointLight& pointLight, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invProjMatrix,
             const Vec4& lightColor, const Vec3& lightDir, const Vec2& screenSize, const bool drawFrustrums);
 
 
