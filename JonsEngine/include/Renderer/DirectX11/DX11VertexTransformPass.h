@@ -21,8 +21,8 @@ namespace JonsEngine
 
         void BindForTransformPass(const D3D_PRIMITIVE_TOPOLOGY primitiveTopology);
         void RenderMesh(DX11Mesh& mesh, const Mat4& wvpMatrix);
-        void RenderMeshes(const RenderQueue& renderQueue, const Mat4& viewProjectionMatrix);
-        void RenderAABBs(const RenderQueue& renderQueue, const Mat4& viewProjectionMatrix);
+        void RenderMeshes(const RenderableMeshes& meshes, const Mat4& viewProjectionMatrix);
+        void RenderAABBs(const RenderableMeshes& meshes, const Mat4& viewProjectionMatrix);
 
 
     private:

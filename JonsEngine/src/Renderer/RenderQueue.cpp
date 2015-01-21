@@ -4,7 +4,7 @@ namespace JonsEngine
 {
     void RenderQueue::Clear()
     {
-        mCamera.clear();
+        mVisibleModels.clear();
         mDirectionalLights.clear();
         mPointLights.clear();
     }
