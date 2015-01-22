@@ -157,61 +157,61 @@ namespace JonsGame
         // sectoid 
         SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
         ModelPtr modelAlien = mEngine->GetResourceManifest().LoadModel("sectoid", jonsPackage);
-        modelAlien->mSceneNode = nodeAlien;
+        modelAlien->SetSceneNode(nodeAlien);
         nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
         nodeAlien->TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
         
         // cube
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
         ModelPtr modelCube = mEngine->GetResourceManifest().LoadModel("cube", jonsPackage);
-        modelCube->mSceneNode = nodeCube;
+        modelCube->SetSceneNode(nodeCube);
         nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
         
         // chair
         SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("nodeChair");
         ModelPtr modelChair = mEngine->GetResourceManifest().LoadModel("chair", jonsPackage);
-        modelChair->mSceneNode = nodeChair;
+        modelChair->SetSceneNode(nodeChair);
         nodeChair->TranslateNode(Vec3(-8.0f, 0.5f, -4.0f));
         nodeChair->ScaleNode(Vec3(2.0f));
         
         // house
         SceneNodePtr nodeHouse = myScene->GetRootNode().CreateChildNode("nodeHouse");
         ModelPtr modelHouse = mEngine->GetResourceManifest().LoadModel("house", jonsPackage);
-        modelHouse->mSceneNode = nodeHouse;
+        modelHouse->SetSceneNode(nodeHouse);
         nodeHouse->TranslateNode(Vec3(-7.0f, 0.5f, -15.0f));
         
         // point light
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
-        PointLightPtr movingLight = myScene->CreatePointLight("MovingPointLight", nodeMovingLight);
+        PointLight* movingLight = myScene->CreatePointLight("MovingPointLight", nodeMovingLight);
         movingLight->mMaxDistance = 10.0f;
         movingLight->mLightIntensity = 2.0f;
         movingLight->mLightColor = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
         nodeMovingLight->TranslateNode(Vec3(5.0f, 3.5f, -15.0f));
         
         // directional light
-        DirectionalLightPtr directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
+        DirectionalLight* directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
         directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
         directionalLight->mLightColor = Vec4(0.25f);
         
         // create a ground plane
         SceneNodePtr nodePlane = myScene->GetRootNode().CreateChildNode("nodePlane");
         ModelPtr plane = mEngine->GetResourceManifest().CreateRectangle("GroundPlane", 64, 1.0, 64);
-        plane->mNodes[0].mMeshes[0].mMaterial = mEngine->GetResourceManifest().LoadMaterial("checkers", jonsPackage);
-        plane->mSceneNode = nodePlane;
-        plane->mNodes[0].mMeshes[0].mMaterialTilingFactor = 64.0f;
+        plane->GetModelNodes()[0].mMeshes[0].mMaterial = mEngine->GetResourceManifest().LoadMaterial("checkers", jonsPackage);
+        plane->SetSceneNode(nodePlane);
+        plane->GetModelNodes()[0].mMeshes[0].mMaterialTilingFactor = 64.0f;
         
         // create a sphere
         SceneNodePtr nodeSphere = myScene->GetRootNode().CreateChildNode("nodeSphere");
         ModelPtr sphere = mEngine->GetResourceManifest().CreateSphere("Sphere", 1.0f, 12, 24);
-        sphere->mNodes[0].mMeshes[0].mMaterial = mEngine->GetResourceManifest().GetMaterial("checkers");
-        sphere->mSceneNode = nodeSphere;
+        sphere->GetModelNodes()[0].mMeshes[0].mMaterial = mEngine->GetResourceManifest().GetMaterial("checkers");
+        sphere->SetSceneNode(nodeSphere);
         nodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
 
         // create a  second cube
         SceneNodePtr nodeCube2 = myScene->GetRootNode().CreateChildNode("nodeCube2");
         ModelPtr cube2 = mEngine->GetResourceManifest().CreateCube("Cube2", 3);
-        cube2->mNodes[0].mMeshes[0].mMaterial = mEngine->GetResourceManifest().GetMaterial("checkers");
-        cube2->mSceneNode = nodeCube2;
+        cube2->GetModelNodes()[0].mMeshes[0].mMaterial = mEngine->GetResourceManifest().GetMaterial("checkers");
+        cube2->SetSceneNode(nodeCube2);
         nodeCube2->TranslateNode(Vec3(11.0f, 2.0f, -15.0f));
         
         // move up camera

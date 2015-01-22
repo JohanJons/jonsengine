@@ -175,6 +175,6 @@ namespace JonsEngine
             mPostProcessor.FXAAPass(mBackbuffer, mScreenSize);
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
-            mAABBPass.Render(renderQueue, lighting.mCameraProjectionMatrix * lighting.mCameraViewMatrix);
+            mAABBPass.Render(renderQueue, renderQueue.mCameraProjectionMatrix * renderQueue.mCameraViewMatrix);
     }
 }
