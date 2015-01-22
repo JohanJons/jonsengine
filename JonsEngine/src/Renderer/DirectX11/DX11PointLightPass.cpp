@@ -1,6 +1,7 @@
 #include "include/Renderer/DirectX11/DX11PointLightPass.h"
 
 #include "include/Renderer/Shapes.h"
+#include "include/Renderer/RenderQueue.h"
 #include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/PointLightPixel.h"
 #include "include/Core/Utils/Math.h"
@@ -8,10 +9,10 @@
 
 namespace JonsEngine
 {
-    const Vec3 CUBEMAP_DIRECTION_VECTORS[DX11PointLightPass::TEXTURE_CUBE_NUM_FACES] = { Vec3(1.0f, 0.0f, 0.0f), Vec3(-1.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f),
-                                                                                         Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 0.0f, 1.0f) };
+	const Vec3 gCubemapDirVectors[RenderablePointLight::POINT_LIGHT_DIR_COUNT] = { Vec3(1.0f, 0.0f, 0.0f), Vec3(-1.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f),
+                                                                                   Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 0.0f, 1.0f) };
 
-    const Vec3 CUBEMAP_UP_VECTORS[DX11PointLightPass::TEXTURE_CUBE_NUM_FACES] = { Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f),
+    const Vec3 gCubemapUpVectors[RenderablePointLight::POINT_LIGHT_DIR_COUNT] = { Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f),
                                                                                   Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f) };
 
 
@@ -39,7 +40,7 @@ namespace JonsEngine
         mDSSShadingPass(nullptr),
         mSphereMesh(CreateSphereMesh(device, context)),
         mVertexTransformPass(vertexTransformPass),
-        mShadowmap(device, context, shadowmapSize, TEXTURE_CUBE_NUM_FACES, true),
+        mShadowmap(device, context, shadowmapSize, RenderablePointLight::POINT_LIGHT_DIR_COUNT, true),
         mPointLightCBuffer(device, context, mPointLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         // rasterize for front-face culling due to light volumes
@@ -143,13 +144,15 @@ namespace JonsEngine
         mContext->RSSetState(mRSCullFront);
         mShadowmap.BindForDrawing();
 
-        for (uint32_t face = 0; face < TEXTURE_CUBE_NUM_FACES; face++)
+        for (uint32_t face = 0; face < RenderablePointLight::POINT_LIGHT_DIR_COUNT; face++)
         {
-            mShadowmap.BindDepthView(face);
-            Mat4 lightViewMatrix = glm::lookAt(viewLightPositonV3, viewLightPositonV3 + CUBEMAP_DIRECTION_VECTORS[face], CUBEMAP_UP_VECTORS[face]);
-            // TODO: precompute?
-            Mat4 lightProjMatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, Z_FAR);
-            mVertexTransformPass.RenderMeshes(renderQueue, lightProjMatrix * lightViewMatrix * viewMatrix);
+            Mat4 lightViewMatrix = glm::lookAt(viewLightPositonV3, viewLightPositonV3 + gCubemapDirVectors[face], gCubemapUpVectors[face]);
+
+			// TODO: precalculate in renderqueue?
+			Mat4 lightProjMatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, pointLight.mMaxDistance);
+
+			mShadowmap.BindDepthView(face);
+			mVertexTransformPass.RenderMeshes(pointLight.mMeshes.at(face), lightProjMatrix * lightViewMatrix * viewMatrix);
         }
 
         //

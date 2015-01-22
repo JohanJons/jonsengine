@@ -4,7 +4,6 @@
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
-#include "include/Renderer/RenderQueue.h"
 #include "include/Core/Types.h"
 
 #include <d3d11.h>
@@ -14,12 +13,11 @@
 namespace JonsEngine
 {
     class DX11VertexTransformPass;
+	struct RenderablePointLight;
 
     class DX11PointLightPass
     {
     public:
-        const static uint32_t TEXTURE_CUBE_NUM_FACES = 6;
-
         DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize);
         ~DX11PointLightPass();
 

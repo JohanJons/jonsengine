@@ -53,6 +53,17 @@ namespace JonsEngine
 
     struct RenderablePointLight
     {
+		enum POINT_LIGHT_DIR
+		{
+			POINT_LIGHT_DIR_POS_X = 0,
+			POINT_LIGHT_DIR_NEG_X,
+			POINT_LIGHT_DIR_POS_Y,
+			POINT_LIGHT_DIR_NEG_Y,
+			POINT_LIGHT_DIR_NEG_Z,
+			POINT_LIGHT_DIR_POS_Z,
+			POINT_LIGHT_DIR_COUNT
+		};
+
         Mat4 mWVPMatrix;
         Mat4 mWorldMatrix;
         Vec4 mLightColor;
@@ -61,7 +72,7 @@ namespace JonsEngine
         float mLightIntensity;
         float mMaxDistance;
 
-        RenderableMeshes mMeshes;
+		std::array<RenderableMeshes, POINT_LIGHT_DIR::POINT_LIGHT_DIR_COUNT> mMeshes;
     };
     
     typedef std::vector<RenderablePointLight> RenderablePointLights;
