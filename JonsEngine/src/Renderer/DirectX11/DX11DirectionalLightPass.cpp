@@ -1,5 +1,6 @@
 #include "include/Renderer/DirectX11/DX11DirectionalLightPass.h"
 
+#include "include/Renderer/RenderQueue.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11Pipeline.h"
@@ -112,8 +113,7 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::Render(const RenderQueue& renderQueue, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invProjMatrix, const Vec4& lightColor, const Vec3& lightDir,
-        const Vec2& screenSize, const bool drawFrustrums)
+    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& screenSize, const bool drawFrustrums)
     {
         // preserve current state
         D3D11_VIEWPORT prevViewport;
@@ -150,8 +150,8 @@ namespace JonsEngine
             mShadowmap.BindDepthView(cascadeIndex);
             
             CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, nearDistArr[cascadeIndex], farDistArr[cascadeIndex], cameraViewMatrix);
-            lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, lightDir);
-            mVertexTransformPass.RenderMeshes(renderQueue, lightVPMatrices[cascadeIndex]);
+            lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, directionalLight.mLightDirection);
+			mVertexTransformPass.RenderMeshes(directionalLight.mMeshes, lightVPMatrices[cascadeIndex]);
 
             lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex] * glm::inverse(cameraViewMatrix);
             farDistArr[cascadeIndex] = -farDistArr[cascadeIndex];
@@ -170,10 +170,10 @@ namespace JonsEngine
         // bind shadowmap SRV for reading
         mShadowmap.BindForReading();
 
-        const Vec4 camLightDir = glm::normalize(cameraViewMatrix * Vec4(-lightDir, 0));
+        const Vec4 camLightDir = glm::normalize(cameraViewMatrix * Vec4(-directionalLight.mLightDirection, 0));
 
         // set dir light cbuffer data and pixel shader
-        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, invProjMatrix, farDistArr, lightColor, camLightDir, screenSize, static_cast<float>(mShadowmap.GetTextureSize())));
+		mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, invCameraProjMatrix, farDistArr, directionalLight.mLightColor, camLightDir, screenSize, static_cast<float>(mShadowmap.GetTextureSize())));
         mContext->PSSetShader(mPixelShader, NULL, NULL);
 
         // run fullscreen pass + dir light shading pass

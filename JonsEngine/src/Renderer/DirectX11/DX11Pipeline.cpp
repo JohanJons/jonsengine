@@ -110,7 +110,7 @@ namespace JonsEngine
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-        for (const RenderableModel& model : renderQueue.mCamera)
+		for (const RenderableModel& model : renderQueue.mVisibleModels)
         {
             assert(model.mMesh.mMeshID != INVALID_MESH_ID);
 
@@ -138,25 +138,24 @@ namespace JonsEngine
         // disable further depth writing
         mContext->OMSetDepthStencilState(mDepthStencilState, 0);
 
-        const Mat4 invProjMatrix = glm::inverse(renderQueue.mCameraProjectionMatrix);
+        const Mat4 invCameraProjMatrix = glm::inverse(renderQueue.mCameraProjectionMatrix);
 
         // ambient light
-        mAmbientPass.Render(invProjMatrix, renderQueue.mAmbientLight, mScreenSize, SSAOEnabled);
+        mAmbientPass.Render(invCameraProjMatrix, renderQueue.mAmbientLight, mScreenSize, SSAOEnabled);
 
         // additive blending for adding lighting
         mContext->OMSetBlendState(mAdditiveBlending, NULL, 0xffffffff);
 
         // do all directional lights
         for (const RenderableDirLight& directionalLight : renderQueue.mDirectionalLights)
-            mDirectionalLightPass.Render(renderQueue, renderQueue.mFOV, mScreenSize.x / mScreenSize.y, renderQueue.mCameraViewMatrix, invProjMatrix, directionalLight.mLightColor,
-                directionalLight.mLightDirection, mScreenSize, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
+            mDirectionalLightPass.Render(directionalLight, renderQueue.mFOV, mScreenSize.x / mScreenSize.y, renderQueue.mCameraViewMatrix, invCameraProjMatrix, mScreenSize, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
 
         // do all point lights
         mPointLightPass.BindForShading();
         for (const RenderablePointLight& pointLight : renderQueue.mPointLights)
         {
             mContext->ClearDepthStencilView(mDSV, D3D11_CLEAR_STENCIL, 1.0f, 0);
-            mPointLightPass.Render(renderQueue, pointLight, lighting.mCameraViewMatrix, invProjMatrix, mScreenSize, Z_FAR, Z_NEAR);
+			mPointLightPass.Render(pointLight, renderQueue.mCameraViewMatrix, invCameraProjMatrix, mScreenSize, Z_FAR, Z_NEAR);
         }
 
         // turn off blending

@@ -4,7 +4,6 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
-#include "include/Renderer/RenderQueue.h"
 #include "include/Core/Types.h"
 
 #include <d3d11.h>
@@ -14,6 +13,7 @@ namespace JonsEngine
 {
     class DX11FullscreenTrianglePass;
     class DX11VertexTransformPass;
+	struct RenderableDirLight;
 
     class DX11DirectionalLightPass
     {
@@ -23,8 +23,7 @@ namespace JonsEngine
         DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize);
         ~DX11DirectionalLightPass();
 
-        void Render(const RenderQueue& renderQueue, const RenderablePointLight& pointLight, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invProjMatrix,
-            const Vec4& lightColor, const Vec3& lightDir, const Vec2& screenSize, const bool drawFrustrums);
+        void Render(const RenderableDirLight& directionalLight, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& screenSize, const bool drawFrustrums);
 
 
     private:
