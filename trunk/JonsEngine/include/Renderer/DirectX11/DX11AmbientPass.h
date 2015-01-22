@@ -17,7 +17,7 @@ namespace JonsEngine
         DX11AmbientPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const uint16_t screenWidth, const uint16_t screenHeight);
         ~DX11AmbientPass();
 
-        void Render(const Mat4& invProjMatrix, const Vec4& ambientLight, const Vec2& screenSize, const bool useSSAO);
+        void Render(const Mat4& invCameraProjMatrix, const Vec4& ambientLight, const Vec2& screenSize, const bool useSSAO);
 
 
     private:
