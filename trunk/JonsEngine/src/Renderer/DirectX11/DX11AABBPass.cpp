@@ -22,6 +22,6 @@ namespace JonsEngine
         mContext->PSSetShader(mPixelShader, NULL, NULL);
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
-        mVertexTransformPass.RenderAABBs(renderQueue, viewProjectionMatrix);
+        mVertexTransformPass.RenderAABBs(renderQueue.mVisibleModels, viewProjectionMatrix);
     }
 }

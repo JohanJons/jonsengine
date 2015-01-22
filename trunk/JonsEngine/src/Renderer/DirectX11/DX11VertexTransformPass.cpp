@@ -49,12 +49,12 @@ namespace JonsEngine
         }
     }
 
-    void DX11VertexTransformPass::RenderAABBs(const RenderableMeshes& meshes, const Mat4& viewProjectionMatrix)
+    void DX11VertexTransformPass::RenderAABBs(const RenderableModels& models, const Mat4& viewProjectionMatrix)
     {
-        for (const RenderableMesh& mesh : meshes)
+        for (const RenderableModel& model : models)
         {
-            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mWorldMatrix));
-            mMeshMap.GetItem(mesh.mMeshID).DrawAABB();
+            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * model.mMesh.mWorldMatrix));
+            mMeshMap.GetItem(model.mMesh.mMeshID).DrawAABB();
         }
     }
 }
