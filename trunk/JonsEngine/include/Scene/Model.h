@@ -11,10 +11,6 @@
 
 namespace JonsEngine
 {
-    class Model;
-
-    typedef std::shared_ptr<Model> ModelPtr;
-
     class Model
     {
     public:
@@ -24,27 +20,18 @@ namespace JonsEngine
 		bool operator==(const Model& m);
         bool operator==(const std::string& modelName);
 
-        const Vec3& GetAABBCenter() const;
-        const Vec3& GetAABBExtent() const;
-
-		void SetSceneNode(SceneNodePtr node);
-		SceneNodePtr GetSceneNode();
+		ModelNode& GetRootNode();
 
 		const std::string& GetName() const;
         const size_t GetHashedName() const;
-		const Mat4& GetInitialTransform() const;
-		std::vector<ModelNode>& GetModelNodes();
 
         
     private:
 		const std::string mName;
         const size_t mHashedID;
-        const Mat4 mInitialTransform;
 
-        Vec3 mAABBCenter;
-        Vec3 mAABBExtent;
-
-		std::vector<ModelNode> mNodes;
-        SceneNodePtr mSceneNode;
+		ModelNode mRootNode;
     };
+
+	typedef std::shared_ptr<Model> ModelPtr;
 }
