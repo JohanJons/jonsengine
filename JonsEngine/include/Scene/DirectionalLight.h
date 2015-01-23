@@ -23,4 +23,6 @@ namespace JonsEngine
         Vec4 mLightColor;
         Vec3 mLightDirection;
     };
+
+	typedef std::unique_ptr<DirectionalLight, std::function<void(DirectionalLight*)>> DirectionalLightPtr;
 }

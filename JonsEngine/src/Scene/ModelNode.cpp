@@ -34,4 +34,25 @@ namespace JonsEngine
     {
         return mAABBExtent;
     }
+
+
+	std::vector<Mesh>& ModelNode::GetMeshes()
+	{
+		return mMeshes;
+	}
+
+	const std::vector<Mesh>& ModelNode::GetMeshes() const
+	{
+		return mMeshes;
+	}
+
+    std::vector<ModelNode>& ModelNode::GetChildNodes()
+	{
+		return mChildNodes;
+	}
+
+	const std::vector<ModelNode>& ModelNode::GetChildNodes() const
+	{
+		return mChildNodes;
+	}
 }

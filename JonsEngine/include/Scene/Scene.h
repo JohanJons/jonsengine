@@ -25,11 +25,12 @@ namespace JonsEngine
         bool operator==(const Scene& s1);
         bool operator==(const std::string& sceneName);
 
-        const RenderQueue& GetRenderQueue();
+        const RenderQueue& GetRenderQueue(const uint32_t windowWidth, const uint32_t windowHeight, const float zNear, const float zFar);
 
         Actor* CreateActor(const std::string& actorName, const ModelPtr model, const SceneNodePtr node);
         void DeleteActor(Actor* actor);
         Actor* GetActor(const std::string& actorName);
+		const std::vector<ActorPtr>& GetActors() const;
         
         PointLight* CreatePointLight(const std::string& lightName, const SceneNodePtr node);
         void DeletePointLight(const PointLight* pointLight);

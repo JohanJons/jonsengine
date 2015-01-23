@@ -7,7 +7,7 @@
 namespace JonsEngine
 {
     Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds) : 
-        mName(name), mHashedID(boost::hash_value(name)), mInitialTransform(initialTransform), mAABBCenter(0.5f * (minBounds + maxBounds)), mAABBExtent(0.5f * (maxBounds - minBounds))
+		mName(name), mHashedID(boost::hash_value(name)), mRootNode(name, initialTransform, minBounds, maxBounds)
     {
     }
 
@@ -27,25 +27,9 @@ namespace JonsEngine
     }
 
 
-    const Vec3& Model::GetAABBCenter() const
-    {
-        return mAABBCenter;
-    }
-
-    const Vec3& Model::GetAABBExtent() const
-    {
-        return mAABBExtent;
-    }
-
-
-	void Model::SetSceneNode(SceneNodePtr node)
+	ModelNode& Model::GetRootNode()
 	{
-		mSceneNode = node;
-	}
-		
-	SceneNodePtr Model::GetSceneNode()
-	{
-		return mSceneNode;
+		return mRootNode;
 	}
 
 		
@@ -58,14 +42,4 @@ namespace JonsEngine
     {
         return mHashedID;
     }
-		
-	const Mat4& Model::GetInitialTransform() const
-	{
-		return mInitialTransform;
-	}
-		
-	std::vector<ModelNode>& Model::GetModelNodes()
-	{
-		return mNodes;
-	}
 }

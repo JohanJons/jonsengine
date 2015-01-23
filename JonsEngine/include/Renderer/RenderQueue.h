@@ -33,13 +33,15 @@ namespace JonsEngine
         float mTextureTilingFactor;
     };
 
-    struct RenderableModel
+    struct RenderableCamera
     {
-        RenderableMesh mMesh;
+		Mat4 mCameraViewMatrix;
+        Mat4 mCameraProjectionMatrix;
+		Vec3 mCameraPosition;
+
+        std::vector<RenderableMesh> mMesh;
         RenderableMaterial mMaterial;
     };
-    
-    typedef std::vector<RenderableModel> RenderableModels;
 
     struct RenderableDirLight
     {
@@ -82,14 +84,11 @@ namespace JonsEngine
         void Clear();
 
 
-        Mat4 mCameraViewMatrix;
-        Mat4 mCameraProjectionMatrix;
         Vec4 mAmbientLight;
-        Vec3 mCameraPosition;
         float mFOV;
 
         // TODO: more than one camera?
-        RenderableModels mVisibleModels;
+        RenderableCamera mCamera;
         RenderableDirLights mDirectionalLights;
         RenderablePointLights mPointLights;
     };

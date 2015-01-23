@@ -26,4 +26,6 @@ namespace JonsEngine
         float mLightIntensity;
         float mMaxDistance;
     };
+
+	typedef std::unique_ptr<PointLight, std::function<void(PointLight*)>> PointLightPtr;
 }

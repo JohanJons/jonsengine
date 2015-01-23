@@ -18,10 +18,10 @@ namespace JonsEngine
     {
         const Mat4 localWVPMatrix = wvpMatrix * node.GetTransformMatrix();
 
-        for (const Mesh& mesh : node.mMeshes)
+		for (const Mesh& mesh : node.GetMeshes())
             AddMesh(resultMeshes, mesh, localWVPMatrix, worldMatrix);
 
-        for (const ModelNode& node : node.mChildNodes)
+		for (const ModelNode& node : node.GetChildNodes())
             AddAllMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
     }
 
@@ -33,37 +33,37 @@ namespace JonsEngine
         FrustrumIntersection nodeAABBIntersection = IsAABBInFrustum(node.GetAABBCenter(), node.GetAABBExtent(), localWVPMatrix);
         switch (nodeAABBIntersection)
         {
-            // if partially inside, recursively test all meshes and child nodes
-        case FRUSTRUM_INTERSECTION_PARTIAL:
-        {
-            FrustrumIntersection meshAABBIntersection(FRUSTRUM_INTERSECTION_INSIDE);
+			// if partially inside, recursively test all meshes and child nodes
+			case FRUSTRUM_INTERSECTION_PARTIAL:
+			{
+				FrustrumIntersection meshAABBIntersection(FRUSTRUM_INTERSECTION_INSIDE);
 
-            for (const Mesh& mesh : node.mMeshes)
-            {
-                meshAABBIntersection = IsAABBInFrustum(mesh.GetAABBCenter(), mesh.GetAABBExtent(), localWVPMatrix);
-                if (meshAABBIntersection == FRUSTRUM_INTERSECTION_OUTSIDE)
-                    continue;
+				for (const Mesh& mesh : node.mMeshes)
+				{
+					meshAABBIntersection = IsAABBInFrustum(mesh.GetAABBCenter(), mesh.GetAABBExtent(), localWVPMatrix);
+					if (meshAABBIntersection == FRUSTRUM_INTERSECTION_OUTSIDE)
+						continue;
 
-                if (meshAABBIntersection == FRUSTRUM_INTERSECTION_INSIDE || meshAABBIntersection == FRUSTRUM_INTERSECTION_PARTIAL)
-                    AddMesh(resultMeshes, mesh, wvpMatrix, worldMatrix);
-            }
+					if (meshAABBIntersection == FRUSTRUM_INTERSECTION_INSIDE || meshAABBIntersection == FRUSTRUM_INTERSECTION_PARTIAL)
+						AddMesh(resultMeshes, mesh, wvpMatrix, worldMatrix);
+				}
 
-            for (const ModelNode& node : node.mChildNodes)
-                CullMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
+				for (const ModelNode& node : node.mChildNodes)
+					CullMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
 
-            break;
-        }
+				break;
+			}
 
-        case FRUSTRUM_INTERSECTION_INSIDE:
-        {
-            AddAllMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
-            break;
-        }
+			case FRUSTRUM_INTERSECTION_INSIDE:
+			{
+				AddAllMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
+				break;
+			}
 
-        case FRUSTRUM_INTERSECTION_OUTSIDE:
-        default:
-            break;
-        }
+			case FRUSTRUM_INTERSECTION_OUTSIDE:
+			default:
+				break;
+		}
     }
 
 
@@ -87,10 +87,26 @@ namespace JonsEngine
     }
 
 
-    const RenderQueue& Scene::GetRenderQueue()
+    const RenderQueue& Scene::GetRenderQueue(const uint32_t windowWidth, const uint32_t windowHeight, const float zNear, const float zFar)
     {
         mRenderQueue.Clear();
 
+		const Mat4 perspectiveMatrix = PerspectiveMatrixFov(GetSceneCamera().GetFOV(), windowWidth / static_cast<float>(windowHeight), zNear, zFar);
+        const Mat4 viewPerspectiveMatrix = perspectiveMatrix * GetSceneCamera().GetCameraTransform();
+
+		for (const ActorPtr& actor : mActors)
+		{
+			if (!actor->mSceneNode)
+				continue;
+
+			const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform();
+			CullMeshes(, actor->mModel->GetRootNode(), viewPerspectiveMatrix * worldMatrix, worldMatrix);
+			/*for (const ModelNode& node : actor->mModel->GetModelNodes())
+			{
+				const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform() * actor->mModel->GetInitialTransform();
+                CullMeshes(, node, viewProjectionMatrix * worldMatrix, worldMatrix);
+			}*/
+		}
         //CullMeshes(mRenderQueue.mCamera.mMeshes, mRootNode., )
         //mRenderQueue.
 
@@ -123,6 +139,11 @@ namespace JonsEngine
 
         return iter->get();
     }
+
+	const std::vector<ActorPtr>& Scene::GetActors() const
+	{
+		return mActors;
+	}
 
 
     PointLight* Scene::CreatePointLight(const std::string& lightName, const SceneNodePtr node)
