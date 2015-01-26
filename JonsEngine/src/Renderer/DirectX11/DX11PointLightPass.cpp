@@ -9,13 +9,6 @@
 
 namespace JonsEngine
 {
-	const Vec3 gCubemapDirVectors[RenderablePointLight::POINT_LIGHT_DIR_COUNT] = { Vec3(1.0f, 0.0f, 0.0f), Vec3(-1.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f),
-                                                                                   Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 0.0f, 1.0f) };
-
-    const Vec3 gCubemapUpVectors[RenderablePointLight::POINT_LIGHT_DIR_COUNT] = { Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f),
-                                                                                  Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f) };
-
-
     DX11Mesh CreateSphereMesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context)
     {
         const float radius = 1.0f;
@@ -117,7 +110,7 @@ namespace JonsEngine
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
 
-    void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& screenSize, const float zFar, const float zNear)
+    void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const Mat4& invCameraProjMatrix, const Vec2& screenSize, const float zFar, const float zNear)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
@@ -130,8 +123,6 @@ namespace JonsEngine
         mContext->OMGetDepthStencilState(&prevDSState, 0);
         mContext->OMGetRenderTargets(1, &prevRTV, &prevDSV);
         mContext->RSGetViewports(&numViewports, &prevViewport);
-        const Vec4 viewLightPositonV4 = cameraViewMatrix * Vec4(pointLight.mLightPosition, 1.0);
-        const Vec3 viewLightPositonV3 = Vec3(viewLightPositonV4);
 
 
         //
@@ -146,13 +137,8 @@ namespace JonsEngine
 
         for (uint32_t face = 0; face < RenderablePointLight::POINT_LIGHT_DIR_COUNT; face++)
         {
-            Mat4 lightViewMatrix = glm::lookAt(viewLightPositonV3, viewLightPositonV3 + gCubemapDirVectors[face], gCubemapUpVectors[face]);
-
-			// TODO: precalculate in renderqueue?
-			Mat4 lightProjMatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, pointLight.mMaxDistance);
-
 			mShadowmap.BindDepthView(face);
-			mVertexTransformPass.RenderMeshes(pointLight.mMeshes.at(face), lightProjMatrix * lightViewMatrix * cameraViewMatrix);
+			mVertexTransformPass.RenderMeshes(pointLight.mMeshes.at(face), pointLight.mFaceWVPMatrices.at(face));
         }
 
         //
@@ -179,7 +165,7 @@ namespace JonsEngine
 
         // set point light pixel shader and its cbuffer
         mContext->PSSetShader(mPixelShader, NULL, NULL);
-        mPointLightCBuffer.SetData(PointLightCBuffer(invCameraProjMatrix, pointLight.mLightColor, viewLightPositonV4, screenSize, pointLight.mLightIntensity, pointLight.mMaxDistance, zFar, zNear));
+        mPointLightCBuffer.SetData(PointLightCBuffer(invCameraProjMatrix, pointLight.mLightColor, pointLight.mLightPosition, screenSize, pointLight.mLightIntensity, pointLight.mMaxDistance, zFar, zNear));
 
         // run transform pass on sphere + point light shading pass
         mVertexTransformPass.RenderMesh(mSphereMesh, pointLight.mWVPMatrix);
