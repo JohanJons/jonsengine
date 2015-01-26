@@ -6,8 +6,11 @@
 
 namespace JonsEngine
 {
-    Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds) : 
-		mName(name), mHashedID(boost::hash_value(name)), mRootNode(name, initialTransform, minBounds, maxBounds)
+    Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds) : mName(name), mHashedID(boost::hash_value(name)), mRootNode(name, initialTransform, minBounds, maxBounds)
+    {
+    }
+
+    Model::Model(const PackageModel& pkgModel) : mName(pkgModel.mName), mHashedID(boost::hash_value(pkgModel.mName)), mRootNode(pkgModel.mRootNode)
     {
     }
 

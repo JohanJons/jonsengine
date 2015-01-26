@@ -3,6 +3,7 @@
 #include "include/Scene/SceneNode.h"
 #include "include/Scene/ModelNode.h"
 #include "include/Scene/Material.h"
+#include "include/Resources/JonsPackage.h"
 #include "include/Core/Types.h"
 
 #include <string>
@@ -15,6 +16,7 @@ namespace JonsEngine
     {
     public:
         Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds);
+        Model(const PackageModel& pkgModel);
         ~Model();
 
 		bool operator==(const Model& m);
