@@ -18,18 +18,18 @@ namespace JonsEngine
     }
 
 
-    ModelPtr ResourceManifest::CreateRectangle(const std::string& modelName, const double sizeX, const double sizeY, const double sizeZ)
+    ModelPtr ResourceManifest::CreateRectangle(const std::string& modelName, const float sizeX, const float sizeY, const float sizeZ)
     {
-        ModelPtr ptr = GetModel(modelName);
-        if (ptr) 
-            return ptr;
+        ModelPtr model = GetModel(modelName);
+        if (model)
+            return model;
 
         assert(sizeX > 0 && sizeY > 0 && sizeZ > 0);
 
         std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
         std::vector<uint16_t> indiceData;
         if (!CreateRectangleData(sizeX, sizeY, sizeZ, vertexData, normalData, texcoordData, indiceData))
-            return ptr;
+            return model;
 
         auto allocator = mMemoryAllocator;
 
@@ -39,104 +39,94 @@ namespace JonsEngine
         Vec3 minBounds(-halfX, -halfY, -halfZ);
         Vec3 maxBounds(halfX, halfY, halfZ);
 
-        ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds), [=](Model* model) { allocator->DeallocateObject(model); }));
+        model = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds), [=](Model* model) { allocator->DeallocateObject(model); }));
 
         const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
-        Mesh mesh("RectangleMesh", minBounds, maxBounds, meshID, nullptr);
-        ModelNode node("RectangleNode", Mat4(1.0f), minBounds, maxBounds);
+        model->GetRootNode().GetMeshes().emplace_back("RectangleMesh", minBounds, maxBounds, meshID, nullptr);
 
-        node.mMeshes.emplace_back(mesh);
-        ptr->GetModelNodes().emplace_back(node);
-
-        return ptr;
+        return model;
     }
 
-    ModelPtr ResourceManifest::CreateCube(const std::string& modelName, const double size)
+    ModelPtr ResourceManifest::CreateCube(const std::string& modelName, const float size)
     {
         return CreateRectangle(modelName, size, size, size);
     }
 
     ModelPtr ResourceManifest::CreateSphere(const std::string& modelName, const float radius, const uint32_t rings, const uint32_t sectors)
     {
-        ModelPtr ptr = GetModel(modelName);
-        if (ptr)
-            return ptr;
+        ModelPtr model = GetModel(modelName);
+        if (model)
+            return model;
 
         assert(radius > 0 && rings > 0 && sectors > 0);
 
         std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
         std::vector<uint16_t> indiceData;
         if (!CreateSphereData(radius, rings, sectors, vertexData, normalData, texcoordData, indiceData))
-            return ptr;
+            return model;
 
         auto allocator = mMemoryAllocator;
 
         Vec3 minBounds(-radius, -radius, -radius);
         Vec3 maxBounds(radius, radius, radius);
 
-        ptr = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds), [=](Model* model) { allocator->DeallocateObject(model); }));
+        model = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds), [=](Model* model) { allocator->DeallocateObject(model); }));
         
         const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
-        Mesh mesh("SphereMesh", minBounds, maxBounds, meshID, nullptr);
-        ModelNode node("SphereNode", Mat4(1.0f), minBounds, maxBounds);
+        model->GetRootNode().GetMeshes().emplace_back("SphereMesh", minBounds, maxBounds, meshID, nullptr);
 
-        node.mMeshes.emplace_back(mesh);
-        ptr->GetModelNodes().emplace_back(node);
-
-        return ptr;
+        return model;
     }
 
     
     ModelPtr ResourceManifest::LoadModel(const std::string& assetName, const JonsPackagePtr jonsPkg)
     {
-        ModelPtr ptr = GetModel(assetName);
-        if (ptr) 
-            return ptr;
+        ModelPtr model = GetModel(assetName);
+        if (model)
+            return model;
 
         size_t hashedName = boost::hash_value(assetName);
-        std::vector<PackageModel>::iterator iter = std::find_if(jonsPkg->mModels.begin(), jonsPkg->mModels.end(), [hashedName](const PackageModel model) { return boost::hash_value(model.mName) == hashedName; });
+        std::vector<PackageModel>::iterator iter = std::find_if(jonsPkg->mModels.begin(), jonsPkg->mModels.end(), [hashedName](const PackageModel pkgModel) { return boost::hash_value(pkgModel.mName) == hashedName; });
 
         if (iter != jonsPkg->mModels.end())
         {
             auto allocator = mMemoryAllocator;
-            ModelPtr model(ProcessModel(*iter, jonsPkg));
-
-            ptr = *mModels.insert(mModels.end(), model);
+            mModels.emplace_back(allocator->AllocateObject<Model>(ProcessModel(*iter, jonsPkg)), [=](Model* model) { allocator->DeallocateObject(model); });
+            model = mModels.back();
         }
 
-        return ptr;
+        return model;
     }
         
     ModelPtr ResourceManifest::GetModel(const std::string& modelName)
     {
-        ModelPtr ptr;
+        ModelPtr model;
         std::vector<ModelPtr>::iterator iter = std::find_if(mModels.begin(), mModels.end(), [modelName](const ModelPtr model) { return *model == modelName; });
 
         if (iter != mModels.end())
-            ptr = *iter;
+            model = *iter;
 
-        return ptr;
+        return model;
     }
 
 
     MaterialPtr ResourceManifest::LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg)
     {
-        MaterialPtr ptr = GetMaterial(assetName);
-        if (ptr)
-            return ptr;
+        MaterialPtr material = GetMaterial(assetName);
+        if (material)
+            return material;
 
         size_t hashedName = boost::hash_value(assetName);
-        auto iter = std::find_if(jonsPkg->mMaterials.begin(), jonsPkg->mMaterials.end(), [hashedName](const PackageMaterial material) { return boost::hash_value(material.mName) == hashedName; });
+        auto iter = std::find_if(jonsPkg->mMaterials.begin(), jonsPkg->mMaterials.end(), [hashedName](const PackageMaterial pkgMaterial) { return boost::hash_value(pkgMaterial.mName) == hashedName; });
 
         if (iter != jonsPkg->mMaterials.end())
         {
             auto allocator = mMemoryAllocator;
-            MaterialPtr material = MaterialPtr(allocator->AllocateObject<Material>(ProcessMaterial(*iter, jonsPkg)), [=](Material* material) { allocator->DeallocateObject(material); });
-
-            ptr = *mMaterials.insert(mMaterials.end(), material);
+            mMaterials.emplace_back(allocator->AllocateObject<Material>(ProcessMaterial(*iter, jonsPkg)), [=](Material* material) { allocator->DeallocateObject(material); });
+            material = mMaterials.back();
         }
 
-        return ptr;
+        return material;
     }
         
     MaterialPtr ResourceManifest::GetMaterial(const std::string& materialName)
@@ -154,7 +144,7 @@ namespace JonsEngine
     ModelPtr ResourceManifest::ProcessModel(const PackageModel& pkgModel, const JonsPackagePtr jonsPkg)
     {
         auto allocator = mMemoryAllocator;
-        ModelPtr model(allocator->AllocateObject<Model>(pkgModel.mName, pkgModel.mTransform, pkgModel.mAABB.mMinBounds, pkgModel.mAABB.mMaxBounds), [=](Model* model) { allocator->DeallocateObject(model); });
+        ModelPtr model(allocator->AllocateObject<Model>(pkgModel.mName, pkgModel.mRootNode.mTransform, pkgModel.mRootNode.mAABB.mMinBounds, pkgModel.mRootNode.mAABB.mMaxBounds), [=](Model* model) { allocator->DeallocateObject(model); });
 
         for (const PackageNode& node : pkgModel.mNodes)
             model->GetModelNodes().emplace_back(ProcessModelNode(node, jonsPkg));

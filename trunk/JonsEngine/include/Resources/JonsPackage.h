@@ -100,9 +100,7 @@ namespace JonsEngine
     struct PackageModel
     {
         std::string mName;
-        PackageAABB mAABB;
-        Mat4 mTransform;
-        std::vector<PackageNode> mNodes;
+        PackageNode mRootNode;
 
 
         PackageModel();
@@ -204,9 +202,7 @@ namespace boost
         void serialize(Archive & ar, JonsEngine::PackageModel& model, const unsigned int version)
         {
             ar & model.mName;
-            ar & model.mAABB;
-            ar & model.mTransform;
-            ar & model.mNodes;
+            ar & model.mRootNode;
         }
 
         template<class Archive>

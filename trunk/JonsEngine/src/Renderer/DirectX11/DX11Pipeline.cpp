@@ -155,7 +155,7 @@ namespace JonsEngine
         for (const RenderablePointLight& pointLight : renderQueue.mPointLights)
         {
             mContext->ClearDepthStencilView(mDSV, D3D11_CLEAR_STENCIL, 1.0f, 0);
-			mPointLightPass.Render(pointLight, renderQueue.mCameraViewMatrix, invCameraProjMatrix, mScreenSize, Z_FAR, Z_NEAR);
+			mPointLightPass.Render(pointLight, invCameraProjMatrix, mScreenSize, Z_FAR, Z_NEAR);
         }
 
         // turn off blending

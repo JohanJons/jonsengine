@@ -9,12 +9,27 @@
 
 namespace JonsEngine
 {
+    const float gPointLightMinZ = 0.1f;
+
+    const Vec3 gCubemapDirVectors[RenderablePointLight::POINT_LIGHT_DIR_COUNT] = { Vec3(1.0f, 0.0f, 0.0f), Vec3(-1.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f),
+                                                                                   Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 0.0f, 1.0f) };
+
+    const Vec3 gCubemapUpVectors[RenderablePointLight::POINT_LIGHT_DIR_COUNT] = { Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f),
+                                                                                  Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f) };
+
+
+    void AddMesh(std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix)
+    {
+        resultMeshes.emplace_back(mesh.mMeshID, wvpMatrix, worldMatrix, mesh.mMaterial->mDiffuseTexture, mesh.mMaterial->mNormalTexture, mesh.mMaterial->mSpecularFactor, mesh.mMaterialTilingFactor);
+    }
+
     void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
         resultMeshes.emplace_back(mesh.mMeshID, wvpMatrix, worldMatrix);
     }
 
-    void AddAllMeshes(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
+    template <typename T>
+    void AddAllMeshes(std::vector<T>& resultMeshes, const ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
         const Mat4 localWVPMatrix = wvpMatrix * node.GetTransformMatrix();
 
@@ -25,7 +40,8 @@ namespace JonsEngine
             AddAllMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
     }
 
-    void CullMeshes(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
+    template <typename T>
+    void CullMeshes(std::vector<T>& resultMeshes, const ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
         const Mat4 localWVPMatrix = wvpMatrix * node.GetTransformMatrix();
 
@@ -38,7 +54,7 @@ namespace JonsEngine
 			{
 				FrustrumIntersection meshAABBIntersection(FRUSTRUM_INTERSECTION_INSIDE);
 
-				for (const Mesh& mesh : node.mMeshes)
+				for (const Mesh& mesh : node.GetMeshes())
 				{
 					meshAABBIntersection = IsAABBInFrustum(mesh.GetAABBCenter(), mesh.GetAABBExtent(), localWVPMatrix);
 					if (meshAABBIntersection == FRUSTRUM_INTERSECTION_OUTSIDE)
@@ -48,7 +64,7 @@ namespace JonsEngine
 						AddMesh(resultMeshes, mesh, wvpMatrix, worldMatrix);
 				}
 
-				for (const ModelNode& node : node.mChildNodes)
+				for (const ModelNode& node : node.GetChildNodes())
 					CullMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
 
 				break;
@@ -91,24 +107,63 @@ namespace JonsEngine
     {
         mRenderQueue.Clear();
 
-		const Mat4 perspectiveMatrix = PerspectiveMatrixFov(GetSceneCamera().GetFOV(), windowWidth / static_cast<float>(windowHeight), zNear, zFar);
-        const Mat4 viewPerspectiveMatrix = perspectiveMatrix * GetSceneCamera().GetCameraTransform();
+        const Mat4& cameraViewMatrix = GetSceneCamera().GetCameraTransform();
+		const Mat4 cameraProjMatrix = PerspectiveMatrixFov(GetSceneCamera().GetFOV(), windowWidth / static_cast<float>(windowHeight), zNear, zFar);
+        const Mat4 cameraViewProjMatrix = cameraProjMatrix * cameraViewMatrix;
 
+        // camera
 		for (const ActorPtr& actor : mActors)
 		{
 			if (!actor->mSceneNode)
 				continue;
 
 			const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform();
-			CullMeshes(, actor->mModel->GetRootNode(), viewPerspectiveMatrix * worldMatrix, worldMatrix);
-			/*for (const ModelNode& node : actor->mModel->GetModelNodes())
-			{
-				const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform() * actor->mModel->GetInitialTransform();
-                CullMeshes(, node, viewProjectionMatrix * worldMatrix, worldMatrix);
-			}*/
+            const Mat4 wvpMatrix = cameraViewProjMatrix * worldMatrix;
+
+            CullMeshes<RenderableModel>(mRenderQueue.mCamera.mModels, actor->mModel->GetRootNode(), wvpMatrix, worldMatrix);
 		}
-        //CullMeshes(mRenderQueue.mCamera.mMeshes, mRootNode., )
-        //mRenderQueue.
+
+        // point lights
+        for (const PointLightPtr& pointLight : mPointLights)
+        {
+            const Vec3& pointLightPosition = pointLight->mSceneNode->Position();
+            const Mat4 worldMatrix = pointLight->mSceneNode->GetNodeTransform();
+            const Vec3 camViewLightPosition = Vec3(cameraViewMatrix * Vec4(pointLightPosition, 1.0));
+
+            // scaled WVP is used for stencil op
+            const Mat4 scaledWorldMatrix = glm::scale(worldMatrix, Vec3(pointLight->mMaxDistance));
+            const Mat4 scaledWVPMatrix = cameraViewProjMatrix * scaledWorldMatrix;
+
+            mRenderQueue.mPointLights.emplace_back(scaledWVPMatrix, pointLight->mLightColor, pointLightPosition, pointLight->mLightIntensity, pointLight->mMaxDistance);
+            RenderablePointLight& renderablePointLight = mRenderQueue.mPointLights.back();
+
+            // for each cubemap face (6) of the point light, get meshes in view
+            for (uint32_t dirIndex = 0; dirIndex < RenderablePointLight::POINT_LIGHT_DIR_COUNT; dirIndex++)
+            {
+                const Mat4 faceViewMatrix = glm::lookAt(camViewLightPosition, camViewLightPosition + gCubemapDirVectors[dirIndex], gCubemapUpVectors[dirIndex]);
+                const Mat4 faceProjmatrix = PerspectiveMatrixFov(90.0f, 1.0f, gPointLightMinZ, pointLight->mMaxDistance);
+
+                // face wvp matrix
+                renderablePointLight.mFaceWVPMatrices.at(dirIndex) = faceProjmatrix * faceViewMatrix * cameraViewMatrix;
+
+                //  cull meshes for each face
+                for (const ActorPtr& actor : mActors)
+                {
+                    if (!actor->mSceneNode)
+                        continue;
+
+                    const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform();
+                    CullMeshes<RenderableMesh>(renderablePointLight.mMeshes.at(dirIndex), actor->mModel->GetRootNode(), renderablePointLight.mFaceWVPMatrices.at(dirIndex) * worldMatrix, worldMatrix);
+                }
+            }
+        }
+
+        // dir lights
+        for (const DirectionalLightPtr& dirLight : mDirectionalLights)
+        {
+            // TODO
+            mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, dirLight->mLightDirection);
+        }
 
         return mRenderQueue;
     }

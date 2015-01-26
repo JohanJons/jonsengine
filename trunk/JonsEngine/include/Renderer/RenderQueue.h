@@ -22,10 +22,10 @@ namespace JonsEngine
 
     struct RenderableMaterial
     {
-        Vec4 mDiffuseColor;
-        Vec4 mAmbientColor;
-        Vec4 mSpecularColor;
-        Vec4 mEmissiveColor;
+        inline RenderableMaterial(const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor, const float tilingFactor)
+            : mDiffuseTextureID(diffuseTexture), mNormalTextureID(normalTexture), mSpecularFactor(specFactor), mTextureTilingFactor(tilingFactor)
+        {
+        }
 
         TextureID mDiffuseTextureID;
         TextureID mNormalTextureID;
@@ -33,18 +33,35 @@ namespace JonsEngine
         float mTextureTilingFactor;
     };
 
+    struct RenderableModel
+    {
+        inline RenderableModel(const MeshID mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix, const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor, const float tilingFactor) :
+            mMesh(mesh, wvpMatrix, worldMatrix), mMaterial(diffuseTexture, normalTexture, specFactor, tilingFactor)
+        {
+        }
+
+        RenderableMesh mMesh;
+        RenderableMaterial mMaterial;
+    };
+
+    typedef std::vector<RenderableModel> RenderableModels;
+
     struct RenderableCamera
     {
 		Mat4 mCameraViewMatrix;
         Mat4 mCameraProjectionMatrix;
 		Vec3 mCameraPosition;
 
-        std::vector<RenderableMesh> mMesh;
-        RenderableMaterial mMaterial;
+        RenderableModels mModels;
     };
 
     struct RenderableDirLight
     {
+        inline RenderableDirLight(const Vec4& lightColor, const Vec3& lightDir) : mLightColor(lightColor), mLightDirection(lightDir)
+        {
+        }
+
+
         Vec4 mLightColor;
         Vec3 mLightDirection;
 
@@ -55,6 +72,12 @@ namespace JonsEngine
 
     struct RenderablePointLight
     {
+        inline RenderablePointLight(const Mat4& wvpMatrix, const Vec4& lightColor, const Vec3& lightPos, const float lightIntensity, const float maxDistance) :
+            mWVPMatrix(wvpMatrix), mLightColor(lightColor), mLightPosition(lightPos), mLightIntensity(lightIntensity), mMaxDistance(maxDistance)
+        {
+        }
+
+
 		enum POINT_LIGHT_DIR
 		{
 			POINT_LIGHT_DIR_POS_X = 0,
@@ -66,8 +89,8 @@ namespace JonsEngine
 			POINT_LIGHT_DIR_COUNT
 		};
 
+
         Mat4 mWVPMatrix;
-        Mat4 mWorldMatrix;
         Vec4 mLightColor;
         Vec3 mLightPosition;
 
@@ -75,6 +98,7 @@ namespace JonsEngine
         float mMaxDistance;
 
 		std::array<RenderableMeshes, POINT_LIGHT_DIR::POINT_LIGHT_DIR_COUNT> mMeshes;
+        std::array<Mat4, POINT_LIGHT_DIR::POINT_LIGHT_DIR_COUNT> mFaceWVPMatrices;
     };
     
     typedef std::vector<RenderablePointLight> RenderablePointLights;
