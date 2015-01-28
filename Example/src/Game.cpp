@@ -134,12 +134,6 @@ namespace JonsGame
 
     void Game::SetupScene()
     {
-        ActorPtr actor();
-
-
-
-
-
         Scene* myScene = mEngine->GetSceneManager().GetActiveScene();
         JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
 
@@ -154,30 +148,30 @@ namespace JonsGame
         //nodeSponza->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
         nodeSponza->TranslateNode(Vec3(0.0f, 0.5f, -54.0f));
         */
-        // sectoid 
+        // sectoid
         SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
         ModelPtr modelAlien = mEngine->GetResourceManifest().LoadModel("sectoid", jonsPackage);
-        modelAlien->SetSceneNode(nodeAlien);
+        Actor* actorAlien = myScene->CreateActor("actorSectoid", modelAlien, nodeAlien);
         nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
         nodeAlien->TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
         
         // cube
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
         ModelPtr modelCube = mEngine->GetResourceManifest().LoadModel("cube", jonsPackage);
-        modelCube->SetSceneNode(nodeCube);
+        Actor* actorCube = myScene->CreateActor("actorCube", modelCube, nodeCube);
         nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
         
         // chair
         SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("nodeChair");
         ModelPtr modelChair = mEngine->GetResourceManifest().LoadModel("chair", jonsPackage);
-        modelChair->SetSceneNode(nodeChair);
+        Actor* actorChair = myScene->CreateActor("actorChair", modelChair, nodeChair);
         nodeChair->TranslateNode(Vec3(-8.0f, 0.5f, -4.0f));
         nodeChair->ScaleNode(Vec3(2.0f));
         
         // house
         SceneNodePtr nodeHouse = myScene->GetRootNode().CreateChildNode("nodeHouse");
         ModelPtr modelHouse = mEngine->GetResourceManifest().LoadModel("house", jonsPackage);
-        modelHouse->SetSceneNode(nodeHouse);
+        Actor* actorHouse = myScene->CreateActor("actorHouse", modelHouse, nodeHouse);
         nodeHouse->TranslateNode(Vec3(-7.0f, 0.5f, -15.0f));
         
         // point light
@@ -193,25 +187,24 @@ namespace JonsGame
         directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
         directionalLight->mLightColor = Vec4(0.25f);
         
+        // load checker material
+        MaterialPtr checkerMaterial = mEngine->GetResourceManifest().LoadMaterial("checkers", jonsPackage);
+
         // create a ground plane
         SceneNodePtr nodePlane = myScene->GetRootNode().CreateChildNode("nodePlane");
-        ModelPtr plane = mEngine->GetResourceManifest().CreateRectangle("GroundPlane", 64, 1.0, 64);
-        plane->GetModelNodes()[0].mMeshes[0].mMaterial = mEngine->GetResourceManifest().LoadMaterial("checkers", jonsPackage);
-        plane->SetSceneNode(nodePlane);
-        plane->GetModelNodes()[0].mMeshes[0].mMaterialTilingFactor = 64.0f;
-        
+        ModelPtr plane = mEngine->GetResourceManifest().CreateRectangle("GroundPlane", 64, 1.0, 64, checkerMaterial);
+        Actor* actorPlane = myScene->CreateActor("actorPlane", plane, nodePlane);
+
         // create a sphere
         SceneNodePtr nodeSphere = myScene->GetRootNode().CreateChildNode("nodeSphere");
-        ModelPtr sphere = mEngine->GetResourceManifest().CreateSphere("Sphere", 1.0f, 12, 24);
-        sphere->GetModelNodes()[0].mMeshes[0].mMaterial = mEngine->GetResourceManifest().GetMaterial("checkers");
-        sphere->SetSceneNode(nodeSphere);
+        ModelPtr sphere = mEngine->GetResourceManifest().CreateSphere("Sphere", 1.0f, 12, 24, checkerMaterial);
+        Actor* actorSphere = myScene->CreateActor("actorHouse", sphere, nodeSphere);
         nodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
 
         // create a  second cube
         SceneNodePtr nodeCube2 = myScene->GetRootNode().CreateChildNode("nodeCube2");
-        ModelPtr cube2 = mEngine->GetResourceManifest().CreateCube("Cube2", 3);
-        cube2->GetModelNodes()[0].mMeshes[0].mMaterial = mEngine->GetResourceManifest().GetMaterial("checkers");
-        cube2->SetSceneNode(nodeCube2);
+        ModelPtr cube2 = mEngine->GetResourceManifest().CreateCube("Cube2", 3, checkerMaterial);
+        Actor* actorCube2 = myScene->CreateActor("actorCube2", cube2, nodeCube2);
         nodeCube2->TranslateNode(Vec3(11.0f, 2.0f, -15.0f));
         
         // move up camera
@@ -221,10 +214,5 @@ namespace JonsGame
     void Game::UpdateSun()
     {
         Scene* activeScene = mEngine->GetSceneManager().GetActiveScene();
-
-       // mSunDirection += JonsEngine::Vec3(glm::sin(0.1f), 0.0f, 0.0f);
-       // activeScene->GetDirectionalLight("DirectionalLight")->mLightDirection = mSunDirection;
-        //activeScene->GetDirectionalLight("DirectionalLight")->mLightDirection += (Vec3(0.0, 0.1f, 0.0f));
-        //activeScene->GetDirectionalLight("DirectionalLight")->mLightDirection -= (Vec3(0.0, 0.1f, 0.0f));
     }
 }
