@@ -51,6 +51,7 @@ namespace JonsEngine
 		Mat4 mCameraViewMatrix;
         Mat4 mCameraProjectionMatrix;
 		Vec3 mCameraPosition;
+        float mFOV;
 
         RenderableModels mModels;
     };
@@ -109,7 +110,6 @@ namespace JonsEngine
 
 
         Vec4 mAmbientLight;
-        float mFOV;
 
         // TODO: more than one camera?
         RenderableCamera mCamera;

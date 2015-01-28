@@ -26,7 +26,7 @@ namespace JonsEngine
     {
     }
 
-    PackageModel::PackageModel() : mName(""), mTransform(1.0f)
+    PackageModel::PackageModel() : mName("")
     {
     }
 

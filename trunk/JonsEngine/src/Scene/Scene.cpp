@@ -107,11 +107,14 @@ namespace JonsEngine
     {
         mRenderQueue.Clear();
 
-        const Mat4& cameraViewMatrix = GetSceneCamera().GetCameraTransform();
-		const Mat4 cameraProjMatrix = PerspectiveMatrixFov(GetSceneCamera().GetFOV(), windowWidth / static_cast<float>(windowHeight), zNear, zFar);
-        const Mat4 cameraViewProjMatrix = cameraProjMatrix * cameraViewMatrix;
+        const Camera& sceneCamera = GetSceneCamera();
 
         // camera
+        mRenderQueue.mCamera.mCameraPosition = sceneCamera.Position();
+        mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(sceneCamera.GetFOV(), windowWidth / static_cast<float>(windowHeight), zNear, zFar);
+        mRenderQueue.mCamera.mCameraViewMatrix = sceneCamera.GetCameraTransform();
+        const Mat4 cameraViewProjMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
+
 		for (const ActorPtr& actor : mActors)
 		{
 			if (!actor->mSceneNode)
@@ -128,7 +131,7 @@ namespace JonsEngine
         {
             const Vec3& pointLightPosition = pointLight->mSceneNode->Position();
             const Mat4 worldMatrix = pointLight->mSceneNode->GetNodeTransform();
-            const Vec3 camViewLightPosition = Vec3(cameraViewMatrix * Vec4(pointLightPosition, 1.0));
+            const Vec3 camViewLightPosition = Vec3(mRenderQueue.mCamera.mCameraViewMatrix * Vec4(pointLightPosition, 1.0));
 
             // scaled WVP is used for stencil op
             const Mat4 scaledWorldMatrix = glm::scale(worldMatrix, Vec3(pointLight->mMaxDistance));
@@ -144,7 +147,7 @@ namespace JonsEngine
                 const Mat4 faceProjmatrix = PerspectiveMatrixFov(90.0f, 1.0f, gPointLightMinZ, pointLight->mMaxDistance);
 
                 // face wvp matrix
-                renderablePointLight.mFaceWVPMatrices.at(dirIndex) = faceProjmatrix * faceViewMatrix * cameraViewMatrix;
+                renderablePointLight.mFaceWVPMatrices.at(dirIndex) = faceProjmatrix * faceViewMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
 
                 //  cull meshes for each face
                 for (const ActorPtr& actor : mActors)

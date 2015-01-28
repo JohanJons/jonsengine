@@ -22,9 +22,9 @@ namespace JonsEngine
         ResourceManifest(DX11Renderer& renderer, IMemoryAllocatorPtr memoryAllocator);
         ~ResourceManifest();
 
-        ModelPtr CreateRectangle(const std::string& modelName, const float sizeX, const float sizeY, const float sizeZ);
-        ModelPtr CreateCube(const std::string& modelName, const float size);
-        ModelPtr CreateSphere(const std::string& modelName, const float radius, const uint32_t rings, const uint32_t sectors);
+        ModelPtr CreateRectangle(const std::string& modelName, const float sizeX, const float sizeY, const float sizeZ, MaterialPtr material);
+        ModelPtr CreateCube(const std::string& modelName, const float size, MaterialPtr material);
+        ModelPtr CreateSphere(const std::string& modelName, const float radius, const uint32_t rings, const uint32_t sectors, MaterialPtr material);
         ModelPtr LoadModel(const std::string& assetName, const JonsPackagePtr jonsPkg);
         ModelPtr GetModel(const std::string& modelName);
 

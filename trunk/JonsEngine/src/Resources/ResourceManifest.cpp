@@ -19,7 +19,7 @@ namespace JonsEngine
     }
 
 
-    ModelPtr ResourceManifest::CreateRectangle(const std::string& modelName, const float sizeX, const float sizeY, const float sizeZ)
+    ModelPtr ResourceManifest::CreateRectangle(const std::string& modelName, const float sizeX, const float sizeY, const float sizeZ, MaterialPtr material)
     {
         ModelPtr model = GetModel(modelName);
         if (model)
@@ -40,17 +40,17 @@ namespace JonsEngine
 
 		const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
 		auto allocator = mMemoryAllocator;
-		mModels.emplace_back(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds, meshID, nullptr), [=](Model* model) { allocator->DeallocateObject(model); });
+        mModels.emplace_back(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds, meshID, material), [=](Model* model) { allocator->DeallocateObject(model); });
 
         return mModels.back();
     }
 
-    ModelPtr ResourceManifest::CreateCube(const std::string& modelName, const float size)
+    ModelPtr ResourceManifest::CreateCube(const std::string& modelName, const float size, MaterialPtr material)
     {
-        return CreateRectangle(modelName, size, size, size);
+        return CreateRectangle(modelName, size, size, size, material);
     }
 
-    ModelPtr ResourceManifest::CreateSphere(const std::string& modelName, const float radius, const uint32_t rings, const uint32_t sectors)
+    ModelPtr ResourceManifest::CreateSphere(const std::string& modelName, const float radius, const uint32_t rings, const uint32_t sectors, MaterialPtr material)
     {
         ModelPtr model = GetModel(modelName);
         if (model)
@@ -68,7 +68,7 @@ namespace JonsEngine
 
 		const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
 		auto allocator = mMemoryAllocator;
-		mModels.emplace_back(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds, meshID, nullptr), [=](Model* model) { allocator->DeallocateObject(model); });
+        mModels.emplace_back(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds, meshID, material), [=](Model* model) { allocator->DeallocateObject(model); });
 
 		return mModels.back();
     }
@@ -86,7 +86,7 @@ namespace JonsEngine
         if (iter != jonsPkg->mModels.end())
         {
             auto allocator = mMemoryAllocator;
-			auto loadMaterialFunc = std::bind(&ResourceManifest::LoadMaterial, this, std::placeholders::_1, this, std::placeholders::_2);
+			auto loadMaterialFunc = std::bind(&ResourceManifest::LoadMaterial, this, std::placeholders::_1, std::placeholders::_2);
 			mModels.emplace_back(allocator->AllocateObject<Model>(mRenderer, jonsPkg, *iter, loadMaterialFunc), [=](Model* model) { allocator->DeallocateObject(model); });
             model = mModels.back();
         }

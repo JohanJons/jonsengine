@@ -110,7 +110,7 @@ namespace JonsEngine
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-		for (const RenderableModel& model : renderQueue.mVisibleModels)
+		for (const RenderableModel& model : renderQueue.mCamera.mModels)
         {
             assert(model.mMesh.mMeshID != INVALID_MESH_ID);
 
@@ -123,7 +123,7 @@ namespace JonsEngine
             if (hasNormalTexture)
                 mTextureMap.GetItem(model.mMaterial.mNormalTextureID).Bind();
 
-            mGBuffer.SetConstantData(model.mMesh.mWVPMatrix, renderQueue.mCameraViewMatrix * model.mMesh.mWorldMatrix, model.mMaterial.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
+            mGBuffer.SetConstantData(model.mMesh.mWVPMatrix, renderQueue.mCamera.mCameraViewMatrix * model.mMesh.mWorldMatrix, model.mMaterial.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
             mMeshMap.GetItem(model.mMesh.mMeshID).Draw();
         }
     }
@@ -138,7 +138,7 @@ namespace JonsEngine
         // disable further depth writing
         mContext->OMSetDepthStencilState(mDepthStencilState, 0);
 
-        const Mat4 invCameraProjMatrix = glm::inverse(renderQueue.mCameraProjectionMatrix);
+        const Mat4 invCameraProjMatrix = glm::inverse(renderQueue.mCamera.mCameraProjectionMatrix);
 
         // ambient light
         mAmbientPass.Render(invCameraProjMatrix, renderQueue.mAmbientLight, mScreenSize, SSAOEnabled);
@@ -148,7 +148,7 @@ namespace JonsEngine
 
         // do all directional lights
         for (const RenderableDirLight& directionalLight : renderQueue.mDirectionalLights)
-            mDirectionalLightPass.Render(directionalLight, renderQueue.mFOV, mScreenSize.x / mScreenSize.y, renderQueue.mCameraViewMatrix, invCameraProjMatrix, mScreenSize, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
+            mDirectionalLightPass.Render(directionalLight, renderQueue.mCamera.mFOV, mScreenSize.x / mScreenSize.y, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix, mScreenSize, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
 
         // do all point lights
         mPointLightPass.BindForShading();
@@ -175,6 +175,6 @@ namespace JonsEngine
             mPostProcessor.FXAAPass(mBackbuffer, mScreenSize);
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
-            mAABBPass.Render(renderQueue, renderQueue.mCameraProjectionMatrix * renderQueue.mCameraViewMatrix);
+            mAABBPass.Render(renderQueue, renderQueue.mCamera.mCameraProjectionMatrix * renderQueue.mCamera.mCameraViewMatrix);
     }
 }
