@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Scene/Mesh.h"
+#include "include/Resources/JonsPackage.h"
 #include "include/Core/Types.h"
 
 #include <string>
@@ -8,32 +9,32 @@
 
 namespace JonsEngine
 {
+	class DX11Renderer;
     struct PackageNode;
+
+	typedef const std::function<MaterialPtr(const std::string& assetName, const JonsPackagePtr jonsPkg)>& LoadMaterialFunc;
 
     class ModelNode
     {
     public:
-        ModelNode(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds);
-        ModelNode(const PackageNode& model);
+        ModelNode(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material);
+        ModelNode(DX11Renderer& renderer, const JonsPackagePtr jonsPkg, const PackageNode& node, LoadMaterialFunc loadMaterialFunction);
         ~ModelNode();
 
         void Transform(const Mat4& transformMatrix);
-
-		const std::string& GetName() const;
 
         const Mat4& GetTransformMatrix() const;
         const Vec3& GetAABBCenter() const;
         const Vec3& GetAABBExtent() const;
 
-		std::vector<Mesh>& GetMeshes();
 		const std::vector<Mesh>& GetMeshes() const;
-        std::vector<ModelNode>& GetChildNodes();
 		const std::vector<ModelNode>& GetChildNodes() const;
 
 
-    private:
 		const std::string mName;
 
+
+    private:
         Mat4 mTransform;
         Vec3 mAABBCenter;
         Vec3 mAABBExtent;

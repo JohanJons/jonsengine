@@ -120,7 +120,7 @@ namespace JonsEngine
 			const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform();
             const Mat4 wvpMatrix = cameraViewProjMatrix * worldMatrix;
 
-            CullMeshes<RenderableModel>(mRenderQueue.mCamera.mModels, actor->mModel->GetRootNode(), wvpMatrix, worldMatrix);
+            CullMeshes<RenderableModel>(mRenderQueue.mCamera.mModels, actor->mModel->mRootNode, wvpMatrix, worldMatrix);
 		}
 
         // point lights
@@ -153,7 +153,7 @@ namespace JonsEngine
                         continue;
 
                     const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform();
-                    CullMeshes<RenderableMesh>(renderablePointLight.mMeshes.at(dirIndex), actor->mModel->GetRootNode(), renderablePointLight.mFaceWVPMatrices.at(dirIndex) * worldMatrix, worldMatrix);
+					CullMeshes<RenderableMesh>(renderablePointLight.mMeshes.at(dirIndex), actor->mModel->mRootNode, renderablePointLight.mFaceWVPMatrices.at(dirIndex) * worldMatrix, worldMatrix);
                 }
             }
         }
@@ -218,9 +218,7 @@ namespace JonsEngine
     
     PointLight* Scene::GetPointLight(const std::string& lightName)
     {
-        size_t hashedID = boost::hash_value(lightName);
-
-        auto iter = std::find_if(mPointLights.begin(), mPointLights.end(), [hashedID](const PointLightPtr& storedLight) { return storedLight->mHashedID == hashedID; });
+		auto iter = std::find_if(mPointLights.begin(), mPointLights.end(), [lightName](const PointLightPtr& storedLight) { return *storedLight == lightName; });
         if (iter == mPointLights.end())
             return nullptr;
 
@@ -250,9 +248,7 @@ namespace JonsEngine
     
     DirectionalLight* Scene::GetDirectionalLight(const std::string& lightName)
     {
-        size_t hashedID = boost::hash_value(lightName);
-
-        auto iter = std::find_if(mDirectionalLights.begin(), mDirectionalLights.end(), [hashedID](const DirectionalLightPtr& storedLight) { return storedLight->mHashedID == hashedID; });
+        auto iter = std::find_if(mDirectionalLights.begin(), mDirectionalLights.end(), [lightName](const DirectionalLightPtr& storedLight) { return *storedLight == lightName; });
         if (iter == mDirectionalLights.end())
             return nullptr;
 
@@ -284,10 +280,5 @@ namespace JonsEngine
     SceneNode& Scene::GetRootNode()
 	{ 
 		return mRootNode;
-	}
-
-    const std::string& Scene::GetSceneName() const
-	{ 
-		return mName;
 	}
 }

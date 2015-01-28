@@ -6,6 +6,7 @@
 #include "boost/functional/hash.hpp"
 #include <algorithm>
 #include <sstream>
+#include <functional>
 
 namespace JonsEngine
 {
@@ -31,20 +32,17 @@ namespace JonsEngine
         if (!CreateRectangleData(sizeX, sizeY, sizeZ, vertexData, normalData, texcoordData, indiceData))
             return model;
 
-        auto allocator = mMemoryAllocator;
-
         const float halfX = sizeX / 2.0f;
         const float halfY = sizeY / 2.0f;
         const float halfZ = sizeZ / 2.0f;
-        Vec3 minBounds(-halfX, -halfY, -halfZ);
-        Vec3 maxBounds(halfX, halfY, halfZ);
+        const Vec3 minBounds(-halfX, -halfY, -halfZ);
+        const Vec3 maxBounds(halfX, halfY, halfZ);
 
-        model = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds), [=](Model* model) { allocator->DeallocateObject(model); }));
+		const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
+		auto allocator = mMemoryAllocator;
+		mModels.emplace_back(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds, meshID, nullptr), [=](Model* model) { allocator->DeallocateObject(model); });
 
-        const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
-        model->GetRootNode().GetMeshes().emplace_back("RectangleMesh", minBounds, maxBounds, meshID, nullptr);
-
-        return model;
+        return mModels.back();
     }
 
     ModelPtr ResourceManifest::CreateCube(const std::string& modelName, const float size)
@@ -65,17 +63,14 @@ namespace JonsEngine
         if (!CreateSphereData(radius, rings, sectors, vertexData, normalData, texcoordData, indiceData))
             return model;
 
-        auto allocator = mMemoryAllocator;
+        const Vec3 minBounds(-radius, -radius, -radius);
+        const Vec3 maxBounds(radius, radius, radius);
 
-        Vec3 minBounds(-radius, -radius, -radius);
-        Vec3 maxBounds(radius, radius, radius);
+		const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
+		auto allocator = mMemoryAllocator;
+		mModels.emplace_back(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds, meshID, nullptr), [=](Model* model) { allocator->DeallocateObject(model); });
 
-        model = *mModels.insert(mModels.end(), ModelPtr(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds), [=](Model* model) { allocator->DeallocateObject(model); }));
-        
-        const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
-        model->GetRootNode().GetMeshes().emplace_back("SphereMesh", minBounds, maxBounds, meshID, nullptr);
-
-        return model;
+		return mModels.back();
     }
 
     
@@ -91,7 +86,8 @@ namespace JonsEngine
         if (iter != jonsPkg->mModels.end())
         {
             auto allocator = mMemoryAllocator;
-            mModels.emplace_back(allocator->AllocateObject<Model>(ProcessModel(*iter, jonsPkg)), [=](Model* model) { allocator->DeallocateObject(model); });
+			auto loadMaterialFunc = std::bind(&ResourceManifest::LoadMaterial, this, std::placeholders::_1, this, std::placeholders::_2);
+			mModels.emplace_back(allocator->AllocateObject<Model>(mRenderer, jonsPkg, *iter, loadMaterialFunc), [=](Model* model) { allocator->DeallocateObject(model); });
             model = mModels.back();
         }
 
@@ -121,8 +117,21 @@ namespace JonsEngine
 
         if (iter != jonsPkg->mMaterials.end())
         {
+			const PackageMaterial& pkgMaterial = *iter;
+
+			TextureID diffuseTexture = INVALID_TEXTURE_ID;
+			TextureID normalTexture  = INVALID_TEXTURE_ID;
+
+			if (pkgMaterial.mHasDiffuseTexture)
+				diffuseTexture = mRenderer.CreateTexture(pkgMaterial.mDiffuseTexture.mTextureType, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth, pkgMaterial.mDiffuseTexture.mTextureHeight);
+
+			if (pkgMaterial.mHasNormalTexture)
+				normalTexture = mRenderer.CreateTexture(pkgMaterial.mNormalTexture.mTextureType, pkgMaterial.mNormalTexture.mTextureData, pkgMaterial.mNormalTexture.mTextureWidth, pkgMaterial.mNormalTexture.mTextureHeight);
+
+			// TODO: real specular factor
+			const float specularFactor = 0.02f;
             auto allocator = mMemoryAllocator;
-            mMaterials.emplace_back(allocator->AllocateObject<Material>(ProcessMaterial(*iter, jonsPkg)), [=](Material* material) { allocator->DeallocateObject(material); });
+			mMaterials.emplace_back(allocator->AllocateObject<Material>(pkgMaterial.mName, diffuseTexture, normalTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, specularFactor), [=](Material* material) { allocator->DeallocateObject(material); });
             material = mMaterials.back();
         }
 
@@ -131,76 +140,12 @@ namespace JonsEngine
         
     MaterialPtr ResourceManifest::GetMaterial(const std::string& materialName)
     {
-        MaterialPtr ptr;
+        MaterialPtr material;
         auto iter = std::find_if(mMaterials.begin(), mMaterials.end(), [materialName](const MaterialPtr material) { return *material == materialName; });
 
         if (iter != mMaterials.end())
-            ptr = *iter;
+            material = *iter;
 
-        return ptr;
-    }
-
-
-    ModelPtr ResourceManifest::ProcessModel(const PackageModel& pkgModel, const JonsPackagePtr jonsPkg)
-    {
-        auto allocator = mMemoryAllocator;
-        ModelPtr model(allocator->AllocateObject<Model>(pkgModel.mName, pkgModel.mRootNode.mTransform, pkgModel.mRootNode.mAABB.mMinBounds, pkgModel.mRootNode.mAABB.mMaxBounds), [=](Model* model) { allocator->DeallocateObject(model); });
-
-        for (const PackageNode& node : pkgModel.mNodes)
-            model->GetModelNodes().emplace_back(ProcessModelNode(node, jonsPkg));
-
-
-
-      //      if (mesh.mHasMaterial)
-      //      {
-      //          PackageMaterial& pkgMaterial = jonsPkg->mMaterials.at(mesh.mMaterialIndex);
-      //          model->mMaterial = LoadMaterial(pkgMaterial.mName, jonsPkg);
-       //     }
-
-       //     model->mMesh = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangents, mesh.mBitangents, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
-
-     //   for(PackageModel& m : pkgModel.mChildren)
-     //       model->mChildren.emplace_back(ProcessModel(m, jonsPkg));
-
-        return model;
-    }
-
-    ModelNode ResourceManifest::ProcessModelNode(const PackageNode& pkgNode, const JonsPackagePtr jonsPkg)
-    {
-        ModelNode node(pkgNode.mName, pkgNode.mTransform, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds);
-
-        for (const PackageMesh& mesh : pkgNode.mMeshes)
-            node.mMeshes.emplace_back(ProcessMesh(mesh, jonsPkg));
-
-        return node;
-    }
-
-    Mesh ResourceManifest::ProcessMesh(const PackageMesh& pkgMesh, const JonsPackagePtr jonsPkg)
-    {
-        const MeshID meshID = mRenderer.CreateMesh(pkgMesh.mVertexData, pkgMesh.mNormalData, pkgMesh.mTexCoordsData, pkgMesh.mTangents, pkgMesh.mBitangents, pkgMesh.mIndiceData,
-            pkgMesh.mAABB.mMinBounds, pkgMesh.mAABB.mMaxBounds);
-
-        MaterialPtr material(nullptr);
-        if (pkgMesh.mHasMaterial)
-        {
-            PackageMaterial& pkgMaterial = jonsPkg->mMaterials.at(pkgMesh.mMaterialIndex);
-            material = LoadMaterial(pkgMaterial.mName, jonsPkg);
-        }
-
-        return Mesh(pkgMesh.mName, pkgMesh.mAABB.mMinBounds, pkgMesh.mAABB.mMaxBounds, meshID, material);
-    }
-
-    Material ResourceManifest::ProcessMaterial(const PackageMaterial& pkgMaterial, const JonsPackagePtr jonsPkg)
-    {
-        TextureID diffuseTexture = INVALID_TEXTURE_ID;
-        TextureID normalTexture  = INVALID_TEXTURE_ID;
-
-        if (pkgMaterial.mHasDiffuseTexture)
-            diffuseTexture = mRenderer.CreateTexture(pkgMaterial.mDiffuseTexture.mTextureType, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth, pkgMaterial.mDiffuseTexture.mTextureHeight);
-
-        if (pkgMaterial.mHasNormalTexture)
-            normalTexture = mRenderer.CreateTexture(pkgMaterial.mNormalTexture.mTextureType, pkgMaterial.mNormalTexture.mTextureData, pkgMaterial.mNormalTexture.mTextureWidth, pkgMaterial.mNormalTexture.mTextureHeight);
-
-        return Material(pkgMaterial.mName, diffuseTexture, normalTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, 0.02f);
+        return material;
     }
 }

@@ -48,11 +48,12 @@ namespace JonsEngine
         Camera& GetSceneCamera();
         const Camera& GetSceneCamera() const;
         SceneNode& GetRootNode();
-        const std::string& GetSceneName() const;
+
+
+		const std::string mName;
 
 
     private:
-		const std::string mName;
         const size_t mHashedID;
 
 		Camera mSceneCamera;

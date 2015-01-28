@@ -6,11 +6,13 @@
 
 namespace JonsEngine
 {
-    Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds) : mName(name), mHashedID(boost::hash_value(name)), mRootNode(name, initialTransform, minBounds, maxBounds)
+    Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material) :
+		mName(name), mHashedID(boost::hash_value(name)), mRootNode(name, initialTransform, minBounds, maxBounds, meshID, material)
     {
     }
 
-    Model::Model(const PackageModel& pkgModel) : mName(pkgModel.mName), mHashedID(boost::hash_value(pkgModel.mName)), mRootNode(pkgModel.mRootNode)
+    Model::Model(DX11Renderer& renderer, const JonsPackagePtr jonsPkg, const PackageModel& pkgModel, LoadMaterialFunc loadMaterialFunction) :
+		mName(pkgModel.mName), mHashedID(boost::hash_value(pkgModel.mName)), mRootNode(renderer, jonsPkg, pkgModel.mRootNode, loadMaterialFunction)
     {
     }
 
@@ -27,22 +29,5 @@ namespace JonsEngine
     bool Model::operator==(const std::string& modelName)
     {
         return mHashedID == boost::hash_value(modelName);
-    }
-
-
-	ModelNode& Model::GetRootNode()
-	{
-		return mRootNode;
-	}
-
-		
-	const std::string& Model::GetName() const
-	{
-		return mName;
-	}
-
-    const size_t Model::GetHashedName() const
-    {
-        return mHashedID;
     }
 }
