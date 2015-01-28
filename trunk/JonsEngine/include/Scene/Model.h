@@ -12,27 +12,25 @@
 
 namespace JonsEngine
 {
+	class DX11Renderer;
+
     class Model
     {
     public:
-        Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds);
-        Model(const PackageModel& pkgModel);
+		Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material);
+        Model(DX11Renderer& renderer, const JonsPackagePtr jonsPkg, const PackageModel& pkgModel, LoadMaterialFunc loadMaterialFunction);
         ~Model();
 
 		bool operator==(const Model& m);
         bool operator==(const std::string& modelName);
 
-		ModelNode& GetRootNode();
 
-		const std::string& GetName() const;
-        const size_t GetHashedName() const;
+		const ModelNode mRootNode;
+		const std::string mName;
 
         
     private:
-		const std::string mName;
         const size_t mHashedID;
-
-		ModelNode mRootNode;
     };
 
 	typedef std::shared_ptr<Model> ModelPtr;

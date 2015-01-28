@@ -18,10 +18,13 @@ namespace JonsEngine
 
 
         const std::string mName;
-        const size_t mHashedID;
 
         Vec4 mLightColor;
         Vec3 mLightDirection;
+
+
+	private:
+		const size_t mHashedID;
     };
 
 	typedef std::unique_ptr<DirectionalLight, std::function<void(DirectionalLight*)>> DirectionalLightPtr;

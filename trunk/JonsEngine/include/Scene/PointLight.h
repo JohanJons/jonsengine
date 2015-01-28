@@ -19,12 +19,15 @@ namespace JonsEngine
 
 
         const std::string mName;
-        const size_t mHashedID;
         SceneNodePtr mSceneNode;
 
         Vec4 mLightColor;
         float mLightIntensity;
         float mMaxDistance;
+
+
+	private:
+		const size_t mHashedID;
     };
 
 	typedef std::unique_ptr<PointLight, std::function<void(PointLight*)>> PointLightPtr;
