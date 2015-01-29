@@ -21,13 +21,14 @@ namespace JonsEngine
         const std::vector<ScenePtr>& GetAllScenes() const;
 
 		Scene* GetActiveScene() const;
+        void SetActiveScene(Scene* scene);
         void SetActiveScene(const std::string& sceneName);
 
 
     private:
         IMemoryAllocator& mMemoryAllocator;
+        std::vector<ScenePtr> mScenes;
 
 		Scene* mActiveScene;
-        std::vector<ScenePtr> mScenes;
     };
 }

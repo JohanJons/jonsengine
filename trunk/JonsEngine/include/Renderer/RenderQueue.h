@@ -22,26 +22,26 @@ namespace JonsEngine
 
     struct RenderableMaterial
     {
-        inline RenderableMaterial(const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor, const float tilingFactor)
-            : mDiffuseTextureID(diffuseTexture), mNormalTextureID(normalTexture), mSpecularFactor(specFactor), mTextureTilingFactor(tilingFactor)
+        inline RenderableMaterial(const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor)
+            : mDiffuseTextureID(diffuseTexture), mNormalTextureID(normalTexture), mSpecularFactor(specFactor)
         {
         }
 
         TextureID mDiffuseTextureID;
         TextureID mNormalTextureID;
         float mSpecularFactor;
-        float mTextureTilingFactor;
     };
 
     struct RenderableModel
     {
         inline RenderableModel(const MeshID mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix, const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor, const float tilingFactor) :
-            mMesh(mesh, wvpMatrix, worldMatrix), mMaterial(diffuseTexture, normalTexture, specFactor, tilingFactor)
+            mMesh(mesh, wvpMatrix, worldMatrix), mMaterial(diffuseTexture, normalTexture, specFactor), mTextureTilingFactor(tilingFactor)
         {
         }
 
         RenderableMesh mMesh;
         RenderableMaterial mMaterial;
+        float mTextureTilingFactor;
     };
 
     typedef std::vector<RenderableModel> RenderableModels;

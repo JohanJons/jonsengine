@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    DX11VertexTransformPass::DX11VertexTransformPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const IDMap<DX11Mesh>& meshMap) :
+    DX11VertexTransformPass::DX11VertexTransformPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDMap<DX11Mesh>& meshMap) :
         mContext(context), mTransformCBuffer(device, context, mTransformCBuffer.CONSTANT_BUFFER_SLOT_VERTEX), mMeshMap(meshMap)
     {
         D3D11_INPUT_ELEMENT_DESC inputDescription;

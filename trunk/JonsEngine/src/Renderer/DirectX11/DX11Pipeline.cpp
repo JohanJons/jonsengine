@@ -10,7 +10,7 @@ namespace JonsEngine
 
 
     DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const uint32_t shadowmapResolution,
-        const IDMap<DX11Mesh>& meshMap, const IDMap<DX11Texture>& textureMap) :
+        IDMap<DX11Mesh>& meshMap, IDMap<DX11Texture>& textureMap) :
 
         mLogger(logger),
         mSwapchain(swapchain),
@@ -123,7 +123,7 @@ namespace JonsEngine
             if (hasNormalTexture)
                 mTextureMap.GetItem(model.mMaterial.mNormalTextureID).Bind();
 
-            mGBuffer.SetConstantData(model.mMesh.mWVPMatrix, renderQueue.mCamera.mCameraViewMatrix * model.mMesh.mWorldMatrix, model.mMaterial.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
+            mGBuffer.SetConstantData(model.mMesh.mWVPMatrix, renderQueue.mCamera.mCameraViewMatrix * model.mMesh.mWorldMatrix, model.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
             mMeshMap.GetItem(model.mMesh.mMeshID).Draw();
         }
     }

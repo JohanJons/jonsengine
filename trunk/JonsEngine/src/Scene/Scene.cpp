@@ -110,8 +110,9 @@ namespace JonsEngine
         const Camera& sceneCamera = GetSceneCamera();
 
         // camera
+        mRenderQueue.mCamera.mFOV = sceneCamera.GetFOV();
         mRenderQueue.mCamera.mCameraPosition = sceneCamera.Position();
-        mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(sceneCamera.GetFOV(), windowWidth / static_cast<float>(windowHeight), zNear, zFar);
+        mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(mRenderQueue.mCamera.mFOV, windowWidth / static_cast<float>(windowHeight), zNear, zFar);
         mRenderQueue.mCamera.mCameraViewMatrix = sceneCamera.GetCameraTransform();
         const Mat4 cameraViewProjMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
 
@@ -167,6 +168,9 @@ namespace JonsEngine
             // TODO
             mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, dirLight->mLightDirection);
         }
+
+        // misc
+        mRenderQueue.mAmbientLight = mAmbientLight;
 
         return mRenderQueue;
     }
