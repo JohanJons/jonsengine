@@ -152,7 +152,6 @@ namespace JonsGame
         SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
         ModelPtr modelAlien = mEngine->GetResourceManifest().LoadModel("sectoid", jonsPackage);
         Actor* actorAlien = myScene->CreateActor("actorSectoid", modelAlien, nodeAlien);
-        nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
         nodeAlien->TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
         
         // cube
@@ -193,6 +192,7 @@ namespace JonsGame
         // create a ground plane
         SceneNodePtr nodePlane = myScene->GetRootNode().CreateChildNode("nodePlane");
         ModelPtr plane = mEngine->GetResourceManifest().CreateRectangle("GroundPlane", 64, 1.0, 64, checkerMaterial);
+        plane->SetTextureTilingFactor(64.0f);
         Actor* actorPlane = myScene->CreateActor("actorPlane", plane, nodePlane);
 
         // create a sphere

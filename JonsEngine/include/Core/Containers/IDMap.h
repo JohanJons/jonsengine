@@ -45,8 +45,8 @@ namespace JonsEngine
 
         void MarkAsFree(const ItemID id)
         {
-            const uint32_t index = IDSTORAGE_INDEX_MASK(id);
-            const uint32_t version = IDSTORAGE_VERSION_MASK(id);
+            const uint32_t index = IDMAP_INDEX_MASK(id);
+            const uint32_t version = IDMAP_VERSION_MASK(id);
 
             assert(mItems[index].mVersion == version);
 
@@ -55,23 +55,18 @@ namespace JonsEngine
 
         inline T& GetItem(const ItemID id)
         {
-            const uint32_t index = IDSTORAGE_INDEX_MASK(id);
-            const uint32_t version = IDSTORAGE_VERSION_MASK(id);
+            const uint32_t index = IDMAP_INDEX_MASK(id);
+            const uint32_t version = IDMAP_VERSION_MASK(id);
 
             assert(mItems[index].mVersion == version);
 
             return mItems[index].mItem;
         }
 
-        inline T& GetItem(const ItemID id) const
+        inline T* TryGetItem(const ItemID id) const
         {
-            return GetItem(id);
-        }
-
-        inline T* TryGetItem(const ItemID id)
-        {
-            const uint32_t index = IDSTORAGE_INDEX_MASK(id);
-            const uint32_t version = IDSTORAGE_VERSION_MASK(id);
+            const uint32_t index = IDMAP_INDEX_MASK(id);
+            const uint32_t version = IDMAP_VERSION_MASK(id);
 
             if (mItems[index].mVersion == version)
                 return &mItems[index].mItem;

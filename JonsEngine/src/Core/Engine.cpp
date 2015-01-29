@@ -8,6 +8,7 @@
 #include "include/Scene/Scene.h"
 #include "include/Window/WindowManager.h"
 #include "include/Resources/ResourceManifest.h"
+#include "include/Renderer/RenderQueue.h"
 
 #include <exception>
 #include <functional>
@@ -36,9 +37,6 @@ namespace JonsEngine
     {
         mWindow.Poll();
 
-        // reset render queue
-        mRenderQueue.Clear();
-
 		Scene* activeScene = mSceneManager.GetActiveScene();
 
         // update model matrix of all nodes in active scene
@@ -49,6 +47,6 @@ namespace JonsEngine
         const RenderQueue& renderQueue = activeScene->GetRenderQueue(mWindow.GetScreenWidth(), mWindow.GetScreenHeight(), mRenderer.GetZNear(), mRenderer.GetZFar());
 
         // render the scene
-        mRenderer.Render(mRenderQueue, debugOptions.mRenderingFlags);
+        mRenderer.Render(renderQueue, debugOptions.mRenderingFlags);
     }
 }

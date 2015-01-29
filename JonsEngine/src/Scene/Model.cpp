@@ -30,4 +30,15 @@ namespace JonsEngine
     {
         return mHashedID == boost::hash_value(modelName);
     }
+
+
+    float Model::GetTextureTilingFactor() const
+    {
+        return mTextureTilingFactor;
+    }
+
+    void Model::SetTextureTilingFactor(const float tilingFactor)
+    {
+        mTextureTilingFactor = tilingFactor;
+    }
 }

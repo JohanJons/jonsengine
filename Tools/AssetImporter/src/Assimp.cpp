@@ -139,14 +139,8 @@ namespace JonsAssetImporter
     {
         PackageModel model;
         model.mName = node->mName.C_Str();
-        model.mRootNode.mTransform = aiMat4ToJonsMat4(node->mTransformation);
-
-        // assume root node has no meshes
-        assert(scene->mRootNode->mMeshes == nullptr);
-
-        for (uint32_t i = 0; i < node->mNumChildren; i++)
-            model.mRootNode.mChildNodes.emplace_back(ProcessAssimpNode(scene, node->mChildren[i], materialMap, model.mAABB.mMinBounds, model.mAABB.mMaxBounds));
-
+        model.mRootNode = ProcessAssimpNode(scene, node, materialMap, model.mRootNode.mAABB.mMinBounds, model.mRootNode.mAABB.mMaxBounds);
+        
         return model;
     }
 

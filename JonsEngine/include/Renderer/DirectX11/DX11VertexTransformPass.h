@@ -16,7 +16,7 @@ namespace JonsEngine
     class DX11VertexTransformPass
     {
     public:
-        DX11VertexTransformPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const IDMap<DX11Mesh>& meshMap);
+        DX11VertexTransformPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDMap<DX11Mesh>& meshMap);
         ~DX11VertexTransformPass();
 
         void BindForTransformPass(const D3D_PRIMITIVE_TOPOLOGY primitiveTopology);
@@ -42,6 +42,6 @@ namespace JonsEngine
 
         DX11ConstantBuffer<TransformCBuffer> mTransformCBuffer;
 
-        const IDMap<DX11Mesh>& mMeshMap;
+        IDMap<DX11Mesh>& mMeshMap;
     };
 }

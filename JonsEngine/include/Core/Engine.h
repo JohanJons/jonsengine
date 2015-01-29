@@ -8,7 +8,6 @@
 #include "include/Resources/ResourceManifest.h"
 #include "include/Window/WindowManager.h"
 #include "include/Renderer/DirectX11/DX11Renderer.h"
-#include "include/Renderer/RenderQueue.h"
 
 
 namespace JonsEngine
@@ -18,7 +17,6 @@ namespace JonsEngine
     class Model;
     class IMemoryAllocator;
     class Logger;
-    class SceneNode;
 
     /*
      * Engine is the central controller object.
@@ -49,9 +47,6 @@ namespace JonsEngine
         DX11Renderer mRenderer;
         ResourceManifest mResourceManifest;
         SceneManager mSceneManager;
-
-        RenderQueue mRenderQueue;
-        std::vector<ModelPtr> mVisibleModels;
     };
 
 
