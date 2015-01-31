@@ -46,16 +46,6 @@ namespace JonsEngine
         return mTransform;
     }
 
-    const Vec3& ModelNode::GetAABBCenter() const
-    {
-        return mAABBCenter;
-    }
-
-    const Vec3& ModelNode::GetAABBExtent() const
-    {
-        return mAABBExtent;
-    }
-
 
 	const std::vector<Mesh>& ModelNode::GetMeshes() const
 	{

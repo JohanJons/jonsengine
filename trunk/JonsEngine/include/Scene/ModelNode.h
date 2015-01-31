@@ -24,8 +24,6 @@ namespace JonsEngine
         void Transform(const Mat4& transformMatrix);
 
         const Mat4& GetTransformMatrix() const;
-        const Vec3& GetAABBCenter() const;
-        const Vec3& GetAABBExtent() const;
 
 		const std::vector<Mesh>& GetMeshes() const;
 		const std::vector<ModelNode>& GetChildNodes() const;
@@ -33,11 +31,12 @@ namespace JonsEngine
 
 		const std::string mName;
 
+        const Vec3 mAABBCenter;
+        const Vec3 mAABBExtent;
+
 
     private:
         Mat4 mTransform;
-        Vec3 mAABBCenter;
-        Vec3 mAABBExtent;
 
 		std::vector<Mesh> mMeshes;
         std::vector<ModelNode> mChildNodes;

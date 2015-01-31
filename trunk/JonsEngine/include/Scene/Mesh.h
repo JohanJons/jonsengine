@@ -14,19 +14,17 @@ namespace JonsEngine
         Mesh(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material);
         ~Mesh();
 
-        const Vec3& GetAABBCenter() const;
-        const Vec3& GetAABBExtent() const;
-
 
         const std::string mName;
         const MeshID mMeshID;
+
+        const Vec3 mAABBCenter;
+        const Vec3 mAABBExtent;
 
         MaterialPtr mMaterial;
         float mMaterialTilingFactor;
 
 
     private:
-        Vec3 mAABBCenter;
-        Vec3 mAABBExtent;
     };
 }

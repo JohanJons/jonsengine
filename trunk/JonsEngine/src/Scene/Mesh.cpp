@@ -12,15 +12,4 @@ namespace JonsEngine
     Mesh::~Mesh()
     {
     }
-
-
-    const Vec3& Mesh::GetAABBCenter() const
-    {
-        return mAABBCenter;
-    }
-
-    const Vec3& Mesh::GetAABBExtent() const
-    {
-        return mAABBExtent;
-    }
 }
