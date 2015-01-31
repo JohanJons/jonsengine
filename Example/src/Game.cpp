@@ -153,6 +153,7 @@ namespace JonsGame
         ModelPtr modelAlien = mEngine->GetResourceManifest().LoadModel("sectoid", jonsPackage);
         Actor* actorAlien = myScene->CreateActor("actorSectoid", modelAlien, nodeAlien);
         nodeAlien->TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
+        nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
         
         // cube
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
