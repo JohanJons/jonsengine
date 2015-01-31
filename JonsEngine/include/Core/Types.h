@@ -19,8 +19,8 @@ namespace JonsEngine
     };
     
     // TODO: move mesh/texture id definitions
-    typedef uint64_t MeshID;
-    typedef uint64_t TextureID;
+    typedef uint32_t MeshID;
+    typedef uint32_t TextureID;
 
     const MeshID INVALID_MESH_ID = 0;
     const TextureID INVALID_TEXTURE_ID = 0;
