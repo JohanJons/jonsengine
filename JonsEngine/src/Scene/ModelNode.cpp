@@ -35,12 +35,6 @@ namespace JonsEngine
     }
 
 
-    void ModelNode::Transform(const Mat4& transformMatrix)
-    {
-        mTransform *= transformMatrix;
-    }
-
-
     const Mat4& ModelNode::GetTransformMatrix() const
     {
         return mTransform;

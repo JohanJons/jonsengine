@@ -55,6 +55,7 @@ namespace JonsEngine
 
     private:
         const size_t mHashedID;
+        IMemoryAllocator& mMemoryAllocator;
 
 		Camera mSceneCamera;
         SceneNode mRootNode;

@@ -4,9 +4,12 @@
 #include "include/Core/EngineSettings.h"
 #include "include/Window/MouseCallback.h"
 #include "include/Window/KeyCallback.h"
+#include "include/Resources/JonsPackage.h"
 
 namespace JonsGame
 {
+    class JonsEngine::Scene;
+
     class Game
     {
     public:
@@ -23,6 +26,8 @@ namespace JonsGame
     private:
         void SetupInputCallbacks();
         void SetupScene();
+        void SetupTestScene(JonsEngine::Scene* myScene, JonsEngine::JonsPackagePtr jonsPackage);
+        void SetupSponzaScene(JonsEngine::Scene* myScene, JonsEngine::JonsPackagePtr jonsPackage);
         void UpdateSun();
 
         JonsEngine::EngineSettings mSettings;
@@ -30,6 +35,6 @@ namespace JonsGame
         JonsEngine::Engine* mEngine;
         bool mRunning;
         float mSunAngle;
-        const float mMoveSpeed;
+        float mMoveSpeed;
     };
 }
