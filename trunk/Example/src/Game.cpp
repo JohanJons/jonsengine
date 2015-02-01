@@ -137,43 +137,41 @@ namespace JonsGame
         Scene* myScene = mEngine->GetSceneManager().GetActiveScene();
         JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
 
+        SetupSponzaScene(myScene, jonsPackage);
+        //SetupTestScene(myScene, jonsPackage);
+    }
+
+    void Game::SetupTestScene(Scene* myScene, JonsPackagePtr jonsPackage)
+    {
         // ambient light
-        myScene->SetAmbientLight(Vec4(0.1f));
-        
-        // sponza 
-       /* SceneNodePtr nodeSponza = myScene->GetRootNode().CreateChildNode("sponza");
-        ModelPtr modelSponza = mEngine->GetResourceManifest().LoadModel("sponza", jonsPackage);
-        modelSponza->mSceneNode = nodeSponza;
-        nodeSponza->ScaleNode(Vec3(0.1f));
-        //nodeSponza->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
-        nodeSponza->TranslateNode(Vec3(0.0f, 0.5f, -54.0f));
-        */
+        myScene->SetAmbientLight(Vec4(0.6f));
+
         // sectoid
         SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
         ModelPtr modelAlien = mEngine->GetResourceManifest().LoadModel("sectoid", jonsPackage);
         Actor* actorAlien = myScene->CreateActor("actorSectoid", modelAlien, nodeAlien);
         nodeAlien->TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
         nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
-        
+
         // cube
         SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
         ModelPtr modelCube = mEngine->GetResourceManifest().LoadModel("cube", jonsPackage);
         Actor* actorCube = myScene->CreateActor("actorCube", modelCube, nodeCube);
         nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
-        
+
         // chair
         SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("nodeChair");
         ModelPtr modelChair = mEngine->GetResourceManifest().LoadModel("chair", jonsPackage);
         Actor* actorChair = myScene->CreateActor("actorChair", modelChair, nodeChair);
         nodeChair->TranslateNode(Vec3(-8.0f, 0.5f, -4.0f));
         nodeChair->ScaleNode(Vec3(2.0f));
-        
+
         // house
         SceneNodePtr nodeHouse = myScene->GetRootNode().CreateChildNode("nodeHouse");
         ModelPtr modelHouse = mEngine->GetResourceManifest().LoadModel("house", jonsPackage);
         Actor* actorHouse = myScene->CreateActor("actorHouse", modelHouse, nodeHouse);
         nodeHouse->TranslateNode(Vec3(-7.0f, 0.5f, -15.0f));
-        
+
         // point light
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
         PointLight* movingLight = myScene->CreatePointLight("MovingPointLight", nodeMovingLight);
@@ -181,12 +179,12 @@ namespace JonsGame
         movingLight->mLightIntensity = 2.0f;
         movingLight->mLightColor = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
         nodeMovingLight->TranslateNode(Vec3(5.0f, 3.5f, -15.0f));
-        
+
         // directional light
         DirectionalLight* directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
         directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
         directionalLight->mLightColor = Vec4(0.25f);
-        
+
         // load checker material
         MaterialPtr checkerMaterial = mEngine->GetResourceManifest().LoadMaterial("checkers", jonsPackage);
 
@@ -207,6 +205,24 @@ namespace JonsGame
         ModelPtr cube2 = mEngine->GetResourceManifest().CreateCube("Cube2", 3, checkerMaterial);
         Actor* actorCube2 = myScene->CreateActor("actorCube2", cube2, nodeCube2);
         nodeCube2->TranslateNode(Vec3(11.0f, 2.0f, -15.0f));
+
+        // move up camera
+        myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
+    }
+
+    void Game::SetupSponzaScene(Scene* myScene, JonsPackagePtr jonsPackage)
+    {
+        // ambient light
+        myScene->SetAmbientLight(Vec4(0.1f));
+        
+        mMoveSpeed = 1.0f;
+
+        // sponza 
+        SceneNodePtr nodeSponza = myScene->GetRootNode().CreateChildNode("sponza");
+        ModelPtr modelSponza = mEngine->GetResourceManifest().LoadModel("sponza", jonsPackage);
+        nodeSponza->ScaleNode(Vec3(0.1f));
+        nodeSponza->TranslateNode(Vec3(0.0f, 0.5f, -54.0f));
+        Actor* actorSponza = myScene->CreateActor("actorPlane", modelSponza, nodeSponza);
         
         // move up camera
         myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
