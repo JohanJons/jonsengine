@@ -29,19 +29,19 @@ namespace JonsEngine
     }
 
     template <typename T>
-    void AddAllMeshes(std::vector<T>& resultMeshes, const ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
+    void AddAllMeshes(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
         const Mat4 localWVPMatrix = wvpMatrix * node.GetTransformMatrix();
 
 		for (const Mesh& mesh : node.GetMeshes())
             AddMesh(resultMeshes, mesh, localWVPMatrix, worldMatrix);
 
-		for (const ModelNode& node : node.GetChildNodes())
+		for (ModelNode& node : node.GetChildNodes())
             AddAllMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
     }
 
     template <typename T>
-    void CullMeshes(std::vector<T>& resultMeshes, const ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
+    void CullMeshes(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
         const Mat4 localWVPMatrix = wvpMatrix * node.GetTransformMatrix();
 
@@ -64,7 +64,7 @@ namespace JonsEngine
                         AddMesh(resultMeshes, mesh, localWVPMatrix, worldMatrix);
 				}
 
-				for (const ModelNode& node : node.GetChildNodes())
+				for (ModelNode& node : node.GetChildNodes())
                     CullMeshes(resultMeshes, node, localWVPMatrix, worldMatrix);
 
 				break;
