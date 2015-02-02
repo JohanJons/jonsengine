@@ -191,7 +191,7 @@ namespace JonsGame
         // create a ground plane
         SceneNodePtr nodePlane = myScene->GetRootNode().CreateChildNode("nodePlane");
         ModelPtr plane = mEngine->GetResourceManifest().CreateRectangle("GroundPlane", 64, 1.0, 64, checkerMaterial);
-        plane->SetTextureTilingFactor(64.0f);
+		plane->GetRootNode().GetMeshes()[0].SetTextureTilingFactor(64.0f);
         Actor* actorPlane = myScene->CreateActor("actorPlane", plane, nodePlane);
 
         // create a sphere

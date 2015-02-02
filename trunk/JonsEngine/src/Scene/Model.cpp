@@ -32,13 +32,8 @@ namespace JonsEngine
     }
 
 
-    float Model::GetTextureTilingFactor() const
-    {
-        return mTextureTilingFactor;
-    }
-
-    void Model::SetTextureTilingFactor(const float tilingFactor)
-    {
-        mTextureTilingFactor = tilingFactor;
-    }
+	ModelNode& Model::GetRootNode()
+	{
+		return mRootNode;
+	}
 }

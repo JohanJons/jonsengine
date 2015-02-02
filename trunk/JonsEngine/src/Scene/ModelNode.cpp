@@ -41,12 +41,12 @@ namespace JonsEngine
     }
 
 
-	const std::vector<Mesh>& ModelNode::GetMeshes() const
+	std::vector<Mesh>& ModelNode::GetMeshes()
 	{
 		return mMeshes;
 	}
 
-	const std::vector<ModelNode>& ModelNode::GetChildNodes() const
+	std::vector<ModelNode>& ModelNode::GetChildNodes()
 	{
 		return mChildNodes;
 	}

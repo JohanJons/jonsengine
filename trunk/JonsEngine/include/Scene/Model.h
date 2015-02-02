@@ -24,17 +24,15 @@ namespace JonsEngine
 		bool operator==(const Model& m);
         bool operator==(const std::string& modelName);
 
-        float GetTextureTilingFactor() const;
-        void SetTextureTilingFactor(const float tilingFactor);
+		ModelNode& GetRootNode();
 
 
-		const ModelNode mRootNode;
 		const std::string mName;
 
         
     private:
         const size_t mHashedID;
-        float mTextureTilingFactor;
+		ModelNode mRootNode;
     };
 
 	typedef std::shared_ptr<Model> ModelPtr;

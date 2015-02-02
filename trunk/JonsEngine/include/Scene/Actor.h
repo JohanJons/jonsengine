@@ -13,12 +13,18 @@ namespace JonsEngine
     public:
         Actor(const std::string& name, const ModelPtr model, const SceneNodePtr node);
 
+		bool operator==(const Actor& actor);
+        bool operator==(const std::string& actorName);
+
 
         const std::string mName;
-        const size_t mHashedID;
 
         ModelPtr mModel;
         SceneNodePtr mSceneNode;
+
+
+	private:
+		const size_t mHashedID;
     };
 
     typedef std::unique_ptr<Actor, std::function<void(Actor*)>> ActorPtr;

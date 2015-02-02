@@ -14,6 +14,12 @@ namespace JonsEngine
         Mesh(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material);
         ~Mesh();
 
+		float GetTextureTilingFactor() const;
+        void SetTextureTilingFactor(const float tilingFactor);
+
+		MaterialPtr GetMaterial() const;
+		void SetMaterial(MaterialPtr material);
+
 
         const std::string mName;
         const MeshID mMeshID;
@@ -21,10 +27,9 @@ namespace JonsEngine
         const Vec3 mAABBCenter;
         const Vec3 mAABBExtent;
 
-        MaterialPtr mMaterial;
-        float mMaterialTilingFactor;
-
 
     private:
+		MaterialPtr mMaterial;
+		float mMaterialTilingFactor;
     };
 }
