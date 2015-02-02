@@ -65,7 +65,6 @@ namespace JonsEngine
         std::vector<PointLightPtr> mPointLights;
         std::vector<DirectionalLightPtr> mDirectionalLights;
 
-        IMemoryAllocator& mMemoryAllocator;
         RenderQueue mRenderQueue;
     };
 
