@@ -12,4 +12,26 @@ namespace JonsEngine
     Mesh::~Mesh()
     {
     }
+
+
+	float Mesh::GetTextureTilingFactor() const
+	{
+		return mMaterialTilingFactor;
+	}
+
+    void Mesh::SetTextureTilingFactor(const float tilingFactor)
+	{
+		mMaterialTilingFactor = tilingFactor;
+	}
+
+
+	MaterialPtr Mesh::GetMaterial() const
+	{
+		return mMaterial;
+	}
+
+	void Mesh::SetMaterial(MaterialPtr material)
+	{
+		mMaterial = material;
+	}
 }

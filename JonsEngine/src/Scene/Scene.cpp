@@ -20,7 +20,7 @@ namespace JonsEngine
 
     void AddMesh(std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
-        resultMeshes.emplace_back(mesh.mMeshID, wvpMatrix, worldMatrix, mesh.mMaterial->mDiffuseTexture, mesh.mMaterial->mNormalTexture, mesh.mMaterial->mSpecularFactor, mesh.mMaterialTilingFactor);
+		resultMeshes.emplace_back(mesh.mMeshID, wvpMatrix, worldMatrix, mesh.GetMaterial()->mDiffuseTexture, mesh.GetMaterial()->mNormalTexture, mesh.GetMaterial()->mSpecularFactor, mesh.GetTextureTilingFactor());
     }
 
     void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix)
@@ -124,7 +124,7 @@ namespace JonsEngine
 			const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform();
             const Mat4 wvpMatrix = cameraViewProjMatrix * worldMatrix;
 
-            CullMeshes<RenderableModel>(mRenderQueue.mCamera.mModels, actor->mModel->mRootNode, wvpMatrix, worldMatrix);
+			CullMeshes<RenderableModel>(mRenderQueue.mCamera.mModels, actor->mModel->GetRootNode(), wvpMatrix, worldMatrix);
 		}
 
         // point lights
@@ -157,7 +157,7 @@ namespace JonsEngine
                         continue;
 
                     const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform();
-					CullMeshes<RenderableMesh>(renderablePointLight.mMeshes.at(dirIndex), actor->mModel->mRootNode, renderablePointLight.mFaceWVPMatrices.at(dirIndex) * worldMatrix, worldMatrix);
+					CullMeshes<RenderableMesh>(renderablePointLight.mMeshes.at(dirIndex), actor->mModel->GetRootNode(), renderablePointLight.mFaceWVPMatrices.at(dirIndex) * worldMatrix, worldMatrix);
                 }
             }
         }
@@ -193,9 +193,7 @@ namespace JonsEngine
 
     Actor* Scene::GetActor(const std::string& actorName)
     {
-        size_t hashedID = boost::hash_value(actorName);
-
-        auto iter = std::find_if(mActors.begin(), mActors.end(), [hashedID](const ActorPtr& storedActor) { return storedActor->mHashedID == hashedID; });
+        auto iter = std::find_if(mActors.begin(), mActors.end(), [actorName](const ActorPtr& storedActor) { return *storedActor == actorName; });
         if (iter == mActors.end())
             return nullptr;
 

@@ -23,8 +23,8 @@ namespace JonsEngine
 
         const Mat4& GetTransformMatrix() const;
 
-		const std::vector<Mesh>& GetMeshes() const;
-		const std::vector<ModelNode>& GetChildNodes() const;
+		std::vector<Mesh>& GetMeshes();
+		std::vector<ModelNode>& GetChildNodes();
 
 
 		const std::string mName;
