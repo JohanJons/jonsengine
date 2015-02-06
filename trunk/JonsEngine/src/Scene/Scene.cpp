@@ -46,21 +46,21 @@ namespace JonsEngine
         const Mat4 localWVPMatrix = wvpMatrix * node.GetTransformMatrix();
 
         // test node frustrum
-        FrustrumIntersection nodeAABBIntersection = IsAABBInFrustum(node.mAABBCenter, node.mAABBExtent, localWVPMatrix);
+        AABBIntersection nodeAABBIntersection = IsAABBInFrustum(node.mAABBCenter, node.mAABBExtent, localWVPMatrix);
         switch (nodeAABBIntersection)
         {
 			// if partially inside, recursively test all meshes and child nodes
-			case FRUSTRUM_INTERSECTION_PARTIAL:
+			case AABBIntersection::AABB_INTERSECTION_PARTIAL:
 			{
-				FrustrumIntersection meshAABBIntersection(FRUSTRUM_INTERSECTION_INSIDE);
+				AABBIntersection meshAABBIntersection(AABBIntersection::AABB_INTERSECTION_INSIDE);
 
 				for (const Mesh& mesh : node.GetMeshes())
 				{
                     meshAABBIntersection = IsAABBInFrustum(mesh.mAABBCenter, mesh.mAABBExtent, localWVPMatrix);
-					if (meshAABBIntersection == FRUSTRUM_INTERSECTION_OUTSIDE)
+					if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_OUTSIDE)
 						continue;
 
-					if (meshAABBIntersection == FRUSTRUM_INTERSECTION_INSIDE || meshAABBIntersection == FRUSTRUM_INTERSECTION_PARTIAL)
+					if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_PARTIAL)
                         AddMesh(resultMeshes, mesh, localWVPMatrix, worldMatrix);
 				}
 
@@ -70,13 +70,13 @@ namespace JonsEngine
 				break;
 			}
 
-			case FRUSTRUM_INTERSECTION_INSIDE:
+			case AABBIntersection::AABB_INTERSECTION_INSIDE:
 			{
                 AddAllMeshes(resultMeshes, node, localWVPMatrix, worldMatrix);
 				break;
 			}
 
-			case FRUSTRUM_INTERSECTION_OUTSIDE:
+			case AABBIntersection::AABB_INTERSECTION_OUTSIDE:
 			default:
 				break;
 		}

@@ -51,8 +51,8 @@ namespace JonsEngine
     Mat4 Camera::Orientation() const
     {
         Quaternion rotation;
-        rotation = glm::angleAxis(mVerticalAngle, Vec3(1.0f, 0.0f, 0.0f));
-        rotation = rotation * glm::angleAxis(mHorizontalAngle, Vec3(0.0f, 1.0f, 0.0f));
+        rotation = glm::angleAxis(glm::radians(mVerticalAngle), Vec3(1.0f, 0.0f, 0.0f));
+        rotation = rotation * glm::angleAxis(glm::radians(mHorizontalAngle), Vec3(0.0f, 1.0f, 0.0f));
 
         return glm::toMat4(rotation);
     }
