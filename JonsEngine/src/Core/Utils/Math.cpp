@@ -30,10 +30,34 @@ namespace JonsEngine
         return ret;
     }
 
-	AABBIntersection IsAABBInSphere(const Vec3& center, const Vec3& extent, const Vec3& sphereCentre, const float sphereRadius)
-	{
+    AABBIntersection IsAABBInSphere(const Vec3& center, const Vec3& extent, const Vec3& sphereCentre, const float sphereRadius)
+    {
+        AABBIntersection ret = AABBIntersection::AABB_INTERSECTION_INSIDE;
 
-	}
+        const Vec3 min(center.x - extent.x, center.y - extent.y, center.z - extent.z);
+        const Vec3 max(center.x + extent.x, center.y + extent.y, center.z + extent.z);
+
+        float distSquared = std::pow(sphereRadius, 2.0f);
+        if (sphereCentre.x < min.x)
+            distSquared -= std::pow(sphereCentre.x - min.x, 2.0f);
+        else if (sphereCentre.x > max.x)
+            distSquared -= std::pow(sphereCentre.x - max.x, 2.0f);
+        if (sphereCentre.y < min.y)
+            distSquared -= std::pow(sphereCentre.y - min.y, 2.0f);
+        else if (sphereCentre.y > max.y)
+            distSquared -= std::pow(sphereCentre.y - max.y, 2.0f);
+        if (sphereCentre.z < min.z)
+            distSquared -= std::pow(sphereCentre.z - min.z, 2.0f);
+        else if (sphereCentre.z > max.z)
+            distSquared -= std::pow(sphereCentre.z - max.z, 2.0f);
+
+        if (distSquared > 0)
+            ret = AABBIntersection::AABB_INTERSECTION_PARTIAL;
+        else
+            ret = AABBIntersection::AABB_INTERSECTION_OUTSIDE;
+
+        return ret;
+    }
 
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float aspectRatio, const float zNear, const float zFar)
     {

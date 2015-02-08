@@ -31,7 +31,7 @@ namespace JonsEngine
     template <typename T>
     void AddAllMeshes(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
-        const Mat4 localWVPMatrix = wvpMatrix * node.GetTransformMatrix();
+        const Mat4 localWVPMatrix = wvpMatrix * node.mTransform;
 
 		for (const Mesh& mesh : node.GetMeshes())
             AddMesh(resultMeshes, mesh, localWVPMatrix, worldMatrix);
@@ -43,7 +43,7 @@ namespace JonsEngine
     template <typename T>
     void CullMeshes(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
-        const Mat4 localWVPMatrix = wvpMatrix * node.GetTransformMatrix();
+        const Mat4 localWVPMatrix = wvpMatrix * node.mTransform;
 
         // test node frustrum
         AABBIntersection nodeAABBIntersection = IsAABBInFrustum(node.mAABBCenter, node.mAABBExtent, localWVPMatrix);
@@ -138,7 +138,7 @@ namespace JonsEngine
             const Mat4 scaledWorldMatrix = glm::scale(worldMatrix, Vec3(pointLight->mMaxDistance));
             const Mat4 scaledWVPMatrix = cameraViewProjMatrix * scaledWorldMatrix;
 
-            mRenderQueue.mPointLights.emplace_back(scaledWVPMatrix, pointLight->mLightColor, pointLightPosition, pointLight->mLightIntensity, pointLight->mMaxDistance);
+            mRenderQueue.mPointLights.emplace_back(scaledWVPMatrix, pointLight->mLightColor, camViewLightPosition, pointLight->mLightIntensity, pointLight->mMaxDistance);
             RenderablePointLight& renderablePointLight = mRenderQueue.mPointLights.back();
 
             // for each cubemap face (6) of the point light, get meshes in view

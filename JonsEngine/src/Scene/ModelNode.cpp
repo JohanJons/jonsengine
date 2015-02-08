@@ -35,12 +35,6 @@ namespace JonsEngine
     }
 
 
-    const Mat4& ModelNode::GetTransformMatrix() const
-    {
-        return mTransform;
-    }
-
-
 	std::vector<Mesh>& ModelNode::GetMeshes()
 	{
 		return mMeshes;

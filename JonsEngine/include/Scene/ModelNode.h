@@ -21,20 +21,18 @@ namespace JonsEngine
         ModelNode(DX11Renderer& renderer, const JonsPackagePtr jonsPkg, const PackageNode& node, LoadMaterialFunc loadMaterialFunction);
         ~ModelNode();
 
-        const Mat4& GetTransformMatrix() const;
-
 		std::vector<Mesh>& GetMeshes();
 		std::vector<ModelNode>& GetChildNodes();
 
 
 		const std::string mName;
+        const Mat4 mTransform;
 
         const Vec3 mAABBCenter;
         const Vec3 mAABBExtent;
 
 
     private:
-        Mat4 mTransform;
 
 		std::vector<Mesh> mMeshes;
         std::vector<ModelNode> mChildNodes;
