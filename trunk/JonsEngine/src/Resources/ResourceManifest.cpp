@@ -81,7 +81,7 @@ namespace JonsEngine
             return model;
 
         size_t hashedName = boost::hash_value(assetName);
-        std::vector<PackageModel>::iterator iter = std::find_if(jonsPkg->mModels.begin(), jonsPkg->mModels.end(), [hashedName](const PackageModel pkgModel) { return boost::hash_value(pkgModel.mName) == hashedName; });
+        std::vector<PackageModel>::iterator iter = std::find_if(jonsPkg->mModels.begin(), jonsPkg->mModels.end(), [hashedName](const PackageModel& pkgModel) { return boost::hash_value(pkgModel.mName) == hashedName; });
 
         if (iter != jonsPkg->mModels.end())
         {
@@ -113,7 +113,7 @@ namespace JonsEngine
             return material;
 
         size_t hashedName = boost::hash_value(assetName);
-        auto iter = std::find_if(jonsPkg->mMaterials.begin(), jonsPkg->mMaterials.end(), [hashedName](const PackageMaterial pkgMaterial) { return boost::hash_value(pkgMaterial.mName) == hashedName; });
+        auto iter = std::find_if(jonsPkg->mMaterials.begin(), jonsPkg->mMaterials.end(), [hashedName](const PackageMaterial& pkgMaterial) { return boost::hash_value(pkgMaterial.mName) == hashedName; });
 
         if (iter != jonsPkg->mMaterials.end())
         {

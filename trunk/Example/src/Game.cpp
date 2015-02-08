@@ -144,7 +144,7 @@ namespace JonsGame
     void Game::SetupTestScene(Scene* myScene, JonsPackagePtr jonsPackage)
     {
         // ambient light
-        myScene->SetAmbientLight(Vec4(0.6f));
+        myScene->SetAmbientLight(Vec4(0.05f));
 
         // sectoid
         SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
