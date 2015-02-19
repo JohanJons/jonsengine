@@ -4,7 +4,12 @@
 
 namespace JonsEngine
 {
-    AABBIntersection IsAABBInFrustum(const Vec3& center, const Vec3& extent, const Mat4& frustumMatrix)
+    AABB::AABB(const Vec3& center, const Vec3& extent) : mAABBCenter(center), mAABBExtent(extent)
+    {
+    }
+
+
+    AABBIntersection IsAABBInFrustum(const AABB& aabb, const Mat4& frustumMatrix)
     {
         const Vec4 rowX(frustumMatrix[0].x, frustumMatrix[1].x, frustumMatrix[2].x, frustumMatrix[3].x);
         const Vec4 rowY(frustumMatrix[0].y, frustumMatrix[1].y, frustumMatrix[2].y, frustumMatrix[3].y);
@@ -18,8 +23,8 @@ namespace JonsEngine
         float d = 0.0f, r = 0.0f;
         for (const Vec4& plane : planes)
         {
-            d = glm::dot(Vec3(plane), center);
-            r = glm::dot(glm::abs(Vec3(plane)), extent);
+            d = glm::dot(Vec3(plane), aabb.mAABBCenter);
+            r = glm::dot(glm::abs(Vec3(plane)), aabb.mAABBExtent);
             
             if (d - r < -plane.w)
                 ret = AABBIntersection::AABB_INTERSECTION_PARTIAL;
@@ -30,12 +35,12 @@ namespace JonsEngine
         return ret;
     }
 
-    AABBIntersection IsAABBInSphere(const Vec3& center, const Vec3& extent, const Vec3& sphereCentre, const float sphereRadius)
+    AABBIntersection IsAABBInSphere(const AABB& aabb, const Vec3& sphereCentre, const float sphereRadius)
     {
         AABBIntersection ret = AABBIntersection::AABB_INTERSECTION_INSIDE;
 
-        const Vec3 min(center.x - extent.x, center.y - extent.y, center.z - extent.z);
-        const Vec3 max(center.x + extent.x, center.y + extent.y, center.z + extent.z);
+        const Vec3 min(aabb.mAABBCenter.x - aabb.mAABBExtent.x, aabb.mAABBCenter.y - aabb.mAABBExtent.y, aabb.mAABBCenter.z - aabb.mAABBExtent.z);
+        const Vec3 max(aabb.mAABBCenter.x + aabb.mAABBExtent.x, aabb.mAABBCenter.y + aabb.mAABBExtent.y, aabb.mAABBCenter.z + aabb.mAABBExtent.z);
 
         float distSquared = std::pow(sphereRadius, 2.0f);
         if (sphereCentre.x < min.x)

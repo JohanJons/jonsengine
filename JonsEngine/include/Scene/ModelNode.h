@@ -33,7 +33,6 @@ namespace JonsEngine
 
 
     private:
-
 		std::vector<Mesh> mMeshes;
         std::vector<ModelNode> mChildNodes;
     };

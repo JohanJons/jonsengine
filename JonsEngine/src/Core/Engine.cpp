@@ -40,7 +40,7 @@ namespace JonsEngine
 		Scene* activeScene = mSceneManager.GetActiveScene();
 
         // update model matrix of all nodes in active scene
-        // TODO: only on change in scene node
+        // TODO: this is wrong.
 		activeScene->GetRootNode().UpdateModelMatrix(gIdentityMatrix);
 
         // get renderqueue from scene

@@ -40,6 +40,8 @@ namespace JonsEngine
         DX11Renderer& mRenderer;
         std::vector<ModelPtr> mModels;
         std::vector<MaterialPtr> mMaterials;
+
+        ModelDataCollection mModelData;
     };
 
 
