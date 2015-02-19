@@ -15,8 +15,17 @@ namespace JonsEngine
     /*
      * Contains various math utilities
      */
+
+    typedef Mat4 Transform;
      
-    const Mat4 gIdentityMatrix(1.0f);
+    struct AABB
+    {
+        AABB(const Vec3& center, const Vec3& extent);
+
+
+        Vec3 mAABBCenter;
+        Vec3 mAABBExtent;
+    };
     
     enum class AABBIntersection
     {
@@ -24,13 +33,15 @@ namespace JonsEngine
         AABB_INTERSECTION_PARTIAL,
         AABB_INTERSECTION_OUTSIDE
     };
-    
-    AABBIntersection IsAABBInFrustum(const Vec3& center, const Vec3& extent, const Mat4& frustumMatrix);
-	AABBIntersection IsAABBInSphere(const Vec3& center, const Vec3& extent, const Vec3& sphereCentre, const float sphereRadius);
+
+    AABBIntersection IsAABBInFrustum(const AABB& aabb, const Mat4& frustumMatrix);
+    AABBIntersection IsAABBInSphere(const AABB& aabb, const Vec3& sphereCentre, const float sphereRadius);
 
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float ratio, const float zNear, const float zFar);
     Mat4 OrthographicMatrix(const float left, const float right, const float top, const float bottom, const float zNear, const float zFar);
 
     Vec3 MinVal(const Vec3& v1, const Vec3& v2);
     Vec3 MaxVal(const Vec3& v1, const Vec3& v2);
+
+    const Mat4 gIdentityMatrix(1.0f);
 }

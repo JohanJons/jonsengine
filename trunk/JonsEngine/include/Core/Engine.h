@@ -42,7 +42,7 @@ namespace JonsEngine
         Logger& mLog;
         IMemoryAllocatorPtr mMemoryAllocator;
 
-        /* Modules */
+        // Subsystems
         WindowManager mWindow;
         DX11Renderer mRenderer;
         ResourceManifest mResourceManifest;

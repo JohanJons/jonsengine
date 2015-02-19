@@ -54,6 +54,9 @@ namespace JonsEngine
 
 
     private:
+        void CullFrustrum(std::vector<MeshID>& visibleMeshes, ModelNode& node, const Mat4& wvpMatrix);
+
+
         const size_t mHashedID;
         IMemoryAllocator& mMemoryAllocator;
 
