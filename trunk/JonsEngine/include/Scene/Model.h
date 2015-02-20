@@ -1,7 +1,6 @@
 #pragma once
 
 #include "include/Scene/SceneNode.h"
-#include "include/Scene/ModelNode.h"
 #include "include/Scene/Material.h"
 #include "include/Resources/JonsPackage.h"
 #include "include/Core/Types.h"
@@ -17,28 +16,35 @@ namespace JonsEngine
 
     struct ModelMesh
     {
-        ModelMesh(const MeshID meshID, const uint32_t aabbIndex, const uint32_t transformIndex);
+		typedef std::vector<ModelMesh>::size_type Index;
+
+		ModelMesh(const MeshID meshID, MaterialPtr material, const AABB::Index aabbIndex, const Transform::Index transformIndex);
 
 
         const MeshID mMeshID;
 
-        const AABB* mAABBIndex;
-        const Transform* mTransformIndex;
+		MaterialPtr mMaterial;
+
+        const AABB::Index mAABBIndex;
+		const Transform::Index mTransformIndex;
     };
 
     struct ModelNode
     {
-        ModelNode(const uint32_t aabbIndex, const uint32_t transformIndex);
+		typedef std::vector<ModelNode>::size_type Index;
 
+		ModelNode(const ModelNode::Index childrenBegin, const ModelNode::Index childrenEnd, const ModelMesh::Index meshesBegin, const ModelMesh::Index meshesEnd, const AABB::Index aabb, const Transform::Index transform);
 
-        const ModelNode* mNodeStart;
-        const ModelNode* mNodeEnd;
+		// '-end' is the index past the end of the range
+        const ModelNode::Index mChildrenBegin;
+		const ModelNode::Index mChildrenEnd;
 
-        const ModelMesh* mMeshStart;
-        const ModelMesh* mMeshEnd;
+		// see comment about model indices above
+		const ModelMesh::Index mMeshesBegin;
+		const ModelMesh::Index mMeshesEnd;
 
-        const AABB* mAABB;
-        const Transform* mTransform;
+        const AABB::Index mAABB;
+		const Transform::Index mTransform;
     };
 
     struct ModelDataCollection
@@ -49,9 +55,11 @@ namespace JonsEngine
         std::vector<ModelNode> mNodes;
     };
 
+	typedef const std::function<MaterialPtr(const std::string& assetName, const JonsPackagePtr jonsPkg)>& LoadMaterialFunc;
+
     struct Model
     {
-		Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material);
+		Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material, ModelDataCollection& modelData);
         Model(DX11Renderer& renderer, const JonsPackagePtr jonsPkg, const PackageModel& pkgModel, LoadMaterialFunc loadMaterialFunction, ModelDataCollection& modelData);
         ~Model();
 
@@ -62,7 +70,7 @@ namespace JonsEngine
 		const std::string mName;
         const size_t mHashedID;
 
-        const ModelNode* mRootNode;
+        const ModelNode::Index mRootNode;
     };
 
 	typedef std::shared_ptr<Model> ModelPtr;
