@@ -373,12 +373,6 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11AABBPass.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Scene\Mesh.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scene\ModelNode.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11LightAccumulationbuffer.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>

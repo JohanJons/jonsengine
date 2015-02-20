@@ -16,10 +16,15 @@ namespace JonsEngine
      * Contains various math utilities
      */
 
-    typedef Mat4 Transform;
-     
+	struct Transform : Mat4
+	{
+		typedef std::vector<Transform>::size_type Index;
+	};
+
     struct AABB
     {
+		typedef std::vector<AABB>::size_type Index;
+
         AABB(const Vec3& center, const Vec3& extent);
 
 
