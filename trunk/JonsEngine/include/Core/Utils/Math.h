@@ -6,7 +6,7 @@
 #include "glm/gtx/rotate_vector.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/quaternion.hpp"
-#include <array>
+#include <vector>
 #include <math.h>
 
 
@@ -15,15 +15,15 @@ namespace JonsEngine
     /*
      * Contains various math utilities
      */
-
-	struct Transform : Mat4
-	{
-		typedef std::vector<Transform>::size_type Index;
-	};
+     
+    struct Transform : Mat4
+    {
+        typedef std::vector<Transform>::size_type Index;
+    };
 
     struct AABB
     {
-		typedef std::vector<AABB>::size_type Index;
+        typedef std::vector<AABB>::size_type Index;
 
         AABB(const Vec3& center, const Vec3& extent);
 
@@ -31,7 +31,7 @@ namespace JonsEngine
         Vec3 mAABBCenter;
         Vec3 mAABBExtent;
     };
-    
+
     enum class AABBIntersection
     {
         AABB_INTERSECTION_INSIDE,

@@ -18,125 +18,71 @@ namespace JonsEngine
                                                                                   Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f) };
 
 
-    void AddMesh(std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& worldMatrix)
+    void AddMesh(std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
-		resultMeshes.emplace_back(mesh.mMeshID, worldMatrix, mesh.GetMaterial()->mDiffuseTexture, mesh.GetMaterial()->mNormalTexture, mesh.GetMaterial()->mSpecularFactor, mesh.GetTextureTilingFactor());
+		resultMeshes.emplace_back(mesh.mMeshID, wvpMatrix, worldMatrix, mesh.GetMaterial()->mDiffuseTexture, mesh.GetMaterial()->mNormalTexture, mesh.GetMaterial()->mSpecularFactor, mesh.GetTextureTilingFactor());
     }
 
-    void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& worldMatrix)
+    void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
-        resultMeshes.emplace_back(mesh.mMeshID, worldMatrix);
-    }
-
-    void AddMesh(std::vector<uint32_t>& resultMeshes, const ModelMesh& mesh, const Mat4& worldMatrix)
-    {
-        resultMeshes.push_back(mesh.mMeshID);
+        resultMeshes.emplace_back(mesh.mMeshID, wvpMatrix, worldMatrix);
     }
 
     template <typename T>
-    void AddAllMeshes(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& worldMatrix)
+    void AddAllMeshes(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
-        const Mat4 localWorldMatrix = worldMatrix * node.mTransform;
+        const Mat4 localWVPMatrix = wvpMatrix * node.mTransform;
 
 		for (const Mesh& mesh : node.GetMeshes())
-            AddMesh(resultMeshes, mesh, localWorldMatrix);
+            AddMesh(resultMeshes, mesh, localWVPMatrix, worldMatrix * node.mTransform);
 
 		for (ModelNode& node : node.GetChildNodes())
-            AddAllMeshes(resultMeshes, node, localWorldMatrix);
+            AddAllMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
     }
 
-    void AddAllMeshes2(const Model& model, const ModelNode& node)
-    {
-
-    }
-
-    void Scene::CullFrustrum(std::vector<MeshID>& visibleMeshes, ModelNode& node, const Mat4& wvpMatrix)
-    {
-        const AABB& aabb = mAABBs.at(node.mAABBIndex);
-
-        const Mat4 localWVPMatrix = wvpMatrix * mTransforms.at(node.mTransformIndex);
-
-        AABBIntersection nodeAABBIntersection = IsAABBInFrustum(aabb, localWVPMatrix);
-        switch (nodeAABBIntersection)
-        {
-            // if partially inside, recursively test all meshes and child nodes
-            case AABBIntersection::AABB_INTERSECTION_PARTIAL:
-            {
-                AABBIntersection meshAABBIntersection(AABBIntersection::AABB_INTERSECTION_INSIDE);
-
-                for (uint32_t meshIndex = node.mMeshStartIndex; meshIndex < node.mMeshEndIndex; meshIndex++)
-                {
-                    const ModelMesh& mesh = mMeshes.at(meshIndex);
-                    const AABB& aabbMesh = mAABBs.at(mesh.mAABBIndex);
-
-                    meshAABBIntersection = IsAABBInFrustum(aabbMesh, localWVPMatrix);
-                    if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_OUTSIDE)
-                        continue;
-
-                    if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_PARTIAL)
-                        visibleMeshes.push_back(mesh.mMeshID);
-                }
-
-                for (uint32_t nodeIndex = node.mNodeStartIndex; nodeIndex < node.mNodeEndIndex; nodeIndex++)
-                    CullFrustrum(visibleMeshes, mNodes.at(nodeIndex), localWVPMatrix);
-
-                break;
-            }
-
-            case AABBIntersection::AABB_INTERSECTION_INSIDE:
-            {
-                for (uint32_t meshIndex = node.mMeshStartIndex; meshIndex < node.mMeshEndIndex; meshIndex++)
-                    visibleMeshes.push_back(mMeshes.at(meshIndex).mMeshID);
-
-                break;
-            }
-
-            case AABBIntersection::AABB_INTERSECTION_OUTSIDE:
-            default:
-                break;
-        }
-    }
-
-    /*void CullMeshesSphere(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius)
+    template <typename T>
+    void CullMeshes(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
         const Mat4 localWVPMatrix = wvpMatrix * node.mTransform;
 
         // test node frustrum
-        AABBIntersection nodeAABBIntersection = IsAABBInFrustum(node.mAABBCenter, node.mAABBExtent, localWVPMatrix);
+        AABBIntersection nodeAABBIntersection = IsAABBInFrustum(node.mAABB, localWVPMatrix);
         switch (nodeAABBIntersection)
         {
-            // if partially inside, recursively test all meshes and child nodes
-        case AABBIntersection::AABB_INTERSECTION_PARTIAL:
-        {
-            AABBIntersection meshAABBIntersection(AABBIntersection::AABB_INTERSECTION_INSIDE);
+			// if partially inside, recursively test all meshes and child nodes
+			case AABBIntersection::AABB_INTERSECTION_PARTIAL:
+			{
+				AABBIntersection meshAABBIntersection(AABBIntersection::AABB_INTERSECTION_INSIDE);
 
-            for (const Mesh& mesh : node.GetMeshes())
-            {
-                meshAABBIntersection = IsAABBInFrustum(mesh.mAABBCenter, mesh.mAABBExtent, localWVPMatrix);
-                if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_OUTSIDE)
-                    continue;
+				for (const Mesh& mesh : node.GetMeshes())
+				{
+                    meshAABBIntersection = IsAABBInFrustum(mesh.mAABB, localWVPMatrix);
+					if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_OUTSIDE)
+						continue;
 
-                if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_PARTIAL)
-                    AddMesh(resultMeshes, mesh, invViewProjMatrix * localWVPMatrix);
-            }
+					if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_PARTIAL)
+                        AddMesh(resultMeshes, mesh, localWVPMatrix, worldMatrix * node.mTransform);
+				}
 
-            for (ModelNode& node : node.GetChildNodes())
-                CullMeshesFrustrum(resultMeshes, node, localWVPMatrix, invViewProjMatrix, worldMatrix);
+                // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
+				for (ModelNode& node : node.GetChildNodes())
+                    CullMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
 
-            break;
-        }
+				break;
+			}
 
-        case AABBIntersection::AABB_INTERSECTION_INSIDE:
-        {
-            AddAllMeshes(resultMeshes, node, invViewProjMatrix * localWVPMatrix);
-            break;
-        }
+			case AABBIntersection::AABB_INTERSECTION_INSIDE:
+			{
+                AddAllMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
+				break;
+			}
 
-        case AABBIntersection::AABB_INTERSECTION_OUTSIDE:
-        default:
-            break;
-        }
-    }*/
+			case AABBIntersection::AABB_INTERSECTION_OUTSIDE:
+			default:
+				break;
+		}
+    }
+
 
     Scene::Scene(const std::string& sceneName) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mRootNode("Root"), mAmbientLight(0.2f)
     {
@@ -169,9 +115,7 @@ namespace JonsEngine
         mRenderQueue.mCamera.mCameraPosition = sceneCamera.Position();
         mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(mRenderQueue.mCamera.mFOV, windowWidth / static_cast<float>(windowHeight), zNear, zFar);
         mRenderQueue.mCamera.mCameraViewMatrix = sceneCamera.GetCameraTransform();
-        
         const Mat4 cameraViewProjMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
-        const Mat4 invCamViewProjMatrix = glm::inverse(cameraViewProjMatrix);
 
 		for (const ActorPtr& actor : mActors)
 		{
@@ -181,11 +125,11 @@ namespace JonsEngine
 			const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform();
             const Mat4 wvpMatrix = cameraViewProjMatrix * worldMatrix;
 
-            CullFrustrum(mRenderQueue.mCamera.mModels, mNodes.at(actor->mModel->mRootNodeIndex), wvpMatrix);
+			CullMeshes<RenderableModel>(mRenderQueue.mCamera.mModels, actor->mModel->GetRootNode(), wvpMatrix, worldMatrix);
 		}
 
         // point lights
-        /*for (const PointLightPtr& pointLight : mPointLights)
+        for (const PointLightPtr& pointLight : mPointLights)
         {
             const Vec3& pointLightPosition = pointLight->mSceneNode->Position();
             const Mat4 worldMatrix = pointLight->mSceneNode->GetNodeTransform();
@@ -217,7 +161,7 @@ namespace JonsEngine
 					CullMeshes<RenderableMesh>(renderablePointLight.mMeshes.at(dirIndex), actor->mModel->GetRootNode(), renderablePointLight.mFaceWVPMatrices.at(dirIndex) * worldMatrix, worldMatrix);
                 }
             }
-        }*/
+        }
 
         // dir lights
         for (const DirectionalLightPtr& dirLight : mDirectionalLights)
@@ -228,7 +172,7 @@ namespace JonsEngine
 
         // misc
         mRenderQueue.mAmbientLight = mAmbientLight;
-        
+
         return mRenderQueue;
     }
 

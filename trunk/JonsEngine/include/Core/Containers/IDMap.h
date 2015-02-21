@@ -11,7 +11,7 @@ namespace JonsEngine
     #define IDMAP_VERSION_MASK(id) (id >> 16) & 0xFFFFFFFF
 
     /*
-     * Contigous-memory ID-mapped container.
+     * Contigous-memory ID-based container.
      */
     template<typename T>
     class IDMap

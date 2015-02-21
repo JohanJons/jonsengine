@@ -17,7 +17,7 @@ namespace JonsEngine
         const Vec4 rowW(frustumMatrix[0].w, frustumMatrix[1].w, frustumMatrix[2].w, frustumMatrix[3].w);
 
         AABBIntersection ret(AABBIntersection::AABB_INTERSECTION_INSIDE);
-        
+
         // left, right, bottom, top, near, far planes
         std::array<Vec4, 6> planes = { rowW + rowX, rowW - rowX, rowW + rowY, rowW - rowY, rowW + rowZ, rowW - rowZ };
         float d = 0.0f, r = 0.0f;
@@ -25,13 +25,13 @@ namespace JonsEngine
         {
             d = glm::dot(Vec3(plane), aabb.mAABBCenter);
             r = glm::dot(glm::abs(Vec3(plane)), aabb.mAABBExtent);
-            
+
             if (d - r < -plane.w)
                 ret = AABBIntersection::AABB_INTERSECTION_PARTIAL;
             if (d + r < -plane.w)
                 return AABBIntersection::AABB_INTERSECTION_OUTSIDE;
         }
-        
+
         return ret;
     }
 

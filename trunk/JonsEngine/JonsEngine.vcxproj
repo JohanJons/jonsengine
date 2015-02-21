@@ -210,7 +210,9 @@
     <ClInclude Include="include\Scene\Camera.h" />
     <ClInclude Include="include\Scene\DirectionalLight.h" />
     <ClInclude Include="include\Scene\Material.h" />
+    <ClInclude Include="include\Scene\Mesh.h" />
     <ClInclude Include="include\Scene\Model.h" />
+    <ClInclude Include="include\Scene\ModelNode.h" />
     <ClInclude Include="include\Scene\PointLight.h" />
     <ClInclude Include="include\Scene\Scene.h" />
     <ClInclude Include="include\Scene\SceneManager.h" />

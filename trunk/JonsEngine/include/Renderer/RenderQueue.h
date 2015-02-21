@@ -2,19 +2,19 @@
 
 #include "include/Core/Types.h"
 
-#include "boost/container/flat_map.hpp"
 #include <vector>
 
 namespace JonsEngine
 {
     struct RenderableMesh
     {
-        inline RenderableMesh(const MeshID mesh, const Mat4& worldMatrix) : mMeshID(mesh), mWorldMatrix(worldMatrix)
+        inline RenderableMesh(const MeshID mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix) : mMeshID(mesh), mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix)
         {
         }
 
 
         MeshID mMeshID;
+        Mat4 mWVPMatrix;
         Mat4 mWorldMatrix;
     };
     
@@ -34,8 +34,8 @@ namespace JonsEngine
 
     struct RenderableModel
     {
-        inline RenderableModel(const MeshID mesh, const Mat4& worldMatrix, const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor, const float tilingFactor) :
-            mMesh(mesh, worldMatrix), mMaterial(diffuseTexture, normalTexture, specFactor), mTextureTilingFactor(tilingFactor)
+        inline RenderableModel(const MeshID mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix, const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor, const float tilingFactor) :
+            mMesh(mesh, wvpMatrix, worldMatrix), mMaterial(diffuseTexture, normalTexture, specFactor), mTextureTilingFactor(tilingFactor)
         {
         }
 
@@ -98,9 +98,8 @@ namespace JonsEngine
         float mLightIntensity;
         float mMaxDistance;
 
-        RenderableMeshes mMeshes;
-		//std::array<RenderableMeshes, POINT_LIGHT_DIR::POINT_LIGHT_DIR_COUNT> mMeshes;
-        //std::array<Mat4, POINT_LIGHT_DIR::POINT_LIGHT_DIR_COUNT> mFaceWVPMatrices;
+		std::array<RenderableMeshes, POINT_LIGHT_DIR::POINT_LIGHT_DIR_COUNT> mMeshes;
+        std::array<Mat4, POINT_LIGHT_DIR::POINT_LIGHT_DIR_COUNT> mFaceWVPMatrices;
     };
     
     typedef std::vector<RenderablePointLight> RenderablePointLights;
@@ -116,25 +115,5 @@ namespace JonsEngine
         RenderableCamera mCamera;
         RenderableDirLights mDirectionalLights;
         RenderablePointLights mPointLights;
-    };
-
-
-
-
-    struct RenderableMesh2
-    {
-        MeshID mMeshID;
-        Mat4 mWorldMatrix;
-    };
-
-    typedef boost::container::flat_map<uint32_t, RenderableMesh> RenderableMeshes2;
-
-    struct RenderQueue2
-    {
-
-        RenderableMeshes2 mMeshes;
-
-
-        std::vector<std::tuple<RenderableMeshes::size_type, RenderableMeshes::size_type>> mCams;
     };
 }
