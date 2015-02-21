@@ -2,6 +2,7 @@
 
 #include "include/Scene/Material.h"
 #include "include/Core/Types.h"
+#include "include/Core/Utils/Math.h"
 
 #include <string>
 #include <vector>
@@ -24,8 +25,7 @@ namespace JonsEngine
         const std::string mName;
         const MeshID mMeshID;
 
-        const Vec3 mAABBCenter;
-        const Vec3 mAABBExtent;
+        const AABB mAABB;
 
 
     private:

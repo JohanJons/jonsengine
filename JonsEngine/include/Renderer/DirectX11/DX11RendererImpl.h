@@ -68,6 +68,8 @@ namespace JonsEngine
         DX11Sampler mShadowmapNoCompareSampler;
         bool mSSAOEnabled;
 
+        //std::vector<DX11MeshPtr> mMeshes;
+        //std::vector<DX11TexturePtr> mTextures;
         IDMap<DX11Mesh> mMeshes;
         IDMap<DX11Texture> mTextures;
     };

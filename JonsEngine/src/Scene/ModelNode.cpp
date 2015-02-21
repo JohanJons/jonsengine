@@ -7,13 +7,13 @@
 namespace JonsEngine
 {
     ModelNode::ModelNode(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material) :
-        mName(name), mTransform(initialTransform), mAABBCenter(0.5f * (minBounds + maxBounds)), mAABBExtent(0.5f * (maxBounds - minBounds))
+        mName(name), mTransform(initialTransform), mAABB(0.5f * (minBounds + maxBounds), 0.5f * (maxBounds - minBounds))
     {
 		mMeshes.emplace_back(name, minBounds, maxBounds, meshID, material);
     }
 
-    ModelNode::ModelNode(DX11Renderer& renderer, const JonsPackagePtr jonsPkg, const PackageNode& node, LoadMaterialFunc loadMaterialFunction) :
-        mName(node.mName), mTransform(node.mTransform), mAABBCenter(0.5f * (node.mAABB.mMinBounds + node.mAABB.mMaxBounds)), mAABBExtent(0.5f * (node.mAABB.mMaxBounds - node.mAABB.mMinBounds))
+    ModelNode::ModelNode(DX11Renderer& renderer, const JonsPackagePtr jonsPkg, const PackageNode& node, const Mat4& parentTransform, LoadMaterialFunc loadMaterialFunction) :
+        mName(node.mName), mTransform(parentTransform * node.mTransform), mAABB(0.5f * (node.mAABB.mMinBounds + node.mAABB.mMaxBounds), 0.5f * (node.mAABB.mMaxBounds - node.mAABB.mMinBounds))
     {
 		for (const PackageMesh& mesh : node.mMeshes)
 		{
@@ -26,8 +26,10 @@ namespace JonsEngine
 			mMeshes.emplace_back(mesh.mName, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds, meshID, material);
 		}
 
-		for (const PackageNode& node : node.mChildNodes)
-			mChildNodes.emplace_back(renderer, jonsPkg, node, loadMaterialFunction);
+        // save absolue model transforms rather than relative to parent. 
+        // this might cause trouble when doing animations?
+		for (const PackageNode& child : node.mChildNodes)
+            mChildNodes.emplace_back(renderer, jonsPkg, child, mTransform, loadMaterialFunction);
     }
 
     ModelNode::~ModelNode()
