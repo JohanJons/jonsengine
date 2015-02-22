@@ -39,6 +39,7 @@ namespace JonsEngine
         AABB_INTERSECTION_OUTSIDE
     };
 
+    // note: make sure frustrum and aabb are in the same space
     AABBIntersection IsAABBInFrustum(const AABB& aabb, const Mat4& frustumMatrix);
     AABBIntersection IsAABBInSphere(const AABB& aabb, const Vec3& sphereCentre, const float sphereRadius);
 

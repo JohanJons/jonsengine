@@ -41,7 +41,7 @@ namespace JonsEngine
     }
 
     template <typename T>
-    void CullMeshes(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
+    void CullMeshesFrustrum(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
         const Mat4 localWVPMatrix = wvpMatrix * node.mTransform;
 
@@ -66,7 +66,7 @@ namespace JonsEngine
 
                 // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
 				for (ModelNode& node : node.GetChildNodes())
-                    CullMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
+                    CullMeshesFrustrum(resultMeshes, node, wvpMatrix, worldMatrix);
 
 				break;
 			}
@@ -81,6 +81,46 @@ namespace JonsEngine
 			default:
 				break;
 		}
+    }
+
+    void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, ModelNode& node, const Vec3& sphereCentre, const Vec3& sphereExtent)
+    {
+        // test node frustrum
+        AABBIntersection nodeAABBIntersection = IsAABBInFrustum(node.mAABB, localWVPMatrix);
+        switch (nodeAABBIntersection)
+        {
+            // if partially inside, recursively test all meshes and child nodes
+        case AABBIntersection::AABB_INTERSECTION_PARTIAL:
+        {
+            AABBIntersection meshAABBIntersection(AABBIntersection::AABB_INTERSECTION_INSIDE);
+
+            for (const Mesh& mesh : node.GetMeshes())
+            {
+                meshAABBIntersection = IsAABBInFrustum(mesh.mAABB, localWVPMatrix);
+                if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_OUTSIDE)
+                    continue;
+
+                if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_PARTIAL)
+                    AddMesh(resultMeshes, mesh, localWVPMatrix, worldMatrix * node.mTransform);
+            }
+
+            // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
+            for (ModelNode& node : node.GetChildNodes())
+                CullMeshesFrustrum(resultMeshes, node, wvpMatrix, worldMatrix);
+
+            break;
+        }
+
+        case AABBIntersection::AABB_INTERSECTION_INSIDE:
+        {
+            AddAllMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
+            break;
+        }
+
+        case AABBIntersection::AABB_INTERSECTION_OUTSIDE:
+        default:
+            break;
+        }
     }
 
 
@@ -125,7 +165,7 @@ namespace JonsEngine
 			const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform();
             const Mat4 wvpMatrix = cameraViewProjMatrix * worldMatrix;
 
-			CullMeshes<RenderableModel>(mRenderQueue.mCamera.mModels, actor->mModel->GetRootNode(), wvpMatrix, worldMatrix);
+            CullMeshesFrustrum<RenderableModel>(mRenderQueue.mCamera.mModels, actor->mModel->GetRootNode(), wvpMatrix, worldMatrix);
 		}
 
         // point lights
@@ -158,7 +198,7 @@ namespace JonsEngine
                         continue;
 
                     const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform();
-					CullMeshes<RenderableMesh>(renderablePointLight.mMeshes.at(dirIndex), actor->mModel->GetRootNode(), renderablePointLight.mFaceWVPMatrices.at(dirIndex) * worldMatrix, worldMatrix);
+                    CullMeshesFrustrum<RenderableMesh>(renderablePointLight.mMeshes.at(dirIndex), actor->mModel->GetRootNode(), renderablePointLight.mFaceWVPMatrices.at(dirIndex) * worldMatrix, worldMatrix);
                 }
             }
         }
