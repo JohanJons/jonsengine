@@ -37,12 +37,10 @@ namespace JonsEngine
 
     AABBIntersection IsAABBInSphere(const AABB& aabb, const Vec3& sphereCentre, const float sphereRadius)
     {
-        AABBIntersection ret = AABBIntersection::AABB_INTERSECTION_INSIDE;
-
-        const Vec3 min(aabb.mAABBCenter.x - aabb.mAABBExtent.x, aabb.mAABBCenter.y - aabb.mAABBExtent.y, aabb.mAABBCenter.z - aabb.mAABBExtent.z);
-        const Vec3 max(aabb.mAABBCenter.x + aabb.mAABBExtent.x, aabb.mAABBCenter.y + aabb.mAABBExtent.y, aabb.mAABBCenter.z + aabb.mAABBExtent.z);
-
         float distSquared = std::pow(sphereRadius, 2.0f);
+        const Vec3 min = Vec3(sphereCentre.x - sphereRadius, sphereCentre.y - sphereRadius, sphereCentre.z - sphereRadius);
+        const Vec3 max = Vec3(sphereCentre.x + sphereRadius, sphereCentre.y + sphereRadius, sphereCentre.z + sphereRadius);
+
         if (sphereCentre.x < min.x)
             distSquared -= std::pow(sphereCentre.x - min.x, 2.0f);
         else if (sphereCentre.x > max.x)
@@ -55,13 +53,8 @@ namespace JonsEngine
             distSquared -= std::pow(sphereCentre.z - min.z, 2.0f);
         else if (sphereCentre.z > max.z)
             distSquared -= std::pow(sphereCentre.z - max.z, 2.0f);
-
-        if (distSquared > 0)
-            ret = AABBIntersection::AABB_INTERSECTION_PARTIAL;
-        else
-            ret = AABBIntersection::AABB_INTERSECTION_OUTSIDE;
-
-        return ret;
+        
+        return distSquared > 0 ? AABBIntersection::AABB_INTERSECTION_PARTIAL : AABBIntersection::AABB_INTERSECTION_OUTSIDE;
     }
 
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float aspectRatio, const float zNear, const float zFar)
