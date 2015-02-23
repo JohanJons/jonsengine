@@ -18,6 +18,17 @@ namespace JonsEngine
     class DX11PointLightPass
     {
     public:
+        enum POINT_LIGHT_DIR
+        {
+            POINT_LIGHT_DIR_POS_X = 0,
+            POINT_LIGHT_DIR_NEG_X,
+            POINT_LIGHT_DIR_POS_Y,
+            POINT_LIGHT_DIR_NEG_Y,
+            POINT_LIGHT_DIR_NEG_Z,
+            POINT_LIGHT_DIR_POS_Z,
+            POINT_LIGHT_DIR_COUNT
+        };
+
         DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize);
         ~DX11PointLightPass();
 

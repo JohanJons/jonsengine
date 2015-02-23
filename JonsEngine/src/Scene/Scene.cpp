@@ -9,15 +9,6 @@
 
 namespace JonsEngine
 {
-    const float gPointLightMinZ = 0.1f;
-
-    const Vec3 gCubemapDirVectors[RenderablePointLight::POINT_LIGHT_DIR_COUNT] = { Vec3(1.0f, 0.0f, 0.0f), Vec3(-1.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f),
-                                                                                   Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 0.0f, 1.0f) };
-
-    const Vec3 gCubemapUpVectors[RenderablePointLight::POINT_LIGHT_DIR_COUNT] = { Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f),
-                                                                                  Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f) };
-
-
     void AddMesh(std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
 		resultMeshes.emplace_back(mesh.mMeshID, wvpMatrix, worldMatrix, mesh.GetMaterial()->mDiffuseTexture, mesh.GetMaterial()->mNormalTexture, mesh.GetMaterial()->mSpecularFactor, mesh.GetTextureTilingFactor());
@@ -83,43 +74,23 @@ namespace JonsEngine
 		}
     }
 
-    void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, ModelNode& node, const Vec3& sphereCentre, const Vec3& sphereExtent)
+    void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, ModelNode& node, const Vec3& sphereCentre, const float sphereRadius)
     {
         // test node frustrum
-        AABBIntersection nodeAABBIntersection = IsAABBInFrustum(node.mAABB, localWVPMatrix);
+		AABBIntersection nodeAABBIntersection = IsAABBInSphere(node.mAABB, sphereCentre, sphereRadius);
         switch (nodeAABBIntersection)
         {
             // if partially inside, recursively test all meshes and child nodes
-        case AABBIntersection::AABB_INTERSECTION_PARTIAL:
-        {
-            AABBIntersection meshAABBIntersection(AABBIntersection::AABB_INTERSECTION_INSIDE);
+			// TODO: check for INSIDE aswell
+			case AABBIntersection::AABB_INTERSECTION_PARTIAL:
+			{
+				AddAllMeshes(resultMeshes, node, Mat4(1.0f), Mat4(1.0f));
+				break;
+			}
 
-            for (const Mesh& mesh : node.GetMeshes())
-            {
-                meshAABBIntersection = IsAABBInFrustum(mesh.mAABB, localWVPMatrix);
-                if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_OUTSIDE)
-                    continue;
-
-                if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_PARTIAL)
-                    AddMesh(resultMeshes, mesh, localWVPMatrix, worldMatrix * node.mTransform);
-            }
-
-            // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-            for (ModelNode& node : node.GetChildNodes())
-                CullMeshesFrustrum(resultMeshes, node, wvpMatrix, worldMatrix);
-
-            break;
-        }
-
-        case AABBIntersection::AABB_INTERSECTION_INSIDE:
-        {
-            AddAllMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
-            break;
-        }
-
-        case AABBIntersection::AABB_INTERSECTION_OUTSIDE:
-        default:
-            break;
+			case AABBIntersection::AABB_INTERSECTION_OUTSIDE:
+			default:
+				break;
         }
     }
 
@@ -182,8 +153,10 @@ namespace JonsEngine
             mRenderQueue.mPointLights.emplace_back(scaledWVPMatrix, pointLight->mLightColor, camViewLightPosition, pointLight->mLightIntensity, pointLight->mMaxDistance);
             RenderablePointLight& renderablePointLight = mRenderQueue.mPointLights.back();
 
+
+
             // for each cubemap face (6) of the point light, get meshes in view
-            for (uint32_t dirIndex = 0; dirIndex < RenderablePointLight::POINT_LIGHT_DIR_COUNT; dirIndex++)
+            /*for (uint32_t dirIndex = 0; dirIndex < RenderablePointLight::POINT_LIGHT_DIR_COUNT; dirIndex++)
             {
                 const Mat4 faceViewMatrix = glm::lookAt(camViewLightPosition, camViewLightPosition + gCubemapDirVectors[dirIndex], gCubemapUpVectors[dirIndex]);
                 const Mat4 faceProjmatrix = PerspectiveMatrixFov(90.0f, 1.0f, gPointLightMinZ, pointLight->mMaxDistance);
@@ -200,7 +173,7 @@ namespace JonsEngine
                     const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform();
                     CullMeshesFrustrum<RenderableMesh>(renderablePointLight.mMeshes.at(dirIndex), actor->mModel->GetRootNode(), renderablePointLight.mFaceWVPMatrices.at(dirIndex) * worldMatrix, worldMatrix);
                 }
-            }
+            }*/
         }
 
         // dir lights

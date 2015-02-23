@@ -9,6 +9,15 @@
 
 namespace JonsEngine
 {
+    const float gPointLightMinZ = 0.1f;
+
+    const Vec3 gCubemapDirVectors[DX11PointLightPass::POINT_LIGHT_DIR_COUNT] = { Vec3(1.0f, 0.0f, 0.0f), Vec3(-1.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f),
+                                                                                 Vec3(0.0f, -1.0f, 0.0f), Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 0.0f, 1.0f) };
+
+    const Vec3 gCubemapUpVectors[DX11PointLightPass::POINT_LIGHT_DIR_COUNT] = { Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 0.0f, 1.0f),
+                                                                                Vec3(0.0f, 0.0f, -1.0f), Vec3(0.0f, 1.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f) };
+
+
     DX11Mesh CreateSphereMesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context)
     {
         const float radius = 1.0f;
@@ -33,7 +42,7 @@ namespace JonsEngine
         mDSSShadingPass(nullptr),
         mSphereMesh(CreateSphereMesh(device, context)),
         mVertexTransformPass(vertexTransformPass),
-        mShadowmap(device, context, shadowmapSize, RenderablePointLight::POINT_LIGHT_DIR_COUNT, true),
+        mShadowmap(device, context, shadowmapSize, DX11PointLightPass::POINT_LIGHT_DIR_COUNT, true),
         mPointLightCBuffer(device, context, mPointLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         // rasterize for front-face culling due to light volumes
@@ -135,10 +144,13 @@ namespace JonsEngine
         mContext->RSSetState(mRSCullFront);
         mShadowmap.BindForDrawing();
 
-        for (uint32_t face = 0; face < RenderablePointLight::POINT_LIGHT_DIR_COUNT; face++)
+        for (uint32_t face = 0; face < DX11PointLightPass::POINT_LIGHT_DIR_COUNT; face++)
         {
+            const Mat4 faceViewMatrix = glm::lookAt(camViewLightPosition, camViewLightPosition + gCubemapDirVectors[dirIndex], gCubemapUpVectors[dirIndex]);
+            const Mat4 faceProjmatrix = PerspectiveMatrixFov(90.0f, 1.0f, gPointLightMinZ, pointLight->mMaxDistance);
+
 			mShadowmap.BindDepthView(face);
-			mVertexTransformPass.RenderMeshes(pointLight.mMeshes.at(face), pointLight.mFaceWVPMatrices.at(face));
+			mVertexTransformPass.RenderMeshes(pointLight.mMeshes, pointLight.mFaceWVPMatrices.at(face));
         }
 
         //

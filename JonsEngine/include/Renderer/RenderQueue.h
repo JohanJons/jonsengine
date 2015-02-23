@@ -79,27 +79,14 @@ namespace JonsEngine
         }
 
 
-		enum POINT_LIGHT_DIR
-		{
-			POINT_LIGHT_DIR_POS_X = 0,
-			POINT_LIGHT_DIR_NEG_X,
-			POINT_LIGHT_DIR_POS_Y,
-			POINT_LIGHT_DIR_NEG_Y,
-			POINT_LIGHT_DIR_NEG_Z,
-			POINT_LIGHT_DIR_POS_Z,
-			POINT_LIGHT_DIR_COUNT
-		};
-
-
-        Mat4 mWVPMatrix;
+		Mat4 mWVPMatrix;
         Vec4 mLightColor;
         Vec3 mLightPosition;
 
         float mLightIntensity;
         float mMaxDistance;
 
-		std::array<RenderableMeshes, POINT_LIGHT_DIR::POINT_LIGHT_DIR_COUNT> mMeshes;
-        std::array<Mat4, POINT_LIGHT_DIR::POINT_LIGHT_DIR_COUNT> mFaceWVPMatrices;
+        RenderableMeshes mMeshes;
     };
     
     typedef std::vector<RenderablePointLight> RenderablePointLights;
