@@ -4,9 +4,39 @@
 
 namespace JonsEngine
 {
-    AABB::AABB(const Vec3& center, const Vec3& extent) : mAABBCenter(center), mAABBExtent(extent)
+	AABB::AABB(const Vec3& center, const Vec3& extent) : mAABBCenter(center, 1.0f), mAABBExtent(extent, 1.0f)
     {
     }
+
+	AABB::AABB(const Vec4& center, const Vec4& extent) : mAABBCenter(center), mAABBExtent(extent)
+	{
+	}
+
+    AABB& AABB::operator*=(const Mat4& transform)
+	{
+		mAABBCenter = transform * mAABBCenter;
+		mAABBExtent = transform * mAABBExtent;
+
+        return *this;
+	}
+
+    AABB operator*(const Mat4& transform, const AABB& aabb)
+	{
+        AABB ret(aabb);
+
+        ret *= transform;
+
+        return ret;
+	}
+
+    AABB operator*(const AABB& aabb, const Mat4& transform)
+	{
+        AABB ret(aabb);
+
+        ret *= transform;
+
+        return ret;
+	}
 
 
     AABBIntersection IsAABBInFrustum(const AABB& aabb, const Mat4& frustumMatrix)
@@ -23,8 +53,8 @@ namespace JonsEngine
         float d = 0.0f, r = 0.0f;
         for (const Vec4& plane : planes)
         {
-            d = glm::dot(Vec3(plane), aabb.mAABBCenter);
-            r = glm::dot(glm::abs(Vec3(plane)), aabb.mAABBExtent);
+            d = glm::dot(plane, aabb.mAABBCenter);
+            r = glm::dot(glm::abs(plane), aabb.mAABBExtent);
 
             if (d - r < -plane.w)
                 ret = AABBIntersection::AABB_INTERSECTION_PARTIAL;
