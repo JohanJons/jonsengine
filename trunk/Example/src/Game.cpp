@@ -137,8 +137,8 @@ namespace JonsGame
         Scene* myScene = mEngine->GetSceneManager().GetActiveScene();
         JonsPackagePtr jonsPackage = ReadJonsPkg("../JonsEngine/bin/Debug/Win32/assets.jons");
 
-        //SetupSponzaScene(myScene, jonsPackage);
-        SetupTestScene(myScene, jonsPackage);
+        SetupSponzaScene(myScene, jonsPackage);
+        //SetupTestScene(myScene, jonsPackage);
     }
 
     void Game::SetupTestScene(Scene* myScene, JonsPackagePtr jonsPackage)

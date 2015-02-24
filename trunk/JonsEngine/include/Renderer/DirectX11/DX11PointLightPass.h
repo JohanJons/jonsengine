@@ -32,7 +32,7 @@ namespace JonsEngine
         DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize);
         ~DX11PointLightPass();
 
-        void Render(const RenderablePointLight& pointLight, const Mat4& invCameraProjMatrix, const Vec2& screenSize, const float zFar, const float zNear);
+		void Render(const RenderablePointLight& pointLight, const Mat4& camViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& screenSize, const float zFar, const float zNear);
 
         void BindForShading();
 

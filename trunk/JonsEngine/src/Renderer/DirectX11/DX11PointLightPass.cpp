@@ -119,7 +119,7 @@ namespace JonsEngine
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
 
-    void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const Mat4& invCameraProjMatrix, const Vec2& screenSize, const float zFar, const float zNear)
+	void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const Mat4& camViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& screenSize, const float zFar, const float zNear)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
@@ -132,6 +132,8 @@ namespace JonsEngine
         mContext->OMGetDepthStencilState(&prevDSState, 0);
         mContext->OMGetRenderTargets(1, &prevRTV, &prevDSV);
         mContext->RSGetViewports(&numViewports, &prevViewport);
+		const Vec4 viewLightPositonV4 = camViewMatrix * Vec4(pointLight.mLightPosition, 1.0);
+		const Vec3 viewLightPositonV3 = Vec3(viewLightPositonV4);
 
 
         //
@@ -144,13 +146,13 @@ namespace JonsEngine
         mContext->RSSetState(mRSCullFront);
         mShadowmap.BindForDrawing();
 
+        const Mat4 faceProjmatrix = PerspectiveMatrixFov(90.0f, 1.0f, gPointLightMinZ, pointLight.mMaxDistance);
         for (uint32_t face = 0; face < DX11PointLightPass::POINT_LIGHT_DIR_COUNT; face++)
         {
-            const Mat4 faceViewMatrix = glm::lookAt(camViewLightPosition, camViewLightPosition + gCubemapDirVectors[dirIndex], gCubemapUpVectors[dirIndex]);
-            const Mat4 faceProjmatrix = PerspectiveMatrixFov(90.0f, 1.0f, gPointLightMinZ, pointLight->mMaxDistance);
+            const Mat4 faceViewMatrix = glm::lookAt(viewLightPositonV3, viewLightPositonV3 + gCubemapDirVectors[face], gCubemapUpVectors[face]);
 
 			mShadowmap.BindDepthView(face);
-			mVertexTransformPass.RenderMeshes(pointLight.mMeshes, pointLight.mFaceWVPMatrices.at(face));
+            mVertexTransformPass.RenderMeshes(pointLight.mMeshes, faceProjmatrix * faceViewMatrix * camViewMatrix);
         }
 
         //

@@ -37,6 +37,7 @@ namespace JonsEngine
         const Mat4 localWVPMatrix = wvpMatrix * node.mTransform;
 
         // test node frustrum
+		// TODO: does this cull objects behind frustrum that still intersects some planes?
         AABBIntersection nodeAABBIntersection = IsAABBInFrustum(node.mAABB, localWVPMatrix);
         switch (nodeAABBIntersection)
         {
@@ -74,17 +75,19 @@ namespace JonsEngine
 		}
     }
 
-    void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, ModelNode& node, const Vec3& sphereCentre, const float sphereRadius)
+	void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius)
     {
+		const AABB worldAABB = worldMatrix * node.mAABB;
+
         // test node frustrum
-		AABBIntersection nodeAABBIntersection = IsAABBInSphere(node.mAABB, sphereCentre, sphereRadius);
+		AABBIntersection nodeAABBIntersection = IsAABBInSphere(worldAABB, sphereCentre, sphereRadius);
         switch (nodeAABBIntersection)
         {
-            // if partially inside, recursively test all meshes and child nodes
-			// TODO: check for INSIDE aswell
+            // TODO: if partially inside, recursively test all meshes and child nodes
+			// TODO: check for INSIDE
 			case AABBIntersection::AABB_INTERSECTION_PARTIAL:
 			{
-				AddAllMeshes(resultMeshes, node, Mat4(1.0f), Mat4(1.0f));
+				AddAllMeshes(resultMeshes, node, Mat4(1.0f), worldMatrix);
 				break;
 			}
 
@@ -142,18 +145,29 @@ namespace JonsEngine
         // point lights
         for (const PointLightPtr& pointLight : mPointLights)
         {
-            const Vec3& pointLightPosition = pointLight->mSceneNode->Position();
+			if (!pointLight->mSceneNode)
+				continue;
+
+			const Vec3 lightPosition = pointLight->mSceneNode->Position();
             const Mat4 worldMatrix = pointLight->mSceneNode->GetNodeTransform();
-            const Vec3 camViewLightPosition = Vec3(mRenderQueue.mCamera.mCameraViewMatrix * Vec4(pointLightPosition, 1.0));
 
             // scaled WVP is used for stencil op
+            // TODO: move to renderer
             const Mat4 scaledWorldMatrix = glm::scale(worldMatrix, Vec3(pointLight->mMaxDistance));
             const Mat4 scaledWVPMatrix = cameraViewProjMatrix * scaledWorldMatrix;
 
-            mRenderQueue.mPointLights.emplace_back(scaledWVPMatrix, pointLight->mLightColor, camViewLightPosition, pointLight->mLightIntensity, pointLight->mMaxDistance);
+			mRenderQueue.mPointLights.emplace_back(scaledWVPMatrix, pointLight->mLightColor, lightPosition, pointLight->mLightIntensity, pointLight->mMaxDistance);
             RenderablePointLight& renderablePointLight = mRenderQueue.mPointLights.back();
 
+			//  cull meshes for each face
+			for (const ActorPtr& actor : mActors)
+			{
+				if (!actor->mSceneNode)
+					continue;
 
+				const Mat4& actorWorldMatrix = actor->mSceneNode->GetNodeTransform();
+				CullMeshesSphere(renderablePointLight.mMeshes, actor->mModel->GetRootNode(), actorWorldMatrix, lightPosition, pointLight->mMaxDistance);
+			}
 
             // for each cubemap face (6) of the point light, get meshes in view
             /*for (uint32_t dirIndex = 0; dirIndex < RenderablePointLight::POINT_LIGHT_DIR_COUNT; dirIndex++)
