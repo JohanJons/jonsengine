@@ -45,14 +45,13 @@ namespace JonsEngine
             Vec4 mLightPosition;
             Vec2 mScreenSize;
             float mLightIntensity;
-            float mMaxDistance;
-            float mZFar;
             float mZNear;
-            float __padding[2];
+            float mMaxDistance;
+            float __padding;
 
 
-            PointLightCBuffer(const Mat4& invProjMatrix, const Vec4& lightColor, const Vec3& lightPosition, const Vec2& screenSize, const float lightIntensity, const float maxDistance, const float zFar, const float zNear) :
-                mInvProjMatrix(invProjMatrix), mLightColor(lightColor), mLightPosition(lightPosition, 1.0f), mScreenSize(screenSize), mLightIntensity(lightIntensity), mMaxDistance(maxDistance), mZFar(zFar), mZNear(zNear)
+            PointLightCBuffer(const Mat4& invProjMatrix, const Vec4& lightColor, const Vec3& lightPosition, const Vec2& screenSize, const float lightIntensity, const float zNear, const float maxDistance) :
+                mInvProjMatrix(invProjMatrix), mLightColor(lightColor), mLightPosition(lightPosition, 1.0f), mScreenSize(screenSize), mLightIntensity(lightIntensity), mMaxDistance(maxDistance), mZNear(zNear)
             {
             }
         };

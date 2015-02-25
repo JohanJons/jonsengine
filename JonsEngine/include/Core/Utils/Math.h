@@ -30,6 +30,9 @@ namespace JonsEngine
 
 		AABB& operator*=(const Mat4& transform);
 
+        Vec4 Min() const;
+        Vec4 Max() const;
+
 
         Vec4 mAABBCenter;
         Vec4 mAABBExtent;
