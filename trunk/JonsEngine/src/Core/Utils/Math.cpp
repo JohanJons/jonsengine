@@ -14,11 +14,30 @@ namespace JonsEngine
 
     AABB& AABB::operator*=(const Mat4& transform)
 	{
-		mAABBCenter = transform * mAABBCenter;
-		mAABBExtent = transform * mAABBExtent;
+        // TODO: perhaps this can be simplified
+        const Vec4 transformedMin = transform * Min();
+        const Vec4 transformedMax = transform * Max();
+
+        mAABBCenter.x = 0.5f * (transformedMin.x + transformedMax.x);
+        mAABBCenter.y = 0.5f * (transformedMin.y + transformedMax.y);
+        mAABBCenter.z = 0.5f * (transformedMin.z + transformedMax.z);
+
+        mAABBExtent.x = 0.5f * (transformedMax.x - transformedMin.x);
+        mAABBExtent.y = 0.5f * (transformedMax.y - transformedMin.y);
+        mAABBExtent.z = 0.5f * (transformedMax.z - transformedMin.z);
 
         return *this;
 	}
+
+    Vec4 AABB::Min() const
+    {
+        return Vec4(mAABBCenter.x - mAABBExtent.x, mAABBCenter.y - mAABBExtent.y, mAABBCenter.z - mAABBExtent.z, 1.0f);
+    }
+
+    Vec4 AABB::Max() const
+    {
+        return Vec4(mAABBCenter.x + mAABBExtent.x, mAABBCenter.y + mAABBExtent.y, mAABBCenter.z + mAABBExtent.z, 1.0f);
+    }
 
     AABB operator*(const Mat4& transform, const AABB& aabb)
 	{
@@ -68,8 +87,8 @@ namespace JonsEngine
     AABBIntersection IsAABBInSphere(const AABB& aabb, const Vec3& sphereCentre, const float sphereRadius)
     {
         float distSquared = std::pow(sphereRadius, 2.0f);
-        const Vec3 min = Vec3(sphereCentre.x - sphereRadius, sphereCentre.y - sphereRadius, sphereCentre.z - sphereRadius);
-        const Vec3 max = Vec3(sphereCentre.x + sphereRadius, sphereCentre.y + sphereRadius, sphereCentre.z + sphereRadius);
+        const Vec4 min = aabb.Min();
+        const Vec4 max = aabb.Max();
 
         if (sphereCentre.x < min.x)
             distSquared -= std::pow(sphereCentre.x - min.x, 2.0f);

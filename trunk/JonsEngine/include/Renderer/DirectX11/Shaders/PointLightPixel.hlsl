@@ -11,9 +11,8 @@ cbuffer PointLightConstants : register(CBUFFER_REGISTER_PIXEL)
     float4 gViewLightPosition;
     float2 gScreenSize;
     float gLightIntensity;
-    float gMaxDistance;
-    float gZFar;
     float gZNear;
+    float gMaxDistance;
 };
 
 Texture2D gDepthTexture : register(TEXTURE_REGISTER_DEPTH);
@@ -28,7 +27,7 @@ float VectorToDepthValue(const float3 Vec)
     float3 AbsVec = abs(Vec);
     float LocalZcomp = max(AbsVec.x, max(AbsVec.y, AbsVec.z));
 
-    const float f = gZFar;
+    const float f = gMaxDistance;
     const float n = gZNear;
 
     float NormZComp = -(f / (n - f) - (n * f) / (n - f) / LocalZcomp);

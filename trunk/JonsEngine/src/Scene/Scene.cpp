@@ -168,26 +168,6 @@ namespace JonsEngine
 				const Mat4& actorWorldMatrix = actor->mSceneNode->GetNodeTransform();
 				CullMeshesSphere(renderablePointLight.mMeshes, actor->mModel->GetRootNode(), actorWorldMatrix, lightPosition, pointLight->mMaxDistance);
 			}
-
-            // for each cubemap face (6) of the point light, get meshes in view
-            /*for (uint32_t dirIndex = 0; dirIndex < RenderablePointLight::POINT_LIGHT_DIR_COUNT; dirIndex++)
-            {
-                const Mat4 faceViewMatrix = glm::lookAt(camViewLightPosition, camViewLightPosition + gCubemapDirVectors[dirIndex], gCubemapUpVectors[dirIndex]);
-                const Mat4 faceProjmatrix = PerspectiveMatrixFov(90.0f, 1.0f, gPointLightMinZ, pointLight->mMaxDistance);
-
-                // face wvp matrix
-                renderablePointLight.mFaceWVPMatrices.at(dirIndex) = faceProjmatrix * faceViewMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
-
-                //  cull meshes for each face
-                for (const ActorPtr& actor : mActors)
-                {
-                    if (!actor->mSceneNode)
-                        continue;
-
-                    const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform();
-                    CullMeshesFrustrum<RenderableMesh>(renderablePointLight.mMeshes.at(dirIndex), actor->mModel->GetRootNode(), renderablePointLight.mFaceWVPMatrices.at(dirIndex) * worldMatrix, worldMatrix);
-                }
-            }*/
         }
 
         // dir lights
