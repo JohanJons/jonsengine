@@ -78,7 +78,7 @@ namespace JonsEngine
         {
         }
 
-
+        // used to render the point light as a sphere mesh 
 		Mat4 mWVPMatrix;
         Vec4 mLightColor;
         Vec3 mLightPosition;

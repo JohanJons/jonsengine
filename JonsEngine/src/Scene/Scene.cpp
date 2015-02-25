@@ -151,8 +151,7 @@ namespace JonsEngine
 			const Vec3 lightPosition = pointLight->mSceneNode->Position();
             const Mat4 worldMatrix = pointLight->mSceneNode->GetNodeTransform();
 
-            // scaled WVP is used for stencil op
-            // TODO: move to renderer
+            // scaled WVP is used for stencil op, might be better moved to the renderer
             const Mat4 scaledWorldMatrix = glm::scale(worldMatrix, Vec3(pointLight->mMaxDistance));
             const Mat4 scaledWVPMatrix = cameraViewProjMatrix * scaledWorldMatrix;
 

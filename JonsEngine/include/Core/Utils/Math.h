@@ -26,16 +26,15 @@ namespace JonsEngine
         typedef std::vector<AABB>::size_type Index;
 
         AABB(const Vec3& center, const Vec3& extent);
-		AABB(const Vec4& center, const Vec4& extent);
 
 		AABB& operator*=(const Mat4& transform);
 
-        Vec4 Min() const;
-        Vec4 Max() const;
+        Vec3 Min() const;
+        Vec3 Max() const;
 
 
-        Vec4 mAABBCenter;
-        Vec4 mAABBExtent;
+        Vec3 mAABBCenter;
+        Vec3 mAABBExtent;
     };
 
     AABB operator*(const Mat4& transform, const AABB& aabb);
