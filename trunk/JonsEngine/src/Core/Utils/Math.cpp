@@ -4,19 +4,15 @@
 
 namespace JonsEngine
 {
-	AABB::AABB(const Vec3& center, const Vec3& extent) : mAABBCenter(center, 1.0f), mAABBExtent(extent, 1.0f)
+	AABB::AABB(const Vec3& center, const Vec3& extent) : mAABBCenter(center), mAABBExtent(extent)
     {
     }
-
-	AABB::AABB(const Vec4& center, const Vec4& extent) : mAABBCenter(center), mAABBExtent(extent)
-	{
-	}
 
     AABB& AABB::operator*=(const Mat4& transform)
 	{
         // TODO: perhaps this can be simplified
-        const Vec4 transformedMin = transform * Min();
-        const Vec4 transformedMax = transform * Max();
+        const Vec4 transformedMin = transform * Vec4(Min(), 1.0f);
+        const Vec4 transformedMax = transform * Vec4(Max(), 1.0f);
 
         mAABBCenter.x = 0.5f * (transformedMin.x + transformedMax.x);
         mAABBCenter.y = 0.5f * (transformedMin.y + transformedMax.y);
@@ -29,14 +25,14 @@ namespace JonsEngine
         return *this;
 	}
 
-    Vec4 AABB::Min() const
+    Vec3 AABB::Min() const
     {
-        return Vec4(mAABBCenter.x - mAABBExtent.x, mAABBCenter.y - mAABBExtent.y, mAABBCenter.z - mAABBExtent.z, 1.0f);
+        return Vec3(mAABBCenter.x - mAABBExtent.x, mAABBCenter.y - mAABBExtent.y, mAABBCenter.z - mAABBExtent.z);
     }
 
-    Vec4 AABB::Max() const
+    Vec3 AABB::Max() const
     {
-        return Vec4(mAABBCenter.x + mAABBExtent.x, mAABBCenter.y + mAABBExtent.y, mAABBCenter.z + mAABBExtent.z, 1.0f);
+        return Vec3(mAABBCenter.x + mAABBExtent.x, mAABBCenter.y + mAABBExtent.y, mAABBCenter.z + mAABBExtent.z);
     }
 
     AABB operator*(const Mat4& transform, const AABB& aabb)
@@ -72,8 +68,8 @@ namespace JonsEngine
         float d = 0.0f, r = 0.0f;
         for (const Vec4& plane : planes)
         {
-            d = glm::dot(plane, aabb.mAABBCenter);
-            r = glm::dot(glm::abs(plane), aabb.mAABBExtent);
+            d = glm::dot(Vec3(plane), aabb.mAABBCenter);
+            r = glm::dot(Vec3(glm::abs(plane)), aabb.mAABBExtent);
 
             if (d - r < -plane.w)
                 ret = AABBIntersection::AABB_INTERSECTION_PARTIAL;
@@ -87,8 +83,8 @@ namespace JonsEngine
     AABBIntersection IsAABBInSphere(const AABB& aabb, const Vec3& sphereCentre, const float sphereRadius)
     {
         float distSquared = std::pow(sphereRadius, 2.0f);
-        const Vec4 min = aabb.Min();
-        const Vec4 max = aabb.Max();
+        const Vec3 min = aabb.Min();
+        const Vec3 max = aabb.Max();
 
         if (sphereCentre.x < min.x)
             distSquared -= std::pow(sphereCentre.x - min.x, 2.0f);
