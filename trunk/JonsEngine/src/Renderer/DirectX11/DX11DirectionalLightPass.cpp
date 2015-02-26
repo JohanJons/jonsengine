@@ -162,7 +162,6 @@ namespace JonsEngine
         //
         
         // restore rendering to backbuffer, rasterize state and viewport
-        //mLightAccBuffer.BindForLightingStage();
         mContext->OMSetRenderTargets(1, &prevRTV.p, prevDSV);
         mContext->RSSetViewports(numViewports, &prevViewport);
         mContext->RSSetState(prevRS);

@@ -50,6 +50,7 @@ namespace JonsEngine
     // note: make sure frustrum and aabb are in the same space
     AABBIntersection IsAABBInFrustum(const AABB& aabb, const Mat4& frustumMatrix);
     AABBIntersection IsAABBInSphere(const AABB& aabb, const Vec3& sphereCentre, const float sphereRadius);
+	bool IsPointInSphere(const Vec3& point, const Vec3& sphereCentre, const float radius);
 
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float ratio, const float zNear, const float zFar);
     Mat4 OrthographicMatrix(const float left, const float right, const float top, const float bottom, const float zNear, const float zFar);

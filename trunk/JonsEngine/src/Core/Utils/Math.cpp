@@ -86,6 +86,9 @@ namespace JonsEngine
         const Vec3 min = aabb.Min();
         const Vec3 max = aabb.Max();
 
+		if (IsPointInSphere(min, sphereCentre, sphereRadius) && IsPointInSphere(max, sphereCentre, sphereRadius))
+			return AABBIntersection::AABB_INTERSECTION_INSIDE;
+
         if (sphereCentre.x < min.x)
             distSquared -= std::pow(sphereCentre.x - min.x, 2.0f);
         else if (sphereCentre.x > max.x)
@@ -98,9 +101,14 @@ namespace JonsEngine
             distSquared -= std::pow(sphereCentre.z - min.z, 2.0f);
         else if (sphereCentre.z > max.z)
             distSquared -= std::pow(sphereCentre.z - max.z, 2.0f);
-        
+
         return distSquared > 0 ? AABBIntersection::AABB_INTERSECTION_PARTIAL : AABBIntersection::AABB_INTERSECTION_OUTSIDE;
     }
+
+	bool IsPointInSphere(const Vec3& point, const Vec3& sphereCentre, const float radius)
+	{
+		return glm::distance(sphereCentre, point) <= radius;
+	}
 
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float aspectRatio, const float zNear, const float zFar)
     {

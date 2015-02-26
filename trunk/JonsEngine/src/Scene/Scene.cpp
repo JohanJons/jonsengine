@@ -83,9 +83,30 @@ namespace JonsEngine
 		AABBIntersection nodeAABBIntersection = IsAABBInSphere(worldAABB, sphereCentre, sphereRadius);
         switch (nodeAABBIntersection)
         {
-            // TODO: if partially inside, recursively test all meshes and child nodes
-			// TODO: check for INSIDE
 			case AABBIntersection::AABB_INTERSECTION_PARTIAL:
+			{
+				AABBIntersection meshAABBIntersection(AABBIntersection::AABB_INTERSECTION_INSIDE);
+
+				for (const Mesh& mesh : node.GetMeshes())
+				{
+					const AABB meshAABB = worldMatrix * node.mAABB;
+
+					meshAABBIntersection = IsAABBInSphere(meshAABB, sphereCentre, sphereRadius);
+					if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_OUTSIDE)
+						continue;
+
+					if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_PARTIAL)
+						AddMesh(resultMeshes, mesh, Mat4(1.0f), worldMatrix * node.mTransform);
+				}
+
+				// each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
+				for (ModelNode& node : node.GetChildNodes())
+					CullMeshesSphere(resultMeshes, node, worldMatrix, sphereCentre, sphereRadius);
+
+				break;
+			}
+
+			case AABBIntersection::AABB_INTERSECTION_INSIDE:
 			{
 				AddAllMeshes(resultMeshes, node, Mat4(1.0f), worldMatrix);
 				break;
