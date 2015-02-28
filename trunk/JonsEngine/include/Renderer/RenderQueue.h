@@ -50,6 +50,7 @@ namespace JonsEngine
     {
 		Mat4 mCameraViewMatrix;
         Mat4 mCameraProjectionMatrix;
+        Mat4 mCameraViewProjectionMatrix;
 		Vec3 mCameraPosition;
         float mFOV;
 
@@ -73,18 +74,11 @@ namespace JonsEngine
 
     struct RenderablePointLight
     {
-        inline RenderablePointLight(const Mat4& wvpMatrix, const Vec4& lightColor, const Vec3& lightPos, const float lightIntensity, const float maxDistance) :
-            mWVPMatrix(wvpMatrix), mLightColor(lightColor), mLightPosition(lightPos), mLightIntensity(lightIntensity), mMaxDistance(maxDistance)
-        {
-        }
-
-        // used to render the point light as a sphere mesh 
-		Mat4 mWVPMatrix;
         Vec4 mLightColor;
         Vec3 mLightPosition;
 
         float mLightIntensity;
-        float mMaxDistance;
+        float mLightRadius;
 
         RenderableMeshes mMeshes;
     };

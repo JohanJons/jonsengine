@@ -6,6 +6,7 @@
 
 #include "boost/functional/hash.hpp"
 #include <algorithm>
+#include <functional>
 
 namespace JonsEngine
 {
@@ -119,7 +120,10 @@ namespace JonsEngine
     }
 
 
-    Scene::Scene(const std::string& sceneName) : mName(sceneName), mHashedID(boost::hash_value(sceneName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mRootNode("Root"), mAmbientLight(0.2f)
+    Scene::Scene(const std::string& sceneName) :
+        mName(sceneName), mHashedID(boost::hash_value(sceneName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()),
+        // TODO: lambda expression adds a layer of indirection, but I'm not sure how the bind syntax would look like
+        mRootNode("Root", [&](SceneNode* node) { mDirtySceneNodes.push_back(node); }), mAmbientLight(0.2f)
     {
     }
 
@@ -141,6 +145,8 @@ namespace JonsEngine
 
     const RenderQueue& Scene::GetRenderQueue(const uint32_t windowWidth, const uint32_t windowHeight, const float zNear, const float zFar)
     {
+        UpdateDirtyObjects();
+
         mRenderQueue.Clear();
 
         const Camera& sceneCamera = GetSceneCamera();
@@ -148,47 +154,60 @@ namespace JonsEngine
         // camera
         mRenderQueue.mCamera.mFOV = sceneCamera.GetFOV();
         mRenderQueue.mCamera.mCameraPosition = sceneCamera.Position();
-        mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(mRenderQueue.mCamera.mFOV, windowWidth / static_cast<float>(windowHeight), zNear, zFar);
         mRenderQueue.mCamera.mCameraViewMatrix = sceneCamera.GetCameraTransform();
-        const Mat4 cameraViewProjMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
+        mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(mRenderQueue.mCamera.mFOV, windowWidth / static_cast<float>(windowHeight), zNear, zFar);
+        mRenderQueue.mCamera.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
 
 		for (const ActorPtr& actor : mActors)
 		{
 			if (!actor->mSceneNode)
 				continue;
 
-			const Mat4& worldMatrix = actor->mSceneNode->GetNodeTransform();
-            const Mat4 wvpMatrix = cameraViewProjMatrix * worldMatrix;
+            const Mat4& worldMatrix = actor->mSceneNode->GetWorldMatrix();
+            const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix * worldMatrix;
 
             CullMeshesFrustrum<RenderableModel>(mRenderQueue.mCamera.mModels, actor->mModel->GetRootNode(), wvpMatrix, worldMatrix);
 		}
 
         // point lights
-        for (const PointLightPtr& pointLight : mPointLights)
+		for (PointLight* dirtyPointLight : mDirtyPointLights)
         {
-			if (!pointLight->mSceneNode)
-				continue;
+            SceneNodePtr sceneNode = dirtyPointLight->GetSceneNode();
+            if (!sceneNode)
+                continue;
 
-			const Vec3 lightPosition = pointLight->mSceneNode->Position();
-            const Mat4 worldMatrix = pointLight->mSceneNode->GetNodeTransform();
+            // find renderable based on point light - if not present, add it
+            auto pointLightMapping = std::find_if(mPointLightRenderableMapping.begin(), mPointLightRenderableMapping.end(), [dirtyPointLight](const std::pair<PointLight*, size_t>& mapping) { return mapping.first == dirtyPointLight; });
+            RenderablePointLights::size_type index;
+            if (pointLightMapping != mPointLightRenderableMapping.end())
+                index = pointLightMapping->second;
+            else
+            {
+                index = mRenderQueue.mPointLights.size();
+                mRenderQueue.mPointLights.emplace_back();
 
-            // scaled WVP is used for stencil op, might be better moved to the renderer
-            const Mat4 scaledWorldMatrix = glm::scale(worldMatrix, Vec3(pointLight->mMaxDistance));
-            const Mat4 scaledWVPMatrix = cameraViewProjMatrix * scaledWorldMatrix;
+                // save mapping for future use
+                mPointLightRenderableMapping.emplace_back(dirtyPointLight, index);
+            }
 
-			mRenderQueue.mPointLights.emplace_back(scaledWVPMatrix, pointLight->mLightColor, lightPosition, pointLight->mLightIntensity, pointLight->mMaxDistance);
-            RenderablePointLight& renderablePointLight = mRenderQueue.mPointLights.back();
+            RenderablePointLight& renderable = mRenderQueue.mPointLights.at(index);
+            renderable.mLightColor = dirtyPointLight->GetLightColor();
+            renderable.mLightIntensity = dirtyPointLight->GetLightIntensity();
+            renderable.mLightRadius = dirtyPointLight->GetLightRadius();
+            renderable.mLightPosition = sceneNode->Position();
 
-			//  cull meshes for each face
+			//  cull meshes using sphere culling
+            renderable.mMeshes.clear();
 			for (const ActorPtr& actor : mActors)
 			{
 				if (!actor->mSceneNode)
 					continue;
 
-				const Mat4& actorWorldMatrix = actor->mSceneNode->GetNodeTransform();
-				CullMeshesSphere(renderablePointLight.mMeshes, actor->mModel->GetRootNode(), actorWorldMatrix, lightPosition, pointLight->mMaxDistance);
+                const Mat4& actorWorldMatrix = actor->mSceneNode->GetWorldMatrix();
+                CullMeshesSphere(renderable.mMeshes, actor->mModel->GetRootNode(), actorWorldMatrix, renderable.mLightPosition, renderable.mLightRadius);
 			}
         }
+        mDirtyPointLights.clear();
 
         // dir lights
         for (const DirectionalLightPtr& dirLight : mDirectionalLights)
@@ -234,33 +253,24 @@ namespace JonsEngine
 	}
 
 
-    PointLight* Scene::CreatePointLight(const std::string& lightName, const SceneNodePtr node)
+	PointLightID Scene::CreatePointLight(const std::string& lightName, SceneNodePtr node)
     {
-        mPointLights.emplace_back(mMemoryAllocator.AllocateObject<PointLight>(lightName, node), std::bind(&HeapAllocator::DeallocateObject<PointLight>, &mMemoryAllocator, std::placeholders::_1));
+        PointLightID pointLightID = mPointLights.AddItem(lightName, std::bind(&Scene::OnPointLightNewNode, this, std::placeholders::_1, std::placeholders::_2), std::bind(&Scene::OnPointLightDirty, this, std::placeholders::_1));
 
-        return mPointLights.back().get();
+        // set the node, will mark as dirty and have it initially added to the render queue next frame
+        mPointLights.GetItem(pointLightID).SetSceneNode(node);
+
+        return pointLightID;
     }
     
-    void Scene::DeletePointLight(const PointLight* pointLight)
+	void Scene::DeletePointLight(const PointLightID pointLightID)
     {
-        auto iter = std::find_if(mPointLights.begin(), mPointLights.end(), [pointLight](const PointLightPtr& storedLight) { return storedLight.get() == pointLight; });
-
-        if (iter != mPointLights.end())
-            mPointLights.erase(iter);
+		mPointLights.MarkAsFree(pointLightID);
     }
     
-    PointLight* Scene::GetPointLight(const std::string& lightName)
+	PointLight& Scene::GetPointLight(const PointLightID pointLightID)
     {
-		auto iter = std::find_if(mPointLights.begin(), mPointLights.end(), [lightName](const PointLightPtr& storedLight) { return *storedLight == lightName; });
-        if (iter == mPointLights.end())
-            return nullptr;
-
-        return iter->get();
-    }
-   
-    const std::vector<PointLightPtr>& Scene::GetPointLights() const
-    {
-        return mPointLights;
+		return mPointLights.GetItem(pointLightID);
     }
     
 
@@ -314,4 +324,48 @@ namespace JonsEngine
 	{ 
 		return mRootNode;
 	}
+
+
+    void Scene::UpdateDirtyObjects()
+    {
+        // flag all objects using dirty scene nodes as dirty as well
+        for (SceneNode* node : mDirtySceneNodes)
+        {
+            // all children needs to be updated
+            // TODO: sort based on hierarchy to avoid unnecessary operations if children present in mDirtySceneNodes aswell
+            node->UpdateWorldMatrix();
+
+            // point lights
+            for (const auto& pointLightNode : mPointLightNodeMapping)
+            {
+                if (pointLightNode.second == node)
+                {
+                    OnPointLightDirty(pointLightNode.first);
+                    break;
+                }
+            }
+        }
+
+        mDirtySceneNodes.clear();
+    }
+
+
+    void Scene::OnPointLightNewNode(PointLight* pointLight, SceneNode* newSceneNode)
+    {
+        // map pointlight to new scene node
+        auto iterMapping = std::find_if(mPointLightNodeMapping.begin(), mPointLightNodeMapping.end(), [pointLight](const std::pair<PointLight*, SceneNode*>& mapping) { return mapping.first == pointLight; });
+        // it could be the case it isn't mapped; for example, if previously nulled
+        if (iterMapping == mPointLightNodeMapping.end())
+            mPointLightNodeMapping.emplace_back(pointLight, newSceneNode);
+        else
+            iterMapping->second = newSceneNode;
+    }
+
+    void Scene::OnPointLightDirty(PointLight* pointLight)
+    {
+        auto iter = std::find(mDirtyPointLights.begin(), mDirtyPointLights.end(), pointLight);
+        // only add if unique
+        if (iter == mDirtyPointLights.end())
+            mDirtyPointLights.push_back(pointLight);
+    }
 }

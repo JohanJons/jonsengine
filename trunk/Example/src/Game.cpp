@@ -63,17 +63,17 @@ namespace JonsGame
 
             // moving the point light 
             else if (evnt.mKey == Key::Q)
-                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(-0.05f, 0.0f, 0.0f));
+                activeScene->GetPointLight(mPointLightID).GetSceneNode()->TranslateNode(Vec3(-0.05f, 0.0f, 0.0f));
             else if (evnt.mKey == Key::E)
-                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.05f, 0.0f, 0.0f));
+                activeScene->GetPointLight(mPointLightID).GetSceneNode()->TranslateNode(Vec3(0.05f, 0.0f, 0.0f));
             else if (evnt.mKey == Key::R)
-                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0f, -0.05f, 0.0f));
+                activeScene->GetPointLight(mPointLightID).GetSceneNode()->TranslateNode(Vec3(0.0f, -0.05f, 0.0f));
             else if (evnt.mKey == Key::T)
-                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0f, 0.05f, 0.0f));
+                activeScene->GetPointLight(mPointLightID).GetSceneNode()->TranslateNode(Vec3(0.0f, 0.05f, 0.0f));
             else if (evnt.mKey == Key::F)
-                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, -0.05f));
+                activeScene->GetPointLight(mPointLightID).GetSceneNode()->TranslateNode(Vec3(0.0f, 0.0f, -0.05f));
             else if (evnt.mKey == Key::G)
-                activeScene->GetPointLight("MovingPointLight")->mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, 0.05f));
+                activeScene->GetPointLight(mPointLightID).GetSceneNode()->TranslateNode(Vec3(0.0f, 0.0f, 0.05f));
 
             //  renderering
             else if (evnt.mKey == Key::ONE)
@@ -174,10 +174,11 @@ namespace JonsGame
 
         // point light
         SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
-        PointLight* movingLight = myScene->CreatePointLight("MovingPointLight", nodeMovingLight);
-        movingLight->mMaxDistance = 10.0f;
-        movingLight->mLightIntensity = 2.0f;
-        movingLight->mLightColor = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
+        mPointLightID = myScene->CreatePointLight("MovingPointLight", nodeMovingLight);
+        PointLight& movingLight = myScene->GetPointLight(mPointLightID);
+        movingLight.SetLightRadius(10.0f);
+        movingLight.SetLightIntensity(2.0f);
+        movingLight.SetLightColor(Vec4(1.0f, 1.0f, 0.0f, 0.0f));
         nodeMovingLight->TranslateNode(Vec3(5.0f, 3.5f, -15.0f));
 
         // directional light

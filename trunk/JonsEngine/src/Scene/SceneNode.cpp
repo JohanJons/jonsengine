@@ -7,8 +7,9 @@
 
 namespace JonsEngine
 {
-    SceneNode::SceneNode(const std::string& nodeName) : mName(nodeName), mHashedID(boost::hash_value(nodeName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()),
-                                                        mModelMatrix(1.0f), mOrientation(1.0f, 0.0f, 0.0f, 0.0f), mScale(1.0f, 1.0f, 1.0f), mTranslation(0.0f, 0.0f, 0.0f)
+    SceneNode::SceneNode(const std::string& nodeName, const OnSceneNodeDirtyFunc& onDirty) :
+        mName(nodeName), mHashedID(boost::hash_value(nodeName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mWorldMatrix(1.0f), mOrientation(1.0f, 0.0f, 0.0f, 0.0f),
+        mScale(1.0f, 1.0f, 1.0f), mTranslation(0.0f, 0.0f, 0.0f), mOnDirtyFunc(onDirty)
     {
     }
         
@@ -30,7 +31,7 @@ namespace JonsEngine
 
     SceneNodePtr SceneNode::CreateChildNode(const std::string& nodeName)
     {
-        mChildNodes.emplace_back(SceneNodePtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<SceneNode, const std::string&>(nodeName), std::bind(&HeapAllocator::DeallocateObject<SceneNode>, &HeapAllocator::GetDefaultHeapAllocator(), std::placeholders::_1)));
+        mChildNodes.emplace_back(SceneNodePtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<SceneNode, const std::string&>(nodeName, mOnDirtyFunc), std::bind(&HeapAllocator::DeallocateObject<SceneNode>, &HeapAllocator::GetDefaultHeapAllocator(), std::placeholders::_1)));
 
         return mChildNodes.back();
     }
@@ -104,33 +105,33 @@ namespace JonsEngine
         
     void SceneNode::ScaleNode(const Vec3& scaleVec)                                
     { 
-        mScale *= scaleVec;            
+        mScale *= scaleVec;
+
+        mOnDirtyFunc(this);
     }
 
     void SceneNode::TranslateNode(const Vec3& translateVec)
     { 
         mTranslation += translateVec;
+
+        mOnDirtyFunc(this);
     }
 
     void SceneNode::RotateNode(const float angle, const Vec3& rotateVec)       
     { 
         Quaternion rotation = glm::angleAxis(glm::radians(angle), rotateVec);
         mOrientation = mOrientation * rotation;
+
+        mOnDirtyFunc(this);
     }
 
 
-    void SceneNode::UpdateModelMatrix(const Mat4& parentModelMatrix)
+    void SceneNode::UpdateWorldMatrix()
     {
-        Mat4 modelMatrix(1.0f);
+        UpdateTransform();
 
-        modelMatrix = glm::translate(modelMatrix, mTranslation);
-        modelMatrix *= glm::toMat4(mOrientation);
-        modelMatrix = glm::scale(modelMatrix, mScale);
-
-        mModelMatrix = parentModelMatrix * modelMatrix;
-
-        for(SceneNodePtr childNode : mChildNodes)
-            childNode->UpdateModelMatrix(mModelMatrix);
+        for (SceneNodePtr childNode : mChildNodes)
+            childNode->UpdateChildren(mWorldMatrix);
     }
 
 
@@ -140,5 +141,26 @@ namespace JonsEngine
         position += mTranslation;
 
         return position;
+    }
+
+
+    void SceneNode::UpdateTransform()
+    {
+        // TODO: necessary?
+        mWorldMatrix = Mat4(1.0f);
+
+        mWorldMatrix = glm::translate(mWorldMatrix, mTranslation);
+        mWorldMatrix *= glm::toMat4(mOrientation);
+        mWorldMatrix = glm::scale(mWorldMatrix, mScale);
+    }
+
+    void SceneNode::UpdateChildren(const Mat4& parentModelMatrix)
+    {
+        UpdateTransform();
+
+        mWorldMatrix = parentModelMatrix * mWorldMatrix;
+
+        for (SceneNodePtr childNode : mChildNodes)
+            childNode->UpdateChildren(mWorldMatrix);
     }
 }
