@@ -12,7 +12,7 @@ cbuffer PointLightConstants : register(CBUFFER_REGISTER_PIXEL)
     float2 gScreenSize;
     float gLightIntensity;
     float gZNear;
-    float gMaxDistance;
+    float gLightRadius;
 };
 
 Texture2D gDepthTexture : register(TEXTURE_REGISTER_DEPTH);
@@ -27,7 +27,7 @@ float VectorToDepthValue(const float3 Vec)
     float3 AbsVec = abs(Vec);
     float LocalZcomp = max(AbsVec.x, max(AbsVec.y, AbsVec.z));
 
-    const float f = gMaxDistance;
+    const float f = gLightRadius;
     const float n = gZNear;
 
     float NormZComp = -(f / (n - f) - (n * f) / (n - f) / LocalZcomp);
@@ -53,7 +53,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
 
     // light attenuation
     float distance = length(positionDiff);
-    float attenuation = clamp(1.0 - distance * distance * (1 / (gMaxDistance * gMaxDistance)), 0.0, 1.0);
+    float attenuation = clamp(1.0 - distance * distance * (1 / (gLightRadius * gLightRadius)), 0.0, 1.0);
     attenuation *= attenuation;
 
     float3 lightDir = normalize(positionDiff);

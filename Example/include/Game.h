@@ -36,5 +36,7 @@ namespace JonsGame
         bool mRunning;
         float mSunAngle;
         float mMoveSpeed;
+
+        JonsEngine::PointLightID mPointLightID;
     };
 }

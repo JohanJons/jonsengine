@@ -6,6 +6,6 @@ namespace JonsEngine
     {
         mCamera.mModels.clear();
         mDirectionalLights.clear();
-        mPointLights.clear();
+        //mPointLights.clear();
     }
 }

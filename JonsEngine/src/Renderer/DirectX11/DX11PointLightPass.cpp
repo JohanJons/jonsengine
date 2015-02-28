@@ -119,7 +119,7 @@ namespace JonsEngine
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
 
-	void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const Mat4& camViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& screenSize, const float zFar, const float zNear)
+	void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix, const Vec2& screenSize, const float zFar, const float zNear)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
@@ -146,7 +146,7 @@ namespace JonsEngine
         mContext->RSSetState(mRSCullFront);
         mShadowmap.BindForDrawing();
 
-        const Mat4 faceProjmatrix = PerspectiveMatrixFov(90.0f, 1.0f, gPointLightMinZ, pointLight.mMaxDistance);
+        const Mat4 faceProjmatrix = PerspectiveMatrixFov(90.0f, 1.0f, gPointLightMinZ, pointLight.mLightRadius);
         for (uint32_t face = 0; face < DX11PointLightPass::POINT_LIGHT_DIR_COUNT; face++)
         {
             const Mat4 faceViewMatrix = glm::lookAt(viewLightPositonV3, viewLightPositonV3 + gCubemapDirVectors[face], gCubemapUpVectors[face]);
@@ -159,6 +159,9 @@ namespace JonsEngine
         // stencil pass
         //
 
+        // used to render the mesh based on camera - scales it by radius to encompass all lit pixels
+        const Mat4 lightMeshWVP = camViewProjMatrix * glm::scale(glm::translate(gIdentityMatrix, pointLight.mLightPosition), Vec3(pointLight.mLightRadius));
+
         // restore rendering to the light acc. buffer
         mContext->OMSetRenderTargets(1, &prevRTV.p, prevDSV);
         mContext->OMSetDepthStencilState(mDSSStencilPass, 0);
@@ -167,7 +170,7 @@ namespace JonsEngine
         // restore screen viewport
         mContext->RSSetViewports(numViewports, &prevViewport);
 
-        mVertexTransformPass.RenderMesh(mSphereMesh, pointLight.mWVPMatrix);
+        mVertexTransformPass.RenderMesh(mSphereMesh, lightMeshWVP);
 
         //
         // shading pass
@@ -179,10 +182,10 @@ namespace JonsEngine
 
         // set point light pixel shader and its cbuffer
         mContext->PSSetShader(mPixelShader, NULL, NULL);
-        mPointLightCBuffer.SetData(PointLightCBuffer(invCameraProjMatrix, pointLight.mLightColor, viewLightPositonV3, screenSize, pointLight.mLightIntensity, gPointLightMinZ, pointLight.mMaxDistance));
+        mPointLightCBuffer.SetData(PointLightCBuffer(invCameraProjMatrix, pointLight.mLightColor, viewLightPositonV3, screenSize, pointLight.mLightIntensity, gPointLightMinZ, pointLight.mLightRadius));
 
         // run transform pass on sphere + point light shading pass
-        mVertexTransformPass.RenderMesh(mSphereMesh, pointLight.mWVPMatrix);
+        mVertexTransformPass.RenderMesh(mSphereMesh, lightMeshWVP);
 
         // restore state
         mContext->RSSetState(prevRasterizerState);

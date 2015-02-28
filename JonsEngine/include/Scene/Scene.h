@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Core/Containers/IDMap.h"
 #include "include/Scene/SceneNode.h"
 #include "include/Scene/Camera.h"
 #include "include/Scene/PointLight.h"
@@ -16,10 +17,12 @@ namespace JonsEngine
 {
     class IMemoryAllocator;
 
+    typedef IDMap<PointLight>::ItemID PointLightID;
+
     class Scene
     {
     public:
-        Scene(const std::string& sceneName);
+		Scene(const std::string& sceneName);
         ~Scene();
 
         bool operator==(const Scene& s1);
@@ -32,10 +35,9 @@ namespace JonsEngine
         Actor* GetActor(const std::string& actorName);
 		const std::vector<ActorPtr>& GetActors() const;
         
-        PointLight* CreatePointLight(const std::string& lightName, const SceneNodePtr node);
-        void DeletePointLight(const PointLight* pointLight);
-        PointLight* GetPointLight(const std::string& lightName);
-        const std::vector<PointLightPtr>& GetPointLights() const;
+		PointLightID CreatePointLight(const std::string& lightName, SceneNodePtr node);
+        void DeletePointLight(const PointLightID pointLightID);
+		PointLight& GetPointLight(const PointLightID pointLightID);
         
         DirectionalLight* CreateDirectionalLight(const std::string& lightName);
         void DeleteDirectionalLight(const DirectionalLight* dirLight);
@@ -54,6 +56,12 @@ namespace JonsEngine
 
 
     private:
+        void UpdateDirtyObjects();
+
+        void OnPointLightNewNode(PointLight* pointLight, SceneNode* newSceneNode);
+        void OnPointLightDirty(PointLight* pointLight);
+
+
         const size_t mHashedID;
         IMemoryAllocator& mMemoryAllocator;
 
@@ -62,8 +70,15 @@ namespace JonsEngine
         Vec4 mAmbientLight;
 
         std::vector<ActorPtr> mActors;
-        std::vector<PointLightPtr> mPointLights;
         std::vector<DirectionalLightPtr> mDirectionalLights;
+
+		IDMap<PointLight> mPointLights;
+
+        std::vector<std::pair<PointLight*, RenderablePointLights::size_type>> mPointLightRenderableMapping;
+        std::vector<std::pair<PointLight*, SceneNode*>> mPointLightNodeMapping;
+
+		std::vector<SceneNode*> mDirtySceneNodes;
+		std::vector<PointLight*> mDirtyPointLights;
 
         RenderQueue mRenderQueue;
     };
