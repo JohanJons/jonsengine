@@ -170,44 +170,26 @@ namespace JonsEngine
 		}
 
         // point lights
-		for (PointLight* dirtyPointLight : mDirtyPointLights)
+        for (const PointLight& pointLight : mPointLights)
         {
-            SceneNodePtr sceneNode = dirtyPointLight->GetSceneNode();
-            if (!sceneNode)
+            if (!pointLight.mSceneNode)
                 continue;
 
-            // find renderable based on point light - if not present, add it
-            auto pointLightMapping = std::find_if(mPointLightRenderableMapping.begin(), mPointLightRenderableMapping.end(), [dirtyPointLight](const std::pair<PointLight*, size_t>& mapping) { return mapping.first == dirtyPointLight; });
-            RenderablePointLights::size_type index;
-            if (pointLightMapping != mPointLightRenderableMapping.end())
-                index = pointLightMapping->second;
-            else
+            const Vec3 lightPosition = pointLight.mSceneNode->Position();
+
+            mRenderQueue.mPointLights.emplace_back(pointLight.mLightColor, lightPosition, pointLight.mLightIntensity, pointLight.mLightRadius);
+            RenderablePointLight& renderablePointLight = mRenderQueue.mPointLights.back();
+
+            //  cull meshes for each face
+            for (const ActorPtr& actor : mActors)
             {
-                index = mRenderQueue.mPointLights.size();
-                mRenderQueue.mPointLights.emplace_back();
-
-                // save mapping for future use
-                mPointLightRenderableMapping.emplace_back(dirtyPointLight, index);
-            }
-
-            RenderablePointLight& renderable = mRenderQueue.mPointLights.at(index);
-            renderable.mLightColor = dirtyPointLight->GetLightColor();
-            renderable.mLightIntensity = dirtyPointLight->GetLightIntensity();
-            renderable.mLightRadius = dirtyPointLight->GetLightRadius();
-            renderable.mLightPosition = sceneNode->Position();
-
-			//  cull meshes using sphere culling
-            renderable.mMeshes.clear();
-			for (const ActorPtr& actor : mActors)
-			{
-				if (!actor->mSceneNode)
-					continue;
+                if (!actor->mSceneNode)
+                    continue;
 
                 const Mat4& actorWorldMatrix = actor->mSceneNode->GetWorldMatrix();
-                CullMeshesSphere(renderable.mMeshes, actor->mModel->GetRootNode(), actorWorldMatrix, renderable.mLightPosition, renderable.mLightRadius);
-			}
+                CullMeshesSphere(renderablePointLight.mMeshes, actor->mModel->GetRootNode(), actorWorldMatrix, lightPosition, pointLight.mLightRadius);
+            }
         }
-        mDirtyPointLights.clear();
 
         // dir lights
         for (const DirectionalLightPtr& dirLight : mDirectionalLights)
@@ -255,12 +237,7 @@ namespace JonsEngine
 
 	PointLightID Scene::CreatePointLight(const std::string& lightName, SceneNodePtr node)
     {
-        PointLightID pointLightID = mPointLights.AddItem(lightName, std::bind(&Scene::OnPointLightNewNode, this, std::placeholders::_1, std::placeholders::_2), std::bind(&Scene::OnPointLightDirty, this, std::placeholders::_1));
-
-        // set the node, will mark as dirty and have it initially added to the render queue next frame
-        mPointLights.GetItem(pointLightID).SetSceneNode(node);
-
-        return pointLightID;
+        return mPointLights.AddItem(lightName, node);
     }
     
 	void Scene::DeletePointLight(const PointLightID pointLightID)

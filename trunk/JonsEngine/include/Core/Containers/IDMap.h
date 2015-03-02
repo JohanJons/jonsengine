@@ -16,9 +16,39 @@ namespace JonsEngine
     template<typename T>
     class IDMap
     {
+    private:
+        struct Item {
+            uint16_t mVersion;
+            T mItem;
+
+            template <typename... Arguments>
+            Item(uint16_t version, Arguments&&... args) : mVersion(version), mItem(args...)
+            {
+            }
+        };
+
+
     public:
         typedef uint32_t ItemID;
 
+        class iterator {
+        public:
+            typedef typename Item& reference;
+            typedef typename Item* pointer;
+
+            iterator();
+            iterator(const iterator&);
+            ~iterator();
+
+            iterator& operator=(const iterator&);
+            bool operator==(const iterator&) const;
+            bool operator!=(const iterator&) const;
+
+            iterator& operator++();
+
+            reference operator*() const;
+            pointer operator->() const;
+        };
 
         template <typename... Arguments>
         ItemID AddItem(Arguments&&... args)
@@ -80,18 +110,17 @@ namespace JonsEngine
             mFreeIndices.clear();
         }
 
+        iterator begin()                { return mItems.begin(); }
+        iterator end()                  { return mItems.end(); }
+        /*iterator begin()                { return mItems.begin(); }
+        const_iterator begin() const    { return mItems.begin(); }
+        const_iterator cbegin() const   { return mItems.cbegin(); }
+        iterator end()                  { return mItems.end(); }
+        const_iterator end() const      { return mItems.end(); }
+        const_iterator cend() const     { return mItems.cend(); }*/
+
 
     private:
-        struct Item {
-            uint16_t mVersion;
-            T mItem;
-
-            template <typename... Arguments>
-            Item(uint16_t version, Arguments&&... args) : mVersion(version), mItem(args...)
-            {
-            }
-        };
-
         std::vector<Item> mItems;
         std::vector<uint16_t> mFreeIndices;
     };
