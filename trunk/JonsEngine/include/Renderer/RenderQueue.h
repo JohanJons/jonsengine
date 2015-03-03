@@ -74,6 +74,12 @@ namespace JonsEngine
 
     struct RenderablePointLight
     {
+        inline RenderablePointLight(const Vec4& lightColor, const Vec3& lightPosition, const float intensity, const float radius) :
+            mLightColor(lightColor), mLightPosition(lightPosition), mLightIntensity(intensity), mLightRadius(radius)
+        {
+        }
+
+
         Vec4 mLightColor;
         Vec3 mLightPosition;
 
