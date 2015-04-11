@@ -105,10 +105,36 @@ namespace JonsEngine
         return distSquared > 0 ? AABBIntersection::AABB_INTERSECTION_PARTIAL : AABBIntersection::AABB_INTERSECTION_OUTSIDE;
     }
 
+    AABBIntersection IsAABBInAABB(const AABB& target, const AABB& source)
+    {
+        const Vec3 min = target.Min();
+        const Vec3 max = target.Max();
+
+        const bool minInAABB = IsPointInAABB(min, source);
+        const bool maxInAABB = IsPointInAABB(max, source);
+
+        if (minInAABB && maxInAABB)
+            return AABBIntersection::AABB_INTERSECTION_INSIDE;
+        else if (minInAABB || maxInAABB)
+            return AABBIntersection::AABB_INTERSECTION_PARTIAL;
+        else
+            return AABBIntersection::AABB_INTERSECTION_OUTSIDE;
+    }
+
 	bool IsPointInSphere(const Vec3& point, const Vec3& sphereCentre, const float radius)
 	{
 		return glm::distance(sphereCentre, point) <= radius;
 	}
+
+    bool IsPointInAABB(const Vec3& point, const AABB& aabb)
+    {
+        const Vec3 min = aabb.Min();
+        const Vec3 max = aabb.Max();
+
+        return min.x <= point.x && point.x <= max.x &&
+               min.y <= point.y && point.y <= max.y &&
+               min.z <= point.z && point.y <= max.z;
+    }
 
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float aspectRatio, const float zNear, const float zFar)
     {
