@@ -4,6 +4,8 @@
 #include "Constants.h"
 #include "Common.hlsl"
 
+#define DEPTH_BIAS 0.0005
+
 cbuffer PointLightConstants : register(CBUFFER_REGISTER_PIXEL)
 {
     float4x4 gInvProjMatrix;
@@ -48,7 +50,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
     cubemapDir.z = -cubemapDir.z;       // TODO: any way to remove this extra instruction?
     float storedDepth = gShadowmap.Sample(gShadowmapSampler, cubemapDir).r;
     float visibility = 0.0;
-    if (storedDepth + 0.00001 > VectorToDepthValue(cubemapDir))
+    if (storedDepth - DEPTH_BIAS > VectorToDepthValue(cubemapDir))
         visibility = 1.0;
 
     // light attenuation

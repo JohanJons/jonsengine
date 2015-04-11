@@ -18,8 +18,10 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mSunAngle(0.0f), mMoveSpeed(0.1f)
+    Game::Game() : mEngine(nullptr), mRunning(true), mSunAngle(0.0f), mMoveSpeed(0.1f)
     {
+        mSettings.mShadowQuality = EngineSettings::SHADOW_QUALITY_HIGH;
+        mEngine = new Engine(mSettings);
     }
         
     Game::~Game()
@@ -78,6 +80,8 @@ namespace JonsGame
             //  renderering
             else if (evnt.mKey == Key::ONE)
                 mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_DRAW_AABB);
+            else if (evnt.mKey == Key::TWO)
+                mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS);
             else if (evnt.mKey == Key::U)
                 mEngine->GetRenderer().SetSSAO(false);
             else if (evnt.mKey == Key::I)
@@ -184,7 +188,7 @@ namespace JonsGame
         // directional light
         DirectionalLight* directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
         directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
-        directionalLight->mLightColor = Vec4(0.25f);
+        directionalLight->mLightColor = Vec4(0.55f);
 
         // load checker material
         MaterialPtr checkerMaterial = mEngine->GetResourceManifest().LoadMaterial("checkers", jonsPackage);
@@ -205,7 +209,7 @@ namespace JonsGame
         SceneNodePtr nodeCube2 = myScene->GetRootNode().CreateChildNode("nodeCube2");
         ModelPtr cube2 = mEngine->GetResourceManifest().CreateCube("Cube2", 3, checkerMaterial);
         Actor* actorCube2 = myScene->CreateActor("actorCube2", cube2, nodeCube2);
-        nodeCube2->TranslateNode(Vec3(11.0f, 2.0f, -15.0f));
+        nodeCube2->TranslateNode(Vec3(3.0f, 2.0f, -15.0f));
 
         // move up camera
         myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));

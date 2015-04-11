@@ -60,7 +60,7 @@ namespace JonsEngine
         // rasterize with no culling for stencil pass
         ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
         rasterizerDesc.FillMode = D3D11_FILL_SOLID;
-        rasterizerDesc.CullMode = D3D11_CULL_NONE;
+        rasterizerDesc.CullMode = D3D11_CULL_BACK;
         rasterizerDesc.FrontCounterClockwise = true;
         rasterizerDesc.DepthClipEnable = true;
         rasterizerDesc.ScissorEnable = false;

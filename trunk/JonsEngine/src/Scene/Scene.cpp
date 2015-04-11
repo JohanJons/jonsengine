@@ -119,6 +119,11 @@ namespace JonsEngine
         }
     }
 
+    void AddAll(std::vector<RenderableMesh>& resultMeshes, ModelNode& node, const Mat4& worldMatrix)
+    {
+        AddAllMeshes(resultMeshes, node, Mat4(1.0f), worldMatrix);
+    }
+
 
     Scene::Scene(const std::string& sceneName) :
         mName(sceneName), mHashedID(boost::hash_value(sceneName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()),
@@ -196,6 +201,16 @@ namespace JonsEngine
         {
             // TODO
             mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, dirLight->mLightDirection);
+            RenderableDirLight& dirLight = mRenderQueue.mDirectionalLights.back();
+
+            for (const ActorPtr& actor : mActors)
+            {
+                if (!actor->mSceneNode)
+                    continue;
+
+                const Mat4& actorWorldMatrix = actor->mSceneNode->GetWorldMatrix();
+                AddAll(dirLight.mMeshes, actor->mModel->GetRootNode(), actorWorldMatrix);
+            }
         }
 
         // misc
