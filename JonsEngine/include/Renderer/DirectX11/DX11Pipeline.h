@@ -61,7 +61,7 @@ namespace JonsEngine
         DX11PointLightPass mPointLightPass;
         DX11PostProcessor mPostProcessor;
 
-        const Vec2 mScreenSize;
+        const Vec2 mWindowSize;
         IDMap<DX11Mesh>& mMeshMap;
         IDMap<DX11Texture>& mTextureMap;
     };

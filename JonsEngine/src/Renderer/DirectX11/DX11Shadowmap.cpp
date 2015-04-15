@@ -33,7 +33,7 @@ namespace JonsEngine
         depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
         depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
         depthBufferDesc.MiscFlags = isCubeTexture ? D3D11_RESOURCE_MISC_TEXTURECUBE : 0;
-        DXCALL(device->CreateTexture2D(&depthBufferDesc, NULL, &mShadowmapTexture));
+        DXCALL(device->CreateTexture2D(&depthBufferDesc, nullptr, &mShadowmapTexture));
 
         D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
         ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
@@ -87,15 +87,15 @@ namespace JonsEngine
         mContext->RSSetViewports(1, &mShadowPassViewport);
 
         // unbind shadowmap as shader resource
-        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSrv.p);
+        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSRV.p);
 
         // defaults to depth rendering/testing
-        mContext->OMSetDepthStencilState(NULL, 0);
+        mContext->OMSetDepthStencilState(nullptr, 0);
     }
 
     void DX11Shadowmap::BindDepthView(const uint32_t depthViewIndex)
     {
-        mContext->OMSetRenderTargets(0, NULL, mShadowmapViews.at(depthViewIndex));
+        mContext->OMSetRenderTargets(0, nullptr, mShadowmapViews.at(depthViewIndex));
         mContext->ClearDepthStencilView(mShadowmapViews.at(depthViewIndex), D3D11_CLEAR_DEPTH, 1.0f, 0);
     }
 

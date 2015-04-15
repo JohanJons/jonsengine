@@ -16,7 +16,7 @@ namespace JonsEngine
         DX11BoxBlurPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const DXGI_FORMAT textureFormat, const uint16_t screenWidth, const uint16_t screenHeight);
         ~DX11BoxBlurPass();
 
-        void Render(ID3D11ShaderResourceViewPtr textureToBlur, const Vec2& screenSize);
+        void Render(ID3D11ShaderResourceViewPtr textureToBlur, const Vec2& windowSize);
 
 
     private:

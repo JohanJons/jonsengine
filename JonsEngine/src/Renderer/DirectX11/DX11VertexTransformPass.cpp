@@ -18,7 +18,7 @@ namespace JonsEngine
         inputDescription.InstanceDataStepRate = 0;
         DXCALL(device->CreateInputLayout(&inputDescription, 1, gTransformVertexShader, sizeof(gTransformVertexShader), &mInputLayout));
 
-        DXCALL(device->CreateVertexShader(gTransformVertexShader, sizeof(gTransformVertexShader), NULL, &mVertexShader));
+        DXCALL(device->CreateVertexShader(gTransformVertexShader, sizeof(gTransformVertexShader), nullptr, &mVertexShader));
     }
 
     DX11VertexTransformPass::~DX11VertexTransformPass()
@@ -31,7 +31,7 @@ namespace JonsEngine
         mContext->IASetPrimitiveTopology(primitiveTopology);
         mContext->IASetInputLayout(mInputLayout);
 
-        mContext->VSSetShader(mVertexShader, NULL, NULL);
+        mContext->VSSetShader(mVertexShader, nullptr, 0);
     }
 
     void DX11VertexTransformPass::RenderMesh(DX11Mesh& mesh, const Mat4& wvpMatrix)

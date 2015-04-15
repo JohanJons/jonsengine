@@ -15,7 +15,7 @@ static const float gIntensity = 1.0;
 cbuffer SSAOConstants : register(CBUFFER_REGISTER_PIXEL)
 {
     float4x4 gInvProjMatrix;
-    float2 gScreenSize;
+    float2 gWindowSize;
 };
 
 Texture2D gDepthTexture : register(TEXTURE_REGISTER_DEPTH);
@@ -38,7 +38,7 @@ float3 getOffsetPosition(int2 ssC, float2 unitOffset, float ssR) {
     uint2 ssP = uint2(ssR*unitOffset) + ssC;
 
     float depth = gDepthTexture[ssP].r;
-    float3 P = reconstructViewPosition(depth, float2(ssP.x / gScreenSize.x, ssP.y / gScreenSize.y), gInvProjMatrix);
+    float3 P = reconstructViewPosition(depth, float2(ssP.x / gWindowSize.x, ssP.y / gWindowSize.y), gInvProjMatrix);
 
     // Divide coordinate by 2^mipLevel
     //P = gPositionTexture.Load(int3(ssP >> mipLevel, mipLevel)).xyz;
@@ -82,7 +82,7 @@ float ps_main(float4 position : SV_Position) : SV_Target0
     uint2 screenSpacePos = (uint2)position.xy;
 
     float depth = gDepthTexture[screenSpacePos].r;
-    float3 originPos = reconstructViewPosition(depth, float2(screenSpacePos.x / gScreenSize.x, screenSpacePos.y / gScreenSize.y), gInvProjMatrix);
+    float3 originPos = reconstructViewPosition(depth, float2(screenSpacePos.x / gWindowSize.x, screenSpacePos.y / gWindowSize.y), gInvProjMatrix);
     float3 normal = reconstructNormal(originPos);
 
     // Hash function used in the HPG12 AlchemyAO paper

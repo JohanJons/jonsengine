@@ -7,7 +7,7 @@ namespace JonsEngine
     DX11FullscreenTrianglePass::DX11FullscreenTrianglePass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context) :
         mContext(context), mVertexShader(nullptr)
     {
-        DXCALL(device->CreateVertexShader(gFullscreenTriangleVertexShader, sizeof(gFullscreenTriangleVertexShader), NULL, &mVertexShader));
+        DXCALL(device->CreateVertexShader(gFullscreenTriangleVertexShader, sizeof(gFullscreenTriangleVertexShader), nullptr, &mVertexShader));
     }
 
     DX11FullscreenTrianglePass::~DX11FullscreenTrianglePass()
@@ -18,9 +18,9 @@ namespace JonsEngine
     void DX11FullscreenTrianglePass::Render()
     {
         mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-        mContext->IASetInputLayout(NULL);
+        mContext->IASetInputLayout(nullptr);
 
-        mContext->VSSetShader(mVertexShader, NULL, NULL);
+        mContext->VSSetShader(mVertexShader, nullptr, 0);
 
         mContext->Draw(3, 0);
     }

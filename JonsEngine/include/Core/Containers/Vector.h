@@ -59,7 +59,7 @@ namespace JonsEngine
         void insert(iterator position,iterator first, iterator last);
         iterator erase(iterator position);
         iterator erase(iterator first, iterator last);
-        void resize(size_t numElements, T obj = NULL);
+        void resize(size_t numElements, T obj = nullptr);
 
         void push_back(const T& item);
         void pop_back();

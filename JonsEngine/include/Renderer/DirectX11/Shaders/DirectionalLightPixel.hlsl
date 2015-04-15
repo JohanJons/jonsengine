@@ -15,7 +15,7 @@ cbuffer DirectionalLightConstants : register(CBUFFER_REGISTER_PIXEL)
     float4 gSplitDistances;
     float4 gLightColor;
     float4 gLightDirection;
-    float2 gScreenSize;
+    float2 gWindowSize;
     float gShadowmapSize;
 };
 
@@ -29,7 +29,7 @@ SamplerComparisonState gShadowmapSampler : register(SAMPLER_REGISTER_POINT_COMPA
 float4 ps_main(float4 position : SV_Position) : SV_Target0
 {
     float depth = gDepthTexture[uint2(position.xy)].r;
-    float4 viewPosition = float4(reconstructViewPosition(depth, float2(position.x / gScreenSize.x, position.y / gScreenSize.y), gInvProjMatrix), 1.0);
+    float4 viewPosition = float4(reconstructViewPosition(depth, float2(position.x / gWindowSize.x, position.y / gWindowSize.y), gInvProjMatrix), 1.0);
     float4 diffuse = gDiffuseTexture[uint2(position.xy)];
     float4 normal = gNormalTexture[uint2(position.xy)];
 

@@ -13,10 +13,10 @@ namespace JonsEngine
     {
         backbufferTextureDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
-        DXCALL(device->CreateTexture2D(&backbufferTextureDesc, NULL, &mFXAABackbufferTexture));
-        DXCALL(device->CreateRenderTargetView(mFXAABackbufferTexture, NULL, &mFXAARTV));
-        DXCALL(device->CreateShaderResourceView(mFXAABackbufferTexture, NULL, &mFXAASRV));
-        DXCALL(device->CreatePixelShader(gFXAAPixelShader, sizeof(gFXAAPixelShader), NULL, &mFXAAPixelShader));
+        DXCALL(device->CreateTexture2D(&backbufferTextureDesc, nullptr, &mFXAABackbufferTexture));
+        DXCALL(device->CreateRenderTargetView(mFXAABackbufferTexture, nullptr, &mFXAARTV));
+        DXCALL(device->CreateShaderResourceView(mFXAABackbufferTexture, nullptr, &mFXAASRV));
+        DXCALL(device->CreatePixelShader(gFXAAPixelShader, sizeof(gFXAAPixelShader), nullptr, &mFXAAPixelShader));
     }
 
     DX11PostProcessor::~DX11PostProcessor()
@@ -24,13 +24,13 @@ namespace JonsEngine
     }
 
 
-    void DX11PostProcessor::FXAAPass(DX11Backbuffer& backbuffer, const Vec2& screenSize)
+    void DX11PostProcessor::FXAAPass(DX11Backbuffer& backbuffer, const Vec2& windowSize)
     {
         backbuffer.CopyBackbuffer(mFXAABackbufferTexture);
 
         mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &mFXAASRV.p);
-        mContext->PSSetShader(mFXAAPixelShader, NULL, NULL);
-        mFXAACBuffer.SetData(FXAACBuffer(screenSize));
+        mContext->PSSetShader(mFXAAPixelShader, nullptr, 0);
+        mFXAACBuffer.SetData(FXAACBuffer(windowSize));
 
         mFullscreenPass.Render();
     }

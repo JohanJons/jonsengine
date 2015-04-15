@@ -166,7 +166,7 @@ namespace JonsEngine
     {
         RemoveWindowSubclass(mWindowHandle, WndProc, gSubClassID);
     
-        DXCALL(mSwapchain->SetFullscreenState(false, NULL));
+        DXCALL(mSwapchain->SetFullscreenState(false, nullptr));
     }
 
 

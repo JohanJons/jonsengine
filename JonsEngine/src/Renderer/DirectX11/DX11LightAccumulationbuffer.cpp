@@ -17,8 +17,8 @@ namespace JonsEngine
 
         // create acc texture/rtv/srv
         DXCALL(device->CreateTexture2D(&backbufferTextureDesc, NULL, &mAccumulationTexture));
-        DXCALL(device->CreateRenderTargetView(mAccumulationTexture, NULL, &mRTV));
-        DXCALL(device->CreateShaderResourceView(mAccumulationTexture, NULL, &mSRV))
+        DXCALL(device->CreateRenderTargetView(mAccumulationTexture, nullptr, &mRTV));
+        DXCALL(device->CreateShaderResourceView(mAccumulationTexture, nullptr, &mSRV))
     }
 
     DX11LightAccumulationbuffer::~DX11LightAccumulationbuffer()

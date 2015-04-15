@@ -19,16 +19,16 @@ namespace JonsEngine
         // color texture
         uint32_t gbufferIndex = DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_DIFFUSE;
         backbufferTextureDesc.Format = DXGI_FORMAT_R16G16B16A16_UNORM;
-        DXCALL(device->CreateTexture2D(&backbufferTextureDesc, NULL, &mTextures.at(gbufferIndex)));
-        DXCALL(device->CreateRenderTargetView(mTextures.at(gbufferIndex), NULL, &mRenderTargets.at(gbufferIndex)));
-        DXCALL(device->CreateShaderResourceView(mTextures.at(gbufferIndex), NULL, &mShaderResourceViews.at(gbufferIndex)));
+        DXCALL(device->CreateTexture2D(&backbufferTextureDesc, nullptr, &mTextures.at(gbufferIndex)));
+        DXCALL(device->CreateRenderTargetView(mTextures.at(gbufferIndex), nullptr, &mRenderTargets.at(gbufferIndex)));
+        DXCALL(device->CreateShaderResourceView(mTextures.at(gbufferIndex), nullptr, &mShaderResourceViews.at(gbufferIndex)));
 
         // normal texture
         gbufferIndex = DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_NORMAL;
         backbufferTextureDesc.Format = DXGI_FORMAT_R16G16B16A16_SNORM;
-        DXCALL(device->CreateTexture2D(&backbufferTextureDesc, NULL, &mTextures.at(gbufferIndex)));
-        DXCALL(device->CreateRenderTargetView(mTextures.at(gbufferIndex), NULL, &mRenderTargets.at(gbufferIndex)));
-        DXCALL(device->CreateShaderResourceView(mTextures.at(gbufferIndex), NULL, &mShaderResourceViews.at(gbufferIndex)));
+        DXCALL(device->CreateTexture2D(&backbufferTextureDesc, nullptr, &mTextures.at(gbufferIndex)));
+        DXCALL(device->CreateRenderTargetView(mTextures.at(gbufferIndex), nullptr, &mRenderTargets.at(gbufferIndex)));
+        DXCALL(device->CreateShaderResourceView(mTextures.at(gbufferIndex), nullptr, &mShaderResourceViews.at(gbufferIndex)));
 
         // input layout
         D3D11_INPUT_ELEMENT_DESC inputDescription[DX11Mesh::NUM_VERTEX_BUFFER_SLOTS];
@@ -71,8 +71,8 @@ namespace JonsEngine
         DXCALL(device->CreateInputLayout(inputDescription, DX11Mesh::NUM_VERTEX_BUFFER_SLOTS, gGBufferVertexShader, sizeof(gGBufferVertexShader), &mInputLayout));
 
         // create shader objects
-        DXCALL(device->CreateVertexShader(gGBufferVertexShader, sizeof(gGBufferVertexShader), NULL, &mVertexShader));
-        DXCALL(device->CreatePixelShader(gGBufferPixelShader, sizeof(gGBufferPixelShader), NULL, &mPixelShader));
+        DXCALL(device->CreateVertexShader(gGBufferVertexShader, sizeof(gGBufferVertexShader), nullptr, &mVertexShader));
+        DXCALL(device->CreatePixelShader(gGBufferPixelShader, sizeof(gGBufferPixelShader), nullptr, &mPixelShader));
     }
 
     DX11GBuffer::~DX11GBuffer()
@@ -90,22 +90,22 @@ namespace JonsEngine
         for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
         {
             // unbind gbuffer textures as input, it is now rendertarget
-            mContext->PSSetShaderResources(index, 1, &gNullSrv.p);
+            mContext->PSSetShaderResources(index, 1, &gNullSRV.p);
             mContext->ClearRenderTargetView(mRenderTargets.at(index), gClearColor);
         }
         // backbuffers depth texture might still be bound on input
-        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSrv.p);
+        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSRV.p);
         mContext->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
         // default == depth testing/writing on
-        mContext->OMSetDepthStencilState(NULL, 0);
+        mContext->OMSetDepthStencilState(nullptr, 0);
         mContext->OMSetRenderTargets(DX11GBuffer::GBUFFER_NUM_RENDERTARGETS, &(mRenderTargets.begin()->p), dsv);
         mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         mContext->IASetInputLayout(mInputLayout);
 
-        mContext->VSSetShader(mVertexShader, NULL, NULL);
-        mContext->PSSetShader(mPixelShader, NULL, NULL);
+        mContext->VSSetShader(mVertexShader, nullptr, 0);
+        mContext->PSSetShader(mPixelShader, nullptr, 0);
     }
 
     void DX11GBuffer::BindGeometryTextures()
