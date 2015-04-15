@@ -8,7 +8,7 @@
 
 namespace JonsEngine
 {
-    DX11AmbientPass::DX11AmbientPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const uint16_t screenWidth, const uint16_t screenHeight) :
+    DX11AmbientPass::DX11AmbientPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const uint32_t screenWidth, const uint32_t screenHeight) :
         mContext(context),
         mSSAOPixelShader(nullptr),
         mAmbientPixelShader(nullptr),
@@ -32,12 +32,12 @@ namespace JonsEngine
         ssaoTextureDesc.ArraySize = 1;
         ssaoTextureDesc.SampleDesc.Count = 1;
 
-        DXCALL(device->CreateTexture2D(&ssaoTextureDesc, NULL, &mSSAOTexture));
-        DXCALL(device->CreateShaderResourceView(mSSAOTexture, NULL, &mSSAOSRV));
-        DXCALL(device->CreateRenderTargetView(mSSAOTexture, NULL, &mSSAORTV));
+        DXCALL(device->CreateTexture2D(&ssaoTextureDesc, nullptr, &mSSAOTexture));
+        DXCALL(device->CreateShaderResourceView(mSSAOTexture, nullptr, &mSSAOSRV));
+        DXCALL(device->CreateRenderTargetView(mSSAOTexture, nullptr, &mSSAORTV));
 
-        DXCALL(device->CreatePixelShader(gAmbientPixelShader, sizeof(gAmbientPixelShader), NULL, &mAmbientPixelShader));
-        DXCALL(device->CreatePixelShader(gSSAOPixelShader, sizeof(gSSAOPixelShader), NULL, &mSSAOPixelShader));
+        DXCALL(device->CreatePixelShader(gAmbientPixelShader, sizeof(gAmbientPixelShader), nullptr, &mAmbientPixelShader));
+        DXCALL(device->CreatePixelShader(gSSAOPixelShader, sizeof(gSSAOPixelShader), nullptr, &mSSAOPixelShader));
     }
 
     DX11AmbientPass::~DX11AmbientPass()
@@ -45,7 +45,7 @@ namespace JonsEngine
     }
 
 
-    void DX11AmbientPass::Render(const Mat4& invCameraProjMatrix, const Vec4& ambientLight, const Vec2& screenSize, const bool useSSAO)
+    void DX11AmbientPass::Render(const Mat4& invCameraProjMatrix, const Vec4& ambientLight, const Vec2& windowSize, const bool useSSAO)
     {
         if (useSSAO)
         {
@@ -54,15 +54,15 @@ namespace JonsEngine
             mContext->OMGetRenderTargets(1, &prevRTV, &prevDSV);
 
             // pass 1: render AO to texture
-            mContext->OMSetRenderTargets(1, &mSSAORTV.p, NULL);
-            mContext->PSSetShader(mSSAOPixelShader, NULL, NULL);
-            mSSAOCBuffer.SetData(SSAOCBuffer(invCameraProjMatrix, screenSize));
+            mContext->OMSetRenderTargets(1, &mSSAORTV.p, nullptr);
+            mContext->PSSetShader(mSSAOPixelShader, nullptr, 0);
+            mSSAOCBuffer.SetData(SSAOCBuffer(invCameraProjMatrix, windowSize));
             mFullscreenPass.Render();
 
             // pass 2: horizontal + vertical blur
             // can keep SSAO texture as rendertarget aswell because box blur does two passes - one intermediate
-            mContext->OMSetRenderTargets(1, &mSSAORTV.p, NULL);
-            mBoxBlurPass.Render(mSSAOSRV, screenSize);
+            mContext->OMSetRenderTargets(1, &mSSAORTV.p, nullptr);
+            mBoxBlurPass.Render(mSSAOSRV, windowSize);
 
             // restore rendering to backbuffer
             mContext->OMSetRenderTargets(1, &prevRTV.p, prevDSV);
@@ -71,7 +71,7 @@ namespace JonsEngine
         }
 
         // pass 3: render ambient light
-        mContext->PSSetShader(mAmbientPixelShader, NULL, NULL);
+        mContext->PSSetShader(mAmbientPixelShader, nullptr, 0);
         mAmbientCBuffer.SetData(AmbientCBuffer(ambientLight, useSSAO));
 
         mFullscreenPass.Render();

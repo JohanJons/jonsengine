@@ -30,11 +30,11 @@ namespace JonsEngine
         mGBuffer(device, mContext, backbufferTextureDesc),
 
         mAmbientPass(device, context, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-        mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, shadowmapResolution),
+        mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, shadowmapResolution, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mPointLightPass(device, mContext, mVertexTransformPass, shadowmapResolution),
         mPostProcessor(device, context, mFullscreenTrianglePass, backbufferTextureDesc),
 
-        mScreenSize(backbufferTextureDesc.Width, backbufferTextureDesc.Height),
+        mWindowSize(backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mMeshMap(meshMap),
         mTextureMap(textureMap)
     {
@@ -49,7 +49,7 @@ namespace JonsEngine
         depthStencilBufferDesc.MipLevels = 1;
         depthStencilBufferDesc.SampleDesc.Count = 1;
         depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-        DXCALL(device->CreateTexture2D(&depthStencilBufferDesc, NULL, &mDepthStencilBuffer));
+        DXCALL(device->CreateTexture2D(&depthStencilBufferDesc, nullptr, &mDepthStencilBuffer));
 
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
@@ -141,25 +141,25 @@ namespace JonsEngine
         const Mat4 invCameraProjMatrix = glm::inverse(renderQueue.mCamera.mCameraProjectionMatrix);
 
         // ambient light
-        mAmbientPass.Render(invCameraProjMatrix, renderQueue.mAmbientLight, mScreenSize, SSAOEnabled);
+        mAmbientPass.Render(invCameraProjMatrix, renderQueue.mAmbientLight, mWindowSize, SSAOEnabled);
 
         // additive blending for adding lighting
-        mContext->OMSetBlendState(mAdditiveBlending, NULL, 0xffffffff);
+        mContext->OMSetBlendState(mAdditiveBlending, nullptr, 0xffffffff);
 
         // do all directional lights
         for (const RenderableDirLight& directionalLight : renderQueue.mDirectionalLights)
-            mDirectionalLightPass.Render(directionalLight, renderQueue.mCamera.mFOV, mScreenSize.x / mScreenSize.y, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix, mScreenSize, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
+            mDirectionalLightPass.Render(directionalLight, renderQueue.mCamera.mFOV, mWindowSize.x / mWindowSize.y, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix, mWindowSize, debugExtra.test(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS));
 
         // do all point lights
         mPointLightPass.BindForShading();
         for (const RenderablePointLight& pointLight : renderQueue.mPointLights)
         {
             mContext->ClearDepthStencilView(mDSV, D3D11_CLEAR_STENCIL, 1.0f, 0);
-            mPointLightPass.Render(pointLight, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix, mScreenSize, Z_FAR, Z_NEAR);
+            mPointLightPass.Render(pointLight, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix, mWindowSize, Z_FAR, Z_NEAR);
         }
 
         // turn off blending
-        mContext->OMSetBlendState(NULL, NULL, 0xffffffff);
+        mContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);
     }
 
     void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA)
@@ -172,7 +172,7 @@ namespace JonsEngine
 
         // FXAA done in sRGB space
         if (AA == EngineSettings::ANTIALIASING_FXAA)
-            mPostProcessor.FXAAPass(mBackbuffer, mScreenSize);
+            mPostProcessor.FXAAPass(mBackbuffer, mWindowSize);
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
             mAABBPass.Render(renderQueue, renderQueue.mCamera.mCameraProjectionMatrix * renderQueue.mCamera.mCameraViewMatrix);

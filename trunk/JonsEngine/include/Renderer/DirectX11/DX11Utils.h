@@ -37,6 +37,7 @@ namespace JonsEngine
     typedef CComPtr<ID3D11Buffer> ID3D11BufferPtr;
     typedef CComPtr<ID3D11VertexShader> ID3D11VertexShaderPtr;
     typedef CComPtr<ID3D11PixelShader> ID3D11PixelShaderPtr;
+    typedef CComPtr<ID3D11ComputeShader> ID3D11ComputeShaderPtr;
     typedef CComPtr<ID3D11RasterizerState> ID3D11RasterizerStatePtr;
     typedef CComPtr<ID3D11BlendState> ID3D11BlendStatePtr;
     typedef CComPtr<ID3D11SamplerState> ID3D11SamplerStatePtr;
@@ -48,7 +49,8 @@ namespace JonsEngine
     typedef CComPtr<ID3D11DeviceContext> ID3D11DeviceContextPtr;
     typedef CComPtr<ID3D11Texture2D> ID3D11Texture2DPtr;
     typedef CComPtr<ID3D11ShaderResourceView> ID3D11ShaderResourceViewPtr;
+    typedef CComPtr<ID3D11UnorderedAccessView> ID3D11UnorderedAccessViewPtr;
     typedef CComPtr<ID3D11InputLayout> ID3D11InputLayoutPtr;
 
-    static ID3D11ShaderResourceViewPtr gNullSrv = nullptr;
+    static ID3D11ShaderResourceViewPtr gNullSRV = nullptr;
 }

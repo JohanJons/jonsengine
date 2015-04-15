@@ -16,17 +16,17 @@ namespace JonsEngine
         DX11PostProcessor(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, D3D11_TEXTURE2D_DESC backbufferTextureDesc);
         ~DX11PostProcessor();
 
-        void FXAAPass(DX11Backbuffer& backbuffer, const Vec2& screenSize);
+        void FXAAPass(DX11Backbuffer& backbuffer, const Vec2& windowSize);
 
 
     private:
         struct FXAACBuffer
         {
-            Vec2 mScreenSizeReciprocal;
+            Vec2 mWindowSizeReciprocal;
             float __padding[2];
 
 
-            FXAACBuffer(const Vec2& screenSize) : mScreenSizeReciprocal(1.0f / screenSize.x, 1.0f / screenSize.y)
+            FXAACBuffer(const Vec2& windowSize) : mWindowSizeReciprocal(1.0f / windowSize.x, 1.0f / windowSize.y)
             {
             }
         };

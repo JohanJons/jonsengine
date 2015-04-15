@@ -29,7 +29,7 @@ namespace JonsEngine
         DXCALL(device->CreateRenderTargetView(mBackbufferTexture, &rtvDesc, &mRTV_SRGB));
 
         // pixelshader that will output lightAccumBuffer to backbuffer
-        DXCALL(device->CreatePixelShader(gSimpleTexturePixelShader, sizeof(gSimpleTexturePixelShader), NULL, &mPixelShader))
+        DXCALL(device->CreatePixelShader(gSimpleTexturePixelShader, sizeof(gSimpleTexturePixelShader), nullptr, &mPixelShader))
     }
 
     DX11Backbuffer::~DX11Backbuffer()
@@ -40,12 +40,12 @@ namespace JonsEngine
     void DX11Backbuffer::FillBackbuffer(ID3D11ShaderResourceViewPtr lightAccumSRV, const bool convertToSRGB)
     {
         if (convertToSRGB)
-            mContext->OMSetRenderTargets(1, &mRTV_SRGB.p, NULL);
+            mContext->OMSetRenderTargets(1, &mRTV_SRGB.p, nullptr);
         else
-            mContext->OMSetRenderTargets(1, &mRTV.p, NULL);
+            mContext->OMSetRenderTargets(1, &mRTV.p, nullptr);
 
         mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &lightAccumSRV.p);
-        mContext->PSSetShader(mPixelShader, NULL, NULL);
+        mContext->PSSetShader(mPixelShader, nullptr, 0);
         mFullscreenPass.Render();
     }
 
@@ -56,7 +56,7 @@ namespace JonsEngine
 
     void DX11Backbuffer::BindForDrawing()
     {
-        mContext->OMSetRenderTargets(1, &mRTV.p, NULL);
+        mContext->OMSetRenderTargets(1, &mRTV.p, nullptr);
     }
 
 

@@ -21,7 +21,7 @@ namespace JonsEngine
         mSwapchainDesc.OutputWindow = mWindowHandle;
         mSwapchainDesc.SampleDesc.Count = 1;
         mSwapchainDesc.Windowed = true;
-        DXCALL(D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, deviceFlags, &featureLevel, numFeatureLevels, D3D11_SDK_VERSION, &mSwapchainDesc, &mSwapchain, &mDevice, NULL, &mContext));
+        DXCALL(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, 0, deviceFlags, &featureLevel, numFeatureLevels, D3D11_SDK_VERSION, &mSwapchainDesc, &mSwapchain, &mDevice, nullptr, &mContext));
 
         ZeroMemory(&mSwapchainDesc, sizeof(DXGI_SWAP_CHAIN_DESC));
         DXCALL(mSwapchain->GetDesc(&mSwapchainDesc));

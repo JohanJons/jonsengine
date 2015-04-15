@@ -10,7 +10,7 @@
 
 cbuffer FXAACBuffer : register(CBUFFER_REGISTER_PIXEL)
 {
-    float2 gScreenSizeReciprocal;
+    float2 gWindowSizeReciprocal;
 };
 
 Texture2D gFinalTexture : register(TEXTURE_REGISTER_EXTRA);
@@ -20,7 +20,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
 {
     FxaaTex InputFXAATex = { gPointSampler, gFinalTexture };
 
-    float2 coords = float2(position.x * gScreenSizeReciprocal.x, position.y * gScreenSizeReciprocal.y);
+    float2 coords = float2(position.x * gWindowSizeReciprocal.x, position.y * gWindowSizeReciprocal.y);
 
     return FxaaPixelShader(
         coords,							        // FxaaFloat2 pos,
@@ -28,7 +28,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
         InputFXAATex,							// FxaaTex tex,
         InputFXAATex,							// FxaaTex fxaaConsole360TexExpBiasNegOne,
         InputFXAATex,							// FxaaTex fxaaConsole360TexExpBiasNegTwo,
-        gScreenSizeReciprocal,				    // FxaaFloat2 fxaaQualityRcpFrame,
+        gWindowSizeReciprocal,				    // FxaaFloat2 fxaaQualityRcpFrame,
         FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsoleRcpFrameOpt,
         FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsoleRcpFrameOpt2,
         FxaaFloat4(0.0f, 0.0f, 0.0f, 0.0f),		// FxaaFloat4 fxaaConsole360RcpFrameOpt2,

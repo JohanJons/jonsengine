@@ -15,6 +15,8 @@ namespace JonsEngine
 {
     typedef std::array<Vec4, 8> CameraFrustrum;
 
+    const uint32_t gComputeShaderTGSize = 16;
+
     const Mat4 gBiasMatrix(0.5f, 0.0f, 0.0f, 0.0f,
                            0.0f, -0.5f, 0.0f, 0.0f,
                            0.0f, 0.0f, 1.0f, 0.0f,
@@ -82,8 +84,19 @@ namespace JonsEngine
         return OrthographicMatrix(-halfExtents.x, halfExtents.x, halfExtents.y, -halfExtents.y, halfExtents.z, -halfExtents.z) * lightViewMatrix;
     }
 
+    // Computes a compute shader dispatch size given a thread group size, and number of elements to process
+    uint32_t DispatchSize(uint32_t tgSize, uint32_t numElements)
+    {
+        uint32_t dispatchSize = numElements / tgSize;
+        dispatchSize += numElements % tgSize > 0 ? 1 : 0;
 
-    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, uint32_t shadowmapSize) :
+        return dispatchSize;
+    }
+
+
+    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, const uint32_t shadowmapSize,
+        const uint32_t windowWidth, const uint32_t windowHeight)
+        :
         mContext(context),
         mPixelShader(nullptr),
         mRSDepthClamp(nullptr),
@@ -92,7 +105,7 @@ namespace JonsEngine
         mShadowmap(device, context, shadowmapSize, NUM_SHADOWMAP_CASCADES, false),
         mDirLightCBuffer(device, context, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
-        DXCALL(device->CreatePixelShader(gDirectionalLightPixelShader, sizeof(gDirectionalLightPixelShader), NULL, &mPixelShader));
+        DXCALL(device->CreatePixelShader(gDirectionalLightPixelShader, sizeof(gDirectionalLightPixelShader), nullptr, &mPixelShader));
 
         // depth clamp to avoid meshes between frustrum split issues
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -106,6 +119,20 @@ namespace JonsEngine
         rasterizerDesc.MultisampleEnable = false;
         rasterizerDesc.AntialiasedLineEnable = false;
         DXCALL(device->CreateRasterizerState(&rasterizerDesc, &mRSDepthClamp));
+
+        // setup UAVs for compute shader
+        uint32_t width = windowWidth;
+        uint32_t height = windowHeight;
+
+        while (width > 1 || height > 1)
+        {
+            width = DispatchSize(gComputeShaderTGSize, width);
+            height = DispatchSize(gComputeShaderTGSize, height);
+
+            /*RenderTarget2D rt;
+            rt.Initialize(device, width, height, DXGI_FORMAT_R16G16_UNORM, 1, 1, 0, FALSE, TRUE);
+            depthReductionTargets.push_back(rt);*/
+        }
     }
 
     DX11DirectionalLightPass::~DX11DirectionalLightPass()
@@ -113,7 +140,7 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& screenSize, const bool drawFrustrums)
+    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const bool drawFrustrums)
     {
         // preserve current state
         D3D11_VIEWPORT prevViewport;
@@ -127,11 +154,22 @@ namespace JonsEngine
 
 
         //
+        // Reduce Depth pass
+        //
+
+        // near/far z range
+        Vec2 zRange = ReduceDepth();
+
+        zRange.x = Z_NEAR;
+        zRange.y = Z_FAR;
+
+
+        //
         // Shadow pass
         //
 
         // unbind any set pixel shader
-        mContext->PSSetShader(NULL, NULL, NULL);
+        mContext->PSSetShader(nullptr, nullptr, 0);
 
         // depth clamp to avoid issues with meshes between splits
         mContext->RSSetState(mRSDepthClamp);
@@ -140,7 +178,7 @@ namespace JonsEngine
         std::array<Mat4, NUM_SHADOWMAP_CASCADES> lightVPMatrices;
 
         // TODO: precompute?
-        CalculateShadowmapCascades(nearDistArr, farDistArr, Z_NEAR, Z_FAR);
+        CalculateShadowmapCascades(nearDistArr, farDistArr, zRange.x, zRange.y);
 
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         mShadowmap.BindForDrawing();
@@ -157,6 +195,7 @@ namespace JonsEngine
             farDistArr[cascadeIndex] = -farDistArr[cascadeIndex];
         }
 
+
         //
         // Shading pass
         //
@@ -172,10 +211,21 @@ namespace JonsEngine
         const Vec4 camLightDir = glm::normalize(cameraViewMatrix * Vec4(-directionalLight.mLightDirection, 0));
 
         // set dir light cbuffer data and pixel shader
-		mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, invCameraProjMatrix, farDistArr, directionalLight.mLightColor, camLightDir, screenSize, static_cast<float>(mShadowmap.GetTextureSize())));
-        mContext->PSSetShader(mPixelShader, NULL, NULL);
+		mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, invCameraProjMatrix, farDistArr, directionalLight.mLightColor, camLightDir, windowSize, static_cast<float>(mShadowmap.GetTextureSize())));
+        mContext->PSSetShader(mPixelShader, nullptr, 0);
 
         // run fullscreen pass + dir light shading pass
         mFullscreenPass.Render();
+    }
+
+
+    Vec2 DX11DirectionalLightPass::ReduceDepth()
+    {
+        mContext->OMSetRenderTargets(0, nullptr, nullptr);
+
+
+
+        // TODO
+        return Vec2(0.1f, 1.0f);
     }
 }

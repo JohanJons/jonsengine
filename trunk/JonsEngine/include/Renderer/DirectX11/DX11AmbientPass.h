@@ -14,10 +14,10 @@ namespace JonsEngine
     class DX11AmbientPass
     {
     public:
-        DX11AmbientPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const uint16_t screenWidth, const uint16_t screenHeight);
+        DX11AmbientPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const uint32_t windowWidth, const uint32_t windowHeight);
         ~DX11AmbientPass();
 
-        void Render(const Mat4& invCameraProjMatrix, const Vec4& ambientLight, const Vec2& screenSize, const bool useSSAO);
+        void Render(const Mat4& invCameraProjMatrix, const Vec4& ambientLight, const Vec2& windowSize, const bool useSSAO);
 
 
     private:
@@ -36,11 +36,11 @@ namespace JonsEngine
         struct SSAOCBuffer
         {
             Mat4 mInvProjMatrix;
-            Vec2 mScreenSize;
+            Vec2 mWindowSize;
             float __padding[2];
 
 
-            SSAOCBuffer(const Mat4& invProjMatrix, const Vec2& screenSize) : mInvProjMatrix(invProjMatrix), mScreenSize(screenSize)
+            SSAOCBuffer(const Mat4& invProjMatrix, const Vec2& windowSize) : mInvProjMatrix(invProjMatrix), mWindowSize(windowSize)
             {
             }
         };

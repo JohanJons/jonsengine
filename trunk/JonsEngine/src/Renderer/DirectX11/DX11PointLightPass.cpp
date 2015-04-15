@@ -105,7 +105,7 @@ namespace JonsEngine
         depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_EQUAL;
         DXCALL(device->CreateDepthStencilState(&depthStencilDesc, &mDSSShadingPass));
 
-        DXCALL(device->CreatePixelShader(gPointLightPixelShader, sizeof(gPointLightPixelShader), NULL, &mPixelShader));
+        DXCALL(device->CreatePixelShader(gPointLightPixelShader, sizeof(gPointLightPixelShader), nullptr, &mPixelShader));
     }
 
     DX11PointLightPass::~DX11PointLightPass()
@@ -119,7 +119,7 @@ namespace JonsEngine
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
 
-	void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix, const Vec2& screenSize, const float zFar, const float zNear)
+	void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const float zFar, const float zNear)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
@@ -141,7 +141,7 @@ namespace JonsEngine
         //
 
         // unbind any set pixel shader
-        mContext->PSSetShader(NULL, NULL, NULL);
+        mContext->PSSetShader(nullptr, nullptr, 0);
 
         mContext->RSSetState(mRSCullFront);
         mShadowmap.BindForDrawing();
@@ -181,8 +181,8 @@ namespace JonsEngine
         mShadowmap.BindForReading();
 
         // set point light pixel shader and its cbuffer
-        mContext->PSSetShader(mPixelShader, NULL, NULL);
-        mPointLightCBuffer.SetData(PointLightCBuffer(invCameraProjMatrix, pointLight.mLightColor, viewLightPositonV3, screenSize, pointLight.mLightIntensity, gPointLightMinZ, pointLight.mLightRadius));
+        mContext->PSSetShader(mPixelShader, nullptr, 0);
+        mPointLightCBuffer.SetData(PointLightCBuffer(invCameraProjMatrix, pointLight.mLightColor, viewLightPositonV3, windowSize, pointLight.mLightIntensity, gPointLightMinZ, pointLight.mLightRadius));
 
         // run transform pass on sphere + point light shading pass
         mVertexTransformPass.RenderMesh(mSphereMesh, lightMeshWVP);
