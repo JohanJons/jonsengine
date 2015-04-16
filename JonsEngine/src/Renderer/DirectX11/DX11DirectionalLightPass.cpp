@@ -129,9 +129,7 @@ namespace JonsEngine
             width = DispatchSize(gComputeShaderTGSize, width);
             height = DispatchSize(gComputeShaderTGSize, height);
 
-            /*RenderTarget2D rt;
-            rt.Initialize(device, width, height, DXGI_FORMAT_R16G16_UNORM, 1, 1, 0, FALSE, TRUE);
-            depthReductionTargets.push_back(rt);*/
+            mDepthReductionRTVs.emplace_back(device, DXGI_FORMAT_R16G16_UNORM, width, height, true);
         }
     }
 
@@ -223,7 +221,11 @@ namespace JonsEngine
     {
         mContext->OMSetRenderTargets(0, nullptr, nullptr);
 
+        DX11RenderTarget2D& initialRT = mDepthReductionRTVs.front();
 
+        mContext->CSSetUnorderedAccessViews(0, 1, &initialRT.mUAV, nullptr);
+        //mContext->CSSetShaderResources(0, 1, ...);
+        //mContext->CSSetShader(mDepth);
 
         // TODO
         return Vec2(0.1f, 1.0f);
