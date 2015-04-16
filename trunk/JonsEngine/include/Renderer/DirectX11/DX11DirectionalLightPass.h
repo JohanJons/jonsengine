@@ -4,6 +4,7 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
+#include "include/Renderer/DirectX11/DX11RenderTarget2D.h"
 #include "include/Core/Types.h"
 
 #include <d3d11.h>
@@ -54,7 +55,7 @@ namespace JonsEngine
         ID3D11ComputeShaderPtr mDepthReductionInitialShader;
         ID3D11ComputeShaderPtr mDepthReductionFinalShader;
         ID3D11RasterizerStatePtr mRSDepthClamp;
-        std::vector<ID3D11UnorderedAccessViewPtr> mUAVs;
+        std::vector<DX11RenderTarget2D> mDepthReductionRTVs;
 
         DX11FullscreenTrianglePass& mFullscreenPass;
         DX11VertexTransformPass& mVertexTransformPass;
