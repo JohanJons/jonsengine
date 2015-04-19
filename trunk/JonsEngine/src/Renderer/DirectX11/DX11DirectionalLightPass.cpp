@@ -7,6 +7,8 @@
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPixel.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/SDSMInitialCompute.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/SDSMFinalCompute.h"
 #include "include/Core/Utils/Math.h"
 
 #include <array>
@@ -15,7 +17,7 @@ namespace JonsEngine
 {
     typedef std::array<Vec4, 8> CameraFrustrum;
 
-    const uint32_t gComputeShaderTGSize = 16;
+    const uint32_t gSDSMThreadGroupSize = 16;
 
     const Mat4 gBiasMatrix(0.5f, 0.0f, 0.0f, 0.0f,
                            0.0f, -0.5f, 0.0f, 0.0f,
@@ -99,13 +101,18 @@ namespace JonsEngine
         :
         mContext(context),
         mPixelShader(nullptr),
+        mSDSMInitialShader(nullptr),
+        mSDSMFinalShader(nullptr),
         mRSDepthClamp(nullptr),
         mFullscreenPass(fullscreenPass),
         mVertexTransformPass(transformPass),
         mShadowmap(device, context, shadowmapSize, NUM_SHADOWMAP_CASCADES, false),
-        mDirLightCBuffer(device, context, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
+        mDirLightCBuffer(device, context, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL),
+        mSDSMCBuffer(device, context, mSDSMCBuffer.CONSTANT_BUFFER_SLOT_COMPUTE)
     {
         DXCALL(device->CreatePixelShader(gDirectionalLightPixelShader, sizeof(gDirectionalLightPixelShader), nullptr, &mPixelShader));
+        DXCALL(device->CreateComputeShader(gSDSMInitialComputeShader, sizeof(gSDSMInitialComputeShader), nullptr, &mSDSMInitialShader));
+        DXCALL(device->CreateComputeShader(gSDSMFinalComputeShader, sizeof(gSDSMFinalComputeShader), nullptr, &mSDSMFinalShader));
 
         // depth clamp to avoid meshes between frustrum split issues
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -123,11 +130,10 @@ namespace JonsEngine
         // setup UAVs for compute shader
         uint32_t width = windowWidth;
         uint32_t height = windowHeight;
-
         while (width > 1 || height > 1)
         {
-            width = DispatchSize(gComputeShaderTGSize, width);
-            height = DispatchSize(gComputeShaderTGSize, height);
+            width = DispatchSize(gSDSMThreadGroupSize, width);
+            height = DispatchSize(gSDSMThreadGroupSize, height);
 
             mDepthReductionRTVs.emplace_back(device, DXGI_FORMAT_R16G16_UNORM, width, height, true);
         }
@@ -138,7 +144,7 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const bool drawFrustrums)
+    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const Mat4& cameraProjMatrix)
     {
         // preserve current state
         D3D11_VIEWPORT prevViewport;
@@ -156,7 +162,7 @@ namespace JonsEngine
         //
 
         // near/far z range
-        Vec2 zRange = ReduceDepth();
+        Vec2 zRange = ReduceDepth(cameraProjMatrix);
 
         zRange.x = Z_NEAR;
         zRange.y = Z_FAR;
@@ -217,15 +223,16 @@ namespace JonsEngine
     }
 
 
-    Vec2 DX11DirectionalLightPass::ReduceDepth()
+    Vec2 DX11DirectionalLightPass::ReduceDepth(const Mat4& cameraProjMatrix)
     {
         mContext->OMSetRenderTargets(0, nullptr, nullptr);
 
-        DX11RenderTarget2D& initialRT = mDepthReductionRTVs.front();
+        mSDSMCBuffer.SetData(SDSMCBuffer(cameraProjMatrix[2].z, cameraProjMatrix[3].z, 0.1f, 100.0f));
 
+        DX11RenderTarget2D& initialRT = mDepthReductionRTVs.front();
         mContext->CSSetUnorderedAccessViews(0, 1, &initialRT.mUAV, nullptr);
-        //mContext->CSSetShaderResources(0, 1, ...);
-        //mContext->CSSetShader(mDepth);
+        mContext->CSSetShaderResources(0, 1, ...);
+        mContext->CSSetShader(mSDSMInitialShader, nullptr, 0);
 
         // TODO
         return Vec2(0.1f, 1.0f);

@@ -140,6 +140,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11PostProcessor.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Renderer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11RendererImpl.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11RenderTarget2D.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Sampler.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Shadowmap.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Texture.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11PostProcessor.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Renderer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11RendererImpl.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11RenderTarget2D.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Sampler.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Shadowmap.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Texture.h" />
@@ -288,6 +290,20 @@
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gPointLightPixelShader</VariableName>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/include/Renderer/DirectX11/Shaders/Compiled/%(Filename).h</HeaderFileOutput>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ps_main</EntryPointName>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\SDSMFinalCompute.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cs_main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gSDSMFinalComputeShader</VariableName>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/include/Renderer/DirectX11/Shaders/Compiled/%(Filename).h</HeaderFileOutput>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\SDSMInitialCompute.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cs_main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/include/Renderer/DirectX11/Shaders/Compiled/%(Filename).h</HeaderFileOutput>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gSDSMInitialComputeShader</VariableName>
     </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\SimpleColorPixel.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ps_main</EntryPointName>

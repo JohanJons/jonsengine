@@ -26,7 +26,7 @@ namespace JonsEngine
             const uint32_t windowWidth, const uint32_t windowHeight);
         ~DX11DirectionalLightPass();
 
-        void Render(const RenderableDirLight& directionalLight, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const bool drawFrustrums);
+        void Render(const RenderableDirLight& directionalLight, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const Mat4& cameraProjMatrix);
 
 
     private:
@@ -48,12 +48,26 @@ namespace JonsEngine
             }
         };
 
-        Vec2 ReduceDepth();
+        struct SDSMCBuffer
+        {
+            float mProjection33;
+            float mProjection43;
+            float mNearClip;
+            float mFarClip;
+
+
+            SDSMCBuffer(const float proj33, const float proj43, const float nearClip, const float farClip) :
+                mProjection33(proj33), mProjection43(proj43), mNearClip(nearClip), mFarClip(farClip)
+            {
+            }
+        };
+
+        Vec2 ReduceDepth(const Mat4& cameraProjMatrix);
 
         ID3D11DeviceContextPtr mContext;
         ID3D11PixelShaderPtr mPixelShader;
-        ID3D11ComputeShaderPtr mDepthReductionInitialShader;
-        ID3D11ComputeShaderPtr mDepthReductionFinalShader;
+        ID3D11ComputeShaderPtr mSDSMInitialShader;
+        ID3D11ComputeShaderPtr mSDSMFinalShader;
         ID3D11RasterizerStatePtr mRSDepthClamp;
         std::vector<DX11RenderTarget2D> mDepthReductionRTVs;
 
@@ -61,5 +75,6 @@ namespace JonsEngine
         DX11VertexTransformPass& mVertexTransformPass;
         DX11Shadowmap mShadowmap;
         DX11ConstantBuffer<DirectionalLightCBuffer> mDirLightCBuffer;
+        DX11ConstantBuffer<SDSMCBuffer> mSDSMCBuffer;
     };
 }

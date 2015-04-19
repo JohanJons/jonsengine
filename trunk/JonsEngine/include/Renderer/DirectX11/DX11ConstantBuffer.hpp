@@ -15,7 +15,8 @@ namespace JonsEngine
         enum CONSTANT_BUFFER_SLOT
         {
             CONSTANT_BUFFER_SLOT_VERTEX = CBUFFER_SLOT_VERTEX,
-            CONSTANT_BUFFER_SLOT_PIXEL = CBUFFER_SLOT_PIXEL
+            CONSTANT_BUFFER_SLOT_PIXEL = CBUFFER_SLOT_PIXEL,
+            CONSTANT_BUFFER_SLOT_COMPUTE = CBUFFER_SLOT_COMPUTE
         };
 
         DX11ConstantBuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const CONSTANT_BUFFER_SLOT cbufferSlot) :
