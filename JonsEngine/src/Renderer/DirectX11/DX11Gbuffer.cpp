@@ -95,6 +95,7 @@ namespace JonsEngine
         }
         // backbuffers depth texture might still be bound on input
         mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSRV.p);
+		mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSRV.p);
         mContext->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
         // default == depth testing/writing on

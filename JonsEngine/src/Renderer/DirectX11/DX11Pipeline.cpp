@@ -134,7 +134,10 @@ namespace JonsEngine
         mLightAccbuffer.BindForDrawing(mDSVReadOnly);
         mGBuffer.BindGeometryTextures();
 
+		// TODO: move elsewhere?
         mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mDepthSRV.p);
+		mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mDepthSRV.p);
+
         // disable further depth writing
         mContext->OMSetDepthStencilState(mDepthStencilState, 0);
 
