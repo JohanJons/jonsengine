@@ -231,7 +231,7 @@ namespace JonsEngine
         mSDSMCBuffer.SetData(SDSMCBuffer(cameraProjMatrix[2].z, cameraProjMatrix[3].z, 0.1f, 100.0f));
 
         auto& initialRTV = mDepthReductionRTVs.front();
-		mContext->CSSetUnorderedAccessViews(0, 1, &initialRTV.mUAV, nullptr);
+		mContext->CSSetUnorderedAccessViews(UAV_SLOT, 1, &initialRTV.mUAV.p, nullptr);
         mContext->CSSetShader(mSDSMInitialShader, nullptr, 0);
 
 		D3D11_TEXTURE2D_DESC rtvTextureDesc;
@@ -245,10 +245,10 @@ namespace JonsEngine
 		for (uint32_t index = 1; index < mDepthReductionRTVs.size(); index++)
 		{
 			auto& prevRTV = mDepthReductionRTVs.at(index - 1);
-			mContext->CSSetShaderResources(0, 1, &prevRTV.mSRV);
+			mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &prevRTV.mSRV);
 
 			auto& rtv = mDepthReductionRTVs.at(index);
-			mContext->CSSetUnorderedAccessViews(0, 1, &rtv.mUAV, nullptr);
+            mContext->CSSetUnorderedAccessViews(UAV_SLOT, 1, &rtv.mUAV, nullptr);
 
 			ZeroMemory(&rtvTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
 			rtv.mTexture->GetDesc(&rtvTextureDesc);
@@ -256,8 +256,8 @@ namespace JonsEngine
 			mContext->Dispatch(rtvTextureDesc.Width, rtvTextureDesc.Height, 1);
 		}
 
-		mContext->CSSetUnorderedAccessViews(0, 0, nullptr, nullptr);
-		mContext->CSSetShaderResources(0, 0, nullptr);
+        mContext->CSSetUnorderedAccessViews(UAV_SLOT, 0, nullptr, nullptr);
+        mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 0, nullptr);
 
         // TODO
         return Vec2(0.1f, 1.0f);
