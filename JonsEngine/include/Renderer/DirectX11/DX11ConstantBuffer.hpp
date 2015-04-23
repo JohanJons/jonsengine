@@ -46,8 +46,10 @@ namespace JonsEngine
             std::memcpy(mappedResource.pData, &content, sizeof(ContentType));
             mContext->Unmap(mConstantBuffer, 0);
 
+            // TODO: split per type?
             mContext->VSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
             mContext->PSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
+            mContext->CSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
         }
 
 
