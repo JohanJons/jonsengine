@@ -240,6 +240,8 @@ namespace JonsEngine
 
 		mContext->Dispatch(rtvTextureDesc.Width, rtvTextureDesc.Height, 1);
 
+		mContext->CSSetUnorderedAccessViews(UAV_SLOT, 1, &gNullUAV.p, nullptr);
+
 		// subsequent passes
 		mContext->CSSetShader(mSDSMFinalShader, nullptr, 0);
 		for (uint32_t index = 1; index < mDepthReductionRTVs.size(); index++)
@@ -254,10 +256,10 @@ namespace JonsEngine
 			rtv.mTexture->GetDesc(&rtvTextureDesc);
 
 			mContext->Dispatch(rtvTextureDesc.Width, rtvTextureDesc.Height, 1);
-		}
 
-        mContext->CSSetUnorderedAccessViews(UAV_SLOT, 0, nullptr, nullptr);
-        mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 0, nullptr);
+			mContext->CSSetUnorderedAccessViews(UAV_SLOT, 1, &gNullUAV.p, nullptr);
+			mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSRV.p);
+		}
 
         // TODO
         return Vec2(0.1f, 1.0f);

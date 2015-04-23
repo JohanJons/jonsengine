@@ -53,4 +53,5 @@ namespace JonsEngine
     typedef CComPtr<ID3D11InputLayout> ID3D11InputLayoutPtr;
 
     static ID3D11ShaderResourceViewPtr gNullSRV = nullptr;
+	static ID3D11UnorderedAccessViewPtr gNullUAV = nullptr;
 }
