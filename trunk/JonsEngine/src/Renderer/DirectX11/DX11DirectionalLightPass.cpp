@@ -245,10 +245,10 @@ namespace JonsEngine
 		for (uint32_t index = 1; index < mDepthReductionRTVs.size(); index++)
 		{
 			auto& prevRTV = mDepthReductionRTVs.at(index - 1);
-			mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &prevRTV.mSRV);
+			mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &prevRTV.mSRV.p);
 
 			auto& rtv = mDepthReductionRTVs.at(index);
-            mContext->CSSetUnorderedAccessViews(UAV_SLOT, 1, &rtv.mUAV, nullptr);
+            mContext->CSSetUnorderedAccessViews(UAV_SLOT, 1, &rtv.mUAV.p, nullptr);
 
 			ZeroMemory(&rtvTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
 			rtv.mTexture->GetDesc(&rtvTextureDesc);

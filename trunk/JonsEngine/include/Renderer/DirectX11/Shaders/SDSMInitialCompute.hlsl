@@ -11,7 +11,7 @@ groupshared float2 depthSamples[SDSM_NUM_THREADS];
 Texture2D<float> gDepthTexture : register(TEXTURE_REGISTER_DEPTH);
 RWTexture2D<float2> gOutputMap : register(UAV_REGISTER);
 
-cbuffer DirectionalLightConstants : register(CBUFFER_REGISTER_PIXEL)
+cbuffer SDSMConstants : register(CBUFFER_REGISTER_COMPUTE)
 {
     float gProjection33;
     float gProjection43;
