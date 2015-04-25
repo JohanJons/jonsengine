@@ -20,7 +20,6 @@ namespace JonsGame
 {
     Game::Game() : mEngine(nullptr), mRunning(true), mSunAngle(0.0f), mMoveSpeed(0.1f)
     {
-        mSettings.mShadowQuality = EngineSettings::SHADOW_QUALITY_HIGH;
         mEngine = new Engine(mSettings);
     }
         
