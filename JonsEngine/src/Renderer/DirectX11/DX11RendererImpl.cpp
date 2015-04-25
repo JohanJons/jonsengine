@@ -109,17 +109,17 @@ namespace JonsEngine
         }
     }
 
-    uint32_t ShadowQualityResolution(const EngineSettings::ShadowQuality shadowQuality)
+    uint32_t ShadowQualityResolution(const EngineSettings::ShadowResolution shadowRes)
     {
-        switch (shadowQuality)
+        switch (shadowRes)
         {
-        case EngineSettings::ShadowQuality::SHADOW_QUALITY_LOW:
-            return 512;
-        case EngineSettings::ShadowQuality::SHADOW_QUALITY_HIGH:
-            return 2048;
-        case EngineSettings::ShadowQuality::SHADOW_QUALITY_MEDIUM:
-        default:
+        case EngineSettings::ShadowResolution::SHADOW_RESOLUTION_1024:
             return 1024;
+        case EngineSettings::ShadowResolution::SHADOW_RESOLUTION_4092:
+            return 4092;
+        case EngineSettings::ShadowResolution::SHADOW_RESOLUTION_2048:
+        default:
+            return 2048;
         }
     }
 
@@ -128,9 +128,10 @@ namespace JonsEngine
         DX11Context(GetActiveWindow()), 
         mLogger(logger),
         mMemoryAllocator(memoryAllocator),
-        mShadowQuality(settings.mShadowQuality),
+        mShadowResolution(settings.mShadowResolution),
+        mShadowReadbackLatency(settings.mShadowReadbackLatency),
         mAntiAliasing(settings.mAntiAliasing),
-        mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), ShadowQualityResolution(settings.mShadowQuality), mMeshes, mTextures),
+        mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), ShadowQualityResolution(settings.mShadowResolution), mMeshes, mTextures),
         // samplers
         mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, mContext, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
         mShadowmapSampler(mDevice, mContext, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
@@ -242,9 +243,14 @@ namespace JonsEngine
         return Z_FAR;
     }
 
-    EngineSettings::ShadowQuality DX11RendererImpl::GetShadowQuality() const
+    EngineSettings::ShadowResolution DX11RendererImpl::GetShadowResolution() const
     {
-        return mShadowQuality;
+        return mShadowResolution;
+    }
+
+    EngineSettings::ShadowReadbackLatency DX11RendererImpl::GetShadowReadbackLatency() const
+    {
+        return mShadowReadbackLatency;
     }
 
 
