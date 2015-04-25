@@ -49,7 +49,8 @@ namespace JonsEngine
 
         float GetZNear() const;
         float GetZFar() const;
-        EngineSettings::ShadowQuality GetShadowQuality() const;
+        EngineSettings::ShadowResolution GetShadowResolution() const;
+        EngineSettings::ShadowReadbackLatency GetShadowReadbackLatency() const;
 
 
     private:
@@ -58,7 +59,8 @@ namespace JonsEngine
 
         Logger& mLogger;
         IMemoryAllocatorPtr mMemoryAllocator;
-        EngineSettings::ShadowQuality mShadowQuality;
+        EngineSettings::ShadowResolution mShadowResolution;
+        EngineSettings::ShadowReadbackLatency mShadowReadbackLatency;
         EngineSettings::AntiAliasing mAntiAliasing;
 
         DX11Pipeline mPipeline;

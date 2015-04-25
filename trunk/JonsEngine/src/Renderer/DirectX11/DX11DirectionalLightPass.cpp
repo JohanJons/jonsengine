@@ -30,7 +30,7 @@ namespace JonsEngine
         const float ratio = nearDist / farDist;
 
         nearDistArr[0] = nearDist;
-        for (uint8_t index = 1; index < DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES; index++)
+        for (uint8_t index = 1; index < DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES; ++index)
         {
             const float si = index / (float)DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES;
 
@@ -65,7 +65,7 @@ namespace JonsEngine
         float maxZ = transf.z, minZ = transf.z;
         float maxX = transf.x, minX = transf.x;
         float maxY = transf.y, minY = transf.y;
-        for (uint32_t i = 1; i < 8; i++)
+        for (uint32_t i = 1; i < 8; ++i)
         {
             transf = lightViewMatrix * cameraFrustrum[i];
 
@@ -137,6 +137,19 @@ namespace JonsEngine
 
             mDepthReductionRTVs.emplace_back(device, DXGI_FORMAT_R16G16_UNORM, width, height, true);
         }
+
+        // setup readback textures
+        D3D11_TEXTURE2D_DESC textureDesc;
+        ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+        textureDesc.Width = 1;
+        textureDesc.Height = 1;
+        textureDesc.ArraySize = 1;
+        textureDesc.SampleDesc.Count = 1;
+        textureDesc.Format = DXGI_FORMAT_R16G16_UNORM;
+        textureDesc.Usage = D3D11_USAGE_STAGING;
+        textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        for (uint32_t index = 0; index < MAX_READBACK_LATENCY; ++index)
+            DXCALL(device->CreateTexture2D(&textureDesc, nullptr, &mReadbackTextures[index]));
     }
 
     DX11DirectionalLightPass::~DX11DirectionalLightPass()
@@ -187,7 +200,7 @@ namespace JonsEngine
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         mShadowmap.BindForDrawing();
         
-        for (uint32_t cascadeIndex = 0; cascadeIndex < NUM_SHADOWMAP_CASCADES; cascadeIndex++)
+        for (uint32_t cascadeIndex = 0; cascadeIndex < NUM_SHADOWMAP_CASCADES; ++cascadeIndex)
         {
             mShadowmap.BindDepthView(cascadeIndex);
             
@@ -228,7 +241,8 @@ namespace JonsEngine
         mContext->OMSetRenderTargets(0, nullptr, nullptr);
 
 		// first pass
-        mSDSMCBuffer.SetData(SDSMCBuffer(cameraProjMatrix[2].z, cameraProjMatrix[3].z, 0.1f, 100.0f));
+        // TODO: why neg. 33?
+        mSDSMCBuffer.SetData(SDSMCBuffer(-cameraProjMatrix[2].z, cameraProjMatrix[3].z, 0.1f, 100.0f));
 
         auto& initialRTV = mDepthReductionRTVs.front();
 		mContext->CSSetUnorderedAccessViews(UAV_SLOT, 1, &initialRTV.mUAV.p, nullptr);
@@ -244,7 +258,7 @@ namespace JonsEngine
 
 		// subsequent passes
 		mContext->CSSetShader(mSDSMFinalShader, nullptr, 0);
-		for (uint32_t index = 1; index < mDepthReductionRTVs.size(); index++)
+		for (uint32_t index = 1; index < mDepthReductionRTVs.size(); ++index)
 		{
 			auto& prevRTV = mDepthReductionRTVs.at(index - 1);
 			mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &prevRTV.mSRV.p);
@@ -260,6 +274,9 @@ namespace JonsEngine
 			mContext->CSSetUnorderedAccessViews(UAV_SLOT, 1, &gNullUAV.p, nullptr);
 			mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSRV.p);
 		}
+
+        // reading back depth
+
 
         // TODO
         return Vec2(0.1f, 1.0f);
