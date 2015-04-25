@@ -21,6 +21,7 @@ namespace JonsEngine
     {
     public:
         const static uint32_t NUM_SHADOWMAP_CASCADES = 4;
+        const static uint32_t MAX_READBACK_LATENCY = 3;
 
         DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, const uint32_t shadowmapSize,
             const uint32_t windowWidth, const uint32_t windowHeight);
@@ -70,6 +71,7 @@ namespace JonsEngine
         ID3D11ComputeShaderPtr mSDSMFinalShader;
         ID3D11RasterizerStatePtr mRSDepthClamp;
         std::vector<DX11RenderTarget2D> mDepthReductionRTVs;
+        std::array<ID3D11Texture2DPtr, MAX_READBACK_LATENCY> mReadbackTextures;
 
         DX11FullscreenTrianglePass& mFullscreenPass;
         DX11VertexTransformPass& mVertexTransformPass;

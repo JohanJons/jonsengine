@@ -40,7 +40,8 @@ namespace JonsEngine
 
         float GetZNear() const;
         float GetZFar() const;
-        EngineSettings::ShadowQuality GetShadowQuality() const;
+        EngineSettings::ShadowResolution GetShadowResolution() const;
+        EngineSettings::ShadowReadbackLatency GetShadowReadbackLatency() const;
 
 
     private:
