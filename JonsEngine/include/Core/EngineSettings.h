@@ -16,29 +16,29 @@ namespace JonsEngine
     {
         // render settings
         enum class ShadowResolution {
-            SHADOW_RESOLUTION_1024 = 0,
-            SHADOW_RESOLUTION_2048,
-            SHADOW_RESOLUTION_4092
+            RESOLUTION_1024,
+            RESOLUTION_2048,
+            RESOLUTION_4092
         } mShadowResolution;
 
         enum class ShadowReadbackLatency {
-            SHADOW_READBACK_LATENCY_0 = 0,
-            SHADOW_READBACK_LATENCY_1,
-            SHADOW_READBACK_LATENCY_2,
-            SHADOW_READBACK_LATENCY_3
+           LATENCY_0,
+           LATENCY_1,
+           LATENCY_2,
+           LATENCY_3
         } mShadowReadbackLatency;
 
         enum class Anisotropic {
-            ANISOTROPIC_1X = 1,
-            ANISOTROPIC_2X = 2,
-            ANISOTROPIC_4X = 4,
-            ANISOTROPIC_8X = 8,
-            ANISOTROPIC_16X = 16
+            X1,
+            X2,
+            X4,
+            X8,
+            X16
         } mAnisotropicFiltering;
 
-        enum class AntiAliasing {
-            ANTIALIASING_NONE = 0,
-            ANTIALIASING_FXAA = 1
+        enum class AntiAliasing{
+            NONE,
+            FXAA
         } mAntiAliasing;
 
         bool mSSAOEnabled;
@@ -57,10 +57,10 @@ namespace JonsEngine
     /* EngineSettings inlines */
     inline EngineSettings::EngineSettings() :
         // render settings
-        mShadowResolution(ShadowResolution::SHADOW_RESOLUTION_2048),
-        mShadowReadbackLatency(ShadowReadbackLatency::SHADOW_READBACK_LATENCY_1),
-        mAnisotropicFiltering(Anisotropic::ANISOTROPIC_16X),
-        mAntiAliasing(AntiAliasing::ANTIALIASING_FXAA),
+        mShadowResolution(ShadowResolution::RESOLUTION_2048),
+        mShadowReadbackLatency(ShadowReadbackLatency::LATENCY_1),
+        mAnisotropicFiltering(Anisotropic::X16),
+        mAntiAliasing(AntiAliasing::FXAA),
         mSSAOEnabled(true),
 
         // window settings

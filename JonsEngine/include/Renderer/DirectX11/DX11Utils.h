@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/Logging/Logger.h"
+#include "include/Core/EngineSettings.h"
 
 #include "boost/current_function.hpp"
 #include <d3d11.h>
@@ -16,6 +17,9 @@ namespace JonsEngine
 
     typedef std::array<float, 4> DX11Color;
 
+    uint32_t EngineSettingsToVal(const EngineSettings::Anisotropic anisotropicEnum);
+    uint32_t EngineSettingsToVal(const EngineSettings::ShadowReadbackLatency shadowReadbackLatencyEnum);
+    uint32_t EngineSettingsToVal(const EngineSettings::ShadowResolution shadowResolutionEnum);
 
     #ifdef _DEBUG
     #define DXCALL(function)                                                                                                                            \

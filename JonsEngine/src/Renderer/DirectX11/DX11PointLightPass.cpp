@@ -35,14 +35,14 @@ namespace JonsEngine
     }
 
 
-    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const uint32_t shadowmapSize) :
+    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const EngineSettings::ShadowResolution shadowmapRes) :
         mContext(context),
         mPixelShader(nullptr),
         mDSSStencilPass(nullptr),
         mDSSShadingPass(nullptr),
         mSphereMesh(CreateSphereMesh(device, context)),
         mVertexTransformPass(vertexTransformPass),
-        mShadowmap(device, context, shadowmapSize, DX11PointLightPass::POINT_LIGHT_DIR_COUNT, true),
+        mShadowmap(device, context, shadowmapRes, DX11PointLightPass::POINT_LIGHT_DIR_COUNT, true),
         mPointLightCBuffer(device, context, mPointLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
         // rasterize for front-face culling due to light volumes

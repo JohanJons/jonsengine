@@ -109,20 +109,6 @@ namespace JonsEngine
         }
     }
 
-    uint32_t ShadowQualityResolution(const EngineSettings::ShadowResolution shadowRes)
-    {
-        switch (shadowRes)
-        {
-        case EngineSettings::ShadowResolution::SHADOW_RESOLUTION_1024:
-            return 1024;
-        case EngineSettings::ShadowResolution::SHADOW_RESOLUTION_4092:
-            return 4092;
-        case EngineSettings::ShadowResolution::SHADOW_RESOLUTION_2048:
-        default:
-            return 2048;
-        }
-    }
-
 
     DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : 
         DX11Context(GetActiveWindow()), 
@@ -131,11 +117,14 @@ namespace JonsEngine
         mShadowResolution(settings.mShadowResolution),
         mShadowReadbackLatency(settings.mShadowReadbackLatency),
         mAntiAliasing(settings.mAntiAliasing),
-        mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), ShadowQualityResolution(settings.mShadowResolution), mMeshes, mTextures),
+
+        mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), mShadowResolution, mShadowReadbackLatency, mMeshes, mTextures),
+
         // samplers
         mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, mContext, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
-        mShadowmapSampler(mDevice, mContext, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
-        mShadowmapNoCompareSampler(mDevice, mContext, EngineSettings::ANISOTROPIC_1X, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT),
+        mShadowmapSampler(mDevice, mContext, EngineSettings::Anisotropic::X1, D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
+        mShadowmapNoCompareSampler(mDevice, mContext, EngineSettings::Anisotropic::X1, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT),
+
         // misc
         mSSAOEnabled(settings.mSSAOEnabled)
     {

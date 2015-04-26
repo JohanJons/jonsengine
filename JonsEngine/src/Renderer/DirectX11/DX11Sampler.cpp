@@ -11,7 +11,7 @@ namespace JonsEngine
         samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
         samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
         samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-        samplerDesc.MaxAnisotropy = mAnisotropicFiltering;
+        samplerDesc.MaxAnisotropy = EngineSettingsToVal(mAnisotropicFiltering);
         samplerDesc.ComparisonFunc = comparison;
         samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
         DXCALL(device->CreateSamplerState(&samplerDesc, &mTextureSampler));
