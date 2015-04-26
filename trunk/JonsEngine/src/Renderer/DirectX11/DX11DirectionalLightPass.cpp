@@ -96,17 +96,21 @@ namespace JonsEngine
     }
 
 
-    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, const uint32_t shadowmapSize,
-        const uint32_t windowWidth, const uint32_t windowHeight)
+    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, const EngineSettings::ShadowResolution shadowmapRes,
+        const EngineSettings::ShadowReadbackLatency readbackLatency, const uint32_t windowWidth, const uint32_t windowHeight)
         :
+        mReadbackLatency(readbackLatency),
+        mCurrFrame(0),
+
         mContext(context),
         mPixelShader(nullptr),
         mSDSMInitialShader(nullptr),
         mSDSMFinalShader(nullptr),
         mRSDepthClamp(nullptr),
+
         mFullscreenPass(fullscreenPass),
         mVertexTransformPass(transformPass),
-        mShadowmap(device, context, shadowmapSize, NUM_SHADOWMAP_CASCADES, false),
+        mShadowmap(device, context, shadowmapRes, NUM_SHADOWMAP_CASCADES, false),
         mDirLightCBuffer(device, context, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL),
         mSDSMCBuffer(device, context, mSDSMCBuffer.CONSTANT_BUFFER_SLOT_COMPUTE)
     {
@@ -276,9 +280,24 @@ namespace JonsEngine
 		}
 
         // reading back depth
+        const uint32_t latency = EngineSettingsToVal(mReadbackLatency) + 1;
+        ID3D11Texture2DPtr lastTarget = mDepthReductionRTVs[mDepthReductionRTVs.size() - 1].mTexture;
+        mContext->CopyResource(mReadbackTextures[mCurrFrame % latency].p, lastTarget.p);
 
+        ++mCurrFrame;
+        if (mCurrFrame >= latency)
+        {
+            ID3D11Texture2DPtr readbackTexture = mReadbackTextures[mCurrFrame % latency];
 
-        // TODO
-        return Vec2(0.1f, 1.0f);
+            D3D11_MAPPED_SUBRESOURCE mapped;
+            DXCALL(mContext->Map(readbackTexture.p, 0, D3D11_MAP_READ, 0, &mapped));
+            mContext->Unmap(readbackTexture.p, 0);
+
+            const uint16_t* texData = reinterpret_cast<uint16_t*>(mapped.pData);
+
+            return Vec2(texData[0] / static_cast<float>(0xffff), texData[1] / static_cast<float>(0xffff));
+        }
+        else
+            return Vec2(0.1f, 1.0f);
     }
 }

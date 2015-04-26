@@ -2,6 +2,7 @@
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/Types.h"
+#include "include/Core/EngineSettings.h"
 
 #include <d3d11.h>
 #include <vector>
@@ -11,7 +12,7 @@ namespace JonsEngine
     class DX11Shadowmap
     {
     public:
-        DX11Shadowmap(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const uint32_t shadowmapSize, const uint32_t numTextures, const bool isCubeTexture);
+        DX11Shadowmap(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const EngineSettings::ShadowResolution shadowmapRes, const uint32_t numTextures, const bool isCubeTexture);
         ~DX11Shadowmap();
 
         void BindForDrawing();

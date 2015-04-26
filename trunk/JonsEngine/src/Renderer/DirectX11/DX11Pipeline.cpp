@@ -9,10 +9,14 @@ namespace JonsEngine
     const DX11Color gClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
-    DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const uint32_t shadowmapResolution,
-        IDMap<DX11Mesh>& meshMap, IDMap<DX11Texture>& textureMap) :
-
+    DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const EngineSettings::ShadowResolution shadowmapResolution,
+        const EngineSettings::ShadowReadbackLatency shadowmapReadbackLatency, IDMap<DX11Mesh>& meshMap, IDMap<DX11Texture>& textureMap) 
+        :
         mLogger(logger),
+        mWindowSize(backbufferTextureDesc.Width, backbufferTextureDesc.Height),
+        mMeshMap(meshMap),
+        mTextureMap(textureMap),
+
         mSwapchain(swapchain),
         mContext(context),
         mDSV(nullptr),
@@ -21,8 +25,8 @@ namespace JonsEngine
         mDepthStencilState(nullptr),
         mAdditiveBlending(nullptr),
         
-        mAABBPass(device, context, mVertexTransformPass),
         mVertexTransformPass(device, context, meshMap),
+        mAABBPass(device, context, mVertexTransformPass),
         mFullscreenTrianglePass(device, context),
 
         mBackbuffer(device, mContext, mSwapchain, mFullscreenTrianglePass),
@@ -30,13 +34,9 @@ namespace JonsEngine
         mGBuffer(device, mContext, backbufferTextureDesc),
 
         mAmbientPass(device, context, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-        mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, shadowmapResolution, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
+        mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, shadowmapResolution, shadowmapReadbackLatency, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mPointLightPass(device, mContext, mVertexTransformPass, shadowmapResolution),
-        mPostProcessor(device, context, mFullscreenTrianglePass, backbufferTextureDesc),
-
-        mWindowSize(backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-        mMeshMap(meshMap),
-        mTextureMap(textureMap)
+        mPostProcessor(device, context, mFullscreenTrianglePass, backbufferTextureDesc)
     {
         // create depth buffer/view/srv
         D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
@@ -174,7 +174,7 @@ namespace JonsEngine
         mBackbuffer.BindForDrawing();
 
         // FXAA done in sRGB space
-        if (AA == EngineSettings::ANTIALIASING_FXAA)
+        if (AA == EngineSettings::AntiAliasing::FXAA)
             mPostProcessor.FXAAPass(mBackbuffer, mWindowSize);
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))

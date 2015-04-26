@@ -25,8 +25,8 @@ namespace JonsEngine
     class DX11Pipeline
     {
     public:
-        DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const uint32_t shadowmapResolution,
-            IDMap<DX11Mesh>& meshMap, IDMap<DX11Texture>& textureMap);
+        DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const EngineSettings::ShadowResolution shadowmapResolution,
+            const EngineSettings::ShadowReadbackLatency shadowmapReadbackLatency, IDMap<DX11Mesh>& meshMap, IDMap<DX11Texture>& textureMap);
         ~DX11Pipeline();
 
         void BeginFrame();
@@ -39,6 +39,10 @@ namespace JonsEngine
 
     private:
         Logger& mLogger;
+        const Vec2 mWindowSize;
+        IDMap<DX11Mesh>& mMeshMap;
+        IDMap<DX11Texture>& mTextureMap;
+
         IDXGISwapChainPtr mSwapchain;
         ID3D11DeviceContextPtr mContext;
         ID3D11Texture2DPtr mDepthStencilBuffer;
@@ -48,8 +52,8 @@ namespace JonsEngine
         ID3D11DepthStencilStatePtr mDepthStencilState;
         ID3D11BlendStatePtr mAdditiveBlending;
     
-        DX11AABBPass mAABBPass;
         DX11VertexTransformPass mVertexTransformPass;
+        DX11AABBPass mAABBPass;
         DX11FullscreenTrianglePass mFullscreenTrianglePass;
 
         DX11Backbuffer mBackbuffer;
@@ -60,9 +64,5 @@ namespace JonsEngine
         DX11DirectionalLightPass mDirectionalLightPass;
         DX11PointLightPass mPointLightPass;
         DX11PostProcessor mPostProcessor;
-
-        const Vec2 mWindowSize;
-        IDMap<DX11Mesh>& mMeshMap;
-        IDMap<DX11Texture>& mTextureMap;
     };
 }

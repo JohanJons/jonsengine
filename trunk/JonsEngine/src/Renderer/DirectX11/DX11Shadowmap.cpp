@@ -5,9 +5,11 @@
 
 namespace JonsEngine
 {
-    DX11Shadowmap::DX11Shadowmap(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const uint32_t shadowmapSize, const uint32_t numTextures, const bool isCubeTexture) :
+    DX11Shadowmap::DX11Shadowmap(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const EngineSettings::ShadowResolution shadowmapRes, const uint32_t numTextures, const bool isCubeTexture) :
         mContext(context), mShadowmapTexture(nullptr), mInputLayout(nullptr), mShadowmapSRV(nullptr)
     {
+        const uint32_t shadowmapResVal = EngineSettingsToVal(shadowmapRes);
+
         mShadowmapViews.resize(numTextures);
 
         D3D11_INPUT_ELEMENT_DESC inputDescription;
@@ -26,8 +28,8 @@ namespace JonsEngine
         ZeroMemory(&depthBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
         depthBufferDesc.ArraySize = numTextures;
         depthBufferDesc.Format = DXGI_FORMAT_R32_TYPELESS;
-        depthBufferDesc.Width = shadowmapSize;
-        depthBufferDesc.Height = shadowmapSize;
+        depthBufferDesc.Width = shadowmapResVal;
+        depthBufferDesc.Height = shadowmapResVal;
         depthBufferDesc.MipLevels = 1;
         depthBufferDesc.SampleDesc.Count = 1;
         depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -71,8 +73,8 @@ namespace JonsEngine
         ZeroMemory(&mShadowPassViewport, sizeof(D3D11_VIEWPORT));
         mShadowPassViewport.TopLeftX = 0;
         mShadowPassViewport.TopLeftY = 0;
-        mShadowPassViewport.Width = static_cast<float>(shadowmapSize);
-        mShadowPassViewport.Height = static_cast<float>(shadowmapSize);
+        mShadowPassViewport.Width = static_cast<float>(shadowmapResVal);
+        mShadowPassViewport.Height = static_cast<float>(shadowmapResVal);
         mShadowPassViewport.MinDepth = 0.0f;
         mShadowPassViewport.MaxDepth = 1.0f;
     }

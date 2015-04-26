@@ -76,8 +76,13 @@ namespace JonsEngine
         return mImplementation->GetZFar();
     }
 
-    EngineSettings::ShadowQuality DX11Renderer::GetShadowQuality() const
+    EngineSettings::ShadowResolution DX11Renderer::GetShadowResolution() const
     {
-        return mImplementation->GetShadowQuality();
+        return mImplementation->GetShadowResolution();
+    }
+
+    EngineSettings::ShadowReadbackLatency DX11Renderer::GetShadowReadbackLatency() const
+    {
+        return mImplementation->GetShadowReadbackLatency();
     }
 }

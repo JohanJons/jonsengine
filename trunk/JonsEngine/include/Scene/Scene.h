@@ -65,6 +65,12 @@ namespace JonsEngine
         const size_t mHashedID;
         IMemoryAllocator& mMemoryAllocator;
 
+        std::vector<SceneNode*> mDirtySceneNodes;
+        std::vector<PointLight*> mDirtyPointLights;
+
+        std::vector<std::pair<PointLight*, RenderablePointLights::size_type>> mPointLightRenderableMapping;
+        std::vector<std::pair<PointLight*, SceneNode*>> mPointLightNodeMapping;
+
 		Camera mSceneCamera;
         SceneNode mRootNode;
         Vec4 mAmbientLight;
@@ -73,12 +79,6 @@ namespace JonsEngine
         std::vector<DirectionalLightPtr> mDirectionalLights;
 
 		IDMap<PointLight> mPointLights;
-
-        std::vector<std::pair<PointLight*, RenderablePointLights::size_type>> mPointLightRenderableMapping;
-        std::vector<std::pair<PointLight*, SceneNode*>> mPointLightNodeMapping;
-
-		std::vector<SceneNode*> mDirtySceneNodes;
-		std::vector<PointLight*> mDirtyPointLights;
 
         RenderQueue mRenderQueue;
     };

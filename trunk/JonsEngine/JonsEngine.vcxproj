@@ -144,6 +144,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Sampler.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Shadowmap.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Texture.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11Utils.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp" />
     <ClCompile Include="src\Renderer\RenderQueue.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
     <ClInclude Include="include\Core\Memory\IMemoryAllocator.h" />
     <ClInclude Include="include\Core\Types.h" />
+    <ClInclude Include="include\Core\Utils\Error.h" />
     <ClInclude Include="include\Core\Utils\Time.h" />
     <ClInclude Include="include\Core\Utils\Math.h" />
     <ClInclude Include="include\Core\Utils\Win32.h" />

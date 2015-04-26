@@ -6,6 +6,7 @@
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
 #include "include/Renderer/DirectX11/DX11RenderTarget2D.h"
 #include "include/Core/Types.h"
+#include "include/Core/EngineSettings.h"
 
 #include <d3d11.h>
 #include <array>
@@ -23,8 +24,8 @@ namespace JonsEngine
         const static uint32_t NUM_SHADOWMAP_CASCADES = 4;
         const static uint32_t MAX_READBACK_LATENCY = 3;
 
-        DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, const uint32_t shadowmapSize,
-            const uint32_t windowWidth, const uint32_t windowHeight);
+        DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, const EngineSettings::ShadowResolution shadowmapRes,
+            const EngineSettings::ShadowReadbackLatency readbackLatency, const uint32_t windowWidth, const uint32_t windowHeight);
         ~DX11DirectionalLightPass();
 
         void Render(const RenderableDirLight& directionalLight, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const Mat4& cameraProjMatrix);
@@ -64,6 +65,9 @@ namespace JonsEngine
         };
 
         Vec2 ReduceDepth(const Mat4& cameraProjMatrix);
+
+        const EngineSettings::ShadowReadbackLatency mReadbackLatency;
+        uint32_t mCurrFrame;
 
         ID3D11DeviceContextPtr mContext;
         ID3D11PixelShaderPtr mPixelShader;
