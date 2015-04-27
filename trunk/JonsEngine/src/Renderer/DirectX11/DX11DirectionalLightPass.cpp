@@ -6,6 +6,7 @@
 #include "include/Renderer/DirectX11/DX11Pipeline.h"
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
+#include "include/Renderer/DirectX11/Shaders/Constants.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPixel.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/SDSMInitialCompute.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/SDSMFinalCompute.h"
@@ -16,8 +17,6 @@
 namespace JonsEngine
 {
     typedef std::array<Vec4, 8> CameraFrustrum;
-
-    const uint32_t gSDSMThreadGroupSize = 16;
 
     const Mat4 gBiasMatrix(0.5f, 0.0f, 0.0f, 0.0f,
                            0.0f, -0.5f, 0.0f, 0.0f,
@@ -136,8 +135,8 @@ namespace JonsEngine
         uint32_t height = windowHeight;
         while (width > 1 || height > 1)
         {
-            width = DispatchSize(gSDSMThreadGroupSize, width);
-            height = DispatchSize(gSDSMThreadGroupSize, height);
+			width = DispatchSize(SDSM_THREAD_GROUP_SIZE, width);
+			height = DispatchSize(SDSM_THREAD_GROUP_SIZE, height);
 
             mDepthReductionRTVs.emplace_back(device, DXGI_FORMAT_R16G16_UNORM, width, height, true);
         }
@@ -180,9 +179,14 @@ namespace JonsEngine
 
         // near/far z range
         Vec2 zRange = ReduceDepth(cameraProjMatrix);
+		const float nearClip = Z_NEAR;
+		const float farClip = Z_FAR;
+		const float clipRange = farClip - nearClip;
 
-        zRange.x = Z_NEAR;
-        zRange.y = Z_FAR;
+		zRange += nearClip;
+		zRange *= clipRange;
+		//zRange.x = nearClip + zRange.x * clipRange;
+		//zRange.y = nearClip + zRange.y * clipRange;
 
 
         //
@@ -245,7 +249,7 @@ namespace JonsEngine
         mContext->OMSetRenderTargets(0, nullptr, nullptr);
 
 		// first pass
-        // TODO: why neg. 33?
+        // TODO: why neg. [2].z?
         mSDSMCBuffer.SetData(SDSMCBuffer(-cameraProjMatrix[2].z, cameraProjMatrix[3].z, 0.1f, 100.0f));
 
         auto& initialRTV = mDepthReductionRTVs.front();
@@ -284,6 +288,7 @@ namespace JonsEngine
         ID3D11Texture2DPtr lastTarget = mDepthReductionRTVs[mDepthReductionRTVs.size() - 1].mTexture;
         mContext->CopyResource(mReadbackTextures[mCurrFrame % latency].p, lastTarget.p);
 
+		// note: when this overflows, will cause a few bad frames
         ++mCurrFrame;
         if (mCurrFrame >= latency)
         {
@@ -298,6 +303,6 @@ namespace JonsEngine
             return Vec2(texData[0] / static_cast<float>(0xffff), texData[1] / static_cast<float>(0xffff));
         }
         else
-            return Vec2(0.1f, 1.0f);
+            return Vec2(0.01f, 1.0f);
     }
 }
