@@ -64,7 +64,8 @@ namespace JonsEngine
             }
         };
 
-        Vec2 ReduceDepth(const Mat4& cameraProjMatrix);
+		float CalculateShadowmapCascades(const Mat4& cameraProjMatrix, std::array<float, NUM_SHADOWMAP_CASCADES>& splitDistances);
+        void ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth);
 
         const EngineSettings::ShadowReadbackLatency mReadbackLatency;
         uint32_t mCurrFrame;

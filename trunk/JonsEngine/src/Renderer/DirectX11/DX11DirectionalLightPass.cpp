@@ -23,7 +23,7 @@ namespace JonsEngine
                            0.0f, 0.0f, 1.0f, 0.0f,
                            0.5f, 0.5f, 0.0f, 1.0f);
 
-    void CalculateShadowmapCascades(std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES>& nearDistArr, std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES>& farDistArr, const float nearDist, const  float farDist)
+    /*void CalculateShadowmapCascades(std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES>& nearDistArr, std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES>& farDistArr, const float nearDist, const  float farDist)
     {
         const float splitWeight = 0.75f;
         const float ratio = nearDist / farDist;
@@ -37,7 +37,7 @@ namespace JonsEngine
             farDistArr[index - 1] = nearDistArr[index] * 1.005f;
         }
         farDistArr[DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES - 1] = farDist;
-    }
+    }*/
 
     CameraFrustrum CalculateCameraFrustrum(const float fovDegrees, const float aspectRatio, const float minDist, const float maxDist, const Mat4& cameraViewMatrix)
     {
@@ -177,16 +177,8 @@ namespace JonsEngine
         // Reduce Depth pass
         //
 
-        // near/far z range
-        Vec2 zRange = ReduceDepth(cameraProjMatrix);
-		const float nearClip = Z_NEAR;
-		const float farClip = Z_FAR;
-		const float clipRange = farClip - nearClip;
-
-		zRange += nearClip;
-		zRange *= clipRange;
-		//zRange.x = nearClip + zRange.x * clipRange;
-		//zRange.y = nearClip + zRange.y * clipRange;
+		std::array<float, NUM_SHADOWMAP_CASCADES> splitDistances;
+		const float minZ = CalculateShadowmapCascades(cameraProjMatrix, splitDistances);
 
 
         //
@@ -199,11 +191,7 @@ namespace JonsEngine
         // depth clamp to avoid issues with meshes between splits
         mContext->RSSetState(mRSDepthClamp);
 
-        std::array<float, NUM_SHADOWMAP_CASCADES> nearDistArr, farDistArr;
         std::array<Mat4, NUM_SHADOWMAP_CASCADES> lightVPMatrices;
-
-        // TODO: precompute?
-        CalculateShadowmapCascades(nearDistArr, farDistArr, zRange.x, zRange.y);
 
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         mShadowmap.BindForDrawing();
@@ -212,13 +200,16 @@ namespace JonsEngine
         {
             mShadowmap.BindDepthView(cascadeIndex);
             
-            CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, nearDistArr[cascadeIndex], farDistArr[cascadeIndex], cameraViewMatrix);
+			CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, cascadeIndex == 0 ? minZ : splitDistances[cascadeIndex - 1], splitDistances[cascadeIndex], cameraViewMatrix);
             lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, directionalLight.mLightDirection);
 			mVertexTransformPass.RenderMeshes(directionalLight.mMeshes, lightVPMatrices[cascadeIndex]);
 
             lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex] * glm::inverse(cameraViewMatrix);
-            farDistArr[cascadeIndex] = -farDistArr[cascadeIndex];
         }
+
+        // negate the split distances for comparison against view space position in the shader
+        for (uint32_t cascadeIndex = 0; cascadeIndex < NUM_SHADOWMAP_CASCADES; ++cascadeIndex)
+            splitDistances[cascadeIndex] = -splitDistances[cascadeIndex];
 
 
         //
@@ -236,7 +227,7 @@ namespace JonsEngine
         const Vec4 camLightDir = glm::normalize(cameraViewMatrix * Vec4(-directionalLight.mLightDirection, 0));
 
         // set dir light cbuffer data and pixel shader
-		mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, invCameraProjMatrix, farDistArr, directionalLight.mLightColor, camLightDir, windowSize, static_cast<float>(mShadowmap.GetTextureSize())));
+		mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, invCameraProjMatrix, splitDistances, directionalLight.mLightColor, camLightDir, windowSize, static_cast<float>(mShadowmap.GetTextureSize())));
         mContext->PSSetShader(mPixelShader, nullptr, 0);
 
         // run fullscreen pass + dir light shading pass
@@ -244,7 +235,37 @@ namespace JonsEngine
     }
 
 
-    Vec2 DX11DirectionalLightPass::ReduceDepth(const Mat4& cameraProjMatrix)
+	float DX11DirectionalLightPass::CalculateShadowmapCascades(const Mat4& cameraProjMatrix, std::array<float, NUM_SHADOWMAP_CASCADES>& splitDistances)
+	{
+		float minDepth, maxDepth;
+		ReduceDepth(cameraProjMatrix, minDepth, maxDepth);
+
+		const float nearClip = Z_NEAR;
+		const float farClip = Z_FAR;
+		const float clipRange = farClip - nearClip;
+
+		const float minZ = nearClip + minDepth * clipRange;
+		const float maxZ = nearClip + maxDepth * clipRange;
+
+        const float range = maxZ - minZ;
+        const float ratio = maxZ / minZ;
+
+		for (uint32_t cascadeIndex = 0; cascadeIndex < DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES; ++cascadeIndex)
+		{
+			const float p = (cascadeIndex + 1) / static_cast<float>(DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES);
+			const float log = minZ * std::pow(ratio, p);
+			const float uniform = minZ + range * p;
+			const float d = log - uniform + uniform;
+			splitDistances[cascadeIndex] = (d - nearClip) / clipRange;
+
+            splitDistances[cascadeIndex] *= farClip;
+		}
+
+		// minZ is used for first splits near distance
+		return minZ;
+	}
+
+	void DX11DirectionalLightPass::ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth)
     {
         mContext->OMSetRenderTargets(0, nullptr, nullptr);
 
@@ -300,9 +321,13 @@ namespace JonsEngine
 
             const uint16_t* texData = reinterpret_cast<uint16_t*>(mapped.pData);
 
-            return Vec2(texData[0] / static_cast<float>(0xffff), texData[1] / static_cast<float>(0xffff));
+			minDepth = texData[0] / static_cast<float>(0xffff);
+			maxDepth = texData[1] / static_cast<float>(0xffff);
         }
-        else
-            return Vec2(0.01f, 1.0f);
+		else
+		{
+			minDepth = 0.01f;
+			maxDepth = 1.0f;
+		}
     }
 }
