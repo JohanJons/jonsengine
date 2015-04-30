@@ -13,6 +13,11 @@
       <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\glm-0.9.6.1;$(SolutionDir)\..\Thirdparty\boost_1_56_0;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
+    <FxCompile>
+      <HeaderFileOutput>$(ProjectDir)/include/Renderer/DirectX11/Shaders/Compiled/%(Filename).h</HeaderFileOutput>
+      <ShaderModel>5.0</ShaderModel>
+      <VariableName>g%(Filename)Shader</VariableName>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>
