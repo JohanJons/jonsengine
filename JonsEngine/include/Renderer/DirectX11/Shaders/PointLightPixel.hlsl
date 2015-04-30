@@ -3,6 +3,7 @@
 
 #include "Constants.h"
 #include "Common.hlsl"
+#include "Shadowmapping.hlsl"
 
 #define DEPTH_BIAS 0.0005
 
@@ -40,10 +41,13 @@ float VectorToDepthValue(const float3 Vec)
 float4 ps_main(float4 position : SV_Position) : SV_Target0
 {
     float depth = gDepthTexture[uint2(position.xy)].r;
-    float4 viewPosition = float4(reconstructViewPosition(depth, float2(position.x / gWindowSize.x, position.y / gWindowSize.y), gInvProjMatrix), 1.0);
+    float4 viewPosition = float4(ReconstructViewPosition(depth, float2(position.x / gWindowSize.x, position.y / gWindowSize.y), gInvProjMatrix), 1.0);
     float4 diffuse = gDiffuseTexture[uint2(position.xy)];
     float3 normal = (float3)gNormalTexture[uint2(position.xy)];
+
     float3 positionDiff = (float3)(gViewLightPosition - viewPosition);
+    float3 lightDir = normalize(positionDiff);
+    const float normalLightAngle = dot(normal, lightDir);
 
     // shadowmapping
     float3 cubemapDir = (float3)(viewPosition - gViewLightPosition);
@@ -58,8 +62,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
     float attenuation = clamp(1.0 - distance * distance * (1 / (gLightRadius * gLightRadius)), 0.0, 1.0);
     attenuation *= attenuation;
 
-    float3 lightDir = normalize(positionDiff);
-    float angleNormal = clamp(dot(normalize(normal), lightDir), 0, 1);
+    float angleNormal = clamp(normalLightAngle, 0, 1);
 
     return visibility * diffuse * angleNormal * attenuation * gLightIntensity * gLightColor;
 }
