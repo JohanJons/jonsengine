@@ -24,7 +24,7 @@ struct GBufferVSOut
 cbuffer GBufferConstants : register(CBUFFER_REGISTER_VERTEX)
 {
     float4x4 gWVPMatrix;
-    float4x4 gWorldMatrix;
+    float4x4 gWorldViewMatrix;
     float gTextureTilingFactor;
     bool gHasDiffuseTexture;
     bool gHasNormalTexture;
@@ -36,9 +36,9 @@ GBufferVSOut vs_main(GBufferVSIn input)
     GBufferVSOut output;
 
     output.mPosition = mul(gWVPMatrix, float4(input.mPosition, 1.0f));
-    output.mNormal = mul(gWorldMatrix, float4(input.mNormal, 0.0f));
-    output.mTangent = mul(gWorldMatrix, float4(input.mTangent, 0.0f));
-    output.mBitangent = mul(gWorldMatrix, float4(input.mBitangent, 0.0f));
+    output.mNormal = mul(gWorldViewMatrix, float4(input.mNormal, 0.0f));
+    output.mTangent = mul(gWorldViewMatrix, float4(input.mTangent, 0.0f));
+    output.mBitangent = mul(gWorldViewMatrix, float4(input.mBitangent, 0.0f));
     output.mTexcoord = gTextureTilingFactor * input.mTexcoord;
 
     return output;

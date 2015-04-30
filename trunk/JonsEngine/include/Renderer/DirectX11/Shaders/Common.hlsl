@@ -1,7 +1,7 @@
 #ifndef COMMON_HLSL
 #define COMMON_HLSL
 
-float3 reconstructViewPosition(const float depth, const float2 texCoord, const float4x4 invProjMatrix)
+float3 ReconstructViewPosition(const float depth, const float2 texCoord, const float4x4 invProjMatrix)
 {
     float x = texCoord.x * 2 - 1;
     float y = (1 - texCoord.y) * 2 - 1;

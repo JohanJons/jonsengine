@@ -23,21 +23,6 @@ namespace JonsEngine
                            0.0f, 0.0f, 1.0f, 0.0f,
                            0.5f, 0.5f, 0.0f, 1.0f);
 
-    /*void CalculateShadowmapCascades(std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES>& nearDistArr, std::array<float, DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES>& farDistArr, const float nearDist, const  float farDist)
-    {
-        const float splitWeight = 0.75f;
-        const float ratio = nearDist / farDist;
-
-        nearDistArr[0] = nearDist;
-        for (uint8_t index = 1; index < DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES; ++index)
-        {
-            const float si = index / (float)DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES;
-
-            nearDistArr[index] = splitWeight * (nearDist * powf(ratio, si)) + (1 - splitWeight) * (nearDist + (farDist - nearDist) * si);
-            farDistArr[index - 1] = nearDistArr[index] * 1.005f;
-        }
-        farDistArr[DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES - 1] = farDist;
-    }*/
 
     CameraFrustrum CalculateCameraFrustrum(const float fovDegrees, const float aspectRatio, const float minDist, const float maxDist, const Mat4& cameraViewMatrix)
     {
