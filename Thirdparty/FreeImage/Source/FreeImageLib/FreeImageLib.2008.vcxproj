@@ -201,14 +201,12 @@ copy ..\FreeImage.h ..\..\Dist
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <Lib>
-      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalDependencies>zlib.lib</AdditionalDependencies>
     </Lib>
     <PostBuildEvent>
-      <Command>copy Release\FreeImage.lib ..\..\Dist
-copy ..\FreeImage.h ..\..\Dist
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

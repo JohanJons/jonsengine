@@ -3,3 +3,6 @@ b2 serialization filesystem system toolset=msvc-12.0 variant=debug threading=mul
 
 release:
 b2 serialization filesystem system toolset=msvc-12.0 variant=release threading=multi link=static runtime-link=static
+
+release x64:
+b2 serialization filesystem system toolset=msvc-12.0 variant=release threading=multi link=static runtime-link=static address-model=64
