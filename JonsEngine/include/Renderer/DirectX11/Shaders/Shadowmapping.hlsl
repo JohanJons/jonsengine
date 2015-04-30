@@ -6,6 +6,7 @@ static const float gNormalOffset = 5.5;
 
 /**
  * Negates most visible shadow acne with very few instructions
+ * TODO: "ScaleByDepth" also might help but expensive?
  */
 float3 ShadowAcneNormalOffset(in float3 normal, in float normalLightAngle, in float shadowmapSize)
 {
