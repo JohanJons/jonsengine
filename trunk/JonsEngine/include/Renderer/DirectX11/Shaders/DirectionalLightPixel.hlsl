@@ -47,6 +47,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
 
     float3 projCoords = (float3)mul(gSplitVPMatrices[index], viewPosition);
 
+    // TODO: could do this on CPU as part of a matrix
     const float2 texelSize = 1.0 / float2(gShadowmapSize, gShadowmapSize);
     projCoords.xy = (floor(projCoords.xy / texelSize)) * texelSize;
 
