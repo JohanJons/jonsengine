@@ -28,6 +28,13 @@ namespace JonsEngine
            LATENCY_3
         } mShadowReadbackLatency;
 
+        enum class ShadowFiltering {
+            PCF_2X2,
+            PCF_3X3,
+            PCF_5X5,
+            PCF_7X7
+        } mShadowFiltering;
+
         enum class Anisotropic {
             X1,
             X2,
@@ -59,6 +66,7 @@ namespace JonsEngine
         // render settings
         mShadowResolution(ShadowResolution::RESOLUTION_2048),
         mShadowReadbackLatency(ShadowReadbackLatency::LATENCY_1),
+        mShadowFiltering(ShadowFiltering::PCF_3X3),
         mAnisotropicFiltering(Anisotropic::X16),
         mAntiAliasing(AntiAliasing::FXAA),
         mSSAOEnabled(true),
