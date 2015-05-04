@@ -140,8 +140,8 @@ namespace JonsGame
         Scene* myScene = mEngine->GetSceneManager().GetActiveScene();
         JonsPackagePtr jonsPackage = ReadJonsPkg("assets.jons");
 
-        //SetupSponzaScene(myScene, jonsPackage);
-        SetupTestScene(myScene, jonsPackage);
+        SetupSponzaScene(myScene, jonsPackage);
+        //SetupTestScene(myScene, jonsPackage);
     }
 
     void Game::SetupTestScene(Scene* myScene, JonsPackagePtr jonsPackage)
@@ -218,13 +218,18 @@ namespace JonsGame
     {
         // ambient light
         myScene->SetAmbientLight(Vec4(0.1f));
+
+        // directional light
+        /*DirectionalLight* directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
+        directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
+        directionalLight->mLightColor = Vec4(1.0F);*/
         
         mMoveSpeed = 1.0f;
 
         // sponza 
         SceneNodePtr nodeSponza = myScene->GetRootNode().CreateChildNode("sponza");
         ModelPtr modelSponza = mEngine->GetResourceManifest().LoadModel("sponza", jonsPackage);
-        nodeSponza->ScaleNode(Vec3(0.1f));
+        nodeSponza->ScaleNode(Vec3(0.05f));
         nodeSponza->TranslateNode(Vec3(0.0f, 0.5f, -54.0f));
         Actor* actorSponza = myScene->CreateActor("actorPlane", modelSponza, nodeSponza);
         

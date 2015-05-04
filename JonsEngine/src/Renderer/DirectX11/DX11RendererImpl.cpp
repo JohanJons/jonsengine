@@ -116,6 +116,7 @@ namespace JonsEngine
         mMemoryAllocator(memoryAllocator),
         mShadowResolution(settings.mShadowResolution),
         mShadowReadbackLatency(settings.mShadowReadbackLatency),
+        mShadowFiltering(settings.mShadowFiltering),
         mAntiAliasing(settings.mAntiAliasing),
 
         mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), mShadowResolution, mShadowReadbackLatency, mMeshes, mTextures),

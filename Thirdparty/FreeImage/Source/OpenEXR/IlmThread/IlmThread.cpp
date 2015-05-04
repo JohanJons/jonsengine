@@ -64,7 +64,7 @@ Thread::Thread ()
 
 Thread::~Thread ()
 {
-    throw Iex::NoImplExc ("Threads not supported on this platform.");
+    //throw Iex::NoImplExc ("Threads not supported on this platform.");
 }
 
 

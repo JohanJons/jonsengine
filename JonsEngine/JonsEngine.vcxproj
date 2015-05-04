@@ -255,6 +255,22 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\DirectionalLightPCF2X2Pixel.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ps_main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\DirectionalLightPCF3X3Pixel.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ps_main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\DirectionalLightPCF5X5Pixel.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ps_main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\DirectionalLightPCF7X7Pixel.hlsl">
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ps_main</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\DirectionalLightPixel.hlsl">
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gDirectionalLightPixelShader</VariableName>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/include/Renderer/DirectX11/Shaders/Compiled/%(Filename).h</HeaderFileOutput>
@@ -264,6 +280,7 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ps_main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <VariableName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gDirectionalLightPixelShader</VariableName>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\FullscreenTriangleVertex.hlsl">
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)/include/Renderer/DirectX11/Shaders/Compiled/%(Filename).h</HeaderFileOutput>
@@ -308,6 +325,9 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">vs_main</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">vs_main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\OptimizedPCF.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\PointLightPixel.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>

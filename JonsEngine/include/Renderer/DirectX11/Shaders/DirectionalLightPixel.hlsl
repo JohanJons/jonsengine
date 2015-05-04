@@ -3,14 +3,15 @@
 
 #include "Constants.h"
 #include "Common.hlsl"
-#include "Shadowmapping.hlsl"
 #include "FullscreenTriangleVertex.hlsl"
+#include "Shadowmapping.hlsl"
+#include "OptimizedPCF.hlsl"
 
-#define NUM_CASCADES 4
+static const uint gNumCascades = 4;
 
 cbuffer DirectionalLightConstants : register(CBUFFER_REGISTER_PIXEL)
 {
-    float4x4 gSplitVPMatrices[NUM_CASCADES];
+    float4x4 gSplitVPMatrices[gNumCascades];
     float4x4 gInvProjMatrix;
     float4 gSplitDistances;
     float4 gLightColor;

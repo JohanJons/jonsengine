@@ -462,5 +462,20 @@
     <FxCompile Include="include\Renderer\DirectX11\Shaders\Shadowmapping.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\OptimizedPCF.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\DirectionalLightPCF2X2Pixel.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\DirectionalLightPCF3X3Pixel.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\DirectionalLightPCF5X5Pixel.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\DirectionalLightPCF7X7Pixel.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

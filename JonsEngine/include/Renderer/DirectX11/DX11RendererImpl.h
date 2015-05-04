@@ -64,6 +64,7 @@ namespace JonsEngine
 
         EngineSettings::ShadowResolution mShadowResolution;
         EngineSettings::ShadowReadbackLatency mShadowReadbackLatency;
+        EngineSettings::ShadowFiltering mShadowFiltering;
         EngineSettings::AntiAliasing mAntiAliasing;
 
         DX11Pipeline mPipeline;
