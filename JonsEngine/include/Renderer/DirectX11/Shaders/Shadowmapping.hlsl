@@ -1,8 +1,8 @@
 #ifndef SHADOWMAPPING_HLSL
 #define SHADOWMAPPING_HLSL
 
-static const float gNormalOffset = 5.5;
-
+static const float gNormalOffset = 4.5;
+static const float gBias = 2;
 
 /**
  * Negates most visible shadow acne with very few instructions
@@ -13,7 +13,10 @@ float3 ShadowAcneNormalOffset(in float3 normal, in float normalLightAngle, in fl
     const float texelSize = 2.0 / shadowmapSize;
     const float normalOffsetScale = saturate(1.0 - normalLightAngle);
 
-    return normal * gNormalOffset * normalOffsetScale * texelSize;
+    float3 ret = normal * gNormalOffset * normalOffsetScale * texelSize;
+    ret.z -= gBias;
+
+    return ret;
 }
 
 #endif
