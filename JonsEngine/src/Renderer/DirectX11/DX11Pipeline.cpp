@@ -128,7 +128,7 @@ namespace JonsEngine
         }
     }
 
-    void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugExtra, const bool SSAOEnabled)
+    void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugExtra, const EngineSettings::ShadowFiltering shadowFiltering, const bool SSAOEnabled)
     {
         mLightAccbuffer.ClearAccumulationBuffer();
         mLightAccbuffer.BindForDrawing(mDSVReadOnly);
@@ -151,7 +151,7 @@ namespace JonsEngine
 
         // do all directional lights
         for (const RenderableDirLight& directionalLight : renderQueue.mDirectionalLights)
-            mDirectionalLightPass.Render(directionalLight, renderQueue.mCamera.mFOV, mWindowSize.x / mWindowSize.y, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix, mWindowSize, renderQueue.mCamera.mCameraProjectionMatrix);
+            mDirectionalLightPass.Render(directionalLight, shadowFiltering, renderQueue.mCamera.mFOV, mWindowSize.x / mWindowSize.y, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix, mWindowSize, renderQueue.mCamera.mCameraProjectionMatrix);
 
         // do all point lights
         mPointLightPass.BindForShading();

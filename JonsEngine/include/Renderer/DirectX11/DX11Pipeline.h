@@ -33,7 +33,7 @@ namespace JonsEngine
         void EndFrame();
 
         void GeometryStage(const RenderQueue& renderQueue);
-        void LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const bool SSAOEnabled);
+        void LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::ShadowFiltering shadowFiltering, const bool SSAOEnabled);
         void PostProcessingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA);
 
 

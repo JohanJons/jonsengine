@@ -66,18 +66,23 @@ namespace JonsEngine
 
 		float CalculateShadowmapCascades(const Mat4& cameraProjMatrix, std::array<float, NUM_SHADOWMAP_CASCADES>& splitDistances);
         void ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth);
+        void BindShadingPixelShader(const EngineSettings::ShadowFiltering shadowFiltering);
 
         const EngineSettings::ShadowReadbackLatency mReadbackLatency;
         uint32_t mCurrFrame;
 
         ID3D11DeviceContextPtr mContext;
-        ID3D11PixelShaderPtr mPixelShader;
-        ID3D11ComputeShaderPtr mSDSMInitialShader;
-        ID3D11ComputeShaderPtr mSDSMFinalShader;
-        ID3D11RasterizerStatePtr mRSDepthClamp;
         std::vector<DX11RenderTarget2D> mDepthReductionRTVs;
         std::array<ID3D11Texture2DPtr, MAX_READBACK_LATENCY> mReadbackTextures;
 
+        ID3D11ComputeShaderPtr mSDSMInitialShader;
+        ID3D11ComputeShaderPtr mSDSMFinalShader;
+        ID3D11PixelShaderPtr mPCF2x2Shader;
+        ID3D11PixelShaderPtr mPCF3x3Shader;
+        ID3D11PixelShaderPtr mPCF5x5Shader;
+        ID3D11PixelShaderPtr mPCF7x7Shader;
+
+        ID3D11RasterizerStatePtr mRSDepthClamp;
         DX11FullscreenTrianglePass& mFullscreenPass;
         DX11VertexTransformPass& mVertexTransformPass;
         DX11Shadowmap mShadowmap;

@@ -7,9 +7,12 @@
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "include/Renderer/DirectX11/Shaders/Constants.h"
-#include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPixel.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/SDSMInitialCompute.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/SDSMFinalCompute.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF2X2Pixel.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF3X3Pixel.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF5X5Pixel.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF7X7Pixel.h"
 #include "include/Core/Utils/Math.h"
 
 #include <array>
@@ -87,20 +90,27 @@ namespace JonsEngine
         mCurrFrame(0),
 
         mContext(context),
-        mPixelShader(nullptr),
+
         mSDSMInitialShader(nullptr),
         mSDSMFinalShader(nullptr),
-        mRSDepthClamp(nullptr),
+        mPCF2x2Shader(nullptr),
+        mPCF3x3Shader(nullptr),
+        mPCF5x5Shader(nullptr),
+        mPCF7x7Shader(nullptr),
 
+        mRSDepthClamp(nullptr),
         mFullscreenPass(fullscreenPass),
         mVertexTransformPass(transformPass),
         mShadowmap(device, context, shadowmapRes, NUM_SHADOWMAP_CASCADES, false),
         mDirLightCBuffer(device, context, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL),
         mSDSMCBuffer(device, context, mSDSMCBuffer.CONSTANT_BUFFER_SLOT_COMPUTE)
     {
-        DXCALL(device->CreatePixelShader(gDirectionalLightPixelShader, sizeof(gDirectionalLightPixelShader), nullptr, &mPixelShader));
         DXCALL(device->CreateComputeShader(gSDSMInitialComputeShader, sizeof(gSDSMInitialComputeShader), nullptr, &mSDSMInitialShader));
         DXCALL(device->CreateComputeShader(gSDSMFinalComputeShader, sizeof(gSDSMFinalComputeShader), nullptr, &mSDSMFinalShader));
+        DXCALL(device->CreatePixelShader(gDirectionalLightPCF2X2PixelShader, sizeof(gDirectionalLightPCF2X2PixelShader), nullptr, &mPCF2x2Shader));
+        DXCALL(device->CreatePixelShader(gDirectionalLightPCF3X3PixelShader, sizeof(gDirectionalLightPCF3X3PixelShader), nullptr, &mPCF3x3Shader));
+        DXCALL(device->CreatePixelShader(gDirectionalLightPCF5X5PixelShader, sizeof(gDirectionalLightPCF5X5PixelShader), nullptr, &mPCF5x5Shader));
+        DXCALL(device->CreatePixelShader(gDirectionalLightPCF7X7PixelShader, sizeof(gDirectionalLightPCF7X7PixelShader), nullptr, &mPCF7x7Shader));
 
         // depth clamp to avoid meshes between frustrum split issues
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -145,7 +155,7 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const Mat4& cameraProjMatrix)
+    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const Mat4& cameraProjMatrix)
     {
         // preserve current state
         D3D11_VIEWPORT prevViewport;
@@ -211,9 +221,11 @@ namespace JonsEngine
 
         const Vec4 camLightDir = glm::normalize(cameraViewMatrix * Vec4(-directionalLight.mLightDirection, 0));
 
-        // set dir light cbuffer data and pixel shader
+        // set dir light cbuffer data
 		mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, invCameraProjMatrix, splitDistances, directionalLight.mLightColor, camLightDir, windowSize, static_cast<float>(mShadowmap.GetTextureSize())));
-        mContext->PSSetShader(mPixelShader, nullptr, 0);
+        
+        // bind appropiate shading pixel shader for shadow filtering argument
+        BindShadingPixelShader(shadowFiltering);
 
         // run fullscreen pass + dir light shading pass
         mFullscreenPass.Render();
@@ -314,5 +326,33 @@ namespace JonsEngine
 			minDepth = 0.01f;
 			maxDepth = 1.0f;
 		}
+    }
+
+    void DX11DirectionalLightPass::BindShadingPixelShader(const EngineSettings::ShadowFiltering shadowFiltering)
+    {
+        switch (shadowFiltering)
+        {
+            default:
+            case EngineSettings::ShadowFiltering::PCF_2X2:
+            {
+                mContext->PSSetShader(mPCF2x2Shader, nullptr, 0);
+                break;
+            }
+            case EngineSettings::ShadowFiltering::PCF_3X3:
+            {
+                mContext->PSSetShader(mPCF3x3Shader, nullptr, 0);
+                break;
+            }
+            case EngineSettings::ShadowFiltering::PCF_5X5:
+            {
+                mContext->PSSetShader(mPCF5x5Shader, nullptr, 0);
+                break;
+            }
+            case EngineSettings::ShadowFiltering::PCF_7X7:
+            {
+                mContext->PSSetShader(mPCF7x7Shader, nullptr, 0);
+                break;
+            }
+        }
     }
 }

@@ -14,7 +14,7 @@ float3 ShadowAcneNormalOffset(in float3 normal, in float normalLightAngle, in fl
     const float normalOffsetScale = saturate(1.0 - normalLightAngle);
 
     float3 ret = normal * gNormalOffset * normalOffsetScale * texelSize;
-    ret.z -= gBias;
+    ret.z -= texelSize * gBias;
 
     return ret;
 }

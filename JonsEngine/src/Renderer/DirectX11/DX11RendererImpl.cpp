@@ -122,9 +122,9 @@ namespace JonsEngine
         mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), mShadowResolution, mShadowReadbackLatency, mMeshes, mTextures),
 
         // samplers
-        mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, mContext, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
-        mShadowmapSampler(mDevice, mContext, EngineSettings::Anisotropic::X1, D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
-        mShadowmapNoCompareSampler(mDevice, mContext, EngineSettings::Anisotropic::X1, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT),
+        mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, mContext, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
+        mShadowmapSampler(mDevice, mContext, EngineSettings::Anisotropic::X1, D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
+        mShadowmapNoCompareSampler(mDevice, mContext, EngineSettings::Anisotropic::X1, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT),
 
         // misc
         mSSAOEnabled(settings.mSSAOEnabled)
@@ -183,7 +183,7 @@ namespace JonsEngine
         mPipeline.BeginFrame();
 
         mPipeline.GeometryStage(renderQueue);
-        mPipeline.LightingStage(renderQueue, debugFlags, mSSAOEnabled);
+        mPipeline.LightingStage(renderQueue, debugFlags, mShadowFiltering, mSSAOEnabled);
         mPipeline.PostProcessingStage(renderQueue, debugFlags, mAntiAliasing);
 
         mPipeline.EndFrame();
@@ -197,7 +197,7 @@ namespace JonsEngine
 
     void DX11RendererImpl::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
     {
-        mModelSampler.reset(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, mContext, anisotropic, D3D11_FILTER_ANISOTROPIC, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC));
+        mModelSampler.reset(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, mContext, anisotropic, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC));
     }
 
 
