@@ -13,13 +13,13 @@
 //{
 //}
 
-float SampleOptimizedPCF(in float3 shadowPos, in float shadowmapSize, in SamplerComparisonState shadowCmpSampler, in Texture2DArray shadowmapArr, in float cascadeIndex)
+float SampleOptimizedPCF(in float3 shadowPos, in float shadowmapSize, in SamplerComparisonState shadowCmpSampler, in Texture2DArray shadowmapArr, in uint cascadeIndex)
 {
-    float2 uv = shadowPos.xy * shadowmapSize; // 1 unit - 1 texel
+    float2 uv = shadowPos.xy * shadowmapSize;
 
-        float2 shadowMapSizeInv = 1.0 / shadowmapSize;
+    float2 shadowMapSizeInv = 1.0 / shadowmapSize;
 
-        float2 base_uv;
+    float2 base_uv;
     base_uv.x = floor(uv.x + 0.5);
     base_uv.y = floor(uv.y + 0.5);
 
@@ -30,6 +30,7 @@ float SampleOptimizedPCF(in float3 shadowPos, in float shadowmapSize, in Sampler
     base_uv *= shadowMapSizeInv;
 
     float sum = 0;
+	const float lightDepth = shadowPos.z;
 
 #if PCF_KERNEL_SIZE == 2
     return shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(shadowPos.xy, cascadeIndex), lightDepth);
@@ -47,10 +48,10 @@ float SampleOptimizedPCF(in float3 shadowPos, in float shadowmapSize, in Sampler
     float v0 = (2 - t) / vw0 - 1;
     float v1 = t / vw1 + 1;
 
-    sum += uw0 * vw0 * SampleShadowMap(base_uv, u0, v0, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw1 * vw0 * SampleShadowMap(base_uv, u1, v0, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw0 * vw1 * SampleShadowMap(base_uv, u0, v1, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw1 * vw1 * SampleShadowMap(base_uv, u1, v1, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
+	sum += uw0 * vw0 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u0, v0) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw1 * vw0 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u1, v0) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw0 * vw1 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u0, v1) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw1 * vw1 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u1, v1) * shadowMapSizeInv, cascadeIndex), lightDepth);
 
     return sum * 1.0f / 16;
 
@@ -72,17 +73,17 @@ float SampleOptimizedPCF(in float3 shadowPos, in float shadowmapSize, in Sampler
     float v1 = (3 + t) / vw1;
     float v2 = t / vw2 + 2;
 
-    sum += uw0 * vw0 * SampleShadowMap(base_uv, u0, v0, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw1 * vw0 * SampleShadowMap(base_uv, u1, v0, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw2 * vw0 * SampleShadowMap(base_uv, u2, v0, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
+	sum += uw0 * vw0 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u0, v0) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw1 * vw0 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u1, v0) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw2 * vw0 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u2, v0) * shadowMapSizeInv, cascadeIndex), lightDepth);
 
-    sum += uw0 * vw1 * SampleShadowMap(base_uv, u0, v1, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw1 * vw1 * SampleShadowMap(base_uv, u1, v1, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw2 * vw1 * SampleShadowMap(base_uv, u2, v1, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
+	sum += uw0 * vw1 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u0, v1) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw1 * vw1 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u1, v1) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw2 * vw1 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u2, v1) * shadowMapSizeInv, cascadeIndex), lightDepth);
 
-    sum += uw0 * vw2 * SampleShadowMap(base_uv, u0, v2, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw1 * vw2 * SampleShadowMap(base_uv, u1, v2, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw2 * vw2 * SampleShadowMap(base_uv, u2, v2, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
+	sum += uw0 * vw2 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u0, v2) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw1 * vw2 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u1, v2) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw2 * vw2 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u2, v2) * shadowMapSizeInv, cascadeIndex), lightDepth);
 
     return sum * 1.0f / 144;
 
@@ -108,25 +109,25 @@ float SampleOptimizedPCF(in float3 shadowPos, in float shadowmapSize, in Sampler
     float v2 = -(7 * t + 5) / vw2 + 1;
     float v3 = -t / vw3 + 3;
 
-    sum += uw0 * vw0 * SampleShadowMap(base_uv, u0, v0, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw1 * vw0 * SampleShadowMap(base_uv, u1, v0, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw2 * vw0 * SampleShadowMap(base_uv, u2, v0, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw3 * vw0 * SampleShadowMap(base_uv, u3, v0, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
+	sum += uw0 * vw0 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u0, v0) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw1 * vw0 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u1, v0) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw2 * vw0 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u2, v0) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw3 * vw0 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u3, v0) * shadowMapSizeInv, cascadeIndex), lightDepth);
 
-    sum += uw0 * vw1 * SampleShadowMap(base_uv, u0, v1, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw1 * vw1 * SampleShadowMap(base_uv, u1, v1, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw2 * vw1 * SampleShadowMap(base_uv, u2, v1, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw3 * vw1 * SampleShadowMap(base_uv, u3, v1, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
+	sum += uw0 * vw1 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u0, v1) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw1 * vw1 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u1, v1) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw2 * vw1 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u2, v1) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw3 * vw1 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u3, v1) * shadowMapSizeInv, cascadeIndex), lightDepth);
 
-    sum += uw0 * vw2 * SampleShadowMap(base_uv, u0, v2, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw1 * vw2 * SampleShadowMap(base_uv, u1, v2, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw2 * vw2 * SampleShadowMap(base_uv, u2, v2, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw3 * vw2 * SampleShadowMap(base_uv, u3, v2, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
+	sum += uw0 * vw2 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u0, v2) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw1 * vw2 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u1, v2) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw2 * vw2 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u2, v2) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw3 * vw2 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u3, v2) * shadowMapSizeInv, cascadeIndex), lightDepth);
 
-    sum += uw0 * vw3 * SampleShadowMap(base_uv, u0, v3, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw1 * vw3 * SampleShadowMap(base_uv, u1, v3, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw2 * vw3 * SampleShadowMap(base_uv, u2, v3, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
-    sum += uw3 * vw3 * SampleShadowMap(base_uv, u3, v3, shadowMapSizeInv, cascadeIdx, lightDepth, receiverPlaneDepthBias);
+	sum += uw0 * vw3 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u0, v3) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw1 * vw3 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u1, v3) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw2 * vw3 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u2, v3) * shadowMapSizeInv, cascadeIndex), lightDepth);
+	sum += uw3 * vw3 * shadowmapArr.SampleCmpLevelZero(shadowCmpSampler, float3(base_uv + float2(u3, v3) * shadowMapSizeInv, cascadeIndex), lightDepth);
 
     return sum * 1.0f / 2704;
 #endif

@@ -55,6 +55,17 @@ namespace JonsEngine
     }
 
 
+	EngineSettings::ShadowFiltering DX11Renderer::GetShadowFiltering() const
+	{
+		return mImplementation->GetShadowFiltering();
+	}
+
+	void DX11Renderer::SetShadowFiltering(const EngineSettings::ShadowFiltering shadowFiltering)
+	{
+		mImplementation->SetShadowFiltering(shadowFiltering);
+	}
+
+
     bool DX11Renderer::IsSSAOEnabled() const
     {
         return mImplementation->IsSSAOEnabled();

@@ -30,10 +30,10 @@ SamplerComparisonState gShadowmapSampler : register(SAMPLER_REGISTER_POINT_COMPA
 float4 ps_main(float4 position : SV_Position) : SV_Target0
 {
     const float depth = gDepthTexture[uint2(position.xy)].r;
+	const float4 diffuse = gDiffuseTexture[uint2(position.xy)];
+	const float4 normal = gNormalTexture[uint2(position.xy)];
     float4 viewPosition = float4(ReconstructViewPosition(depth, float2(position.x / gWindowSize.x, position.y / gWindowSize.y), gInvProjMatrix), 1.0);
-    float4 diffuse = gDiffuseTexture[uint2(position.xy)];
-    float4 normal = gNormalTexture[uint2(position.xy)];
-
+    
     uint index = 3;
     if (viewPosition.z > gSplitDistances.x)
         index = 0;
@@ -46,16 +46,13 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
 
     viewPosition.xyz += ShadowAcneNormalOffset(normal.xyz, normalLightAngle, gShadowmapSize);
 
-    float3 projCoords = (float3)mul(gSplitVPMatrices[index], viewPosition);
+    const float3 projCoords = (float3)mul(gSplitVPMatrices[index], viewPosition);
 
     // TODO: could do this on CPU as part of a matrix
-    const float2 texelSize = 1.0 / float2(gShadowmapSize, gShadowmapSize);
-    projCoords.xy = (floor(projCoords.xy / texelSize)) * texelSize;
+    //const float2 texelSize = 1.0 / float2(gShadowmapSize, gShadowmapSize);
+    //projCoords.xy = (floor(projCoords.xy / texelSize)) * texelSize;
 
-    const float viewDepth = projCoords.z;
-    projCoords.z = float(index);
-
-    const float visibilty = gShadowmap.SampleCmpLevelZero(gShadowmapSampler, projCoords, viewDepth);
+	const float visibilty = SampleOptimizedPCF(projCoords, gShadowmapSize, gShadowmapSampler, gShadowmap, index);
     const float angleNormal = clamp(normalLightAngle, 0, 1);
 
     return visibilty * diffuse * angleNormal * gLightColor;

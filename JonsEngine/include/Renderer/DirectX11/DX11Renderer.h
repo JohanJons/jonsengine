@@ -35,6 +35,9 @@ namespace JonsEngine
         EngineSettings::AntiAliasing GetAntiAliasing() const;
         void SetAntiAliasing(const EngineSettings::AntiAliasing aa);
 
+		EngineSettings::ShadowFiltering GetShadowFiltering() const;
+		void SetShadowFiltering(const EngineSettings::ShadowFiltering shadowFiltering);
+
         bool IsSSAOEnabled() const;
         void SetSSAO(const bool useSSAO);
 

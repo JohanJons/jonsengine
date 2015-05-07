@@ -44,6 +44,9 @@ namespace JonsEngine
         EngineSettings::AntiAliasing GetAntiAliasing() const;
         void SetAntiAliasing(const EngineSettings::AntiAliasing aa);
 
+		EngineSettings::ShadowFiltering GetShadowFiltering() const;
+		void SetShadowFiltering(const EngineSettings::ShadowFiltering shadowFiltering);
+
         bool IsSSAOEnabled() const;
         void SetSSAO(const bool useSSAO);
 
@@ -62,8 +65,8 @@ namespace JonsEngine
         IDMap<DX11Mesh> mMeshes;
         IDMap<DX11Texture> mTextures;
 
-        EngineSettings::ShadowResolution mShadowResolution;
-        EngineSettings::ShadowReadbackLatency mShadowReadbackLatency;
+        const EngineSettings::ShadowResolution mShadowResolution;
+        const EngineSettings::ShadowReadbackLatency mShadowReadbackLatency;
         EngineSettings::ShadowFiltering mShadowFiltering;
         EngineSettings::AntiAliasing mAntiAliasing;
 
