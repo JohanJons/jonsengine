@@ -121,9 +121,10 @@
     <ClCompile Include="src\Core\Logging\OutputStream.cpp" />
     <ClCompile Include="src\Core\Logging\StreamBuf.cpp" />
     <ClCompile Include="src\Core\Logging\Logger.cpp" />
+    <ClCompile Include="src\Core\Math\AABB.cpp" />
+    <ClCompile Include="src\Core\Math\Math.cpp" />
     <ClCompile Include="src\Core\Memory\HeapAllocator.cpp" />
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
-    <ClCompile Include="src\Core\Utils\Math.cpp" />
     <ClCompile Include="src\Core\Utils\Time.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11AABBPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11AmbientPass.cpp" />
@@ -177,12 +178,13 @@
     <ClInclude Include="include\Core\Logging\StreamBuf.h" />
     <ClInclude Include="include\Core\Logging\Logger.h" />
     <ClInclude Include="include\Core\Logging\LogManager.h" />
+    <ClInclude Include="include\Core\Math\AABB.h" />
+    <ClInclude Include="include\Core\Math\Math.h" />
     <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
     <ClInclude Include="include\Core\Memory\IMemoryAllocator.h" />
     <ClInclude Include="include\Core\Types.h" />
     <ClInclude Include="include\Core\Utils\Error.h" />
     <ClInclude Include="include\Core\Utils\Time.h" />
-    <ClInclude Include="include\Core\Utils\Math.h" />
     <ClInclude Include="include\Core\Utils\Win32.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11AABBPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11AmbientPass.h" />

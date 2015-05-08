@@ -2,7 +2,6 @@
 
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Memory/HeapAllocator.h"
-#include "include/Core/Utils/Math.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/DebugOptions.h"
 #include "include/Scene/Scene.h"

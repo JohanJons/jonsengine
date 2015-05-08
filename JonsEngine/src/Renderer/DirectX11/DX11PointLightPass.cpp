@@ -4,7 +4,7 @@
 #include "include/Renderer/RenderQueue.h"
 #include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/PointLightPixel.h"
-#include "include/Core/Utils/Math.h"
+#include "include/Core/Math/Math.h"
 #include "include/Core/Logging/Logger.h"
 
 namespace JonsEngine

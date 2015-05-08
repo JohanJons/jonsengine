@@ -1,6 +1,6 @@
 #include "include/Scene/Model.h"
 
-#include "include/Core/Utils/Math.h"
+#include "include/Core/Math/Math.h"
 
 #include "boost/functional/hash.hpp"
 

@@ -2,7 +2,7 @@
 
 #include "include/Scene/Material.h"
 #include "include/Core/Types.h"
-#include "include/Core/Utils/Math.h"
+#include "include/Core/Math/AABB.h"
 
 #include <string>
 #include <vector>

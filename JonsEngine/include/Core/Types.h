@@ -33,4 +33,5 @@ namespace JonsEngine
     typedef glm::fquat Quaternion;
     typedef glm::vec4 Plane;
     typedef std::array<Plane, 6> FrustrumPlanes;
+    typedef std::array<Vec4, 8> CameraFrustrum;
 }

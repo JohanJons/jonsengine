@@ -1,7 +1,7 @@
 #include "include/Scene/Scene.h"
 #include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/EngineDefs.h"
-#include "include/Core/Utils/Math.h"
+#include "include/Core/Math/Math.h"
 #include "include/Resources/ResourceManifest.h"
 
 #include "boost/functional/hash.hpp"

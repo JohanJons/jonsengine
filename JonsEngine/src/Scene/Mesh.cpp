@@ -1,7 +1,5 @@
 #include "include/Scene/Mesh.h"
 
-#include "include/Core/Utils/Math.h"
-
 namespace JonsEngine
 {
     Mesh::Mesh(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material) :

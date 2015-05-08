@@ -2,7 +2,6 @@
 
 #include "include/Resources/JonsPackage.h"
 #include "include/Renderer/DirectX11/DX11Renderer.h"
-#include "include/Core/Utils/Math.h"
 
 namespace JonsEngine
 {

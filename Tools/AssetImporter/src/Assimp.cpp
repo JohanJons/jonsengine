@@ -1,6 +1,6 @@
 #include "include/Assimp.h"
 
-#include "include/Core/Utils/Math.h"
+#include "include/Core/Math/Math.h"
 #include "include/FreeImage.h"
 
 #include <limits>

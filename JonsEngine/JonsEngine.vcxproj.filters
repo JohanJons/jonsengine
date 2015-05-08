@@ -78,6 +78,12 @@
     <Filter Include="Header Files\Renderer\DirectX11\Shaders">
       <UniqueIdentifier>{c2480e19-3446-43fa-8891-a1bd483bb955}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Core\Math">
+      <UniqueIdentifier>{715a4116-fd7a-4d30-b42d-f6be5508ceaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core\Math">
+      <UniqueIdentifier>{b074f7aa-71f8-4a51-b4e6-83de54bfc707}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Engine.cpp">
@@ -155,9 +161,6 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Context.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Utils\Math.cpp">
-      <Filter>Source Files\Core\Utils</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\DirectX11\DX11Texture.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
@@ -221,6 +224,12 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Utils.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Math\AABB.cpp">
+      <Filter>Source Files\Core\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Math\Math.cpp">
+      <Filter>Source Files\Core\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -243,9 +252,6 @@
     </ClInclude>
     <ClInclude Include="include\Core\Logging\Logger.h">
       <Filter>Header Files\Core\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Utils\Math.h">
-      <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
     <ClInclude Include="include\Scene\Camera.h">
       <Filter>Header Files\Scene</Filter>
@@ -408,6 +414,12 @@
     </ClInclude>
     <ClInclude Include="include\Core\Utils\Error.h">
       <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Math\Math.h">
+      <Filter>Header Files\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Math\AABB.h">
+      <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -3,7 +3,7 @@
 #include "include/Scene/Mesh.h"
 #include "include/Resources/JonsPackage.h"
 #include "include/Core/Types.h"
-#include "include/Core/Utils/Math.h"
+#include "include/Core/Math/AABB.h"
 
 #include <string>
 #include <vector>

@@ -2,7 +2,6 @@
 
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Types.h"
-#include "include/Core/Utils/Math.h"
 #include "include/Scene/Scene.h"
 #include "include/Resources/ResourceManifest.h"
 

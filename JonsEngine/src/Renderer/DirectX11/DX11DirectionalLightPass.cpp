@@ -13,7 +13,7 @@
 #include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF3X3Pixel.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF5X5Pixel.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF7X7Pixel.h"
-#include "include/Core/Utils/Math.h"
+#include "include/Core/Math/Math.h"
 
 #include <array>
 
