@@ -31,11 +31,4 @@ Scene:
 
 Window:
 - Basic window management
-- Raw input handling
-
-
-
-
-
-
-
+- Raw keyboard/mouse input handling
