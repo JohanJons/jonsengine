@@ -68,9 +68,27 @@ namespace JonsEngine
     }
 
 
-    WindowManagerImpl::WindowManagerImpl(const EngineSettings& engineSettings, Logger& logger) : mLogger(logger), mWindowTitle(engineSettings.mWindowTitle), mScreenWidth(engineSettings.mWindowWidth), mScreenHeight(engineSettings.mWindowHeight),
-        mShowMouseCursor(false), mFullscreen(false), mRelativePosX(0), mRelativePosY(0), mMouseButtonCallback(nullptr), mMousePositionCallback(nullptr), mKeyCallback(nullptr),
-        mInstanceHandle(GetModuleHandle(NULL)), mWindowHandle(nullptr)
+    WindowManagerImpl::WindowManagerImpl(const EngineSettings& engineSettings, Logger& logger) : 
+        mLogger(logger), 
+        
+        mWindowTitle(engineSettings.mWindowTitle),
+        mScreenWidth(engineSettings.mWindowWidth),
+        mScreenHeight(engineSettings.mWindowHeight),
+        mShowMouseCursor(false),
+        mFullscreen(false),
+        
+        mRelativePosX(0),
+        mRelativePosY(0),
+        mCtrlPressed(false),
+        mAltPressed(false),
+        mShiftPressed(false),
+
+        mMouseButtonCallback(nullptr),
+        mMousePositionCallback(nullptr),
+        mKeyCallback(nullptr),
+
+        mInstanceHandle(GetModuleHandle(NULL)),
+        mWindowHandle(nullptr)
     {
         // Register class
         WNDCLASSEX wcex;
@@ -111,8 +129,8 @@ namespace JonsEngine
         // initialize RAW input
         RAWINPUTDEVICE rawInputDevices[2] =
         {
-            { 0x01, 0x02, 0, mWindowHandle },  // mouse
-            { 0x01, 0x06, 0, mWindowHandle }   // keyboard
+            { 0x01, 0x02, RIDEV_NOLEGACY, mWindowHandle },  // mouse
+            { 0x01, 0x06, RIDEV_NOLEGACY, mWindowHandle }   // keyboard
         };
 
         if (!RegisterRawInputDevices(rawInputDevices, 2, sizeof(rawInputDevices[0])))
@@ -278,12 +296,19 @@ namespace JonsEngine
 
     void WindowManagerImpl::ProcessKeyboardInput(const RAWKEYBOARD& keyInput)
     {
-        if (!mKeyCallback)
+        // '255' means fake/illegal key press
+        if (!mKeyCallback || keyInput.VKey == 255)
             return;
 
-        SHORT altDown = GetKeyState(VK_MENU);
-        SHORT shiftDown = GetKeyState(VK_SHIFT);
-        SHORT ctrlDown = GetKeyState(VK_CONTROL);
+        const bool isE0 = ((keyInput.Flags & RI_KEY_E0) != 0);
+
+        // key modifiers
+        if (keyInput.VKey == VK_CONTROL)
+            mCtrlPressed = keyInput.Flags == RI_KEY_MAKE;
+        if (keyInput.VKey == VK_MENU)
+            mAltPressed = keyInput.Flags == RI_KEY_MAKE;
+        if (keyInput.VKey == VK_SHIFT)
+            mShiftPressed = keyInput.Flags == RI_KEY_MAKE;
 
         mKeyEvents.emplace_back(KeyEvent(
             [&]()
@@ -361,12 +386,9 @@ namespace JonsEngine
 				case VK_DOWN:           return DOWN;
 				case VK_LEFT:           return LEFT;
 				case VK_RIGHT:          return RIGHT;
-				case VK_LSHIFT:         return LEFT_SHIFT;
-				case VK_RSHIFT:         return RIGHT_SHIFT;
-				case VK_LCONTROL:       return LEFT_CTRL;
-				case VK_RCONTROL:       return RIGHT_CTRL;
-				case VK_LMENU:          return LEFT_ALT;
-				case VK_RMENU:          return RIGHT_ALT;
+                case VK_SHIFT:          return isE0 ? RIGHT_SHIFT : LEFT_SHIFT;
+                case VK_CONTROL:        return isE0 ? RIGHT_CTRL : LEFT_CTRL;
+                case VK_MENU:           return isE0 ? RIGHT_ALT : LEFT_ALT;
 				case VK_TAB:            return TAB;
 				case VK_RETURN:         return ENTER;
 				case VK_BACK:           return BACKSPACE;
@@ -389,7 +411,6 @@ namespace JonsEngine
 				case VK_CAPITAL:        return CAPS_LOCK;
 				case VK_SCROLL:         return SCROLL_LOCK;
 				case VK_PAUSE:          return PAUSE;
-				case VK_MENU:           return MENU;
 				default:                return UNKNOWN;
             };
         }(),
@@ -398,22 +419,15 @@ namespace JonsEngine
         {
             switch (keyInput.Flags)
             {
-				case RI_KEY_MAKE:    return KeyEvent::STATE_PRESSED;
-				case RI_KEY_BREAK:   return KeyEvent::STATE_RELEASED;
-				default:             return KeyEvent::STATE_UNKNOWN;
+                default:
+                case RI_KEY_MAKE:    return KeyEvent::KeyState::STATE_PRESSED;
+                case RI_KEY_BREAK:   return KeyEvent::KeyState::STATE_RELEASED;
             }
         }(),
-            [&]()
-        {
-            KeyEvent::KeyModifiers modifiers;
-
-            if (altDown)    modifiers.flip(KeyEvent::MODIFIER_ALT);
-            if (shiftDown)  modifiers.flip(KeyEvent::MODIFIER_SHIFT);
-            if (ctrlDown)   modifiers.flip(KeyEvent::MODIFIER_CONTROL);
-
-            return modifiers;
-        }()
-            ));
+            mCtrlPressed,
+            mAltPressed,
+            mShiftPressed
+        ));
     }
 
     void WindowManagerImpl::ProcessMouseInput(const RAWMOUSE& mouseInput)

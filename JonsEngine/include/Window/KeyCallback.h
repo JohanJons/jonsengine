@@ -4,7 +4,6 @@
 #include "include/Window/KeyDefinition.h"
 
 #include <functional>
-#include <bitset>
 
 namespace JonsEngine
 {
@@ -19,34 +18,37 @@ namespace JonsEngine
     struct KeyEvent
     {
     public:
-        typedef std::bitset<sizeof(uint32_t)> KeyModifiers;
-
-        enum KeyState
+        enum class KeyState
         {
-            STATE_UNKNOWN = 0,
             STATE_PRESSED,
             STATE_RELEASED,
             STATE_REPEAT
         };
 
-        enum KeyModifier
+        enum class KeyModifier
         {
-            MODIFIER_SHIFT = 0,
+            MODIFIER_SHIFT,
             MODIFIER_CONTROL,
             MODIFIER_ALT
         };
 
-        Key mKey;
-        uint16_t mScancode;      /* System-specific scancode */
-        KeyState mState;
-        KeyModifiers mModifiers;
+        const Key mKey;
+        const uint16_t mScancode;      /* System-specific scancode */
+        const KeyState mState;
+
+        const bool mControlPressed;
+        const bool mAltPressed;
+        const bool mShiftPressed;
 
 
-        KeyEvent(Key keySymbol, uint16_t scanCode, KeyState state, KeyModifiers modifiers);
+        KeyEvent(const Key keySymbol, const uint16_t scanCode, const KeyState state, const bool controlPressed, const bool altPressed, const bool shiftPressed);
     };
 
 
     /* KeyEvent inlines */
-    inline KeyEvent::KeyEvent(Key keySymbol, uint16_t scanCode, KeyState state, KeyModifiers modifiers) : mKey(keySymbol), mScancode(scanCode), mState(state), mModifiers(modifiers) { }
+    inline KeyEvent::KeyEvent(const Key keySymbol, const uint16_t scanCode, const KeyState state, const bool controlPressed, const bool altPressed, const bool shiftPressed)
+        : 
+        mKey(keySymbol), mScancode(scanCode), mState(state), mControlPressed(controlPressed), mAltPressed(altPressed), mShiftPressed(shiftPressed)
+    {}
 
 }

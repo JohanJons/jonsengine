@@ -60,8 +60,12 @@ namespace JonsEngine
         uint16_t mScreenHeight;
         bool mShowMouseCursor;
         bool mFullscreen;
+
         int32_t mRelativePosX;
         int32_t mRelativePosY;
+        bool mCtrlPressed;
+        bool mAltPressed;
+        bool mShiftPressed;
 
         MouseButtonCallback mMouseButtonCallback;
         MousePositionCallback mMousePositionCallback;
