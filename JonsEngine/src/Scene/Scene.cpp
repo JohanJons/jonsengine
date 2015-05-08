@@ -326,38 +326,8 @@ namespace JonsEngine
             // all children needs to be updated
             // TODO: sort based on hierarchy to avoid unnecessary operations if children present in mDirtySceneNodes aswell
             node->UpdateWorldMatrix();
-
-            // point lights
-            for (const auto& pointLightNode : mPointLightNodeMapping)
-            {
-                if (pointLightNode.second == node)
-                {
-                    OnPointLightDirty(pointLightNode.first);
-                    break;
-                }
-            }
         }
 
         mDirtySceneNodes.clear();
-    }
-
-
-    void Scene::OnPointLightNewNode(PointLight* pointLight, SceneNode* newSceneNode)
-    {
-        // map pointlight to new scene node
-        auto iterMapping = std::find_if(mPointLightNodeMapping.begin(), mPointLightNodeMapping.end(), [pointLight](const std::pair<PointLight*, SceneNode*>& mapping) { return mapping.first == pointLight; });
-        // it could be the case it isn't mapped; for example, if previously nulled
-        if (iterMapping == mPointLightNodeMapping.end())
-            mPointLightNodeMapping.emplace_back(pointLight, newSceneNode);
-        else
-            iterMapping->second = newSceneNode;
-    }
-
-    void Scene::OnPointLightDirty(PointLight* pointLight)
-    {
-        auto iter = std::find(mDirtyPointLights.begin(), mDirtyPointLights.end(), pointLight);
-        // only add if unique
-        if (iter == mDirtyPointLights.end())
-            mDirtyPointLights.push_back(pointLight);
     }
 }

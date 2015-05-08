@@ -155,6 +155,7 @@ namespace JonsEngine
             mVertexTransformPass.RenderMeshes(pointLight.mMeshes, faceProjmatrix * faceViewMatrix * camViewMatrix);
         }
 
+
         //
         // stencil pass
         //
@@ -171,6 +172,7 @@ namespace JonsEngine
         mContext->RSSetViewports(numViewports, &prevViewport);
 
         mVertexTransformPass.RenderMesh(mSphereMesh, lightMeshWVP);
+
 
         //
         // shading pass

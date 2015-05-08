@@ -66,10 +66,6 @@ namespace JonsEngine
         IMemoryAllocator& mMemoryAllocator;
 
         std::vector<SceneNode*> mDirtySceneNodes;
-        std::vector<PointLight*> mDirtyPointLights;
-
-        std::vector<std::pair<PointLight*, RenderablePointLights::size_type>> mPointLightRenderableMapping;
-        std::vector<std::pair<PointLight*, SceneNode*>> mPointLightNodeMapping;
 
 		Camera mSceneCamera;
         SceneNode mRootNode;
