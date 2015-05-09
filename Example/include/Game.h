@@ -6,6 +6,8 @@
 #include "include/Window/KeyCallback.h"
 #include "include/Resources/JonsPackage.h"
 
+#include <functional>
+
 namespace JonsGame
 {
     class JonsEngine::Scene;
@@ -32,7 +34,8 @@ namespace JonsGame
 
         JonsEngine::EngineSettings mSettings;
         JonsEngine::DebugOptions mDebugOptions;
-        JonsEngine::Engine* mEngine;
+        std::unique_ptr<JonsEngine::Engine> mEngine;
+
         bool mRunning;
         float mSunAngle;
         float mMoveSpeed;

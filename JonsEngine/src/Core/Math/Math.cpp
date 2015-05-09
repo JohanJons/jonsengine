@@ -39,8 +39,18 @@ namespace JonsEngine
         return Vec3(std::min(v1.x, v2.x), std::min(v1.y, v2.y), std::min(v1.z, v2.z));
     }
 
+    Vec4 MinVal(const Vec4& v1, const Vec4& v2)
+    {
+        return Vec4(std::min(v1.x, v2.x), std::min(v1.y, v2.y), std::min(v1.z, v2.z), std::min(v1.w, v2.w));
+    }
+
     Vec3 MaxVal(const Vec3& v1, const Vec3& v2)
     {
         return Vec3(std::max(v1.x, v2.x), std::max(v1.y, v2.y), std::max(v1.z, v2.z));
+    }
+
+    Vec4 MaxVal(const Vec4& v1, const Vec4& v2)
+    {
+        return Vec4(std::max(v1.x, v2.x), std::max(v1.y, v2.y), std::max(v1.z, v2.z), std::max(v1.w, v2.w));
     }
 }

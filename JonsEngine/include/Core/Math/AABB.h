@@ -2,20 +2,13 @@
 
 #include "include/Core/Types.h"
 
-#include "glm/glm.hpp"
-#include "glm/gtx/rotate_vector.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtx/quaternion.hpp"
 #include <vector>
-#include <math.h>
 
 
 namespace JonsEngine
 {
     struct AABB
     {
-        typedef std::vector<AABB>::size_type Index;
-
         enum class AABBIntersection
         {
             AABB_INTERSECTION_INSIDE,
@@ -24,6 +17,7 @@ namespace JonsEngine
         };
 
 
+        AABB();
         AABB(const Vec3& center, const Vec3& extent);
 
 		AABB& operator*=(const Mat4& transform);

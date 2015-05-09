@@ -1,5 +1,5 @@
 #include "include/Scene/SceneNode.h"
-#include "include/Core/Utils/Math.h"
+#include "include/Core/Math/Math.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
 #include "boost/functional/hash.hpp"

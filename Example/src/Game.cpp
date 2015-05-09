@@ -17,14 +17,12 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(nullptr), mRunning(true), mSunAngle(0.0f), mMoveSpeed(0.1f)
+    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mSunAngle(0.0f), mMoveSpeed(0.1f)
     {
-        mEngine = new Engine(mSettings);
     }
         
     Game::~Game()
     {
-        delete mEngine;
     }
 
         
@@ -158,7 +156,7 @@ namespace JonsGame
     void Game::SetupTestScene(Scene* myScene, JonsPackagePtr jonsPackage)
     {
         // ambient light
-        myScene->SetAmbientLight(Vec4(0.00f));
+        myScene->SetAmbientLight(Vec4(0.01f));
 
         // sectoid
         SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
@@ -240,6 +238,7 @@ namespace JonsGame
         // sponza 
         SceneNodePtr nodeSponza = myScene->GetRootNode().CreateChildNode("sponza");
         ModelPtr modelSponza = mEngine->GetResourceManifest().LoadModel("sponza", jonsPackage);
+        // this model is huge compared to others - scale it down massively
         nodeSponza->ScaleNode(Vec3(0.05f));
         nodeSponza->TranslateNode(Vec3(0.0f, 0.5f, -54.0f));
         Actor* actorSponza = myScene->CreateActor("actorPlane", modelSponza, nodeSponza);
@@ -250,6 +249,6 @@ namespace JonsGame
 
     void Game::UpdateSun()
     {
-        Scene* activeScene = mEngine->GetSceneManager().GetActiveScene();
+        // TODO: animated dirlight as sun
     }
 }

@@ -4,6 +4,10 @@
 
 namespace JonsEngine
 {
+    AABB::AABB() : mAABBCenter(0.0f), mAABBExtent(0.0f)
+    {
+    }
+
 	AABB::AABB(const Vec3& center, const Vec3& extent) : mAABBCenter(center), mAABBExtent(extent)
     {
     }

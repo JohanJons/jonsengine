@@ -14,47 +14,29 @@
 #include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF5X5Pixel.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF7X7Pixel.h"
 #include "include/Core/Math/Math.h"
+#include "include/Core/Math/CameraFrustrum.h"
 
 #include <array>
 
 namespace JonsEngine
 {
-    typedef std::array<Vec4, 8> CameraFrustrum;
-
     const Mat4 gBiasMatrix(0.5f, 0.0f, 0.0f, 0.0f,
                            0.0f, -0.5f, 0.0f, 0.0f,
                            0.0f, 0.0f, 1.0f, 0.0f,
                            0.5f, 0.5f, 0.0f, 1.0f);
 
 
-    CameraFrustrum CalculateCameraFrustrum(const float fovDegrees, const float aspectRatio, const float minDist, const float maxDist, const Mat4& cameraViewMatrix)
-    {
-        CameraFrustrum ret = { Vec4(1.0f, -1.0f, 0.0f, 1.0f), Vec4(1.0f, 1.0f, 0.0f, 1.0f), Vec4(-1.0f, 1.0f, 0.0f, 1.0f), Vec4(-1.0f, -1.0f, 0.0f, 1.0f),
-                               Vec4(1.0f, -1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, -1.0f, 1.0f, 1.0f), };
-
-        const Mat4 perspectiveMatrix = PerspectiveMatrixFov(fovDegrees, aspectRatio, minDist, maxDist);
-        const Mat4 invMVP = glm::inverse(perspectiveMatrix * cameraViewMatrix);
-
-        for (Vec4& corner : ret)
-        {
-            corner = invMVP * corner;
-            corner /= corner.w;
-        }
-
-        return ret;
-    }
-
     Mat4 CreateDirLightVPMatrix(const CameraFrustrum& cameraFrustrum, const Vec3& lightDir)
     {
         Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
 
-        Vec4 transf = lightViewMatrix * cameraFrustrum[0];
+        Vec4 transf = lightViewMatrix * cameraFrustrum.mCorners[0];
         float maxZ = transf.z, minZ = transf.z;
         float maxX = transf.x, minX = transf.x;
         float maxY = transf.y, minY = transf.y;
         for (uint32_t i = 1; i < 8; ++i)
         {
-            transf = lightViewMatrix * cameraFrustrum[i];
+            transf = lightViewMatrix * cameraFrustrum.mCorners[i];
 
             if (transf.z > maxZ) maxZ = transf.z;
             if (transf.z < minZ) minZ = transf.z;
@@ -195,7 +177,10 @@ namespace JonsEngine
         {
             mShadowmap.BindDepthView(cascadeIndex);
             
-			CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(degreesFOV, aspectRatio, cascadeIndex == 0 ? minZ : splitDistances[cascadeIndex - 1], splitDistances[cascadeIndex], cameraViewMatrix);
+            // get cascade frustrum
+            const Mat4 perspectiveMatrix = PerspectiveMatrixFov(degreesFOV, aspectRatio, cascadeIndex == 0 ? minZ : splitDistances[cascadeIndex - 1], splitDistances[cascadeIndex]);
+            CameraFrustrum cameraFrustrum(perspectiveMatrix * cameraViewMatrix);
+
             lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, directionalLight.mLightDirection);
 			mVertexTransformPass.RenderMeshes(directionalLight.mMeshes, lightVPMatrices[cascadeIndex]);
 

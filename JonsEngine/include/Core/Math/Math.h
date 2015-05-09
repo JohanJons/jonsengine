@@ -22,5 +22,7 @@ namespace JonsEngine
     Mat4 OrthographicMatrix(const float left, const float right, const float top, const float bottom, const float zNear, const float zFar);
 
     Vec3 MinVal(const Vec3& v1, const Vec3& v2);
+    Vec4 MinVal(const Vec4& v1, const Vec4& v2);
     Vec3 MaxVal(const Vec3& v1, const Vec3& v2);
+    Vec4 MaxVal(const Vec4& v1, const Vec4& v2);
 }
