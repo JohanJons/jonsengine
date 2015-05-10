@@ -10,26 +10,24 @@
 
 namespace JonsEngine
 {
-    void AddMesh(std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix)
+    void AddMesh(std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& worldMatrix)
     {
-		resultMeshes.emplace_back(mesh.mMeshID, wvpMatrix, worldMatrix, mesh.GetMaterial()->mDiffuseTexture, mesh.GetMaterial()->mNormalTexture, mesh.GetMaterial()->mSpecularFactor, mesh.GetTextureTilingFactor());
+		resultMeshes.emplace_back(mesh.mMeshID, worldMatrix, mesh.GetMaterial()->mDiffuseTexture, mesh.GetMaterial()->mNormalTexture, mesh.GetMaterial()->mSpecularFactor, mesh.GetTextureTilingFactor());
     }
 
-    void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix)
+    void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& worldMatrix)
     {
-        resultMeshes.emplace_back(mesh.mMeshID, wvpMatrix, worldMatrix);
+        resultMeshes.emplace_back(mesh.mMeshID, worldMatrix);
     }
 
     template <typename T>
-    void AddAllMeshes(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
+    void AddAllMeshes(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& worldMatrix)
     {
-        const Mat4 localWVPMatrix = wvpMatrix * node.mTransform;
-
 		for (const Mesh& mesh : node.GetMeshes())
-            AddMesh(resultMeshes, mesh, localWVPMatrix, worldMatrix * node.mTransform);
+            AddMesh(resultMeshes, mesh, worldMatrix * node.mTransform);
 
 		for (ModelNode& node : node.GetChildNodes())
-            AddAllMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
+            AddAllMeshes(resultMeshes, node, worldMatrix);
     }
 
     template <typename T>
@@ -54,7 +52,7 @@ namespace JonsEngine
 						continue;
 
 					if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_PARTIAL)
-                        AddMesh(resultMeshes, mesh, localWVPMatrix, worldMatrix * node.mTransform);
+                        AddMesh(resultMeshes, mesh, worldMatrix * node.mTransform);
 				}
 
                 // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
@@ -66,7 +64,7 @@ namespace JonsEngine
 
 			case AABBIntersection::AABB_INTERSECTION_INSIDE:
 			{
-                AddAllMeshes(resultMeshes, node, wvpMatrix, worldMatrix);
+                AddAllMeshes(resultMeshes, node, worldMatrix);
 				break;
 			}
 
@@ -74,6 +72,46 @@ namespace JonsEngine
 			default:
 				break;
 		}
+    }
+
+    void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, ModelNode& node, const AABB& aabb, const Mat4& worldMatrix)
+    {
+        // test node AABB
+        AABBIntersection nodeAABBIntersection = IsAABBInAABB(node.mAABB, aabb);
+        switch (nodeAABBIntersection)
+        {
+            // if partially inside, recursively test all meshes and child nodes
+            case AABBIntersection::AABB_INTERSECTION_PARTIAL:
+            {
+                AABBIntersection meshAABBIntersection(AABBIntersection::AABB_INTERSECTION_INSIDE);
+
+                for (const Mesh& mesh : node.GetMeshes())
+                {
+                    meshAABBIntersection = IsAABBInAABB(mesh.mAABB, aabb);
+                    if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_OUTSIDE)
+                        continue;
+
+                    if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_PARTIAL)
+                        AddMesh(resultMeshes, mesh, worldMatrix * node.mTransform);
+                }
+
+                // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
+                for (ModelNode& node : node.GetChildNodes())
+                    CullMeshesAABB(resultMeshes, node, aabb, worldMatrix);
+
+                break;
+            }
+
+        case AABBIntersection::AABB_INTERSECTION_INSIDE:
+        {
+            AddAllMeshes(resultMeshes, node, worldMatrix);
+            break;
+        }
+
+        case AABBIntersection::AABB_INTERSECTION_OUTSIDE:
+        default:
+            break;
+        }
     }
 
 	void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius)
@@ -97,7 +135,7 @@ namespace JonsEngine
 						continue;
 
 					if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_PARTIAL)
-						AddMesh(resultMeshes, mesh, Mat4(1.0f), worldMatrix * node.mTransform);
+						AddMesh(resultMeshes, mesh, worldMatrix * node.mTransform);
 				}
 
 				// each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
@@ -109,7 +147,7 @@ namespace JonsEngine
 
 			case AABBIntersection::AABB_INTERSECTION_INSIDE:
 			{
-				AddAllMeshes(resultMeshes, node, Mat4(1.0f), worldMatrix);
+				AddAllMeshes(resultMeshes, node, worldMatrix);
 				break;
 			}
 
@@ -117,11 +155,6 @@ namespace JonsEngine
 			default:
 				break;
         }
-    }
-
-    void AddAll(std::vector<RenderableMesh>& resultMeshes, ModelNode& node, const Mat4& worldMatrix)
-    {
-        AddAllMeshes(resultMeshes, node, Mat4(1.0f), worldMatrix);
     }
 
 
@@ -197,19 +230,21 @@ namespace JonsEngine
         }
 
         // dir lights
+        CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(mRenderQueue.mCamera.mCameraViewProjectionMatrix);
         for (const DirectionalLightPtr& dirLight : mDirectionalLights)
         {
-            // TODO
             mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, dirLight->mLightDirection);
             RenderableDirLight& dirLight = mRenderQueue.mDirectionalLights.back();
-
+            
+            const AABB cameraAABB(cameraFrustrum);
             for (const ActorPtr& actor : mActors)
             {
                 if (!actor->mSceneNode)
                     continue;
 
-                const Mat4& actorWorldMatrix = actor->mSceneNode->GetWorldMatrix();
-                AddAll(dirLight.mMeshes, actor->mModel->GetRootNode(), actorWorldMatrix);
+                const Mat4& worldMatrix = actor->mSceneNode->GetWorldMatrix();
+                // TODO - not working?
+                CullMeshesAABB(dirLight.mMeshes, actor->mModel->GetRootNode(), cameraAABB, worldMatrix);
             }
         }
 

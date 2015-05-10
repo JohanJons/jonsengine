@@ -1,16 +1,28 @@
 #include "include/Core/Math/AABB.h"
+#include "include/Core/Math/Math.h"
 
 #include <cmath>
 
 namespace JonsEngine
 {
-    AABB::AABB() : mAABBCenter(0.0f), mAABBExtent(0.0f)
-    {
-    }
-
 	AABB::AABB(const Vec3& center, const Vec3& extent) : mAABBCenter(center), mAABBExtent(extent)
     {
     }
+
+    AABB::AABB(const CameraFrustrum& cameraFrustrum)
+    {
+        Vec4 minBounds(std::numeric_limits<float>::max()), maxBounds(-std::numeric_limits<float>::max());
+
+        for (const Vec4& corner : cameraFrustrum)
+        {
+            minBounds = MinVal(minBounds, corner);
+            maxBounds = MaxVal(maxBounds, corner);
+        }
+
+        mAABBCenter = Vec3(0.5f * (minBounds + maxBounds));
+        mAABBExtent = Vec3(0.5f * (maxBounds - minBounds));
+    }
+
 
     AABB& AABB::operator*=(const Mat4& transform)
 	{
@@ -28,6 +40,7 @@ namespace JonsEngine
 
         return *this;
 	}
+
 
     Vec3 AABB::Min() const
     {
@@ -109,13 +122,13 @@ namespace JonsEngine
         return distSquared > 0 ? AABBIntersection::AABB_INTERSECTION_PARTIAL : AABBIntersection::AABB_INTERSECTION_OUTSIDE;
     }
 
-    AABBIntersection IsAABBInAABB(const AABB& target, const AABB& source)
+    AABBIntersection IsAABBInAABB(const AABB& source, const AABB& target)
     {
-        const Vec3 min = target.Min();
-        const Vec3 max = target.Max();
+        const Vec3 min = source.Min();
+        const Vec3 max = source.Max();
 
-        const bool minInAABB = IsPointInAABB(min, source);
-        const bool maxInAABB = IsPointInAABB(max, source);
+        const bool minInAABB = IsPointInAABB(min, target);
+        const bool maxInAABB = IsPointInAABB(max, target);
 
         if (minInAABB && maxInAABB)
             return AABBIntersection::AABB_INTERSECTION_INSIDE;

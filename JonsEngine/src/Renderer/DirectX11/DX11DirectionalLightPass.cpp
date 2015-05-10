@@ -14,7 +14,6 @@
 #include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF5X5Pixel.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF7X7Pixel.h"
 #include "include/Core/Math/Math.h"
-#include "include/Core/Math/CameraFrustrum.h"
 
 #include <array>
 
@@ -30,13 +29,13 @@ namespace JonsEngine
     {
         Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
 
-        Vec4 transf = lightViewMatrix * cameraFrustrum.mCorners[0];
+        Vec4 transf = lightViewMatrix * cameraFrustrum[0];
         float maxZ = transf.z, minZ = transf.z;
         float maxX = transf.x, minX = transf.x;
         float maxY = transf.y, minY = transf.y;
         for (uint32_t i = 1; i < 8; ++i)
         {
-            transf = lightViewMatrix * cameraFrustrum.mCorners[i];
+            transf = lightViewMatrix * cameraFrustrum[i];
 
             if (transf.z > maxZ) maxZ = transf.z;
             if (transf.z < minZ) minZ = transf.z;
@@ -179,7 +178,7 @@ namespace JonsEngine
             
             // get cascade frustrum
             const Mat4 perspectiveMatrix = PerspectiveMatrixFov(degreesFOV, aspectRatio, cascadeIndex == 0 ? minZ : splitDistances[cascadeIndex - 1], splitDistances[cascadeIndex]);
-            CameraFrustrum cameraFrustrum(perspectiveMatrix * cameraViewMatrix);
+            CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(perspectiveMatrix * cameraViewMatrix);
 
             lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, directionalLight.mLightDirection);
 			mVertexTransformPass.RenderMeshes(directionalLight.mMeshes, lightVPMatrices[cascadeIndex]);

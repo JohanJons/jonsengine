@@ -122,7 +122,6 @@
     <ClCompile Include="src\Core\Logging\StreamBuf.cpp" />
     <ClCompile Include="src\Core\Logging\Logger.cpp" />
     <ClCompile Include="src\Core\Math\AABB.cpp" />
-    <ClCompile Include="src\Core\Math\CameraFrustrum.cpp" />
     <ClCompile Include="src\Core\Math\Math.cpp" />
     <ClCompile Include="src\Core\Memory\HeapAllocator.cpp" />
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
@@ -180,7 +179,6 @@
     <ClInclude Include="include\Core\Logging\Logger.h" />
     <ClInclude Include="include\Core\Logging\LogManager.h" />
     <ClInclude Include="include\Core\Math\AABB.h" />
-    <ClInclude Include="include\Core\Math\CameraFrustrum.h" />
     <ClInclude Include="include\Core\Math\Math.h" />
     <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
     <ClInclude Include="include\Core\Memory\IMemoryAllocator.h" />

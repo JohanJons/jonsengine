@@ -17,8 +17,8 @@ namespace JonsEngine
         };
 
 
-        AABB();
         AABB(const Vec3& center, const Vec3& extent);
+        AABB(const CameraFrustrum& cameraFrustrum);
 
 		AABB& operator*=(const Mat4& transform);
 
@@ -45,8 +45,8 @@ namespace JonsEngine
     AABBIntersection IsAABBInFrustum(const AABB& aabb, const Mat4& frustumMatrix);
     AABBIntersection IsAABBInSphere(const AABB& aabb, const Vec3& sphereCentre, const float sphereRadius);
     
-    // "is target in source"
-    AABBIntersection IsAABBInAABB(const AABB& target, const AABB& source);
+    // "is source in target"
+    AABBIntersection IsAABBInAABB(const AABB& source, const AABB& target);
 	bool IsPointInSphere(const Vec3& point, const Vec3& sphereCentre, const float radius);
     bool IsPointInAABB(const Vec3& point, const AABB& aabb);
 }

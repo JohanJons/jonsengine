@@ -123,7 +123,7 @@ namespace JonsEngine
             if (hasNormalTexture)
                 mTextureMap.GetItem(model.mMaterial.mNormalTextureID).Bind();
 
-            mGBuffer.SetConstantData(model.mMesh.mWVPMatrix, renderQueue.mCamera.mCameraViewMatrix * model.mMesh.mWorldMatrix, model.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
+            mGBuffer.SetConstantData(renderQueue.mCamera.mCameraViewProjectionMatrix * model.mMesh.mWorldMatrix, renderQueue.mCamera.mCameraViewMatrix * model.mMesh.mWorldMatrix, model.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
             mMeshMap.GetItem(model.mMesh.mMeshID).Draw();
         }
     }

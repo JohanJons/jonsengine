@@ -8,13 +8,12 @@ namespace JonsEngine
 {
     struct RenderableMesh
     {
-        inline RenderableMesh(const MeshID mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix) : mMeshID(mesh), mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix)
+        inline RenderableMesh(const MeshID mesh, const Mat4& worldMatrix) : mMeshID(mesh), mWorldMatrix(worldMatrix)
         {
         }
 
 
         MeshID mMeshID;
-        Mat4 mWVPMatrix;
         Mat4 mWorldMatrix;
     };
     
@@ -34,8 +33,8 @@ namespace JonsEngine
 
     struct RenderableModel
     {
-        inline RenderableModel(const MeshID mesh, const Mat4& wvpMatrix, const Mat4& worldMatrix, const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor, const float tilingFactor) :
-            mMesh(mesh, wvpMatrix, worldMatrix), mMaterial(diffuseTexture, normalTexture, specFactor), mTextureTilingFactor(tilingFactor)
+        inline RenderableModel(const MeshID mesh, const Mat4& worldMatrix, const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor, const float tilingFactor) :
+            mMesh(mesh, worldMatrix), mMaterial(diffuseTexture, normalTexture, specFactor), mTextureTilingFactor(tilingFactor)
         {
         }
 

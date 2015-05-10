@@ -230,9 +230,6 @@
     <ClCompile Include="src\Core\Math\Math.cpp">
       <Filter>Source Files\Core\Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Math\CameraFrustrum.cpp">
-      <Filter>Source Files\Core\Math</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -422,9 +419,6 @@
       <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Math\AABB.h">
-      <Filter>Header Files\Core\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Math\CameraFrustrum.h">
       <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
   </ItemGroup>

@@ -33,6 +33,22 @@ namespace JonsEngine
         return ret;
     }
 
+    CameraFrustrum CalculateCameraFrustrum(const Mat4& cameraViewProjMatrix)
+    {
+        CameraFrustrum ret = { Vec4(1.0f, -1.0f, 0.0f, 1.0f), Vec4(1.0f, 1.0f, 0.0f, 1.0f), Vec4(-1.0f, 1.0f, 0.0f, 1.0f), Vec4(-1.0f, -1.0f, 0.0f, 1.0f),
+                               Vec4(1.0f, -1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, -1.0f, 1.0f, 1.0f), };
+
+        const Mat4 invVP = glm::inverse(cameraViewProjMatrix);
+
+        for (Vec4& corner : ret)
+        {
+            corner = invVP * corner;
+            corner /= corner.w;
+        }
+
+        return ret;
+    }
+
 
     Vec3 MinVal(const Vec3& v1, const Vec3& v2)
     {
