@@ -230,6 +230,9 @@
     <ClCompile Include="src\Core\Math\Math.cpp">
       <Filter>Source Files\Core\Math</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11DepthReductionPass.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -420,6 +423,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\Math\AABB.h">
       <Filter>Header Files\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11DepthReductionPass.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

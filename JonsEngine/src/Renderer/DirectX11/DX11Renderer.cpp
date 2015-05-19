@@ -32,6 +32,11 @@ namespace JonsEngine
         mImplementation->Render(renderQueue, debugFlags);
     }
 
+    void DX11Renderer::ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth)
+    {
+        mImplementation->ReduceDepth(cameraProjMatrix, minDepth, maxDepth);
+    }
+
 
     EngineSettings::Anisotropic DX11Renderer::GetAnisotropicFiltering() const
     {

@@ -28,6 +28,7 @@ namespace JonsEngine
         TextureID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight);
 
         void Render(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags);
+        void ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth);
 
         EngineSettings::Anisotropic GetAnisotropicFiltering() const;
         void SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic);

@@ -219,6 +219,12 @@ namespace JonsGame
         Actor* actorCube2 = myScene->CreateActor("actorCube2", cube2, nodeCube2);
         nodeCube2->TranslateNode(Vec3(3.0f, 2.0f, -15.0f));
 
+        // create a third cube, far away casting shadows from the dir light
+        SceneNodePtr nodeCube3 = myScene->GetRootNode().CreateChildNode("nodeCube3");
+        ModelPtr cube3 = mEngine->GetResourceManifest().CreateCube("Cube3", 3, checkerMaterial);
+        Actor* actorCube3 = myScene->CreateActor("actorCube3", cube3, nodeCube3);
+        nodeCube3->TranslateNode(-directionalLight->mLightDirection * 40.0f);
+
         // move up camera
         myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
     }

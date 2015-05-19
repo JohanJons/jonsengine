@@ -178,6 +178,7 @@ namespace JonsEngine
         return mTextures.AddItem(mDevice, mContext, textureData, textureWidth, textureHeight, GetShaderTextureSlot(textureType), isSRGB);
     }
 
+
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags)
     {
         mPipeline.BeginFrame();
@@ -187,6 +188,11 @@ namespace JonsEngine
         mPipeline.PostProcessingStage(renderQueue, debugFlags, mAntiAliasing);
 
         mPipeline.EndFrame();
+    }
+
+    void DX11RendererImpl::ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth)
+    {
+        //mImplementation->ReduceDepth(cameraProjMatrix, minDepth, maxDepth);
     }
 
 

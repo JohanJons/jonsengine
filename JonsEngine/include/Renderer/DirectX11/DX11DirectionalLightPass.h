@@ -4,7 +4,6 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
-#include "include/Renderer/DirectX11/DX11RenderTarget2D.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
 
@@ -22,7 +21,6 @@ namespace JonsEngine
     {
     public:
         const static uint32_t NUM_SHADOWMAP_CASCADES = 4;
-        const static uint32_t MAX_READBACK_LATENCY = 3;
 
         DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, const EngineSettings::ShadowResolution shadowmapRes,
             const EngineSettings::ShadowReadbackLatency readbackLatency, const uint32_t windowWidth, const uint32_t windowHeight);
@@ -50,33 +48,11 @@ namespace JonsEngine
             }
         };
 
-        struct SDSMCBuffer
-        {
-            float mProjection33;
-            float mProjection43;
-            float mNearClip;
-            float mFarClip;
-
-
-            SDSMCBuffer(const float proj33, const float proj43, const float nearClip, const float farClip) :
-                mProjection33(proj33), mProjection43(proj43), mNearClip(nearClip), mFarClip(farClip)
-            {
-            }
-        };
-
 		float CalculateShadowmapCascades(const Mat4& cameraProjMatrix, std::array<float, NUM_SHADOWMAP_CASCADES>& splitDistances);
-        void ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth);
         void BindShadingPixelShader(const EngineSettings::ShadowFiltering shadowFiltering);
 
-        const EngineSettings::ShadowReadbackLatency mReadbackLatency;
-        uint32_t mCurrFrame;
-
         ID3D11DeviceContextPtr mContext;
-        std::vector<DX11RenderTarget2D> mDepthReductionRTVs;
-        std::array<ID3D11Texture2DPtr, MAX_READBACK_LATENCY> mReadbackTextures;
 
-        ID3D11ComputeShaderPtr mSDSMInitialShader;
-        ID3D11ComputeShaderPtr mSDSMFinalShader;
         ID3D11PixelShaderPtr mPCF2x2Shader;
         ID3D11PixelShaderPtr mPCF3x3Shader;
         ID3D11PixelShaderPtr mPCF5x5Shader;
@@ -87,6 +63,5 @@ namespace JonsEngine
         DX11VertexTransformPass& mVertexTransformPass;
         DX11Shadowmap mShadowmap;
         DX11ConstantBuffer<DirectionalLightCBuffer> mDirLightCBuffer;
-        DX11ConstantBuffer<SDSMCBuffer> mSDSMCBuffer;
     };
 }
