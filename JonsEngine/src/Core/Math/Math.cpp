@@ -49,6 +49,11 @@ namespace JonsEngine
         return ret;
     }
 
+    bool IsPointInSphere(const Vec3& point, const Vec3& sphereCentre, const float radius)
+    {
+        return glm::distance(sphereCentre, point) <= radius;
+    }
+
 
     Vec3 MinVal(const Vec3& v1, const Vec3& v2)
     {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Core/Math/KDOP.h"
 #include "include/Core/Types.h"
 
 #include <vector>
@@ -25,28 +26,25 @@ namespace JonsEngine
         Vec3 Min() const;
         Vec3 Max() const;
 
+        // "is source in this"
+        AABBIntersection IsAABBInAABB(const AABB& source) const;
+        AABBIntersection IsAABBInFrustum(const Mat4& frustumMatrix) const;
+        AABBIntersection IsAABBInSphere(const Vec3& sphereCentre, const float sphereRadius) const;
+
+        template <uint32_t MAX_KDOP_PLANES>
+        AABBIntersection IsAABBInKDOP(const KDOP<MAX_KDOP_PLANES>& kdop) const
+        {
+
+        }
+
+        bool IsPointInAABB(const Vec3& point) const;
+
 
         Vec3 mAABBCenter;
         Vec3 mAABBExtent;
     };
 
+
     AABB operator*(const Mat4& transform, const AABB& aabb);
     AABB operator*(const AABB& aabb, const Mat4& transform);
-
-    enum class AABBIntersection
-    {
-        AABB_INTERSECTION_INSIDE,
-        AABB_INTERSECTION_PARTIAL,
-        AABB_INTERSECTION_OUTSIDE
-    };
-
-
-    // note: make sure frustrum and aabb are in the same space
-    AABBIntersection IsAABBInFrustum(const AABB& aabb, const Mat4& frustumMatrix);
-    AABBIntersection IsAABBInSphere(const AABB& aabb, const Vec3& sphereCentre, const float sphereRadius);
-    
-    // "is source in target"
-    AABBIntersection IsAABBInAABB(const AABB& source, const AABB& target);
-	bool IsPointInSphere(const Vec3& point, const Vec3& sphereCentre, const float radius);
-    bool IsPointInAABB(const Vec3& point, const AABB& aabb);
 }

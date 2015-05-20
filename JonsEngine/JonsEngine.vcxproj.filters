@@ -427,6 +427,9 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11DepthReductionPass.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
+    <ClInclude Include="include\Core\Math\KDOP.h">
+      <Filter>Header Files\Core\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferPixel.hlsl">

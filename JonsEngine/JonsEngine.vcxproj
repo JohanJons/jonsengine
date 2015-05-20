@@ -180,6 +180,7 @@
     <ClInclude Include="include\Core\Logging\Logger.h" />
     <ClInclude Include="include\Core\Logging\LogManager.h" />
     <ClInclude Include="include\Core\Math\AABB.h" />
+    <ClInclude Include="include\Core\Math\KDOP.h" />
     <ClInclude Include="include\Core\Math\Math.h" />
     <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
     <ClInclude Include="include\Core\Memory\IMemoryAllocator.h" />

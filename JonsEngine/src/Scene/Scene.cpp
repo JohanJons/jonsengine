@@ -37,21 +37,21 @@ namespace JonsEngine
 
         // test node frustrum
 		// TODO: does this cull objects behind frustrum that still intersects some planes?
-        AABBIntersection nodeAABBIntersection = IsAABBInFrustum(node.mAABB, localWVPMatrix);
+        AABB::AABBIntersection nodeAABBIntersection = node.mAABB.IsAABBInFrustum(localWVPMatrix);
         switch (nodeAABBIntersection)
         {
 			// if partially inside, recursively test all meshes and child nodes
-			case AABBIntersection::AABB_INTERSECTION_PARTIAL:
+			case AABB::AABBIntersection::AABB_INTERSECTION_PARTIAL:
 			{
-				AABBIntersection meshAABBIntersection(AABBIntersection::AABB_INTERSECTION_INSIDE);
+                AABB::AABBIntersection meshAABBIntersection(AABB::AABBIntersection::AABB_INTERSECTION_INSIDE);
 
 				for (const Mesh& mesh : node.GetMeshes())
 				{
-                    meshAABBIntersection = IsAABBInFrustum(mesh.mAABB, localWVPMatrix);
-					if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_OUTSIDE)
+                    meshAABBIntersection = mesh.mAABB.IsAABBInFrustum(localWVPMatrix);
+                    if (meshAABBIntersection == AABB::AABBIntersection::AABB_INTERSECTION_OUTSIDE)
 						continue;
 
-					if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_PARTIAL)
+                    if (meshAABBIntersection == AABB::AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABB::AABBIntersection::AABB_INTERSECTION_PARTIAL)
                         AddMesh(resultMeshes, mesh, worldMatrix * node.mTransform);
 				}
 
@@ -62,13 +62,13 @@ namespace JonsEngine
 				break;
 			}
 
-			case AABBIntersection::AABB_INTERSECTION_INSIDE:
+            case AABB::AABBIntersection::AABB_INTERSECTION_INSIDE:
 			{
                 AddAllMeshes(resultMeshes, node, worldMatrix);
 				break;
 			}
 
-			case AABBIntersection::AABB_INTERSECTION_OUTSIDE:
+            case AABB::AABBIntersection::AABB_INTERSECTION_OUTSIDE:
 			default:
 				break;
 		}
@@ -77,21 +77,21 @@ namespace JonsEngine
     void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, ModelNode& node, const AABB& aabb, const Mat4& worldMatrix)
     {
         // test node AABB
-        AABBIntersection nodeAABBIntersection = IsAABBInAABB(node.mAABB, aabb);
+        AABB::AABBIntersection nodeAABBIntersection = aabb.IsAABBInAABB(node.mAABB);
         switch (nodeAABBIntersection)
         {
             // if partially inside, recursively test all meshes and child nodes
-            case AABBIntersection::AABB_INTERSECTION_PARTIAL:
+            case AABB::AABBIntersection::AABB_INTERSECTION_PARTIAL:
             {
-                AABBIntersection meshAABBIntersection(AABBIntersection::AABB_INTERSECTION_INSIDE);
+                AABB::AABBIntersection meshAABBIntersection(AABB::AABBIntersection::AABB_INTERSECTION_INSIDE);
 
                 for (const Mesh& mesh : node.GetMeshes())
                 {
-                    meshAABBIntersection = IsAABBInAABB(mesh.mAABB, aabb);
-                    if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_OUTSIDE)
+                    meshAABBIntersection = aabb.IsAABBInAABB(mesh.mAABB);
+                    if (meshAABBIntersection == AABB::AABBIntersection::AABB_INTERSECTION_OUTSIDE)
                         continue;
 
-                    if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_PARTIAL)
+                    if (meshAABBIntersection == AABB::AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABB::AABBIntersection::AABB_INTERSECTION_PARTIAL)
                         AddMesh(resultMeshes, mesh, worldMatrix * node.mTransform);
                 }
 
@@ -102,13 +102,13 @@ namespace JonsEngine
                 break;
             }
 
-        case AABBIntersection::AABB_INTERSECTION_INSIDE:
+        case AABB::AABBIntersection::AABB_INTERSECTION_INSIDE:
         {
             AddAllMeshes(resultMeshes, node, worldMatrix);
             break;
         }
 
-        case AABBIntersection::AABB_INTERSECTION_OUTSIDE:
+        case AABB::AABBIntersection::AABB_INTERSECTION_OUTSIDE:
         default:
             break;
         }
@@ -119,22 +119,22 @@ namespace JonsEngine
 		const AABB worldAABB = worldMatrix * node.mAABB;
 
         // test node frustrum
-		AABBIntersection nodeAABBIntersection = IsAABBInSphere(worldAABB, sphereCentre, sphereRadius);
+        AABB::AABBIntersection nodeAABBIntersection = worldAABB.IsAABBInSphere(sphereCentre, sphereRadius);
         switch (nodeAABBIntersection)
         {
-			case AABBIntersection::AABB_INTERSECTION_PARTIAL:
+			case AABB::AABBIntersection::AABB_INTERSECTION_PARTIAL:
 			{
-				AABBIntersection meshAABBIntersection(AABBIntersection::AABB_INTERSECTION_INSIDE);
+                AABB::AABBIntersection meshAABBIntersection(AABB::AABBIntersection::AABB_INTERSECTION_INSIDE);
 
 				for (const Mesh& mesh : node.GetMeshes())
 				{
 					const AABB meshAABB = worldMatrix * node.mAABB;
 
-					meshAABBIntersection = IsAABBInSphere(meshAABB, sphereCentre, sphereRadius);
-					if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_OUTSIDE)
+                    meshAABBIntersection = meshAABB.IsAABBInSphere(sphereCentre, sphereRadius);
+                    if (meshAABBIntersection == AABB::AABBIntersection::AABB_INTERSECTION_OUTSIDE)
 						continue;
 
-					if (meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABBIntersection::AABB_INTERSECTION_PARTIAL)
+                    if (meshAABBIntersection == AABB::AABBIntersection::AABB_INTERSECTION_INSIDE || meshAABBIntersection == AABB::AABBIntersection::AABB_INTERSECTION_PARTIAL)
 						AddMesh(resultMeshes, mesh, worldMatrix * node.mTransform);
 				}
 
@@ -145,13 +145,13 @@ namespace JonsEngine
 				break;
 			}
 
-			case AABBIntersection::AABB_INTERSECTION_INSIDE:
+            case AABB::AABBIntersection::AABB_INTERSECTION_INSIDE:
 			{
 				AddAllMeshes(resultMeshes, node, worldMatrix);
 				break;
 			}
 
-			case AABBIntersection::AABB_INTERSECTION_OUTSIDE:
+            case AABB::AABBIntersection::AABB_INTERSECTION_OUTSIDE:
 			default:
 				break;
         }
@@ -365,4 +365,75 @@ namespace JonsEngine
 
         mDirtySceneNodes.clear();
     }
+
+
+
+
+
+	enum LSM_PLANE_INTERSECT {
+		LSM_PI_FRONT,
+		LSM_PI_BACK,
+		LSM_PI_INTERSECT,
+	};
+
+	 LSM_PLANE_INTERSECT TestAABB(const AABB &_aAabb, const Plane &_pPlane) {
+		// Center of the AABB.
+		 Vec3 vC = (_aAabb.Max() + _aAabb.Min()) * 0.5f;
+		// Positive extents.
+		 Vec3 vE = _aAabb.Max() - vC;
+
+		// Compute the projected interval radius of _aAabb onto L(t) = _aAabb.c + t * _pPlane.n.
+		 float fR = vE[0] * glm::abs(_pPlane.mNormal[0]) +
+			 vE[1] * glm::abs(_pPlane.mNormal[1]) +
+			 vE[2] * glm::abs(_pPlane.mNormal[2]);
+
+		// Distance from box center to plane.
+		 float fS = glm::dot(_pPlane.mNormal, vC) - _pPlane.mDistance;
+
+		// If less than R, return overlap.
+		if (glm::abs(fS) <= fR) { return LSM_PI_INTERSECT; }
+		// Otherwise it is in front or back of the plane.
+		return fS > fR ? LSM_PI_FRONT : LSM_PI_BACK;
+	}
+
+	 /*template <unsigned _uMax>
+	 bool CTest::AabbKDop(const CAabb &_aAabb, const CCappedKDop<_uMax> &_ckdDop) {
+		 for (LSUINT32 I = _ckdDop.TotalPlanes(); I--;) {
+			 if (CClassify::Aabb(_aAabb, _ckdDop[I]) == LSM_PI_BACK) { return false; }
+		 }
+		 return true;
+	 }
+
+	 void MakeKDop(const CFrustum &_fFrustum, const CVector3 _vCorners[8]) {
+		 m_ckdKDop.Reset();
+		 CVector3 vDir = GetDir();
+		 // Add planes that are facing towards us.
+		 for (LSUINT32 I = LSM_FP_TOTAL; I--;) {
+			 LSREAL fDir = _fFrustum[I].n * vDir;
+			 if (fDir < LSM_ZERO) {
+				 m_ckdKDop.AddPlane(_fFrustum[I]);
+			 }
+		 }
+		 // We have added the back sides of the planes.  Now find the edges.
+		 // For each plane.
+		 for (LSUINT32 I = LSM_FP_TOTAL; I--;) {
+			 // If this plane is facing away from us, move on.
+			 LSREAL fDir = _fFrustum[I].n * vDir;
+			 if (fDir > LSM_ZERO) { continue; }
+			 // For each neighbor of this plane.
+			 LSM_FRUSTUM_PLANES fpNeighbors[4];
+			 CFrustum::GetNeighbors(static_cast<LSM_FRUSTUM_PLANES>(I), fpNeighbors);
+			 for (LSUINT32 J = 4UL; J--;) {
+				 LSREAL fNeighborDir = _fFrustum[fpNeighbors[J]].n * vDir;
+				 // If this plane is facing away from us, the edge between plane I and plane J
+				 //	marks the edge of a plane we need to add.
+				 if (fNeighborDir > LSM_ZERO) {
+					 LSM_FRUSTUM_POINTS fpPoints[2];
+					 CFrustum::GetCornersOfPlanes(static_cast<LSM_FRUSTUM_PLANES>(I), fpNeighbors[J], fpPoints);
+					 CPlane3 pAddMe(_vCorners[fpPoints[0]], _vCorners[fpPoints[1]], _vCorners[fpPoints[0]] + vDir);
+					 m_ckdKDop.AddPlane(pAddMe);
+				 }
+			 }
+		 }
+	 }*/
 }
