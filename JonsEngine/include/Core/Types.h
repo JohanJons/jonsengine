@@ -32,10 +32,4 @@ namespace JonsEngine
     typedef glm::mat4 Mat4;
     typedef glm::fquat Quaternion;
     typedef std::array<Vec4, 8> CameraFrustrum;
-
-    struct Plane
-    {
-        Vec3 mNormal;
-        float mDistance;
-    };
 }

@@ -53,14 +53,30 @@ namespace JonsEngine
     }
 
 
-    AABB::AABBIntersection AABB::IsAABBInFrustum(const Mat4& frustumMatrix) const
+    AABB::AABBIntersection AABB::Intersection(const AABB& source) const
+	{
+		const Vec3 min = source.Min();
+		const Vec3 max = source.Max();
+
+		const bool minInAABB = IsPointInAABB(min);
+		const bool maxInAABB = IsPointInAABB(max);
+
+		if (minInAABB && maxInAABB)
+            return AABBIntersection::Inside;
+		else if (minInAABB || maxInAABB)
+            return AABBIntersection::Partial;
+		else
+            return AABBIntersection::Outside;
+	}
+
+    AABB::AABBIntersection AABB::Intersection(const Mat4& frustumMatrix) const
     {
         const Vec4 rowX(frustumMatrix[0].x, frustumMatrix[1].x, frustumMatrix[2].x, frustumMatrix[3].x);
         const Vec4 rowY(frustumMatrix[0].y, frustumMatrix[1].y, frustumMatrix[2].y, frustumMatrix[3].y);
         const Vec4 rowZ(frustumMatrix[0].z, frustumMatrix[1].z, frustumMatrix[2].z, frustumMatrix[3].z);
         const Vec4 rowW(frustumMatrix[0].w, frustumMatrix[1].w, frustumMatrix[2].w, frustumMatrix[3].w);
 
-        AABB::AABBIntersection ret(AABBIntersection::AABB_INTERSECTION_INSIDE);
+        AABB::AABBIntersection ret(AABBIntersection::Inside);
 
         // left, right, bottom, top, near, far planes
         std::array<Vec4, 6> planes = { rowW + rowX, rowW - rowX, rowW + rowY, rowW - rowY, rowW + rowZ, rowW - rowZ };
@@ -71,22 +87,22 @@ namespace JonsEngine
             r = glm::dot(Vec3(glm::abs(plane)), mAABBExtent);
 
             if (d - r < -plane.w)
-                ret = AABBIntersection::AABB_INTERSECTION_PARTIAL;
+                ret = AABBIntersection::Partial;
             if (d + r < -plane.w)
-                return AABBIntersection::AABB_INTERSECTION_OUTSIDE;
+                return AABBIntersection::Outside;
         }
 
         return ret;
     }
 
-    AABB::AABBIntersection AABB::IsAABBInSphere(const Vec3& sphereCentre, const float sphereRadius) const
+    AABB::AABBIntersection AABB::Intersection(const Vec3& sphereCentre, const float sphereRadius) const
     {
         float distSquared = std::pow(sphereRadius, 2.0f);
         const Vec3 min = Min();
         const Vec3 max = Max();
 
 		if (IsPointInSphere(min, sphereCentre, sphereRadius) && IsPointInSphere(max, sphereCentre, sphereRadius))
-			return AABBIntersection::AABB_INTERSECTION_INSIDE;
+            return AABBIntersection::Inside;
 
         if (sphereCentre.x < min.x)
             distSquared -= std::pow(sphereCentre.x - min.x, 2.0f);
@@ -101,23 +117,7 @@ namespace JonsEngine
         else if (sphereCentre.z > max.z)
             distSquared -= std::pow(sphereCentre.z - max.z, 2.0f);
 
-        return distSquared > 0 ? AABBIntersection::AABB_INTERSECTION_PARTIAL : AABBIntersection::AABB_INTERSECTION_OUTSIDE;
-    }
-
-    AABB::AABBIntersection AABB::IsAABBInAABB(const AABB& source) const
-    {
-        const Vec3 min = source.Min();
-        const Vec3 max = source.Max();
-
-        const bool minInAABB = IsPointInAABB(min);
-        const bool maxInAABB = IsPointInAABB(max);
-
-        if (minInAABB && maxInAABB)
-            return AABBIntersection::AABB_INTERSECTION_INSIDE;
-        else if (minInAABB || maxInAABB)
-            return AABBIntersection::AABB_INTERSECTION_PARTIAL;
-        else
-            return AABBIntersection::AABB_INTERSECTION_OUTSIDE;
+        return distSquared > 0 ? AABBIntersection::Partial : AABBIntersection::Outside;
     }
 
     bool AABB::IsPointInAABB(const Vec3& point) const
@@ -126,7 +126,7 @@ namespace JonsEngine
         const Vec3 max = Max();
 
         return min.x <= point.x && point.x <= max.x &&
-            min.y <= point.y && point.y <= max.y &&
-            min.z <= point.z && point.y <= max.z;
+               min.y <= point.y && point.y <= max.y &&
+               min.z <= point.z && point.y <= max.z;
     }
 }

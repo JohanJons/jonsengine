@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Core/Math/Plane.h"
 #include "include/Core/Types.h"
 
 namespace JonsEngine
@@ -8,46 +9,28 @@ namespace JonsEngine
     class KDOP
     {
     public:
-        inline KDOP() : mNumPlanes(0)
-        {
-        }
+        typedef std::array<Plane, MAX_KDOP_PLANES> array_container;
+        typedef array_container::iterator iterator;
 
 
-        inline Plane& operator[] (const uint32_t index)
-        {
-            assert(index < mNumPlanes);
+        KDOP();
+        ~KDOP();
 
-            return mPlanes[index];
-        }
+        Plane& operator[] (const uint32_t index);
+        const Plane& operator[] (const uint32_t index) const;
 
-        inline const Plane& operator[] (const uint32_t index) const
-        {
-            assert(index < mNumPlanes);
+        iterator begin();
+        iterator end();
 
-            return mPlanes[index];
-        }
-
-
-        inline uint32_t TotalPlanes() const
-        {
-            return mNumPlanes;
-        }
-
-        inline void AddPlane(const Plane& plane)
-        {
-            assert(mNumPlanes < MAX_KDOP_PLANES);
-
-            mPlanes[++mNumPlanes] = plane;
-        }
-
-        inline void Reset()
-        {
-            mNumPlanes = 0;
-        }
+        uint32_t TotalPlanes() const;
+        void AddPlane(const Plane& plane);
+        void Reset();
 
 
     private:
-        std::array<Plane, MAX_KDOP_PLANES> mPlanes;
+        array_container mPlanes;
         uint32_t mNumPlanes;
     };
 }
+
+#include "include/Core/Math/KDOP.hpp"
