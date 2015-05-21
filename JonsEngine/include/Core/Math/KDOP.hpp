@@ -29,13 +29,13 @@ namespace JonsEngine
     
     
     template <uint32_t MAX_KDOP_PLANES>
-    KDOP<MAX_KDOP_PLANES>::iterator KDOP<MAX_KDOP_PLANES>::begin()
+    typename KDOP<MAX_KDOP_PLANES>::iterator KDOP<MAX_KDOP_PLANES>::begin()
     {
         return mPlanes.begin();
     }
 
     template <uint32_t MAX_KDOP_PLANES>
-    KDOP<MAX_KDOP_PLANES>::iterator KDOP<MAX_KDOP_PLANES>::end()
+    typename KDOP<MAX_KDOP_PLANES>::iterator KDOP<MAX_KDOP_PLANES>::end()
     {
         return mPlanes.end();
     }

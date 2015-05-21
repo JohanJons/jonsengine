@@ -182,6 +182,7 @@
     <ClInclude Include="include\Core\Math\AABB.h" />
     <ClInclude Include="include\Core\Math\KDOP.h" />
     <ClInclude Include="include\Core\Math\Math.h" />
+    <ClInclude Include="include\Core\Math\Plane.h" />
     <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
     <ClInclude Include="include\Core\Memory\IMemoryAllocator.h" />
     <ClInclude Include="include\Core\Types.h" />

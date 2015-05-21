@@ -10,7 +10,7 @@ namespace JonsEngine
     {
     public:
         typedef std::array<Plane, MAX_KDOP_PLANES> array_container;
-        typedef array_container::iterator iterator;
+        typedef typename array_container::iterator iterator;
 
 
         KDOP();

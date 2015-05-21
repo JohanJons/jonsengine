@@ -1,10 +1,11 @@
 #pragma once
 
-#include "include/Core/Math/AABB.h"
 #include "include/Core/Types.h"
 
 namespace JonsEngine
 {
+    struct AABB;
+
     struct Plane
     {
         enum class PlaneIntersection
