@@ -26,8 +26,8 @@ GBufferPSOut ps_main(GBufferVSOut input)
 
     if (gHasNormalTexture)
     {
-        float4 normalTangentSpace = normalize(gNormalTexture.Sample(gSampler, input.mTexcoord) * 2.0 - 1.0);
-        float4x4 tangentToWorldSpace = CreateMatrixFromCols(normalize(input.mTangent), normalize(input.mBitangent), normalize(input.mNormal), float4(0.0, 0.0, 0.0, 1.0));
+        float3 normalTangentSpace = normalize(gNormalTexture.Sample(gSampler, input.mTexcoord) * 2.0 - 1.0);
+        float3x3 tangentToWorldSpace = CreateMatrixFromCols(normalize(input.mTangent), normalize(input.mBitangent), normalize(input.mNormal));
 
         output.mNormal = mul(tangentToWorldSpace, normalTangentSpace);
     }
