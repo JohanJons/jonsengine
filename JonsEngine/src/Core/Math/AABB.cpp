@@ -129,4 +129,22 @@ namespace JonsEngine
                min.y <= point.y && point.y <= max.y &&
                min.z <= point.z && point.y <= max.z;
     }
+
+    AABB operator*(const Mat4& transform, const AABB& aabb)
+    {
+        AABB ret(aabb);
+
+        ret *= transform;
+
+        return ret;
+    }
+
+    AABB operator*(const AABB& aabb, const Mat4& transform)
+    {
+        AABB ret(aabb);
+
+        ret *= transform;
+
+        return ret;
+    }
 }

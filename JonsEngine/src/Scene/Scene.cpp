@@ -368,7 +368,7 @@ namespace JonsEngine
 
 
 
-	 template <unsigned _uMax>
+	/* template <unsigned _uMax>
 	 bool CTest::AabbKDop(const CAabb &_aAabb, const CCappedKDop<_uMax> &_ckdDop) {
 		 for (LSUINT32 I = _ckdDop.TotalPlanes(); I--;) {
 			 if (CClassify::Aabb(_aAabb, _ckdDop[I]) == LSM_PI_BACK) { return false; }
@@ -407,5 +407,5 @@ namespace JonsEngine
 				 }
 			 }
 		 }
-	 }
+	 }*/
 }
