@@ -30,7 +30,8 @@ namespace JonsEngine
         bool RemoveChildNode(const std::string& nodeName);
         bool RemoveChildNode(SceneNodePtr node);
 
-        void ScaleNode(const Vec3& scaleVec);
+        // TODO: for non-uniform scaling, need change in gbuffer shader
+        void ScaleNode(const float scale);
         void TranslateNode(const Vec3& translateVec);
         void RotateNode(const float angle, const Vec3& rotateVec);
 

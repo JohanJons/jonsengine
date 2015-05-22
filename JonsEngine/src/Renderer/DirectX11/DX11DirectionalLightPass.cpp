@@ -175,8 +175,9 @@ namespace JonsEngine
 
 	float DX11DirectionalLightPass::CalculateShadowmapCascades(const Mat4& cameraProjMatrix, std::array<float, NUM_SHADOWMAP_CASCADES>& splitDistances)
 	{
-		float minDepth, maxDepth;
-		ReduceDepth(cameraProjMatrix, minDepth, maxDepth);
+        float minDepth = 0.1f, maxDepth = 1.0f;
+        // temp
+		//ReduceDepth(cameraProjMatrix, minDepth, maxDepth);
 
 		const float nearClip = Z_NEAR;
 		const float farClip = Z_FAR;

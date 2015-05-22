@@ -176,7 +176,7 @@ namespace JonsGame
         ModelPtr modelChair = mEngine->GetResourceManifest().LoadModel("chair", jonsPackage);
         Actor* actorChair = myScene->CreateActor("actorChair", modelChair, nodeChair);
         nodeChair->TranslateNode(Vec3(-8.0f, 0.5f, -4.0f));
-        nodeChair->ScaleNode(Vec3(2.0f));
+        nodeChair->ScaleNode(2.0f);
 
         // house
         SceneNodePtr nodeHouse = myScene->GetRootNode().CreateChildNode("nodeHouse");
@@ -245,7 +245,7 @@ namespace JonsGame
         SceneNodePtr nodeSponza = myScene->GetRootNode().CreateChildNode("sponza");
         ModelPtr modelSponza = mEngine->GetResourceManifest().LoadModel("sponza", jonsPackage);
         // this model is huge compared to others - scale it down massively
-        nodeSponza->ScaleNode(Vec3(0.05f));
+        nodeSponza->ScaleNode(0.05f);
         nodeSponza->TranslateNode(Vec3(0.0f, 0.5f, -54.0f));
         Actor* actorSponza = myScene->CreateActor("actorPlane", modelSponza, nodeSponza);
         

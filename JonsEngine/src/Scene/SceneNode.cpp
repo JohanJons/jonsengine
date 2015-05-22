@@ -103,9 +103,9 @@ namespace JonsEngine
     }
 
         
-    void SceneNode::ScaleNode(const Vec3& scaleVec)                                
+    void SceneNode::ScaleNode(const float scale)
     { 
-        mScale *= scaleVec;
+        mScale *= scale;
 
         mOnDirtyFunc(this);
     }

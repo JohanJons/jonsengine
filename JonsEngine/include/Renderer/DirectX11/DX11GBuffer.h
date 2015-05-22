@@ -32,14 +32,14 @@ namespace JonsEngine
         struct GBufferCBuffer
         {
             Mat4 mWVPMatrix;
-            Mat4 mWorldMatrix;
+            Mat4 mWorldViewMatrix;
             float mTextureTilingFactor;
             uint32_t mHasDiffuseTexture;
             uint32_t mHasNormalTexture;
             float __padding;
 
-            GBufferCBuffer(const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuse, const bool hasNormal) :
-                mWVPMatrix(wvpMatrix), mWorldMatrix(worldMatrix), mTextureTilingFactor(textureTilingFactor), mHasDiffuseTexture(hasDiffuse), mHasNormalTexture(hasNormal)
+            GBufferCBuffer(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuse, const bool hasNormal) :
+                mWVPMatrix(wvpMatrix), mWorldViewMatrix(worldViewMatrix), mTextureTilingFactor(textureTilingFactor), mHasDiffuseTexture(hasDiffuse), mHasNormalTexture(hasNormal)
             {
             }
         };

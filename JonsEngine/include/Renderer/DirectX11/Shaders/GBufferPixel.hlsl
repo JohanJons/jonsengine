@@ -7,7 +7,7 @@
 struct GBufferPSOut
 {
     float4 mDiffuse : SV_Target0;
-    float4 mNormal : SV_Target1;
+    float3 mNormal : SV_Target1;
 };
 
 Texture2D gDiffuseTexture : register(TEXTURE_REGISTER_DIFFUSE);
@@ -26,8 +26,8 @@ GBufferPSOut ps_main(GBufferVSOut input)
 
     if (gHasNormalTexture)
     {
-        float3 normalTangentSpace = normalize(gNormalTexture.Sample(gSampler, input.mTexcoord) * 2.0 - 1.0);
-        float3x3 tangentToWorldSpace = CreateMatrixFromCols(normalize(input.mTangent), normalize(input.mBitangent), normalize(input.mNormal));
+        const float3 normalTangentSpace = normalize(gNormalTexture.Sample(gSampler, input.mTexcoord).xyz * 2.0 - 1.0);
+        const float3x3 tangentToWorldSpace = CreateMatrixFromCols(normalize(input.mTangent), normalize(input.mBitangent), normalize(input.mNormal));
 
         output.mNormal = mul(tangentToWorldSpace, normalTangentSpace);
     }

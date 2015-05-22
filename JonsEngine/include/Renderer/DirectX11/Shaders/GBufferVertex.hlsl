@@ -15,15 +15,17 @@ struct GBufferVSIn
 struct GBufferVSOut
 {
     float4 mPosition : SV_POSITION;
-    float4 mNormal : NORMAL;
-    float4 mTangent : TANGENT;
-    float4 mBitangent : BITANGENT;
+    float3 mNormal : NORMAL;
+    float3 mTangent : TANGENT;
+    float3 mBitangent : BITANGENT;
     float2 mTexcoord : TEXCOORD;
 };
 
 cbuffer GBufferConstants : register(CBUFFER_REGISTER_VERTEX)
 {
     float4x4 gWVPMatrix;
+    // Something bogus with glm makes any non-4x4 matrix bad when uploaded to shader. Probably simd-related
+    // Otherwise, 3x3 would be enough.
     float4x4 gWorldViewMatrix;
     float gTextureTilingFactor;
     bool gHasDiffuseTexture;
@@ -35,10 +37,10 @@ GBufferVSOut vs_main(GBufferVSIn input)
 {
     GBufferVSOut output;
 
-    output.mPosition = mul(gWVPMatrix, float4(input.mPosition, 1.0f));
-    output.mNormal = mul(gWorldViewMatrix, float4(input.mNormal, 0.0f));
-    output.mTangent = mul(gWorldViewMatrix, float4(input.mTangent, 0.0f));
-    output.mBitangent = mul(gWorldViewMatrix, float4(input.mBitangent, 0.0f));
+    output.mPosition = mul(gWVPMatrix, float4(input.mPosition, 1.0));
+    output.mNormal = mul((float3x3)gWorldViewMatrix, input.mNormal);
+    output.mTangent = mul((float3x3)gWorldViewMatrix, input.mTangent);
+    output.mBitangent = mul((float3x3)gWorldViewMatrix, input.mBitangent);
     output.mTexcoord = gTextureTilingFactor * input.mTexcoord;
 
     return output;
