@@ -24,7 +24,7 @@ struct GBufferVSOut
 cbuffer GBufferConstants : register(CBUFFER_REGISTER_VERTEX)
 {
     float4x4 gWVPMatrix;
-    // Something bogus with glm makes any non-4x4 matrix bad when uploaded to shader. Probably simd-related
+    // Something bogus with glm makes any non-4x4 matrix bad when uploaded to shader. Probably simd/non-simd related
     // Otherwise, 3x3 would be enough.
     float4x4 gWorldViewMatrix;
     float gTextureTilingFactor;

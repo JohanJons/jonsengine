@@ -31,7 +31,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
 {
     const float depth = gDepthTexture[uint2(position.xy)].r;
 	const float4 diffuse = gDiffuseTexture[uint2(position.xy)];
-	const float4 normal = gNormalTexture[uint2(position.xy)];
+    const float3 normal = SampleNormalTexture(gNormalTexture, uint2(position.xy));
     float4 viewPosition = float4(ReconstructViewPosition(depth, float2(position.x / gWindowSize.x, position.y / gWindowSize.y), gInvProjMatrix), 1.0);
     
     uint index = 3;
@@ -42,9 +42,9 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
     else if (viewPosition.z > gSplitDistances.z)
         index = 2;
 
-    const float normalLightAngle = dot(normal, gLightDirection);
+    const float normalLightAngle = dot(normal, gLightDirection.xyz);
 
-    viewPosition.xyz += ShadowAcneNormalOffset(normal.xyz, normalLightAngle, gShadowmapSize);
+    viewPosition.xyz += ShadowAcneNormalOffset(normal, normalLightAngle, gShadowmapSize);
 
     const float3 projCoords = (float3)mul(gSplitVPMatrices[index], viewPosition);
 

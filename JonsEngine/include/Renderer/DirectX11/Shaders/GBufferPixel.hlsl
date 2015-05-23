@@ -34,6 +34,9 @@ GBufferPSOut ps_main(GBufferVSOut input)
     else
         output.mNormal = normalize(input.mNormal);
 
+    output.mNormal += 1.0;
+    output.mNormal *= 0.5;
+
     return output;
 }
 

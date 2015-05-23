@@ -25,7 +25,7 @@ namespace JonsEngine
 
         // normal texture
         gbufferIndex = DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_NORMAL;
-        backbufferTextureDesc.Format = DXGI_FORMAT_R16G16B16A16_SNORM;
+        backbufferTextureDesc.Format = DXGI_FORMAT_R10G10B10A2_UNORM;
         DXCALL(device->CreateTexture2D(&backbufferTextureDesc, nullptr, &mTextures.at(gbufferIndex)));
         DXCALL(device->CreateRenderTargetView(mTextures.at(gbufferIndex), nullptr, &mRenderTargets.at(gbufferIndex)));
         DXCALL(device->CreateShaderResourceView(mTextures.at(gbufferIndex), nullptr, &mShaderResourceViews.at(gbufferIndex)));

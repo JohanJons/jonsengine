@@ -1,6 +1,16 @@
 #ifndef COMMON_HLSL
 #define COMMON_HLSL
 
+float3 SampleNormalTexture(in Texture2D normalTexture, uint2 samplePosition)
+{
+    float3 normal = normalTexture[samplePosition].xyz;
+
+    normal *= 2.0;
+    normal -= 1.0;
+
+    return normal;
+}
+
 float3 ReconstructViewPosition(const float depth, const float2 texCoord, const float4x4 invProjMatrix)
 {
     float x = texCoord.x * 2 - 1;
