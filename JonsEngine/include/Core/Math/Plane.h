@@ -16,7 +16,8 @@ namespace JonsEngine
         };
 
 
-        Plane(const Vec3& normal, const float distance);
+        Plane();
+        Plane(const Vec3& point1, const Vec3& point2, const Vec3& point3);
         ~Plane();
 
         PlaneIntersection Intersection(const AABB& aabb) const;

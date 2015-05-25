@@ -233,6 +233,9 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11DepthReductionPass.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Math\Plane.cpp">
+      <Filter>Source Files\Core\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -431,6 +434,9 @@
       <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Math\Plane.h">
+      <Filter>Header Files\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Math\KDOP.hpp">
       <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
   </ItemGroup>

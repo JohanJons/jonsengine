@@ -1,8 +1,14 @@
 #include "include/Core/Math/Plane.h"
 
+#include "include/Core/Math/AABB.h"
+
 namespace JonsEngine
 {
-    Plane::Plane(const Vec3& normal, const float distance) : mNormal(normal), mDistance(distance)
+    Plane::Plane()
+    {
+    }
+
+    Plane::Plane(const Vec3& point1, const Vec3& point2, const Vec3& point3) : mNormal(glm::normalize(glm::cross(point2 - point1, point3 - point2))), mDistance(glm::dot(mNormal, point1))
     {
     }
 

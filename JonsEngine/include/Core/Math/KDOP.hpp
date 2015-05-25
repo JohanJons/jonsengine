@@ -27,19 +27,6 @@ namespace JonsEngine
         return mPlanes[index];
     }
     
-    
-    template <uint32_t MAX_KDOP_PLANES>
-    typename KDOP<MAX_KDOP_PLANES>::iterator KDOP<MAX_KDOP_PLANES>::begin()
-    {
-        return mPlanes.begin();
-    }
-
-    template <uint32_t MAX_KDOP_PLANES>
-    typename KDOP<MAX_KDOP_PLANES>::iterator KDOP<MAX_KDOP_PLANES>::end()
-    {
-        return mPlanes.end();
-    }
-
 
     template <uint32_t MAX_KDOP_PLANES>
     uint32_t KDOP<MAX_KDOP_PLANES>::TotalPlanes() const
@@ -52,7 +39,7 @@ namespace JonsEngine
     {
         assert(mNumPlanes < MAX_KDOP_PLANES);
 
-        mPlanes[++mNumPlanes] = plane;
+        mPlanes[mNumPlanes++] = plane;
     }
 
     template <uint32_t MAX_KDOP_PLANES>

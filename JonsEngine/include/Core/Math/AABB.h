@@ -48,8 +48,10 @@ namespace JonsEngine
     {
         auto ret = AABBIntersection::Inside;
 
-        for (const Plane& plane : kdop)
+        for (uint32_t index = 0; index < kdop.TotalPlanes(); ++index)
         {
+            const Plane& plane = kdop[index];
+
             auto planeIntersection = plane.Intersection(*this);
             // if the AABB is behind any of the planes, it is not inside the k-dop
             if (planeIntersection == Plane::PlaneIntersection::Back)

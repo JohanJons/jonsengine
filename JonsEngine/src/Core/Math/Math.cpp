@@ -1,5 +1,7 @@
 #include "include/Core/Math/Math.h"
 
+#include "include/Core/Math/Plane.h"
+
 namespace JonsEngine
 {
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float aspectRatio, const float zNear, const float zFar)
@@ -35,8 +37,14 @@ namespace JonsEngine
 
     CameraFrustrum CalculateCameraFrustrum(const Mat4& cameraViewProjMatrix)
     {
-        CameraFrustrum ret = { Vec4(1.0f, -1.0f, 0.0f, 1.0f), Vec4(1.0f, 1.0f, 0.0f, 1.0f), Vec4(-1.0f, 1.0f, 0.0f, 1.0f), Vec4(-1.0f, -1.0f, 0.0f, 1.0f),
-                               Vec4(1.0f, -1.0f, 1.0f, 1.0f), Vec4(1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, 1.0f, 1.0f, 1.0f), Vec4(-1.0f, -1.0f, 1.0f, 1.0f), };
+        CameraFrustrum ret = { Vec4(-1.0f, -1.0f, 0.0f, 1.0f),     // near bottom-left
+                               Vec4(-1.0f, 1.0f, 0.0f, 1.0f),      // near top-left
+                               Vec4(1.0f, 1.0f, 0.0f, 1.0f),       // near top-right
+                               Vec4(1.0f, -1.0f, 0.0f, 1.0f),      // near bottom-right
+                               Vec4(-1.0f, -1.0f, 1.0f, 1.0f),     // far bottom-left
+                               Vec4(-1.0f, 1.0f, 1.0f, 1.0f),      // far top-left
+                               Vec4(1.0f, 1.0f, 1.0f, 1.0f),       // far top-right
+                               Vec4(1.0f, -1.0f, 1.0f, 1.0f), };   // far bottom-right
 
         const Mat4 invVP = glm::inverse(cameraViewProjMatrix);
 

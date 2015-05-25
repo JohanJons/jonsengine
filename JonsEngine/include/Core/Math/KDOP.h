@@ -9,18 +9,11 @@ namespace JonsEngine
     class KDOP
     {
     public:
-        typedef std::array<Plane, MAX_KDOP_PLANES> array_container;
-        typedef typename array_container::iterator iterator;
-
-
         KDOP();
         ~KDOP();
 
         Plane& operator[] (const uint32_t index);
         const Plane& operator[] (const uint32_t index) const;
-
-        iterator begin();
-        iterator end();
 
         uint32_t TotalPlanes() const;
         void AddPlane(const Plane& plane);
@@ -28,7 +21,7 @@ namespace JonsEngine
 
 
     private:
-        array_container mPlanes;
+        std::array<Plane, MAX_KDOP_PLANES> mPlanes;
         uint32_t mNumPlanes;
     };
 }

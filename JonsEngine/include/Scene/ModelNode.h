@@ -27,13 +27,11 @@ namespace JonsEngine
 
 
 		const std::string mName;
-        const Mat4 mTransform;
-
-        const AABB mAABB;
+        const Mat4 mLocalTransform;
+        const AABB mLocalAABB;
 
 
     private:
-
 		std::vector<Mesh> mMeshes;
         std::vector<ModelNode> mChildNodes;
     };

@@ -24,8 +24,7 @@ namespace JonsEngine
 
         const std::string mName;
         const MeshID mMeshID;
-
-        const AABB mAABB;
+        const AABB mLocalAABB;
 
 
     private:
