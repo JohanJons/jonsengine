@@ -444,27 +444,53 @@ namespace JonsEngine
 
         CameraFrustrum frusturm = CalculateCameraFrustrum(mRenderQueue.mCamera.mCameraViewProjectionMatrix);
 
-        Plane nearP(Vec3(frusturm.at(2)), Vec3(frusturm.at(1)), Vec3(frusturm.at(0)));
-        Plane farP(Vec3(frusturm.at(5)), Vec3(frusturm.at(6)), Vec3(frusturm.at(7)));
+        //ntl,ntr,nbr
+        Plane nearP(Vec3(frusturm.at(1)), Vec3(frusturm.at(2)), Vec3(frusturm.at(3)));
+        //ftr,ftl,fbl
+        Plane farP(Vec3(frusturm.at(6)), Vec3(frusturm.at(5)), Vec3(frusturm.at(4)));
 
-        Plane leftP(Vec3(frusturm.at(0)), Vec3(frusturm.at(4)), Vec3(frusturm.at(5)));
-        Plane rightP(Vec3(frusturm.at(2)), Vec3(frusturm.at(6)), Vec3(frusturm.at(7)));
+        //ntl,nbl,fbl
+        Plane leftP(Vec3(frusturm.at(1)), Vec3(frusturm.at(0)), Vec3(frusturm.at(4)));
+        //nbr,ntr,fbr
+        Plane rightP(Vec3(frusturm.at(3)), Vec3(frusturm.at(2)), Vec3(frusturm.at(7)));
 
-        Plane topP(Vec3(frusturm.at(1)), Vec3(frusturm.at(5)), Vec3(frusturm.at(6)));
-        Plane bottomP(Vec3(frusturm.at(3)), Vec3(frusturm.at(7)), Vec3(frusturm.at(4)));
+        //ntr,ntl,ftl
+        Plane topP(Vec3(frusturm.at(2)), Vec3(frusturm.at(1)), Vec3(frusturm.at(5)));
+        //nbl,nbr,fbr
+        Plane bottomP(Vec3(frusturm.at(0)), Vec3(frusturm.at(3)), Vec3(frusturm.at(7)));
 
         std::array<Plane, 6> frustumPlanes = { leftP, rightP, topP, bottomP, nearP, farP };
 
         KDOP<11> kdop;
         MakeKDop(kdop, frustumPlanes, frusturm, Vec3(-1.0f, -1.0f, -1.0f));
-        //MakeKDop
 
         // test kdop
         const ActorPtr& actor = mActors.front();
         const Mat4& worldMatrix = actor->mSceneNode->GetWorldMatrix();
-        const AABB aabb = actor->mModel->GetRootNode().mLocalAABB * worldMatrix;
+        const AABB& localAABB = actor->mModel->GetRootNode().mLocalAABB;
+        const AABB aabb = localAABB * worldMatrix;
 
         AABB::AABBIntersection intersection = aabb.Intersection<11>(kdop);
+
+
+
+        /*
+         front
+         back
+         intersect
+         intersect
+         front
+         back
+         */
+        Plane::PlaneIntersection qqnear = nearP.Intersection(aabb);
+        Plane::PlaneIntersection qqfar = farP.Intersection(aabb);
+        Plane::PlaneIntersection qqleft = leftP.Intersection(aabb);
+        Plane::PlaneIntersection qqright = rightP.Intersection(aabb);
+        Plane::PlaneIntersection qqtop = topP.Intersection(aabb);
+        Plane::PlaneIntersection qqbottom = bottomP.Intersection(aabb);
+
+
+
 
 		for (const ActorPtr& actor : mActors)
 		{
@@ -506,7 +532,7 @@ namespace JonsEngine
             mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, dirLight->mLightDirection);
             RenderableDirLight& dirLight = mRenderQueue.mDirectionalLights.back();
             
-            const AABB cameraAABB(cameraFrustrum);
+            /*const AABB cameraAABB(cameraFrustrum);
             for (const ActorPtr& actor : mActors)
             {
                 if (!actor->mSceneNode)
@@ -515,7 +541,7 @@ namespace JonsEngine
                 const Mat4& worldMatrix = actor->mSceneNode->GetWorldMatrix();
                 // TODO - not working?
                 CullMeshesAABB(dirLight.mMeshes, actor->mModel->GetRootNode(), cameraAABB, worldMatrix);
-            }
+            }*/
         }
 
         // misc

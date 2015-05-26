@@ -5,30 +5,50 @@
 
 namespace JonsEngine
 {
-	AABB::AABB(const Vec3& center, const Vec3& extent) : mAABBCenter(center), mAABBExtent(extent)
+    AABB::AABB(const Vec3& minBounds, const Vec3& maxBounds) : mAABBCenter(0.5f * (minBounds + maxBounds)), mAABBExtent(0.5f * (maxBounds - minBounds))
     {
     }
 
-    AABB::AABB(const CameraFrustrum& cameraFrustrum)
-    {
-        Vec4 minBounds(std::numeric_limits<float>::max()), maxBounds(-std::numeric_limits<float>::max());
 
-        for (const Vec4& corner : cameraFrustrum)
-        {
-            minBounds = MinVal(minBounds, corner);
-            maxBounds = MaxVal(maxBounds, corner);
-        }
-
-        mAABBCenter = Vec3(0.5f * (minBounds + maxBounds));
-        mAABBExtent = Vec3(0.5f * (maxBounds - minBounds));
-    }
-
-
-    AABB& AABB::operator*=(const Mat4& transform)
+    /*AABB& AABB::operator*=(const Mat4& transform)
 	{
+        
+        
+        var xa = m.Right * boundingBox.Min.X;
+        var xb = m.Right * boundingBox.Max.X;
+ 
+        var ya = m.Up * boundingBox.Min.Y;
+        var yb = m.Up * boundingBox.Max.Y;
+ 
+        var za = m.Backward * boundingBox.Min.Z;
+        var zb = m.Backward * boundingBox.Max.Z;
+ 
+        return new BoundingBox(
+            Vector3.Min(xa, xb) + Vector3.Min(ya, yb) + Vector3.Min(za, zb) + m.Translation,
+            Vector3.Max(xa, xb) + Vector3.Max(ya, yb) + Vector3.Max(za, zb) + m.Translation
+        );
+
+        
+
+        const Vec3 min = Min();
+        const Vec3 max = Max();
+
+        Vec4 xa = transform[0] * min.x;
+        Vec4 xb = transform[0] * max.x;
+
+        Vec4 ya = transform[1] * min.y;
+        Vec4 yb = transform[1] * max.y;
+
+        Vec4 za = transform[2] * min.z;
+        Vec4 zb = transform[2] * max.z;
+
+       // mAABBCenter = 0.5f * ()
+
+
         // TODO: perhaps this can be simplified
-        const Vec4 transformedMin = transform * Vec4(Min(), 1.0f);
-        const Vec4 transformedMax = transform * Vec4(Max(), 1.0f);
+
+        const Vec4 transformedMin = transform * Vec4(min.x, min.y, min.z, 1.0f);
+        const Vec4 transformedMax = transform * Vec4(max.x, max.y, max.z, 1.0f);
 
         mAABBCenter.x = 0.5f * (transformedMin.x + transformedMax.x);
         mAABBCenter.y = 0.5f * (transformedMin.y + transformedMax.y);
@@ -39,7 +59,7 @@ namespace JonsEngine
         mAABBExtent.z = 0.5f * (transformedMax.z - transformedMin.z);
 
         return *this;
-	}
+	}*/
 
 
     Vec3 AABB::Min() const
@@ -130,21 +150,74 @@ namespace JonsEngine
                min.z <= point.z && point.y <= max.z;
     }
 
+
     AABB operator*(const Mat4& transform, const AABB& aabb)
     {
-        AABB ret(aabb);
 
-        ret *= transform;
+        /*
+         var xa = m.Right * boundingBox.Min.X;
+        var xb = m.Right * boundingBox.Max.X;
+ 
+        var ya = m.Up * boundingBox.Min.Y;
+        var yb = m.Up * boundingBox.Max.Y;
+ 
+        var za = m.Backward * boundingBox.Min.Z;
+        var zb = m.Backward * boundingBox.Max.Z;
+ 
+        return new BoundingBox(
+            Vector3.Min(xa, xb) + Vector3.Min(ya, yb) + Vector3.Min(za, zb) + m.Translation,
+            Vector3.Max(xa, xb) + Vector3.Max(ya, yb) + Vector3.Max(za, zb) + m.Translation
+        );
+        */
+        const Vec3 oldMin = aabb.Min();
+        const Vec3 oldMax = aabb.Max();
+        float av, bv;
+        int   i, j;
 
-        return ret;
+
+        //Box new_box(mat.m[12], mat.m[13], mat.m[14], mat.m[12], mat.m[13], mat.m[14]);
+
+        Vec3 min(transform[3].x, transform[3].y, transform[3].z);
+        Vec3 max(transform[3].x, transform[3].y, transform[3].z);
+        for (i = 0; i < 3; i++)
+        {
+            for (j = 0; j < 3; j++)
+            {
+                av = transform[i][j] * oldMin[j];
+                bv = transform[i][j] * oldMax[j];
+
+                if (av < bv)
+                {
+                    min[i] += av;
+                    max[i] += bv;
+                }
+                else {
+                    min[i] += bv;
+                    max[i] += av;
+                }
+            }
+        }
+
+
+        Vec4 xa = transform[0] * min.x;
+        Vec4 xb = transform[0] * max.x;
+
+        Vec4 ya = transform[1] * min.y;
+        Vec4 yb = transform[1] * max.y;
+
+        Vec4 za = transform[2] * min.z;
+        Vec4 zb = transform[2] * max.z;
+
+        Vec4 minzz = MinVal(xa, xb) + MinVal(ya, yb) + MinVal(za, zb) + transform[3];
+        Vec4 maxzz = MaxVal(xa, xb) + MaxVal(ya, yb) + MaxVal(za, zb) + transform[3];
+
+
+        return AABB(Vec3(MinVal(xa, xb) + MinVal(ya, yb) + MinVal(za, zb) + transform[3]),
+                    Vec3(MaxVal(xa, xb) + MaxVal(ya, yb) + MaxVal(za, zb) + transform[3]));
     }
 
     AABB operator*(const AABB& aabb, const Mat4& transform)
     {
-        AABB ret(aabb);
-
-        ret *= transform;
-
-        return ret;
+        return transform * aabb;
     }
 }

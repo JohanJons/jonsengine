@@ -18,10 +18,7 @@ namespace JonsEngine
         };
 
 
-        AABB(const Vec3& center, const Vec3& extent);
-        AABB(const CameraFrustrum& cameraFrustrum);
-
-		AABB& operator*=(const Mat4& transform);
+        AABB(const Vec3& minBounds, const Vec3& maxBounds);
 
         Vec3 Min() const;
         Vec3 Max() const;
@@ -35,8 +32,8 @@ namespace JonsEngine
         bool IsPointInAABB(const Vec3& point) const;
 
 
-        Vec3 mAABBCenter;
-        Vec3 mAABBExtent;
+        const Vec3 mAABBCenter;
+        const Vec3 mAABBExtent;
     };
 
     AABB operator*(const Mat4& transform, const AABB& aabb);

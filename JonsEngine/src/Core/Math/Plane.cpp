@@ -8,7 +8,7 @@ namespace JonsEngine
     {
     }
 
-    Plane::Plane(const Vec3& point1, const Vec3& point2, const Vec3& point3) : mNormal(glm::normalize(glm::cross(point2 - point1, point3 - point2))), mDistance(glm::dot(mNormal, point1))
+    Plane::Plane(const Vec3& point1, const Vec3& point2, const Vec3& point3) : mNormal(glm::normalize(glm::cross(point2 - point1, point3 - point1))), mDistance(glm::dot(mNormal, point1))
     {
     }
 
