@@ -23,7 +23,7 @@ namespace JonsEngine
                            0.5f, 0.5f, 0.0f, 1.0f);
 
 
-    Mat4 CreateDirLightVPMatrix(const CameraFrustrum& cameraFrustrum, const Vec3& lightDir)
+    Mat4 CreateDirLightVPMatrix(const CameraFrustum& cameraFrustrum, const Vec3& lightDir)
     {
         Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
 
@@ -135,7 +135,7 @@ namespace JonsEngine
             
             // get cascade frustrum
             const Mat4 perspectiveMatrix = PerspectiveMatrixFov(degreesFOV, aspectRatio, cascadeIndex == 0 ? minZ : splitDistances[cascadeIndex - 1], splitDistances[cascadeIndex]);
-            CameraFrustrum cameraFrustrum = CalculateCameraFrustrum(perspectiveMatrix * cameraViewMatrix);
+            CameraFrustum cameraFrustrum = CalculateCameraFrustum(perspectiveMatrix * cameraViewMatrix);
 
             lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, directionalLight.mLightDirection);
 			mVertexTransformPass.RenderMeshes(directionalLight.mMeshes, lightVPMatrices[cascadeIndex]);

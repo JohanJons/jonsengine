@@ -35,9 +35,9 @@ namespace JonsEngine
         return ret;
     }
 
-    CameraFrustrum CalculateCameraFrustrum(const Mat4& cameraViewProjMatrix)
+    CameraFrustum CalculateCameraFrustum(const Mat4& cameraViewProjMatrix)
     {
-        CameraFrustrum ret = { Vec4(-1.0f, -1.0f, 0.0f, 1.0f),     // near bottom-left
+        CameraFrustum ret = { Vec4(-1.0f, -1.0f, 0.0f, 1.0f),     // near bottom-left
                                Vec4(-1.0f, 1.0f, 0.0f, 1.0f),      // near top-left
                                Vec4(1.0f, 1.0f, 0.0f, 1.0f),       // near top-right
                                Vec4(1.0f, -1.0f, 0.0f, 1.0f),      // near bottom-right

@@ -20,7 +20,7 @@ namespace JonsEngine
 
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float ratio, const float zNear, const float zFar);
     Mat4 OrthographicMatrix(const float left, const float right, const float top, const float bottom, const float zNear, const float zFar);
-    CameraFrustrum CalculateCameraFrustrum(const Mat4& cameraViewProjMatrix);
+    CameraFrustum CalculateCameraFrustum(const Mat4& cameraViewProjMatrix);
     bool IsPointInSphere(const Vec3& point, const Vec3& sphereCentre, const float radius);
 
     Vec3 MinVal(const Vec3& v1, const Vec3& v2);

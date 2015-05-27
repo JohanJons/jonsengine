@@ -41,5 +41,7 @@ namespace JonsGame
         float mMoveSpeed;
 
         JonsEngine::PointLightID mPointLightID;
+        // TODO: refactor into IDs
+        JonsEngine::Actor* mAlienActor;
     };
 }
