@@ -14,11 +14,24 @@ namespace JonsEngine
     {
     }
 
-    Logger& Logger::GetCoreLogger()         { return gCoreLogger;       }
-    Logger& Logger::GetRendererLogger()     { return gRendererLogger;   } 
-    Logger& Logger::GetWindowLogger()       { return gWindowLogger;     }
 
-    void Logger::Log(LogManager::LogLevel level, const std::string& logMsg)
+    Logger& Logger::GetCoreLogger()
+    { 
+        return gCoreLogger;
+    }
+
+    Logger& Logger::GetRendererLogger()
+    { 
+        return gRendererLogger;
+    }
+
+    Logger& Logger::GetWindowLogger()
+    {
+        return gWindowLogger;
+    }
+
+
+    void Logger::Log(const LogManager::LogLevel level, const std::string& logMsg)
     {
         const std::string msg = mLoggerName + ": " +  logMsg;
 

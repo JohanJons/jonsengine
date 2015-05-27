@@ -6,7 +6,7 @@ namespace JonsEngine
     static LogManager gLogManager(GameEngineTag);
 
 
-    LogManager::LogManager(const std::string logPrefix) : mLogPrefix(logPrefix), mLogStream(&mStreamBuf), mLogPath(InternalGetLogName()), mLogFilter(LEVEL_INFO)
+    LogManager::LogManager(const std::string logPrefix) : mLogPrefix(logPrefix), mLogStream(&mStreamBuf), mLogPath(InternalGetLogName()), mLogFilter(LogLevel::Info)
     {
         mFileStream.open(mLogPath, std::ifstream::trunc);
 
@@ -52,12 +52,13 @@ namespace JonsEngine
             return false;
     }
 
-    void LogManager::SetLevelFilter(LogLevel level)
+    void LogManager::SetLevelFilter(const LogLevel level)
     {
         mLogFilter = level;
     }
 
-    const std::string LogManager::InternalGetLogName() const
+
+    std::string LogManager::InternalGetLogName() const
     {
         std::stringstream ret;
 
@@ -68,16 +69,15 @@ namespace JonsEngine
         return ret.str();
     }
 
-    const std::string LogManager::LogLevelToString(LogLevel level)
+    std::string LogManager::LogLevelToString(const LogLevel level) const
     {
         switch (level)
         {
-            case LEVEL_DEBUG:       {   return "DEBUG";     break;  }
-            case LEVEL_INFO:        {   return "INFO";      break;  }
-            case LEVEL_WARNING:     {   return "WARNING";   break;  }
-            case LEVEL_ERROR:       {   return "ERROR";     break;  }
-            case LEVEL_CRITICAL:    {   return "CRITICAL";  break;  }
-            default:                {   return "UNKNOWN";   break;  }
+            case LogLevel::Debug:       {   return "DEBUG";     break;  }
+            case LogLevel::Info:        {   return "INFO";      break;  }
+            case LogLevel::Warning:     {   return "WARNING";   break;  }
+            case LogLevel::Error:       {   return "ERROR";     break;  }
+            default:                    {   return "UNKNOWN";   break;  }
         }
     }
 }

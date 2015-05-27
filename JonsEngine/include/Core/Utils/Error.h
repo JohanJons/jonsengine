@@ -16,5 +16,5 @@
     #endif
 #endif
 
-#define JONS_ERROR(logger, msg)     { logger.Log(LogManager::LEVEL_ERROR, msg); if (JONS_ERROR_LEVEL >= JONS_ERROR_LEVEL_ERROR) throw std::runtime_error(msg);  }
-#define JONS_WARNING(logger, msg)   { logger.Log(LogManager::LEVEL_WARNING, msg); if (JONS_ERROR_LEVEL >= JONS_ERROR_LEVEL_WARNING) throw std::runtime_error(msg);  }
+#define JONS_ERROR(logger, msg)     { logger.Log(LogManager::LogLevel::Error, msg);   if (JONS_ERROR_LEVEL >= JONS_ERROR_LEVEL_ERROR) throw std::runtime_error(msg);    }
+#define JONS_WARNING(logger, msg)   { logger.Log(LogManager::LogLevel::Warning, msg); if (JONS_ERROR_LEVEL >= JONS_ERROR_LEVEL_WARNING) throw std::runtime_error(msg);  }
