@@ -17,7 +17,7 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mSunAngle(0.0f), mMoveSpeed(0.1f), mPointLightID(0), mAlienActor(nullptr)
+    Game::Game() : mEngine(new Engine(mSettings)), mRunning(true), mSunAngle(0.0f), mMoveSpeed(0.1f), mPointLightID(0)
     {
     }
         
@@ -59,20 +59,6 @@ namespace JonsGame
                 mEngine->GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_5X5);
             else if (evnt.mKey == Key::FOUR)
                 mEngine->GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_7X7);
-
-            // moving alien
-            else if (evnt.mKey == Key::Q)
-                mAlienActor->mSceneNode->TranslateNode(Vec3(-0.05f, 0.0f, 0.0f));
-            else if (evnt.mKey == Key::E)
-                mAlienActor->mSceneNode->TranslateNode(Vec3(0.05f, 0.0f, 0.0f));
-            else if (evnt.mKey == Key::R)
-                mAlienActor->mSceneNode->TranslateNode(Vec3(0.0f, -0.05f, 0.0f));
-            else if (evnt.mKey == Key::T)
-                mAlienActor->mSceneNode->TranslateNode(Vec3(0.0f, 0.05f, 0.0f));
-            else if (evnt.mKey == Key::F)
-                mAlienActor->mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, -0.05f));
-            else if (evnt.mKey == Key::G)
-                mAlienActor->mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, 0.05f));
         }
         // no modifiers
         else if (evnt.mState == KeyEvent::KeyState::STATE_PRESSED || evnt.mState == KeyEvent::KeyState::STATE_REPEAT)
@@ -177,7 +163,7 @@ namespace JonsGame
         // sectoid
         SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
         ModelPtr modelAlien = mEngine->GetResourceManifest().LoadModel("sectoid", jonsPackage);
-        mAlienActor = myScene->CreateActor("actorSectoid", modelAlien, nodeAlien);
+        Actor* actorAlien = myScene->CreateActor("actorSectoid", modelAlien, nodeAlien);
         nodeAlien->TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
         nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
