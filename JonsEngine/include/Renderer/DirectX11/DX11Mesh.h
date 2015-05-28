@@ -18,7 +18,7 @@ namespace JonsEngine
     public:
         enum VertexBufferSlot
         {
-            VERTEX_BUFFER_SLOT_VERTICES = 0,
+            VERTEX_BUFFER_SLOT_POSITIONS = 0,
             VERTEX_BUFFER_SLOT_NORMALS,
             VERTEX_BUFFER_SLOT_TANGENTS,
             VERTEX_BUFFER_SLOT_BITANGENTS,
@@ -32,6 +32,7 @@ namespace JonsEngine
         ~DX11Mesh();
 
         void Draw();
+        void DrawPositions();
         void DrawAABB();
 
         MeshID GetMeshID() const;

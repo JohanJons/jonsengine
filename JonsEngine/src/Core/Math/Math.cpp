@@ -35,9 +35,9 @@ namespace JonsEngine
         return ret;
     }
 
-    CameraFrustum CalculateCameraFrustum(const Mat4& cameraViewProjMatrix)
+    FrustumCorners GetFrustumCorners(const Mat4& cameraViewProjMatrix)
     {
-        CameraFrustum ret = { Vec4(-1.0f, -1.0f, 0.0f, 1.0f),     // near bottom-left
+        FrustumCorners ret = { Vec4(-1.0f, -1.0f, 0.0f, 1.0f),     // near bottom-left
                                Vec4(-1.0f, 1.0f, 0.0f, 1.0f),      // near top-left
                                Vec4(1.0f, 1.0f, 0.0f, 1.0f),       // near top-right
                                Vec4(1.0f, -1.0f, 0.0f, 1.0f),      // near bottom-right
@@ -57,9 +57,52 @@ namespace JonsEngine
         return ret;
     }
 
-    bool IsPointInSphere(const Vec3& point, const Vec3& sphereCentre, const float radius)
+    FrustumPlanes GetFrustumPlanes(const Mat4& viewFrustum)
     {
-        return glm::distance(sphereCentre, point) <= radius;
+        FrustumPlanes ret;
+
+        /*
+        TODO:
+
+        #define m(row,col)  m[col*4+row-5]
+
+        void FrustumG::setFrustum(float *m) {
+
+        pl[NEARP].setCoefficients(
+                        m(3,1) + m(4,1),
+                        m(3,2) + m(4,2),
+                        m(3,3) + m(4,3),
+                        m(3,4) + m(4,4));
+        pl[FARP].setCoefficients(
+                    -m(3,1) + m(4,1),
+                    -m(3,2) + m(4,2),
+                    -m(3,3) + m(4,3),
+                    -m(3,4) + m(4,4));
+        pl[BOTTOM].setCoefficients(
+                    m(2,1) + m(4,1),
+                    m(2,2) + m(4,2),
+                    m(2,3) + m(4,3),
+                    m(2,4) + m(4,4));
+        pl[TOP].setCoefficients(
+                -m(2,1) + m(4,1),
+                -m(2,2) + m(4,2),
+                -m(2,3) + m(4,3),
+                -m(2,4) + m(4,4));
+        pl[LEFT].setCoefficients(
+                m(1,1) + m(4,1),
+                m(1,2) + m(4,2),
+                m(1,3) + m(4,3),
+                m(1,4) + m(4,4));
+        pl[RIGHT].setCoefficients(
+                -m(1,1) + m(4,1),
+                -m(1,2) + m(4,2),
+                -m(1,3) + m(4,3),
+                -m(1,4) + m(4,4));
+        }
+        
+        */
+
+        return ret;
     }
 
 

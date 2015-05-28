@@ -1,8 +1,9 @@
 #include "include/Scene/Scene.h"
+#include "include/Resources/ResourceManifest.h"
 #include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/EngineDefs.h"
 #include "include/Core/Math/Math.h"
-#include "include/Resources/ResourceManifest.h"
+#include "include/Core/Math/Intersection.h"
 
 #include "boost/functional/hash.hpp"
 #include <algorithm>
@@ -212,7 +213,7 @@ namespace JonsEngine
 
 
     template <uint32_t MAX_KDOP_PLANES>
-    void MakeKDop(KDOP<MAX_KDOP_PLANES>& kdop, const std::array<Plane, 6>& frustumPlanes, const CameraFrustum& frustumCorners, const Vec3& lightDir) {
+    void MakeKDop(KDOP<MAX_KDOP_PLANES>& kdop, const std::array<Plane, 6>& frustumPlanes, const FrustumCorners& frustumCorners, const Vec3& lightDir) {
         kdop.Reset();
         // Add planes that are facing towards us.
         for (uint32_t index = 0; index < frustumPlanes.size(); index++) {
@@ -282,21 +283,21 @@ namespace JonsEngine
 
         // test node frustrum
 		// TODO: does this cull objects behind frustrum that still intersects some planes?
-        AABB::AABBIntersection nodeAABBIntersection = node.mLocalAABB.Intersection(localWVPMatrix);
+        AABBIntersection nodeAABBIntersection = Intersection(node.mLocalAABB, localWVPMatrix);
         switch (nodeAABBIntersection)
         {
 			// if partially inside, recursively test all meshes and child nodes
-			case AABB::AABBIntersection::Partial:
+			case AABBIntersection::Partial:
 			{
-                AABB::AABBIntersection meshAABBIntersection(AABB::AABBIntersection::Inside);
+                AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
 
 				for (const Mesh& mesh : node.GetMeshes())
 				{
-                    meshAABBIntersection = mesh.mLocalAABB.Intersection(localWVPMatrix);
-                    if (meshAABBIntersection == AABB::AABBIntersection::Outside)
+                    meshAABBIntersection = Intersection(mesh.mLocalAABB, localWVPMatrix);
+                    if (meshAABBIntersection == AABBIntersection::Outside)
 						continue;
 
-                    if (meshAABBIntersection == AABB::AABBIntersection::Inside || meshAABBIntersection == AABB::AABBIntersection::Partial)
+                    if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
                         AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
 				}
 
@@ -307,13 +308,13 @@ namespace JonsEngine
 				break;
 			}
 
-            case AABB::AABBIntersection::Inside:
+            case AABBIntersection::Inside:
 			{
                 AddAllMeshes(resultMeshes, node, worldMatrix);
 				break;
 			}
 
-            case AABB::AABBIntersection::Outside:
+            case AABBIntersection::Outside:
 			default:
 				break;
 		}
@@ -322,21 +323,21 @@ namespace JonsEngine
     void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, ModelNode& node, const AABB& aabb, const Mat4& worldMatrix)
     {
         // test node AABB
-        AABB::AABBIntersection nodeAABBIntersection = aabb.Intersection(node.mLocalAABB);
+        AABBIntersection nodeAABBIntersection = Intersection(node.mLocalAABB, aabb);
         switch (nodeAABBIntersection)
         {
             // if partially inside, recursively test all meshes and child nodes
-            case AABB::AABBIntersection::Partial:
+            case AABBIntersection::Partial:
             {
-                AABB::AABBIntersection meshAABBIntersection(AABB::AABBIntersection::Inside);
+                AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
 
                 for (const Mesh& mesh : node.GetMeshes())
                 {
-                    meshAABBIntersection = aabb.Intersection(mesh.mLocalAABB);
-                    if (meshAABBIntersection == AABB::AABBIntersection::Outside)
+                    meshAABBIntersection = Intersection(mesh.mLocalAABB, aabb);
+                    if (meshAABBIntersection == AABBIntersection::Outside)
                         continue;
 
-                    if (meshAABBIntersection == AABB::AABBIntersection::Inside || meshAABBIntersection == AABB::AABBIntersection::Partial)
+                    if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
                         AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
                 }
 
@@ -347,13 +348,13 @@ namespace JonsEngine
                 break;
             }
 
-            case AABB::AABBIntersection::Inside:
+            case AABBIntersection::Inside:
         {
             AddAllMeshes(resultMeshes, node, worldMatrix);
             break;
         }
 
-        case AABB::AABBIntersection::Outside:
+        case AABBIntersection::Outside:
         default:
             break;
         }
@@ -364,22 +365,22 @@ namespace JonsEngine
 		const AABB worldAABB = worldMatrix * node.mLocalAABB;
 
         // test node frustrum
-        AABB::AABBIntersection nodeAABBIntersection = worldAABB.Intersection(sphereCentre, sphereRadius);
+        AABBIntersection nodeAABBIntersection = Intersection(worldAABB, sphereCentre, sphereRadius);
         switch (nodeAABBIntersection)
         {
-			case AABB::AABBIntersection::Partial:
+			case AABBIntersection::Partial:
 			{
-                AABB::AABBIntersection meshAABBIntersection(AABB::AABBIntersection::Inside);
+                AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
 
 				for (const Mesh& mesh : node.GetMeshes())
 				{
 					const AABB meshAABB = worldMatrix * node.mLocalAABB;
 
-                    meshAABBIntersection = meshAABB.Intersection(sphereCentre, sphereRadius);
-                    if (meshAABBIntersection == AABB::AABBIntersection::Outside)
+                    meshAABBIntersection = Intersection(meshAABB, sphereCentre, sphereRadius);
+                    if (meshAABBIntersection == AABBIntersection::Outside)
 						continue;
 
-                    if (meshAABBIntersection == AABB::AABBIntersection::Inside || meshAABBIntersection == AABB::AABBIntersection::Partial)
+                    if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
                         AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
 				}
 
@@ -390,13 +391,13 @@ namespace JonsEngine
 				break;
 			}
 
-            case AABB::AABBIntersection::Inside:
+            case AABBIntersection::Inside:
 			{
 				AddAllMeshes(resultMeshes, node, worldMatrix);
 				break;
 			}
 
-            case AABB::AABBIntersection::Outside:
+            case AABBIntersection::Outside:
 			default:
 				break;
         }
@@ -442,7 +443,7 @@ namespace JonsEngine
         mRenderQueue.mCamera.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
 
 
-        CameraFrustum frusturm = CalculateCameraFrustum(mRenderQueue.mCamera.mCameraViewProjectionMatrix);
+        FrustumCorners frusturm = GetFrustumCorners(mRenderQueue.mCamera.mCameraViewProjectionMatrix);
 
         //ntl,ntr,nbr
         Plane nearP(Vec3(frusturm.at(1)), Vec3(frusturm.at(2)), Vec3(frusturm.at(3)));
@@ -470,29 +471,15 @@ namespace JonsEngine
         const AABB& localAABB = actor->mModel->GetRootNode().mLocalAABB;
         const AABB aabb = localAABB * worldMatrix;
 
-        AABB::AABBIntersection intersection = aabb.Intersection<11>(kdop);
+        AABBIntersection intersection = Intersection<11>(aabb, kdop);
 
         for (Plane& plane : frustumPlanes)
         {
-            if (plane.Intersection(aabb) == Plane::PlaneIntersection::Back)
+            if (Intersection(plane, aabb) == PlaneIntersection::Back)
                 assert(1 == 0);
         }
 
 
-        /*
-         front
-         back
-         intersect
-         intersect
-         front
-         back
-         */
-        /*Plane::PlaneIntersection qqnear = nearP.Intersection(aabb);
-        Plane::PlaneIntersection qqfar = farP.Intersection(aabb);
-        Plane::PlaneIntersection qqleft = leftP.Intersection(aabb);
-        Plane::PlaneIntersection qqright = rightP.Intersection(aabb);
-        Plane::PlaneIntersection qqtop = topP.Intersection(aabb);
-        Plane::PlaneIntersection qqbottom = bottomP.Intersection(aabb);*/
 
 
 
@@ -530,7 +517,7 @@ namespace JonsEngine
         }
 
         // dir lights
-        CameraFrustum cameraFrustrum = CalculateCameraFrustum(mRenderQueue.mCamera.mCameraViewProjectionMatrix);
+        FrustumCorners cameraFrustrum = GetFrustumCorners(mRenderQueue.mCamera.mCameraViewProjectionMatrix);
         for (const DirectionalLightPtr& dirLight : mDirectionalLights)
         {
             mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, dirLight->mLightDirection);

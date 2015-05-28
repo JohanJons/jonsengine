@@ -23,17 +23,17 @@ namespace JonsEngine
                            0.5f, 0.5f, 0.0f, 1.0f);
 
 
-    Mat4 CreateDirLightVPMatrix(const CameraFrustum& cameraFrustrum, const Vec3& lightDir)
+    Mat4 CreateDirLightVPMatrix(const FrustumCorners& frustumCorners, const Vec3& lightDir)
     {
         Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
 
-        Vec4 transf = lightViewMatrix * cameraFrustrum[0];
+        Vec4 transf = lightViewMatrix * frustumCorners[0];
         float maxZ = transf.z, minZ = transf.z;
         float maxX = transf.x, minX = transf.x;
         float maxY = transf.y, minY = transf.y;
         for (uint32_t i = 1; i < 8; ++i)
         {
-            transf = lightViewMatrix * cameraFrustrum[i];
+            transf = lightViewMatrix * frustumCorners[i];
 
             if (transf.z > maxZ) maxZ = transf.z;
             if (transf.z < minZ) minZ = transf.z;
@@ -135,9 +135,9 @@ namespace JonsEngine
             
             // get cascade frustrum
             const Mat4 perspectiveMatrix = PerspectiveMatrixFov(degreesFOV, aspectRatio, cascadeIndex == 0 ? minZ : splitDistances[cascadeIndex - 1], splitDistances[cascadeIndex]);
-            CameraFrustum cameraFrustrum = CalculateCameraFrustum(perspectiveMatrix * cameraViewMatrix);
+            const auto frustumCorners = GetFrustumCorners(perspectiveMatrix * cameraViewMatrix);
 
-            lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(cameraFrustrum, directionalLight.mLightDirection);
+            lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(frustumCorners, directionalLight.mLightDirection);
 			mVertexTransformPass.RenderMeshes(directionalLight.mMeshes, lightVPMatrices[cascadeIndex]);
 
             lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex] * glm::inverse(cameraViewMatrix);

@@ -37,7 +37,7 @@ namespace JonsEngine
     void DX11VertexTransformPass::RenderMesh(DX11Mesh& mesh, const Mat4& wvpMatrix)
     {
         mTransformCBuffer.SetData(TransformCBuffer(wvpMatrix));
-        mesh.Draw();
+        mesh.DrawPositions();
     }
 
     void DX11VertexTransformPass::RenderMeshes(const RenderableMeshes& meshes, const Mat4& viewProjectionMatrix)
@@ -45,7 +45,7 @@ namespace JonsEngine
         for (const RenderableMesh& mesh : meshes)
         {
             mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mWorldMatrix));
-            mMeshMap.GetItem(mesh.mMeshID).Draw();
+            mMeshMap.GetItem(mesh.mMeshID).DrawPositions();
         }
     }
 

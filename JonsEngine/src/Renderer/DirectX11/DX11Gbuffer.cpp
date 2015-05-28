@@ -33,13 +33,13 @@ namespace JonsEngine
         // input layout
         D3D11_INPUT_ELEMENT_DESC inputDescription[DX11Mesh::NUM_VERTEX_BUFFER_SLOTS];
         ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC) * DX11Mesh::NUM_VERTEX_BUFFER_SLOTS);
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].SemanticName = "POSITION";
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].SemanticIndex = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].InputSlot = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].AlignedByteOffset = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_VERTICES].InstanceDataStepRate = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS].SemanticName = "POSITION";
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS].SemanticIndex = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS].InputSlot = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS].AlignedByteOffset = 0;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS].InstanceDataStepRate = 0;
         inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].SemanticName = "NORMAL";
         inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].SemanticIndex = 0;
         inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].Format = DXGI_FORMAT_R32G32B32_FLOAT;

@@ -39,9 +39,13 @@ GBufferVSOut vs_main(GBufferVSIn input)
 
     output.mPosition = mul(gWVPMatrix, float4(input.mPosition, 1.0));
     output.mNormal = mul((float3x3)gWorldViewMatrix, input.mNormal);
-    output.mTangent = mul((float3x3)gWorldViewMatrix, input.mTangent);
-    output.mBitangent = mul((float3x3)gWorldViewMatrix, input.mBitangent);
-    output.mTexcoord = gTextureTilingFactor * input.mTexcoord;
+    if (gHasNormalTexture)
+    {
+        output.mTangent = mul((float3x3)gWorldViewMatrix, input.mTangent);
+        output.mBitangent = mul((float3x3)gWorldViewMatrix, input.mBitangent);
+    }
+    if (gHasDiffuseTexture)
+        output.mTexcoord = gTextureTilingFactor * input.mTexcoord;
 
     return output;
 }

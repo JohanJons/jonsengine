@@ -116,7 +116,7 @@ namespace JonsEngine
         const uint32_t vertexSize = sizeof(float) * 3;
         const uint32_t offset = 0;
 
-        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_VERTICES, 1, &mVertexBuffer.p, &vertexSize, &offset);
+        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &vertexSize, &offset);
         if (mNormalBuffer)
             mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer.p, &vertexSize, &offset);
         if (mTangentBuffer)
@@ -133,6 +133,17 @@ namespace JonsEngine
         mContext->DrawIndexed(mNumIndices, 0, 0);
     }
 
+    void DX11Mesh::DrawPositions()
+    {
+        const uint32_t vertexSize = sizeof(float) * 3;
+        const uint32_t offset = 0;
+
+        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &vertexSize, &offset);
+
+        mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+        mContext->DrawIndexed(mNumIndices, 0, 0);
+    }
+
     void DX11Mesh::DrawAABB()
     {
         // AABB vertices are offset into the mesh vertex buffer
@@ -141,7 +152,7 @@ namespace JonsEngine
         const uint32_t offset = mNumVertices * sizeof(float);
         const uint32_t numAABBPoints = gAABBIndices.size();
 
-        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_VERTICES, 1, &mVertexBuffer.p, &vertexSize, &offset);
+        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &vertexSize, &offset);
         mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, mNumIndices * sizeof(uint16_t));
         mContext->DrawIndexed(numAABBPoints, 0, 0);
     }

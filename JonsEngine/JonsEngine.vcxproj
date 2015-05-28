@@ -122,6 +122,7 @@
     <ClCompile Include="src\Core\Logging\StreamBuf.cpp" />
     <ClCompile Include="src\Core\Logging\Logger.cpp" />
     <ClCompile Include="src\Core\Math\AABB.cpp" />
+    <ClCompile Include="src\Core\Math\Intersection.cpp" />
     <ClCompile Include="src\Core\Math\Math.cpp" />
     <ClCompile Include="src\Core\Math\Plane.cpp" />
     <ClCompile Include="src\Core\Memory\HeapAllocator.cpp" />
@@ -181,6 +182,7 @@
     <ClInclude Include="include\Core\Logging\Logger.h" />
     <ClInclude Include="include\Core\Logging\LogManager.h" />
     <ClInclude Include="include\Core\Math\AABB.h" />
+    <ClInclude Include="include\Core\Math\Intersection.h" />
     <ClInclude Include="include\Core\Math\KDOP.h" />
     <ClInclude Include="include\Core\Math\KDOP.hpp" />
     <ClInclude Include="include\Core\Math\Math.h" />
