@@ -11,7 +11,7 @@
 
 namespace JonsEngine
 {
-    enum LSM_FRUSTUM_PLANES {
+    /*enum LSM_FRUSTUM_PLANES {
         LSM_FP_LEFT,
         LSM_FP_RIGHT,
         LSM_FP_TOP,
@@ -247,7 +247,7 @@ namespace JonsEngine
             }
         }
     }
-
+    */
 
 
 
@@ -461,9 +461,10 @@ namespace JonsEngine
         Plane bottomP(Vec3(frusturm.at(0)), Vec3(frusturm.at(3)), Vec3(frusturm.at(7)));
 
         std::array<Plane, 6> frustumPlanes = { leftP, rightP, topP, bottomP, nearP, farP };
+        std::array<Plane, 6> frustumPlanes2 = GetFrustumPlanes(mRenderQueue.mCamera.mCameraViewProjectionMatrix);
 
-        KDOP<11> kdop;
-        MakeKDop(kdop, frustumPlanes, frusturm, Vec3(-1.0f, -1.0f, -1.0f));
+       // KDOP<11> kdop;
+      //  MakeKDop(kdop, frustumPlanes, frusturm, Vec3(-1.0f, -1.0f, -1.0f));
 
         // test kdop
         const ActorPtr& actor = mActors.front();
@@ -471,7 +472,7 @@ namespace JonsEngine
         const AABB& localAABB = actor->mModel->GetRootNode().mLocalAABB;
         const AABB aabb = localAABB * worldMatrix;
 
-        AABBIntersection intersection = Intersection<11>(aabb, kdop);
+       // AABBIntersection intersection = Intersection<11>(aabb, kdop);
 
         for (Plane& plane : frustumPlanes)
         {

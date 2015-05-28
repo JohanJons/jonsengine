@@ -1,6 +1,6 @@
 namespace JonsEngine
 {
-    template <uint32_t MAX_KDOP_PLANES>
+    /*template <uint32_t MAX_KDOP_PLANES>
     KDOP<MAX_KDOP_PLANES>::KDOP() : mNumPlanes(0)
     {
     }
@@ -46,5 +46,5 @@ namespace JonsEngine
     void KDOP<MAX_KDOP_PLANES>::Reset()
     {
         mNumPlanes = 0;
-    }
+    }*/
 }

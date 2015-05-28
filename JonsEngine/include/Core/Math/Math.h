@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/Core/Math/KDOP.h"
+#include "include/Core/Math/Plane.h"
 #include "include/Core/Types.h"
 
 #include "glm/glm.hpp"
@@ -8,6 +8,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/quaternion.hpp"
 #include <math.h>
+#include <array>
 
 
 namespace JonsEngine
@@ -16,7 +17,6 @@ namespace JonsEngine
      * Contains various math functions
      */
 
-    typedef KDOP<6> FrustumPlanes;
     typedef std::array<Vec4, 8> FrustumCorners;
      
     const Mat4 gIdentityMatrix(1.0f);

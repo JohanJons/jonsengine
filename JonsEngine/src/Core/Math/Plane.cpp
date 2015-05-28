@@ -2,14 +2,10 @@
 
 namespace JonsEngine
 {
-    Plane::Plane() : mNormal(glm::normalize(1.0f)), mDistance(0.0f)
-    {
-    }
-
     // xyzw = abcd
     Plane::Plane(const Vec4& planeCoefficients) :
         mNormal(glm::normalize(Vec3(planeCoefficients.x, planeCoefficients.y, planeCoefficients.z))),
-        mDistance(planeCoefficients.w / (glm::sqrt(glm::pow(mNormal.x, 2) + glm::pow(mNormal.y, 2) + glm::pow(mNormal.z, 2))))
+        mDistance(planeCoefficients.w / (glm::sqrt(mNormal.x * mNormal.x + mNormal.y * mNormal.y + mNormal.z * mNormal.z)))
     {
     }
 

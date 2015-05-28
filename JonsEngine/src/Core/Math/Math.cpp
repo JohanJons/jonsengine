@@ -59,50 +59,16 @@ namespace JonsEngine
 
     FrustumPlanes GetFrustumPlanes(const Mat4& viewFrustum)
     {
-        FrustumPlanes ret;
-
-        /*
-        TODO:
-
-        #define m(row,col)  m[col*4+row-5]
-
-        void FrustumG::setFrustum(float *m) {
-
-        pl[NEARP].setCoefficients(
-                        m(3,1) + m(4,1),
-                        m(3,2) + m(4,2),
-                        m(3,3) + m(4,3),
-                        m(3,4) + m(4,4));
-        pl[FARP].setCoefficients(
-                    -m(3,1) + m(4,1),
-                    -m(3,2) + m(4,2),
-                    -m(3,3) + m(4,3),
-                    -m(3,4) + m(4,4));
-        pl[BOTTOM].setCoefficients(
-                    m(2,1) + m(4,1),
-                    m(2,2) + m(4,2),
-                    m(2,3) + m(4,3),
-                    m(2,4) + m(4,4));
-        pl[TOP].setCoefficients(
-                -m(2,1) + m(4,1),
-                -m(2,2) + m(4,2),
-                -m(2,3) + m(4,3),
-                -m(2,4) + m(4,4));
-        pl[LEFT].setCoefficients(
-                m(1,1) + m(4,1),
-                m(1,2) + m(4,2),
-                m(1,3) + m(4,3),
-                m(1,4) + m(4,4));
-        pl[RIGHT].setCoefficients(
-                -m(1,1) + m(4,1),
-                -m(1,2) + m(4,2),
-                -m(1,3) + m(4,3),
-                -m(1,4) + m(4,4));
-        }
-        
-        */
-
-        return ret;
+        // TODO: distance from origin still bonkers....
+        return FrustumPlanes
+        { {
+                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) + Vec4(viewFrustum[0].x, viewFrustum[1].x, viewFrustum[2].x, viewFrustum[3].x)),      // left
+                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) - Vec4(viewFrustum[0].x, viewFrustum[1].x, viewFrustum[2].x, viewFrustum[3].x)),      // right
+                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) - Vec4(viewFrustum[0].y, viewFrustum[1].y, viewFrustum[2].y, viewFrustum[3].y)),      // top
+                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) + Vec4(viewFrustum[0].y, viewFrustum[1].y, viewFrustum[2].y, viewFrustum[3].y)),      // bottom
+                Plane(Vec4(viewFrustum[0].z, viewFrustum[1].z, viewFrustum[2].z, viewFrustum[3].z)),                                                                                     // near
+                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) - Vec4(viewFrustum[0].z, viewFrustum[1].z, viewFrustum[2].z, viewFrustum[3].z)),      // far
+        } };
     }
 
 

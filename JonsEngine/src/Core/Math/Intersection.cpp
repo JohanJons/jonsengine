@@ -69,6 +69,24 @@ namespace JonsEngine
         return distSquared > 0 ? AABBIntersection::Partial : AABBIntersection::Outside;
     }
 
+    AABBIntersection Intersection(const AABB& aabb, const KDOP& kdop)
+    {
+        auto ret = AABBIntersection::Inside;
+
+        for (const Plane& plane : kdop)
+        {
+            const auto planeIntersection = Intersection(plane, aabb);
+
+            // if the AABB is behind any of the planes, it is not inside the k-dop
+            if (planeIntersection == PlaneIntersection::Back)
+                return AABBIntersection::Outside;
+            if (planeIntersection == PlaneIntersection::Intersect)
+                ret = AABBIntersection::Partial;
+        }
+
+        return ret;
+    }
+
 
     PlaneIntersection Intersection(const Plane& plane, const AABB& aabb)
     {

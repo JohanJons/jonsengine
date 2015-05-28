@@ -3,10 +3,11 @@
 #include "include/Core/Math/Plane.h"
 #include "include/Core/Types.h"
 
+#include <vector>
+
 namespace JonsEngine
 {
-    template <uint32_t MAX_KDOP_PLANES>
-    class KDOP
+    /*class KDOP
     {
     public:
         KDOP();
@@ -21,9 +22,8 @@ namespace JonsEngine
 
 
     private:
-        std::array<Plane, MAX_KDOP_PLANES> mPlanes;
-        uint32_t mNumPlanes;
-    };
+        std::vector<Plane> mPlanes;
+    };*/
 }
 
-#include "include/Core/Math/KDOP.hpp"
+//#include "include/Core/Math/KDOP.hpp"
