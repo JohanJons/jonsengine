@@ -442,29 +442,7 @@ namespace JonsEngine
         mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(mRenderQueue.mCamera.mFOV, windowWidth / static_cast<float>(windowHeight), zNear, zFar);
         mRenderQueue.mCamera.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
 
-
-        FrustumCorners frusturm = GetFrustumCorners(mRenderQueue.mCamera.mCameraViewProjectionMatrix);
-
-        //ntl,ntr,nbr
-        Plane nearP(Vec3(frusturm.at(1)), Vec3(frusturm.at(2)), Vec3(frusturm.at(3)));
-        //ftr,ftl,fbl
-        Plane farP(Vec3(frusturm.at(6)), Vec3(frusturm.at(5)), Vec3(frusturm.at(4)));
-
-        //ntl,nbl,fbl
-        Plane leftP(Vec3(frusturm.at(1)), Vec3(frusturm.at(0)), Vec3(frusturm.at(4)));
-        //nbr,ntr,fbr
-        Plane rightP(Vec3(frusturm.at(3)), Vec3(frusturm.at(2)), Vec3(frusturm.at(7)));
-
-        //ntr,ntl,ftl
-        Plane topP(Vec3(frusturm.at(2)), Vec3(frusturm.at(1)), Vec3(frusturm.at(5)));
-        //nbl,nbr,fbr
-        Plane bottomP(Vec3(frusturm.at(0)), Vec3(frusturm.at(3)), Vec3(frusturm.at(7)));
-
-        std::array<Plane, 6> frustumPlanes = { leftP, rightP, topP, bottomP, nearP, farP };
-        std::array<Plane, 6> frustumPlanes2 = GetFrustumPlanes(mRenderQueue.mCamera.mCameraViewProjectionMatrix);
-
-       // KDOP<11> kdop;
-      //  MakeKDop(kdop, frustumPlanes, frusturm, Vec3(-1.0f, -1.0f, -1.0f));
+        /*FrustumPlanes frustumPlanes = GetFrustumPlanes(mRenderQueue.mCamera.mCameraViewProjectionMatrix);
 
         // test kdop
         const ActorPtr& actor = mActors.front();
@@ -478,11 +456,7 @@ namespace JonsEngine
         {
             if (Intersection(plane, aabb) == PlaneIntersection::Back)
                 assert(1 == 0);
-        }
-
-
-
-
+        }*/
 
 		for (const ActorPtr& actor : mActors)
 		{

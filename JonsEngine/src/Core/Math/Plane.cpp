@@ -5,7 +5,7 @@ namespace JonsEngine
     // xyzw = abcd
     Plane::Plane(const Vec4& planeCoefficients) :
         mNormal(glm::normalize(Vec3(planeCoefficients.x, planeCoefficients.y, planeCoefficients.z))),
-        mDistance(planeCoefficients.w / (glm::sqrt(mNormal.x * mNormal.x + mNormal.y * mNormal.y + mNormal.z * mNormal.z)))
+        mDistance(-planeCoefficients.w / (glm::sqrt(planeCoefficients.x * planeCoefficients.x + planeCoefficients.y * planeCoefficients.y + planeCoefficients.z * planeCoefficients.z)))
     {
     }
 
