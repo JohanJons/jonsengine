@@ -196,7 +196,7 @@ namespace JonsGame
         nodeMovingLight->TranslateNode(Vec3(5.0f, 3.5f, -15.0f));
 
         // directional light
-        DirectionalLight* directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
+        DirectionalLight* directionalLight = myScene->CreateDirectionalLight("DirectionalLight", 4);
         directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
         directionalLight->mLightColor = Vec4(0.55f);
 
@@ -212,7 +212,7 @@ namespace JonsGame
         // create a sphere
         SceneNodePtr nodeSphere = myScene->GetRootNode().CreateChildNode("nodeSphere");
         ModelPtr sphere = mEngine->GetResourceManifest().CreateSphere("Sphere", 1.0f, 12, 24, checkerMaterial);
-        Actor* actorSphere = myScene->CreateActor("actorHouse", sphere, nodeSphere);
+        Actor* actorSphere = myScene->CreateActor("actorSphere", sphere, nodeSphere);
         nodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
 
         // create a  second cube

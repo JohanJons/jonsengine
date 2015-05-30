@@ -69,7 +69,8 @@ namespace JonsEngine
         return distSquared > 0 ? AABBIntersection::Partial : AABBIntersection::Outside;
     }
 
-    AABBIntersection Intersection(const AABB& aabb, const KDOP& kdop)
+    template<class PlaneContainer>
+    AABBIntersection AABBPlaneContainerIntersection(const AABB& aabb, const PlaneContainer& kdop)
     {
         auto ret = AABBIntersection::Inside;
 
@@ -85,6 +86,21 @@ namespace JonsEngine
         }
 
         return ret;
+    }
+
+    AABBIntersection Intersection(const AABB& aabb, const FrustumPlanes& frustumPlanes)
+    {
+        return AABBPlaneContainerIntersection(aabb, frustumPlanes);
+    }
+
+    AABBIntersection Intersection(const AABB& aabb, const KDOP& kdop)
+    {
+        return AABBPlaneContainerIntersection(aabb, kdop);
+    }
+
+    AABBIntersection Intersection(const AABB& aabb, const ConstRangedIterator<KDOP>& rangedKDOP)
+    {
+        return AABBPlaneContainerIntersection(aabb, rangedKDOP);
     }
 
 

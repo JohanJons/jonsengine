@@ -434,14 +434,15 @@ namespace JonsEngine
         mRenderQueue.Clear();
 
         const Camera& sceneCamera = GetSceneCamera();
+        const float cameraFov = sceneCamera.GetFOV();
+        const float windowAspectRatio = windowWidth / static_cast<float>(windowHeight);
 
         // camera
-        mRenderQueue.mCamera.mFOV = sceneCamera.GetFOV();
+        mRenderQueue.mCamera.mFOV = cameraFov;
         mRenderQueue.mCamera.mCameraPosition = sceneCamera.Position();
         mRenderQueue.mCamera.mCameraViewMatrix = sceneCamera.GetCameraTransform();
-        mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(mRenderQueue.mCamera.mFOV, windowWidth / static_cast<float>(windowHeight), zNear, zFar);
+        mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(cameraFov, windowAspectRatio, zNear, zFar);
         mRenderQueue.mCamera.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
-
         /*FrustumPlanes frustumPlanes = GetFrustumPlanes(mRenderQueue.mCamera.mCameraViewProjectionMatrix);
 
         // test kdop
@@ -492,22 +493,30 @@ namespace JonsEngine
         }
 
         // dir lights
-        FrustumCorners cameraFrustrum = GetFrustumCorners(mRenderQueue.mCamera.mCameraViewProjectionMatrix);
-        for (const DirectionalLightPtr& dirLight : mDirectionalLights)
+        for (DirectionalLightPtr& dirLight : mDirectionalLights)
         {
-            mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, dirLight->mLightDirection);
-            RenderableDirLight& dirLight = mRenderQueue.mDirectionalLights.back();
-            
-            /*const AABB cameraAABB(cameraFrustrum);
-            for (const ActorPtr& actor : mActors)
-            {
-                if (!actor->mSceneNode)
-                    continue;
+            mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, glm::normalize(dirLight->mLightDirection));
+            RenderableDirLight& renderableDirLight = mRenderQueue.mDirectionalLights.back();
 
-                const Mat4& worldMatrix = actor->mSceneNode->GetWorldMatrix();
-                // TODO - not working?
-                CullMeshesAABB(dirLight.mMeshes, actor->mModel->GetRootNode(), cameraAABB, worldMatrix);
-            }*/
+            dirLight->UpdateCascadesBoundingVolume(mRenderQueue.mCamera.mCameraViewMatrix, cameraFov, windowAspectRatio, 0.0f, 1.0f);
+            for (uint32_t cascadeIndex = 0; cascadeIndex < dirLight->mNumShadowmapCascades; ++cascadeIndex)
+            {
+                auto kdopIterator = dirLight->GetBoundingVolume(cascadeIndex);
+
+                for (const ActorPtr& actor : mActors)
+                {
+                    if (!actor->mSceneNode)
+                        continue;
+
+                    const Mat4& worldMatrix = actor->mSceneNode->GetWorldMatrix();
+                    const Mat4 localWorldMatrix = worldMatrix* actor->mModel->GetRootNode().mLocalTransform;
+                    const AABB worldAABB = localWorldMatrix * actor->mModel->GetRootNode().mLocalAABB;
+
+                    const auto aabbIntersection = Intersection(worldAABB, kdopIterator);
+                    if (aabbIntersection == AABBIntersection::Inside || aabbIntersection == AABBIntersection::Partial)
+                        AddAllMeshes(renderableDirLight.mMeshes, actor->mModel->GetRootNode(), worldMatrix);
+                }
+            }
         }
 
         // misc
@@ -565,7 +574,16 @@ namespace JonsEngine
 
     DirectionalLight* Scene::CreateDirectionalLight(const std::string& lightName)
     {
-        mDirectionalLights.emplace_back(mMemoryAllocator.AllocateObject<DirectionalLight>(lightName), std::bind(&HeapAllocator::DeallocateObject<DirectionalLight>, &mMemoryAllocator, std::placeholders::_1));
+        const uint32_t defaultNumCascades = 4;
+
+        mDirectionalLights.emplace_back(mMemoryAllocator.AllocateObject<DirectionalLight>(lightName, defaultNumCascades), std::bind(&HeapAllocator::DeallocateObject<DirectionalLight>, &mMemoryAllocator, std::placeholders::_1));
+
+        return mDirectionalLights.back().get();
+    }
+
+    DirectionalLight* Scene::CreateDirectionalLight(const std::string& lightName, const uint32_t numShadowmapCascades)
+    {
+        mDirectionalLights.emplace_back(mMemoryAllocator.AllocateObject<DirectionalLight>(lightName, numShadowmapCascades), std::bind(&HeapAllocator::DeallocateObject<DirectionalLight>, &mMemoryAllocator, std::placeholders::_1));
 
         return mDirectionalLights.back().get();
     }

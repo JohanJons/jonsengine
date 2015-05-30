@@ -40,6 +40,7 @@ namespace JonsEngine
 		PointLight& GetPointLight(const PointLightID pointLightID);
         
         DirectionalLight* CreateDirectionalLight(const std::string& lightName);
+        DirectionalLight* CreateDirectionalLight(const std::string& lightName, const uint32_t numShadowmapCascades);
         void DeleteDirectionalLight(const DirectionalLight* dirLight);
         DirectionalLight* GetDirectionalLight(const std::string& lightName);
         const std::vector<DirectionalLightPtr>& GetDirectionalLights() const;
@@ -57,9 +58,6 @@ namespace JonsEngine
 
     private:
         void UpdateDirtyObjects();
-
-        void OnPointLightNewNode(PointLight* pointLight, SceneNode* newSceneNode);
-        void OnPointLightDirty(PointLight* pointLight);
 
 
         const size_t mHashedID;

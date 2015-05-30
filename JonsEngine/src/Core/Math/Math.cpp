@@ -59,7 +59,6 @@ namespace JonsEngine
 
     FrustumPlanes GetFrustumPlanes(const Mat4& viewFrustum)
     {
-        // TODO: distance from origin still bonkers....
         return FrustumPlanes
         { {
                 Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) + Vec4(viewFrustum[0].x, viewFrustum[1].x, viewFrustum[2].x, viewFrustum[3].x)),      // left

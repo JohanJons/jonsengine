@@ -25,7 +25,7 @@ namespace JonsEngine
 
     Mat4 CreateDirLightVPMatrix(const FrustumCorners& frustumCorners, const Vec3& lightDir)
     {
-        Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -glm::normalize(lightDir), Vec3(0.0f, -1.0f, 0.0f));
+        Mat4 lightViewMatrix = glm::lookAt(Vec3(0.0f), -lightDir, Vec3(0.0f, -1.0f, 0.0f));
 
         Vec4 transf = lightViewMatrix * frustumCorners[0];
         float maxZ = transf.z, minZ = transf.z;
@@ -175,7 +175,7 @@ namespace JonsEngine
 
 	float DX11DirectionalLightPass::CalculateShadowmapCascades(const Mat4& cameraProjMatrix, std::array<float, NUM_SHADOWMAP_CASCADES>& splitDistances)
 	{
-        float minDepth = 0.1f, maxDepth = 1.0f;
+        float minDepth = 0.0f, maxDepth = 1.0f;
         // temp
 		//ReduceDepth(cameraProjMatrix, minDepth, maxDepth);
 

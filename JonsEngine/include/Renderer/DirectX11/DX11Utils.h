@@ -12,6 +12,7 @@
 
 namespace JonsEngine
 {
+    // TODO: make dynamic?
     const float Z_NEAR = 0.1f;
     const float Z_FAR = 100.0f;
 
