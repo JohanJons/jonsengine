@@ -445,6 +445,9 @@
     <ClInclude Include="include\Core\Math\Intersection.h">
       <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
+    <ClInclude Include="include\Core\Containers\RangedIterator.hpp">
+      <Filter>Header Files\Core\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferPixel.hlsl">

@@ -172,6 +172,7 @@
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
     <ClInclude Include="include\Core\Containers\IDMap.h" />
     <ClInclude Include="include\Core\Containers\IDMap.hpp" />
+    <ClInclude Include="include\Core\Containers\RangedIterator.hpp" />
     <ClInclude Include="include\Core\Containers\Vector.h" />
     <ClInclude Include="include\Core\DebugOptions.h" />
     <ClInclude Include="include\Core\Engine.h" />
