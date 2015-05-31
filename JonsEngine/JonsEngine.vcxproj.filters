@@ -442,11 +442,11 @@
     <ClInclude Include="include\Core\Containers\IDMapPointer.hpp">
       <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Containers\DataCache.hpp">
-      <Filter>Header Files\Core\Containers</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Utils\NonCopyable.h">
       <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Containers\DataPool.hpp">
+      <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "include/Core/Containers/IDMap.hpp"
-#include "include/Core/Containers/DataCache.hpp"
+#include "include/Core/Containers/DataPool.hpp"
 #include "include/Scene/SceneNode.h"
 #include "include/Scene/Camera.h"
 #include "include/Scene/PointLight.h"
@@ -63,7 +63,7 @@ namespace JonsEngine
 
         const size_t mHashedID;
         IMemoryAllocator& mMemoryAllocator;
-        DataCache<Mat4> mTransformCache;
+        DataPool<Mat4> mTransformCache;
 
         std::vector<SceneNode*> mDirtySceneNodes;
 

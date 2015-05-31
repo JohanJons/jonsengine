@@ -170,7 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
-    <ClInclude Include="include\Core\Containers\DataCache.hpp" />
+    <ClInclude Include="include\Core\Containers\DataPool.hpp" />
     <ClInclude Include="include\Core\Containers\IDMap.hpp" />
     <ClInclude Include="include\Core\Containers\IDMapPointer.hpp" />
     <ClInclude Include="include\Core\Containers\RangedIterator.hpp" />

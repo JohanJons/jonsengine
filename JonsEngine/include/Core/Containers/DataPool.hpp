@@ -8,7 +8,7 @@ namespace JonsEngine
 {
     // TODO: functionality like memory allocators, useful statistics...
     template <typename T>
-    class DataCache
+    class DataPool
     {
     public:
         IDMap<T>& GetStorage()
