@@ -1,7 +1,8 @@
 #pragma once
 
 #include "include/Core/Types.h"
-#include "include/Core/Containers/IDMap.h"
+#include "include/Core/Containers/IDMap.hpp"
+#include "include/Core/Containers/IDMapPointer.hpp"
 
 #include <string>
 #include <vector>
@@ -19,7 +20,7 @@ namespace JonsEngine
     class SceneNode
     {
     public:
-        SceneNode(const std::string& nodeName, const OnSceneNodeDirtyFunc& onDirty);
+        SceneNode(const std::string& nodeName, IDMap<Mat4>& transformStorage, const OnSceneNodeDirtyFunc& onDirty);
         ~SceneNode();
 		
         bool operator==(const SceneNode& s1);
@@ -56,7 +57,9 @@ namespace JonsEngine
         IMemoryAllocator& mMemoryAllocator;
 
         // base components
-        Mat4 mWorldMatrix;
+        IDMap<Mat4>& mTransformStorage;
+        IDMapPointer<Mat4> mTransform;
+
         Quaternion mOrientation;
         Vec3 mScale;
         Vec3 mTranslation;
@@ -66,7 +69,7 @@ namespace JonsEngine
 
 
     /* SceneNode inlines */
-    inline const Mat4& SceneNode::GetWorldMatrix() const                        { return mWorldMatrix;  }
+    inline const Mat4& SceneNode::GetWorldMatrix() const                        { return *mTransform; }
     inline const std::string& SceneNode::GetNodeName() const                    { return mName;         }
     inline const std::vector<SceneNodePtr>& SceneNode::GetChildNodes() const    { return mChildNodes;   }
 }

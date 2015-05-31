@@ -40,7 +40,7 @@ namespace JonsEngine
 
 		const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
 		auto allocator = mMemoryAllocator;
-        mModels.emplace_back(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds, meshID, material), [=](Model* model) { allocator->DeallocateObject(model); });
+        mModels.emplace_back(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds, meshID, material, mTransformCache.GetStorage()), [=](Model* model) { allocator->DeallocateObject(model); });
 
         return mModels.back();
     }
@@ -68,7 +68,7 @@ namespace JonsEngine
 
 		const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
 		auto allocator = mMemoryAllocator;
-        mModels.emplace_back(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds, meshID, material), [=](Model* model) { allocator->DeallocateObject(model); });
+        mModels.emplace_back(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds, meshID, material, mTransformCache.GetStorage()), [=](Model* model) { allocator->DeallocateObject(model); });
 
 		return mModels.back();
     }
@@ -87,7 +87,7 @@ namespace JonsEngine
         {
             auto allocator = mMemoryAllocator;
 			auto loadMaterialFunc = std::bind(&ResourceManifest::LoadMaterial, this, std::placeholders::_1, std::placeholders::_2);
-			mModels.emplace_back(allocator->AllocateObject<Model>(mRenderer, jonsPkg, *iter, loadMaterialFunc), [=](Model* model) { allocator->DeallocateObject(model); });
+            mModels.emplace_back(allocator->AllocateObject<Model>(mRenderer, jonsPkg, *iter, loadMaterialFunc, mTransformCache.GetStorage()), [=](Model* model) { allocator->DeallocateObject(model); });
             model = mModels.back();
         }
 

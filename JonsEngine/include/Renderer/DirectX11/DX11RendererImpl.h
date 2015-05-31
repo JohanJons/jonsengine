@@ -11,7 +11,7 @@
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Memory/HeapAllocator.h"
-#include "include/Core/Containers/IDMap.h"
+#include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/DebugOptions.h"
 
 #include <windows.h>

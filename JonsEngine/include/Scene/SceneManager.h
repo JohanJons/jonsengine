@@ -27,8 +27,8 @@ namespace JonsEngine
 
     private:
         IMemoryAllocator& mMemoryAllocator;
-        std::vector<ScenePtr> mScenes;
 
+        std::vector<ScenePtr> mScenes;
 		Scene* mActiveScene;
     };
 }

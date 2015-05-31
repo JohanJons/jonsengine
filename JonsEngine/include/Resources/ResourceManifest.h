@@ -2,6 +2,7 @@
 
 #include "include/Resources/JonsPackage.h"
 #include "include/Core/Memory/IMemoryAllocator.h"
+#include "include/Core/Containers/DataCache.hpp"
 #include "include/Scene/Model.h"
 #include "include/Scene/ModelNode.h"
 #include "include/Scene/Mesh.h"
@@ -37,7 +38,9 @@ namespace JonsEngine
 
     private:
 		IMemoryAllocatorPtr mMemoryAllocator;
+        DataCache<Mat4> mTransformCache;
         DX11Renderer& mRenderer;
+
         std::vector<ModelPtr> mModels;
         std::vector<MaterialPtr> mMaterials;
     };

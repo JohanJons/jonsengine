@@ -16,7 +16,7 @@
 #include "include/Core/DebugOptions.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Types.h"
-#include "include/Core/Containers/IDMap.h"
+#include "include/Core/Containers/IDMap.hpp"
 
 #include <d3d11.h>
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "include/Core/Containers/IDMap.h"
+#include "include/Core/Containers/IDMap.hpp"
+#include "include/Core/Containers/DataCache.hpp"
 #include "include/Scene/SceneNode.h"
 #include "include/Scene/Camera.h"
 #include "include/Scene/PointLight.h"
@@ -22,7 +23,7 @@ namespace JonsEngine
     class Scene
     {
     public:
-		Scene(const std::string& sceneName);
+        Scene(const std::string& sceneName);
         ~Scene();
 
         bool operator==(const Scene& s1);
@@ -62,6 +63,7 @@ namespace JonsEngine
 
         const size_t mHashedID;
         IMemoryAllocator& mMemoryAllocator;
+        DataCache<Mat4> mTransformCache;
 
         std::vector<SceneNode*> mDirtySceneNodes;
 

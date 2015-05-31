@@ -6,13 +6,13 @@
 
 namespace JonsEngine
 {
-    Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material) :
-		mName(name), mHashedID(boost::hash_value(name)), mRootNode(name, initialTransform, minBounds, maxBounds, meshID, material)
+    Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material, IDMap<Mat4>& transformStorage) :
+        mName(name), mHashedID(boost::hash_value(name)), mRootNode(name, initialTransform, minBounds, maxBounds, meshID, material, transformStorage)
     {
     }
 
-    Model::Model(DX11Renderer& renderer, const JonsPackagePtr jonsPkg, const PackageModel& pkgModel, LoadMaterialFunc loadMaterialFunction) :
-		mName(pkgModel.mName), mHashedID(boost::hash_value(pkgModel.mName)), mRootNode(renderer, jonsPkg, pkgModel.mRootNode, gIdentityMatrix, loadMaterialFunction)
+    Model::Model(DX11Renderer& renderer, const JonsPackagePtr jonsPkg, const PackageModel& pkgModel, LoadMaterialFunc loadMaterialFunction, IDMap<Mat4>& transformStorage) :
+        mName(pkgModel.mName), mHashedID(boost::hash_value(pkgModel.mName)), mRootNode(renderer, jonsPkg, pkgModel.mRootNode, gIdentityMatrix, loadMaterialFunction, transformStorage)
     {
     }
 

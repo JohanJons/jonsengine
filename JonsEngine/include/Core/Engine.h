@@ -3,8 +3,6 @@
 #include "include/Core/Types.h"
 #include "include/Core/Memory/HeapAllocator.h"
 #include "include/Scene/SceneManager.h"
-#include "include/Scene/Scene.h"
-#include "include/Scene/Model.h"
 #include "include/Resources/ResourceManifest.h"
 #include "include/Window/WindowManager.h"
 #include "include/Renderer/DirectX11/DX11Renderer.h"
@@ -14,7 +12,6 @@ namespace JonsEngine
 {
     struct EngineSettings;
     struct DebugOptions;
-    class Model;
     class IMemoryAllocator;
     class Logger;
 

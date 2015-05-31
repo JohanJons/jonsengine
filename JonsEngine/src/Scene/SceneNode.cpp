@@ -7,9 +7,9 @@
 
 namespace JonsEngine
 {
-    SceneNode::SceneNode(const std::string& nodeName, const OnSceneNodeDirtyFunc& onDirty) :
-        mName(nodeName), mHashedID(boost::hash_value(nodeName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mWorldMatrix(1.0f), mOrientation(1.0f, 0.0f, 0.0f, 0.0f),
-        mScale(1.0f, 1.0f, 1.0f), mTranslation(0.0f, 0.0f, 0.0f), mOnDirtyFunc(onDirty)
+    SceneNode::SceneNode(const std::string& nodeName, IDMap<Mat4>& transformStorage, const OnSceneNodeDirtyFunc& onDirty) :
+        mName(nodeName), mHashedID(boost::hash_value(nodeName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mTransformStorage(transformStorage), mTransform(transformStorage, 1.0f),
+        mOrientation(1.0f, 0.0f, 0.0f, 0.0f), mScale(1.0f, 1.0f, 1.0f), mTranslation(0.0f, 0.0f, 0.0f), mOnDirtyFunc(onDirty)
     {
     }
         
@@ -31,7 +31,7 @@ namespace JonsEngine
 
     SceneNodePtr SceneNode::CreateChildNode(const std::string& nodeName)
     {
-        mChildNodes.emplace_back(SceneNodePtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<SceneNode, const std::string&>(nodeName, mOnDirtyFunc), std::bind(&HeapAllocator::DeallocateObject<SceneNode>, &HeapAllocator::GetDefaultHeapAllocator(), std::placeholders::_1)));
+        mChildNodes.emplace_back(SceneNodePtr(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<SceneNode, const std::string&>(nodeName, mTransformStorage, mOnDirtyFunc), std::bind(&HeapAllocator::DeallocateObject<SceneNode>, &HeapAllocator::GetDefaultHeapAllocator(), std::placeholders::_1)));
 
         return mChildNodes.back();
     }
@@ -131,7 +131,7 @@ namespace JonsEngine
         UpdateTransform();
 
         for (SceneNodePtr childNode : mChildNodes)
-            childNode->UpdateChildren(mWorldMatrix);
+            childNode->UpdateChildren(*mTransform);
     }
 
 
@@ -146,21 +146,21 @@ namespace JonsEngine
 
     void SceneNode::UpdateTransform()
     {
-        // TODO: necessary?
-        mWorldMatrix = Mat4(1.0f);
+        Mat4& worldMatrix = *mTransform;
 
-        mWorldMatrix = glm::translate(mWorldMatrix, mTranslation);
-        mWorldMatrix *= glm::toMat4(mOrientation);
-        mWorldMatrix = glm::scale(mWorldMatrix, mScale);
+        worldMatrix = glm::translate(gIdentityMatrix, mTranslation);
+        worldMatrix *= glm::toMat4(mOrientation);
+        worldMatrix = glm::scale(worldMatrix, mScale);
     }
 
     void SceneNode::UpdateChildren(const Mat4& parentModelMatrix)
     {
         UpdateTransform();
 
-        mWorldMatrix = parentModelMatrix * mWorldMatrix;
+        Mat4& worldMatrix = *mTransform;
+        worldMatrix = parentModelMatrix * worldMatrix;
 
         for (SceneNodePtr childNode : mChildNodes)
-            childNode->UpdateChildren(mWorldMatrix);
+            childNode->UpdateChildren(worldMatrix);
     }
 }

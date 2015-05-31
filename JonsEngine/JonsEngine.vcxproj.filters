@@ -412,9 +412,6 @@
     <ClInclude Include="include\Scene\Actor.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Containers\IDMap.h">
-      <Filter>Header Files\Core\Containers</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11RenderTarget2D.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
@@ -433,13 +430,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11DepthReductionPass.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Math\KDOP.h">
-      <Filter>Header Files\Core\Math</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Math\Plane.h">
-      <Filter>Header Files\Core\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Math\KDOP.hpp">
       <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Math\Intersection.h">
@@ -447,6 +438,15 @@
     </ClInclude>
     <ClInclude Include="include\Core\Containers\RangedIterator.hpp">
       <Filter>Header Files\Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Containers\IDMapPointer.hpp">
+      <Filter>Header Files\Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Containers\DataCache.hpp">
+      <Filter>Header Files\Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\NonCopyable.h">
+      <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

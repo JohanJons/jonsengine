@@ -170,8 +170,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
-    <ClInclude Include="include\Core\Containers\IDMap.h" />
+    <ClInclude Include="include\Core\Containers\DataCache.hpp" />
     <ClInclude Include="include\Core\Containers\IDMap.hpp" />
+    <ClInclude Include="include\Core\Containers\IDMapPointer.hpp" />
     <ClInclude Include="include\Core\Containers\RangedIterator.hpp" />
     <ClInclude Include="include\Core\Containers\Vector.h" />
     <ClInclude Include="include\Core\DebugOptions.h" />
@@ -184,14 +185,13 @@
     <ClInclude Include="include\Core\Logging\LogManager.h" />
     <ClInclude Include="include\Core\Math\AABB.h" />
     <ClInclude Include="include\Core\Math\Intersection.h" />
-    <ClInclude Include="include\Core\Math\KDOP.h" />
-    <ClInclude Include="include\Core\Math\KDOP.hpp" />
     <ClInclude Include="include\Core\Math\Math.h" />
     <ClInclude Include="include\Core\Math\Plane.h" />
     <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
     <ClInclude Include="include\Core\Memory\IMemoryAllocator.h" />
     <ClInclude Include="include\Core\Types.h" />
     <ClInclude Include="include\Core\Utils\Error.h" />
+    <ClInclude Include="include\Core\Utils\NonCopyable.h" />
     <ClInclude Include="include\Core\Utils\Time.h" />
     <ClInclude Include="include\Core\Utils\Win32.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11AABBPass.h" />

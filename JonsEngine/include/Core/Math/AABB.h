@@ -1,6 +1,5 @@
 #pragma once
 
-#include "include/Core/Math/KDOP.h"
 #include "include/Core/Types.h"
 
 #include <vector>

@@ -11,251 +11,6 @@
 
 namespace JonsEngine
 {
-    /*enum LSM_FRUSTUM_PLANES {
-        LSM_FP_LEFT,
-        LSM_FP_RIGHT,
-        LSM_FP_TOP,
-        LSM_FP_BOTTOM,
-        LSM_FP_NEAR,
-        LSM_FP_FAR,
-        LSM_FP_TOTAL
-    };
-
-    enum LSM_FRUSTUM_POINTS {
-        LSM_FP_NEAR_BOTTOM_LEFT,
-        LSM_FP_NEAR_TOP_LEFT,
-        LSM_FP_NEAR_TOP_RIGHT,
-        LSM_FP_NEAR_BOTTOM_RIGHT,
-        LSM_FP_FAR_BOTTOM_LEFT,
-        LSM_FP_FAR_TOP_LEFT,
-        LSM_FP_FAR_TOP_RIGHT,
-        LSM_FP_FAR_BOTTOM_RIGHT,
-    };
-
-    void GetNeighbors(uint32_t index, LSM_FRUSTUM_PLANES _fpRet[4]) {
-        static const LSM_FRUSTUM_PLANES fpTable[LSM_FP_TOTAL][4] = {
-            {	// LSM_FP_LEFT
-                LSM_FP_TOP,
-                LSM_FP_BOTTOM,
-                LSM_FP_NEAR,
-                LSM_FP_FAR
-            },
-            {	// LSM_FP_RIGHT
-                LSM_FP_TOP,
-                LSM_FP_BOTTOM,
-                LSM_FP_NEAR,
-                LSM_FP_FAR
-            },
-            {	// LSM_FP_TOP
-                LSM_FP_LEFT,
-                LSM_FP_RIGHT,
-                LSM_FP_NEAR,
-                LSM_FP_FAR
-            },
-            {	// LSM_FP_BOTTOM
-                LSM_FP_LEFT,
-                LSM_FP_RIGHT,
-                LSM_FP_NEAR,
-                LSM_FP_FAR
-            },
-            {	// LSM_FP_NEAR
-                LSM_FP_LEFT,
-                LSM_FP_RIGHT,
-                LSM_FP_TOP,
-                LSM_FP_BOTTOM
-            },
-            {	// LSM_FP_FAR
-                LSM_FP_LEFT,
-                LSM_FP_RIGHT,
-                LSM_FP_TOP,
-                LSM_FP_BOTTOM
-            },
-        };
-
-        for (uint32_t I = 4UL; I--;) {
-            _fpRet[I] = fpTable[index][I];
-        }
-    }
-
-
-    void GetCornersOfPlanes(LSM_FRUSTUM_PLANES _fpPlane0, LSM_FRUSTUM_PLANES _fpPlane1, LSM_FRUSTUM_POINTS _fpRet[2]) {
-        static const LSM_FRUSTUM_POINTS fpTable[LSM_FP_TOTAL][LSM_FP_TOTAL][2] = {
-            {	// LSM_FP_LEFT
-                {	// LSM_FP_LEFT
-                    LSM_FP_FAR_BOTTOM_LEFT, LSM_FP_FAR_BOTTOM_LEFT,		// Invalid combination.
-                },
-                {	// LSM_FP_RIGHT
-                    LSM_FP_FAR_BOTTOM_LEFT, LSM_FP_FAR_BOTTOM_LEFT,		// Invalid combination.
-                },
-                {	// LSM_FP_TOP
-                    LSM_FP_NEAR_TOP_LEFT, LSM_FP_FAR_TOP_LEFT,
-                },
-                {	// LSM_FP_BOTTOM
-                    LSM_FP_FAR_BOTTOM_LEFT, LSM_FP_NEAR_BOTTOM_LEFT,
-                },
-                {	// LSM_FP_NEAR
-                    LSM_FP_NEAR_BOTTOM_LEFT, LSM_FP_NEAR_TOP_LEFT,
-                },
-                {	// LSM_FP_FAR
-                    LSM_FP_FAR_TOP_LEFT, LSM_FP_FAR_BOTTOM_LEFT,
-                },
-            },
-            {	// LSM_FP_RIGHT
-                {	// LSM_FP_LEFT
-                    LSM_FP_FAR_BOTTOM_RIGHT, LSM_FP_FAR_BOTTOM_RIGHT,	// Invalid combination.
-                },
-                {	// LSM_FP_RIGHT
-                    LSM_FP_FAR_BOTTOM_RIGHT, LSM_FP_FAR_BOTTOM_RIGHT,	// Invalid combination.
-                },
-                {	// LSM_FP_TOP
-                    LSM_FP_FAR_TOP_RIGHT, LSM_FP_NEAR_TOP_RIGHT,
-                },
-                {	// LSM_FP_BOTTOM
-                    LSM_FP_NEAR_BOTTOM_RIGHT, LSM_FP_FAR_BOTTOM_RIGHT,
-                },
-                {	// LSM_FP_NEAR
-                    LSM_FP_NEAR_TOP_RIGHT, LSM_FP_NEAR_BOTTOM_RIGHT,
-                },
-                {	// LSM_FP_FAR
-                    LSM_FP_FAR_BOTTOM_RIGHT, LSM_FP_FAR_TOP_RIGHT,
-                },
-            },
-
-            // ==
-
-            {	// LSM_FP_TOP
-                {	// LSM_FP_LEFT
-                    LSM_FP_FAR_TOP_LEFT, LSM_FP_NEAR_TOP_LEFT,
-                },
-                {	// LSM_FP_RIGHT
-                    LSM_FP_NEAR_TOP_RIGHT, LSM_FP_FAR_TOP_RIGHT,
-                },
-                {	// LSM_FP_TOP
-                    LSM_FP_NEAR_TOP_LEFT, LSM_FP_FAR_TOP_LEFT,		// Invalid combination.
-                },
-                {	// LSM_FP_BOTTOM
-                    LSM_FP_FAR_BOTTOM_LEFT, LSM_FP_NEAR_BOTTOM_LEFT,	// Invalid combination.
-                },
-                {	// LSM_FP_NEAR
-                    LSM_FP_NEAR_TOP_LEFT, LSM_FP_NEAR_TOP_RIGHT,
-                },
-                {	// LSM_FP_FAR
-                    LSM_FP_FAR_TOP_RIGHT, LSM_FP_FAR_TOP_LEFT,
-                },
-            },
-            {	// LSM_FP_BOTTOM
-                {	// LSM_FP_LEFT
-                    LSM_FP_NEAR_BOTTOM_LEFT, LSM_FP_FAR_BOTTOM_LEFT,
-                },
-                {	// LSM_FP_RIGHT
-                    LSM_FP_FAR_BOTTOM_RIGHT, LSM_FP_NEAR_BOTTOM_RIGHT,
-                },
-                {	// LSM_FP_TOP
-                    LSM_FP_NEAR_BOTTOM_LEFT, LSM_FP_FAR_BOTTOM_LEFT,	// Invalid combination.
-                },
-                {	// LSM_FP_BOTTOM
-                    LSM_FP_FAR_BOTTOM_LEFT, LSM_FP_NEAR_BOTTOM_LEFT,	// Invalid combination.
-                },
-                {	// LSM_FP_NEAR
-                    LSM_FP_NEAR_BOTTOM_RIGHT, LSM_FP_NEAR_BOTTOM_LEFT,
-                },
-                {	// LSM_FP_FAR
-                    LSM_FP_FAR_BOTTOM_LEFT, LSM_FP_FAR_BOTTOM_RIGHT,
-                },
-            },
-
-            // ==
-
-            {	// LSM_FP_NEAR
-                {	// LSM_FP_LEFT
-                    LSM_FP_NEAR_TOP_LEFT, LSM_FP_NEAR_BOTTOM_LEFT,
-                },
-                {	// LSM_FP_RIGHT
-                    LSM_FP_NEAR_BOTTOM_RIGHT, LSM_FP_NEAR_TOP_RIGHT,
-                },
-                {	// LSM_FP_TOP
-                    LSM_FP_NEAR_TOP_RIGHT, LSM_FP_NEAR_TOP_LEFT,
-                },
-                {	// LSM_FP_BOTTOM
-                    LSM_FP_NEAR_BOTTOM_LEFT, LSM_FP_NEAR_BOTTOM_RIGHT,
-                },
-                {	// LSM_FP_NEAR
-                    LSM_FP_NEAR_TOP_LEFT, LSM_FP_NEAR_TOP_RIGHT,		// Invalid combination.
-                },
-                {	// LSM_FP_FAR
-                    LSM_FP_FAR_TOP_RIGHT, LSM_FP_FAR_TOP_LEFT,		// Invalid combination.
-                },
-            },
-            {	// LSM_FP_FAR
-                {	// LSM_FP_LEFT
-                    LSM_FP_FAR_BOTTOM_LEFT, LSM_FP_FAR_TOP_LEFT,
-                },
-                {	// LSM_FP_RIGHT
-                    LSM_FP_FAR_TOP_RIGHT, LSM_FP_FAR_BOTTOM_RIGHT,
-                },
-                {	// LSM_FP_TOP
-                    LSM_FP_FAR_TOP_LEFT, LSM_FP_FAR_TOP_RIGHT,
-                },
-                {	// LSM_FP_BOTTOM
-                    LSM_FP_FAR_BOTTOM_RIGHT, LSM_FP_FAR_BOTTOM_LEFT,
-                },
-                {	// LSM_FP_NEAR
-                    LSM_FP_FAR_TOP_LEFT, LSM_FP_FAR_TOP_RIGHT,		// Invalid combination.
-                },
-                {	// LSM_FP_FAR
-                    LSM_FP_FAR_TOP_RIGHT, LSM_FP_FAR_TOP_LEFT,		// Invalid combination.
-                },
-            },
-        };
-        _fpRet[0] = fpTable[_fpPlane0][_fpPlane1][0];
-        _fpRet[1] = fpTable[_fpPlane0][_fpPlane1][1];
-    }
-
-
-    template <uint32_t MAX_KDOP_PLANES>
-    void MakeKDop(KDOP<MAX_KDOP_PLANES>& kdop, const std::array<Plane, 6>& frustumPlanes, const FrustumCorners& frustumCorners, const Vec3& lightDir) {
-        kdop.Reset();
-        // Add planes that are facing towards us.
-        for (uint32_t index = 0; index < frustumPlanes.size(); index++) {
-            const Plane& plane = frustumPlanes.at(index);
-            float fDir = glm::dot(plane.mNormal, lightDir);
-            if (fDir < 0.0f) {
-                kdop.AddPlane(plane);
-            }
-        }
-
-        // We have added the back sides of the planes.  Now find the edges.
-        // For each plane.
-        for (uint32_t index = 0; index < frustumPlanes.size(); index++) {
-            const Plane& plane = frustumPlanes.at(index);
-            // If this plane is facing away from us, move on.
-            float fDir = glm::dot(plane.mNormal, lightDir);
-            if (fDir > 0.0f) { continue; }
-            // For each neighbor of this plane.
-            LSM_FRUSTUM_PLANES fpNeighbors[4];
-            GetNeighbors(index, fpNeighbors);
-            for (uint32_t J = 4UL; J--;) {
-                float fNeighborDir = glm::dot(frustumPlanes[fpNeighbors[J]].mNormal, lightDir);
-                // If this plane is facing away from us, the edge between plane I and plane J
-                //	marks the edge of a plane we need to add.
-                if (fNeighborDir > 0.0f) {
-                    LSM_FRUSTUM_POINTS fpPoints[2];
-                    GetCornersOfPlanes(static_cast<LSM_FRUSTUM_PLANES>(index), fpNeighbors[J], fpPoints);
-                    Plane pAddMe(Vec3(frustumCorners[fpPoints[0]]), Vec3(frustumCorners[fpPoints[1]]), Vec3(frustumCorners[fpPoints[0]]) + lightDir);
-                    kdop.AddPlane(pAddMe);
-                }
-            }
-        }
-    }
-    */
-
-
-
-
-
-
-
-
     void AddMesh(std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& worldMatrix)
     {
 		resultMeshes.emplace_back(mesh.mMeshID, worldMatrix, mesh.GetMaterial()->mDiffuseTexture, mesh.GetMaterial()->mNormalTexture, mesh.GetMaterial()->mSpecularFactor, mesh.GetTextureTilingFactor());
@@ -270,7 +25,7 @@ namespace JonsEngine
     void AddAllMeshes(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& worldMatrix)
     {
 		for (const Mesh& mesh : node.GetMeshes())
-            AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+            AddMesh(resultMeshes, mesh, worldMatrix * node.GetLocalTransform());
 
 		for (ModelNode& node : node.GetChildNodes())
             AddAllMeshes(resultMeshes, node, worldMatrix);
@@ -279,7 +34,7 @@ namespace JonsEngine
     template <typename T>
     void CullMeshesFrustrum(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& wvpMatrix, const Mat4& worldMatrix)
     {
-        const Mat4 localWVPMatrix = wvpMatrix * node.mLocalTransform;
+        const Mat4 localWVPMatrix = wvpMatrix * node.GetLocalTransform();
 
         // test node frustrum
 		// TODO: does this cull objects behind frustrum that still intersects some planes?
@@ -298,7 +53,7 @@ namespace JonsEngine
 						continue;
 
                     if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                        AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+                        AddMesh(resultMeshes, mesh, worldMatrix * node.GetLocalTransform());
 				}
 
                 // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
@@ -338,7 +93,7 @@ namespace JonsEngine
                         continue;
 
                     if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                        AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+                        AddMesh(resultMeshes, mesh, worldMatrix * node.GetLocalTransform());
                 }
 
                 // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
@@ -381,7 +136,7 @@ namespace JonsEngine
 						continue;
 
                     if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                        AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+                        AddMesh(resultMeshes, mesh, worldMatrix * node.GetLocalTransform());
 				}
 
 				// each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
@@ -407,7 +162,7 @@ namespace JonsEngine
     Scene::Scene(const std::string& sceneName) :
         mName(sceneName), mHashedID(boost::hash_value(sceneName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()),
         // TODO: lambda expression adds a layer of indirection, but I'm not sure how the bind syntax would look like
-        mRootNode("Root", [&](SceneNode* node) { mDirtySceneNodes.push_back(node); }), mAmbientLight(0.2f)
+        mRootNode("Root", mTransformCache.GetStorage(), [&](SceneNode* node) { mDirtySceneNodes.push_back(node); }), mAmbientLight(0.2f)
     {
     }
 
@@ -509,7 +264,7 @@ namespace JonsEngine
                         continue;
 
                     const Mat4& worldMatrix = actor->mSceneNode->GetWorldMatrix();
-                    const Mat4 localWorldMatrix = worldMatrix* actor->mModel->GetRootNode().mLocalTransform;
+                    const Mat4 localWorldMatrix = worldMatrix* actor->mModel->GetRootNode().GetLocalTransform();
                     const AABB worldAABB = localWorldMatrix * actor->mModel->GetRootNode().mLocalAABB;
 
                     const auto aabbIntersection = Intersection(worldAABB, kdopIterator);
