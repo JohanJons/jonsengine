@@ -1,5 +1,5 @@
 # jonsengine
-Hobby DX11 game engine
+DirectX11 game engine
 
 # List of features (2015-05-08)
 
