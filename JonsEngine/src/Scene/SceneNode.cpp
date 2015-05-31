@@ -131,7 +131,7 @@ namespace JonsEngine
         UpdateTransform();
 
         for (SceneNodePtr childNode : mChildNodes)
-            childNode->UpdateChildren(*mTransform);
+            childNode->UpdateChildren(mTransform.Get());
     }
 
 
@@ -146,7 +146,7 @@ namespace JonsEngine
 
     void SceneNode::UpdateTransform()
     {
-        Mat4& worldMatrix = *mTransform;
+        Mat4& worldMatrix = mTransform.Get();
 
         worldMatrix = glm::translate(gIdentityMatrix, mTranslation);
         worldMatrix *= glm::toMat4(mOrientation);
@@ -157,7 +157,7 @@ namespace JonsEngine
     {
         UpdateTransform();
 
-        Mat4& worldMatrix = *mTransform;
+        Mat4& worldMatrix = mTransform.Get();
         worldMatrix = parentModelMatrix * worldMatrix;
 
         for (SceneNodePtr childNode : mChildNodes)

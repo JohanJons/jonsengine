@@ -202,7 +202,7 @@ namespace JonsEngine
 
         // test kdop
         const ActorPtr& actor = mActors.front();
-        const Mat4 worldMatrix = actor->mSceneNode->GetWorldMatrix() * actor->mModel->GetRootNode().mLocalTransform;
+        const Mat4 worldMatrix = actor->mSceneNode->GetWorldTransform() * actor->mModel->GetRootNode().mLocalTransform;
         const AABB& localAABB = actor->mModel->GetRootNode().mLocalAABB;
         const AABB aabb = localAABB * worldMatrix;
 
@@ -219,7 +219,7 @@ namespace JonsEngine
 			if (!actor->mSceneNode)
 				continue;
 
-            const Mat4& worldMatrix = actor->mSceneNode->GetWorldMatrix();
+            const Mat4& worldMatrix = actor->mSceneNode->GetWorldTransform();
             const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix * worldMatrix;
 
             CullMeshesFrustrum<RenderableModel>(mRenderQueue.mCamera.mModels, actor->mModel->GetRootNode(), wvpMatrix, worldMatrix);
@@ -242,7 +242,7 @@ namespace JonsEngine
                 if (!actor->mSceneNode)
                     continue;
 
-                const Mat4& actorWorldMatrix = actor->mSceneNode->GetWorldMatrix();
+                const Mat4& actorWorldMatrix = actor->mSceneNode->GetWorldTransform();
                 CullMeshesSphere(renderablePointLight.mMeshes, actor->mModel->GetRootNode(), actorWorldMatrix, lightPosition, pointLight.mLightRadius);
             }
         }
@@ -263,8 +263,8 @@ namespace JonsEngine
                     if (!actor->mSceneNode)
                         continue;
 
-                    const Mat4& worldMatrix = actor->mSceneNode->GetWorldMatrix();
-                    const Mat4 localWorldMatrix = worldMatrix* actor->mModel->GetRootNode().GetLocalTransform();
+                    const Mat4& worldMatrix = actor->mSceneNode->GetWorldTransform();
+                    const Mat4 localWorldMatrix = worldMatrix * actor->mModel->GetRootNode().GetLocalTransform();
                     const AABB worldAABB = localWorldMatrix * actor->mModel->GetRootNode().mLocalAABB;
 
                     const auto aabbIntersection = Intersection(worldAABB, kdopIterator);

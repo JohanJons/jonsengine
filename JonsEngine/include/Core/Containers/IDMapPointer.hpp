@@ -14,36 +14,31 @@ namespace JonsEngine
         {
         }
 
+        IDMapPointer(IDMapPointer&& other) throw() : mStorage(std::move(other.mStorage)), mID(std::move(other.mID))
+        {
+            other.mID = IDMap<T>::INVALID_ITEM_ID;
+        }
+
         ~IDMapPointer()
         {
             if (mID != IDMap<T>::INVALID_ITEM_ID)
                 mStorage.MarkAsFree(mID);
         }
 
-        IDMapPointer(IDMapPointer&& other) throw() : mStorage(std::move(other.mStorage)), mID(std::move(other.mID))
-        {
-            other.mID = IDMap<T>::INVALID_ITEM_ID;
-        }
 
-
-        T& operator*()
-        {
-            return mStorage.GetItem(mID);
-        }
-        const T& operator*() const
+        T& Get()
         {
             return mStorage.GetItem(mID);
         }
 
-
-        T* operator->()
+        const T& Get() const
         {
-            return &mStorage.GetItem(mID);
+            return mStorage.GetItem(mID);
         }
 
-        const T* operator->() const
+        typename IDMap<T>::ItemID GetID() const
         {
-            return &mStorage.GetItem(mID);
+            return mID;
         }
 
 

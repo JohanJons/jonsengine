@@ -40,7 +40,8 @@ namespace JonsEngine
 
         Vec3 Position() const;
 
-        const Mat4& GetWorldMatrix() const;
+        const Mat4& GetWorldTransform() const;
+        IDMap<Mat4>::ItemID GetWorldTransformID() const;
         const std::string& GetNodeName() const;
         const std::vector<SceneNodePtr>& GetChildNodes() const;
 
@@ -69,7 +70,8 @@ namespace JonsEngine
 
 
     /* SceneNode inlines */
-    inline const Mat4& SceneNode::GetWorldMatrix() const                        { return *mTransform; }
-    inline const std::string& SceneNode::GetNodeName() const                    { return mName;         }
-    inline const std::vector<SceneNodePtr>& SceneNode::GetChildNodes() const    { return mChildNodes;   }
+    inline const Mat4& SceneNode::GetWorldTransform() const                     { return mTransform.Get();   }
+    inline IDMap<Mat4>::ItemID SceneNode::GetWorldTransformID() const           { return mTransform.GetID(); }
+    inline const std::string& SceneNode::GetNodeName() const                    { return mName;              }
+    inline const std::vector<SceneNodePtr>& SceneNode::GetChildNodes() const    { return mChildNodes;        }
 }

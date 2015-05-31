@@ -30,6 +30,7 @@ namespace JonsEngine
 		std::vector<ModelNode>& GetChildNodes();
 
         const Mat4& GetLocalTransform() const;
+        IDMap<Mat4>::ItemID GetLocalTransformID() const;
 
 
 		const std::string mName;

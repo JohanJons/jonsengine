@@ -54,6 +54,11 @@ namespace JonsEngine
 
     const Mat4& ModelNode::GetLocalTransform() const
     {
-        return *mLocalTransform;
+        return mLocalTransform.Get();
+    }
+
+    IDMap<Mat4>::ItemID ModelNode::GetLocalTransformID() const
+    {
+        return mLocalTransform.GetID();
     }
 }
