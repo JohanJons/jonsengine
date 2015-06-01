@@ -10,7 +10,7 @@ Core:
 
 Resources:
 - Custom binary file format for parsing game assets
-- Offline asset exporter tool
+- Offline asset exporter tool for above mentioned file format
 - Various thirdparty libraries to parse a wide range of assets into a unified asset format
 - Create basic geometric shapes at runtime
 
@@ -19,15 +19,15 @@ Rendering:
 - Deferred shading pipeline with phong shading
 - Directional/Point/Ambient lights with shadowmapping
 - Cascaded shadow mapping (CSM) with Sample distribution shadow maps (SDSM)
-- Fast PCF shadow filtering
-- Scalable Ambient Obscurance (SSAO)
-- Fast approximate antialiasing (FXAA)
+- Shadow filtering (OptimizedPCF)
+- Screenspace ambient occlusion (Scalable Ambient Obscurance)
+- Antialiasing (FXAA)
 - Gamma corrected lighting
 
 Scene:
 - Basic hierarchical scenegraph structure
 - Models, materials, cameras, directional/point/ambient lights
-- Basic renderqueue with asset culling
+- Basic renderqueue with mesh culling for camera and directional/point lights
 
 Window:
 - Basic window management
