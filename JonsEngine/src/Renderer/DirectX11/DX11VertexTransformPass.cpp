@@ -40,20 +40,26 @@ namespace JonsEngine
         mesh.DrawPositions();
     }
 
-    void DX11VertexTransformPass::RenderMeshes(const RenderableMeshes& meshes, const Mat4& viewProjectionMatrix)
+    void DX11VertexTransformPass::RenderMeshes(const RenderableMeshes& meshes, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix)
     {
         for (const RenderableMesh& mesh : meshes)
         {
-            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mWorldMatrix));
+            const Mat4& localTransform = localTransformStorage.GetItem(mesh.mLocalTransformID);
+            const Mat4& worldTransform = worldTransformStorage.GetItem(mesh.mWorldTransformID);
+
+            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * worldTransform * localTransform));
             mMeshMap.GetItem(mesh.mMeshID).DrawPositions();
         }
     }
 
-    void DX11VertexTransformPass::RenderAABBs(const RenderableModels& models, const Mat4& viewProjectionMatrix)
+    void DX11VertexTransformPass::RenderAABBs(const RenderableModels& models, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix)
     {
         for (const RenderableModel& model : models)
         {
-            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * model.mMesh.mWorldMatrix));
+            const Mat4& localTransform = localTransformStorage.GetItem(model.mMesh.mLocalTransformID);
+            const Mat4& worldTransform = worldTransformStorage.GetItem(model.mMesh.mWorldTransformID);
+
+            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * worldTransform * localTransform));
             mMeshMap.GetItem(model.mMesh.mMeshID).DrawAABB();
         }
     }

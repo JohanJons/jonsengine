@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/Types.h"
+#include "include/Core/Containers/IDMap.hpp"
 
 #include <vector>
 
@@ -8,15 +9,15 @@ namespace JonsEngine
 {
     struct RenderableMesh
     {
-        RenderableMesh(const MeshID mesh, const IDMap<Mat4>::ItemID worldTransformID, const IDMap<Mat4>::ItemID localTransformID) :
-            mMeshID(mesh), mWorldTransformID(worldTransformID), mLocalTransformID(localTransformID)
+        RenderableMesh(const MeshID mesh, const IDMap<Mat4>::ItemID localTransformID, const IDMap<Mat4>::ItemID worldTransformID) :
+            mMeshID(mesh), mLocalTransformID(localTransformID), mWorldTransformID(worldTransformID)
         {
         }
 
 
         MeshID mMeshID;
-        IDMap<Mat4>::ItemID mWorldTransformID;
         IDMap<Mat4>::ItemID mLocalTransformID;
+        IDMap<Mat4>::ItemID mWorldTransformID;
     };
     
     typedef std::vector<RenderableMesh> RenderableMeshes;
@@ -35,8 +36,8 @@ namespace JonsEngine
 
     struct RenderableModel
     {
-        RenderableModel(const MeshID mesh, const IDMap<Mat4>::ItemID worldTransformID, const IDMap<Mat4>::ItemID localTransformID, const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor, const float tilingFactor) :
-            mMesh(mesh, worldTransformID, localTransformID), mMaterial(diffuseTexture, normalTexture, specFactor), mTextureTilingFactor(tilingFactor)
+        RenderableModel(const MeshID mesh, const IDMap<Mat4>::ItemID localTransformID, const IDMap<Mat4>::ItemID worldTransformID, const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor, const float tilingFactor) :
+            mMesh(mesh, localTransformID, worldTransformID), mMaterial(diffuseTexture, normalTexture, specFactor), mTextureTilingFactor(tilingFactor)
         {
         }
 

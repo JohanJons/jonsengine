@@ -21,7 +21,7 @@ namespace JonsEngine
                                                      mWindow(settings, mMemoryAllocator, mLog), 
                                                      mRenderer(settings, mMemoryAllocator, mLog),
                                                      mResourceManifest(mRenderer, mMemoryAllocator), 
-                                                     mSceneManager()
+                                                     mSceneManager(mResourceManifest.GetTransformStorage())
     {
         JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
     }

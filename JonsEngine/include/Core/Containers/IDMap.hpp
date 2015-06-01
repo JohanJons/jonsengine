@@ -46,6 +46,7 @@ namespace JonsEngine
         void MarkAsFree(const ItemID id);
 
         T& GetItem(const ItemID id);
+        const T& GetItem(const ItemID id) const;
         T* TryGetItem(const ItemID id) const;
 
         void Clear();
@@ -155,15 +156,21 @@ namespace JonsEngine
 		const uint16_t index = IDMAP_INDEX_MASK(id);
 		const uint16_t version = IDMAP_VERSION_MASK(id);
 
-        if (mItems[index].mVersion != version)
-        {
-            int i = 0;
-        }
-
 		assert(mItems[index].mVersion == version);
 
 		return mItems[index].mItem;
 	}
+
+    template <typename T>
+    const T& IDMap<T>::GetItem(const ItemID id) const
+    {
+        const uint16_t index = IDMAP_INDEX_MASK(id);
+        const uint16_t version = IDMAP_VERSION_MASK(id);
+
+        assert(mItems[index].mVersion == version);
+
+        return mItems[index].mItem;
+    }
 
 	template <typename T>
 	T* IDMap<T>::TryGetItem(const ItemID id) const

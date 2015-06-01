@@ -119,7 +119,7 @@ namespace JonsEngine
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
 
-	void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const float zFar, const float zNear)
+    void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const float zFar, const float zNear)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
@@ -152,7 +152,7 @@ namespace JonsEngine
             const Mat4 faceViewMatrix = glm::lookAt(viewLightPositonV3, viewLightPositonV3 + gCubemapDirVectors[face], gCubemapUpVectors[face]);
 
 			mShadowmap.BindDepthView(face);
-            mVertexTransformPass.RenderMeshes(pointLight.mMeshes, faceProjmatrix * faceViewMatrix * camViewMatrix);
+            mVertexTransformPass.RenderMeshes(pointLight.mMeshes, localTransformStorage, worldTransformStorage, faceProjmatrix * faceViewMatrix * camViewMatrix);
         }
 
 

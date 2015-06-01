@@ -123,7 +123,11 @@ namespace JonsEngine
             if (hasNormalTexture)
                 mTextureMap.GetItem(model.mMaterial.mNormalTextureID).Bind();
 
-            mGBuffer.SetConstantData(renderQueue.mCamera.mCameraViewProjectionMatrix * model.mMesh.mWorldMatrix, renderQueue.mCamera.mCameraViewMatrix * model.mMesh.mWorldMatrix, model.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
+            const Mat4& localTransform = renderQueue.mLocalTransformStorage.GetItem(model.mMesh.mLocalTransformID);
+            const Mat4& worldTransform = renderQueue.mWorldTransformStorage.GetItem(model.mMesh.mWorldTransformID);
+            const Mat4 localWorldMatrix = worldTransform * localTransform;
+
+            mGBuffer.SetConstantData(renderQueue.mCamera.mCameraViewProjectionMatrix * localWorldMatrix, renderQueue.mCamera.mCameraViewMatrix * localWorldMatrix, model.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
             mMeshMap.GetItem(model.mMesh.mMeshID).Draw();
         }
     }
@@ -151,14 +155,14 @@ namespace JonsEngine
 
         // do all directional lights
         for (const RenderableDirLight& directionalLight : renderQueue.mDirectionalLights)
-            mDirectionalLightPass.Render(directionalLight, shadowFiltering, renderQueue.mCamera.mFOV, mWindowSize.x / mWindowSize.y, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix, mWindowSize, renderQueue.mCamera.mCameraProjectionMatrix);
+            mDirectionalLightPass.Render(directionalLight, renderQueue.mLocalTransformStorage, renderQueue.mWorldTransformStorage, shadowFiltering, renderQueue.mCamera.mFOV, mWindowSize.x / mWindowSize.y, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix, mWindowSize, renderQueue.mCamera.mCameraProjectionMatrix);
 
         // do all point lights
         mPointLightPass.BindForShading();
         for (const RenderablePointLight& pointLight : renderQueue.mPointLights)
         {
             mContext->ClearDepthStencilView(mDSV, D3D11_CLEAR_STENCIL, 1.0f, 0);
-            mPointLightPass.Render(pointLight, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix, mWindowSize, Z_FAR, Z_NEAR);
+            mPointLightPass.Render(pointLight, renderQueue.mLocalTransformStorage, renderQueue.mWorldTransformStorage, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix, mWindowSize, Z_FAR, Z_NEAR);
         }
 
         // turn off blending
@@ -178,6 +182,6 @@ namespace JonsEngine
             mPostProcessor.FXAAPass(mBackbuffer, mWindowSize);
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
-            mAABBPass.Render(renderQueue, renderQueue.mCamera.mCameraProjectionMatrix * renderQueue.mCamera.mCameraViewMatrix);
+            mAABBPass.Render(renderQueue);
     }
 }

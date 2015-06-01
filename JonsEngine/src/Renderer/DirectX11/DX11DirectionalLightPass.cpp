@@ -93,7 +93,7 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const Mat4& cameraProjMatrix)
+    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const Mat4& cameraProjMatrix)
     {
         // preserve current state
         D3D11_VIEWPORT prevViewport;
@@ -138,7 +138,7 @@ namespace JonsEngine
             const auto frustumCorners = GetFrustumCorners(perspectiveMatrix * cameraViewMatrix);
 
             lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(frustumCorners, directionalLight.mLightDirection);
-			mVertexTransformPass.RenderMeshes(directionalLight.mMeshes, lightVPMatrices[cascadeIndex]);
+            mVertexTransformPass.RenderMeshes(directionalLight.mMeshes, localTransformStorage, worldTransformStorage, lightVPMatrices[cascadeIndex]);
 
             lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex] * glm::inverse(cameraViewMatrix);
         }
