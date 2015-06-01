@@ -51,75 +51,54 @@ namespace JonsGame
         if ((evnt.mState == KeyEvent::KeyState::STATE_PRESSED || evnt.mState == KeyEvent::KeyState::STATE_REPEAT) && evnt.mShiftPressed)
         {
             //  renderering
-            if (evnt.mKey == Key::ONE)
-                mEngine->GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_2X2);
-            else if (evnt.mKey == Key::TWO)
-                mEngine->GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_3X3);
-            else if (evnt.mKey == Key::THREE)
-                mEngine->GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_5X5);
-            else if (evnt.mKey == Key::FOUR)
-                mEngine->GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_7X7);
+            switch (evnt.mKey)
+            {
+                case Key::ONE:      mEngine->GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_2X2); break;
+                case Key::TWO:      mEngine->GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_3X3); break;
+                case Key::THREE:    mEngine->GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_5X5); break;
+                case Key::FOUR:     mEngine->GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_7X7); break;
+                default:
+                    break;
+            }
         }
         // no modifiers
         else if (evnt.mState == KeyEvent::KeyState::STATE_PRESSED || evnt.mState == KeyEvent::KeyState::STATE_REPEAT)
         {
-            // camera position
-            if (evnt.mKey == Key::A)
-                camera.TranslateCamera(-camera.Right() * mMoveSpeed);
-            else if (evnt.mKey == Key::W)
-                camera.TranslateCamera(camera.Forward() * mMoveSpeed);
-            else if (evnt.mKey == Key::S)
-                camera.TranslateCamera(-camera.Forward() * mMoveSpeed);
-            else if (evnt.mKey == Key::D)
-                camera.TranslateCamera(camera.Right() * mMoveSpeed);
+            switch (evnt.mKey)
+            {
+                // camera
+                case Key::A: camera.TranslateCamera(-camera.Right() * mMoveSpeed);   break;
+                case Key::W: camera.TranslateCamera(camera.Forward() * mMoveSpeed);  break;
+                case Key::S: camera.TranslateCamera(-camera.Forward() * mMoveSpeed); break;
+                case Key::D: camera.TranslateCamera(camera.Right() * mMoveSpeed);    break;
+                
+                // moving the point light 
+                case Key::Q: activeScene->GetPointLight(mPointLightID).mSceneNode->TranslateNode(Vec3(-0.05f, 0.0f, 0.0f)); break;
+                case Key::E: activeScene->GetPointLight(mPointLightID).mSceneNode->TranslateNode(Vec3(0.05f, 0.0f, 0.0f));  break;
+                case Key::R: activeScene->GetPointLight(mPointLightID).mSceneNode->TranslateNode(Vec3(0.0f, -0.05f, 0.0f)); break;
+                case Key::T: activeScene->GetPointLight(mPointLightID).mSceneNode->TranslateNode(Vec3(0.0f, 0.05f, 0.0f));  break;
+                case Key::F: activeScene->GetPointLight(mPointLightID).mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, -0.05f)); break;
+                case Key::G: activeScene->GetPointLight(mPointLightID).mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, 0.05f));  break;
 
-            // moving the point light 
-            else if (evnt.mKey == Key::Q)
-                activeScene->GetPointLight(mPointLightID).mSceneNode->TranslateNode(Vec3(-0.05f, 0.0f, 0.0f));
-            else if (evnt.mKey == Key::E)
-                activeScene->GetPointLight(mPointLightID).mSceneNode->TranslateNode(Vec3(0.05f, 0.0f, 0.0f));
-            else if (evnt.mKey == Key::R)
-                activeScene->GetPointLight(mPointLightID).mSceneNode->TranslateNode(Vec3(0.0f, -0.05f, 0.0f));
-            else if (evnt.mKey == Key::T)
-                activeScene->GetPointLight(mPointLightID).mSceneNode->TranslateNode(Vec3(0.0f, 0.05f, 0.0f));
-            else if (evnt.mKey == Key::F)
-                activeScene->GetPointLight(mPointLightID).mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, -0.05f));
-            else if (evnt.mKey == Key::G)
-                activeScene->GetPointLight(mPointLightID).mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, 0.05f));
+                //  renderering
+                case Key::ONE: mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_DRAW_AABB); break;
+                case Key::TWO: mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS); break;
+                case Key::U: mEngine->GetRenderer().SetSSAO(false); break;
+                case Key::I: mEngine->GetRenderer().SetSSAO(true); break;
+                case Key::H: mEngine->GetRenderer().SetAnisotropicFiltering(EngineSettings::Anisotropic::X1); break;
+                case Key::J: mEngine->GetRenderer().SetAnisotropicFiltering(EngineSettings::Anisotropic::X16); break;
+                case Key::K: mEngine->GetRenderer().SetAntiAliasing(EngineSettings::AntiAliasing::NONE); break;
+                case Key::L: mEngine->GetRenderer().SetAntiAliasing(EngineSettings::AntiAliasing::FXAA); break;
 
-            //  renderering
-            else if (evnt.mKey == Key::ONE)
-                mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_DRAW_AABB);
-            else if (evnt.mKey == Key::TWO)
-                mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS);
-            else if (evnt.mKey == Key::U)
-                mEngine->GetRenderer().SetSSAO(false);
-            else if (evnt.mKey == Key::I)
-                mEngine->GetRenderer().SetSSAO(true);
-            else if (evnt.mKey == Key::H)
-                mEngine->GetRenderer().SetAnisotropicFiltering(EngineSettings::Anisotropic::X1);
-            else if (evnt.mKey == Key::J)
-                mEngine->GetRenderer().SetAnisotropicFiltering(EngineSettings::Anisotropic::X16);
-            else if (evnt.mKey == Key::K)
-                mEngine->GetRenderer().SetAntiAliasing(EngineSettings::AntiAliasing::NONE);
-            else if (evnt.mKey == Key::L)
-                mEngine->GetRenderer().SetAntiAliasing(EngineSettings::AntiAliasing::FXAA);
-
-            // misc
-            else if (evnt.mKey == Key::N)
-                mEngine->GetWindow().SetFullscreen(true);
-            else if (evnt.mKey == Key::M)
-                mEngine->GetWindow().SetFullscreen(false);
-            else if (evnt.mKey == Key::V)
-                mEngine->GetWindow().ShowMouseCursor(true);
-            else if (evnt.mKey == Key::B)
-                mEngine->GetWindow().ShowMouseCursor(false);
-            else if (evnt.mKey == Key::X)
-                mEngine->GetWindow().SetScreenResolution(1080, 720);
-            else if (evnt.mKey == Key::C)
-                mEngine->GetWindow().SetScreenResolution(1920, 1080);
-            else if (evnt.mKey == Key::ESC)
-                mRunning = false;
+                //  misc
+                case Key::N: mEngine->GetWindow().SetFullscreen(true); break;
+                case Key::M: mEngine->GetWindow().SetFullscreen(false); break;
+                case Key::V: mEngine->GetWindow().ShowMouseCursor(true); break;
+                case Key::B: mEngine->GetWindow().ShowMouseCursor(false); break;
+                case Key::X: mEngine->GetWindow().SetScreenResolution(1080, 720); break;
+                case Key::C: mEngine->GetWindow().SetScreenResolution(1920, 1080); break;
+                case Key::ESC: mRunning = false; break;
+            }
         }
     }
 
