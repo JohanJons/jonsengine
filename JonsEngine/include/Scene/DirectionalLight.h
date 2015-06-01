@@ -21,7 +21,9 @@ namespace JonsEngine
 
         void SetCascadeSplitLambda(const float lambda);
         void UpdateCascadesBoundingVolume(const Mat4& viewMatrix, const float degreesFOV, const float aspectRatio, const float minDepth, const float maxDepth);
+        
         ConstRangedIterator<KDOP> GetBoundingVolume(const uint32_t cascadeIndex) const;
+        const std::vector<float>& GetSplitDistances() const;
 
 
         const std::string mName;
@@ -32,7 +34,7 @@ namespace JonsEngine
 
 
 	private:
-        float UpdateSplitDistances(const float minDepth, const float maxDepth);
+        void UpdateSplitDistances(const float minDepth, const float maxDepth);
         void UpdateKDOP(const FrustumPlanes& frustumPlanes, const FrustumCorners& frustumCorners);
 
 

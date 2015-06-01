@@ -272,12 +272,12 @@ namespace JonsEngine
         mKDOP.clear();
         mCascadeKDOPRange.clear();
 
-        const float minZ = UpdateSplitDistances(minDepth, maxDepth);
+        UpdateSplitDistances(minDepth, maxDepth);
 
         for (uint32_t cascadeIndex = 0; cascadeIndex < mNumShadowmapCascades; ++cascadeIndex)
         {
-            const float nearZ = cascadeIndex == 0 ? minZ : mSplitDistances[cascadeIndex - 1];
-            const float farZ = mSplitDistances[cascadeIndex];
+            const float nearZ = mSplitDistances[cascadeIndex];
+            const float farZ = mSplitDistances[cascadeIndex + 1];
 
             const Mat4 cascadePerspectiveMatrix = PerspectiveMatrixFov(degreesFOV, aspectRatio, nearZ, farZ);
             const Mat4 cascadeViewProjMatrix = cascadePerspectiveMatrix * viewMatrix;
@@ -289,6 +289,7 @@ namespace JonsEngine
         }
     }
 
+
     ConstRangedIterator<KDOP> DirectionalLight::GetBoundingVolume(const uint32_t cascadeIndex) const
     {
         assert(cascadeIndex < mNumShadowmapCascades);
@@ -299,8 +300,13 @@ namespace JonsEngine
         return ConstRangedIterator<KDOP>(mKDOP, startIndex, endIndex);
     }
 
+    const std::vector<float>& DirectionalLight::GetSplitDistances() const
+    {
+        return mSplitDistances;
+    }
 
-    float DirectionalLight::UpdateSplitDistances(const float minDepth, const float maxDepth)
+
+    void DirectionalLight::UpdateSplitDistances(const float minDepth, const float maxDepth)
     {
         mSplitDistances.clear();
 
@@ -314,6 +320,7 @@ namespace JonsEngine
         const float range = maxZ - minZ;
         const float ratio = maxZ / minZ;
 
+        mSplitDistances.push_back(minZ);
         for (uint32_t cascadeIndex = 0; cascadeIndex < mNumShadowmapCascades; ++cascadeIndex)
         {
             const float p = (cascadeIndex + 1) / static_cast<float>(mNumShadowmapCascades);
@@ -323,8 +330,6 @@ namespace JonsEngine
 
             mSplitDistances.push_back(((d - nearClip) / clipRange) * farClip);
         }
-
-        return minZ;
     }
 
     void DirectionalLight::UpdateKDOP(const FrustumPlanes& frustumPlanes, const FrustumCorners& frustumCorners)

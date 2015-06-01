@@ -61,13 +61,14 @@ namespace JonsEngine
 
     struct RenderableDirLight
     {
-        RenderableDirLight(const Vec4& lightColor, const Vec3& lightDir) : mLightColor(lightColor), mLightDirection(lightDir)
+        RenderableDirLight(const Vec4& lightColor, const Vec3& lightDir, const std::vector<float>& splitDistances) : mLightColor(lightColor), mLightDirection(lightDir), mSplitDistances(splitDistances)
         {
         }
 
 
         Vec4 mLightColor;
         Vec3 mLightDirection;
+        std::vector<float> mSplitDistances;
 
         RenderableMeshes mMeshes;
     };

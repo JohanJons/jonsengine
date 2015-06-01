@@ -198,21 +198,6 @@ namespace JonsEngine
         mRenderQueue.mCamera.mCameraViewMatrix = sceneCamera.GetCameraTransform();
         mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(cameraFov, windowAspectRatio, zNear, zFar);
         mRenderQueue.mCamera.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
-        /*FrustumPlanes frustumPlanes = GetFrustumPlanes(mRenderQueue.mCamera.mCameraViewProjectionMatrix);
-
-        // test kdop
-        const ActorPtr& actor = mActors.front();
-        const Mat4 worldMatrix = actor->mSceneNode->GetWorldTransform() * actor->mModel->GetRootNode().mLocalTransform;
-        const AABB& localAABB = actor->mModel->GetRootNode().mLocalAABB;
-        const AABB aabb = localAABB * worldMatrix;
-
-       // AABBIntersection intersection = Intersection<11>(aabb, kdop);
-
-        for (Plane& plane : frustumPlanes)
-        {
-            if (Intersection(plane, aabb) == PlaneIntersection::Back)
-                assert(1 == 0);
-        }*/
 
 		for (const ActorPtr& actor : mActors)
 		{
@@ -252,14 +237,13 @@ namespace JonsEngine
         // dir lights
         for (DirectionalLightPtr& dirLight : mDirectionalLights)
         {
-            mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, glm::normalize(dirLight->mLightDirection));
+            mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, glm::normalize(dirLight->mLightDirection), dirLight->GetSplitDistances());
             RenderableDirLight& renderableDirLight = mRenderQueue.mDirectionalLights.back();
 
             dirLight->UpdateCascadesBoundingVolume(mRenderQueue.mCamera.mCameraViewMatrix, cameraFov, windowAspectRatio, 0.0f, 1.0f);
             for (uint32_t cascadeIndex = 0; cascadeIndex < dirLight->mNumShadowmapCascades; ++cascadeIndex)
             {
                 auto kdopIterator = dirLight->GetBoundingVolume(cascadeIndex);
-
                 for (const ActorPtr& actor : mActors)
                 {
                     if (!actor->mSceneNode)
