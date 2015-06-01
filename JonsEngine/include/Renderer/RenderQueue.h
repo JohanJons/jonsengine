@@ -8,20 +8,22 @@ namespace JonsEngine
 {
     struct RenderableMesh
     {
-        inline RenderableMesh(const MeshID mesh, const Mat4& worldMatrix) : mMeshID(mesh), mWorldMatrix(worldMatrix)
+        RenderableMesh(const MeshID mesh, const IDMap<Mat4>::ItemID worldTransformID, const IDMap<Mat4>::ItemID localTransformID) :
+            mMeshID(mesh), mWorldTransformID(worldTransformID), mLocalTransformID(localTransformID)
         {
         }
 
 
         MeshID mMeshID;
-        Mat4 mWorldMatrix;
+        IDMap<Mat4>::ItemID mWorldTransformID;
+        IDMap<Mat4>::ItemID mLocalTransformID;
     };
     
     typedef std::vector<RenderableMesh> RenderableMeshes;
 
     struct RenderableMaterial
     {
-        inline RenderableMaterial(const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor)
+        RenderableMaterial(const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor)
             : mDiffuseTextureID(diffuseTexture), mNormalTextureID(normalTexture), mSpecularFactor(specFactor)
         {
         }
@@ -33,8 +35,8 @@ namespace JonsEngine
 
     struct RenderableModel
     {
-        inline RenderableModel(const MeshID mesh, const Mat4& worldMatrix, const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor, const float tilingFactor) :
-            mMesh(mesh, worldMatrix), mMaterial(diffuseTexture, normalTexture, specFactor), mTextureTilingFactor(tilingFactor)
+        RenderableModel(const MeshID mesh, const IDMap<Mat4>::ItemID worldTransformID, const IDMap<Mat4>::ItemID localTransformID, const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor, const float tilingFactor) :
+            mMesh(mesh, worldTransformID, localTransformID), mMaterial(diffuseTexture, normalTexture, specFactor), mTextureTilingFactor(tilingFactor)
         {
         }
 
@@ -58,7 +60,7 @@ namespace JonsEngine
 
     struct RenderableDirLight
     {
-        inline RenderableDirLight(const Vec4& lightColor, const Vec3& lightDir) : mLightColor(lightColor), mLightDirection(lightDir)
+        RenderableDirLight(const Vec4& lightColor, const Vec3& lightDir) : mLightColor(lightColor), mLightDirection(lightDir)
         {
         }
 
@@ -73,7 +75,7 @@ namespace JonsEngine
 
     struct RenderablePointLight
     {
-        inline RenderablePointLight(const Vec4& lightColor, const Vec3& lightPosition, const float intensity, const float radius) :
+        RenderablePointLight(const Vec4& lightColor, const Vec3& lightPosition, const float intensity, const float radius) :
             mLightColor(lightColor), mLightPosition(lightPosition), mLightIntensity(intensity), mLightRadius(radius)
         {
         }
@@ -92,6 +94,11 @@ namespace JonsEngine
 
     struct RenderQueue
     {
+        RenderQueue(const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage) :
+            mLocalTransformStorage(localTransformStorage), mWorldTransformStorage(worldTransformStorage)
+        {
+        }
+
         void Clear();
 
 
@@ -101,5 +108,8 @@ namespace JonsEngine
         RenderableCamera mCamera;
         RenderableDirLights mDirectionalLights;
         RenderablePointLights mPointLights;
+
+        const IDMap<Mat4>& mLocalTransformStorage;
+        const IDMap<Mat4>& mWorldTransformStorage;
     };
 }

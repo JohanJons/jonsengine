@@ -32,9 +32,10 @@ namespace JonsGame
         void SetupSponzaScene(JonsEngine::Scene* myScene, JonsEngine::JonsPackagePtr jonsPackage);
         void UpdateSun();
 
+
         JonsEngine::EngineSettings mSettings;
+        JonsEngine::Engine mEngine;
         JonsEngine::DebugOptions mDebugOptions;
-        std::unique_ptr<JonsEngine::Engine> mEngine;
 
         bool mRunning;
         float mSunAngle;

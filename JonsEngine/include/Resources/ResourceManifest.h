@@ -34,6 +34,7 @@ namespace JonsEngine
 
         const std::vector<ModelPtr>& GetAllModels() const;
         std::vector<ModelPtr>& GetAllModels();
+        const IDMap<Mat4>& GetTransformStorage() const;
 
 
     private:
@@ -44,9 +45,4 @@ namespace JonsEngine
         std::vector<ModelPtr> mModels;
         std::vector<MaterialPtr> mMaterials;
     };
-
-
-    /* ResourceManifest inlines */
-    inline const std::vector<ModelPtr>& ResourceManifest::GetAllModels() const      { return mModels; }
-    inline std::vector<ModelPtr>& ResourceManifest::GetAllModels()                  { return mModels; }
 }

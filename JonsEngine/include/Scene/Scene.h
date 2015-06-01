@@ -23,7 +23,7 @@ namespace JonsEngine
     class Scene
     {
     public:
-        Scene(const std::string& sceneName);
+        Scene(const std::string& sceneName, const IDMap<Mat4>& modelTransformCache);
         ~Scene();
 
         bool operator==(const Scene& s1);

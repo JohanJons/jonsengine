@@ -7,7 +7,7 @@
 
 namespace JonsEngine
 {
-    SceneManager::SceneManager() : mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mActiveScene(CreateScene("DefaultScene"))
+    SceneManager::SceneManager(const IDMap<Mat4>& modelTransformCache) : mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mModelTransformCache(modelTransformCache), mActiveScene(CreateScene("DefaultScene"))
     {
     }
 

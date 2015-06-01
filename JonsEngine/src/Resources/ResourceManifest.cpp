@@ -148,4 +148,20 @@ namespace JonsEngine
 
         return material;
     }
+
+
+    const std::vector<ModelPtr>& ResourceManifest::GetAllModels() const
+    { 
+        return mModels;
+    }
+
+    std::vector<ModelPtr>& ResourceManifest::GetAllModels()
+    { 
+        return mModels;
+    }
+
+    const IDMap<Mat4>& ResourceManifest::GetTransformStorage() const
+    {
+        return mTransformCache.GetStorage();
+    }
 }

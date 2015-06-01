@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Scene/Scene.h"
+#include "include/Core/Containers/IDMap.hpp"
 
 #include <vector>
 #include <memory>
@@ -13,7 +14,7 @@ namespace JonsEngine
     class SceneManager
     {
     public:
-        SceneManager();
+        SceneManager(const IDMap<Mat4>& modelTransformCache);
         ~SceneManager();
 
         Scene* CreateScene(const std::string& sceneName);
@@ -27,6 +28,7 @@ namespace JonsEngine
 
     private:
         IMemoryAllocator& mMemoryAllocator;
+        const IDMap<Mat4>& mModelTransformCache;
 
         std::vector<ScenePtr> mScenes;
 		Scene* mActiveScene;

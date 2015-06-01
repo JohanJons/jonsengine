@@ -159,10 +159,10 @@ namespace JonsEngine
     }
 
 
-    Scene::Scene(const std::string& sceneName) :
+    Scene::Scene(const std::string& sceneName, const IDMap<Mat4>& modelTransformCache) :
         mName(sceneName), mHashedID(boost::hash_value(sceneName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()),
         // TODO: lambda expression adds a layer of indirection, but I'm not sure how the bind syntax would look like
-        mRootNode("Root", mTransformCache.GetStorage(), [&](SceneNode* node) { mDirtySceneNodes.push_back(node); }), mAmbientLight(0.2f)
+        mRootNode("Root", mTransformCache.GetStorage(), [&](SceneNode* node) { mDirtySceneNodes.push_back(node); }), mAmbientLight(0.2f), mRenderQueue(modelTransformCache, mTransformCache.GetStorage())
     {
     }
 

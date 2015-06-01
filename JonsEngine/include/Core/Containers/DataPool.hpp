@@ -16,6 +16,11 @@ namespace JonsEngine
             return mStorage;
         }
 
+        const IDMap<T>& GetStorage() const
+        {
+            return mStorage;
+        }
+
 
     private:
         IDMap<T> mStorage;
