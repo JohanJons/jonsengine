@@ -262,7 +262,7 @@ namespace JonsEngine
                         AddAllMeshes(renderableDirLight.mMeshes, actor->mModel->GetRootNode(), worldTransformID);
                 }
 
-                renderableDirLight.mCascadeSplits.emplace_back(nearZ, farZ, renderableDirLight.mMeshes.size() - 1);
+                renderableDirLight.mCascadeSplits.emplace_back(nearZ, farZ, renderableDirLight.mMeshes.size());
             }
         }
 

@@ -294,7 +294,7 @@ namespace JonsEngine
     {
         assert(cascadeIndex < mNumShadowmapCascades);
 
-        const size_t startIndex = cascadeIndex == 0 ? 0 : mCascadeKDOPRange.at(cascadeIndex - 1) + 1;
+        const size_t startIndex = cascadeIndex == 0 ? 0 : mCascadeKDOPRange.at(cascadeIndex - 1);
         const size_t endIndex = mCascadeKDOPRange.at(cascadeIndex);
 
         return ConstRangedIterator<KDOP>(mKDOP, startIndex, endIndex);
@@ -370,8 +370,6 @@ namespace JonsEngine
             }
         }
 
-        //const size_t kdopEndSize = mKDOP.size();
-
-        mCascadeKDOPRange.push_back(mKDOP.size() - 1);
+        mCascadeKDOPRange.push_back(mKDOP.size());
     }
 }

@@ -8,9 +8,9 @@ namespace JonsEngine
     public:
         typedef typename Container::iterator Iterator;
 
-        RangedIterator(Container& container, const size_t begin, const size_t end) : mIterBegin(container.begin() + begin), mIterEnd(container.begin() + end)
+        RangedIterator(Container& container, const size_t beginIndex, const size_t upToIndex) : mIterBegin(container.begin() + beginIndex), mIterEnd(container.begin() + upToIndex)
         {
-            assert(end >= begin);
+            assert(upToIndex >= beginIndex);
         }
 
         Iterator begin()
@@ -36,9 +36,9 @@ namespace JonsEngine
     public:
         typedef typename Container::const_iterator Iterator;
 
-        ConstRangedIterator(const Container& container, const size_t begin, const size_t end) : mIterBegin(container.cbegin() + begin), mIterEnd(container.cbegin() + end)
+        ConstRangedIterator(const Container& container, const size_t beginIndex, const size_t upToIndex) : mIterBegin(container.cbegin() + beginIndex), mIterEnd(container.cbegin() + upToIndex)
         {
-            assert(end >= begin);
+            assert(upToIndex >= beginIndex);
         }
 
         const Iterator begin() const
