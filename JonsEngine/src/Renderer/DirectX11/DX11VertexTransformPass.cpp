@@ -40,9 +40,10 @@ namespace JonsEngine
         mesh.DrawPositions();
     }
 
-    void DX11VertexTransformPass::RenderMeshes(const RenderableMeshes& meshes, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix)
+    template <typename T>
+    void RenderMeshesAux(const T& meshContainer, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix)
     {
-        for (const RenderableMesh& mesh : meshes)
+        for (const RenderableMesh& mesh : meshContainer)
         {
             const Mat4& localTransform = localTransformStorage.GetItem(mesh.mLocalTransformID);
             const Mat4& worldTransform = worldTransformStorage.GetItem(mesh.mWorldTransformID);
@@ -50,6 +51,16 @@ namespace JonsEngine
             mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * worldTransform * localTransform));
             mMeshMap.GetItem(mesh.mMeshID).DrawPositions();
         }
+    }
+
+    void DX11VertexTransformPass::RenderMeshes(const RenderableMeshes& meshes, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix)
+    {
+        RenderMeshesAux(meshes, localTransformStorage, worldTransformStorage, viewProjectionMatrix);
+    }
+
+    void DX11VertexTransformPass::RenderMeshes(ConstRangedIterator<RenderableMeshes>& meshIterator, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix)
+    {
+        RenderMeshesAux(meshIterator, localTransformStorage, worldTransformStorage, viewProjectionMatrix);
     }
 
     void DX11VertexTransformPass::RenderAABBs(const RenderableModels& models, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix)

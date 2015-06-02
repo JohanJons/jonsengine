@@ -237,12 +237,15 @@ namespace JonsEngine
         // dir lights
         for (DirectionalLightPtr& dirLight : mDirectionalLights)
         {
-            mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, glm::normalize(dirLight->mLightDirection), dirLight->GetSplitDistances());
+            mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, glm::normalize(dirLight->mLightDirection));
             RenderableDirLight& renderableDirLight = mRenderQueue.mDirectionalLights.back();
 
             dirLight->UpdateCascadesBoundingVolume(mRenderQueue.mCamera.mCameraViewMatrix, cameraFov, windowAspectRatio, 0.0f, 1.0f);
             for (uint32_t cascadeIndex = 0; cascadeIndex < dirLight->mNumShadowmapCascades; ++cascadeIndex)
             {
+                float nearZ = 0.0f, farZ = 0.0f;
+                dirLight->GetSplitDistance(cascadeIndex, nearZ, farZ);
+
                 auto kdopIterator = dirLight->GetBoundingVolume(cascadeIndex);
                 for (const ActorPtr& actor : mActors)
                 {
@@ -258,6 +261,8 @@ namespace JonsEngine
                     if (aabbIntersection == AABBIntersection::Inside || aabbIntersection == AABBIntersection::Partial)
                         AddAllMeshes(renderableDirLight.mMeshes, actor->mModel->GetRootNode(), worldTransformID);
                 }
+
+                renderableDirLight.mCascadeSplits.emplace_back(nearZ, farZ, renderableDirLight.mMeshes.size() - 1);
             }
         }
 

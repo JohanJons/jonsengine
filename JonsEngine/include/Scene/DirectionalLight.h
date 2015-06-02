@@ -23,7 +23,7 @@ namespace JonsEngine
         void UpdateCascadesBoundingVolume(const Mat4& viewMatrix, const float degreesFOV, const float aspectRatio, const float minDepth, const float maxDepth);
         
         ConstRangedIterator<KDOP> GetBoundingVolume(const uint32_t cascadeIndex) const;
-        const std::vector<float>& GetSplitDistances() const;
+        void GetSplitDistance(const uint32_t cascadeIndex, float& nearZ, float& farZ) const;
 
 
         const std::string mName;

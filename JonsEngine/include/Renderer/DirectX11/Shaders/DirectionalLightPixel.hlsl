@@ -7,13 +7,13 @@
 #include "Shadowmapping.hlsl"
 #include "OptimizedPCF.hlsl"
 
-static const uint gNumCascades = 4;
+static const uint gMaxNumCascades = 4;
 
 cbuffer DirectionalLightConstants : register(CBUFFER_REGISTER_PIXEL)
 {
-    float4x4 gSplitVPMatrices[gNumCascades];
+    float4x4 gSplitVPMatrices[gMaxNumCascades];
     float4x4 gInvProjMatrix;
-    float4 gSplitDistances;
+    float gSplitDistances[gMaxNumCascades];
     float4 gLightColor;
     float4 gLightDirection;
     float2 gWindowSize;

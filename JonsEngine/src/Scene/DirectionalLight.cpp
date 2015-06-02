@@ -300,9 +300,12 @@ namespace JonsEngine
         return ConstRangedIterator<KDOP>(mKDOP, startIndex, endIndex);
     }
 
-    const std::vector<float>& DirectionalLight::GetSplitDistances() const
+    void DirectionalLight::GetSplitDistance(const uint32_t cascadeIndex, float& nearZ, float& farZ) const
     {
-        return mSplitDistances;
+        assert(cascadeIndex < mNumShadowmapCascades);
+
+        nearZ = mSplitDistances[cascadeIndex];
+        farZ = mSplitDistances[cascadeIndex + 1];
     }
 
 

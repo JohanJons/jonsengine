@@ -61,15 +61,29 @@ namespace JonsEngine
 
     struct RenderableDirLight
     {
-        RenderableDirLight(const Vec4& lightColor, const Vec3& lightDir, const std::vector<float>& splitDistances) : mLightColor(lightColor), mLightDirection(lightDir), mSplitDistances(splitDistances)
+        struct CascadeSplit
+        {
+            CascadeSplit(const float nearZ, const float farZ, const size_t meshEndIndex) : mNearZ(nearZ), mFarZ(farZ), mMeshEndIndex(meshEndIndex)
+            {
+            }
+
+
+            float mNearZ;
+            float mFarZ;
+            size_t mMeshEndIndex;
+        };
+
+
+        RenderableDirLight(const Vec4& lightColor, const Vec3& lightDir, const uint32_t numCascades) : mLightColor(lightColor), mLightDirection(lightDir), mNumCascades(numCascades)
         {
         }
 
 
         Vec4 mLightColor;
         Vec3 mLightDirection;
-        std::vector<float> mSplitDistances;
+        uint32_t mNumCascades;
 
+        std::vector<CascadeSplit> mCascadeSplits;
         RenderableMeshes mMeshes;
     };
     

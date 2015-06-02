@@ -6,6 +6,7 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
+#include "include/Core/Containers/RangedIterator.hpp"
 
 #include <d3d11.h>
 #include <vector>
@@ -22,6 +23,7 @@ namespace JonsEngine
         void BindForTransformPass(const D3D_PRIMITIVE_TOPOLOGY primitiveTopology);
         void RenderMesh(DX11Mesh& mesh, const Mat4& wvpMatrix);
         void RenderMeshes(const RenderableMeshes& meshes, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix);
+        void RenderMeshes(ConstRangedIterator<RenderableMeshes>& meshIterator, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix);
         void RenderAABBs(const RenderableModels& models, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix);
 
 

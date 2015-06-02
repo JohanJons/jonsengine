@@ -14,6 +14,7 @@
 #include "include/Core/Math/Math.h"
 
 #include <array>
+#include <limits>
 
 namespace JonsEngine
 {
@@ -107,14 +108,6 @@ namespace JonsEngine
 
 
         //
-        // Reduce Depth pass
-        //
-
-		std::array<float, NUM_SHADOWMAP_CASCADES> splitDistances;
-		const float minZ = CalculateShadowmapCascades(cameraProjMatrix, splitDistances);
-
-
-        //
         // Shadow pass
         //
 
@@ -124,28 +117,36 @@ namespace JonsEngine
         // depth clamp to avoid issues with meshes between splits
         mContext->RSSetState(mRSDepthClamp);
 
-        std::array<Mat4, NUM_SHADOWMAP_CASCADES> lightVPMatrices;
-
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         mShadowmap.BindForDrawing();
-        
-        for (uint32_t cascadeIndex = 0; cascadeIndex < NUM_SHADOWMAP_CASCADES; ++cascadeIndex)
+
+        const float maxFloatVal = std::numeric_limits<float>::max();
+        std::array<float, NUM_SHADOWMAP_CASCADES> splitDistances = { maxFloatVal, maxFloatVal, maxFloatVal, maxFloatVal };
+        std::array<Mat4, NUM_SHADOWMAP_CASCADES> lightVPMatrices;
+        for (uint32_t cascadeIndex = 0; cascadeIndex < directionalLight.mNumCascades; ++cascadeIndex)
         {
             mShadowmap.BindDepthView(cascadeIndex);
+
+            const auto& cascadeSplit = directionalLight.mCascadeSplits.at(cascadeIndex);
             
-            // get cascade frustrum
-            const Mat4 perspectiveMatrix = PerspectiveMatrixFov(degreesFOV, aspectRatio, cascadeIndex == 0 ? minZ : splitDistances[cascadeIndex - 1], splitDistances[cascadeIndex]);
+            // create view-projection matrix for cascade
+            const Mat4 perspectiveMatrix = PerspectiveMatrixFov(degreesFOV, aspectRatio, cascadeSplit.mNearZ, cascadeSplit.mFarZ);
             const auto frustumCorners = GetFrustumCorners(perspectiveMatrix * cameraViewMatrix);
-
             lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(frustumCorners, directionalLight.mLightDirection);
-            mVertexTransformPass.RenderMeshes(directionalLight.mMeshes, localTransformStorage, worldTransformStorage, lightVPMatrices[cascadeIndex]);
 
+            // render meshes from lights POV
+            const size_t meshStartIndex = cascadeIndex == 0 ? 0 : directionalLight.mCascadeSplits.at(cascadeIndex - 1).mMeshEndIndex;
+            const size_t meshEndIndex = cascadeSplit.mMeshEndIndex;
+            ConstRangedIterator<RenderableMeshes> meshIterator(directionalLight.mMeshes, meshStartIndex, meshEndIndex);
+            mVertexTransformPass.RenderMeshes(meshIterator, localTransformStorage, worldTransformStorage, lightVPMatrices[cascadeIndex]);
+
+            // store view-projection for shading pass
             lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex] * glm::inverse(cameraViewMatrix);
         }
 
         // negate the split distances for comparison against view space position in the shader
-        for (uint32_t cascadeIndex = 0; cascadeIndex < NUM_SHADOWMAP_CASCADES; ++cascadeIndex)
-            splitDistances[cascadeIndex] = -splitDistances[cascadeIndex];
+        for (uint32_t cascadeIndex = 0; cascadeIndex < directionalLight.mNumCascades; ++cascadeIndex)
+            splitDistances[cascadeIndex] = -directionalLight.mCascadeSplits.at(cascadeIndex).mFarZ;
 
 
         //
