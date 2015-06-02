@@ -41,7 +41,7 @@ namespace JonsEngine
     }
 
     template <typename T>
-    void RenderMeshesAux(const T& meshContainer, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix)
+    void DX11VertexTransformPass::RenderMeshesAux(const T& meshContainer, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix)
     {
         for (const RenderableMesh& mesh : meshContainer)
         {

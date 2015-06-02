@@ -10,7 +10,7 @@ namespace JonsEngine
     DirectionalLight::DirectionalLight(const std::string& name, const uint32_t numShadowmapCascades) :
         mName(name), mNumShadowmapCascades(numShadowmapCascades), mLightColor(1.0f), mLightDirection(0.0f, -1.0f, -1.0f), mCascadeSplitLambda(0.8f), mHashedID(boost::hash_value(name))
     {
-        assert(numShadowmapCascades >= 1);
+        assert(numShadowmapCascades >= 1 && numShadowmapCascades <= 4);
 
         mCascadeKDOPRange.reserve(numShadowmapCascades);
         mSplitDistances.reserve(numShadowmapCascades);

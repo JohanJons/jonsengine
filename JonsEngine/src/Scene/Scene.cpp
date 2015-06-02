@@ -237,7 +237,7 @@ namespace JonsEngine
         // dir lights
         for (DirectionalLightPtr& dirLight : mDirectionalLights)
         {
-            mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, glm::normalize(dirLight->mLightDirection));
+            mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, glm::normalize(dirLight->mLightDirection), dirLight->mNumShadowmapCascades);
             RenderableDirLight& renderableDirLight = mRenderQueue.mDirectionalLights.back();
 
             dirLight->UpdateCascadesBoundingVolume(mRenderQueue.mCamera.mCameraViewMatrix, cameraFov, windowAspectRatio, 0.0f, 1.0f);

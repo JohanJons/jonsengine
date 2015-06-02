@@ -38,6 +38,10 @@ namespace JonsEngine
             }
         };
 
+        template <typename T>
+        void RenderMeshesAux(const T& meshes, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix);
+
+
         ID3D11DeviceContextPtr mContext;
         ID3D11VertexShaderPtr mVertexShader;
         ID3D11InputLayoutPtr mInputLayout;

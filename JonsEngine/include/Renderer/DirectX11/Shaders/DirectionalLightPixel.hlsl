@@ -13,7 +13,7 @@ cbuffer DirectionalLightConstants : register(CBUFFER_REGISTER_PIXEL)
 {
     float4x4 gSplitVPMatrices[gMaxNumCascades];
     float4x4 gInvProjMatrix;
-    float gSplitDistances[gMaxNumCascades];
+    float4 gSplitDistances;
     float4 gLightColor;
     float4 gLightDirection;
     float2 gWindowSize;
