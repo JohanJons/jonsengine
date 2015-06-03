@@ -155,14 +155,14 @@ namespace JonsEngine
 
         // do all directional lights
         for (const RenderableDirLight& directionalLight : renderQueue.mDirectionalLights)
-            mDirectionalLightPass.Render(directionalLight, renderQueue.mLocalTransformStorage, renderQueue.mWorldTransformStorage, shadowFiltering, renderQueue.mCamera.mFOV, mWindowSize.x / mWindowSize.y, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix, mWindowSize, renderQueue.mCamera.mCameraProjectionMatrix);
+            mDirectionalLightPass.Render(directionalLight, renderQueue.mLocalTransformStorage, renderQueue.mWorldTransformStorage, shadowFiltering, renderQueue.mCamera.mFOV, mWindowSize.x / mWindowSize.y, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix, mWindowSize);
 
         // do all point lights
         mPointLightPass.BindForShading();
         for (const RenderablePointLight& pointLight : renderQueue.mPointLights)
         {
             mContext->ClearDepthStencilView(mDSV, D3D11_CLEAR_STENCIL, 1.0f, 0);
-            mPointLightPass.Render(pointLight, renderQueue.mLocalTransformStorage, renderQueue.mWorldTransformStorage, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix, mWindowSize, Z_FAR, Z_NEAR);
+            mPointLightPass.Render(pointLight, renderQueue.mLocalTransformStorage, renderQueue.mWorldTransformStorage, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix, mWindowSize);
         }
 
         // turn off blending

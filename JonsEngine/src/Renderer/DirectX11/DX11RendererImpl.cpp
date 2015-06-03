@@ -120,6 +120,7 @@ namespace JonsEngine
         mAntiAliasing(settings.mAntiAliasing),
 
         mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), mShadowResolution, mShadowReadbackLatency, mMeshes, mTextures),
+        mDepthReductionPass(mDevice, mContext, settings.mShadowReadbackLatency, settings.mWindowWidth, settings.mWindowHeight),
 
         // samplers
         mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, mContext, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
@@ -192,7 +193,7 @@ namespace JonsEngine
 
     void DX11RendererImpl::ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth)
     {
-        //mImplementation->ReduceDepth(cameraProjMatrix, minDepth, maxDepth);
+        mDepthReductionPass.ReduceDepth(cameraProjMatrix, minDepth, maxDepth);
     }
 
 

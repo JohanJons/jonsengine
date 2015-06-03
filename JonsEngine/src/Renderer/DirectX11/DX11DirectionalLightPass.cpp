@@ -94,7 +94,7 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const Mat4& cameraProjMatrix)
+    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize)
     {
         // preserve current state
         D3D11_VIEWPORT prevViewport;
@@ -173,37 +173,6 @@ namespace JonsEngine
         mFullscreenPass.Render();
     }
 
-
-	float DX11DirectionalLightPass::CalculateShadowmapCascades(const Mat4& cameraProjMatrix, std::array<float, NUM_SHADOWMAP_CASCADES>& splitDistances)
-	{
-        float minDepth = 0.0f, maxDepth = 1.0f;
-        // temp
-		//ReduceDepth(cameraProjMatrix, minDepth, maxDepth);
-
-		const float nearClip = Z_NEAR;
-		const float farClip = Z_FAR;
-		const float clipRange = farClip - nearClip;
-
-		const float minZ = nearClip + minDepth * clipRange;
-		const float maxZ = nearClip + maxDepth * clipRange;
-
-        const float range = maxZ - minZ;
-        const float ratio = maxZ / minZ;
-
-		for (uint32_t cascadeIndex = 0; cascadeIndex < DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES; ++cascadeIndex)
-		{
-			const float p = (cascadeIndex + 1) / static_cast<float>(DX11DirectionalLightPass::NUM_SHADOWMAP_CASCADES);
-			const float log = minZ * std::pow(ratio, p);
-			const float uniform = minZ + range * p;
-			const float d = log - uniform + uniform;
-			splitDistances[cascadeIndex] = (d - nearClip) / clipRange;
-
-            splitDistances[cascadeIndex] *= farClip;
-		}
-
-		// minZ is used for first splits near distance
-		return minZ;
-	}
 
     void DX11DirectionalLightPass::BindShadingPixelShader(const EngineSettings::ShadowFiltering shadowFiltering)
     {

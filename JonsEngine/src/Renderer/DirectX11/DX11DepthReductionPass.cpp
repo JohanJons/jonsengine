@@ -16,8 +16,8 @@ namespace JonsEngine
     }
 
 
-    DX11DepthReductionPass::DX11DepthReductionPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const uint32_t readbackLatency, const uint32_t windowWidth, const uint32_t windowHeight) :
-        mReadbackLatency(readbackLatency), mCurrFrame(0), mContext(context), mSDSMInitialShader(nullptr), mSDSMFinalShader(nullptr), mSDSMCBuffer(device, context, mSDSMCBuffer.CONSTANT_BUFFER_SLOT_COMPUTE)
+    DX11DepthReductionPass::DX11DepthReductionPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const EngineSettings::ShadowReadbackLatency readbackLatency, const uint16_t windowWidth, const uint16_t windowHeight) :
+        mReadbackLatency(EngineSettingsToVal(readbackLatency)), mCurrFrame(0), mContext(context), mSDSMInitialShader(nullptr), mSDSMFinalShader(nullptr), mSDSMCBuffer(device, context, mSDSMCBuffer.CONSTANT_BUFFER_SLOT_COMPUTE)
     {
         DXCALL(device->CreateComputeShader(gSDSMInitialComputeShader, sizeof(gSDSMInitialComputeShader), nullptr, &mSDSMInitialShader));
         DXCALL(device->CreateComputeShader(gSDSMFinalComputeShader, sizeof(gSDSMFinalComputeShader), nullptr, &mSDSMFinalShader));

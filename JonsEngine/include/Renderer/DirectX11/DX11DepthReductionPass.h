@@ -4,6 +4,7 @@
 #include "include/Renderer/DirectX11/DX11RenderTarget2D.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Core/Types.h"
+#include "include/Core/EngineSettings.h"
 
 #include <array>
 #include <vector>
@@ -15,7 +16,7 @@ namespace JonsEngine
     public:
         const static uint32_t MAX_READBACK_LATENCY = 3;
 
-        DX11DepthReductionPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const uint32_t readbackLatency, const uint32_t windowWidth, const uint32_t windowHeight);
+        DX11DepthReductionPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const EngineSettings::ShadowReadbackLatency readbackLatency, const uint16_t windowWidth, const uint16_t windowHeight);
         ~DX11DepthReductionPass();
 
 

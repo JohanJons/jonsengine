@@ -119,7 +119,7 @@ namespace JonsEngine
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     }
 
-    void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const float zFar, const float zNear)
+    void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
@@ -132,8 +132,7 @@ namespace JonsEngine
         mContext->OMGetDepthStencilState(&prevDSState, 0);
         mContext->OMGetRenderTargets(1, &prevRTV, &prevDSV);
         mContext->RSGetViewports(&numViewports, &prevViewport);
-		const Vec4 viewLightPositonV4 = camViewMatrix * Vec4(pointLight.mLightPosition, 1.0);
-		const Vec3 viewLightPositonV3 = Vec3(viewLightPositonV4);
+        const Vec3 viewLightPositonV3 = Vec3(camViewMatrix * Vec4(pointLight.mLightPosition, 1.0));
 
 
         //

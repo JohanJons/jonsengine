@@ -27,7 +27,7 @@ namespace JonsEngine
             const EngineSettings::ShadowReadbackLatency readbackLatency, const uint32_t windowWidth, const uint32_t windowHeight);
         ~DX11DirectionalLightPass();
 
-        void Render(const RenderableDirLight& directionalLight, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize, const Mat4& cameraProjMatrix);
+        void Render(const RenderableDirLight& directionalLight, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const float aspectRatio, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize);
 
 
     private:
@@ -49,7 +49,6 @@ namespace JonsEngine
             }
         };
 
-		float CalculateShadowmapCascades(const Mat4& cameraProjMatrix, std::array<float, NUM_SHADOWMAP_CASCADES>& splitDistances);
         void BindShadingPixelShader(const EngineSettings::ShadowFiltering shadowFiltering);
 
         ID3D11DeviceContextPtr mContext;

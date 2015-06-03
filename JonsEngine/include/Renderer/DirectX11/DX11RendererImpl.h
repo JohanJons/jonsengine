@@ -5,7 +5,7 @@
 #include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11Context.h"
 #include "include/Renderer/DirectX11/DX11Pipeline.h"
-#include "include/Renderer/DirectX11/DX11GBuffer.h"
+#include "include/Renderer/DirectX11/DX11DepthReductionPass.h"
 #include "include/Renderer/DirectX11/DX11Sampler.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/Types.h"
@@ -72,6 +72,7 @@ namespace JonsEngine
         EngineSettings::AntiAliasing mAntiAliasing;
 
         DX11Pipeline mPipeline;
+        DX11DepthReductionPass mDepthReductionPass;
         ID3D11RasterizerStatePtr mDefaultRasterizerState;
         std::unique_ptr<DX11Sampler, std::function<void(DX11Sampler*)>> mModelSampler;
         DX11Sampler mShadowmapSampler;

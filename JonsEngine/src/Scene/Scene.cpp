@@ -182,21 +182,19 @@ namespace JonsEngine
     }
 
 
-    const RenderQueue& Scene::GetRenderQueue(const uint32_t windowWidth, const uint32_t windowHeight, const float zNear, const float zFar)
+    const RenderQueue& Scene::GetRenderQueue(const Mat4& cameraProjectionMatrix, const float fov, const float aspectRatio, const float minDepth, const float maxDepth)
     {
         UpdateDirtyObjects();
 
         mRenderQueue.Clear();
 
         const Camera& sceneCamera = GetSceneCamera();
-        const float cameraFov = sceneCamera.GetFOV();
-        const float windowAspectRatio = windowWidth / static_cast<float>(windowHeight);
 
         // camera
-        mRenderQueue.mCamera.mFOV = cameraFov;
+        mRenderQueue.mCamera.mFOV = fov;
         mRenderQueue.mCamera.mCameraPosition = sceneCamera.Position();
         mRenderQueue.mCamera.mCameraViewMatrix = sceneCamera.GetCameraTransform();
-        mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(cameraFov, windowAspectRatio, zNear, zFar);
+        mRenderQueue.mCamera.mCameraProjectionMatrix = cameraProjectionMatrix;
         mRenderQueue.mCamera.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
 
 		for (const ActorPtr& actor : mActors)
@@ -240,7 +238,7 @@ namespace JonsEngine
             mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, glm::normalize(dirLight->mLightDirection), dirLight->mNumShadowmapCascades);
             RenderableDirLight& renderableDirLight = mRenderQueue.mDirectionalLights.back();
 
-            dirLight->UpdateCascadesBoundingVolume(mRenderQueue.mCamera.mCameraViewMatrix, cameraFov, windowAspectRatio, 0.0f, 1.0f);
+            dirLight->UpdateCascadesBoundingVolume(mRenderQueue.mCamera.mCameraViewMatrix, fov, aspectRatio, minDepth, maxDepth);
             for (uint32_t cascadeIndex = 0; cascadeIndex < dirLight->mNumShadowmapCascades; ++cascadeIndex)
             {
                 float nearZ = 0.0f, farZ = 0.0f;
