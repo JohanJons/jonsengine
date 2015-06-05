@@ -35,41 +35,6 @@ namespace JonsEngine
         return ret;
     }
 
-    FrustumCorners GetFrustumCorners(const Mat4& cameraViewProjMatrix)
-    {
-        FrustumCorners ret = { Vec4(-1.0f, -1.0f, 0.0f, 1.0f),     // near bottom-left
-                               Vec4(-1.0f, 1.0f, 0.0f, 1.0f),      // near top-left
-                               Vec4(1.0f, 1.0f, 0.0f, 1.0f),       // near top-right
-                               Vec4(1.0f, -1.0f, 0.0f, 1.0f),      // near bottom-right
-                               Vec4(-1.0f, -1.0f, 1.0f, 1.0f),     // far bottom-left
-                               Vec4(-1.0f, 1.0f, 1.0f, 1.0f),      // far top-left
-                               Vec4(1.0f, 1.0f, 1.0f, 1.0f),       // far top-right
-                               Vec4(1.0f, -1.0f, 1.0f, 1.0f), };   // far bottom-right
-
-        const Mat4 invVP = glm::inverse(cameraViewProjMatrix);
-
-        for (Vec4& corner : ret)
-        {
-            corner = invVP * corner;
-            corner /= corner.w;
-        }
-
-        return ret;
-    }
-
-    FrustumPlanes GetFrustumPlanes(const Mat4& viewFrustum)
-    {
-        return FrustumPlanes
-        { {
-                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) + Vec4(viewFrustum[0].x, viewFrustum[1].x, viewFrustum[2].x, viewFrustum[3].x)),      // left
-                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) - Vec4(viewFrustum[0].x, viewFrustum[1].x, viewFrustum[2].x, viewFrustum[3].x)),      // right
-                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) - Vec4(viewFrustum[0].y, viewFrustum[1].y, viewFrustum[2].y, viewFrustum[3].y)),      // top
-                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) + Vec4(viewFrustum[0].y, viewFrustum[1].y, viewFrustum[2].y, viewFrustum[3].y)),      // bottom
-                Plane(Vec4(viewFrustum[0].z, viewFrustum[1].z, viewFrustum[2].z, viewFrustum[3].z)),                                                                                     // near
-                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) - Vec4(viewFrustum[0].z, viewFrustum[1].z, viewFrustum[2].z, viewFrustum[3].z)),      // far
-        } };
-    }
-
 
     Vec3 MinVal(const Vec3& v1, const Vec3& v2)
     {

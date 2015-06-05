@@ -65,7 +65,7 @@ namespace JonsEngine
     inline EngineSettings::EngineSettings() :
         // render settings
         mShadowResolution(ShadowResolution::RESOLUTION_2048),
-        mShadowReadbackLatency(ShadowReadbackLatency::LATENCY_1),
+        mShadowReadbackLatency(ShadowReadbackLatency::LATENCY_2),
         mShadowFiltering(ShadowFiltering::PCF_2X2),
         mAnisotropicFiltering(Anisotropic::X16),
         mAntiAliasing(AntiAliasing::FXAA),

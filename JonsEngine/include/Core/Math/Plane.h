@@ -18,6 +18,5 @@ namespace JonsEngine
         const float mDistance;
     };
 
-    typedef std::array<Plane, 6> FrustumPlanes;
     typedef std::vector<Plane> KDOP;
 }

@@ -2,6 +2,7 @@
 
 #include "include/Core/Math/AABB.h"
 #include "include/Core/Math/Plane.h"
+#include "include/Core/Math/Frustum.h"
 #include "include/Core/Types.h"
 #include "include/Core/Containers/RangedIterator.hpp"
 

@@ -17,15 +17,11 @@ namespace JonsEngine
      * Contains various math functions
      */
 
-    typedef std::array<Vec4, 8> FrustumCorners;
-     
     const Mat4 gIdentityMatrix(1.0f);
 
 
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float ratio, const float zNear, const float zFar);
     Mat4 OrthographicMatrix(const float left, const float right, const float top, const float bottom, const float zNear, const float zFar);
-    FrustumCorners GetFrustumCorners(const Mat4& viewFrustum);
-    FrustumPlanes GetFrustumPlanes(const Mat4& viewFrustum);
 
     Vec3 MinVal(const Vec3& v1, const Vec3& v2);
     Vec4 MinVal(const Vec4& v1, const Vec4& v2);

@@ -239,6 +239,9 @@
     <ClCompile Include="src\Core\Math\Intersection.cpp">
       <Filter>Source Files\Core\Math</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Math\Frustum.cpp">
+      <Filter>Source Files\Core\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -447,6 +450,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\Containers\DataPool.hpp">
       <Filter>Header Files\Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Math\Frustum.h">
+      <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
 #include "include/Core/Types.h"
+#include "include/Core/Math/Frustum.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/EngineSettings.h"
 
