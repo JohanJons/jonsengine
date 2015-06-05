@@ -155,7 +155,7 @@ namespace JonsEngine
 
         // do all directional lights
         for (const RenderableDirLight& directionalLight : renderQueue.mDirectionalLights)
-            mDirectionalLightPass.Render(directionalLight, renderQueue.mLocalTransformStorage, renderQueue.mWorldTransformStorage, shadowFiltering, renderQueue.mCamera.mFOV, mWindowSize.x / mWindowSize.y, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix, mWindowSize);
+            mDirectionalLightPass.Render(directionalLight, renderQueue.mLocalTransformStorage, renderQueue.mWorldTransformStorage, shadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix);
 
         // do all point lights
         mPointLightPass.BindForShading();
