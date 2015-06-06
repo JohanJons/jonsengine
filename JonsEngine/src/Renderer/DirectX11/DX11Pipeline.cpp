@@ -35,7 +35,7 @@ namespace JonsEngine
 
         mAmbientPass(device, context, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, shadowmapResolution, shadowmapReadbackLatency, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-        mPointLightPass(device, mContext, mVertexTransformPass, shadowmapResolution),
+        mPointLightPass(device, mContext, mVertexTransformPass, shadowmapResolution, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mPostProcessor(device, context, mFullscreenTrianglePass, backbufferTextureDesc)
     {
         // create depth buffer/view/srv
@@ -162,7 +162,7 @@ namespace JonsEngine
         for (const RenderablePointLight& pointLight : renderQueue.mPointLights)
         {
             mContext->ClearDepthStencilView(mDSV, D3D11_CLEAR_STENCIL, 1.0f, 0);
-            mPointLightPass.Render(pointLight, renderQueue.mLocalTransformStorage, renderQueue.mWorldTransformStorage, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix, mWindowSize);
+            mPointLightPass.Render(pointLight, renderQueue.mLocalTransformStorage, renderQueue.mWorldTransformStorage, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix);
         }
 
         // turn off blending

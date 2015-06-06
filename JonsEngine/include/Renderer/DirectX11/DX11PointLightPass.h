@@ -30,10 +30,10 @@ namespace JonsEngine
             POINT_LIGHT_DIR_COUNT
         };
 
-        DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const EngineSettings::ShadowResolution shadowmapRes);
+        DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const EngineSettings::ShadowResolution shadowmapRes, const uint32_t windowWidth, const uint32_t windowHeight);
         ~DX11PointLightPass();
 
-        void Render(const RenderablePointLight& pointLight, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix, const Vec2& windowSize);
+        void Render(const RenderablePointLight& pointLight, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix);
 
         void BindForShading();
 
@@ -51,13 +51,17 @@ namespace JonsEngine
             float __padding;
 
 
-            PointLightCBuffer(const Mat4& invProjMatrix, const Vec4& lightColor, const Vec3& lightPosition, const Vec2& windowSize, const float lightIntensity, const float zNear, const float maxDistance) :
-                mInvProjMatrix(invProjMatrix), mLightColor(lightColor), mLightPosition(lightPosition, 1.0f), mWindowSize(windowSize), mLightIntensity(lightIntensity), mMaxDistance(maxDistance), mZNear(zNear)
+            PointLightCBuffer(const Mat4& invProjMatrix, const Vec4& lightColor, const Vec4& lightPosition, const Vec2& windowSize, const float lightIntensity, const float zNear, const float maxDistance) :
+                mInvProjMatrix(invProjMatrix), mLightColor(lightColor), mLightPosition(lightPosition), mWindowSize(windowSize), mLightIntensity(lightIntensity), mMaxDistance(maxDistance), mZNear(zNear)
             {
             }
         };
 
+
+        const Vec2 mWindowSize;
+
         ID3D11DeviceContextPtr mContext;
+
         ID3D11PixelShaderPtr mPixelShader;
         ID3D11DepthStencilStatePtr mDSSStencilPass;
         ID3D11DepthStencilStatePtr mDSSShadingPass;
