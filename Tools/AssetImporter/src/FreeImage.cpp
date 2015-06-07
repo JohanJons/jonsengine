@@ -27,14 +27,14 @@ namespace JonsAssetImporter
         PackageMaterial material;
 
         material.mName = textureName;
-        material.mDiffuseTexture = ProcessTexture(texturePath, TEXTURE_TYPE_DIFFUSE);
+        material.mDiffuseTexture = ProcessTexture(texturePath);
         material.mHasDiffuseTexture = true;
         pkg->mMaterials.push_back(material);
 
         return !material.mDiffuseTexture.mTextureData.empty();
     }
 
-    PackageTexture FreeImage::ProcessTexture(const boost::filesystem::path& assetPath, const JonsEngine::TextureType textureType)
+    PackageTexture FreeImage::ProcessTexture(const boost::filesystem::path& assetPath)
     {
         PackageTexture texture;
         const std::string filename = assetPath.filename().string();
@@ -65,7 +65,6 @@ namespace JonsAssetImporter
         texture.mName = assetPath.filename().string();
         texture.mTextureWidth = widthInPixels;
         texture.mTextureHeight = heightInPixels;
-        texture.mTextureType = textureType;
         // FreeImage implicitly converts image format to RGB/RGBA from BRG/BRGA
 
         for (unsigned y = 0; y < FreeImage_GetHeight(bitmap); y++) {

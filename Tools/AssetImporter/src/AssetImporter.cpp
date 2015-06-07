@@ -3,109 +3,77 @@
 #include "include/Utils.h"
 #include "include/Assimp.h"
 #include "include/FreeImage.h"
+#include <tuple>
 
 using namespace JonsEngine;
 
 namespace JonsAssetImporter
 {
-    bool Import(const std::string& packageName, const std::vector<boost::filesystem::path>& assets, const std::vector<std::string>& assetNames, Assimp& assimpImporter, FreeImage& freeimageParser);
+    enum class ParamType
+    {
+        UNKNOWN,
+        MODEL,
+        MATERIAL,
+        SKYBOX,
+        ASSET_NAME,
+        PACKAGE
+    };
+
+    typedef boost::filesystem::path FilePath;
+    typedef std::string AssetName;
+    typedef std::tuple<ParamType, FilePath> AssetPath;
+    typedef std::tuple<ParamType, FilePath, AssetName> Asset;
+
+    bool Import(const std::string& packageName, const std::vector<Asset>& assets, Assimp& assimpImporter, FreeImage& freeimageParser);
+
+    bool CheckForParamType(const std::string& parameter, ParamType& paramType);
+    bool ParseParam(const std::string& parameter, const ParamType type, std::vector<AssetPath>& assetPaths, std::vector<AssetName>& assetNames, std::string& packageName);
+    bool VerifyParams(std::vector<AssetPath>& assetPaths, std::vector<AssetName>& assetNames, std::string& packageName);
+    bool MatchAssetPathAndName(std::vector<AssetPath>& assetPaths, std::vector<AssetName>& assetNames, std::vector<Asset>& assets);
 
 
     ParseResult ParseCommands(const Command command, std::vector<std::string>& parameters)
     {
         Assimp assimpImporter;
         FreeImage freeimageParser;
-        ParseResult result = { false, GetLog() };
 
         if (parameters.size() <= 0)
         {
             Log("-JonsAssetImporter: ERROR: No commands given");
-            return result;
+            return { false, GetLog() };
         }
 
-        enum ImportFlag
-        {
-            UNKNOWN_FLAG = 0,
-            ASSET,
-            ASSET_NAME,
-            PACKAGE,
-        } flag(UNKNOWN_FLAG);
 
-        std::vector<boost::filesystem::path> assets;
-        std::vector<std::string> assetNames;
-        std::string package;
+        std::vector<AssetPath> assetPaths;
+        std::vector<AssetName> assetNames;
+        std::string packageName;
 
+        // parse parameters from input
+        ParamType paramType(ParamType::UNKNOWN);
         for (const std::string& parameter : parameters)
         {
-            if (parameter.compare("-a") == 0)
-            {
-                flag = ASSET;
+            if (CheckForParamType(parameter, paramType))
                 continue;
-            }
-            else if (parameter.compare("-n") == 0)
-            {
-                flag = ASSET_NAME;
-                continue;
-            }
-            else if (parameter.compare("-p") == 0)
-            {
-                flag = PACKAGE;
-                continue;
-            }
 
-            switch (flag)
-            {
-                case ASSET:
-                {
-                    assets.push_back(parameter);
-                    break;
-                }
-
-                case ASSET_NAME:
-                {
-                    assetNames.push_back(parameter);
-                    break;
-                }
-
-                case PACKAGE:
-                {
-                    if (!package.empty())
-                    {
-                        Log("-JonsAssetImporter: ERROR: Several package names given");
-                        return result;
-                    }
-
-                    package = parameter;
-                    if (package.size() <= 5 || (package.compare(package.size() - 5, 5, ".jons") != 0))
-                        package.append(".jons");
-                    break;
-                }
-
-                default:
-                {
-                    Log("-JonsAssetImporter: ERROR: No parameter flag set");
-                    return result;
-                }
-            }
+            if (!ParseParam(parameter, paramType, assetPaths, assetNames, packageName))
+                return ParseResult { false, GetLog() };
         }
 
-        // verify parameters
-        if (assets.size() <= 0) {
-            Log("-JonsAssetImporter: ERROR: No assets supplied");
-            return result;
-        }
+        // verify params
+        if (!VerifyParams(assetPaths, assetNames, packageName))
+            return ParseResult { false, GetLog() };
 
-        if (package.empty()) {
-            Log("-JonsAssetImporter: ERROR: No package name given");
-            return result;
-        }
+        // build asset info
+        std::vector<Asset> assets;
+        if (!MatchAssetPathAndName(assetPaths, assetNames, assets))
+            return ParseResult{ false, GetLog() };
 
         bool cmdResult = false;
         switch (command)
         {
             case Command::IMPORT:
             {
-                cmdResult = Import(package, assets, assetNames, assimpImporter, freeimageParser);
+                cmdResult = Import(packageName, assets, assimpImporter, freeimageParser);
                 break;
             }
 
@@ -113,12 +81,10 @@ namespace JonsAssetImporter
                 Log("-JonsAssetImporter: ERROR: Unknown command");
         }
 
-        result.mSuccess = cmdResult;
-
-        return result;
+        return { cmdResult, GetLog() };
     }
 
-    bool Import(const std::string& packageName, const std::vector<boost::filesystem::path>& assets, const std::vector<std::string>& assetNames, Assimp& assimpImporter, FreeImage& freeimageParser)
+    bool Import(const std::string& packageName, const std::vector<Asset>& assets, Assimp& assimpImporter, FreeImage& freeimageParser)
     {
         JonsPackagePtr pkg;// = ReadJonsPkg(packageName);   // TODO: support opening previous package
         uint32_t materialNum = 0;
@@ -126,45 +92,150 @@ namespace JonsAssetImporter
             pkg = JonsPackagePtr(new JonsPackage());
 
         bool ret;
-        std::vector<std::string>::const_iterator assetName = assetNames.begin();
-        for (const boost::filesystem::path& asset : assets)
+        for (const Asset& asset : assets)
         {
-            if (!boost::filesystem::exists(asset) || !boost::filesystem::is_regular_file(asset))
-            {
-                Log("-JonsAssetImporter: No such file: " + asset.string());
-                continue;
-            }
+            const auto& assetType = std::get<0>(asset);
+            const auto& assetPath = std::get<1>(asset);
+            const auto& assetName = std::get<2>(asset);
 
-            switch (GetAssetType(asset.string().c_str()))
+            switch (assetType)
             {
-                case MODEL:
+                case ParamType::MODEL:
                 {
-                    const std::string modelName = assetName != assetNames.end() ? *assetName : std::string();
-                    ret = assimpImporter.ProcessScene(asset, modelName, freeimageParser, pkg);
-
+                    ret = assimpImporter.ProcessScene(assetPath, assetName, freeimageParser, pkg);
                     break;
                 }
 
-                case MATERIAL:
+                case ParamType::MATERIAL:
                 {
-                    // assume diffuse texture - could it be anything else?
-                    const std::string textureName = assetName != assetNames.end() ? *assetName : asset.filename().string();
-                    ret = freeimageParser.ProcessMaterial(asset, textureName, TEXTURE_TYPE_DIFFUSE, pkg);
-
+                    // TODO: assume diffuse texture - support normal maps?
+                    ret = freeimageParser.ProcessMaterial(assetPath, assetName, TEXTURE_TYPE_DIFFUSE, pkg);
                     break;
                 }
 
                 default:
-                    break;
+                    return false;
             }
 
-            if (assetName != assetNames.end())
-                assetName++;
+            if (!ret)
+                return false;
         }
 
         if (ret)
             WriteJonsPkg(packageName, pkg);
 
         return ret;
+    }
+
+
+    bool CheckForParamType(const std::string& parameter, ParamType& paramType)
+    {
+        if (parameter.compare("-model") == 0)
+        {
+            paramType = ParamType::MODEL;
+            return true;
+        }
+        else if (parameter.compare("-material") == 0)
+        {
+            paramType = ParamType::MATERIAL;
+            return true;
+        }
+        else if (parameter.compare("-skybox") == 0)
+        {
+            paramType = ParamType::SKYBOX;
+            return true;
+        }
+        else if (parameter.compare("-name") == 0)
+        {
+            paramType = ParamType::ASSET_NAME;
+            return true;
+        }
+        else if (parameter.compare("-package") == 0)
+        {
+            paramType = ParamType::PACKAGE;
+            return true;
+        }
+
+        return false;
+    }
+
+    bool ParseParam(const std::string& parameter, const ParamType type, std::vector<AssetPath>& assetPaths, std::vector<AssetName>& assetNames, std::string& packageName)
+    {
+        switch (type)
+        {
+            case ParamType::MODEL:
+            case ParamType::MATERIAL:
+            case ParamType::SKYBOX:
+            {
+                assetPaths.emplace_back(type, parameter);
+                return true;
+            }
+
+            case ParamType::ASSET_NAME:
+            {
+                assetNames.push_back(parameter);
+                return true;
+            }
+
+            case ParamType::PACKAGE:
+            {
+                if (!packageName.empty())
+                {
+                    Log("-JonsAssetImporter: ERROR: Several package names given");
+                    return false;
+                }
+
+                packageName = parameter;
+                if (packageName.size() <= 5 || (packageName.compare(packageName.size() - 5, 5, ".jons") != 0))
+                    packageName.append(".jons");
+                return true;
+            }
+
+            case ParamType::UNKNOWN:
+            default:
+            {
+                Log("-JonsAssetImporter: ERROR: Bad parameter");
+                return false;
+            }
+        }
+    }
+
+    bool VerifyParams(std::vector<AssetPath>& assetPaths, std::vector<AssetName>& assetNames, std::string& packageName)
+    {
+        // verify parameters
+        if (assetPaths.size() <= 0) {
+            Log("-JonsAssetImporter: ERROR: No assets supplied");
+            return false;
+        }
+
+        if (packageName.empty()) {
+            Log("-JonsAssetImporter: ERROR: No package name given");
+            return false;
+        }
+
+        return true;
+    }
+
+    bool MatchAssetPathAndName(std::vector<AssetPath>& assetPaths, std::vector<AssetName>& assetNames, std::vector<Asset>& assets)
+    {
+        std::vector<AssetName>::const_iterator assetName = assetNames.begin();
+        for (const AssetPath& path : assetPaths)
+        {
+            const auto& assetType = std::get<0>(path);
+            const auto& assetPath = std::get<1>(path);
+
+            if (!boost::filesystem::exists(assetPath) || !boost::filesystem::is_regular_file(assetPath))
+            {
+                Log("-JonsAssetImporter: No such file: " + assetPath.string());
+                false;
+            }
+
+            assets.emplace_back(assetType, assetPath, assetName != assetNames.end() ? *assetName : assetPath.filename().string());
+
+            if (assetName != assetNames.end())
+                assetName++;
+        }
+
+        return true;
     }
 }

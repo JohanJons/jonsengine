@@ -87,7 +87,7 @@ namespace JonsAssetImporter
                 }
                 fullTexturePath.append(texturePath.string());
 
-                PackageTexture diffuseTexture = freeimageImporter.ProcessTexture(fullTexturePath, TEXTURE_TYPE_DIFFUSE);
+                PackageTexture diffuseTexture = freeimageImporter.ProcessTexture(fullTexturePath);
                 pkgMaterial.mDiffuseTexture = diffuseTexture;
                 pkgMaterial.mHasDiffuseTexture = true;
             }
@@ -105,7 +105,7 @@ namespace JonsAssetImporter
                 }
                 fullTexturePath.append(texturePath.string());
 
-                PackageTexture normalTexture = freeimageImporter.ProcessTexture(fullTexturePath, TEXTURE_TYPE_NORMAL);
+                PackageTexture normalTexture = freeimageImporter.ProcessTexture(fullTexturePath);
                 pkgMaterial.mNormalTexture = normalTexture;
                 pkgMaterial.mHasNormalTexture = true;
             }

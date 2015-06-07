@@ -22,23 +22,15 @@ namespace JonsEngine
     {
     }
 
-    PackageNode::PackageNode() : mName(""), mTransform(1.0f)
+    PackageNode::PackageNode() : mTransform(1.0f)
     {
     }
 
-    PackageModel::PackageModel() : mName("")
+    PackageTexture::PackageTexture() : mTextureWidth(0), mTextureHeight(0)
     {
     }
 
-    PackageTexture::PackageTexture() : mName(""), mTextureWidth(0), mTextureHeight(0), mTextureType(TextureType::TEXTURE_TYPE_DIFFUSE)
-    {
-    }
-
-    PackageMaterial::PackageMaterial() : mName(""), mHasDiffuseTexture(false), mHasNormalTexture(false), mDiffuseColor(1.0f), mAmbientColor(1.0f), mSpecularColor(1.0f), mEmissiveColor(0.0f)
-    {
-    }
-
-    JonsPackage::JonsPackage()
+    PackageMaterial::PackageMaterial() : mHasDiffuseTexture(false), mHasNormalTexture(false), mDiffuseColor(1.0f), mAmbientColor(1.0f), mSpecularColor(1.0f), mEmissiveColor(0.0f)
     {
     }
 

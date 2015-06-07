@@ -75,10 +75,15 @@ namespace JonsEngine
         std::vector<uint8_t> mTextureData;
         uint32_t mTextureWidth;         // width/height in pixels
         uint32_t mTextureHeight;
-        TextureType mTextureType;
 
 
         PackageTexture();
+    };
+
+    struct PackageSkybox
+    {
+        std::string mName;
+        std::array<PackageTexture, 6> mTextures;
     };
 
     struct PackageMaterial
@@ -101,9 +106,6 @@ namespace JonsEngine
     {
         std::string mName;
         PackageNode mRootNode;
-
-
-        PackageModel();
     };
 
     struct JonsPackage
@@ -111,9 +113,7 @@ namespace JonsEngine
         PackageHeader mHeader;
         std::vector<PackageModel> mModels;
         std::vector<PackageMaterial> mMaterials;
-
-
-        JonsPackage();
+        std::vector<PackageSkybox> mSkyBoxes;
     };
 
 
@@ -181,7 +181,6 @@ namespace boost
             ar & texture.mTextureData;
             ar & texture.mTextureWidth;
             ar & texture.mTextureHeight;
-            ar & texture.mTextureType;
         }
 
         template<class Archive>

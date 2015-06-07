@@ -123,10 +123,10 @@ namespace JonsEngine
 			TextureID normalTexture  = INVALID_TEXTURE_ID;
 
 			if (pkgMaterial.mHasDiffuseTexture)
-				diffuseTexture = mRenderer.CreateTexture(pkgMaterial.mDiffuseTexture.mTextureType, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth, pkgMaterial.mDiffuseTexture.mTextureHeight);
+				diffuseTexture = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_DIFFUSE, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth, pkgMaterial.mDiffuseTexture.mTextureHeight);
 
 			if (pkgMaterial.mHasNormalTexture)
-				normalTexture = mRenderer.CreateTexture(pkgMaterial.mNormalTexture.mTextureType, pkgMaterial.mNormalTexture.mTextureData, pkgMaterial.mNormalTexture.mTextureWidth, pkgMaterial.mNormalTexture.mTextureHeight);
+                normalTexture = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_NORMAL, pkgMaterial.mNormalTexture.mTextureData, pkgMaterial.mNormalTexture.mTextureWidth, pkgMaterial.mNormalTexture.mTextureHeight);
 
 			// TODO: real specular factor
 			const float specularFactor = 0.02f;

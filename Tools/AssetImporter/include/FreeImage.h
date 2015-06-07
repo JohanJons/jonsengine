@@ -14,6 +14,6 @@ namespace JonsAssetImporter
         ~FreeImage();
 
         bool ProcessMaterial(const boost::filesystem::path& texturePath, const std::string& textureName, const JonsEngine::TextureType textureType, JonsEngine::JonsPackagePtr pkg);
-        JonsEngine::PackageTexture ProcessTexture(const boost::filesystem::path& texturePath, const JonsEngine::TextureType textureType);
+        JonsEngine::PackageTexture ProcessTexture(const boost::filesystem::path& texturePath);
     };
 }
