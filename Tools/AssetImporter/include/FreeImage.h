@@ -14,6 +14,12 @@ namespace JonsAssetImporter
         ~FreeImage();
 
         bool ProcessMaterial(const boost::filesystem::path& texturePath, const std::string& textureName, const JonsEngine::TextureType textureType, JonsEngine::JonsPackagePtr pkg);
-        JonsEngine::PackageTexture ProcessTexture(const boost::filesystem::path& texturePath);
+        bool ProcessSkybox(const boost::filesystem::path& texturePath, const std::string& textureName, JonsEngine::JonsPackagePtr pkg);
+        bool ProcessTexture(JonsEngine::PackageTexture& texture, const boost::filesystem::path& assetPath);
+        bool ProcessTexture(JonsEngine::PackageTexture& texture, const boost::filesystem::path& assetPath, const uint32_t offsetWidth, const uint32_t offsetHeight, const uint32_t width, const uint32_t height);
+
+
+    private:
+
     };
 }

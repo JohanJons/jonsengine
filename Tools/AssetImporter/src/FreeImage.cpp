@@ -6,6 +6,7 @@ using namespace JonsEngine;
 
 namespace JonsAssetImporter
 {
+    FIBITMAP* GetBitmap(const std::string& filePath, const std::string& filename);
     void FreeImageErrorHandler(FREE_IMAGE_FORMAT imageFormat, const char* message);
 
 
@@ -27,34 +28,38 @@ namespace JonsAssetImporter
         PackageMaterial material;
 
         material.mName = textureName;
-        material.mDiffuseTexture = ProcessTexture(texturePath);
         material.mHasDiffuseTexture = true;
+        ProcessTexture(material.mDiffuseTexture, texturePath);
         pkg->mMaterials.push_back(material);
 
         return !material.mDiffuseTexture.mTextureData.empty();
     }
 
-    PackageTexture FreeImage::ProcessTexture(const boost::filesystem::path& assetPath)
+    bool FreeImage::ProcessSkybox(const boost::filesystem::path& texturePath, const std::string& textureName, JonsEngine::JonsPackagePtr pkg)
     {
-        PackageTexture texture;
-        const std::string filename = assetPath.filename().string();
+        PackageSkybox skybox;
 
-        FREE_IMAGE_FORMAT imageFormat = FreeImage_GetFileType(filename.c_str());
-        if (imageFormat == FIF_UNKNOWN)
-            imageFormat = FreeImage_GetFIFFromFilename(filename.c_str());
-
-        if (imageFormat == FIF_UNKNOWN || !FreeImage_FIFSupportsReading(imageFormat))
+        skybox.mName = textureName;
+        const uint32_t numTextures = 6;
+        for (uint32_t index = 0; index < numTextures; ++index)
         {
-            Log("-JonsAssetImporter: Unable to open file: " + filename);
-            return texture;
+            ProcessTexture(skybox.mTextures.at(index), texturePath);
+            //skybox.mTextures.at(index) = ProcessTexture(texturePath);
         }
 
-        FIBITMAP* bitmap = FreeImage_Load(imageFormat, assetPath.string().c_str());
-        if (!bitmap || !FreeImage_GetBits(bitmap) || !FreeImage_GetWidth(bitmap) || !FreeImage_GetHeight(bitmap))
-        {
-            Log("-JonsAssetImporter: Invalid image data: " + filename);
-            return texture;
-        }
+        pkg->mSkyBoxes.push_back(skybox);
+
+        return true;
+    }
+
+    bool FreeImage::ProcessTexture(JonsEngine::PackageTexture& texture, const boost::filesystem::path& assetPath)
+    {
+        const std::string fileName = assetPath.filename().string();
+        const std::string filePath = assetPath.string();
+
+        FIBITMAP* bitmap = GetBitmap(filePath, fileName);
+        if (!bitmap)
+            return false;
 
         FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(bitmap);
         uint32_t bytesPerPixel = FreeImage_GetBPP(bitmap) / 8;
@@ -85,9 +90,52 @@ namespace JonsAssetImporter
 
         FreeImage_Unload(bitmap);
 
-        return texture;
+        return true;
     }
 
+    bool ProcessTexture(JonsEngine::PackageTexture& texture, const boost::filesystem::path& assetPath, const uint32_t offsetWidth, const uint32_t offsetHeight, const uint32_t width, const uint32_t height)
+    {
+        const std::string fileName = assetPath.filename().string();
+        const std::string filePath = assetPath.string();
+
+        FIBITMAP* bitmap = GetBitmap(filePath, fileName);
+        if (!bitmap)
+            return false;
+
+        FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(bitmap);
+        uint32_t bytesPerPixel = FreeImage_GetBPP(bitmap) / 8;
+        uint32_t widthInPixels = FreeImage_GetWidth(bitmap);
+        uint32_t heightInPixels = FreeImage_GetHeight(bitmap);
+
+        texture.mName = assetPath.filename().string();
+        texture.mTextureWidth = width;
+        texture.mTextureHeight = height;
+
+        return true;
+    }
+
+
+    FIBITMAP* GetBitmap(const std::string& filePath, const std::string& filename)
+    {
+        FREE_IMAGE_FORMAT imageFormat = FreeImage_GetFileType(filename.c_str());
+        if (imageFormat == FIF_UNKNOWN)
+            imageFormat = FreeImage_GetFIFFromFilename(filename.c_str());
+
+        if (imageFormat == FIF_UNKNOWN || !FreeImage_FIFSupportsReading(imageFormat))
+        {
+            Log("-JonsAssetImporter: Unable to open file: " + filename);
+            return nullptr;
+        }
+
+        FIBITMAP* bitmap = FreeImage_Load(imageFormat, filePath.c_str());
+        if (!bitmap || !FreeImage_GetBits(bitmap) || !FreeImage_GetWidth(bitmap) || !FreeImage_GetHeight(bitmap))
+        {
+            Log("-JonsAssetImporter: Invalid image data: " + filename);
+            return nullptr;
+        }
+
+        return bitmap;
+    }
 
     void FreeImageErrorHandler(FREE_IMAGE_FORMAT imageFormat, const char* message)
     {

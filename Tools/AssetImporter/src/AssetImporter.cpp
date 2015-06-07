@@ -113,6 +113,12 @@ namespace JonsAssetImporter
                     break;
                 }
 
+                case ParamType::SKYBOX:
+                {
+                    ret = freeimageParser.ProcessSkybox(assetPath, assetName, pkg);
+                    break;
+                }
+
                 default:
                     return false;
             }
