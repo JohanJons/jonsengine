@@ -6,7 +6,7 @@
   ========================================================================
 */
 
-#include "../Thirdparty/dlmalloc/dlmalloc.h"
+#include "Thirdparty/dlmalloc/dlmalloc.h"
 
 /*------------------------------ internal #includes ---------------------- */
 

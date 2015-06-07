@@ -83,7 +83,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty\assimp/build;$(SolutionDir)\..\Thirdparty\assimp/include;$(SolutionDir)\..\Thirdparty\assimp/code/BoostWorkaround;$(SolutionDir)\..\Thirdparty\assimp/contrib/zlib;$(SolutionDir)\..\Thirdparty\assimp/build/contrib/zlib;$(SolutionDir)\..\Thirdparty\assimp/code/../contrib/unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Thirdparty\assimp/build;$(SolutionDir)\Thirdparty\assimp/include;$(SolutionDir)\Thirdparty\assimp/code/BoostWorkaround;$(SolutionDir)\Thirdparty\assimp/contrib/zlib;$(SolutionDir)\Thirdparty\assimp/build/contrib/zlib;$(SolutionDir)\Thirdparty\assimp/code/../contrib/unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
@@ -112,7 +112,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\..\Thirdparty/assimp/build;$(SolutionDir)\..\Thirdparty/assimp/include;$(SolutionDir)\..\Thirdparty/assimp/code/BoostWorkaround;$(SolutionDir)\..\Thirdparty/assimp/contrib/zlib;$(SolutionDir)\..\Thirdparty/assimp/build/contrib/zlib;$(SolutionDir)\..\Thirdparty/assimp/code/../contrib/unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Thirdparty/assimp/build;$(SolutionDir)\Thirdparty/assimp/include;$(SolutionDir)\Thirdparty/assimp/code/BoostWorkaround;$(SolutionDir)\Thirdparty/assimp/contrib/zlib;$(SolutionDir)\Thirdparty/assimp/build/contrib/zlib;$(SolutionDir)\Thirdparty/assimp/code/../contrib/unzip;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>

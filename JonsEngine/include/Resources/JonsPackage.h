@@ -184,6 +184,13 @@ namespace boost
         }
 
         template<class Archive>
+        void serialize(Archive & ar, JonsEngine::PackageSkybox& skybox, const unsigned int version)
+        {
+            ar & skybox.mName;
+            ar & skybox.mTextures;
+        }
+
+        template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageMaterial& material, const unsigned int version)
         {
             ar & material.mName;
@@ -210,6 +217,7 @@ namespace boost
             ar & pkg.mHeader;
             ar & pkg.mModels;
             ar & pkg.mMaterials;
+            ar & pkg.mSkyBoxes;
         }
 
         template<class Archive>
