@@ -1,1 +1,0 @@
-All rights belongs to artists who made these
