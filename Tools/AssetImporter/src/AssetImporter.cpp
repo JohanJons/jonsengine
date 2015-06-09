@@ -39,7 +39,7 @@ namespace JonsAssetImporter
 
         if (parameters.size() <= 0)
         {
-            Log("-JonsAssetImporter: ERROR: No commands given");
+            Log("ERROR: No commands given");
             return { false, GetLog() };
         }
 
@@ -78,7 +78,7 @@ namespace JonsAssetImporter
             }
 
             default:
-                Log("-JonsAssetImporter: ERROR: Unknown command");
+                Log("ERROR: Unknown command");
         }
 
         return { cmdResult, GetLog() };
@@ -187,7 +187,7 @@ namespace JonsAssetImporter
             {
                 if (!packageName.empty())
                 {
-                    Log("-JonsAssetImporter: ERROR: Several package names given");
+                    Log("ERROR: Several package names given");
                     return false;
                 }
 
@@ -200,7 +200,7 @@ namespace JonsAssetImporter
             case ParamType::UNKNOWN:
             default:
             {
-                Log("-JonsAssetImporter: ERROR: Bad parameter");
+                Log("ERROR: Bad parameter");
                 return false;
             }
         }
@@ -210,12 +210,12 @@ namespace JonsAssetImporter
     {
         // verify parameters
         if (assetPaths.size() <= 0) {
-            Log("-JonsAssetImporter: ERROR: No assets supplied");
+            Log("ERROR: No assets supplied");
             return false;
         }
 
         if (packageName.empty()) {
-            Log("-JonsAssetImporter: ERROR: No package name given");
+            Log("ERROR: No package name given");
             return false;
         }
 
@@ -232,7 +232,7 @@ namespace JonsAssetImporter
 
             if (!boost::filesystem::exists(assetPath) || !boost::filesystem::is_regular_file(assetPath))
             {
-                Log("-JonsAssetImporter: No such file: " + assetPath.string());
+                Log("ERROR: No such file: " + assetPath.string());
                 false;
             }
 

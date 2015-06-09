@@ -25,29 +25,26 @@ namespace JonsAssetImporter
 
     bool FreeImage::ProcessMaterial(const boost::filesystem::path& texturePath, const std::string& textureName, const JonsEngine::TextureType textureType, JonsEngine::JonsPackagePtr pkg)
     {
-        PackageMaterial material;
+        pkg->mMaterials.emplace_back(textureName, textureType == JonsEngine::TEXTURE_TYPE_DIFFUSE, textureType == JonsEngine::TEXTURE_TYPE_NORMAL);
 
-        material.mName = textureName;
-        material.mHasDiffuseTexture = true;
-        ProcessTexture(material.mDiffuseTexture, texturePath);
-        pkg->mMaterials.push_back(material);
+        auto& material = pkg->mMaterials.back();
+        if (!ProcessTexture(material.mDiffuseTexture, texturePath))
+            return false;
 
-        return !material.mDiffuseTexture.mTextureData.empty();
+        return true;
     }
 
     bool FreeImage::ProcessSkybox(const boost::filesystem::path& texturePath, const std::string& textureName, JonsEngine::JonsPackagePtr pkg)
     {
-        PackageSkybox skybox;
+        pkg->mSkyBoxes.emplace_back(textureName);
 
-        skybox.mName = textureName;
+        auto& skybox = pkg->mSkyBoxes.back();
         const uint32_t numTextures = 6;
         for (uint32_t index = 0; index < numTextures; ++index)
         {
-            ProcessTexture(skybox.mTextures.at(index), texturePath);
-            //skybox.mTextures.at(index) = ProcessTexture(texturePath);
+            if (!ProcessTexture(skybox.mTextures.at(index), texturePath))
+                return false;
         }
-
-        pkg->mSkyBoxes.push_back(skybox);
 
         return true;
     }
@@ -123,14 +120,14 @@ namespace JonsAssetImporter
 
         if (imageFormat == FIF_UNKNOWN || !FreeImage_FIFSupportsReading(imageFormat))
         {
-            Log("-JonsAssetImporter: Unable to open file: " + filename);
+            Log("ERROR: Unable to open file: " + filename);
             return nullptr;
         }
 
         FIBITMAP* bitmap = FreeImage_Load(imageFormat, filePath.c_str());
         if (!bitmap || !FreeImage_GetBits(bitmap) || !FreeImage_GetWidth(bitmap) || !FreeImage_GetHeight(bitmap))
         {
-            Log("-JonsAssetImporter: Invalid image data: " + filename);
+            Log("ERROR: Invalid image data: " + filename);
             return nullptr;
         }
 

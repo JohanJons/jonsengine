@@ -30,7 +30,27 @@ namespace JonsEngine
     {
     }
 
+    PackageSkybox::PackageSkybox()
+    {
+    }
+
+    PackageSkybox::PackageSkybox(const std::string& name) : mName(name)
+    {
+    }
+
     PackageMaterial::PackageMaterial() : mHasDiffuseTexture(false), mHasNormalTexture(false), mDiffuseColor(1.0f), mAmbientColor(1.0f), mSpecularColor(1.0f), mEmissiveColor(0.0f)
+    {
+    }
+
+    PackageMaterial::PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture) : mName(name), mHasDiffuseTexture(hasDiffTexture), mHasNormalTexture(hasNormalTexture)
+    {
+    }
+
+    PackageModel::PackageModel()
+    {
+    }
+
+    PackageModel::PackageModel(const std::string& name) : mName(name)
     {
     }
 

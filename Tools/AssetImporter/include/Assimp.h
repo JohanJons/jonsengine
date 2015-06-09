@@ -24,9 +24,9 @@ namespace JonsAssetImporter
 
     private:
         void ProcessAssimpMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsEngine::JonsPackagePtr pkg);
-        JonsEngine::PackageModel ProcessAssimpModelGeometry(const aiScene* scene, const aiNode* node, const MaterialMap& materialMap);
-        JonsEngine::PackageNode ProcessAssimpNode(const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, JonsEngine::Vec3& modelMinBounds, JonsEngine::Vec3& modelMaxBounds);
-        JonsEngine::PackageMesh ProcessAssimpMesh(const aiMesh* mesh, const MaterialMap& materialMap, JonsEngine::Vec3& nodeMinBounds, JonsEngine::Vec3& nodeMaxBounds);
+        bool ProcessAssimpNode(JonsEngine::PackageNode& pkgNode, const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, JonsEngine::Vec3& modelMinBounds, JonsEngine::Vec3& modelMaxBounds);
+        bool ProcessAssimpMesh(JonsEngine::PackageMesh& pkgMesh, const aiMesh* mesh, const MaterialMap& materialMap, JonsEngine::Vec3& nodeMinBounds, JonsEngine::Vec3& nodeMaxBounds);
+
 
         ::Assimp::Importer mImporter;
     };

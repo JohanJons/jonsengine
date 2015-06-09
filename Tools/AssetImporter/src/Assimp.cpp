@@ -46,7 +46,7 @@ namespace JonsAssetImporter
         const aiScene* scene = mImporter.ReadFile(modelPath.string(), aiProcessPreset_TargetRealtime_MaxQuality);
         if (!scene)
         {
-            Log("-JonsAssetImporter: Assimp parsing error: ");
+            Log("ERROR: Assimp parsing error: ");
             Log(mImporter.GetErrorString());
             return false;
         }
@@ -57,9 +57,10 @@ namespace JonsAssetImporter
         ProcessAssimpMaterials(scene, modelPath, materialMap, freeimageImporter, pkg);
 
         // process model hierarchy
-        PackageModel rootModel(ProcessAssimpModelGeometry(scene, scene->mRootNode, materialMap));
-        rootModel.mName = modelName;
-        pkg->mModels.push_back(rootModel);
+        pkg->mModels.emplace_back(modelName);
+        auto& model = pkg->mModels.back();
+        if (!ProcessAssimpNode(model.mRootNode, scene, scene->mRootNode, materialMap, model.mRootNode.mAABB.mMinBounds, model.mRootNode.mAABB.mMaxBounds))
+            return false;
 
         return true;
     }
@@ -133,36 +134,33 @@ namespace JonsAssetImporter
         }
     }
 
-    JonsEngine::PackageModel Assimp::ProcessAssimpModelGeometry(const aiScene* scene, const aiNode* node, const MaterialMap& materialMap)
+    bool Assimp::ProcessAssimpNode(JonsEngine::PackageNode& pkgNode, const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, JonsEngine::Vec3& parentMinBounds, JonsEngine::Vec3& parentMaxBounds)
     {
-        PackageModel model;
-        model.mName = node->mName.C_Str();
-        model.mRootNode = ProcessAssimpNode(scene, node, materialMap, model.mRootNode.mAABB.mMinBounds, model.mRootNode.mAABB.mMaxBounds);
-        
-        return model;
-    }
-
-    JonsEngine::PackageNode Assimp::ProcessAssimpNode(const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, JonsEngine::Vec3& parentMinBounds, JonsEngine::Vec3& parentMaxBounds)
-    {
-        PackageNode pkgNode;
         pkgNode.mName = node->mName.C_Str();
         pkgNode.mTransform = aiMat4ToJonsMat4(node->mTransformation);
 
         for (uint32_t i = 0; i < node->mNumMeshes; i++)
-            pkgNode.mMeshes.emplace_back(ProcessAssimpMesh(scene->mMeshes[node->mMeshes[i]], materialMap, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds));
+        {
+            pkgNode.mMeshes.emplace_back();
+            if (!ProcessAssimpMesh(pkgNode.mMeshes.back(), scene->mMeshes[node->mMeshes[i]], materialMap, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds))
+                return false;
+        }
 
         for (uint32_t i = 0; i < node->mNumChildren; i++)
-            pkgNode.mChildNodes.emplace_back(ProcessAssimpNode(scene, node->mChildren[i], materialMap, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds));
+        {
+            pkgNode.mChildNodes.emplace_back();
+            if (ProcessAssimpNode(pkgNode.mChildNodes.back(), scene, node->mChildren[i], materialMap, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds))
+                return false;
+        }
 
         parentMinBounds = MinVal(parentMinBounds, pkgNode.mAABB.mMinBounds);
         parentMaxBounds = MaxVal(parentMaxBounds, pkgNode.mAABB.mMaxBounds);
 
-        return pkgNode;
+        return true;
     }
 
-    JonsEngine::PackageMesh Assimp::ProcessAssimpMesh(const aiMesh* m, const MaterialMap& materialMap, JonsEngine::Vec3& nodeMinBounds, JonsEngine::Vec3& nodeMaxBounds)
+    bool Assimp::ProcessAssimpMesh(JonsEngine::PackageMesh& pkgMesh, const aiMesh* m, const MaterialMap& materialMap, JonsEngine::Vec3& nodeMinBounds, JonsEngine::Vec3& nodeMaxBounds)
     {
-        PackageMesh pkgMesh;
         pkgMesh.mName = m->mName.C_Str();
 
         pkgMesh.mVertexData.reserve(m->mNumVertices * 3);
@@ -222,8 +220,14 @@ namespace JonsAssetImporter
             }
         }
 
-        if (materialMap.find(m->mMaterialIndex) != materialMap.end())
+        if (m->mMaterialIndex)
         {
+            if (materialMap.find(m->mMaterialIndex) == materialMap.end())
+            {
+                Log("ERROR: Unable to find mesh material in materialMap");
+                return false;
+            }
+
             pkgMesh.mMaterialIndex = materialMap.at(m->mMaterialIndex);
             pkgMesh.mHasMaterial = true;
         }
@@ -232,6 +236,6 @@ namespace JonsAssetImporter
         nodeMinBounds = MinVal(nodeMinBounds, pkgMesh.mAABB.mMinBounds);
         nodeMaxBounds = MaxVal(nodeMaxBounds, pkgMesh.mAABB.mMaxBounds);
 
-        return pkgMesh;
+        return true;
     }
 }
