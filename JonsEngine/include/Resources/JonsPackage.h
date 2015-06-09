@@ -84,6 +84,10 @@ namespace JonsEngine
     {
         std::string mName;
         std::array<PackageTexture, 6> mTextures;
+
+
+        PackageSkybox();
+        PackageSkybox(const std::string& name);
     };
 
     struct PackageMaterial
@@ -100,12 +104,17 @@ namespace JonsEngine
 
 
         PackageMaterial();
+        PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture);
     };
 
     struct PackageModel
     {
         std::string mName;
         PackageNode mRootNode;
+
+
+        PackageModel();
+        PackageModel(const std::string& name);
     };
 
     struct JonsPackage

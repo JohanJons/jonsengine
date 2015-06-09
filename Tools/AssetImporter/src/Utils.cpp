@@ -10,6 +10,7 @@ namespace JonsAssetImporter
 
     void Log(const std::string& msg)
     {
+        gLog.append("-JonsAssetImporter: ");
         gLog.append(msg);
         gLog.append("\n");
     }
