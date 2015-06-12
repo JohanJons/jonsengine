@@ -6,15 +6,19 @@
 
 namespace JonsEngine
 {
-    static MeshID gNextMeshID = 1;
-
+    const static uint32_t gVertexSize = sizeof(float) * 3;
+    const static uint32_t gTangentSize = vertexSize * 2;
+    const static uint32_t gTexcoordSize = sizeof(float) * 2;
+    const static uint32_t gStaticOffset = 0;
     const std::array<uint16_t, 16> gAABBIndices = { 0, 1, 2, 3, 0, 5, 4, 3, 2, 7, 4, 7, 6, 5, 6, 1 };
+
+    static MeshID gNextMeshID = 1;
 
 
     DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
-        const std::vector<float>& tangentData, const std::vector<float>& bitangentData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
+        const std::vector<float>& tangentData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
         : 
-        mContext(context), mVertexBuffer(nullptr), mNormalBuffer(nullptr), mTangentBuffer(nullptr), mBitangentBuffer(nullptr), mTexcoordBuffer(nullptr), mIndexBuffer(nullptr), mMeshID(gNextMeshID++), mNumVertices(vertexData.size()), mNumIndices(indexData.size())
+        mContext(context), mVertexBuffer(nullptr), mNormalBuffer(nullptr), mTangentBuffer(nullptr), mTexcoordBuffer(nullptr), mIndexBuffer(nullptr), mMeshID(gNextMeshID++), mNumVertices(vertexData.size()), mNumIndices(indexData.size())
     {
         // vertex buffer
         // use a temporary vector to merge vertices and AABB points
@@ -52,30 +56,18 @@ namespace JonsEngine
             DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mNormalBuffer));
         }
 
-        // tangent buffer
-        if (tangentData.size() > 0)
+        // bitangent/tangent buffer
+        const size_t tangentDataSize = tangentData.size();
+        if (tangentDataSize > 0)
         {
             ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
             bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-            bufferDescription.ByteWidth = tangentData.size() * sizeof(float);
+            bufferDescription.ByteWidth = tangentDataSize * sizeof(float);
             bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
             ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
             initData.pSysMem = &tangentData.at(0);
             DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mTangentBuffer));
-        }
-
-        // bitangent buffer
-        if (bitangentData.size() > 0)
-        {
-            ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
-            bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-            bufferDescription.ByteWidth = bitangentData.size() * sizeof(float);
-            bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-
-            ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
-            initData.pSysMem = &bitangentData.at(0);
-            DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mBitangentBuffer));
         }
 
         // texcoord buffer
@@ -113,32 +105,21 @@ namespace JonsEngine
 
     void DX11Mesh::Draw()
     {
-        const uint32_t vertexSize = sizeof(float) * 3;
-        const uint32_t offset = 0;
-
-        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &vertexSize, &offset);
+        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gVertexSize, &gStaticOffset);
         if (mNormalBuffer)
-            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer.p, &vertexSize, &offset);
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer.p, &gVertexSize, &gStaticOffset);
         if (mTangentBuffer)
-            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer.p, &vertexSize, &offset);
-        if (mBitangentBuffer)
-            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BITANGENTS, 1, &mBitangentBuffer.p, &vertexSize, &offset);
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer.p, &gTangentSize, &gStaticOffset);
         if (mTexcoordBuffer)
-        {
-            const uint32_t texcoordSize = sizeof(float) * 2;
-            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer.p, &texcoordSize, &offset);
-        }
-
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer.p, &gTexcoordSize, &gStaticOffset);
+        
         mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
         mContext->DrawIndexed(mNumIndices, 0, 0);
     }
 
     void DX11Mesh::DrawPositions()
     {
-        const uint32_t vertexSize = sizeof(float) * 3;
-        const uint32_t offset = 0;
-
-        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &vertexSize, &offset);
+        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gVertexSize, &gStaticOffset);
 
         mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
         mContext->DrawIndexed(mNumIndices, 0, 0);
@@ -146,13 +127,11 @@ namespace JonsEngine
 
     void DX11Mesh::DrawAABB()
     {
-        // AABB vertices are offset into the mesh vertex buffer
-        const uint32_t vertexSize = 3 * sizeof(float);
         // AABB indices are offset into the mesh index buffer
         const uint32_t offset = mNumVertices * sizeof(float);
         const uint32_t numAABBPoints = gAABBIndices.size();
 
-        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &vertexSize, &offset);
+        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gVertexSize, &offset);
         mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, mNumIndices * sizeof(uint16_t));
         mContext->DrawIndexed(numAABBPoints, 0, 0);
     }

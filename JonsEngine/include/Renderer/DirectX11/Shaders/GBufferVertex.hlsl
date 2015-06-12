@@ -7,18 +7,18 @@ struct GBufferVSIn
 {
     float3 mPosition : POSITION;
     float3 mNormal : NORMAL;
+    float2 mTexcoord : TEXCOORD;
     float3 mTangent : TANGENT;
     float3 mBitangent : BITANGENT;
-    float2 mTexcoord : TEXCOORD;
 };
 
 struct GBufferVSOut
 {
     float4 mPosition : SV_POSITION;
     float3 mNormal : NORMAL;
+    float2 mTexcoord : TEXCOORD;
     float3 mTangent : TANGENT;
     float3 mBitangent : BITANGENT;
-    float2 mTexcoord : TEXCOORD;
 };
 
 cbuffer GBufferConstants : register(CBUFFER_REGISTER_VERTEX)

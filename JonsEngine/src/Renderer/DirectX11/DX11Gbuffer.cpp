@@ -8,6 +8,16 @@
 
 namespace JonsEngine
 {
+    enum VSInputLayout
+    {
+        POSITION = 0,
+        NORMAL,
+        TEXCOORD,
+        TANGENT,
+        BITANGENT,
+        NUM_INPUT_LAYOUTS
+    };
+
     const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
@@ -31,43 +41,48 @@ namespace JonsEngine
         DXCALL(device->CreateShaderResourceView(mTextures.at(gbufferIndex), nullptr, &mShaderResourceViews.at(gbufferIndex)));
 
         // input layout
-        D3D11_INPUT_ELEMENT_DESC inputDescription[DX11Mesh::NUM_VERTEX_BUFFER_SLOTS];
-        ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC) * DX11Mesh::NUM_VERTEX_BUFFER_SLOTS);
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS].SemanticName = "POSITION";
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS].SemanticIndex = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS].InputSlot = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS].AlignedByteOffset = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS].InstanceDataStepRate = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].SemanticName = "NORMAL";
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].SemanticIndex = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].InputSlot = 1;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].AlignedByteOffset = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS].InstanceDataStepRate = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS].SemanticName = "TANGENT";
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS].SemanticIndex = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS].InputSlot = 2;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS].AlignedByteOffset = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS].InstanceDataStepRate = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_BITANGENTS].SemanticName = "BITANGENT";
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_BITANGENTS].SemanticIndex = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_BITANGENTS].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_BITANGENTS].InputSlot = 3;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_BITANGENTS].AlignedByteOffset = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_BITANGENTS].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_BITANGENTS].InstanceDataStepRate = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS].SemanticName = "TEXCOORD";
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS].SemanticIndex = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS].Format = DXGI_FORMAT_R32G32_FLOAT;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS].InputSlot = 4;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS].AlignedByteOffset = 0;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-        inputDescription[DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS].InstanceDataStepRate = 0;
+        D3D11_INPUT_ELEMENT_DESC inputDescription[NUM_INPUT_LAYOUTS];
+        ZeroMemory(&inputDescription, sizeof(D3D11_INPUT_ELEMENT_DESC) * NUM_INPUT_LAYOUTS);
+
+        inputDescription[VSInputLayout::POSITION].SemanticName = "POSITION";
+        inputDescription[VSInputLayout::POSITION].SemanticIndex = 0;
+        inputDescription[VSInputLayout::POSITION].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        inputDescription[VSInputLayout::POSITION].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS;
+        inputDescription[VSInputLayout::POSITION].AlignedByteOffset = 0;
+        inputDescription[VSInputLayout::POSITION].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[VSInputLayout::POSITION].InstanceDataStepRate = 0;
+
+        inputDescription[VSInputLayout::NORMAL].SemanticName = "NORMAL";
+        inputDescription[VSInputLayout::NORMAL].SemanticIndex = 0;
+        inputDescription[VSInputLayout::NORMAL].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        inputDescription[VSInputLayout::NORMAL].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS;
+        inputDescription[VSInputLayout::NORMAL].AlignedByteOffset = 0;
+        inputDescription[VSInputLayout::NORMAL].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[VSInputLayout::NORMAL].InstanceDataStepRate = 0;
+
+        inputDescription[VSInputLayout::TEXCOORD].SemanticName = "TEXCOORD";
+        inputDescription[VSInputLayout::TEXCOORD].SemanticIndex = 0;
+        inputDescription[VSInputLayout::TEXCOORD].Format = DXGI_FORMAT_R32G32_FLOAT;
+        inputDescription[VSInputLayout::TEXCOORD].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS;
+        inputDescription[VSInputLayout::TEXCOORD].AlignedByteOffset = 0;
+        inputDescription[VSInputLayout::TEXCOORD].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[VSInputLayout::TEXCOORD].InstanceDataStepRate = 0;
+
+        // tangents/bitangents share buffer slot
+        inputDescription[VSInputLayout::TANGENT].SemanticName = "TANGENT";
+        inputDescription[VSInputLayout::TANGENT].SemanticIndex = 0;
+        inputDescription[VSInputLayout::TANGENT].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        inputDescription[VSInputLayout::TANGENT].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS;
+        inputDescription[VSInputLayout::TANGENT].AlignedByteOffset = 0;
+        inputDescription[VSInputLayout::TANGENT].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[VSInputLayout::TANGENT].InstanceDataStepRate = 0;
+        inputDescription[VSInputLayout::BITANGENT].SemanticName = "BITANGENT";
+        inputDescription[VSInputLayout::BITANGENT].SemanticIndex = 0;
+        inputDescription[VSInputLayout::BITANGENT].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        inputDescription[VSInputLayout::BITANGENT].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_TANGENTS;
+        inputDescription[VSInputLayout::BITANGENT].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+        inputDescription[VSInputLayout::BITANGENT].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[VSInputLayout::BITANGENT].InstanceDataStepRate = 0;
         DXCALL(device->CreateInputLayout(inputDescription, DX11Mesh::NUM_VERTEX_BUFFER_SLOTS, gGBufferVertexShader, sizeof(gGBufferVertexShader), &mInputLayout));
 
         // create shader objects

@@ -14,9 +14,10 @@ namespace JonsEngine
     ModelNode::ModelNode(DX11Renderer& renderer, const JonsPackagePtr jonsPkg, const PackageNode& node, const Mat4& parentTransform, LoadMaterialFunc loadMaterialFunction, IDMap<Mat4>& transformStorage) :
         mName(node.mName), mLocalTransform(transformStorage, parentTransform * node.mTransform), mLocalAABB(node.mAABB.mMinBounds, node.mAABB.mMaxBounds)
     {
+        // TODO: this initialization routine should be moved elsewhere
 		for (const PackageMesh& mesh : node.mMeshes)
 		{
-			const MeshID meshID = renderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangents, mesh.mBitangents, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
+			const MeshID meshID = renderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
 			
 			MaterialPtr material = nullptr;
 			if (mesh.mHasMaterial)

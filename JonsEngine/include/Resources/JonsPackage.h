@@ -43,12 +43,10 @@ namespace JonsEngine
     {
         std::string mName;
         PackageAABB mAABB;
-
         std::vector<float> mVertexData;
         std::vector<float> mNormalData;
         std::vector<float> mTexCoordsData;
-        std::vector<float> mTangents;
-        std::vector<float> mBitangents;
+        std::vector<float> mTangentData;
         std::vector<uint16_t> mIndiceData;
         uint16_t mMaterialIndex;
         bool mHasMaterial;
@@ -71,7 +69,6 @@ namespace JonsEngine
 
     struct PackageTexture
     {
-        std::string mName;
         std::vector<uint8_t> mTextureData;
         uint32_t mTextureWidth;         // width/height in pixels
         uint32_t mTextureHeight;
@@ -166,8 +163,7 @@ namespace boost
             ar & mesh.mVertexData;
             ar & mesh.mNormalData;
             ar & mesh.mTexCoordsData;
-            ar & mesh.mTangents;
-            ar & mesh.mBitangents;
+            ar & mesh.mTangentData;
             ar & mesh.mIndiceData;
             ar & mesh.mMaterialIndex;
             ar & mesh.mHasMaterial;

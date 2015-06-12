@@ -27,7 +27,7 @@ namespace JonsEngine
 
         assert(sizeX > 0 && sizeY > 0 && sizeZ > 0);
 
-        std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
+        std::vector<float> vertexData, normalData, texcoordData, tangentData;
         std::vector<uint16_t> indiceData;
         if (!CreateRectangleData(sizeX, sizeY, sizeZ, vertexData, normalData, texcoordData, indiceData))
             return model;
@@ -38,7 +38,7 @@ namespace JonsEngine
         const Vec3 minBounds(-halfX, -halfY, -halfZ);
         const Vec3 maxBounds(halfX, halfY, halfZ);
 
-		const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
+        const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, indiceData, minBounds, maxBounds);
 		auto allocator = mMemoryAllocator;
         mModels.emplace_back(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds, meshID, material, mTransformCache.GetStorage()), [=](Model* model) { allocator->DeallocateObject(model); });
 
@@ -58,7 +58,7 @@ namespace JonsEngine
 
         assert(radius > 0 && rings > 0 && sectors > 0);
 
-        std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
+        std::vector<float> vertexData, normalData, texcoordData, tangentData;
         std::vector<uint16_t> indiceData;
         if (!CreateSphereData(radius, rings, sectors, vertexData, normalData, texcoordData, indiceData))
             return model;
@@ -66,7 +66,7 @@ namespace JonsEngine
         const Vec3 minBounds(-radius, -radius, -radius);
         const Vec3 maxBounds(radius, radius, radius);
 
-		const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangents, bitangents, indiceData, minBounds, maxBounds);
+        const MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, indiceData, minBounds, maxBounds);
 		auto allocator = mMemoryAllocator;
         mModels.emplace_back(allocator->AllocateObject<Model>(modelName, Mat4(1.0f), minBounds, maxBounds, meshID, material, mTransformCache.GetStorage()), [=](Model* model) { allocator->DeallocateObject(model); });
 

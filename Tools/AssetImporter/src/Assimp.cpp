@@ -166,8 +166,8 @@ namespace JonsAssetImporter
         pkgMesh.mVertexData.reserve(m->mNumVertices * 3);
         pkgMesh.mNormalData.reserve(m->mNumVertices * 3);
         pkgMesh.mTexCoordsData.reserve(m->mNumVertices * 2);
-        pkgMesh.mTangents.reserve(m->mNumVertices * 3);
-        pkgMesh.mBitangents.reserve(m->mNumVertices * 3);
+        // store both tangents and bitangents in same buffer
+        pkgMesh.mTangentData.reserve(m->mNumVertices * 6);;
 
         // vertice, normal, texcoord, tangents and bitangents data
         for (unsigned int j = 0; j < m->mNumVertices; j++)
@@ -191,13 +191,13 @@ namespace JonsAssetImporter
 
             if (m->HasTangentsAndBitangents())
             {
-                pkgMesh.mTangents.push_back(m->mTangents[j].x);
-                pkgMesh.mTangents.push_back(m->mTangents[j].y);
-                pkgMesh.mTangents.push_back(m->mTangents[j].z);
+                pkgMesh.mTangentData.push_back(m->mTangents[j].x);
+                pkgMesh.mTangentData.push_back(m->mTangents[j].y);
+                pkgMesh.mTangentData.push_back(m->mTangents[j].z);
 
-                pkgMesh.mBitangents.push_back(m->mBitangents[j].x);
-                pkgMesh.mBitangents.push_back(m->mBitangents[j].y);
-                pkgMesh.mBitangents.push_back(m->mBitangents[j].z);
+                pkgMesh.mTangentData.push_back(m->mBitangents[j].x);
+                pkgMesh.mTangentData.push_back(m->mBitangents[j].y);
+                pkgMesh.mTangentData.push_back(m->mBitangents[j].z);
             }
 
             // mesh AABB

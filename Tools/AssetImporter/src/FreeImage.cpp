@@ -23,27 +23,63 @@ namespace JonsAssetImporter
     }
 
 
-    bool FreeImage::ProcessMaterial(const boost::filesystem::path& texturePath, const std::string& textureName, const JonsEngine::TextureType textureType, JonsEngine::JonsPackagePtr pkg)
+    bool FreeImage::ProcessMaterial(const boost::filesystem::path& assetPath, const std::string& textureName, const JonsEngine::TextureType textureType, JonsEngine::JonsPackagePtr pkg)
     {
         pkg->mMaterials.emplace_back(textureName, textureType == JonsEngine::TEXTURE_TYPE_DIFFUSE, textureType == JonsEngine::TEXTURE_TYPE_NORMAL);
 
+        const std::string fileName = assetPath.filename().string();
+        const std::string filePath = assetPath.string();
+
+        FIBITMAP* bitmap = GetBitmap(filePath, fileName);
+        if (!bitmap)
+            return false;
+
         auto& material = pkg->mMaterials.back();
-        if (!ProcessTexture(material.mDiffuseTexture, texturePath))
+        if (!ProcessTexture(material.mDiffuseTexture, bitmap))
             return false;
 
         return true;
     }
 
-    bool FreeImage::ProcessSkybox(const boost::filesystem::path& texturePath, const std::string& textureName, JonsEngine::JonsPackagePtr pkg)
+    bool FreeImage::ProcessSkybox(const boost::filesystem::path& assetPath, const std::string& textureName, JonsEngine::JonsPackagePtr pkg)
     {
         pkg->mSkyBoxes.emplace_back(textureName);
 
+        const std::string fileName = assetPath.filename().string();
+        const std::string filePath = assetPath.string();
+
+        FIBITMAP* bitmap = GetBitmap(filePath, fileName);
+        if (!bitmap)
+            return false;
+
+        const uint32_t widthInPixels = FreeImage_GetWidth(bitmap);
+        const uint32_t heightInPixels = FreeImage_GetHeight(bitmap);
+        const bool isHorizontalSkybox = heightInPixels > widthInPixels;
+        const uint32_t numColumns = isHorizontalSkybox ? 4 : 3;
+        const uint32_t numRows = isHorizontalSkybox ? 3 : 4;
+
+        const uint32_t textureWidth = widthInPixels / numColumns;
+        const uint32_t textureHeight = heightInPixels / numRows;
+
+        // skybox texture format:
+        // 0 1 0      0 1 0 0
+        // 1 1 1  or  1 1 1 1
+        // 0 1 0      0 1 0 0
+        // 0 1 0
+        const uint32_t allInclusiveRow = 1;
+        const uint32_t alwaysPresentColumn = 1;
         auto& skybox = pkg->mSkyBoxes.back();
-        const uint32_t numTextures = 6;
-        for (uint32_t index = 0; index < numTextures; ++index)
+        uint32_t textureIndex = 0;
+        for (uint32_t row = 0; row < numRows; ++row)
         {
-            if (!ProcessTexture(skybox.mTextures.at(index), texturePath))
-                return false;
+            for (uint32_t column = 0; column < numColumns; ++column)
+            {
+                if (column != alwaysPresentColumn && row != allInclusiveRow)
+                    continue;
+
+                if (!ProcessTexture(skybox.mTextures.at(textureIndex++), bitmap, column * widthInPixels, row * heightInPixels, textureWidth, textureHeight))
+                    return false;
+            }
         }
 
         return true;
@@ -58,27 +94,42 @@ namespace JonsAssetImporter
         if (!bitmap)
             return false;
 
-        FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(bitmap);
-        uint32_t bytesPerPixel = FreeImage_GetBPP(bitmap) / 8;
-        uint32_t widthInPixels = FreeImage_GetWidth(bitmap);
-        uint32_t heightInPixels = FreeImage_GetHeight(bitmap);
+        return ProcessTexture(texture, bitmap);
+    }
 
-        // should be OK now
-        texture.mName = assetPath.filename().string();
-        texture.mTextureWidth = widthInPixels;
-        texture.mTextureHeight = heightInPixels;
-        // FreeImage implicitly converts image format to RGB/RGBA from BRG/BRGA
+    bool FreeImage::ProcessTexture(JonsEngine::PackageTexture& texture, FIBITMAP* bitmap)
+    {
+        const uint32_t widthInPixels = FreeImage_GetWidth(bitmap);
+        const uint32_t heightInPixels = FreeImage_GetHeight(bitmap);
 
-        for (unsigned y = 0; y < FreeImage_GetHeight(bitmap); y++) {
+        return ProcessTexture(texture, bitmap, 0, 0, widthInPixels, heightInPixels);
+    }
+
+    bool ProcessTexture(JonsEngine::PackageTexture& texture, FIBITMAP* bitmap, const uint32_t offsetWidth, const uint32_t offsetHeight, const uint32_t width, const uint32_t height)
+    {
+        assert(bitmap != nullptr);
+
+        const FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(bitmap);
+        const uint32_t bytesPerPixel = FreeImage_GetBPP(bitmap) / 8;
+
+        // NOTE: only R8B8G8A8 textures supported in JonsEngine
+        assert(bytesPerPixel == 4);
+
+        texture.mTextureWidth = width;
+        texture.mTextureHeight = height;
+
+        // NOTE: FreeImage implicitly converts image format to RGB/RGBA from BRG/BRGA
+        for (unsigned y = offsetHeight; y < height; ++y) {
             BYTE *bits = FreeImage_GetScanLine(bitmap, y);
 
-            for (unsigned x = 0; x < FreeImage_GetWidth(bitmap); x++) {
+            for (unsigned x = offsetWidth; x < width; ++x) {
                 texture.mTextureData.push_back(bits[FI_RGBA_RED]);
                 texture.mTextureData.push_back(bits[FI_RGBA_GREEN]);
                 texture.mTextureData.push_back(bits[FI_RGBA_BLUE]);
                 if (colorType == FIC_RGBALPHA)
                     texture.mTextureData.push_back(bits[FI_RGBA_ALPHA]);
                 else
+                    // this could maybe be optimized for textures without alpha components
                     texture.mTextureData.push_back(0);
 
                 bits += bytesPerPixel;
@@ -86,27 +137,6 @@ namespace JonsAssetImporter
         }
 
         FreeImage_Unload(bitmap);
-
-        return true;
-    }
-
-    bool ProcessTexture(JonsEngine::PackageTexture& texture, const boost::filesystem::path& assetPath, const uint32_t offsetWidth, const uint32_t offsetHeight, const uint32_t width, const uint32_t height)
-    {
-        const std::string fileName = assetPath.filename().string();
-        const std::string filePath = assetPath.string();
-
-        FIBITMAP* bitmap = GetBitmap(filePath, fileName);
-        if (!bitmap)
-            return false;
-
-        FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(bitmap);
-        uint32_t bytesPerPixel = FreeImage_GetBPP(bitmap) / 8;
-        uint32_t widthInPixels = FreeImage_GetWidth(bitmap);
-        uint32_t heightInPixels = FreeImage_GetHeight(bitmap);
-
-        texture.mName = assetPath.filename().string();
-        texture.mTextureWidth = width;
-        texture.mTextureHeight = height;
 
         return true;
     }

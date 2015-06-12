@@ -21,14 +21,13 @@ namespace JonsEngine
             VERTEX_BUFFER_SLOT_POSITIONS = 0,
             VERTEX_BUFFER_SLOT_NORMALS,
             VERTEX_BUFFER_SLOT_TANGENTS,
-            VERTEX_BUFFER_SLOT_BITANGENTS,
             VERTEX_BUFFER_SLOT_TEXCOORDS,
             NUM_VERTEX_BUFFER_SLOTS
         };
 
 
         DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
-            const std::vector<float>& tangents, const std::vector<float>& bitangents, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds);
+            const std::vector<float>& tangentData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds);
         ~DX11Mesh();
 
         void Draw();
@@ -43,7 +42,6 @@ namespace JonsEngine
         ID3D11BufferPtr mVertexBuffer;
         ID3D11BufferPtr mNormalBuffer;
         ID3D11BufferPtr mTangentBuffer;
-        ID3D11BufferPtr mBitangentBuffer;
         ID3D11BufferPtr mTexcoordBuffer;
         ID3D11BufferPtr mIndexBuffer;
 
