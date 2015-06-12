@@ -20,8 +20,8 @@ namespace JonsEngine
         {
             VERTEX_BUFFER_SLOT_POSITIONS = 0,
             VERTEX_BUFFER_SLOT_NORMALS,
-            VERTEX_BUFFER_SLOT_TANGENTS,
             VERTEX_BUFFER_SLOT_TEXCOORDS,
+            VERTEX_BUFFER_SLOT_TANGENTS,
             NUM_VERTEX_BUFFER_SLOTS
         };
 
