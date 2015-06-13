@@ -5,10 +5,10 @@
 
 #include <string>
 
+struct FIBITMAP;
+
 namespace JonsAssetImporter
 {
-    struct FIBITMAP;
-
     class FreeImage
     {
     public:

@@ -418,9 +418,6 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11RenderTarget2D.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Containers\IDMap.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Utils\Error.h">
       <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
@@ -453,6 +450,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\Math\Frustum.h">
       <Filter>Header Files\Core\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Containers\IDMap.hpp">
+      <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -182,7 +182,6 @@ namespace boost
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageTexture& texture, const unsigned int version)
         {
-            ar & texture.mName;
             ar & texture.mTextureData;
             ar & texture.mTextureWidth;
             ar & texture.mTextureHeight;

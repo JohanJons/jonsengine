@@ -21,7 +21,7 @@ namespace JonsEngine
         const float radius = 1.0f;
         const uint32_t rings = 12, sectors = 24;
 
-        std::vector<float> vertexData, normalData, texcoordData, tangents, bitangents;
+        std::vector<float> vertexData, normalData, texcoordData, tangentData;
         std::vector<uint16_t> indiceData;
         if (!CreateSphereData(radius, rings, sectors, vertexData, normalData, texcoordData, indiceData))
         {
@@ -29,7 +29,7 @@ namespace JonsEngine
             throw std::runtime_error("Failed to create sphere for shading pass");
         }
 
-        return DX11Mesh(device, context, vertexData, normalData, texcoordData, tangents, bitangents, indiceData, Vec3(-radius, -radius, -radius), Vec3(radius, radius, radius));
+        return DX11Mesh(device, context, vertexData, normalData, texcoordData, tangentData, indiceData, Vec3(-radius, -radius, -radius), Vec3(radius, radius, radius));
     }
 
 

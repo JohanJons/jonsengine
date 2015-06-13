@@ -105,7 +105,7 @@ namespace JonsAssetImporter
         return ProcessTexture(texture, bitmap, 0, 0, widthInPixels, heightInPixels);
     }
 
-    bool ProcessTexture(JonsEngine::PackageTexture& texture, FIBITMAP* bitmap, const uint32_t offsetWidth, const uint32_t offsetHeight, const uint32_t width, const uint32_t height)
+    bool FreeImage::ProcessTexture(JonsEngine::PackageTexture& texture, FIBITMAP* bitmap, const uint32_t offsetWidth, const uint32_t offsetHeight, const uint32_t width, const uint32_t height)
     {
         assert(bitmap != nullptr);
 
