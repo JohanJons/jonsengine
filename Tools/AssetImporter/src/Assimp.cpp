@@ -149,7 +149,7 @@ namespace JonsAssetImporter
         for (uint32_t i = 0; i < node->mNumChildren; i++)
         {
             pkgNode.mChildNodes.emplace_back();
-            if (ProcessAssimpNode(pkgNode.mChildNodes.back(), scene, node->mChildren[i], materialMap, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds))
+            if (!ProcessAssimpNode(pkgNode.mChildNodes.back(), scene, node->mChildren[i], materialMap, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds))
                 return false;
         }
 
@@ -220,17 +220,14 @@ namespace JonsAssetImporter
             }
         }
 
-        if (m->mMaterialIndex)
+        if (materialMap.find(m->mMaterialIndex) == materialMap.end())
         {
-            if (materialMap.find(m->mMaterialIndex) == materialMap.end())
-            {
-                Log("ERROR: Unable to find mesh material in materialMap");
-                return false;
-            }
-
-            pkgMesh.mMaterialIndex = materialMap.at(m->mMaterialIndex);
-            pkgMesh.mHasMaterial = true;
+            Log("ERROR: Unable to find mesh material in materialMap");
+            return false;
         }
+
+        pkgMesh.mMaterialIndex = materialMap.at(m->mMaterialIndex);
+        pkgMesh.mHasMaterial = true;
 
         // node AABB
         nodeMinBounds = MinVal(nodeMinBounds, pkgMesh.mAABB.mMinBounds);

@@ -113,7 +113,8 @@ namespace JonsAssetImporter
         const uint32_t bytesPerPixel = FreeImage_GetBPP(bitmap) / 8;
 
         // NOTE: only R8B8G8A8 textures supported in JonsEngine
-        assert(bytesPerPixel == 4);
+        // R8B8G8 or R8B8G8A8
+        assert(bytesPerPixel == 3 || bytesPerPixel == 4);
 
         texture.mTextureWidth = width;
         texture.mTextureHeight = height;

@@ -83,7 +83,7 @@ namespace JonsEngine
         inputDescription[VSInputLayout::BITANGENT].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
         inputDescription[VSInputLayout::BITANGENT].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
         inputDescription[VSInputLayout::BITANGENT].InstanceDataStepRate = 0;
-        DXCALL(device->CreateInputLayout(inputDescription, DX11Mesh::NUM_VERTEX_BUFFER_SLOTS, gGBufferVertexShader, sizeof(gGBufferVertexShader), &mInputLayout));
+        DXCALL(device->CreateInputLayout(inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gGBufferVertexShader, sizeof(gGBufferVertexShader), &mInputLayout));
 
         // create shader objects
         DXCALL(device->CreateVertexShader(gGBufferVertexShader, sizeof(gGBufferVertexShader), nullptr, &mVertexShader));
