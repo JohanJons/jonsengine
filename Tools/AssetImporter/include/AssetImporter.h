@@ -11,7 +11,7 @@
 
 namespace JonsAssetImporter
 {
-    enum Command
+    enum class Command
     {
         UNKNOWN = 0,
 

@@ -38,6 +38,8 @@ namespace JonsAssetImporter
         if (!ProcessTexture(material.mDiffuseTexture, bitmap))
             return false;
 
+        FreeImage_Unload(bitmap);
+
         return true;
     }
 
@@ -54,7 +56,7 @@ namespace JonsAssetImporter
 
         const uint32_t widthInPixels = FreeImage_GetWidth(bitmap);
         const uint32_t heightInPixels = FreeImage_GetHeight(bitmap);
-        const bool isHorizontalSkybox = heightInPixels > widthInPixels;
+        const bool isHorizontalSkybox = widthInPixels > heightInPixels;
         const uint32_t numColumns = isHorizontalSkybox ? 4 : 3;
         const uint32_t numRows = isHorizontalSkybox ? 3 : 4;
 
@@ -82,6 +84,8 @@ namespace JonsAssetImporter
             }
         }
 
+        FreeImage_Unload(bitmap);
+
         return true;
     }
 
@@ -94,7 +98,11 @@ namespace JonsAssetImporter
         if (!bitmap)
             return false;
 
-        return ProcessTexture(texture, bitmap);
+        const bool ret = ProcessTexture(texture, bitmap);
+
+        FreeImage_Unload(bitmap);
+
+        return ret;
     }
 
     bool FreeImage::ProcessTexture(JonsEngine::PackageTexture& texture, FIBITMAP* bitmap)
@@ -136,8 +144,6 @@ namespace JonsAssetImporter
                 bits += bytesPerPixel;
             }
         }
-
-        FreeImage_Unload(bitmap);
 
         return true;
     }
