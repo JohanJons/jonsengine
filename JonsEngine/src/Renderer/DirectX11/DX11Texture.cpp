@@ -24,33 +24,12 @@ namespace JonsEngine
         else
             textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         textureDesc.SampleDesc.Count = 1;
-        textureDesc.Usage = D3D11_USAGE_IMMUTABLE;
-        textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        textureDesc.Usage = D3D11_USAGE_DEFAULT;
+        textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
         textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
         if (isCubeTexture)
             textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
-
-        if (isCubeTexture)
-        {
-            D3D11_SUBRESOURCE_DATA initialData[cubemapNumTextures];
-            for (uint32_t face = 0; face < cubemapNumTextures; ++face)
-            {
-                ZeroMemory(&initialData[face], sizeof(D3D11_SUBRESOURCE_DATA));
-                //initialData[face].pSysMem = &textureData.at(0);
-                initialData[face].SysMemPitch = textureWidth * sizeof(uint8_t) * 4;
-            }
-           
-            DXCALL(device->CreateTexture2D(&textureDesc, &initialData, &mTexture));
-        }
-        else
-        {
-            D3D11_SUBRESOURCE_DATA initialData;
-            ZeroMemory(&initialData, sizeof(D3D11_SUBRESOURCE_DATA));
-            initialData.pSysMem = &textureData.at(0);
-            initialData.SysMemPitch = textureWidth * sizeof(uint8_t) * 4;
-
-            DXCALL(device->CreateTexture2D(&textureDesc, &initialData, &mTexture));
-        }
+        DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mTexture));
 
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
@@ -61,6 +40,10 @@ namespace JonsEngine
         else
             srvDesc.TextureCube.MipLevels = -1;
         DXCALL(device->CreateShaderResourceView(mTexture, &srvDesc, &mShaderResourceView));
+
+        // mip-level 0 data
+        uint32_t sizeWidth = textureWidth * sizeof(uint8_t) * 4;
+        context->UpdateSubresource(mTexture, 0, NULL, &textureData.at(0), sizeWidth, 0);
 
         context->GenerateMips(mShaderResourceView);
     }
