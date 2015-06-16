@@ -166,6 +166,7 @@
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneManager.cpp" />
     <ClCompile Include="src\Scene\SceneNode.cpp" />
+    <ClCompile Include="src\Scene\Skybox.cpp" />
     <ClCompile Include="src\Window\WindowManager.cpp" />
     <ClCompile Include="src\Window\WindowManagerImpl.cpp" />
   </ItemGroup>
@@ -237,6 +238,7 @@
     <ClInclude Include="include\Scene\Scene.h" />
     <ClInclude Include="include\Scene\SceneManager.h" />
     <ClInclude Include="include\Scene\SceneNode.h" />
+    <ClInclude Include="include\Scene\Skybox.h" />
     <ClInclude Include="include\Window\KeyCallback.h" />
     <ClInclude Include="include\Window\KeyDefinition.h" />
     <ClInclude Include="include\Window\MouseCallback.h" />
