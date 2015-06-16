@@ -26,6 +26,9 @@ namespace JonsEngine
             case TextureType::TEXTURE_TYPE_NORMAL:
                 return DX11Texture::SHADER_TEXTURE_SLOT_NORMAL;
 
+            case TextureType::TEXTURE_TYPE_SKYBOX:
+                return DX11Texture::SHADER_TEXTURE_SLOT_EXTRA;
+
             default:
                 {
                     JONS_LOG_ERROR(Logger::GetRendererLogger(), "Bad TextureType provided");
@@ -175,8 +178,9 @@ namespace JonsEngine
         auto allocator = mMemoryAllocator;
 
         const bool isSRGB = (textureType == TextureType::TEXTURE_TYPE_DIFFUSE);
+        const bool isCubemap = (textureType == TextureType::TEXTURE_TYPE_SKYBOX);
 
-        return mTextures.AddItem(mDevice, mContext, textureData, textureWidth, textureHeight, GetShaderTextureSlot(textureType), isSRGB);
+        return mTextures.AddItem(mDevice, mContext, textureData, textureWidth, textureHeight, GetShaderTextureSlot(textureType), isCubemap, isSRGB);
     }
 
 

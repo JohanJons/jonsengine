@@ -80,7 +80,7 @@ namespace JonsEngine
     struct PackageSkybox
     {
         std::string mName;
-        std::array<PackageTexture, 6> mTextures;
+        PackageTexture mSkyboxTexture;
 
 
         PackageSkybox();

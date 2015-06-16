@@ -15,7 +15,8 @@ namespace JonsEngine
     enum TextureType
     {
         TEXTURE_TYPE_DIFFUSE = 0,
-        TEXTURE_TYPE_NORMAL
+        TEXTURE_TYPE_NORMAL,
+        TEXTURE_TYPE_SKYBOX
     };
     
     // TODO: move mesh/texture id definitions

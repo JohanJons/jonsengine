@@ -79,7 +79,7 @@ namespace JonsAssetImporter
                 if (column != alwaysPresentColumn && row != allInclusiveRow)
                     continue;
 
-                if (!ProcessTexture(skybox.mTextures.at(textureIndex++), bitmap, column * widthInPixels, row * heightInPixels, textureWidth, textureHeight))
+                if (!ProcessTexture(skybox.mSkyboxTexture, bitmap, column * widthInPixels, row * heightInPixels, textureWidth, textureHeight))
                     return false;
             }
         }

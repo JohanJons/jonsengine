@@ -26,19 +26,20 @@ namespace JonsEngine
         };
 
         DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const uint32_t textureWidth, const uint32_t textureHeight,
-            const SHADER_TEXTURE_SLOT textureSlot, const bool isSRGB);
+            const SHADER_TEXTURE_SLOT textureSlot, const bool isCubeTexture, const bool isSRGB);
         ~DX11Texture();
 
         void Bind();
 
-        TextureID GetTextureID() const;
+
+        const TextureID mTextureID;
+        const bool mIsCubeTexture;
+        const SHADER_TEXTURE_SLOT mShaderTextureSlot;
 
 
     private:
         ID3D11DeviceContextPtr mContext;
         ID3D11Texture2DPtr mTexture;
         ID3D11ShaderResourceViewPtr mShaderResourceView;
-        TextureID mTextureID;
-        SHADER_TEXTURE_SLOT mShaderTextureSlot;
     };
 }
