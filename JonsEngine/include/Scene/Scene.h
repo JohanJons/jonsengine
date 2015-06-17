@@ -8,6 +8,7 @@
 #include "include/Scene/DirectionalLight.h"
 #include "include/Scene/Model.h"
 #include "include/Scene/Actor.h"
+#include "include/Scene/Skybox.h"
 #include "include/Renderer/RenderQueue.h"
 
 #include <string>
@@ -49,6 +50,9 @@ namespace JonsEngine
 		void SetAmbientLight(const Vec4& ambientLight);
         const Vec4& GetAmbientLight() const;
 
+        void SetSkybox(const SkyboxPtr skybox);
+        SkyboxPtr GetSkybox() const;
+
         Camera& GetSceneCamera();
         const Camera& GetSceneCamera() const;
         SceneNode& GetRootNode();
@@ -70,6 +74,7 @@ namespace JonsEngine
 		Camera mSceneCamera;
         SceneNode mRootNode;
         Vec4 mAmbientLight;
+        SkyboxPtr mSkybox;
 
         std::vector<ActorPtr> mActors;
         std::vector<DirectionalLightPtr> mDirectionalLights;

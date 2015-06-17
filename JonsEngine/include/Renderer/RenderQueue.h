@@ -110,15 +110,13 @@ namespace JonsEngine
 
     struct RenderQueue
     {
-        RenderQueue(const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage) :
-            mLocalTransformStorage(localTransformStorage), mWorldTransformStorage(worldTransformStorage)
-        {
-        }
+        RenderQueue(const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage);
 
         void Clear();
 
 
         Vec4 mAmbientLight;
+        TextureID mSkyboxTextureID;
 
         // TODO: more than one camera?
         RenderableCamera mCamera;

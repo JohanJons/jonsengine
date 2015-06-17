@@ -245,6 +245,9 @@
     <ClCompile Include="src\Scene\Skybox.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11SkyboxPass.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -460,6 +463,9 @@
     <ClInclude Include="include\Scene\Skybox.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11SkyboxPass.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferPixel.hlsl">
@@ -526,6 +532,12 @@
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\DirectionalLightPCF7X7Pixel.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\SkyboxPixel.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\SkyboxVertex.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

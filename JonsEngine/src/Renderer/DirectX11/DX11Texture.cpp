@@ -5,20 +5,19 @@
 namespace JonsEngine
 {
     static TextureID gNextTextureID = 1;
+    static const uint32_t gCubemapNumTextures = 6;
 
 
     DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const uint32_t textureWidth, const uint32_t textureHeight,
         const SHADER_TEXTURE_SLOT textureSlot, const bool isCubeTexture, const bool isSRGB) :
         mContext(context), mTexture(nullptr), mShaderResourceView(nullptr), mTextureID(gNextTextureID++), mIsCubeTexture(isCubeTexture), mShaderTextureSlot(textureSlot)
     {
-        const uint32_t cubemapNumTextures = 6;
-
         // create texture
         D3D11_TEXTURE2D_DESC textureDesc;
         ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
         textureDesc.Width = textureWidth;
         textureDesc.Height = textureHeight;
-        textureDesc.ArraySize = isCubeTexture ? cubemapNumTextures : 1;
+        textureDesc.ArraySize = isCubeTexture ? gCubemapNumTextures : 1;
         if (isSRGB)
             textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
         else

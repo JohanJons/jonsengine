@@ -7,6 +7,7 @@
 #include "include/Scene/ModelNode.h"
 #include "include/Scene/Mesh.h"
 #include "include/Scene/Material.h"
+#include "include/Scene/Skybox.h"
 #include "include/Renderer/DirectX11/DX11Renderer.h"
 #include "include/Renderer/Shapes.h"
 
@@ -15,8 +16,6 @@
 
 namespace JonsEngine
 {
-    class OpenGLRenderer;
-
     class ResourceManifest
     {
     public:
@@ -32,8 +31,9 @@ namespace JonsEngine
         MaterialPtr LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg);
         MaterialPtr GetMaterial(const std::string& materialName);
 
-        const std::vector<ModelPtr>& GetAllModels() const;
-        std::vector<ModelPtr>& GetAllModels();
+        SkyboxPtr LoadSkybox(const std::string& skyboxName, const JonsPackagePtr jonsPkg);
+        SkyboxPtr GetSkybox(const std::string& skyboxName);
+
         const IDMap<Mat4>& GetTransformStorage() const;
 
 
@@ -44,5 +44,6 @@ namespace JonsEngine
 
         std::vector<ModelPtr> mModels;
         std::vector<MaterialPtr> mMaterials;
+        std::vector<SkyboxPtr> mSkyboxes;
     };
 }

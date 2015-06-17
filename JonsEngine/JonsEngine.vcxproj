@@ -148,6 +148,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11RenderTarget2D.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Sampler.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Shadowmap.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11SkyboxPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Texture.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Utils.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp" />
@@ -217,6 +218,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11RenderTarget2D.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Sampler.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Shadowmap.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11SkyboxPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Texture.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11VertexTransformPass.h" />
@@ -403,6 +405,8 @@
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ps_main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
     </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\SkyboxPixel.hlsl" />
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\SkyboxVertex.hlsl" />
     <FxCompile Include="include\Renderer\DirectX11\Shaders\SSAOPixel.hlsl">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ps_main</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>

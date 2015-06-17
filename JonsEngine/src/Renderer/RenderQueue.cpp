@@ -2,6 +2,11 @@
 
 namespace JonsEngine
 {
+    RenderQueue::RenderQueue(const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage) :
+        mSkyboxTextureID(INVALID_TEXTURE_ID), mLocalTransformStorage(localTransformStorage), mWorldTransformStorage(worldTransformStorage)
+    {
+    }
+
     void RenderQueue::Clear()
     {
         mCamera.mModels.clear();

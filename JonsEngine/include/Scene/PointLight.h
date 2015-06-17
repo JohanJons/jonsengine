@@ -29,6 +29,4 @@ namespace JonsEngine
     private:
         const size_t mHashedID;
     };
-
-    typedef std::unique_ptr<PointLight, std::function<void(PointLight*)>> PointLightPtr;
 }

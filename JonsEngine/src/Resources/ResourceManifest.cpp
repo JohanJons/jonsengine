@@ -150,15 +150,40 @@ namespace JonsEngine
     }
 
 
-    const std::vector<ModelPtr>& ResourceManifest::GetAllModels() const
-    { 
-        return mModels;
+    SkyboxPtr ResourceManifest::LoadSkybox(const std::string& skyboxName, const JonsPackagePtr jonsPkg)
+    {
+        SkyboxPtr skybox = GetSkybox(skyboxName);
+        if (skybox)
+            return skybox;
+
+        size_t hashedName = boost::hash_value(skyboxName);
+        auto iter = std::find_if(jonsPkg->mSkyBoxes.begin(), jonsPkg->mSkyBoxes.end(), [hashedName](const PackageSkybox& pkgSkybox) { return boost::hash_value(pkgSkybox.mName) == hashedName; });
+
+        if (iter == jonsPkg->mSkyBoxes.end())
+            return skybox;
+
+        const PackageSkybox& pkgSkybox = (*iter);
+        const PackageTexture& pkgSkyboxTexture = pkgSkybox.mSkyboxTexture;
+
+        const TextureID skyboxTextureID = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_SKYBOX, pkgSkyboxTexture.mTextureData, pkgSkyboxTexture.mTextureWidth, pkgSkyboxTexture.mTextureHeight);
+
+        auto allocator = mMemoryAllocator;
+        mSkyboxes.emplace_back(allocator->AllocateObject<Skybox>(pkgSkybox.mName, skyboxTextureID), [=](Skybox* skybox) { allocator->DeallocateObject(skybox); });
+
+        return mSkyboxes.back();
     }
 
-    std::vector<ModelPtr>& ResourceManifest::GetAllModels()
-    { 
-        return mModels;
+    SkyboxPtr ResourceManifest::GetSkybox(const std::string& skyboxName)
+    {
+        SkyboxPtr skybox;
+        auto iter = std::find_if(mSkyboxes.begin(), mSkyboxes.end(), [skyboxName](const SkyboxPtr skybox) { return *skybox == skyboxName; });
+
+        if (iter != mSkyboxes.end())
+            skybox = *iter;
+
+        return skybox;
     }
+
 
     const IDMap<Mat4>& ResourceManifest::GetTransformStorage() const
     {

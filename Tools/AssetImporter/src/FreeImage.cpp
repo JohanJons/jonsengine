@@ -79,10 +79,14 @@ namespace JonsAssetImporter
                 if (column != alwaysPresentColumn && row != allInclusiveRow)
                     continue;
 
-                if (!ProcessTexture(skybox.mSkyboxTexture, bitmap, column * widthInPixels, row * heightInPixels, textureWidth, textureHeight))
+                if (!ProcessTexture(skybox.mSkyboxTexture, bitmap, column * textureWidth, row * textureHeight, textureWidth, textureHeight))
                     return false;
             }
         }
+
+        // width/height per subtexture
+        skybox.mSkyboxTexture.mTextureWidth = textureWidth;
+        skybox.mSkyboxTexture.mTextureHeight = textureHeight;
 
         FreeImage_Unload(bitmap);
 
@@ -128,10 +132,10 @@ namespace JonsAssetImporter
         texture.mTextureHeight = height;
 
         // NOTE: FreeImage implicitly converts image format to RGB/RGBA from BRG/BRGA
-        for (unsigned y = offsetHeight; y < height; ++y) {
+        for (unsigned y = offsetHeight; y < offsetHeight + height; ++y) {
             BYTE *bits = FreeImage_GetScanLine(bitmap, y);
 
-            for (unsigned x = offsetWidth; x < width; ++x) {
+            for (unsigned x = offsetWidth; x < offsetWidth + width; ++x) {
                 texture.mTextureData.push_back(bits[FI_RGBA_RED]);
                 texture.mTextureData.push_back(bits[FI_RGBA_GREEN]);
                 texture.mTextureData.push_back(bits[FI_RGBA_BLUE]);

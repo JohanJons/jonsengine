@@ -210,6 +210,10 @@ namespace JonsGame
         Actor* actorCube3 = myScene->CreateActor("actorCube3", cube3, nodeCube3);
         nodeCube3->TranslateNode(-directionalLight->mLightDirection * 40.0f);
 
+        // load skybox
+        const SkyboxPtr skybox = mEngine.GetResourceManifest().LoadSkybox("skybox", jonsPackage);
+        myScene->SetSkybox(skybox);
+
         // move up camera
         myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
     }
