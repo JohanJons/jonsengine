@@ -35,9 +35,9 @@ namespace JonsEngine
         srvDesc.Format = textureDesc.Format;
         srvDesc.ViewDimension = isCubeTexture ? D3D11_SRV_DIMENSION_TEXTURECUBE : D3D11_SRV_DIMENSION_TEXTURE2D;
         if (isCubeTexture)
-            srvDesc.Texture2D.MipLevels = -1;
-        else
             srvDesc.TextureCube.MipLevels = -1;
+        else
+            srvDesc.Texture2D.MipLevels = -1;
         DXCALL(device->CreateShaderResourceView(mTexture, &srvDesc, &mShaderResourceView));
 
         // mip-level 0 data

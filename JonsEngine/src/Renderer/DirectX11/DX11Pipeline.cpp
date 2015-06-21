@@ -10,7 +10,7 @@ namespace JonsEngine
 
 
     DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const EngineSettings::ShadowResolution shadowmapResolution,
-        const EngineSettings::ShadowReadbackLatency shadowmapReadbackLatency, IDMap<DX11Mesh>& meshMap, IDMap<DX11Texture>& textureMap) 
+        const EngineSettings::ShadowReadbackLatency shadowmapReadbackLatency, IDMap<DX11Mesh>& meshMap, IDMap<DX11Texture>& textureMap)
         :
         mLogger(logger),
         mWindowSize(backbufferTextureDesc.Width, backbufferTextureDesc.Height),
@@ -24,7 +24,7 @@ namespace JonsEngine
         mDepthSRV(nullptr),
         mDepthStencilState(nullptr),
         mAdditiveBlending(nullptr),
-        
+
         mVertexTransformPass(device, context, meshMap),
         mAABBPass(device, context, mVertexTransformPass),
         mFullscreenTrianglePass(device, context),
@@ -36,7 +36,8 @@ namespace JonsEngine
         mAmbientPass(device, context, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, shadowmapResolution, shadowmapReadbackLatency, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mPointLightPass(device, mContext, mVertexTransformPass, shadowmapResolution, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-        mPostProcessor(device, context, mFullscreenTrianglePass, backbufferTextureDesc)
+        mPostProcessor(device, context, mFullscreenTrianglePass, backbufferTextureDesc),
+        mSkyboxPass(device, context)
     {
         // create depth buffer/view/srv
         D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
@@ -180,6 +181,9 @@ namespace JonsEngine
         // FXAA done in sRGB space
         if (AA == EngineSettings::AntiAliasing::FXAA)
             mPostProcessor.FXAAPass(mBackbuffer, mWindowSize);
+
+        if (renderQueue.mSkyboxTextureID != INVALID_TEXTURE_ID)
+            mSkyboxPass.Render(renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraProjectionMatrix, mTextureMap.GetItem(renderQueue.mSkyboxTextureID));
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
             mAABBPass.Render(renderQueue);

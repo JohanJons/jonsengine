@@ -134,8 +134,9 @@ namespace JonsAssetImporter
         // NOTE: FreeImage implicitly converts image format to RGB/RGBA from BRG/BRGA
         for (unsigned y = offsetHeight; y < offsetHeight + height; ++y) {
             BYTE *bits = FreeImage_GetScanLine(bitmap, y);
+            bits += (offsetWidth * bytesPerPixel);
 
-            for (unsigned x = offsetWidth; x < offsetWidth + width; ++x) {
+            for (unsigned x = 0; x < offsetWidth + width; ++x) {
                 texture.mTextureData.push_back(bits[FI_RGBA_RED]);
                 texture.mTextureData.push_back(bits[FI_RGBA_GREEN]);
                 texture.mTextureData.push_back(bits[FI_RGBA_BLUE]);
@@ -180,3 +181,9 @@ namespace JonsAssetImporter
         Log(message);
     }
 }
+
+
+
+
+
+

@@ -1,7 +1,10 @@
 #ifndef SKYBOX_PIXEL_HLSL
 #define SKYBOX_PIXEL_HLSL
 
-Texture2D gSkybox : register(TEXTURE_REGISTER_EXTRA);
+#include "Constants.h"
+#include "SkyboxVertex.hlsl"
+
+TextureCube gSkybox : register(TEXTURE_REGISTER_EXTRA);
 SamplerState gSampler : register(SAMPLER_REGISTER_ANISOTROPIC);
 
 
