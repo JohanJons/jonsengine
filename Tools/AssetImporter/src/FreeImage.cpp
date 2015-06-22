@@ -136,7 +136,7 @@ namespace JonsAssetImporter
             BYTE *bits = FreeImage_GetScanLine(bitmap, y);
             bits += (offsetWidth * bytesPerPixel);
 
-            for (unsigned x = 0; x < offsetWidth + width; ++x) {
+            for (unsigned x = 0; x < width; ++x) {
                 texture.mTextureData.push_back(bits[FI_RGBA_RED]);
                 texture.mTextureData.push_back(bits[FI_RGBA_GREEN]);
                 texture.mTextureData.push_back(bits[FI_RGBA_BLUE]);
