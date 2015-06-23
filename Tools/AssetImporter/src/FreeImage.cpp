@@ -1,6 +1,7 @@
 #include "include/FreeImage.h"
 
 #include "FreeImage.h"
+#include <utility>
 
 using namespace JonsEngine;
 
@@ -8,6 +9,10 @@ namespace JonsAssetImporter
 {
     FIBITMAP* GetBitmap(const std::string& filePath, const std::string& filename);
     void FreeImageErrorHandler(FREE_IMAGE_FORMAT imageFormat, const char* message);
+
+    // [width, height] offsets per face [+x, -x, +y, -y, +z, -z]
+    static const std::array<std::pair<uint32_t, uint32_t>, 6> gSkyboxHorizontalOffsets = { { { 0, 1 }, { 2, 1 }, { 1, 2 }, { 1, 0 }, { 1, 1 }, { 3, 1 } } };
+    static const std::array<std::pair<uint32_t, uint32_t>, 6> gSkyboxVerticalOffsets =   { { { 0, 2 }, { 2, 2 }, { 1, 3 }, { 1, 1 }, { 1, 2 }, { 1, 0 } } };
 
 
     FreeImage::FreeImage()
@@ -68,20 +73,12 @@ namespace JonsAssetImporter
         // 1 1 1  or  1 1 1 1
         // 0 1 0      0 1 0 0
         // 0 1 0
-        const uint32_t allInclusiveRow = 1;
-        const uint32_t alwaysPresentColumn = 1;
         auto& skybox = pkg->mSkyBoxes.back();
-        uint32_t textureIndex = 0;
-        for (uint32_t row = 0; row < numRows; ++row)
+        const auto& skyboxOffsets = isHorizontalSkybox ? gSkyboxHorizontalOffsets : gSkyboxVerticalOffsets;
+        for (const auto& offsets : skyboxOffsets)
         {
-            for (uint32_t column = 0; column < numColumns; ++column)
-            {
-                if (column != alwaysPresentColumn && row != allInclusiveRow)
-                    continue;
-
-                if (!ProcessTexture(skybox.mSkyboxTexture, bitmap, column * textureWidth, row * textureHeight, textureWidth, textureHeight))
-                    return false;
-            }
+            if (!ProcessTexture(skybox.mSkyboxTexture, bitmap, offsets.first * textureWidth, offsets.second * textureHeight, textureWidth, textureHeight))
+                return false;
         }
 
         // width/height per subtexture
