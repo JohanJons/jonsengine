@@ -139,6 +139,7 @@ namespace JonsEngine
         mLightAccbuffer.BindForDrawing(mDSVReadOnly);
         mGBuffer.BindGeometryTextures();
 
+        // expose depth buffer as SRV
 		// TODO: move elsewhere?
         mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mDepthSRV.p);
 		mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mDepthSRV.p);
@@ -173,10 +174,10 @@ namespace JonsEngine
     void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA)
     {
         // flip from lightAccumulatorBuffer --> backbuffer
-        mBackbuffer.FillBackbuffer(mLightAccbuffer.GetLightAccumulationBuffer(), true);
+        mBackbuffer.FillBackbuffer(mLightAccbuffer.GetLightAccumulationBuffer());
 
         //  post-processing done in sRGB space
-        mBackbuffer.BindForDrawing();
+        mBackbuffer.BindForDrawing(mDSVReadOnly);
 
         // FXAA done in sRGB space
         if (AA == EngineSettings::AntiAliasing::FXAA)

@@ -15,9 +15,9 @@ namespace JonsEngine
         DX11Backbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDXGISwapChainPtr swapchain, DX11FullscreenTrianglePass& fullscreenPass);
         ~DX11Backbuffer();
 
-        void FillBackbuffer(ID3D11ShaderResourceViewPtr lightAccumSRV, const bool convertToSRGB);
+        void FillBackbuffer(ID3D11ShaderResourceViewPtr lightAccumSRV);
         void CopyBackbuffer(ID3D11Texture2DPtr dest);
-        void BindForDrawing();
+        void BindForDrawing(ID3D11DepthStencilViewPtr dsv);
         
         void ClearBackbuffer(const DX11Color& clearColor);
 

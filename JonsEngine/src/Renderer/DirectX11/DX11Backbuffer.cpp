@@ -37,12 +37,9 @@ namespace JonsEngine
     }
 
 
-    void DX11Backbuffer::FillBackbuffer(ID3D11ShaderResourceViewPtr lightAccumSRV, const bool convertToSRGB)
+    void DX11Backbuffer::FillBackbuffer(ID3D11ShaderResourceViewPtr lightAccumSRV)
     {
-        if (convertToSRGB)
-            mContext->OMSetRenderTargets(1, &mRTV_SRGB.p, nullptr);
-        else
-            mContext->OMSetRenderTargets(1, &mRTV.p, nullptr);
+        mContext->OMSetRenderTargets(1, &mRTV_SRGB.p, nullptr);
 
         mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &lightAccumSRV.p);
         mContext->PSSetShader(mPixelShader, nullptr, 0);
@@ -54,9 +51,9 @@ namespace JonsEngine
         mContext->CopyResource(dest, mBackbufferTexture);
     }
 
-    void DX11Backbuffer::BindForDrawing()
+    void DX11Backbuffer::BindForDrawing(ID3D11DepthStencilViewPtr dsv)
     {
-        mContext->OMSetRenderTargets(1, &mRTV.p, nullptr);
+        mContext->OMSetRenderTargets(1, &mRTV.p, dsv);
     }
 
 

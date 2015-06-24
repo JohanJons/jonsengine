@@ -10,7 +10,7 @@ SamplerState gSampler : register(SAMPLER_REGISTER_ANISOTROPIC);
 
 float4 ps_main(GBufferVSOut input) : SV_Target0
 {
-    return gSkybox.Sample(gSampler, input.mWorldPosition.xyz);
+    return gSkybox.Sample(gSampler, input.mTexcoord);
 }
 
 #endif

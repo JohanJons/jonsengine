@@ -3,6 +3,7 @@
 #include "include/Core/Types.h"
 
 #include <vector>
+#include <algorithm>
 #include <assert.h>
 
 namespace JonsEngine
@@ -124,9 +125,6 @@ namespace JonsEngine
 			const uint32_t freeIndex = mFreeIndices.back();
 			mFreeIndices.pop_back();
 
-			// destruct old item
-			mItems[freeIndex].mItem.~T();
-
 			Item* item = new(&mItems[freeIndex]) Item(mItems[freeIndex].mVersion + 1, std::forward<Arguments>(args)...);
 
 			return (freeIndex | (static_cast<uint32_t>(item->mVersion) << 16));
@@ -146,6 +144,9 @@ namespace JonsEngine
 		const uint16_t version = IDMAP_VERSION_MASK(id);
 
 		assert(mItems[index].mVersion == version);
+
+        std::swap(mItems[index], mItems.back());
+        mItems.pop_back();
 
 		mFreeIndices.push_back(index);
 	}
