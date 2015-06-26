@@ -7,12 +7,13 @@ namespace JonsEngine
     static TextureID gNextTextureID = 1;
     static const uint32_t gCubemapNumTextures = 6;
 
+    uint32_t GetNumMipLevels(uint32_t width, uint32_t height);
+
 
     DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const uint32_t textureWidth, const uint32_t textureHeight,
         const SHADER_TEXTURE_SLOT textureSlot, const bool isCubeTexture, const bool isSRGB) :
         mContext(context), mTexture(nullptr), mShaderResourceView(nullptr), mTextureID(gNextTextureID++), mIsCubeTexture(isCubeTexture), mShaderTextureSlot(textureSlot)
     {
-        // create texture
         D3D11_TEXTURE2D_DESC textureDesc;
         ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
         textureDesc.Width = textureWidth;
@@ -26,6 +27,7 @@ namespace JonsEngine
         textureDesc.Usage = D3D11_USAGE_DEFAULT;
         textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
         textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+        textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
         if (isCubeTexture)
             textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
         DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mTexture));
@@ -54,6 +56,18 @@ namespace JonsEngine
             context->UpdateSubresource(mTexture, 0, NULL, &textureData.at(0), sizeWidth, 0);
     
         context->GenerateMips(mShaderResourceView);
+
+        const uint32_t numMipsPerTexture = GetNumMipLevels(textureWidth, textureHeight);
+        std::vector<D3D11_SUBRESOURCE_DATA> initialData(numMipsPerTexture * textureDesc.ArraySize);
+        for (uint32_t textureIndex = 0; textureIndex < textureDesc.ArraySize; ++textureIndex)
+        {
+            for (uint32_t mipLevel = 0; mipLevel < numMipsPerTexture; ++mipLevel)
+            {
+                const uint32_t subresourceIndex = D3D11CalcSubresource(mipLevel, textureIndex, numMipsPerTexture);
+                context->Map(mTexture, subresourceIndex, D3D11_MAP_READ, 0, &initialData.at(textureIndex * mipLevel));
+                context->Unmap(mTexture, subresourceIndex);
+            }
+        }
     }
 
     DX11Texture::~DX11Texture()
@@ -64,5 +78,20 @@ namespace JonsEngine
     void DX11Texture::Bind()
     {
         mContext->PSSetShaderResources(mShaderTextureSlot, 1, &mShaderResourceView.p);
+    }
+
+
+    uint32_t GetNumMipLevels(uint32_t width, uint32_t height)
+    {
+        uint32_t numLevels = 1;
+        const uint32_t minLevel = 1;
+        while ((width > 1) || (height > 1))
+        {
+            width = std::max(width / 2, minLevel);
+            height = std::max(height / 2, minLevel);
+            ++numLevels;
+        }
+
+        return numLevels;
     }
 }

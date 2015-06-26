@@ -6,6 +6,7 @@
 #include "include/Resources/ResourceManifest.h"
 
 #include "boost/bind.hpp"
+#include <chrono>
 
 using namespace std;
 using namespace JonsEngine;
@@ -17,7 +18,7 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(mSettings), mRunning(true), mSunAngle(0.0f), mMoveSpeed(0.1f), mPointLightID(0)
+    Game::Game() : mEngine(mSettings), mRunning(true), mMoveSpeed(0.1f), mPointLightID(0), mSunSpeed(0.02f), mSunMoving(true)
     {
     }
         
@@ -36,7 +37,8 @@ namespace JonsGame
 
         while (mRunning)
         {
-            UpdateSun();
+            if (mSunMoving)
+                UpdateSun();
 
             mEngine.Tick(mDebugOptions);
         }
@@ -50,13 +52,19 @@ namespace JonsGame
         // SHIFT-modifier activated
         if ((evnt.mState == KeyEvent::KeyState::STATE_PRESSED || evnt.mState == KeyEvent::KeyState::STATE_REPEAT) && evnt.mShiftPressed)
         {
-            //  renderering
             switch (evnt.mKey)
             {
+                //  renderering
                 case Key::ONE: mEngine.GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_2X2); break;
                 case Key::TWO: mEngine.GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_3X3); break;
                 case Key::THREE: mEngine.GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_5X5); break;
                 case Key::FOUR: mEngine.GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_7X7); break;
+
+                // sun
+                case Key::Q: mSunMoving = true; break;
+                case Key::W: mSunMoving = false; break;
+                case Key::E: mSunSpeed += 0.005f; break;
+                case Key::R: mSunSpeed -= 0.005f; break;
                 
                 default:
                     break;
@@ -131,55 +139,56 @@ namespace JonsGame
 
     void Game::SetupScene()
     {
-        Scene* myScene = mEngine.GetSceneManager().GetActiveScene();
         JonsPackagePtr jonsPackage = ReadJonsPkg("assets.jons");
 
         //SetupSponzaScene(myScene, jonsPackage);
-        SetupTestScene(myScene, jonsPackage);
+        SetupTestScene(jonsPackage);
     }
 
-    void Game::SetupTestScene(Scene* myScene, JonsPackagePtr jonsPackage)
+    void Game::SetupTestScene(JonsPackagePtr jonsPackage)
     {
+        Scene* scene = mEngine.GetSceneManager().GetActiveScene();
+
         // ambient light
-        myScene->SetAmbientLight(Vec4(0.01f));
+        scene->SetAmbientLight(Vec4(0.01f));
 
         // sectoid
-        SceneNodePtr nodeAlien = myScene->GetRootNode().CreateChildNode("nodeSectoid");
+        SceneNodePtr nodeAlien = scene->GetRootNode().CreateChildNode("nodeSectoid");
         ModelPtr modelAlien = mEngine.GetResourceManifest().LoadModel("sectoid", jonsPackage);
-        Actor* actorAlien = myScene->CreateActor("actorSectoid", modelAlien, nodeAlien);
+        Actor* actorAlien = scene->CreateActor("actorSectoid", modelAlien, nodeAlien);
         nodeAlien->TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
         nodeAlien->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
         // cube
-        SceneNodePtr nodeCube = myScene->GetRootNode().CreateChildNode("nodeCube");
+        SceneNodePtr nodeCube = scene->GetRootNode().CreateChildNode("nodeCube");
         ModelPtr modelCube = mEngine.GetResourceManifest().LoadModel("cube", jonsPackage);
-        Actor* actorCube = myScene->CreateActor("actorCube", modelCube, nodeCube);
+        Actor* actorCube = scene->CreateActor("actorCube", modelCube, nodeCube);
         nodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
 
         // chair
-        SceneNodePtr nodeChair = myScene->GetRootNode().CreateChildNode("nodeChair");
+        SceneNodePtr nodeChair = scene->GetRootNode().CreateChildNode("nodeChair");
         ModelPtr modelChair = mEngine.GetResourceManifest().LoadModel("chair", jonsPackage);
-        Actor* actorChair = myScene->CreateActor("actorChair", modelChair, nodeChair);
+        Actor* actorChair = scene->CreateActor("actorChair", modelChair, nodeChair);
         nodeChair->TranslateNode(Vec3(-8.0f, 0.5f, -4.0f));
         nodeChair->ScaleNode(2.0f);
 
         // house
-        SceneNodePtr nodeHouse = myScene->GetRootNode().CreateChildNode("nodeHouse");
+        SceneNodePtr nodeHouse = scene->GetRootNode().CreateChildNode("nodeHouse");
         ModelPtr modelHouse = mEngine.GetResourceManifest().LoadModel("house", jonsPackage);
-        Actor* actorHouse = myScene->CreateActor("actorHouse", modelHouse, nodeHouse);
+        Actor* actorHouse = scene->CreateActor("actorHouse", modelHouse, nodeHouse);
         nodeHouse->TranslateNode(Vec3(-7.0f, 0.5f, -15.0f));
 
         // point light
-        SceneNodePtr nodeMovingLight = myScene->GetRootNode().CreateChildNode("nodeMovingLight");
-        mPointLightID = myScene->CreatePointLight("MovingPointLight", nodeMovingLight);
-        PointLight& movingLight = myScene->GetPointLight(mPointLightID);
+        SceneNodePtr nodeMovingLight = scene->GetRootNode().CreateChildNode("nodeMovingLight");
+        mPointLightID = scene->CreatePointLight("MovingPointLight", nodeMovingLight);
+        PointLight& movingLight = scene->GetPointLight(mPointLightID);
         movingLight.mLightRadius = 10.0f;
         movingLight.mLightIntensity = 2.0f;
         movingLight.mLightColor = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
         nodeMovingLight->TranslateNode(Vec3(5.0f, 3.5f, -15.0f));
 
         // directional light
-        DirectionalLight* directionalLight = myScene->CreateDirectionalLight("DirectionalLight", 4);
+        DirectionalLight* directionalLight = scene->CreateDirectionalLight("DirectionalLight", 4);
         directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
         directionalLight->mLightColor = Vec4(0.55f);
 
@@ -187,63 +196,46 @@ namespace JonsGame
         MaterialPtr checkerMaterial = mEngine.GetResourceManifest().LoadMaterial("checkers", jonsPackage);
 
         // create a ground plane
-        SceneNodePtr nodePlane = myScene->GetRootNode().CreateChildNode("nodePlane");
+        SceneNodePtr nodePlane = scene->GetRootNode().CreateChildNode("nodePlane");
         ModelPtr plane = mEngine.GetResourceManifest().CreateRectangle("GroundPlane", 64, 1.0, 64, checkerMaterial);
 		plane->GetRootNode().GetMeshes()[0].SetTextureTilingFactor(64.0f);
-        Actor* actorPlane = myScene->CreateActor("actorPlane", plane, nodePlane);
+        Actor* actorPlane = scene->CreateActor("actorPlane", plane, nodePlane);
 
         // create a sphere
-        SceneNodePtr nodeSphere = myScene->GetRootNode().CreateChildNode("nodeSphere");
+        SceneNodePtr nodeSphere = scene->GetRootNode().CreateChildNode("nodeSphere");
         ModelPtr sphere = mEngine.GetResourceManifest().CreateSphere("Sphere", 1.0f, 12, 24, checkerMaterial);
-        Actor* actorSphere = myScene->CreateActor("actorSphere", sphere, nodeSphere);
+        Actor* actorSphere = scene->CreateActor("actorSphere", sphere, nodeSphere);
         nodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
 
         // create a  second cube
-        SceneNodePtr nodeCube2 = myScene->GetRootNode().CreateChildNode("nodeCube2");
+        SceneNodePtr nodeCube2 = scene->GetRootNode().CreateChildNode("nodeCube2");
         ModelPtr cube2 = mEngine.GetResourceManifest().CreateCube("Cube2", 3, checkerMaterial);
-        Actor* actorCube2 = myScene->CreateActor("actorCube2", cube2, nodeCube2);
+        Actor* actorCube2 = scene->CreateActor("actorCube2", cube2, nodeCube2);
         nodeCube2->TranslateNode(Vec3(3.0f, 2.0f, -15.0f));
 
         // create a third cube, far away casting shadows from the dir light
-        SceneNodePtr nodeCube3 = myScene->GetRootNode().CreateChildNode("nodeCube3");
+        SceneNodePtr nodeCube3 = scene->GetRootNode().CreateChildNode("nodeCube3");
         ModelPtr cube3 = mEngine.GetResourceManifest().CreateCube("Cube3", 3, checkerMaterial);
-        Actor* actorCube3 = myScene->CreateActor("actorCube3", cube3, nodeCube3);
+        Actor* actorCube3 = scene->CreateActor("actorCube3", cube3, nodeCube3);
         nodeCube3->TranslateNode(-directionalLight->mLightDirection * 40.0f);
 
         // load skybox
         const SkyboxPtr skybox = mEngine.GetResourceManifest().LoadSkybox("skybox", jonsPackage);
-        myScene->SetSkybox(skybox);
+        scene->SetSkybox(skybox);
 
         // move up camera
-        myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
-    }
-
-    void Game::SetupSponzaScene(Scene* myScene, JonsPackagePtr jonsPackage)
-    {
-        // ambient light
-        myScene->SetAmbientLight(Vec4(0.1f));
-
-        // directional light
-        /*DirectionalLight* directionalLight = myScene->CreateDirectionalLight("DirectionalLight");
-        directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
-        directionalLight->mLightColor = Vec4(1.0F);*/
-        
-        mMoveSpeed = 1.0f;
-
-        // sponza 
-        SceneNodePtr nodeSponza = myScene->GetRootNode().CreateChildNode("sponza");
-        ModelPtr modelSponza = mEngine.GetResourceManifest().LoadModel("sponza", jonsPackage);
-        // this model is huge compared to others - scale it down massively
-        nodeSponza->ScaleNode(0.05f);
-        nodeSponza->TranslateNode(Vec3(0.0f, 0.5f, -54.0f));
-        Actor* actorSponza = myScene->CreateActor("actorPlane", modelSponza, nodeSponza);
-        
-        // move up camera
-        myScene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
+        scene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
     }
 
     void Game::UpdateSun()
     {
-        // TODO: animated dirlight as sun
+        Scene* scene = mEngine.GetSceneManager().GetActiveScene();
+
+        const uint32_t time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::seconds(1);
+        const float angleDegreesTime = glm::mod(360.0f, static_cast<float>(time));
+        const float angleRad = glm::radians(angleDegreesTime * mSunSpeed);
+
+        DirectionalLight* directionalLight = scene->GetDirectionalLight("DirectionalLight");
+        directionalLight->mLightDirection = glm::rotateY(directionalLight->mLightDirection, angleRad);
     }
 }
