@@ -28,8 +28,7 @@ namespace JonsGame
     private:
         void SetupInputCallbacks();
         void SetupScene();
-        void SetupTestScene(JonsEngine::Scene* myScene, JonsEngine::JonsPackagePtr jonsPackage);
-        void SetupSponzaScene(JonsEngine::Scene* myScene, JonsEngine::JonsPackagePtr jonsPackage);
+        void SetupTestScene(JonsEngine::JonsPackagePtr jonsPackage);
         void UpdateSun();
 
 
@@ -38,9 +37,10 @@ namespace JonsGame
         JonsEngine::DebugOptions mDebugOptions;
 
         bool mRunning;
-        float mSunAngle;
         float mMoveSpeed;
-
         JonsEngine::PointLightID mPointLightID;
+
+        float mSunSpeed;
+        bool mSunMoving;
     };
 }
