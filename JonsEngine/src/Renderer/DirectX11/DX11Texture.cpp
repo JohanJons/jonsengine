@@ -27,7 +27,7 @@ namespace JonsEngine
         textureDesc.Usage = D3D11_USAGE_DEFAULT;
         textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
         textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
-        textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+        //textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
         if (isCubeTexture)
             textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
         DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mTexture));
@@ -57,17 +57,27 @@ namespace JonsEngine
     
         context->GenerateMips(mShaderResourceView);
 
-        const uint32_t numMipsPerTexture = GetNumMipLevels(textureWidth, textureHeight);
+        /*const uint32_t numMipsPerTexture = GetNumMipLevels(textureWidth, textureHeight);
         std::vector<D3D11_SUBRESOURCE_DATA> initialData(numMipsPerTexture * textureDesc.ArraySize);
+        D3D11_MAPPED_SUBRESOURCE subresource;
         for (uint32_t textureIndex = 0; textureIndex < textureDesc.ArraySize; ++textureIndex)
         {
             for (uint32_t mipLevel = 0; mipLevel < numMipsPerTexture; ++mipLevel)
             {
                 const uint32_t subresourceIndex = D3D11CalcSubresource(mipLevel, textureIndex, numMipsPerTexture);
-                context->Map(mTexture, subresourceIndex, D3D11_MAP_READ, 0, &initialData.at(textureIndex * mipLevel));
-                context->Unmap(mTexture, subresourceIndex);
+                ZeroMemory(&subresource, sizeof(D3D11_MAPPED_SUBRESOURCE));
+                context->Map(mTexture, subresourceIndex, D3D11_MAP_READ, 0, &subresource);
             }
         }
+
+        for (uint32_t textureIndex = 0; textureIndex < textureDesc.ArraySize; ++textureIndex)
+        {
+            for (uint32_t mipLevel = 0; mipLevel < numMipsPerTexture; ++mipLevel)
+            {
+                const uint32_t subresourceIndex = D3D11CalcSubresource(mipLevel, textureIndex, numMipsPerTexture);
+                context->Unmap(mTexture, subresourceIndex);
+            }
+        }*/
     }
 
     DX11Texture::~DX11Texture()

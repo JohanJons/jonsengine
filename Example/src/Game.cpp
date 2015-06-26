@@ -18,7 +18,7 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(mSettings), mRunning(true), mMoveSpeed(0.1f), mPointLightID(0), mSunSpeed(0.02f), mSunMoving(true)
+    Game::Game() : mEngine(mSettings), mRunning(true), mMoveSpeed(0.1f), mPointLightID(0), mSunSpeed(0.0002f), mSunMoving(true)
     {
     }
         
@@ -220,8 +220,8 @@ namespace JonsGame
         nodeCube3->TranslateNode(-directionalLight->mLightDirection * 40.0f);
 
         // load skybox
-        const SkyboxPtr skybox = mEngine.GetResourceManifest().LoadSkybox("skybox", jonsPackage);
-        scene->SetSkybox(skybox);
+        //const SkyboxPtr skybox = mEngine.GetResourceManifest().LoadSkybox("skybox", jonsPackage);
+        //scene->SetSkybox(skybox);
 
         // move up camera
         scene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
@@ -231,9 +231,9 @@ namespace JonsGame
     {
         Scene* scene = mEngine.GetSceneManager().GetActiveScene();
 
-        const uint32_t time = std::chrono::system_clock::now().time_since_epoch() / std::chrono::seconds(1);
-        const float angleDegreesTime = glm::mod(360.0f, static_cast<float>(time));
-        const float angleRad = glm::radians(angleDegreesTime * mSunSpeed);
+        const uint64_t time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        const uint32_t angleDegreesTime = time % 360;
+        const float angleRad = glm::radians(angleDegreesTime) / 60.0f;
 
         DirectionalLight* directionalLight = scene->GetDirectionalLight("DirectionalLight");
         directionalLight->mLightDirection = glm::rotateY(directionalLight->mLightDirection, angleRad);
