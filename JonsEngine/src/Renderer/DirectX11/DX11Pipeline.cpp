@@ -177,7 +177,8 @@ namespace JonsEngine
         mBackbuffer.FillBackbuffer(mLightAccbuffer.GetLightAccumulationBuffer());
 
         //  post-processing done in sRGB space
-        mBackbuffer.BindForDrawing(mDSVReadOnly);
+        // TODO: TEMP
+        mBackbuffer.BindForDrawing(nullptr);
 
         // FXAA done in sRGB space
         if (AA == EngineSettings::AntiAliasing::FXAA)

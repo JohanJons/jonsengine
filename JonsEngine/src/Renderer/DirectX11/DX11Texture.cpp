@@ -42,11 +42,16 @@ namespace JonsEngine
 
         // mip-level 0 data
         uint32_t sizeWidth = textureWidth * sizeof(uint8_t) * 4;
-        for (uint32_t index = 0; index < gCubemapNumTextures; ++index)
+        if (isCubeTexture)
         {
-            const uint32_t subResourceID = D3D11CalcSubresource(0, index, 1);
-            context->UpdateSubresource(mTexture, subResourceID, NULL, &textureData.at(sizeWidth * textureHeight * index), sizeWidth, 0);
+            for (uint32_t index = 0; index < gCubemapNumTextures; ++index)
+            {
+                const uint32_t subResourceID = D3D11CalcSubresource(0, index, 1);
+                context->UpdateSubresource(mTexture, subResourceID, NULL, &textureData.at(sizeWidth * textureHeight * index), sizeWidth, 0);
+            }
         }
+        else
+            context->UpdateSubresource(mTexture, 0, NULL, &textureData.at(0), sizeWidth, 0);
     
         context->GenerateMips(mShaderResourceView);
     }

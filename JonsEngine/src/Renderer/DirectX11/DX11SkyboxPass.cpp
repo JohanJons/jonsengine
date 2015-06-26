@@ -19,7 +19,7 @@ namespace JonsEngine
 
     void DX11SkyboxPass::Render(const Mat4& viewMatrix, const Mat4& projMatrix, DX11Texture& skyboxTexture)
     {
-        mSkyboxCBuffer.SetData(SkyboxCBuffer(viewMatrix, projMatrix));
+        mSkyboxCBuffer.SetData(SkyboxCBuffer(glm::inverse(viewMatrix), glm::inverse(projMatrix)));
         skyboxTexture.Bind();
 
         mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
