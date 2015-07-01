@@ -220,8 +220,8 @@ namespace JonsGame
         nodeCube3->TranslateNode(-directionalLight->mLightDirection * 40.0f);
 
         // load skybox
-        //const SkyboxPtr skybox = mEngine.GetResourceManifest().LoadSkybox("skybox", jonsPackage);
-        //scene->SetSkybox(skybox);
+        const SkyboxPtr skybox = mEngine.GetResourceManifest().LoadSkybox("skybox", jonsPackage);
+        scene->SetSkybox(skybox);
 
         // move up camera
         scene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
@@ -233,7 +233,7 @@ namespace JonsGame
 
         const uint64_t time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         const uint32_t angleDegreesTime = time % 360;
-        const float angleRad = glm::radians(angleDegreesTime) / 60.0f;
+        const float angleRad = glm::radians(static_cast<float>(angleDegreesTime)) / 60.0f;
 
         DirectionalLight* directionalLight = scene->GetDirectionalLight("DirectionalLight");
         directionalLight->mLightDirection = glm::rotateY(directionalLight->mLightDirection, angleRad);

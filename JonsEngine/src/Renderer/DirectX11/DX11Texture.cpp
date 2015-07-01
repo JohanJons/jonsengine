@@ -48,7 +48,7 @@ namespace JonsEngine
         {
             for (uint32_t index = 0; index < gCubemapNumTextures; ++index)
             {
-                const uint32_t subResourceID = D3D11CalcSubresource(0, index, 1);
+                const uint32_t subResourceID = D3D11CalcSubresource(0, index, GetNumMipLevels(textureWidth, textureHeight));
                 context->UpdateSubresource(mTexture, subResourceID, NULL, &textureData.at(sizeWidth * textureHeight * index), sizeWidth, 0);
             }
         }
