@@ -43,7 +43,7 @@ namespace JonsAssetImporter
 
     bool Assimp::ProcessScene(const boost::filesystem::path& modelPath, const std::string& modelName, FreeImage& freeimageImporter, JonsEngine::JonsPackagePtr pkg)
     {
-        const aiScene* scene = mImporter.ReadFile(modelPath.string(), aiProcessPreset_TargetRealtime_MaxQuality);
+        const aiScene* scene = mImporter.ReadFile(modelPath.string(), aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_MaxQuality);
         if (!scene)
         {
             Log("ERROR: Assimp parsing error: ");
