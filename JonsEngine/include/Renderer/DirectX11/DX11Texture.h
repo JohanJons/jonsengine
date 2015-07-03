@@ -10,9 +10,6 @@
 
 namespace JonsEngine
 {
-    class DX11Texture;
-    typedef std::shared_ptr<DX11Texture> DX11TexturePtr;
-
     class DX11Texture
     {
     public:
@@ -25,8 +22,11 @@ namespace JonsEngine
             NUM_SHADER_TEXTURE_SLOTS
         };
 
-        DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const uint32_t textureWidth, const uint32_t textureHeight,
-            const SHADER_TEXTURE_SLOT textureSlot, const bool isCubeTexture, const bool isSRGB);
+
+        DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight,
+            const SHADER_TEXTURE_SLOT textureSlot, const uint32_t numTextures, const bool isCubeTexture, const bool isDepthTexture);
+        DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight,
+            const SHADER_TEXTURE_SLOT textureSlot, const uint32_t numTextures, const bool isCubeTexture, const bool isDepthTexture, const bool genMipmaps);
         ~DX11Texture();
 
         void Bind();

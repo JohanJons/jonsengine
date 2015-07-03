@@ -6,7 +6,7 @@
 
 namespace JonsEngine
 {
-    const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    static const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 
     DX11LightAccumulationbuffer::DX11LightAccumulationbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc) :

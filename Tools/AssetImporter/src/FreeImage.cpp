@@ -11,8 +11,8 @@ namespace JonsAssetImporter
     void FreeImageErrorHandler(FREE_IMAGE_FORMAT imageFormat, const char* message);
 
     // [width, height] offsets per face [+x, -x, +y, -y, +z, -z]
-    static const std::array<std::pair<uint32_t, uint32_t>, 6> gSkyboxHorizontalOffsets = { { { 0, 1 }, { 2, 1 }, { 1, 2 }, { 1, 0 }, { 1, 1 }, { 3, 1 } } };
-    static const std::array<std::pair<uint32_t, uint32_t>, 6> gSkyboxVerticalOffsets =   { { { 0, 2 }, { 2, 2 }, { 1, 3 }, { 1, 1 }, { 1, 2 }, { 1, 0 } } };
+    static const std::array<std::pair<uint32_t, uint32_t>, 6> gSkyboxHorizontalOffsets = { { { 0, 2 }, { 2, 2 }, { 1, 3 }, { 1, 1 }, { 1, 2 }, { 3, 2 } } };
+    static const std::array<std::pair<uint32_t, uint32_t>, 6> gSkyboxVerticalOffsets =   { { { 0, 3 }, { 2, 3 }, { 1, 4 }, { 1, 2 }, { 1, 3 }, { 1, 1 } } };
 
 
     FreeImage::FreeImage()

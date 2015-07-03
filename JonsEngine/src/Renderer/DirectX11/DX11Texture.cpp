@@ -5,29 +5,39 @@
 namespace JonsEngine
 {
     static TextureID gNextTextureID = 1;
-    static const uint32_t gCubemapNumTextures = 6;
 
     uint32_t GetNumMipLevels(uint32_t width, uint32_t height);
 
 
-    DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const uint32_t textureWidth, const uint32_t textureHeight,
-        const SHADER_TEXTURE_SLOT textureSlot, const bool isCubeTexture, const bool isSRGB) :
+    DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight,
+        const SHADER_TEXTURE_SLOT textureSlot, const uint32_t numTextures, const bool isCubeTexture, const bool isDepthTexture) :
+        DX11Texture(device, context, std::vector<uint8_t>(), textureFormat, textureWidth, textureHeight, textureSlot, numTextures, isCubeTexture, isDepthTexture, false)
+    {
+    }
+
+    DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight,
+        const SHADER_TEXTURE_SLOT textureSlot, const uint32_t numTextures, const bool isCubeTexture, const bool isDepthTexture, const bool genMipmaps) :
         mContext(context), mTexture(nullptr), mShaderResourceView(nullptr), mTextureID(gNextTextureID++), mIsCubeTexture(isCubeTexture), mShaderTextureSlot(textureSlot)
     {
+        assert(textureData.empty() && !genMipmaps);
+
         D3D11_TEXTURE2D_DESC textureDesc;
         ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
         textureDesc.Width = textureWidth;
         textureDesc.Height = textureHeight;
-        textureDesc.ArraySize = isCubeTexture ? gCubemapNumTextures : 1;
-        if (isSRGB)
-            textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-        else
-            textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        textureDesc.ArraySize = numTextures;
+        textureDesc.Format = textureFormat;
         textureDesc.SampleDesc.Count = 1;
         textureDesc.Usage = D3D11_USAGE_DEFAULT;
-        textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-        textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
-        //textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
+        textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        textureDesc.MipLevels = genMipmaps ? 0 : 1;
+        if (genMipmaps)
+        {
+            textureDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+            textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+        }
+        if (isDepthTexture)
+            textureDesc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
         if (isCubeTexture)
             textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
         DXCALL(device->CreateTexture2D(&textureDesc, NULL, &mTexture));
@@ -56,28 +66,6 @@ namespace JonsEngine
             context->UpdateSubresource(mTexture, 0, NULL, &textureData.at(0), sizeWidth, 0);
     
         context->GenerateMips(mShaderResourceView);
-
-        /*const uint32_t numMipsPerTexture = GetNumMipLevels(textureWidth, textureHeight);
-        std::vector<D3D11_SUBRESOURCE_DATA> initialData(numMipsPerTexture * textureDesc.ArraySize);
-        D3D11_MAPPED_SUBRESOURCE subresource;
-        for (uint32_t textureIndex = 0; textureIndex < textureDesc.ArraySize; ++textureIndex)
-        {
-            for (uint32_t mipLevel = 0; mipLevel < numMipsPerTexture; ++mipLevel)
-            {
-                const uint32_t subresourceIndex = D3D11CalcSubresource(mipLevel, textureIndex, numMipsPerTexture);
-                ZeroMemory(&subresource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-                context->Map(mTexture, subresourceIndex, D3D11_MAP_READ, 0, &subresource);
-            }
-        }
-
-        for (uint32_t textureIndex = 0; textureIndex < textureDesc.ArraySize; ++textureIndex)
-        {
-            for (uint32_t mipLevel = 0; mipLevel < numMipsPerTexture; ++mipLevel)
-            {
-                const uint32_t subresourceIndex = D3D11CalcSubresource(mipLevel, textureIndex, numMipsPerTexture);
-                context->Unmap(mTexture, subresourceIndex);
-            }
-        }*/
     }
 
     DX11Texture::~DX11Texture()

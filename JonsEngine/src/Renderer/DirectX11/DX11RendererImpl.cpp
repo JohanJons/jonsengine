@@ -15,27 +15,9 @@ namespace JonsEngine
 
     const UINT_PTR gSubClassID = 1;
 
+    DXGI_FORMAT GetTextureFormat(const TextureType textureType);
+    DX11Texture::SHADER_TEXTURE_SLOT GetShaderTextureSlot(const TextureType textureType);
 
-    DX11Texture::SHADER_TEXTURE_SLOT GetShaderTextureSlot(TextureType textureType)
-    {
-        switch (textureType)
-        {
-            case TextureType::TEXTURE_TYPE_DIFFUSE:
-                return DX11Texture::SHADER_TEXTURE_SLOT_DIFFUSE;
-
-            case TextureType::TEXTURE_TYPE_NORMAL:
-                return DX11Texture::SHADER_TEXTURE_SLOT_NORMAL;
-
-            case TextureType::TEXTURE_TYPE_SKYBOX:
-                return DX11Texture::SHADER_TEXTURE_SLOT_EXTRA;
-
-            default:
-                {
-                    JONS_LOG_ERROR(Logger::GetRendererLogger(), "Bad TextureType provided");
-                    throw std::runtime_error("Bad TextureType provided");
-                }
-        };
-    }
 
     LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
     {
@@ -177,10 +159,10 @@ namespace JonsEngine
     {
         auto allocator = mMemoryAllocator;
 
-        const bool isSRGB = (textureType == TextureType::TEXTURE_TYPE_DIFFUSE);
-        const bool isCubemap = (textureType == TextureType::TEXTURE_TYPE_SKYBOX);
+        const bool isCubeTexture = textureType == TextureType::TEXTURE_TYPE_SKYBOX;
+        const uint32_t numTextures = isCubeTexture ? 6 : 1;
 
-        return mTextures.AddItem(mDevice, mContext, textureData, textureWidth, textureHeight, GetShaderTextureSlot(textureType), isCubemap, isSRGB);
+        return mTextures.AddItem(mDevice, mContext, textureData, GetTextureFormat(textureType), textureWidth, textureHeight, GetShaderTextureSlot(textureType), numTextures, isCubeTexture, false, true);
     }
 
 
@@ -283,5 +265,46 @@ namespace JonsEngine
         mModelSampler->BindSampler();
         mShadowmapSampler.BindSampler();
         mShadowmapNoCompareSampler.BindSampler();
+    }
+
+
+    DXGI_FORMAT GetTextureFormat(const TextureType textureType)
+    {
+        switch (textureType)
+        {
+            case TextureType::TEXTURE_TYPE_DIFFUSE:
+            case TextureType::TEXTURE_TYPE_SKYBOX:
+                return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+
+            case TextureType::TEXTURE_TYPE_NORMAL:
+                return DXGI_FORMAT_R8G8B8A8_UNORM;
+
+            default:
+            {
+                JONS_LOG_ERROR(Logger::GetRendererLogger(), "Bad TextureType provided");
+                throw std::runtime_error("Bad TextureType provided");
+            }
+        }
+    }
+    
+    DX11Texture::SHADER_TEXTURE_SLOT GetShaderTextureSlot(const TextureType textureType)
+    {
+        switch (textureType)
+        {
+            case TextureType::TEXTURE_TYPE_DIFFUSE:
+                return DX11Texture::SHADER_TEXTURE_SLOT_DIFFUSE;
+
+            case TextureType::TEXTURE_TYPE_NORMAL:
+                return DX11Texture::SHADER_TEXTURE_SLOT_NORMAL;
+
+            case TextureType::TEXTURE_TYPE_SKYBOX:
+                return DX11Texture::SHADER_TEXTURE_SLOT_EXTRA;
+
+            default:
+            {
+                JONS_LOG_ERROR(Logger::GetRendererLogger(), "Bad TextureType provided");
+                throw std::runtime_error("Bad TextureType provided");
+            }
+        };
     }
 }
