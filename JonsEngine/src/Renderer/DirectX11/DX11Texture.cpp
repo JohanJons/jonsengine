@@ -19,7 +19,7 @@ namespace JonsEngine
         const SHADER_TEXTURE_SLOT textureSlot, const uint32_t numTextures, const bool isCubeTexture, const bool isDepthTexture, const bool genMipmaps) :
         mContext(context), mTexture(nullptr), mShaderResourceView(nullptr), mTextureID(gNextTextureID++), mIsCubeTexture(isCubeTexture), mShaderTextureSlot(textureSlot)
     {
-        assert(textureData.empty() && !genMipmaps);
+        assert(numTextures >= 1);
 
         D3D11_TEXTURE2D_DESC textureDesc;
         ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
@@ -45,27 +45,39 @@ namespace JonsEngine
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
         srvDesc.Format = textureDesc.Format;
-        srvDesc.ViewDimension = isCubeTexture ? D3D11_SRV_DIMENSION_TEXTURECUBE : D3D11_SRV_DIMENSION_TEXTURE2D;
-        if (isCubeTexture)
-            srvDesc.TextureCube.MipLevels = -1;
-        else
-            srvDesc.Texture2D.MipLevels = -1;
-        DXCALL(device->CreateShaderResourceView(mTexture, &srvDesc, &mShaderResourceView));
-
-        // mip-level 0 data
-        uint32_t sizeWidth = textureWidth * sizeof(uint8_t) * 4;
         if (isCubeTexture)
         {
-            for (uint32_t index = 0; index < gCubemapNumTextures; ++index)
+            srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+            if (genMipmaps)
+                srvDesc.TextureCube.MipLevels = -1;
+        }
+        else if (numTextures > 1)
+        {
+            srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+            srvDesc.Texture2DArray.ArraySize = numTextures;
+            if (genMipmaps)
+                srvDesc.Texture2DArray.MipLevels = -1;
+        }
+        else
+        {
+            srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+            if (genMipmaps)
+                srvDesc.Texture2D.MipLevels = -1;
+        }
+        DXCALL(device->CreateShaderResourceView(mTexture, &srvDesc, &mShaderResourceView));
+
+        if (genMipmaps)
+        {
+            // mip-level 0 data
+            uint32_t sizeWidth = textureWidth * sizeof(uint8_t) * 4;
+            for (uint32_t index = 0; index < numTextures; ++index)
             {
                 const uint32_t subResourceID = D3D11CalcSubresource(0, index, GetNumMipLevels(textureWidth, textureHeight));
                 context->UpdateSubresource(mTexture, subResourceID, NULL, &textureData.at(sizeWidth * textureHeight * index), sizeWidth, 0);
             }
+
+            context->GenerateMips(mShaderResourceView);
         }
-        else
-            context->UpdateSubresource(mTexture, 0, NULL, &textureData.at(0), sizeWidth, 0);
-    
-        context->GenerateMips(mShaderResourceView);
     }
 
     DX11Texture::~DX11Texture()

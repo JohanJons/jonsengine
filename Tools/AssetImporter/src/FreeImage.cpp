@@ -77,7 +77,7 @@ namespace JonsAssetImporter
         const auto& skyboxOffsets = isHorizontalSkybox ? gSkyboxHorizontalOffsets : gSkyboxVerticalOffsets;
         for (const auto& offsets : skyboxOffsets)
         {
-            if (!ProcessTexture(skybox.mSkyboxTexture, bitmap, offsets.first * textureWidth, offsets.second * textureHeight, textureWidth, textureHeight))
+            if (!ProcessTexture(skybox.mSkyboxTexture, bitmap, offsets.first * textureWidth, (offsets.second * textureHeight) - 1, textureWidth, textureHeight))
                 return false;
         }
 
@@ -111,7 +111,7 @@ namespace JonsAssetImporter
         const uint32_t widthInPixels = FreeImage_GetWidth(bitmap);
         const uint32_t heightInPixels = FreeImage_GetHeight(bitmap);
 
-        return ProcessTexture(texture, bitmap, 0, heightInPixels, widthInPixels, heightInPixels);
+        return ProcessTexture(texture, bitmap, 0, heightInPixels - 1, widthInPixels, heightInPixels);
     }
 
     bool FreeImage::ProcessTexture(JonsEngine::PackageTexture& texture, FIBITMAP* bitmap, const uint32_t offsetWidth, const uint32_t offsetHeight, const uint32_t width, const uint32_t height)
@@ -129,9 +129,9 @@ namespace JonsAssetImporter
         texture.mTextureHeight = height;
 
         // NOTE: FreeImage implicitly converts image format to RGB/RGBA from BRG/BRGA
-        for (unsigned y = offsetHeight; y > offsetHeight - height; --y) {
+        for (unsigned y = offsetHeight; y > (offsetHeight - height - 1); --y) {
             BYTE *bits = FreeImage_GetScanLine(bitmap, y);
-            bits -= (offsetWidth * bytesPerPixel);
+            bits += (offsetWidth * bytesPerPixel);
 
             for (unsigned x = 0; x < width; ++x) {
                 texture.mTextureData.push_back(bits[FI_RGBA_RED]);
