@@ -105,9 +105,11 @@ namespace JonsEngine
         ID3D11RasterizerStatePtr prevRS = nullptr;
         ID3D11RenderTargetViewPtr prevRTV = nullptr;
         ID3D11DepthStencilViewPtr prevDSV = nullptr;
+        ID3D11DepthStencilStatePtr prevDSState = nullptr;
         uint32_t numViewports = 1;
         mContext->RSGetViewports(&numViewports, &prevViewport);
         mContext->OMGetRenderTargets(1, &prevRTV, &prevDSV);
+        mContext->OMGetDepthStencilState(&prevDSState, 0);
         mContext->RSGetState(&prevRS);
 
 
@@ -157,10 +159,11 @@ namespace JonsEngine
         // Shading pass
         //
         
-        // restore rendering to backbuffer, rasterize state and viewport
+        // restore state
         mContext->OMSetRenderTargets(1, &prevRTV.p, prevDSV);
         mContext->RSSetViewports(numViewports, &prevViewport);
         mContext->RSSetState(prevRS);
+        mContext->OMSetDepthStencilState(prevDSState, 0);
         
         // bind shadowmap SRV for reading
         mShadowmap.BindForReading();

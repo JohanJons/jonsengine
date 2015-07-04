@@ -220,9 +220,8 @@ namespace JonsGame
         nodeCube3->TranslateNode(-directionalLight->mLightDirection * 40.0f);
 
         // load skybox
-        // TODO: textures UVs
-        //const SkyboxPtr skybox = mEngine.GetResourceManifest().LoadSkybox("skybox", jonsPackage);
-        //scene->SetSkybox(skybox);
+        const SkyboxPtr skybox = mEngine.GetResourceManifest().LoadSkybox("skybox", jonsPackage);
+        scene->SetSkybox(skybox);
 
         // move up camera
         scene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));

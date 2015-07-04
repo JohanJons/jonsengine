@@ -11,8 +11,8 @@ namespace JonsAssetImporter
     void FreeImageErrorHandler(FREE_IMAGE_FORMAT imageFormat, const char* message);
 
     // [width, height] offsets per face [+x, -x, +y, -y, +z, -z]
-    static const std::array<std::pair<uint32_t, uint32_t>, 6> gSkyboxHorizontalOffsets = { { { 0, 2 }, { 2, 2 }, { 1, 3 }, { 1, 1 }, { 1, 2 }, { 3, 2 } } };
-    static const std::array<std::pair<uint32_t, uint32_t>, 6> gSkyboxVerticalOffsets =   { { { 0, 3 }, { 2, 3 }, { 1, 4 }, { 1, 2 }, { 1, 3 }, { 1, 1 } } };
+    static const std::array<std::pair<uint32_t, uint32_t>, 6> gSkyboxHorizontalOffsets = { { { 2, 2 }, { 0, 2 }, { 1, 3 }, { 1, 1 }, { 1, 2 }, { 3, 2 } } };
+    static const std::array<std::pair<uint32_t, uint32_t>, 6> gSkyboxVerticalOffsets =   { { { 2, 3 }, { 0, 3 }, { 1, 4 }, { 1, 2 }, { 1, 3 }, { 1, 1 } } };
 
 
     FreeImage::FreeImage()
@@ -129,8 +129,8 @@ namespace JonsAssetImporter
         texture.mTextureHeight = height;
 
         // NOTE: FreeImage implicitly converts image format to RGB/RGBA from BRG/BRGA
-        for (unsigned y = offsetHeight; y > (offsetHeight - height - 1); --y) {
-            BYTE *bits = FreeImage_GetScanLine(bitmap, y);
+        for (unsigned y = 0; y < height; ++y) {
+            BYTE *bits = FreeImage_GetScanLine(bitmap, offsetHeight - y);
             bits += (offsetWidth * bytesPerPixel);
 
             for (unsigned x = 0; x < width; ++x) {
