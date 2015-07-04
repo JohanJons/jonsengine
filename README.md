@@ -1,7 +1,7 @@
 # jonsengine
 DirectX11 game engine
 
-# List of features (2015-05-08)
+# List of features (2015-07-04)
 
 Core:
 - File logging
@@ -23,10 +23,11 @@ Rendering:
 - Screenspace ambient occlusion (Scalable Ambient Obscurance)
 - Antialiasing (FXAA)
 - Gamma corrected lighting
+- Skyboxes
 
 Scene:
 - Basic hierarchical scenegraph structure
-- Models, materials, cameras, directional/point/ambient lights
+- Models, materials, cameras, directional/point/ambient lights, skyboxes
 - Basic renderqueue with mesh culling for camera and directional/point lights
 
 Window:
