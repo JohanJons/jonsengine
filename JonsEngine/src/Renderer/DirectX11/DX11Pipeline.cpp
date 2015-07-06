@@ -119,10 +119,10 @@ namespace JonsEngine
             const bool hasNormalTexture = model.mMaterial.mNormalTextureID != INVALID_TEXTURE_ID;
 
             if (hasDiffuseTexture)
-                mTextureMap.GetItem(model.mMaterial.mDiffuseTextureID).Bind();
+                mTextureMap.GetItem(model.mMaterial.mDiffuseTextureID).BindAsShaderResource(DX11Texture::SHADER_TEXTURE_SLOT_DIFFUSE);
 
             if (hasNormalTexture)
-                mTextureMap.GetItem(model.mMaterial.mNormalTextureID).Bind();
+                mTextureMap.GetItem(model.mMaterial.mNormalTextureID).BindAsShaderResource(DX11Texture::SHADER_TEXTURE_SLOT_NORMAL);
 
             const Mat4& localTransform = renderQueue.mLocalTransformStorage.GetItem(model.mMesh.mLocalTransformID);
             const Mat4& worldTransform = renderQueue.mWorldTransformStorage.GetItem(model.mMesh.mWorldTransformID);

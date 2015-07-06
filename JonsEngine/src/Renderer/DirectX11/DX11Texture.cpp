@@ -10,14 +10,13 @@ namespace JonsEngine
 
 
     DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight,
-        const SHADER_TEXTURE_SLOT textureSlot, const uint32_t numTextures, const bool isCubeTexture, const bool isDepthTexture) :
-        DX11Texture(device, context, std::vector<uint8_t>(), textureFormat, textureWidth, textureHeight, textureSlot, numTextures, isCubeTexture, isDepthTexture, false)
+        const uint32_t numTextures, const bool isCubeTexture, const bool isDepthTexture) :
+        DX11Texture(device, context, std::vector<uint8_t>(), textureFormat, textureWidth, textureHeight, numTextures, isCubeTexture, isDepthTexture, false)
     {
     }
 
-    DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight,
-        const SHADER_TEXTURE_SLOT textureSlot, const uint32_t numTextures, const bool isCubeTexture, const bool isDepthTexture, const bool genMipmaps) :
-        mContext(context), mTexture(nullptr), mShaderResourceView(nullptr), mTextureID(gNextTextureID++), mIsCubeTexture(isCubeTexture), mShaderTextureSlot(textureSlot)
+    DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight, const uint32_t numTextures, const bool isCubeTexture, const bool isDepthTexture, const bool genMipmaps) :
+        mContext(context), mTexture(nullptr), mShaderResourceView(nullptr), mTextureID(gNextTextureID++), mIsCubeTexture(isCubeTexture)
     {
         assert(numTextures >= 1);
 
@@ -48,25 +47,22 @@ namespace JonsEngine
         if (isCubeTexture)
         {
             srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-            if (genMipmaps)
-                srvDesc.TextureCube.MipLevels = -1;
+            srvDesc.TextureCube.MipLevels = genMipmaps ? -1 : 1;
         }
         else if (numTextures > 1)
         {
             srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
             srvDesc.Texture2DArray.ArraySize = numTextures;
-            if (genMipmaps)
-                srvDesc.Texture2DArray.MipLevels = -1;
+            srvDesc.Texture2DArray.MipLevels = genMipmaps ? -1 : 1;
         }
         else
         {
             srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-            if (genMipmaps)
-                srvDesc.Texture2D.MipLevels = -1;
+            srvDesc.Texture2D.MipLevels = genMipmaps ? -1 : 1;
         }
         DXCALL(device->CreateShaderResourceView(mTexture, &srvDesc, &mShaderResourceView));
 
-        if (genMipmaps)
+        if (!textureData.empty())
         {
             // mip-level 0 data
             uint32_t sizeWidth = textureWidth * sizeof(uint8_t) * 4;
@@ -75,9 +71,10 @@ namespace JonsEngine
                 const uint32_t subResourceID = D3D11CalcSubresource(0, index, GetNumMipLevels(textureWidth, textureHeight));
                 context->UpdateSubresource(mTexture, subResourceID, NULL, &textureData.at(sizeWidth * textureHeight * index), sizeWidth, 0);
             }
-
-            context->GenerateMips(mShaderResourceView);
         }
+
+        if (genMipmaps)
+            context->GenerateMips(mShaderResourceView);
     }
 
     DX11Texture::~DX11Texture()
@@ -85,9 +82,9 @@ namespace JonsEngine
     }
 
 
-    void DX11Texture::Bind()
+    void DX11Texture::BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot)
     {
-        mContext->PSSetShaderResources(mShaderTextureSlot, 1, &mShaderResourceView.p);
+        mContext->PSSetShaderResources(shaderTextureSlot, 1, &mShaderResourceView.p);
     }
 
 
