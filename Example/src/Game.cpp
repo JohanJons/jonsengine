@@ -235,7 +235,7 @@ namespace JonsGame
         const uint32_t angleDegreesTime = time % 360;
         const float angleRad = glm::radians(static_cast<float>(angleDegreesTime)) / 60.0f;
 
-        DirectionalLight* directionalLight = scene->GetDirectionalLight("DirectionalLight");
-        directionalLight->mLightDirection = glm::rotateY(directionalLight->mLightDirection, angleRad);
+        //DirectionalLight* directionalLight = scene->GetDirectionalLight("DirectionalLight");
+        //directionalLight->mLightDirection = glm::rotateY(directionalLight->mLightDirection, angleRad);
     }
 }

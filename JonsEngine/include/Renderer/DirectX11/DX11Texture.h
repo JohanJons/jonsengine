@@ -29,15 +29,17 @@ namespace JonsEngine
             TextureCube
         };
 
+        DX11Texture(IDXGISwapChainPtr swapchain);
         DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight,
-            const uint32_t numTextures, const TextureDimension dimension, const bool isDepthTexture);
+            const uint32_t numTextures, const TextureDimension dimension, const bool isRenderTarget, const bool isDepthTexture);
         DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight,
-            const uint32_t numTextures, const TextureDimension dimension, const bool isDepthTexture, const std::vector<uint8_t>& textureData, const bool genMipmaps);
+            const uint32_t numTextures, const TextureDimension dimension, const bool isRenderTarget, const bool isDepthTexture, const std::vector<uint8_t>& textureData, const bool genMipmaps);
         ~DX11Texture();
 
         ID3D11ShaderResourceViewPtr CreateSRV(ID3D11DevicePtr device);
         ID3D11ShaderResourceViewPtr CreateSRV(ID3D11DevicePtr device, const DXGI_FORMAT srvFormat);
         ID3D11RenderTargetViewPtr CreateRTV(ID3D11DevicePtr device);
+        ID3D11RenderTargetViewPtr CreateRTV(ID3D11DevicePtr device, const DXGI_FORMAT rtvFormat);
         ID3D11UnorderedAccessViewPtr CreateUAV(ID3D11DevicePtr device);
         ID3D11DepthStencilViewPtr CreateDSV(ID3D11DevicePtr device);
 

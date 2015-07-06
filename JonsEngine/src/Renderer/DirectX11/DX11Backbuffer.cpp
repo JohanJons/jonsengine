@@ -12,22 +12,12 @@ namespace JonsEngine
 
 
     DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDXGISwapChainPtr swapchain, DX11FullscreenTrianglePass& fullscreenPass) :
-        mContext(context), mBackbufferTexture(nullptr), mRTV(nullptr), mRTV_SRGB(nullptr), mFullscreenPass(fullscreenPass)
+        mContext(context),
+        mTexture(swapchain),
+        mRTV(mTexture.CreateRTV(device, DXGI_FORMAT_R8G8B8A8_UNORM)),
+        mRTV_SRGB(mTexture.CreateRTV(device, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB)),
+        mFullscreenPass(fullscreenPass)
     {
-        // backbuffer rendertarget setup
-        DXCALL(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&mBackbufferTexture));
-        
-        // create RTVs
-        D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
-        ZeroMemory(&rtvDesc, sizeof(D3D11_RENDER_TARGET_VIEW_DESC));
-        rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-        rtvDesc.Texture2D.MipSlice = 0;
-        DXCALL(device->CreateRenderTargetView(mBackbufferTexture, &rtvDesc, &mRTV));
-
-        rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-        DXCALL(device->CreateRenderTargetView(mBackbufferTexture, &rtvDesc, &mRTV_SRGB));
-
         // pixelshader that will output lightAccumBuffer to backbuffer
         DXCALL(device->CreatePixelShader(gSimpleTexturePixelShader, sizeof(gSimpleTexturePixelShader), nullptr, &mPixelShader))
     }
@@ -37,11 +27,8 @@ namespace JonsEngine
     }
 
 
-    void DX11Backbuffer::FillBackbuffer(ID3D11ShaderResourceViewPtr lightAccumSRV)
+    void DX11Backbuffer::FillBackbuffer()
     {
-        mContext->OMSetRenderTargets(1, &mRTV_SRGB.p, nullptr);
-
-        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &lightAccumSRV.p);
         mContext->PSSetShader(mPixelShader, nullptr, 0);
         mFullscreenPass.Render();
     }
@@ -51,9 +38,12 @@ namespace JonsEngine
         mContext->CopyResource(dest, mBackbufferTexture);
     }
 
-    void DX11Backbuffer::BindForDrawing(ID3D11DepthStencilViewPtr dsv)
+    void DX11Backbuffer::BindForDrawing(ID3D11DepthStencilViewPtr dsv, const bool renderToSRGB)
     {
-        mContext->OMSetRenderTargets(1, &mRTV.p, dsv);
+        if (renderToSRGB)
+            mContext->OMSetRenderTargets(1, &mRTV_SRGB.p, dsv);
+        else
+            mContext->OMSetRenderTargets(1, &mRTV.p, dsv);
     }
 
 

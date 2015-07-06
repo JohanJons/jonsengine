@@ -9,13 +9,19 @@ namespace JonsEngine
     uint32_t GetNumMipLevels(uint32_t width, uint32_t height);
 
 
+    DX11Texture::DX11Texture(IDXGISwapChainPtr swapchain) : mTextureDimension(TextureDimension::Texture2D)
+    {
+        DXCALL(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&mTexture));
+    }
+
     DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight,
-        const uint32_t numTextures, const TextureDimension dimension, const bool isDepthTexture) :
-        DX11Texture(device, context, textureFormat, textureWidth, textureHeight, numTextures, dimension, isDepthTexture, std::vector<uint8_t>(), false)
+        const uint32_t numTextures, const TextureDimension dimension, const bool isRenderTarget, const bool isDepthTexture) :
+        DX11Texture(device, context, textureFormat, textureWidth, textureHeight, numTextures, dimension, isRenderTarget, isDepthTexture, std::vector<uint8_t>(), false)
     {
     }
 
-    DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight, const uint32_t numTextures, const TextureDimension dimension, const bool isDepthTexture, const std::vector<uint8_t>& textureData, const bool genMipmaps) :
+    DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight, const uint32_t numTextures,
+        const TextureDimension dimension, const bool isRenderTarget, const bool isDepthTexture, const std::vector<uint8_t>& textureData, const bool genMipmaps) :
         mContext(context), mTexture(nullptr), mTextureDimension(dimension)
     {
         assert(numTextures >= 1);
@@ -31,11 +37,10 @@ namespace JonsEngine
         textureDesc.Usage = D3D11_USAGE_DEFAULT;
         textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
         textureDesc.MipLevels = genMipmaps ? 0 : 1;
-        if (genMipmaps)
-        {
+        if (isRenderTarget || genMipmaps)
             textureDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+        if (genMipmaps)
             textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
-        }
         if (isDepthTexture)
             textureDesc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
         if (dimension == TextureDimension::TextureCube)
@@ -134,17 +139,34 @@ namespace JonsEngine
 
     ID3D11RenderTargetViewPtr DX11Texture::CreateRTV(ID3D11DevicePtr device)
     {
+        ID3D11RenderTargetViewPtr retRTV(nullptr);
+        DXCALL(device->CreateRenderTargetView(mTexture, nullptr, &retRTV));
 
+        return retRTV;
+    }
+
+    ID3D11RenderTargetViewPtr DX11Texture::CreateRTV(ID3D11DevicePtr device, const DXGI_FORMAT srvFormat)
+    {
+        ID3D11RenderTargetViewPtr retRTV(nullptr);
+        DXCALL(device->CreateRenderTargetView(mTexture, nullptr, &retRTV));
+
+        return retRTV;
     }
 
     ID3D11UnorderedAccessViewPtr DX11Texture::CreateUAV(ID3D11DevicePtr device)
     {
+        ID3D11UnorderedAccessViewPtr retUAV(nullptr);
+        DXCALL(device->CreateUnorderedAccessView(mTexture, nullptr, &retUAV));
 
+        return retUAV;
     }
     
     ID3D11DepthStencilViewPtr DX11Texture::CreateDSV(ID3D11DevicePtr device)
     {
+        ID3D11DepthStencilViewPtr retDSV(nullptr);
+        DXCALL(device->CreateDepthStencilView(mTexture, nullptr, &retDSV));
 
+        return retDSV;
     }
 
 

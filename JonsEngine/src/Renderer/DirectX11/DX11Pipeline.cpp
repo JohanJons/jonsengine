@@ -30,7 +30,7 @@ namespace JonsEngine
         mFullscreenTrianglePass(device, context),
 
         mBackbuffer(device, mContext, mSwapchain, mFullscreenTrianglePass),
-        mLightAccbuffer(device, mContext, backbufferTextureDesc),
+        mLightAccbuffer(device, mContext, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mGBuffer(device, mContext, backbufferTextureDesc),
 
         mAmbientPass(device, context, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
@@ -135,8 +135,8 @@ namespace JonsEngine
 
     void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugExtra, const EngineSettings::ShadowFiltering shadowFiltering, const bool SSAOEnabled)
     {
-        mLightAccbuffer.ClearAccumulationBuffer();
-        mLightAccbuffer.BindForDrawing(mDSVReadOnly);
+        mLightAccbuffer.Clear();
+        mLightAccbuffer.BindAsRenderTarget(mDSVReadOnly);
         mGBuffer.BindGeometryTextures();
 
         // expose depth buffer as SRV
@@ -174,10 +174,12 @@ namespace JonsEngine
     void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA)
     {
         // flip from lightAccumulatorBuffer --> backbuffer
-        mBackbuffer.FillBackbuffer(mLightAccbuffer.GetLightAccumulationBuffer());
+        mBackbuffer.BindForDrawing(mDSVReadOnly, true);
+        mLightAccbuffer.BindAsShaderResource(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA);
+        mBackbuffer.FillBackbuffer();
 
-        //  post-processing done in sRGB space
-        mBackbuffer.BindForDrawing(mDSVReadOnly);
+        // post-processing done in sRGB space
+        mBackbuffer.BindForDrawing(mDSVReadOnly, false);
 
         // FXAA done in sRGB space
         if (AA == EngineSettings::AntiAliasing::FXAA)

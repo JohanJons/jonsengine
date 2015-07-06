@@ -9,16 +9,12 @@ namespace JonsEngine
     static const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 
-    DX11LightAccumulationbuffer::DX11LightAccumulationbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc) :
-        mContext(context), mAccumulationTexture(nullptr), mRTV(nullptr), mSRV(nullptr)
+    DX11LightAccumulationbuffer::DX11LightAccumulationbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const uint32_t textureWidth, const uint32_t textureHeight) :
+        mContext(context),
+        mTexture(device, context, DXGI_FORMAT_R16G16B16A16_UNORM, textureWidth, textureHeight, 1, DX11Texture::TextureDimension::Texture2D, true, false),
+        mRTV(mTexture.CreateRTV(device)),
+        mSRV(mTexture.CreateSRV(device))
     {
-        backbufferTextureDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
-        backbufferTextureDesc.Format = DXGI_FORMAT_R16G16B16A16_UNORM;
-
-        // create acc texture/rtv/srv
-        DXCALL(device->CreateTexture2D(&backbufferTextureDesc, NULL, &mAccumulationTexture));
-        DXCALL(device->CreateRenderTargetView(mAccumulationTexture, nullptr, &mRTV));
-        DXCALL(device->CreateShaderResourceView(mAccumulationTexture, nullptr, &mSRV))
     }
 
     DX11LightAccumulationbuffer::~DX11LightAccumulationbuffer()
@@ -26,19 +22,18 @@ namespace JonsEngine
     }
 
 
-    void DX11LightAccumulationbuffer::BindForDrawing(ID3D11DepthStencilViewPtr dsv)
+    void DX11LightAccumulationbuffer::BindAsRenderTarget(ID3D11DepthStencilViewPtr dsv)
     {
         mContext->OMSetRenderTargets(1, &mRTV.p, dsv);
     }
 
-    void DX11LightAccumulationbuffer::ClearAccumulationBuffer()
+    void DX11LightAccumulationbuffer::BindAsShaderResource(const DX11Texture::SHADER_TEXTURE_SLOT shaderTextureSlot)
     {
-        mContext->ClearRenderTargetView(mRTV, gClearColor);
+        mContext->PSSetShaderResources(shaderTextureSlot, 1, &mSRV.p);
     }
 
-
-    ID3D11ShaderResourceViewPtr DX11LightAccumulationbuffer::GetLightAccumulationBuffer()
+    void DX11LightAccumulationbuffer::Clear()
     {
-        return mSRV;
+        mContext->ClearRenderTargetView(mRTV, gClearColor);
     }
 }
