@@ -10,12 +10,12 @@ namespace JonsEngine
 
 
     DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const EngineSettings::ShadowResolution shadowmapResolution,
-        const EngineSettings::ShadowReadbackLatency shadowmapReadbackLatency, IDMap<DX11Mesh>& meshMap, IDMap<DX11Texture>& textureMap)
+        const EngineSettings::ShadowReadbackLatency shadowmapReadbackLatency, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap)
         :
         mLogger(logger),
         mWindowSize(backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mMeshMap(meshMap),
-        mTextureMap(textureMap),
+        mMaterialMap(materialMap),
 
         mSwapchain(swapchain),
         mContext(context),
@@ -119,10 +119,10 @@ namespace JonsEngine
             const bool hasNormalTexture = model.mMaterial.mNormalTextureID != INVALID_TEXTURE_ID;
 
             if (hasDiffuseTexture)
-                mTextureMap.GetItem(model.mMaterial.mDiffuseTextureID).BindAsShaderResource(DX11Texture::SHADER_TEXTURE_SLOT_DIFFUSE);
+                mMaterialMap.GetItem(model.mMaterial.mDiffuseTextureID).BindAsShaderResource(DX11Texture::SHADER_TEXTURE_SLOT_DIFFUSE);
 
             if (hasNormalTexture)
-                mTextureMap.GetItem(model.mMaterial.mNormalTextureID).BindAsShaderResource(DX11Texture::SHADER_TEXTURE_SLOT_NORMAL);
+                mMaterialMap.GetItem(model.mMaterial.mNormalTextureID).BindAsShaderResource(DX11Texture::SHADER_TEXTURE_SLOT_NORMAL);
 
             const Mat4& localTransform = renderQueue.mLocalTransformStorage.GetItem(model.mMesh.mLocalTransformID);
             const Mat4& worldTransform = renderQueue.mWorldTransformStorage.GetItem(model.mMesh.mWorldTransformID);
@@ -184,7 +184,7 @@ namespace JonsEngine
             mPostProcessor.FXAAPass(mBackbuffer, mWindowSize);
 
         if (renderQueue.mSkyboxTextureID != INVALID_TEXTURE_ID)
-            mSkyboxPass.Render(renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraProjectionMatrix, mTextureMap.GetItem(renderQueue.mSkyboxTextureID));
+            mSkyboxPass.Render(renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraProjectionMatrix, mMaterialMap.GetItem(renderQueue.mSkyboxTextureID));
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
             mAABBPass.Render(renderQueue);

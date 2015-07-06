@@ -2,7 +2,7 @@
 
 #include "include/Renderer/RenderQueue.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
-#include "include/Renderer/DirectX11/DX11Texture.h"
+#include "include/Renderer/DirectX11/DX11Material.h"
 #include "include/Renderer/DirectX11/DX11Context.h"
 #include "include/Renderer/DirectX11/DX11Pipeline.h"
 #include "include/Renderer/DirectX11/DX11DepthReductionPass.h"
@@ -34,7 +34,7 @@ namespace JonsEngine
 
         MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,
             const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds);
-        TextureID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight);
+        MaterialID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight);
 
         void Render(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags);
         void ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth);
@@ -64,7 +64,7 @@ namespace JonsEngine
         Logger& mLogger;
         IMemoryAllocatorPtr mMemoryAllocator;
         IDMap<DX11Mesh> mMeshes;
-        IDMap<DX11Texture> mTextures;
+        IDMap<DX11Material> mMaterials;
 
         const EngineSettings::ShadowResolution mShadowResolution;
         const EngineSettings::ShadowReadbackLatency mShadowReadbackLatency;

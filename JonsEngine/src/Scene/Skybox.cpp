@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    Skybox::Skybox(const std::string& name, const TextureID skyboxTexture) : mName(name), mSkyboxTexture(skyboxTexture), mHashedID(boost::hash_value(name))
+    Skybox::Skybox(const std::string& name, const MaterialID skyboxTexture) : mName(name), mSkyboxTexture(skyboxTexture), mHashedID(boost::hash_value(name))
     {
     }
 

@@ -119,8 +119,8 @@ namespace JonsEngine
         {
 			const PackageMaterial& pkgMaterial = *iter;
 
-			TextureID diffuseTexture = INVALID_TEXTURE_ID;
-			TextureID normalTexture  = INVALID_TEXTURE_ID;
+			MaterialID diffuseTexture = INVALID_TEXTURE_ID;
+			MaterialID normalTexture  = INVALID_TEXTURE_ID;
 
 			if (pkgMaterial.mHasDiffuseTexture)
 				diffuseTexture = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_DIFFUSE, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth, pkgMaterial.mDiffuseTexture.mTextureHeight);
@@ -165,7 +165,7 @@ namespace JonsEngine
         const PackageSkybox& pkgSkybox = (*iter);
         const PackageTexture& pkgSkyboxTexture = pkgSkybox.mSkyboxTexture;
 
-        const TextureID skyboxTextureID = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_SKYBOX, pkgSkyboxTexture.mTextureData, pkgSkyboxTexture.mTextureWidth, pkgSkyboxTexture.mTextureHeight);
+        const MaterialID skyboxTextureID = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_SKYBOX, pkgSkyboxTexture.mTextureData, pkgSkyboxTexture.mTextureWidth, pkgSkyboxTexture.mTextureHeight);
 
         auto allocator = mMemoryAllocator;
         mSkyboxes.emplace_back(allocator->AllocateObject<Skybox>(pkgSkybox.mName, skyboxTextureID), [=](Skybox* skybox) { allocator->DeallocateObject(skybox); });

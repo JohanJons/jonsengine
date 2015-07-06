@@ -22,23 +22,31 @@ namespace JonsEngine
             NUM_SHADER_TEXTURE_SLOTS
         };
 
+        enum class TextureDimension
+        {
+            Texture2D,
+            Texture2DArray,
+            TextureCube
+        };
 
         DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight,
-            const uint32_t numTextures, const bool isCubeTexture, const bool isDepthTexture);
+            const uint32_t numTextures, const TextureDimension dimension, const bool isDepthTexture);
         DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight,
-            const uint32_t numTextures, const bool isCubeTexture, const bool isDepthTexture, const std::vector<uint8_t>& textureData, const bool genMipmaps);
+            const uint32_t numTextures, const TextureDimension dimension, const bool isDepthTexture, const std::vector<uint8_t>& textureData, const bool genMipmaps);
         ~DX11Texture();
 
-        void BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot);
+        ID3D11ShaderResourceViewPtr CreateSRV(ID3D11DevicePtr device);
+        ID3D11ShaderResourceViewPtr CreateSRV(ID3D11DevicePtr device, const DXGI_FORMAT srvFormat);
+        ID3D11RenderTargetViewPtr CreateRTV(ID3D11DevicePtr device);
+        ID3D11UnorderedAccessViewPtr CreateUAV(ID3D11DevicePtr device);
+        ID3D11DepthStencilViewPtr CreateDSV(ID3D11DevicePtr device);
 
 
-        const TextureID mTextureID;
-        const bool mIsCubeTexture;
+        const TextureDimension mTextureDimension;
 
 
     private:
         ID3D11DeviceContextPtr mContext;
         ID3D11Texture2DPtr mTexture;
-        ID3D11ShaderResourceViewPtr mShaderResourceView;
     };
 }

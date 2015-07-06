@@ -103,7 +103,7 @@ namespace JonsEngine
         mShadowFiltering(settings.mShadowFiltering),
         mAntiAliasing(settings.mAntiAliasing),
 
-        mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), mShadowResolution, mShadowReadbackLatency, mMeshes, mTextures),
+        mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), mShadowResolution, mShadowReadbackLatency, mMeshes, mMaterials),
         mDepthReductionPass(mDevice, mContext, settings.mShadowReadbackLatency, settings.mWindowWidth, settings.mWindowHeight),
 
         // samplers
@@ -154,14 +154,14 @@ namespace JonsEngine
         return mMeshes.AddItem(mDevice, mContext, vertexData, normalData, texCoords, tangentData, indexData, minBounds, maxBounds);
     }
 
-    TextureID DX11RendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
+    MaterialID DX11RendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
     {
         auto allocator = mMemoryAllocator;
 
-        const bool isCubeTexture = textureType == TextureType::TEXTURE_TYPE_SKYBOX;
-        const uint32_t numTextures = isCubeTexture ? 6 : 1;
+        const DX11Texture::TextureDimension dimension = textureType == TextureType::TEXTURE_TYPE_SKYBOX ? DX11Texture::TextureDimension::TextureCube : DX11Texture::TextureDimension::Texture2D;
+        const uint32_t numTextures = dimension == DX11Texture::TextureDimension::TextureCube ? 6 : 1;
 
-        return mTextures.AddItem(mDevice, mContext, GetTextureFormat(textureType), textureWidth, textureHeight, numTextures, isCubeTexture, false, textureData, true);
+        return mMaterials.AddItem(mDevice, mContext, GetTextureFormat(textureType), textureWidth, textureHeight, numTextures, dimension, textureData, true);
     }
 
 

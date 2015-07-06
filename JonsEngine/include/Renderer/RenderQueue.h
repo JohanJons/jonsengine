@@ -24,19 +24,19 @@ namespace JonsEngine
 
     struct RenderableMaterial
     {
-        RenderableMaterial(const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor)
+        RenderableMaterial(const MaterialID diffuseTexture, const MaterialID normalTexture, const float specFactor)
             : mDiffuseTextureID(diffuseTexture), mNormalTextureID(normalTexture), mSpecularFactor(specFactor)
         {
         }
 
-        TextureID mDiffuseTextureID;
-        TextureID mNormalTextureID;
+        MaterialID mDiffuseTextureID;
+        MaterialID mNormalTextureID;
         float mSpecularFactor;
     };
 
     struct RenderableModel
     {
-        RenderableModel(const MeshID mesh, const IDMap<Mat4>::ItemID localTransformID, const IDMap<Mat4>::ItemID worldTransformID, const TextureID diffuseTexture, const TextureID normalTexture, const float specFactor, const float tilingFactor) :
+        RenderableModel(const MeshID mesh, const IDMap<Mat4>::ItemID localTransformID, const IDMap<Mat4>::ItemID worldTransformID, const MaterialID diffuseTexture, const MaterialID normalTexture, const float specFactor, const float tilingFactor) :
             mMesh(mesh, localTransformID, worldTransformID), mMaterial(diffuseTexture, normalTexture, specFactor), mTextureTilingFactor(tilingFactor)
         {
         }
@@ -116,7 +116,7 @@ namespace JonsEngine
 
 
         Vec4 mAmbientLight;
-        TextureID mSkyboxTextureID;
+        MaterialID mSkyboxTextureID;
 
         // TODO: more than one camera?
         RenderableCamera mCamera;

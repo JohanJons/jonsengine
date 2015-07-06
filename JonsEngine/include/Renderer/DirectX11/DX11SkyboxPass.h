@@ -8,7 +8,7 @@
 
 namespace JonsEngine
 {
-    class DX11Texture;
+    class DX11Material;
 
     class DX11SkyboxPass
     {
@@ -16,7 +16,7 @@ namespace JonsEngine
         DX11SkyboxPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context);
         ~DX11SkyboxPass();
 
-        void Render(const Mat4& viewMatrix, const Mat4& projMatrix, DX11Texture& skyboxTexture);
+        void Render(const Mat4& viewMatrix, const Mat4& projMatrix, DX11Material& skyboxTexture);
 
 
     private:

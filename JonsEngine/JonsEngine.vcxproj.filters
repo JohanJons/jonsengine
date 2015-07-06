@@ -248,6 +248,9 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11SkyboxPass.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11Material.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -464,6 +467,9 @@
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11SkyboxPass.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11Material.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
   </ItemGroup>

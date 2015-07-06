@@ -1,7 +1,7 @@
 #pragma once
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/Renderer/DirectX11/DX11Texture.h"
+#include "include/Renderer/DirectX11/DX11Material.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11GBuffer.h"
 #include "include/Renderer/DirectX11/DX11LightAccumulationbuffer.h"
@@ -27,7 +27,7 @@ namespace JonsEngine
     {
     public:
         DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const EngineSettings::ShadowResolution shadowmapResolution,
-            const EngineSettings::ShadowReadbackLatency shadowmapReadbackLatency, IDMap<DX11Mesh>& meshMap, IDMap<DX11Texture>& textureMap);
+            const EngineSettings::ShadowReadbackLatency shadowmapReadbackLatency, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap);
         ~DX11Pipeline();
 
         void BeginFrame();
@@ -42,7 +42,7 @@ namespace JonsEngine
         Logger& mLogger;
         const Vec2 mWindowSize;
         IDMap<DX11Mesh>& mMeshMap;
-        IDMap<DX11Texture>& mTextureMap;
+        IDMap<DX11Material>& mMaterialMap;
 
         IDXGISwapChainPtr mSwapchain;
         ID3D11DeviceContextPtr mContext;
