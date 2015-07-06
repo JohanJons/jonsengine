@@ -8,8 +8,6 @@ namespace JonsEngine
     DX11Shadowmap::DX11Shadowmap(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const EngineSettings::ShadowResolution shadowmapRes, const uint32_t numTextures, const bool isCubeTexture) :
         mContext(context), mShadowmapTexture(nullptr), mInputLayout(nullptr), mShadowmapSRV(nullptr)
     {
-        const uint32_t shadowmapResVal = EngineSettingsToVal(shadowmapRes);
-
         mShadowmapViews.resize(numTextures);
 
         D3D11_INPUT_ELEMENT_DESC inputDescription;
@@ -24,6 +22,8 @@ namespace JonsEngine
         DXCALL(device->CreateInputLayout(&inputDescription, 1, gTransformVertexShader, sizeof(gTransformVertexShader), &mInputLayout));
 
         // create shadowmap texture/view/srv
+        const uint32_t shadowmapResVal = EngineSettingsToVal(shadowmapRes);
+
         D3D11_TEXTURE2D_DESC depthBufferDesc;
         ZeroMemory(&depthBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
         depthBufferDesc.ArraySize = numTextures;

@@ -161,7 +161,7 @@ namespace JonsEngine
         const bool isCubeTexture = textureType == TextureType::TEXTURE_TYPE_SKYBOX;
         const uint32_t numTextures = isCubeTexture ? 6 : 1;
 
-        return mTextures.AddItem(mDevice, mContext, textureData, GetTextureFormat(textureType), textureWidth, textureHeight, numTextures, isCubeTexture, false, true);
+        return mTextures.AddItem(mDevice, mContext, GetTextureFormat(textureType), textureWidth, textureHeight, numTextures, isCubeTexture, false, textureData, true);
     }
 
 
