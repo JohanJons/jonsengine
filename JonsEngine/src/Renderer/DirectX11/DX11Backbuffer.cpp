@@ -35,7 +35,7 @@ namespace JonsEngine
 
     void DX11Backbuffer::CopyBackbuffer(ID3D11Texture2DPtr dest)
     {
-        mContext->CopyResource(dest, mBackbufferTexture);
+        mTexture.CopyTexture(dest);
     }
 
     void DX11Backbuffer::BindForDrawing(ID3D11DepthStencilViewPtr dsv, const bool renderToSRGB)

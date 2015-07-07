@@ -43,6 +43,8 @@ namespace JonsEngine
         ID3D11UnorderedAccessViewPtr CreateUAV(ID3D11DevicePtr device);
         ID3D11DepthStencilViewPtr CreateDSV(ID3D11DevicePtr device);
 
+        ID3D11Texture2DPtr CopyTexture(ID3D11Texture2DPtr dest);
+
 
         const TextureDimension mTextureDimension;
 

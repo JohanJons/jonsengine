@@ -7,6 +7,7 @@ namespace JonsEngine
     static MaterialID gNextTextureID = 1;
 
     uint32_t GetNumMipLevels(uint32_t width, uint32_t height);
+    D3D11_TEXTURE2D_DESC GetTextureDesc(ID3D11Texture2DPtr texture);
 
 
     DX11Texture::DX11Texture(IDXGISwapChainPtr swapchain) : mTextureDimension(TextureDimension::Texture2D)
@@ -107,13 +108,11 @@ namespace JonsEngine
     {
         assert(mTextureDimension == TextureDimension::Texture2D || mTextureDimension == TextureDimension::Texture2DArray || mTextureDimension == TextureDimension::TextureCube);
 
-        D3D11_TEXTURE2D_DESC textureDesc;
-        ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
-        mTexture->GetDesc(&textureDesc);
+        D3D11_TEXTURE2D_DESC textureDesc(GetTextureDesc(mTexture));
 
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
-        srvDesc.Format = textureDesc.Format;
+        srvDesc.Format = srvFormat;
         if (mTextureDimension == TextureDimension::TextureCube)
         {
             srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
@@ -132,7 +131,7 @@ namespace JonsEngine
         }
 
         ID3D11ShaderResourceViewPtr retSRV(nullptr);
-        DXCALL(device->CreateShaderResourceView(mTexture, nullptr, &retSRV));
+        DXCALL(device->CreateShaderResourceView(mTexture, &srvDesc, &retSRV));
 
         return retSRV;
     }
@@ -147,8 +146,16 @@ namespace JonsEngine
 
     ID3D11RenderTargetViewPtr DX11Texture::CreateRTV(ID3D11DevicePtr device, const DXGI_FORMAT srvFormat)
     {
+        // TODO: support other dimensions?
+        assert(mTextureDimension == TextureDimension::Texture2D);
+
+        D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+        ZeroMemory(&rtvDesc, sizeof(D3D11_RENDER_TARGET_VIEW_DESC));
+        rtvDesc.Format = srvFormat;
+        rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+        
         ID3D11RenderTargetViewPtr retRTV(nullptr);
-        DXCALL(device->CreateRenderTargetView(mTexture, nullptr, &retRTV));
+        DXCALL(device->CreateRenderTargetView(mTexture, &rtvDesc, &retRTV));
 
         return retRTV;
     }
@@ -170,6 +177,12 @@ namespace JonsEngine
     }
 
 
+    ID3D11Texture2DPtr DX11Texture::CopyTexture(ID3D11Texture2DPtr dest)
+    {
+        mContext->CopyResource(dest, mTexture);
+    }
+
+
     uint32_t GetNumMipLevels(uint32_t width, uint32_t height)
     {
         uint32_t numLevels = 1;
@@ -182,5 +195,14 @@ namespace JonsEngine
         }
 
         return numLevels;
+    }
+
+    D3D11_TEXTURE2D_DESC GetTextureDesc(ID3D11Texture2DPtr texture)
+    {
+        D3D11_TEXTURE2D_DESC textureDesc;
+        ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+        texture->GetDesc(&textureDesc);
+
+        return textureDesc;
     }
 }
