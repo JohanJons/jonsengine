@@ -135,9 +135,4 @@ namespace JonsEngine
         mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, mNumIndices * sizeof(uint16_t));
         mContext->DrawIndexed(numAABBPoints, 0, 0);
     }
-
-    MeshID DX11Mesh::GetMeshID() const
-    {
-        return mMeshID;
-    }
 }

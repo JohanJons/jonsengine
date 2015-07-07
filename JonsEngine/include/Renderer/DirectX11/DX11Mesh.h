@@ -34,7 +34,8 @@ namespace JonsEngine
         void DrawPositions();
         void DrawAABB();
 
-        MeshID GetMeshID() const;
+
+        const MeshID mMeshID;
 
 
     private:
@@ -45,7 +46,6 @@ namespace JonsEngine
         ID3D11BufferPtr mTexcoordBuffer;
         ID3D11BufferPtr mIndexBuffer;
 
-        MeshID mMeshID;
         uint32_t mNumVertices;
         uint16_t mNumIndices;
     };
