@@ -158,10 +158,9 @@ namespace JonsEngine
     {
         auto allocator = mMemoryAllocator;
 
-        const DX11Texture::TextureDimension dimension = textureType == TextureType::TEXTURE_TYPE_SKYBOX ? DX11Texture::TextureDimension::TextureCube : DX11Texture::TextureDimension::Texture2D;
-        const uint32_t numTextures = dimension == DX11Texture::TextureDimension::TextureCube ? 6 : 1;
+        const bool isCubemap = textureType == TextureType::TEXTURE_TYPE_SKYBOX;
 
-        return mMaterials.AddItem(mDevice, mContext, GetTextureFormat(textureType), textureWidth, textureHeight, numTextures, dimension, textureData, true);
+        return mMaterials.AddItem(mDevice, mContext, textureData, GetTextureFormat(textureType), textureWidth, textureHeight, isCubemap);
     }
 
 

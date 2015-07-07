@@ -1,7 +1,6 @@
 #include "include/Renderer/DirectX11/DX11Pipeline.h"
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/Renderer/DirectX11/DX11Texture.h"
 
 
 namespace JonsEngine
@@ -30,7 +29,7 @@ namespace JonsEngine
         mFullscreenTrianglePass(device, context),
 
         mBackbuffer(device, mContext, mSwapchain, mFullscreenTrianglePass),
-        mLightAccbuffer(device, mContext, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
+        mLightAccbuffer(device, mContext, backbufferTextureDesc),
         mGBuffer(device, mContext, backbufferTextureDesc),
 
         mAmbientPass(device, context, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
@@ -119,10 +118,10 @@ namespace JonsEngine
             const bool hasNormalTexture = model.mMaterial.mNormalTextureID != INVALID_TEXTURE_ID;
 
             if (hasDiffuseTexture)
-                mMaterialMap.GetItem(model.mMaterial.mDiffuseTextureID).BindAsShaderResource(DX11Texture::SHADER_TEXTURE_SLOT_DIFFUSE);
+                mMaterialMap.GetItem(model.mMaterial.mDiffuseTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_DIFFUSE);
 
             if (hasNormalTexture)
-                mMaterialMap.GetItem(model.mMaterial.mNormalTextureID).BindAsShaderResource(DX11Texture::SHADER_TEXTURE_SLOT_NORMAL);
+                mMaterialMap.GetItem(model.mMaterial.mNormalTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_NORMAL);
 
             const Mat4& localTransform = renderQueue.mLocalTransformStorage.GetItem(model.mMesh.mLocalTransformID);
             const Mat4& worldTransform = renderQueue.mWorldTransformStorage.GetItem(model.mMesh.mWorldTransformID);
@@ -141,8 +140,8 @@ namespace JonsEngine
 
         // expose depth buffer as SRV
 		// TODO: move elsewhere?
-        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mDepthSRV.p);
-		mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &mDepthSRV.p);
+        mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_DEPTH, 1, &mDepthSRV.p);
+		mContext->CSSetShaderResources(SHADER_TEXTURE_SLOT_DEPTH, 1, &mDepthSRV.p);
 
         // disable further depth writing
         mContext->OMSetDepthStencilState(mDepthStencilState, 0);
@@ -175,7 +174,7 @@ namespace JonsEngine
     {
         // flip from lightAccumulatorBuffer --> backbuffer
         mBackbuffer.BindForDrawing(mDSVReadOnly, true);
-        mLightAccbuffer.BindAsShaderResource(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA);
+        mLightAccbuffer.BindAsShaderResource(SHADER_TEXTURE_SLOT_EXTRA);
         mBackbuffer.FillBackbuffer();
 
         // post-processing done in sRGB space

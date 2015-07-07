@@ -1,7 +1,6 @@
 #pragma once
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Core/Types.h"
 
 #include <d3d11.h>
@@ -25,7 +24,7 @@ namespace JonsEngine
 
     private:
         ID3D11DeviceContextPtr mContext;
-        DX11Texture mTexture;
+        ID3D11Texture2DPtr mBackbufferTexture;
         // for sRGB post-processing rendering to the backbuffer
         ID3D11RenderTargetViewPtr mRTV;
         // used to write from accumulationbuffer to backbuffer; performs linear->sRGB conversion automatically

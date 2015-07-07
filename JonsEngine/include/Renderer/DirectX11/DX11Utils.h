@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Renderer/DirectX11/Shaders/Constants.h"
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/EngineSettings.h"
 
@@ -17,6 +18,15 @@ namespace JonsEngine
     const float Z_FAR = 100.0f;
 
     typedef std::array<float, 4> DX11Color;
+
+    enum SHADER_TEXTURE_SLOT
+    {
+        SHADER_TEXTURE_SLOT_DIFFUSE = TEXTURE_SLOT_DIFFUSE,
+        SHADER_TEXTURE_SLOT_NORMAL = TEXTURE_SLOT_NORMAL,
+        SHADER_TEXTURE_SLOT_DEPTH = TEXTURE_SLOT_DEPTH,
+        SHADER_TEXTURE_SLOT_EXTRA = TEXTURE_SLOT_EXTRA,
+        NUM_SHADER_TEXTURE_SLOTS
+    };
 
     uint32_t EngineSettingsToVal(const EngineSettings::Anisotropic anisotropicEnum);
     uint32_t EngineSettingsToVal(const EngineSettings::ShadowReadbackLatency shadowReadbackLatencyEnum);

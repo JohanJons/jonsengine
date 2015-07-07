@@ -1,7 +1,6 @@
 #include "include/Renderer/DirectX11/DX11BoxBlurPass.h"
 
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
-#include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/BoxBlurPixel.h"
 
 namespace JonsEngine
@@ -41,16 +40,16 @@ namespace JonsEngine
 
         // horizontal pass
         mContext->OMSetRenderTargets(1, &mBoxBlurRTV.p, nullptr);
-        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &textureToBlur.p);
+        mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &textureToBlur.p);
         mBoxBlurCBuffer.SetData(BoxBlurCBuffer(Vec2(1.0f / windowSize.x, 0.0f)));
 
         mFullscreenPass.Render();
 
         // vertical pass
         // first set extra slot to null to avoid dx warnings
-        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSRV.p);
+        mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSRV.p);
         mContext->OMSetRenderTargets(1, &prevRTV.p, prevDSV);
-        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &mBoxBlurSRV.p);
+        mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mBoxBlurSRV.p);
         mBoxBlurCBuffer.SetData(BoxBlurCBuffer(Vec2(0.0f, 1.0f / windowSize.y)));
 
         mFullscreenPass.Render();

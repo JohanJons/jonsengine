@@ -2,7 +2,6 @@
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
-#include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/GBufferVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/GBufferPixel.h"
 
@@ -109,8 +108,8 @@ namespace JonsEngine
             mContext->ClearRenderTargetView(mRenderTargets.at(index), gClearColor);
         }
         // backbuffers depth texture might still be bound as SRV
-        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSRV.p);
-		mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSRV.p);
+        mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSRV.p);
+		mContext->CSSetShaderResources(SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSRV.p);
         mContext->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
         // default == depth testing/writing on

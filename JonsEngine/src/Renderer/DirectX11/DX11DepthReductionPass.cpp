@@ -1,6 +1,5 @@
 #include "include/Renderer/DirectX11/DX11DepthReductionPass.h"
 
-#include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/SDSMInitialCompute.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/SDSMFinalCompute.h"
 
@@ -77,7 +76,7 @@ namespace JonsEngine
         for (uint32_t index = 1; index < mDepthReductionRTVs.size(); ++index)
         {
             auto& prevRTV = mDepthReductionRTVs.at(index - 1);
-            mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &prevRTV.mSRV.p);
+            mContext->CSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &prevRTV.mSRV.p);
 
             auto& rtv = mDepthReductionRTVs.at(index);
             mContext->CSSetUnorderedAccessViews(UAV_SLOT, 1, &rtv.mUAV.p, nullptr);
@@ -88,7 +87,7 @@ namespace JonsEngine
             mContext->Dispatch(rtvTextureDesc.Width, rtvTextureDesc.Height, 1);
 
             mContext->CSSetUnorderedAccessViews(UAV_SLOT, 1, &gNullUAV.p, nullptr);
-            mContext->CSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSRV.p);
+            mContext->CSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSRV.p);
         }
 
         // reading back depth

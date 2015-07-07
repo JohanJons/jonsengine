@@ -161,9 +161,6 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Context.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX11\DX11Texture.cpp">
-      <Filter>Source Files\Renderer\DirectX11</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\DirectX11\DX11Gbuffer.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
@@ -365,9 +362,6 @@
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11RendererImpl.h">
-      <Filter>Header Files\Renderer\DirectX11</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DX11Texture.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h">

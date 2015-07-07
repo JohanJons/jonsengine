@@ -20,7 +20,7 @@ namespace JonsEngine
     void DX11SkyboxPass::Render(const Mat4& viewMatrix, const Mat4& projMatrix, DX11Material& skyboxTexture)
     {
         mSkyboxCBuffer.SetData(SkyboxCBuffer(glm::inverse(viewMatrix), glm::inverse(projMatrix)));
-        skyboxTexture.BindAsShaderResource(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA);
+        skyboxTexture.BindAsShaderResource(SHADER_TEXTURE_SLOT_EXTRA);
 
         mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
         mContext->IASetInputLayout(nullptr);

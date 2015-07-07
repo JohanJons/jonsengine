@@ -1,7 +1,6 @@
 #include "include/Renderer/DirectX11/DX11LightAccumulationbuffer.h"
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/Renderer/DirectX11/DX11Texture.h"
 
 
 namespace JonsEngine
@@ -9,12 +8,19 @@ namespace JonsEngine
     static const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 
-    DX11LightAccumulationbuffer::DX11LightAccumulationbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const uint32_t textureWidth, const uint32_t textureHeight) :
+    DX11LightAccumulationbuffer::DX11LightAccumulationbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc) :
         mContext(context),
-        mTexture(device, context, DXGI_FORMAT_R16G16B16A16_UNORM, textureWidth, textureHeight, 1, DX11Texture::TextureDimension::Texture2D, true, false),
-        mRTV(mTexture.CreateRTV(device)),
-        mSRV(mTexture.CreateSRV(device))
+        mAccumulationTexture(nullptr),
+        mRTV(nullptr),
+        mSRV(nullptr)
     {
+        backbufferTextureDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+        backbufferTextureDesc.Format = DXGI_FORMAT_R16G16B16A16_UNORM;
+
+        // create acc texture/rtv/srv
+        DXCALL(device->CreateTexture2D(&backbufferTextureDesc, NULL, &mAccumulationTexture));
+        DXCALL(device->CreateRenderTargetView(mAccumulationTexture, nullptr, &mRTV));
+        DXCALL(device->CreateShaderResourceView(mAccumulationTexture, nullptr, &mSRV))
     }
 
     DX11LightAccumulationbuffer::~DX11LightAccumulationbuffer()
@@ -27,7 +33,7 @@ namespace JonsEngine
         mContext->OMSetRenderTargets(1, &mRTV.p, dsv);
     }
 
-    void DX11LightAccumulationbuffer::BindAsShaderResource(const DX11Texture::SHADER_TEXTURE_SLOT shaderTextureSlot)
+    void DX11LightAccumulationbuffer::BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot)
     {
         mContext->PSSetShaderResources(shaderTextureSlot, 1, &mSRV.p);
     }

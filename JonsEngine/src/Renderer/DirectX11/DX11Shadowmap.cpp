@@ -1,6 +1,5 @@
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
 
-#include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/TransformVertex.h"
 
 namespace JonsEngine
@@ -89,7 +88,7 @@ namespace JonsEngine
         mContext->RSSetViewports(1, &mShadowPassViewport);
 
         // unbind shadowmap as shader resource
-        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSRV.p);
+        mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &gNullSRV.p);
 
         // defaults to depth rendering/testing
         mContext->OMSetDepthStencilState(nullptr, 0);
@@ -103,7 +102,7 @@ namespace JonsEngine
 
     void DX11Shadowmap::BindForReading()
     {
-        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &mShadowmapSRV.p);
+        mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mShadowmapSRV.p);
     }
 
 

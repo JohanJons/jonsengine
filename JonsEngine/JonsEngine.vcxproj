@@ -150,7 +150,6 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Sampler.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Shadowmap.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11SkyboxPass.cpp" />
-    <ClCompile Include="src\Renderer\DirectX11\DX11Texture.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Utils.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp" />
     <ClCompile Include="src\Renderer\RenderQueue.cpp" />
@@ -221,7 +220,6 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Sampler.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Shadowmap.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11SkyboxPass.h" />
-    <ClInclude Include="include\Renderer\DirectX11\DX11Texture.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11VertexTransformPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\Shaders\Constants.h">

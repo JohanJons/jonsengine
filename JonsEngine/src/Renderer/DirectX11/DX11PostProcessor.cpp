@@ -2,7 +2,6 @@
 
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "include/Renderer/DirectX11/DX11Backbuffer.h"
-#include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/FXAAPixel.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/SSAOPixel.h"
 
@@ -28,7 +27,7 @@ namespace JonsEngine
     {
         backbuffer.CopyBackbuffer(mFXAABackbufferTexture);
 
-        mContext->PSSetShaderResources(DX11Texture::SHADER_TEXTURE_SLOT_EXTRA, 1, &mFXAASRV.p);
+        mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mFXAASRV.p);
         mContext->PSSetShader(mFXAAPixelShader, nullptr, 0);
         mFXAACBuffer.SetData(FXAACBuffer(windowSize));
 
