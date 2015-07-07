@@ -13,7 +13,7 @@ namespace JonsEngine
 
     DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDXGISwapChainPtr swapchain, DX11FullscreenTrianglePass& fullscreenPass) :
         mContext(context),
-        mTexture(swapchain),
+        mTexture(swapchain, context),
         mRTV(mTexture.CreateRTV(device, DXGI_FORMAT_R8G8B8A8_UNORM)),
         mRTV_SRGB(mTexture.CreateRTV(device, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB)),
         mFullscreenPass(fullscreenPass)

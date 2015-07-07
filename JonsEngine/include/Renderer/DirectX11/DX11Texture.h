@@ -29,7 +29,7 @@ namespace JonsEngine
             TextureCube
         };
 
-        DX11Texture(IDXGISwapChainPtr swapchain);
+        DX11Texture(IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context);
         DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight,
             const uint32_t numTextures, const TextureDimension dimension, const bool isRenderTarget, const bool isDepthTexture);
         DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight,
@@ -43,7 +43,7 @@ namespace JonsEngine
         ID3D11UnorderedAccessViewPtr CreateUAV(ID3D11DevicePtr device);
         ID3D11DepthStencilViewPtr CreateDSV(ID3D11DevicePtr device);
 
-        ID3D11Texture2DPtr CopyTexture(ID3D11Texture2DPtr dest);
+        void CopyTexture(ID3D11Texture2DPtr dest);
 
 
         const TextureDimension mTextureDimension;

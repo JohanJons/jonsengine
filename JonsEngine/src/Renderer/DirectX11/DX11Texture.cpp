@@ -10,7 +10,10 @@ namespace JonsEngine
     D3D11_TEXTURE2D_DESC GetTextureDesc(ID3D11Texture2DPtr texture);
 
 
-    DX11Texture::DX11Texture(IDXGISwapChainPtr swapchain) : mTextureDimension(TextureDimension::Texture2D)
+    DX11Texture::DX11Texture(IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context) :
+        mTextureDimension(TextureDimension::Texture2D),
+        mContext(context),
+        mTexture(nullptr)
     {
         DXCALL(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&mTexture));
     }
@@ -177,7 +180,7 @@ namespace JonsEngine
     }
 
 
-    ID3D11Texture2DPtr DX11Texture::CopyTexture(ID3D11Texture2DPtr dest)
+    void DX11Texture::CopyTexture(ID3D11Texture2DPtr dest)
     {
         mContext->CopyResource(dest, mTexture);
     }
