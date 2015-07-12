@@ -29,16 +29,17 @@ namespace JonsGame
         
     void Game::Run()
     {
-        SetupInputCallbacks();
-        SetupScene();
+        const float initAngleSun = glm::radians(91.0f);
 
-        //mEngine.GetWindow().SetFullscreen(true);
+        SetupInputCallbacks();
+        SetupScene(initAngleSun);
+
         mEngine.GetWindow().ShowMouseCursor(false);
 
         while (mRunning)
         {
             if (mSunMoving)
-                UpdateSun();
+                UpdateSun(initAngleSun);
 
             mEngine.Tick(mDebugOptions);
         }
@@ -137,15 +138,15 @@ namespace JonsGame
         mEngine.GetWindow().SetKeyCallback(boost::bind(&Game::OnKeyEvent, this, _1));
     }
 
-    void Game::SetupScene()
+    void Game::SetupScene(const float initAngleSun)
     {
         JonsPackagePtr jonsPackage = ReadJonsPkg("assets.jons");
 
         //SetupSponzaScene(myScene, jonsPackage);
-        SetupTestScene(jonsPackage);
+        SetupTestScene(initAngleSun, jonsPackage);
     }
 
-    void Game::SetupTestScene(JonsPackagePtr jonsPackage)
+    void Game::SetupTestScene(const float initAngleSun, JonsPackagePtr jonsPackage)
     {
         Scene* scene = mEngine.GetSceneManager().GetActiveScene();
 
@@ -189,7 +190,7 @@ namespace JonsGame
 
         // directional light
         DirectionalLight* directionalLight = scene->CreateDirectionalLight("DirectionalLight", 4);
-        directionalLight->mLightDirection = Vec3(-1.0f, -1.0f, -1.0f);
+        directionalLight->mLightDirection = Vec3(glm::sin(initAngleSun), glm::cos(initAngleSun), 0.0f);
         directionalLight->mLightColor = Vec4(0.55f);
 
         // load checker material
@@ -227,15 +228,23 @@ namespace JonsGame
         scene->GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
     }
 
-    void Game::UpdateSun()
+    void Game::UpdateSun(const float initAngleSun)
     {
         Scene* scene = mEngine.GetSceneManager().GetActiveScene();
 
-        const uint64_t time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-        const uint32_t angleDegreesTime = time % 360;
-        const float angleRad = glm::radians(static_cast<float>(angleDegreesTime)) / 60.0f;
+        const uint64_t time = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count() % 360;
+        const uint32_t angleDegreesTime = glm::radians(static_cast<float>(time));
+        //const float angleRad = glm::radians(static_cast<float>(angleDegreesTime)) / 60.0f;
 
-        //DirectionalLight* directionalLight = scene->GetDirectionalLight("DirectionalLight");
-        //directionalLight->mLightDirection = glm::rotateY(directionalLight->mLightDirection, angleRad);
+        const float alpha = glm::radians(-90.0f + static_cast<float>(angleDegreesTime));
+
+        DirectionalLight* directionalLight = scene->GetDirectionalLight("DirectionalLight");
+        directionalLight->mLightDirection = Vec3(glm::cos(angleDegreesTime), -glm::sin(angleDegreesTime), 0.0f);//Vec3(glm::sin(initAngleSun) * glm::cos(alpha), glm::cos(initAngleSun), 0.0f);
+        /*const float n = 5669.97f;
+        const float eclipticObliquity = 23.439f - 0.0000004f * n;
+        const float g = glm::radians(357.528f) + glm::radians(0.9856003f * n);
+        const float R = 1.00014f - 0.01671f * glm::cos(g) - 0.00014f * glm::cos(2 * g);
+        
+        const float X = */
     }
 }

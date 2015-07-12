@@ -7,7 +7,7 @@
 
 namespace JonsEngine
 {
-    const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    static const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 
     DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDXGISwapChainPtr swapchain, DX11FullscreenTrianglePass& fullscreenPass) :

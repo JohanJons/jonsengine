@@ -27,9 +27,9 @@ namespace JonsGame
 
     private:
         void SetupInputCallbacks();
-        void SetupScene();
-        void SetupTestScene(JonsEngine::JonsPackagePtr jonsPackage);
-        void UpdateSun();
+        void SetupScene(const float initAngleSun);
+        void SetupTestScene(const float initAngleSun, JonsEngine::JonsPackagePtr jonsPackage);
+        void UpdateSun(const float initAngleSun);
 
 
         JonsEngine::EngineSettings mSettings;
