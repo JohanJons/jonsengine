@@ -14,9 +14,9 @@ namespace JonsGame
 
 
     private:
-        JonsEngine::DirectionalLight& mSun;
+        JonsEngine::DirectionalLight& mDirLight;
 
-        float mSunSpeed;
-        bool mSunMoving;
+        float mSpeed;
+        bool mIsMoving;
     };
 }

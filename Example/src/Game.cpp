@@ -1,10 +1,11 @@
 #include "include/Game.h"
 
+#include "include/Sun.h"
+
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Types.h"
 #include "include/Scene/Scene.h"
 #include "include/Resources/ResourceManifest.h"
-
 #include "boost/bind.hpp"
 #include <chrono>
 
@@ -34,6 +35,7 @@ namespace JonsGame
         SetupInputCallbacks();
         SetupScene(initAngleSun);
 
+        Sun sun();
         mEngine.GetWindow().ShowMouseCursor(false);
 
         while (mRunning)
