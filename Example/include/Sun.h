@@ -2,6 +2,8 @@
 
 #include "include/Scene/DirectionalLight.h"
 
+#include <chrono>
+
 namespace JonsGame
 {
     class Sun
@@ -13,10 +15,17 @@ namespace JonsGame
         void Update();
 
 
-    private:
-        JonsEngine::DirectionalLight& mDirLight;
-
-        float mSpeed;
         bool mIsMoving;
+        float mNightDayRatio;
+
+
+    private:
+        typedef std::chrono::system_clock Clock;
+        typedef std::chrono::time_point<Clock> TimeStamp;
+        typedef std::chrono::duration<float, std::ratio<24, 1>> Intervall;
+
+        JonsEngine::DirectionalLight& mDirLight;
+        float mSpeed;
+        TimeStamp mTimeStart;
     };
 }

@@ -233,18 +233,18 @@ namespace JonsEngine
         }
 
         // dir lights
-        for (DirectionalLightPtr& dirLight : mDirectionalLights)
+        for (DirectionalLight& dirLight : mDirectionalLights)
         {
-            mRenderQueue.mDirectionalLights.emplace_back(dirLight->mLightColor, glm::normalize(dirLight->mLightDirection), dirLight->mNumShadowmapCascades);
+            mRenderQueue.mDirectionalLights.emplace_back(dirLight.mLightColor, glm::normalize(dirLight.mLightDirection), dirLight.mNumShadowmapCascades);
             RenderableDirLight& renderableDirLight = mRenderQueue.mDirectionalLights.back();
 
-            dirLight->UpdateCascadesBoundingVolume(mRenderQueue.mCamera.mCameraViewMatrix, fov, aspectRatio, minDepth, maxDepth);
-            for (uint32_t cascadeIndex = 0; cascadeIndex < dirLight->mNumShadowmapCascades; ++cascadeIndex)
+            dirLight.UpdateCascadesBoundingVolume(mRenderQueue.mCamera.mCameraViewMatrix, fov, aspectRatio, minDepth, maxDepth);
+            for (uint32_t cascadeIndex = 0; cascadeIndex < dirLight.mNumShadowmapCascades; ++cascadeIndex)
             {
                 float nearZ = 0.0f, farZ = 0.0f;
-                dirLight->GetSplitDistance(cascadeIndex, nearZ, farZ);
+                dirLight.GetSplitDistance(cascadeIndex, nearZ, farZ);
 
-                auto kdopIterator = dirLight->GetBoundingVolume(cascadeIndex);
+                auto kdopIterator = dirLight.GetBoundingVolume(cascadeIndex);
                 for (const ActorPtr& actor : mActors)
                 {
                     if (!actor->mSceneNode)
@@ -318,42 +318,26 @@ namespace JonsEngine
     }
     
 
-    DirectionalLight* Scene::CreateDirectionalLight(const std::string& lightName)
+    DirectionalLightID Scene::CreateDirectionalLight(const std::string& lightName)
     {
         const uint32_t defaultNumCascades = 4;
 
-        mDirectionalLights.emplace_back(mMemoryAllocator.AllocateObject<DirectionalLight>(lightName, defaultNumCascades), std::bind(&HeapAllocator::DeallocateObject<DirectionalLight>, &mMemoryAllocator, std::placeholders::_1));
-
-        return mDirectionalLights.back().get();
+        return mDirectionalLights.AddItem(lightName, defaultNumCascades);
     }
 
-    DirectionalLight* Scene::CreateDirectionalLight(const std::string& lightName, const uint32_t numShadowmapCascades)
+    DirectionalLightID Scene::CreateDirectionalLight(const std::string& lightName, const uint32_t numShadowmapCascades)
     {
-        mDirectionalLights.emplace_back(mMemoryAllocator.AllocateObject<DirectionalLight>(lightName, numShadowmapCascades), std::bind(&HeapAllocator::DeallocateObject<DirectionalLight>, &mMemoryAllocator, std::placeholders::_1));
-
-        return mDirectionalLights.back().get();
-    }
-    
-    void Scene::DeleteDirectionalLight(const DirectionalLight* dirLight)
-    {
-        auto iter = std::find_if(mDirectionalLights.begin(), mDirectionalLights.end(), [dirLight](const DirectionalLightPtr& storedLight) { return storedLight.get() == dirLight; });
-
-        if (iter != mDirectionalLights.end())
-            mDirectionalLights.erase(iter);
-    }
-    
-    DirectionalLight* Scene::GetDirectionalLight(const std::string& lightName)
-    {
-        auto iter = std::find_if(mDirectionalLights.begin(), mDirectionalLights.end(), [lightName](const DirectionalLightPtr& storedLight) { return *storedLight == lightName; });
-        if (iter == mDirectionalLights.end())
-            return nullptr;
-
-        return iter->get();
+        return mDirectionalLights.AddItem(lightName, numShadowmapCascades);
     }
 
-    const std::vector<DirectionalLightPtr>& Scene::GetDirectionalLights() const
+    void Scene::DeleteDirectionalLight(const DirectionalLightID dirLight)
     {
-        return mDirectionalLights;
+        mDirectionalLights.MarkAsFree(dirLight);
+    }
+
+    DirectionalLight& Scene::GetDirectionalLight(const DirectionalLightID dirLightID)
+    {
+        return mDirectionalLights.GetItem(dirLightID);
     }
 
 

@@ -34,6 +34,7 @@ namespace JonsEngine
             bool operator!=(const iterator& iterator) const;
             iterator& operator++();
             iterator operator++(int);
+            T& operator*();
             const T& operator*() const;
 
 
@@ -104,6 +105,12 @@ namespace JonsEngine
 
 		return old;
 	}
+
+    template <typename T>
+    T& IDMap<T>::iterator::operator*()
+    {
+        return mIterator->mItem;
+    }
 
 	template <typename T>
 	const T& IDMap<T>::iterator::operator*() const

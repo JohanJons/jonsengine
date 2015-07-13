@@ -20,6 +20,7 @@ namespace JonsEngine
     class IMemoryAllocator;
 
     typedef IDMap<PointLight>::ItemID PointLightID;
+    typedef IDMap<PointLight>::ItemID DirectionalLightID;
 
     class Scene
     {
@@ -41,11 +42,10 @@ namespace JonsEngine
         void DeletePointLight(const PointLightID pointLightID);
 		PointLight& GetPointLight(const PointLightID pointLightID);
         
-        DirectionalLight* CreateDirectionalLight(const std::string& lightName);
-        DirectionalLight* CreateDirectionalLight(const std::string& lightName, const uint32_t numShadowmapCascades);
-        void DeleteDirectionalLight(const DirectionalLight* dirLight);
-        DirectionalLight* GetDirectionalLight(const std::string& lightName);
-        const std::vector<DirectionalLightPtr>& GetDirectionalLights() const;
+        DirectionalLightID CreateDirectionalLight(const std::string& lightName);
+        DirectionalLightID CreateDirectionalLight(const std::string& lightName, const uint32_t numShadowmapCascades);
+        void DeleteDirectionalLight(const DirectionalLightID dirLight);
+        DirectionalLight& GetDirectionalLight(const DirectionalLightID dirLightID);
 
 		void SetAmbientLight(const Vec4& ambientLight);
         const Vec4& GetAmbientLight() const;
@@ -77,9 +77,9 @@ namespace JonsEngine
         SkyboxPtr mSkybox;
 
         std::vector<ActorPtr> mActors;
-        std::vector<DirectionalLightPtr> mDirectionalLights;
 
 		IDMap<PointLight> mPointLights;
+        IDMap<DirectionalLight> mDirectionalLights;
 
         RenderQueue mRenderQueue;
     };

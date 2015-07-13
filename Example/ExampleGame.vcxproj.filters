@@ -8,6 +8,9 @@
     <ClCompile Include="src\Sun.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source">
@@ -22,6 +25,9 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="include\Sun.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

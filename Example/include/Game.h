@@ -1,5 +1,8 @@
 #pragma once
 
+#include "include/Scene.h"
+#include "include/Sun.h"
+
 #include "include/Core/Engine.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Window/MouseCallback.h"
@@ -10,8 +13,6 @@
 
 namespace JonsGame
 {
-    class JonsEngine::Scene;
-
     class Game
     {
     public:
@@ -27,20 +28,16 @@ namespace JonsGame
 
     private:
         void SetupInputCallbacks();
-        void SetupScene(const float initAngleSun);
-        void SetupTestScene(const float initAngleSun, JonsEngine::JonsPackagePtr jonsPackage);
-        void UpdateSun(const float initAngleSun);
 
 
         JonsEngine::EngineSettings mSettings;
         JonsEngine::Engine mEngine;
         JonsEngine::DebugOptions mDebugOptions;
 
+        Scene mGameScene;
+        Sun mSun;
+
         bool mRunning;
         float mMoveSpeed;
-        JonsEngine::PointLightID mPointLightID;
-
-        float mSunSpeed;
-        bool mSunMoving;
     };
 }
