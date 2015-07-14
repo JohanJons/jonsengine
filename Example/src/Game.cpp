@@ -129,24 +129,4 @@ namespace JonsGame
         mEngine.GetWindow().SetMousePositionCallback(boost::bind(&Game::OnMousePositionEvent, this, _1));
         mEngine.GetWindow().SetKeyCallback(boost::bind(&Game::OnKeyEvent, this, _1));
     }
-
-    //void Game::UpdateSun(const float initAngleSun)
-    //{
-    //    Scene* scene = mEngine.GetSceneManager().GetActiveScene();
-
-    //    const uint64_t time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() % 360;
-    //    const float angleDegreesTime = glm::radians(static_cast<float>(time));
-    //    //const float angleRad = glm::radians(static_cast<float>(angleDegreesTime)) / 60.0f;
-
-    //    const float alpha = glm::radians(-90.0f + static_cast<float>(angleDegreesTime));
-
-    //    DirectionalLight* directionalLight = scene->GetDirectionalLight("DirectionalLight");
-    //    directionalLight->mLightDirection = Vec3(glm::cos(angleDegreesTime), glm::sin(angleDegreesTime), 0.0f);//Vec3(glm::sin(initAngleSun) * glm::cos(alpha), glm::cos(initAngleSun), 0.0f);
-    //    /*const float n = 5669.97f;
-    //    const float eclipticObliquity = 23.439f - 0.0000004f * n;
-    //    const float g = glm::radians(357.528f) + glm::radians(0.9856003f * n);
-    //    const float R = 1.00014f - 0.01671f * glm::cos(g) - 0.00014f * glm::cos(2 * g);
-    //    
-    //    const float X = */
-    //}
 }

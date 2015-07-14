@@ -16,7 +16,6 @@ namespace JonsGame
 
 
         bool mIsMoving;
-        float mNightDayRatio;
 
 
     private:
@@ -25,7 +24,7 @@ namespace JonsGame
         typedef std::chrono::duration<float, std::ratio<24, 1>> Intervall;
 
         JonsEngine::DirectionalLight& mDirLight;
-        float mSpeed;
+        float mNightDayRatio;
         TimeStamp mTimeStart;
     };
 }
