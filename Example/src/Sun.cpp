@@ -29,8 +29,16 @@ namespace JonsGame
         const float angle = count * glm::two_pi<float>() - glm::pi<float>();*/
         const float pi = glm::pi<float>();
         const float latitude = 40 * pi / 180;
-        const float solarDeclination = 0.0f;
-        const float solarTime = 0.5f;   // TODO: variable
+        //const float solarDeclination = 0.0f;
+        //const float solarTime = 0.5f;   // TODO: variable
+
+        const double julian = 2451604.875;
+
+        const uint32_t hoursSinceMidnight = 12;
+        const float solarTime = pi / 12 * (hoursSinceMidnight - 12
+            + 0.17 * glm::sin(4 * pi * (julian - 80) / 373)
+            - 0.129 * glm::sin(2 * pi * (julian - 8) / 355));
+        const float solarDeclination = 0.4093 * glm::sin(2 * pi * (julian - 81) / 368);
 
         const float solarZenith = glm::acos(glm::sin(latitude) * glm::sin(solarDeclination) + glm::cos(latitude) * glm::cos(solarDeclination) * glm::cos(solarTime));
         const float lightZenith = glm::min(solarZenith, pi / 2 - 0.2f);
