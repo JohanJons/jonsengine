@@ -41,9 +41,9 @@ namespace JonsGame
         const float solarDeclination = 0.4093 * glm::sin(2 * pi * (julian - 81) / 368);
 
         const float solarZenith = glm::acos(glm::sin(latitude) * glm::sin(solarDeclination) + glm::cos(latitude) * glm::cos(solarDeclination) * glm::cos(solarTime));
-        const float lightZenith = glm::min(solarZenith, pi / 2 - 0.2f);
+        //const float lightZenith = glm::min(solarZenith, pi / 2 - 0.2f);   no clamping for day/night cycle?
         const float solarAzimuth = solarTime;
 
-        mDirLight.mLightDirection = Vec3(glm::sin(solarAzimuth) * glm::sin(lightZenith), glm::cos(lightZenith), glm::cos(solarAzimuth) * glm::sin(lightZenith));
+        mDirLight.mLightDirection = Vec3(glm::sin(solarAzimuth) * glm::sin(solarZenith), glm::cos(solarZenith), glm::cos(solarAzimuth) * glm::sin(solarZenith));
     }
 }
