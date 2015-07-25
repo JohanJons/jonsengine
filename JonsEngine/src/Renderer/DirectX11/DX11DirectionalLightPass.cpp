@@ -84,6 +84,9 @@ namespace JonsEngine
         rasterizerDesc.FillMode = D3D11_FILL_SOLID;
         rasterizerDesc.CullMode = D3D11_CULL_BACK;
         rasterizerDesc.FrontCounterClockwise = true;
+        // TODO: reasonable numbers
+        rasterizerDesc.SlopeScaledDepthBias = 1.0f;
+        rasterizerDesc.DepthBias = 1;
         rasterizerDesc.DepthBiasClamp = 1.0f;
         rasterizerDesc.DepthClipEnable = false;
         rasterizerDesc.ScissorEnable = false;

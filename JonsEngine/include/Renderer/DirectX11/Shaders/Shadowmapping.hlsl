@@ -2,7 +2,7 @@
 #define SHADOWMAPPING_HLSL
 
 static const float gNormalOffset = 4.5;
-static const float gBias = 2;
+static const float gBias = 1;
 
 /**
  * Negates most visible shadow acne with very few instructions

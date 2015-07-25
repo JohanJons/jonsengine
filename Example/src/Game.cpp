@@ -55,8 +55,8 @@ namespace JonsGame
                 case Key::FOUR: mEngine.GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_7X7); break;
 
                 // sun
-                case Key::Q: mSun.mIsMoving = true; break;
-                case Key::W: mSun.mIsMoving = false; break;
+                case Key::Q: mSun.SetIsMoving(true); break;
+                case Key::W: mSun.SetIsMoving(false); break;
                 //case Key::E: mSunSpeed += 0.005f; break;
                 //case Key::R: mSunSpeed -= 0.005f; break;
                 

@@ -14,17 +14,18 @@ namespace JonsGame
 
         void Update();
 
-
-        bool mIsMoving;
+        void SetIsMoving(const bool moving);
+        bool IsMoving() const;
 
 
     private:
         typedef std::chrono::system_clock Clock;
         typedef std::chrono::time_point<Clock> TimeStamp;
-        typedef std::chrono::duration<float, std::ratio<24, 1>> Intervall;
+        typedef std::chrono::duration<float, std::ratio<96, 1>> Intervall;
 
         JonsEngine::DirectionalLight& mDirLight;
         float mNightDayRatio;
+        bool mIsMoving;
         TimeStamp mTimeStart;
     };
 }
