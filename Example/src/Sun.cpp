@@ -20,7 +20,7 @@ namespace JonsGame
 
         const auto now = Clock::now();
         const auto timeDiff = now - mTimeStart;
-        const float count = glm::clamp(std::chrono::duration_cast<Intervall>(timeDiff).count(), 0.2f, 1.0f);
+        const float count = glm::clamp(0.2f + std::chrono::duration_cast<Intervall>(timeDiff).count(), 0.2f, 1.0f);
 
         assert(mNightDayRatio <= 1.0f);
         //if (count >= 0.5f + 0.5f * mNightDayRatio)
