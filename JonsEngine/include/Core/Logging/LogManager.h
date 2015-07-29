@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/Core/EngineDefs.h"
+#include "include/Core/Types.h"
 #include "include/Core/Logging/StreamBuf.h"
 #include "include/Core/Logging/OutputStream.h"
 

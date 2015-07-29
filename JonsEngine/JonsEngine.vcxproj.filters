@@ -84,6 +84,9 @@
     <Filter Include="Source Files\Core\Math">
       <UniqueIdentifier>{b074f7aa-71f8-4a51-b4e6-83de54bfc707}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Core\Platform">
+      <UniqueIdentifier>{a433238b-126a-45f5-bfa8-a8106e7b41ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Engine.cpp">
@@ -340,9 +343,6 @@
     <ClInclude Include="include\Window\WindowManagerImpl.h">
       <Filter>Header Files\Window</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Utils\Win32.h">
-      <Filter>Header Files\Core\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11AmbientPass.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
@@ -465,6 +465,12 @@
     </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11Material.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Platform\Windows.h">
+      <Filter>Header Files\Core\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Platform\Directx11.h">
+      <Filter>Header Files\Core\Platform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

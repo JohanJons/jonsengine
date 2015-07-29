@@ -193,11 +193,12 @@
     <ClInclude Include="include\Core\Math\Plane.h" />
     <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
     <ClInclude Include="include\Core\Memory\IMemoryAllocator.h" />
+    <ClInclude Include="include\Core\Platform\Directx11.h" />
+    <ClInclude Include="include\Core\Platform\Windows.h" />
     <ClInclude Include="include\Core\Types.h" />
     <ClInclude Include="include\Core\Utils\Error.h" />
     <ClInclude Include="include\Core\Utils\NonCopyable.h" />
     <ClInclude Include="include\Core\Utils\Time.h" />
-    <ClInclude Include="include\Core\Utils\Win32.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11AABBPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11AmbientPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Backbuffer.h" />

@@ -12,15 +12,12 @@ namespace JonsEngine
 {
     struct EngineSettings;
     struct DebugOptions;
-    class IMemoryAllocator;
     class Logger;
 
     /*
      * Engine is the central controller object.
      * It creates all subsystems and is responsible for advancing the engine state.
      */
-
-    /* Engine definition */
     class Engine
     {
     public:

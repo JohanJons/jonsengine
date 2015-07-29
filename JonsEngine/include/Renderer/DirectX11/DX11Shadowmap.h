@@ -3,8 +3,8 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
+#include "include/Core/Platform/Directx11.h"
 
-#include <d3d11.h>
 #include <vector>
 
 namespace JonsEngine

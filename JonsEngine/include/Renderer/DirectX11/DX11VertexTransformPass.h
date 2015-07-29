@@ -7,8 +7,8 @@
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/Containers/RangedIterator.hpp"
+#include "include/Core/Platform/Directx11.h"
 
-#include <d3d11.h>
 #include <vector>
 #include <array>
 

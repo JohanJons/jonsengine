@@ -3,9 +3,10 @@
 #include "include/Renderer/DirectX11/Shaders/Constants.h"
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/EngineSettings.h"
+#include "include/Core/Types.h"
+#include "include/Core/Platform/Directx11.h"
 
 #include "boost/current_function.hpp"
-#include <d3d11.h>
 #include <atlbase.h>
 #include <sstream>
 #include <exception>

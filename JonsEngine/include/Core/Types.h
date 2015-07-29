@@ -1,9 +1,9 @@
 #pragma once
 
-#include "include/Core/EngineDefs.h"
-
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#include <cstdint>
+#include <cstddef>
 #include <array>
 
 namespace JonsEngine

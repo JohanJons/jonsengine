@@ -1,9 +1,7 @@
 #pragma once
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
-
-#include <Windows.h>
-#include <d3d11.h>
+#include "include/Core/Platform/Directx11.h"
 
 namespace JonsEngine
 {

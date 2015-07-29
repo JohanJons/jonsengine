@@ -2,9 +2,7 @@
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/Shaders/Constants.h"
-
-#include <d3d11.h>
-#include <cstring>
+#include "include/Core/Platform/Directx11.h"
 
 namespace JonsEngine
 {

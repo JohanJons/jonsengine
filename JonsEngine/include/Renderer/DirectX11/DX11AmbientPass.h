@@ -3,9 +3,8 @@
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11BoxBlurPass.h"
+#include "include/Core/Platform/Directx11.h"
 #include "include/Core/Types.h"
-
-#include <d3d11.h>
 
 namespace JonsEngine
 {

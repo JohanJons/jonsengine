@@ -8,8 +8,8 @@
 #include "include/Core/Math/Frustum.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/EngineSettings.h"
+#include "include/Core/Platform/Directx11.h"
 
-#include <d3d11.h>
 #include <array>
 #include <vector>
 

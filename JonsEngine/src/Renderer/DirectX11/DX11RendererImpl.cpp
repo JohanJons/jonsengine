@@ -2,7 +2,6 @@
 
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Math/Math.h"
-#include "include/Core/Utils/Win32.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 
 #include <Commctrl.h>

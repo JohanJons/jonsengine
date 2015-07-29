@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/Containers/DataPool.hpp"
 #include "include/Scene/SceneNode.h"

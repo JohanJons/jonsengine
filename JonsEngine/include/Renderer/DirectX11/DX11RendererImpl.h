@@ -13,9 +13,8 @@
 #include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/DebugOptions.h"
+#include "include/Core/Platform/Directx11.h"
 
-#include <windows.h>
-#include <d3d11.h>
 #include <string>
 #include <vector>
 #include <memory>

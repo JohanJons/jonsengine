@@ -3,8 +3,8 @@
 #include "include/Window/KeyCallback.h"
 #include "include/Window/KeyDefinition.h"
 #include "include/Window/MouseCallback.h"
+#include "include/Core/Platform/Windows.h"
 
-#include <Windows.h>
 #include <string>
 #include <vector>
 

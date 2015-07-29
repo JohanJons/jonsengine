@@ -1,7 +1,6 @@
 #pragma once
 
 #include "include/Core/Types.h"
-#include "include/Core/EngineDefs.h"
 
 #include <vector>
 #include <memory>
@@ -104,10 +103,20 @@ namespace JonsEngine
         PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture);
     };
 
+    struct PackageAnimation
+    {
+        std::string mName;
+        float mDurationInSeconds;
+
+
+        PackageAnimation(const std::string& name, const float durationSeconds);
+    };
+
     struct PackageModel
     {
         std::string mName;
         PackageNode mRootNode;
+        std::vector<PackageAnimation> mAnimations;
 
 
         PackageModel();

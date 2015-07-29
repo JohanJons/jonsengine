@@ -3,7 +3,6 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/RenderQueue.h"
-#include "include/Core/EngineDefs.h"
 #include "include/Core/Types.h"
 
 namespace JonsEngine

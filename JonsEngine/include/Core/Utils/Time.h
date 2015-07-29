@@ -7,7 +7,7 @@
 #include <time.h>
 #include <string>
 
-#include "include/Core/EngineDefs.h"
+#include "include/Core/Types.h"
 
 namespace JonsEngine
 {

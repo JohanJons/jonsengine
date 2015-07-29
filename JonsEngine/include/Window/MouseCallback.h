@@ -1,6 +1,6 @@
 #pragma once
 
-#include"include/Core/EngineDefs.h"
+#include"include/Core/Types.h"
 
 #include <functional>
 

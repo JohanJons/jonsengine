@@ -18,8 +18,7 @@
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
-
-#include <d3d11.h>
+#include "include/Core/Platform/Directx11.h"
 
 namespace JonsEngine
 {

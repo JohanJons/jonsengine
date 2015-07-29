@@ -46,6 +46,10 @@ namespace JonsEngine
     {
     }
 
+    PackageAnimation::PackageAnimation(const std::string& name, const float durationSeconds) : mName(name), mDurationInSeconds(durationSeconds)
+    {
+    }
+
     PackageModel::PackageModel()
     {
     }
