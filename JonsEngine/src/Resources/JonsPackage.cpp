@@ -46,7 +46,27 @@ namespace JonsEngine
     {
     }
 
-    PackageAnimation::PackageAnimation(const std::string& name, const float durationSeconds) : mName(name), mDurationInSeconds(durationSeconds)
+    PackageAnimatedNodeTransform::PackageAnimatedNodeTransform()
+    {
+    }
+
+    PackageAnimatedNodeTransform::PackageAnimatedNodeTransform(const double timestamp, const Mat4& transform) : mTimestamp(timestamp), mTransform(transform)
+    {
+    }
+
+    PackageAnimatedNode::PackageAnimatedNode()
+    {
+    }
+
+    PackageAnimatedNode::PackageAnimatedNode(const std::string& nodeName) : mNodeName(nodeName)
+    {
+    }
+
+    PackageAnimation::PackageAnimation()
+    {
+    }
+
+    PackageAnimation::PackageAnimation(const std::string& name, const double durationSeconds) : mName(name), mDurationInSeconds(durationSeconds)
     {
     }
 

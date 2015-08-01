@@ -8,7 +8,7 @@ using namespace JonsEngine;
 namespace JonsGame
 {
     Scene::Scene(JonsEngine::Scene& jonsScene, JonsEngine::ResourceManifest& resManifest, const std::string& jonsPkgName) :
-        mScene(jonsScene), mMovingPointLightID(0), mSunDirLightID(0)
+        mScene(jonsScene), mMovingPointLightID(0), mSunDirLightID(0), mWuson(nullptr)
     {
         JonsPackagePtr jonsPackage = ReadJonsPkg("assets.jons");
 
@@ -40,6 +40,13 @@ namespace JonsGame
         ModelPtr modelHouse = resManifest.LoadModel("house", jonsPackage);
         Actor* actorHouse = mScene.CreateActor("actorHouse", modelHouse, nodeHouse);
         nodeHouse->TranslateNode(Vec3(-7.0f, 0.5f, -15.0f));
+
+        // animated wuson
+        SceneNodePtr nodeWuson = mScene.GetRootNode().CreateChildNode("wuson");
+        ModelPtr modelWuson = resManifest.LoadModel("wuson", jonsPackage);
+        mWuson = mScene.CreateActor("wuson", modelWuson, nodeWuson);
+        nodeWuson->TranslateNode(Vec3(-10.0f, 0.5f, -11.0f));
+        nodeWuson->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
         // point light
         SceneNodePtr nodeMovingLight = mScene.GetRootNode().CreateChildNode("nodeMovingLight");
@@ -108,5 +115,10 @@ namespace JonsGame
     JonsEngine::DirectionalLight& Scene::GetSunDirLight()
     {
         return mScene.GetDirectionalLight(mSunDirLightID);
+    }
+
+    JonsEngine::Actor& Scene::GetAnimatedWuson()
+    {
+        return *mWuson;
     }
 }

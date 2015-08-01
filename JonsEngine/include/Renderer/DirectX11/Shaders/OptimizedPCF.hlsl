@@ -9,10 +9,6 @@
     #define PCF_KERNEL_SIZE 2
 #endif
 
-//float SampleOptimizedPCF(in float3 shadowPos, in SamplerComparisonState shadowCmpSampler, in float shadowmapSize, in Texture2D shadowmap)
-//{
-//}
-
 float SampleOptimizedPCF(in float3 shadowPos, in float shadowmapSize, in SamplerComparisonState shadowCmpSampler, in Texture2DArray shadowmapArr, in uint cascadeIndex)
 {
     float2 uv = shadowPos.xy * shadowmapSize;

@@ -251,6 +251,9 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Material.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene\Animation.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -471,6 +474,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\Platform\Directx11.h">
       <Filter>Header Files\Core\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\Animation.h">
+      <Filter>Header Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

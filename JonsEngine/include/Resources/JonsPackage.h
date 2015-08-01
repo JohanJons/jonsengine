@@ -103,13 +103,35 @@ namespace JonsEngine
         PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture);
     };
 
+    struct PackageAnimatedNodeTransform
+    {
+        double mTimestamp;
+        Mat4 mTransform;
+
+
+        PackageAnimatedNodeTransform();
+        PackageAnimatedNodeTransform(const double timestamp, const Mat4& transform);
+    };
+
+    struct PackageAnimatedNode
+    {
+        std::string mNodeName;
+        std::vector<PackageAnimatedNodeTransform> mAnimationTransforms;
+
+
+        PackageAnimatedNode();
+        PackageAnimatedNode(const std::string& nodeName);
+    };
+
     struct PackageAnimation
     {
         std::string mName;
-        float mDurationInSeconds;
+        double mDurationInSeconds;
+        std::vector<PackageAnimatedNode> mAnimatedNodes;
 
 
-        PackageAnimation(const std::string& name, const float durationSeconds);
+        PackageAnimation();
+        PackageAnimation(const std::string& name, const double durationSeconds);
     };
 
     struct PackageModel
@@ -218,10 +240,33 @@ namespace boost
         }
 
         template<class Archive>
+        void serialize(Archive & ar, JonsEngine::PackageAnimatedNodeTransform& animationNodeTransform, const unsigned int version)
+        {
+            ar & animationNodeTransform.mTimestamp;
+            ar & animationNodeTransform.mTransform;
+        }
+
+        template<class Archive>
+        void serialize(Archive & ar, JonsEngine::PackageAnimatedNode& animationNode, const unsigned int version)
+        {
+            ar & animationNode.mNodeName;
+            ar & animationNode.mAnimationTransforms;
+        }
+        
+        template<class Archive>
+        void serialize(Archive & ar, JonsEngine::PackageAnimation& animation, const unsigned int version)
+        {
+            ar & animation.mName;
+            ar & animation.mDurationInSeconds;
+            ar & animation.mAnimatedNodes;
+        }
+
+        template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageModel& model, const unsigned int version)
         {
             ar & model.mName;
             ar & model.mRootNode;
+            ar & model.mAnimations;
         }
 
         template<class Archive>

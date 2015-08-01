@@ -157,6 +157,7 @@
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
     <ClCompile Include="src\Scene\Actor.cpp" />
+    <ClCompile Include="src\Scene\Animation.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
     <ClCompile Include="src\Scene\DirectionalLight.cpp" />
     <ClCompile Include="src\Scene\Material.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="include\Resources\JonsPackage.h" />
     <ClInclude Include="include\Resources\ResourceManifest.h" />
     <ClInclude Include="include\Scene\Actor.h" />
+    <ClInclude Include="include\Scene\Animation.h" />
     <ClInclude Include="include\Scene\Camera.h" />
     <ClInclude Include="include\Scene\DirectionalLight.h" />
     <ClInclude Include="include\Scene\Material.h" />

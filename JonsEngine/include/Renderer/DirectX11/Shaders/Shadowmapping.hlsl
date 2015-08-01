@@ -11,10 +11,10 @@ static const float gBias = 1;
 float3 ShadowAcneNormalOffset(in float3 normal, in float normalLightAngle, in float shadowmapSize)
 {
     const float texelSize = 2.0 / shadowmapSize;
-    const float normalOffsetScale = saturate(1.0 - abs(normalLightAngle));
+    const float normalOffsetScale = saturate(1.0 - normalLightAngle);
 
     float3 ret = normal * gNormalOffset * normalOffsetScale * texelSize;
-    ret.z -= texelSize * gBias;
+    //ret.z -= texelSize * gBias;
 
     return ret;
 }

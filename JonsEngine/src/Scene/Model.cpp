@@ -36,4 +36,10 @@ namespace JonsEngine
 	{
 		return mRootNode;
 	}
+
+
+    void Model::PlayAnimation(const std::string animationName)
+    {
+
+    }
 }
