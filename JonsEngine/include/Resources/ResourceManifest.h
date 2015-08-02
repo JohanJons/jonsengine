@@ -15,8 +15,8 @@ namespace JonsEngine
     class DX11Renderer;
 
     typedef IDMap<Model>::ItemID ModelID;
-    typedef IDMap<Model>::ItemID MaterialID;
-    typedef IDMap<Model>::ItemID SkyboxID;
+    typedef IDMap<Material>::ItemID MaterialID;
+    typedef IDMap<Skybox>::ItemID SkyboxID;
 
     class ResourceManifest
     {

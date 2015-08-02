@@ -2,7 +2,7 @@
 
 namespace JonsEngine
 {
-    Mesh::Mesh(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material) :
+    Mesh::Mesh(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID, MaterialPtr material) :
         mName(name), mMaterialTilingFactor(1.0f), mLocalAABB(minBounds, maxBounds), mMeshID(meshID), mMaterial(material)
     {
     }

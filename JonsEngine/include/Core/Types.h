@@ -20,11 +20,11 @@ namespace JonsEngine
     };
     
     // TODO: move mesh/texture id definitions
-    typedef uint32_t MeshID;
-    typedef uint32_t MaterialID;
+    typedef uint32_t DX11MeshID;
+    typedef uint32_t DX11MaterialID;
 
-    const MeshID INVALID_MESH_ID = 0;
-    const MaterialID INVALID_TEXTURE_ID = 0;
+    const DX11MeshID INVALID_MESH_ID = 0;
+    const DX11MaterialID INVALID_TEXTURE_ID = 0;
 
     typedef glm::vec2 Vec2;
     typedef glm::vec3 Vec3;

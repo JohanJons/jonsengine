@@ -15,13 +15,13 @@ namespace JonsEngine
     }
 
 
-    MeshID DX11Renderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,
+    DX11MeshID DX11Renderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,
         const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
     {
         return mImplementation->CreateMesh(vertexData, normalData, texCoords, tangentData, indexData, minBounds, maxBounds);
     }
 
-    MaterialID DX11Renderer::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
+    DX11MaterialID DX11Renderer::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
     {
         return mImplementation->CreateTexture(textureType, textureData, textureWidth, textureHeight);
     }

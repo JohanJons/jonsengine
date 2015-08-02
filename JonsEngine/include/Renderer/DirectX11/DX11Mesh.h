@@ -34,7 +34,7 @@ namespace JonsEngine
         void DrawAABB();
 
 
-        const MeshID mMeshID;
+        const DX11MeshID mMeshID;
 
 
     private:

@@ -12,7 +12,7 @@ namespace JonsEngine
     class Mesh
     {
     public:
-        Mesh(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material);
+        Mesh(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID, MaterialPtr material);
         ~Mesh();
 
 		float GetTextureTilingFactor() const;
@@ -23,7 +23,7 @@ namespace JonsEngine
 
 
         const std::string mName;
-        const MeshID mMeshID;
+        const DX11MeshID mMeshID;
         const AABB mLocalAABB;
 
 

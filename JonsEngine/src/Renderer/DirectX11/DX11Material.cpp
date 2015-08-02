@@ -2,7 +2,7 @@
 
 namespace JonsEngine
 {
-    static MaterialID gNextTextureID = 1;
+    static DX11MaterialID gNextTextureID = 1;
 
     uint32_t GetNumMipLevels(uint32_t width, uint32_t height);
 

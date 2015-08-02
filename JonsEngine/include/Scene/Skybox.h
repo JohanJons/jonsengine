@@ -10,14 +10,14 @@ namespace JonsEngine
     class Skybox
     {
     public:
-        Skybox(const std::string& name, const MaterialID skyboxTexture);
+        Skybox(const std::string& name, const DX11MaterialID skyboxTexture);
 
         bool operator==(const Skybox& m);
         bool operator==(const std::string& modelName);
 
 
         const std::string mName;
-        const MaterialID mSkyboxTexture;
+        const DX11MaterialID mSkyboxTexture;
 
 
     private:

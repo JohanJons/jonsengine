@@ -10,14 +10,14 @@ namespace JonsEngine
     class Material
     {
 	public:
-		Material(const std::string& name, const MaterialID diffuseTexture, const MaterialID normalTexture, const Vec3& diffuseColor, const Vec3& ambientColor, const Vec3& specularColor, const Vec3& emissiveColor, const float specularFactor);
+		Material(const std::string& name, const DX11MaterialID diffuseTexture, const DX11MaterialID normalTexture, const Vec3& diffuseColor, const Vec3& ambientColor, const Vec3& specularColor, const Vec3& emissiveColor, const float specularFactor);
 
         bool operator==(const Material& material);
         bool operator==(const std::string& materialName);
 
 		const std::string mName;
-		const MaterialID mDiffuseTexture;
-        const MaterialID mNormalTexture;
+		const DX11MaterialID mDiffuseTexture;
+        const DX11MaterialID mNormalTexture;
         const Vec3 mDiffuseColor;
         const Vec3 mAmbientColor;
         const Vec3 mSpecularColor;

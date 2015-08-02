@@ -154,8 +154,14 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp" />
     <ClCompile Include="src\Renderer\RenderQueue.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />
+    <ClCompile Include="src\Resources\Animation.cpp" />
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
+    <ClCompile Include="src\Resources\Material.cpp" />
+    <ClCompile Include="src\Resources\Mesh.cpp" />
+    <ClCompile Include="src\Resources\Model.cpp" />
+    <ClCompile Include="src\Resources\ModelNode.cpp" />
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
+    <ClCompile Include="src\Resources\Skybox.cpp" />
     <ClCompile Include="src\Scene\Actor.cpp" />
     <ClCompile Include="src\Scene\Animation.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
@@ -229,8 +235,14 @@
     </ClInclude>
     <ClInclude Include="include\Renderer\RenderQueue.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
+    <ClInclude Include="include\Resources\Animation.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />
+    <ClInclude Include="include\Resources\Material.h" />
+    <ClInclude Include="include\Resources\Mesh.h" />
+    <ClInclude Include="include\Resources\Model.h" />
+    <ClInclude Include="include\Resources\ModelNode.h" />
     <ClInclude Include="include\Resources\ResourceManifest.h" />
+    <ClInclude Include="include\Resources\Skybox.h" />
     <ClInclude Include="include\Scene\Actor.h" />
     <ClInclude Include="include\Scene\Animation.h" />
     <ClInclude Include="include\Scene\Camera.h" />

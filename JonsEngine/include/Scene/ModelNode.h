@@ -21,7 +21,7 @@ namespace JonsEngine
     class ModelNode : NonCopyable
     {
     public:
-        ModelNode(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material, IDMap<Mat4>& transformStorage);
+        ModelNode(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID, MaterialPtr material, IDMap<Mat4>& transformStorage);
         ModelNode(DX11Renderer& renderer, const JonsPackagePtr jonsPkg, const PackageNode& node, const Mat4& parentTransform, LoadMaterialFunc loadMaterialFunction, IDMap<Mat4>& transformStorage);
         ModelNode(ModelNode&& other) throw();
         ~ModelNode();

@@ -17,7 +17,7 @@ namespace JonsEngine
 
         void BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot);
 
-        const MaterialID mTextureID;
+        const DX11MaterialID mTextureID;
 
 
     private:

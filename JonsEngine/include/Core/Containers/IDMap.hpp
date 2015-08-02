@@ -48,7 +48,7 @@ namespace JonsEngine
 
         T& GetItem(const ItemID id);
         const T& GetItem(const ItemID id) const;
-        T* TryGetItem(const ItemID id) const;
+        T* TryGetItem(const ItemID id);
 
         void Clear();
 
@@ -180,7 +180,7 @@ namespace JonsEngine
     }
 
 	template <typename T>
-	T* IDMap<T>::TryGetItem(const ItemID id) const
+	T* IDMap<T>::TryGetItem(const ItemID id)
 	{
 		const uint16_t index = IDMAP_INDEX_MASK(id);
 		const uint16_t version = IDMAP_VERSION_MASK(id);

@@ -9,13 +9,13 @@ namespace JonsEngine
 {
     struct RenderableMesh
     {
-        RenderableMesh(const MeshID mesh, const IDMap<Mat4>::ItemID localTransformID, const IDMap<Mat4>::ItemID worldTransformID) :
+        RenderableMesh(const DX11MeshID mesh, const IDMap<Mat4>::ItemID localTransformID, const IDMap<Mat4>::ItemID worldTransformID) :
             mMeshID(mesh), mLocalTransformID(localTransformID), mWorldTransformID(worldTransformID)
         {
         }
 
 
-        MeshID mMeshID;
+        DX11MeshID mMeshID;
         IDMap<Mat4>::ItemID mLocalTransformID;
         IDMap<Mat4>::ItemID mWorldTransformID;
     };
@@ -24,19 +24,19 @@ namespace JonsEngine
 
     struct RenderableMaterial
     {
-        RenderableMaterial(const MaterialID diffuseTexture, const MaterialID normalTexture, const float specFactor)
+        RenderableMaterial(const DX11MaterialID diffuseTexture, const DX11MaterialID normalTexture, const float specFactor)
             : mDiffuseTextureID(diffuseTexture), mNormalTextureID(normalTexture), mSpecularFactor(specFactor)
         {
         }
 
-        MaterialID mDiffuseTextureID;
-        MaterialID mNormalTextureID;
+        DX11MaterialID mDiffuseTextureID;
+        DX11MaterialID mNormalTextureID;
         float mSpecularFactor;
     };
 
     struct RenderableModel
     {
-        RenderableModel(const MeshID mesh, const IDMap<Mat4>::ItemID localTransformID, const IDMap<Mat4>::ItemID worldTransformID, const MaterialID diffuseTexture, const MaterialID normalTexture, const float specFactor, const float tilingFactor) :
+        RenderableModel(const DX11MeshID mesh, const IDMap<Mat4>::ItemID localTransformID, const IDMap<Mat4>::ItemID worldTransformID, const DX11MaterialID diffuseTexture, const DX11MaterialID normalTexture, const float specFactor, const float tilingFactor) :
             mMesh(mesh, localTransformID, worldTransformID), mMaterial(diffuseTexture, normalTexture, specFactor), mTextureTilingFactor(tilingFactor)
         {
         }
@@ -116,7 +116,7 @@ namespace JonsEngine
 
 
         Vec4 mAmbientLight;
-        MaterialID mSkyboxTextureID;
+        DX11MaterialID mSkyboxTextureID;
 
         // TODO: more than one camera?
         RenderableCamera mCamera;

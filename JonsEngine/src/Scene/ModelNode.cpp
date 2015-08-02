@@ -5,7 +5,7 @@
 
 namespace JonsEngine
 {
-    ModelNode::ModelNode(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material, IDMap<Mat4>& transformStorage) :
+    ModelNode::ModelNode(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID, MaterialPtr material, IDMap<Mat4>& transformStorage) :
         mName(name), mLocalTransform(transformStorage, initialTransform), mLocalAABB(minBounds, maxBounds)
     {
 		mMeshes.emplace_back(name, minBounds, maxBounds, meshID, material);
@@ -17,7 +17,7 @@ namespace JonsEngine
         // TODO: this initialization routine should be moved elsewhere
 		for (const PackageMesh& mesh : node.mMeshes)
 		{
-			const MeshID meshID = renderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
+			const DX11MeshID meshID = renderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
 			
 			MaterialPtr material = nullptr;
 			if (mesh.mHasMaterial)

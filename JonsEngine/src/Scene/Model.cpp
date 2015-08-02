@@ -6,7 +6,7 @@
 
 namespace JonsEngine
 {
-    Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const MeshID meshID, MaterialPtr material, IDMap<Mat4>& transformStorage) :
+    Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID, MaterialPtr material, IDMap<Mat4>& transformStorage) :
         mName(name), mHashedID(boost::hash_value(name)), mRootNode(name, initialTransform, minBounds, maxBounds, meshID, material, transformStorage)
     {
     }

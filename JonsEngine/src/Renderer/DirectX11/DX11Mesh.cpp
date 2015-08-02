@@ -12,7 +12,7 @@ namespace JonsEngine
     const static uint32_t gStaticOffset = 0;
     const std::array<uint16_t, 16> gAABBIndices = { 0, 1, 2, 3, 0, 5, 4, 3, 2, 7, 4, 7, 6, 5, 6, 1 };
 
-    static MeshID gNextMeshID = 1;
+    static DX11MeshID gNextMeshID = 1;
 
 
     DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
