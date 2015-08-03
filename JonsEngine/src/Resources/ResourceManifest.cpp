@@ -77,7 +77,7 @@ namespace JonsEngine
         DX11ResourceMeshTuples pairings;
         ParseDX11Resources(pairings, jonsPkg, pkgModel.mRootNode);
 
-        return mModels.AddItem(mRenderer, jonsPkg, pkgModel);
+        return mModels.AddItem(pkgModel, pairings);
     }
 
     Model* ResourceManifest::GetModel(const ModelID modelID)

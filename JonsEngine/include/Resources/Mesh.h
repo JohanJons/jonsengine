@@ -13,6 +13,7 @@ namespace JonsEngine
         Mesh(const std::string name, const DX11MeshID meshID, const DX11MaterialID materialID, const Vec3& minBounds, const Vec3& maxBounds);
         ~Mesh();
 
+
         const std::string mName;
         const DX11MeshID mMeshID;
         const AABB mLocalAABB;

@@ -57,7 +57,7 @@ namespace JonsGame
                 // sun
                 case Key::Q: mSun.SetIsMoving(true); break;
                 case Key::W: mSun.SetIsMoving(false); break;
-                case Key::E: mGameScene.GetAnimatedWuson().mModel->PlayAnimation("Wuson_Run");
+                //case Key::E: mGameScene.GetAnimatedWuson().mModel->PlayAnimation("Wuson_Run");
                 //case Key::R: mSunSpeed -= 0.005f; break;
                 
                 default:
