@@ -265,7 +265,7 @@ namespace JonsEngine
 
         // misc
         mRenderQueue.mAmbientLight = mAmbientLight;
-        mRenderQueue.mSkyboxTextureID = mSkybox.get() ? mSkybox->mSkyboxTexture : INVALID_TEXTURE_ID;
+        mRenderQueue.mSkyboxTextureID = mSkybox.get() ? mSkybox->mSkyboxTexture : INVALID_MATERIAL_ID;
 
         return mRenderQueue;
     }

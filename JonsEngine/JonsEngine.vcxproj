@@ -163,18 +163,12 @@
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
     <ClCompile Include="src\Resources\Skybox.cpp" />
     <ClCompile Include="src\Scene\Actor.cpp" />
-    <ClCompile Include="src\Scene\Animation.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
     <ClCompile Include="src\Scene\DirectionalLight.cpp" />
-    <ClCompile Include="src\Scene\Material.cpp" />
-    <ClCompile Include="src\Scene\Mesh.cpp" />
-    <ClCompile Include="src\Scene\Model.cpp" />
-    <ClCompile Include="src\Scene\ModelNode.cpp" />
     <ClCompile Include="src\Scene\PointLight.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneManager.cpp" />
     <ClCompile Include="src\Scene\SceneNode.cpp" />
-    <ClCompile Include="src\Scene\Skybox.cpp" />
     <ClCompile Include="src\Window\WindowManager.cpp" />
     <ClCompile Include="src\Window\WindowManagerImpl.cpp" />
   </ItemGroup>
@@ -244,18 +238,12 @@
     <ClInclude Include="include\Resources\ResourceManifest.h" />
     <ClInclude Include="include\Resources\Skybox.h" />
     <ClInclude Include="include\Scene\Actor.h" />
-    <ClInclude Include="include\Scene\Animation.h" />
     <ClInclude Include="include\Scene\Camera.h" />
     <ClInclude Include="include\Scene\DirectionalLight.h" />
-    <ClInclude Include="include\Scene\Material.h" />
-    <ClInclude Include="include\Scene\Mesh.h" />
-    <ClInclude Include="include\Scene\Model.h" />
-    <ClInclude Include="include\Scene\ModelNode.h" />
     <ClInclude Include="include\Scene\PointLight.h" />
     <ClInclude Include="include\Scene\Scene.h" />
     <ClInclude Include="include\Scene\SceneManager.h" />
     <ClInclude Include="include\Scene\SceneNode.h" />
-    <ClInclude Include="include\Scene\Skybox.h" />
     <ClInclude Include="include\Window\KeyCallback.h" />
     <ClInclude Include="include\Window\KeyDefinition.h" />
     <ClInclude Include="include\Window\MouseCallback.h" />

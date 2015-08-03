@@ -4,10 +4,9 @@
 #include "include/Resources/Mesh.h"
 #include "include/Resources/JonsPackage.h"
 #include "include/Core/Types.h"
-//#include "include/Core/Containers/DataPool.hpp"
-//#include "include/Core/Containers/IDMap.hpp"
 
 #include <string>
+#include <vector>
 
 namespace JonsEngine
 {
@@ -17,7 +16,7 @@ namespace JonsEngine
     {
     public:
         Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
-        Model(const PackageModel& pkgModel);
+        Model(const PackageModel& pkgModel, const DX11ResourceMeshTuples& meshResources);
         ~Model();
 
         ModelNode& GetRootNode();
@@ -32,10 +31,5 @@ namespace JonsEngine
 
         NodeContainer mNodes;
         MeshContainer mMeshes;
-        //ModelNode mRootNode;
-        // TODO
-        //DataPool<Mat4> mTransformCache;
-        //IDMap<ModelNode> mModelNodes;
-        //IDMap<Mesh> mMeshes;
     };
 }

@@ -119,13 +119,7 @@
     <ClCompile Include="src\Resources\JonsPackage.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Model.cpp">
-      <Filter>Source Files\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scene\Camera.cpp">
-      <Filter>Source Files\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\Material.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Shapes.cpp">
@@ -200,12 +194,6 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11AABBPass.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Mesh.cpp">
-      <Filter>Source Files\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\ModelNode.cpp">
-      <Filter>Source Files\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\DirectX11\DX11LightAccumulationbuffer.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
@@ -242,17 +230,11 @@
     <ClCompile Include="src\Core\Math\Frustum.cpp">
       <Filter>Source Files\Core\Math</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\Skybox.cpp">
-      <Filter>Source Files\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\DirectX11\DX11SkyboxPass.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\DirectX11\DX11Material.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\Animation.cpp">
-      <Filter>Source Files\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Resources\Animation.cpp">
       <Filter>Source Files\Resources</Filter>
@@ -316,17 +298,11 @@
     <ClInclude Include="include\Resources\JonsPackage.h">
       <Filter>Header Files\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Scene\Model.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\EngineDefs.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Memory\IMemoryAllocator.h">
       <Filter>Header Files\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scene\Material.h">
-      <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\Shapes.h">
       <Filter>Header Files\Renderer</Filter>
@@ -421,12 +397,6 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11AABBPass.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Scene\Mesh.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scene\ModelNode.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11LightAccumulationbuffer.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
@@ -478,9 +448,6 @@
     <ClInclude Include="include\Core\Containers\IDMap.hpp">
       <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="include\Scene\Skybox.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11SkyboxPass.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
@@ -492,9 +459,6 @@
     </ClInclude>
     <ClInclude Include="include\Core\Platform\Directx11.h">
       <Filter>Header Files\Core\Platform</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scene\Animation.h">
-      <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Resources\Animation.h">
       <Filter>Header Files\Resources</Filter>

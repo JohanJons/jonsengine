@@ -44,6 +44,9 @@ namespace JonsEngine
         typedef IDMap<Material> MaterialMap;
         typedef IDMap<Skybox> SkyboxMap;
 
+        void ParseDX11Resources(DX11ResourceMeshTuples& meshResources, const JonsPackagePtr jongPkg, const PackageNode& node);
+
+
 		IMemoryAllocatorPtr mMemoryAllocator;
         DX11Renderer& mRenderer;
 

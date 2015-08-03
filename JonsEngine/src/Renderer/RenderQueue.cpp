@@ -3,7 +3,7 @@
 namespace JonsEngine
 {
     RenderQueue::RenderQueue(const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage) :
-        mAmbientLight(0.01f), mSkyboxTextureID(INVALID_TEXTURE_ID), mLocalTransformStorage(localTransformStorage), mWorldTransformStorage(worldTransformStorage)
+        mAmbientLight(0.01f), mSkyboxTextureID(INVALID_MATERIAL_ID), mLocalTransformStorage(localTransformStorage), mWorldTransformStorage(worldTransformStorage)
     {
     }
 

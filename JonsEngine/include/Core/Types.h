@@ -24,7 +24,7 @@ namespace JonsEngine
     typedef uint32_t DX11MaterialID;
 
     const DX11MeshID INVALID_MESH_ID = 0;
-    const DX11MaterialID INVALID_TEXTURE_ID = 0;
+    const DX11MaterialID INVALID_MATERIAL_ID = 0;
 
     typedef glm::vec2 Vec2;
     typedef glm::vec3 Vec3;

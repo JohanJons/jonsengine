@@ -73,9 +73,11 @@ namespace JonsEngine
 
         const PackageModel& pkgModel = *iter;
 
-        auto loadMaterialFunc = std::bind(&ResourceManifest::LoadMaterial, this, std::placeholders::_1, std::placeholders::_2);
+        //auto loadMaterialFunc = std::bind(&ResourceManifest::LoadMaterial, this, std::placeholders::_1, std::placeholders::_2);
+        DX11ResourceMeshTuples pairings;
+        ParseDX11Resources(pairings, jonsPkg, pkgModel.mRootNode);
 
-        return mModels.AddItem(mRenderer, jonsPkg, pkgModel, loadMaterialFunc);
+        return mModels.AddItem(mRenderer, jonsPkg, pkgModel);
     }
 
     Model* ResourceManifest::GetModel(const ModelID modelID)
@@ -92,8 +94,8 @@ namespace JonsEngine
 
         const PackageMaterial& pkgMaterial = *iter;
 
-        DX11MaterialID diffuseTexture = INVALID_TEXTURE_ID;
-        DX11MaterialID normalTexture  = INVALID_TEXTURE_ID;
+        DX11MaterialID diffuseTexture = INVALID_MATERIAL_ID;
+        DX11MaterialID normalTexture  = INVALID_MATERIAL_ID;
 
         if (pkgMaterial.mHasDiffuseTexture)
         	diffuseTexture = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_DIFFUSE, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth, pkgMaterial.mDiffuseTexture.mTextureHeight);
@@ -132,6 +134,28 @@ namespace JonsEngine
     Skybox* ResourceManifest::GetSkybox(const SkyboxID skyboxID)
     {
         return mSkyboxes.TryGetItem(skyboxID);
+    }
+
+
+    void ResourceManifest::ParseDX11Resources(DX11ResourceMeshTuples& meshResources, const JonsPackagePtr jongPkg, const PackageNode& node)
+    {
+        for (const PackageMesh& mesh : node.mMeshes)
+        {
+            const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
+            DX11MaterialID materialID = INVALID_MATERIAL_ID;
+            if (mesh.mHasMaterial)
+            {
+                const PackageMaterial& material = jongPkg->mMaterials.at(mesh.mMaterialIndex);
+                materialID = LoadMaterial(material.mName, jongPkg);
+
+                assert(materialID != INVALID_MATERIAL_ID);
+            }
+
+            meshResources.emplace_back(mesh, meshID, materialID);
+        }
+
+        for (const PackageNode& child : node.mChildNodes)
+            ParseDX11Resources(meshResources, jongPkg, child);
     }
 
 

@@ -2,16 +2,14 @@
 
 namespace JonsEngine
 {
-    Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID) :
-        mName(name)
+    Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID) : mName(name)
     {
         mNodes.emplace_back(mNodes, mMeshes, name, minBounds, maxBounds, initialTransform, meshID);
     }
 
-    Model::Model(const PackageModel& pkgModel) :
-        mName(pkgModel.mName)
+    Model::Model(const PackageModel& pkgModel, const DX11ResourceMeshTuples& meshResources) : mName(pkgModel.mName)
     {
-        mNodes.emplace_back(pkgModel.mRootNode, mNodes, mMeshes);
+        mNodes.emplace_back(pkgModel.mRootNode, meshResources, mNodes, mMeshes);
     }
 
     Model::~Model()

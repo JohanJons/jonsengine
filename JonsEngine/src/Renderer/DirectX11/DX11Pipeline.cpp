@@ -114,8 +114,8 @@ namespace JonsEngine
         {
             assert(model.mMesh.mMeshID != INVALID_MESH_ID);
 
-            const bool hasDiffuseTexture = model.mMaterial.mDiffuseTextureID != INVALID_TEXTURE_ID;
-            const bool hasNormalTexture = model.mMaterial.mNormalTextureID != INVALID_TEXTURE_ID;
+            const bool hasDiffuseTexture = model.mMaterial.mDiffuseTextureID != INVALID_MATERIAL_ID;
+            const bool hasNormalTexture = model.mMaterial.mNormalTextureID != INVALID_MATERIAL_ID;
 
             if (hasDiffuseTexture)
                 mMaterialMap.GetItem(model.mMaterial.mDiffuseTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_DIFFUSE);
@@ -184,7 +184,7 @@ namespace JonsEngine
         if (AA == EngineSettings::AntiAliasing::FXAA)
             mPostProcessor.FXAAPass(mBackbuffer, mWindowSize);
 
-        if (renderQueue.mSkyboxTextureID != INVALID_TEXTURE_ID)
+        if (renderQueue.mSkyboxTextureID != INVALID_MATERIAL_ID)
             mSkyboxPass.Render(renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraProjectionMatrix, mMaterialMap.GetItem(renderQueue.mSkyboxTextureID));
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
