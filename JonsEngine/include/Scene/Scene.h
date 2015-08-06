@@ -20,16 +20,13 @@ namespace JonsEngine
     class IMemoryAllocator;
 
     typedef IDMap<PointLight>::ItemID PointLightID;
-    typedef IDMap<PointLight>::ItemID DirectionalLightID;
+    typedef IDMap<DirectionalLight>::ItemID DirectionalLightID;
 
     class Scene
     {
     public:
-        Scene(const std::string& sceneName, const IDMap<Mat4>& modelTransformCache);
+        Scene(const std::string& sceneName, const ResourceManifest& resourceManifest);
         ~Scene();
-
-        bool operator==(const Scene& s1);
-        bool operator==(const std::string& sceneName);
 
         const RenderQueue& GetRenderQueue(const Mat4& cameraProjectionMatrix, const float fov, const float aspectRatio, const float minDepth, const float maxDepth);
 
@@ -65,8 +62,8 @@ namespace JonsEngine
         void UpdateDirtyObjects();
 
 
-        const size_t mHashedID;
         IMemoryAllocator& mMemoryAllocator;
+        const ResourceManifest& mResourceManifest;
         DataPool<Mat4> mTransformCache;
 
         std::vector<SceneNode*> mDirtySceneNodes;
