@@ -67,7 +67,7 @@ namespace JonsEngine
     {
         const size_t sizeBegin = meshes.size() == 0 ? 0 : meshes.size() - 1;
 
-        meshes.emplace_back(name, meshID, INVALID_MATERIAL_ID, minBounds, maxBounds);
+        meshes.emplace_back(name, meshID, INVALID_DX11_MATERIAL_ID, minBounds, maxBounds);
 
         const size_t sizeEnd = meshes.size() - 1;
 

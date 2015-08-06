@@ -4,34 +4,33 @@
 #include "include/Core/Math/Math.h"
 #include "include/Core/Math/Intersection.h"
 
-#include "boost/functional/hash.hpp"
 #include <algorithm>
 #include <functional>
 
 namespace JonsEngine
 {
-    void AddMesh(std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const IDMap<Mat4>::ItemID localTransformID, const IDMap<Mat4>::ItemID worldTransformID)
+    void AddMesh(std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)
     {
-        resultMeshes.emplace_back(mesh.mMeshID, localTransformID, worldTransformID, mesh.GetMaterial()->mDiffuseTexture, mesh.GetMaterial()->mNormalTexture, mesh.GetMaterial()->mSpecularFactor, mesh.GetTextureTilingFactor());
+        resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix, mesh.GetMaterial()->mDiffuseTexture, mesh.GetMaterial()->mNormalTexture, mesh.GetMaterial()->mSpecularFactor, mesh.GetTextureTilingFactor());
     }
 
-    void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const IDMap<Mat4>::ItemID localTransformID, const IDMap<Mat4>::ItemID worldTransformID)
+    void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)
     {
-        resultMeshes.emplace_back(mesh.mMeshID, localTransformID, worldTransformID);
+        resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix);
     }
 
     template <typename T>
-    void AddAllMeshes(std::vector<T>& resultMeshes, ModelNode& node, const IDMap<Mat4>::ItemID worldTransformID)
+    void AddAllMeshes(std::vector<T>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix)
     {
 		for (const Mesh& mesh : node.GetMeshes())
-            AddMesh(resultMeshes, mesh, node.GetLocalTransformID(), worldTransformID);
+            AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
 
 		for (ModelNode& node : node.GetChildNodes())
-            AddAllMeshes(resultMeshes, node, worldTransformID);
+            AddAllMeshes(resultMeshes, node, worldMatrix);
     }
 
     template <typename T>
-    void CullMeshesFrustrum(std::vector<T>& resultMeshes, ModelNode& node, const Mat4& wvpMatrix, const IDMap<Mat4>::ItemID worldMatrixID)
+    void CullMeshesFrustrum(std::vector<T>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix)
     {
         const Mat4 localWVPMatrix = wvpMatrix * node.GetLocalTransform();
 
@@ -52,11 +51,11 @@ namespace JonsEngine
 						continue;
 
                     if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                        AddMesh(resultMeshes, mesh, node.GetLocalTransformID(), worldMatrixID);
+                        AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
 				}
 
                 // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-				for (ModelNode& node : node.GetChildNodes())
+				for (const ModelNode& node : node.GetChildNodes())
                     CullMeshesFrustrum(resultMeshes, node, wvpMatrix, worldMatrixID);
 
 				break;
@@ -74,7 +73,7 @@ namespace JonsEngine
 		}
     }
 
-    void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, ModelNode& node, const AABB& aabb, const IDMap<Mat4>::ItemID worldTransformID)
+    void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const AABB& aabb, const Mat4& worldMatrix)
     {
         // test node AABB
         AABBIntersection nodeAABBIntersection = Intersection(node.mLocalAABB, aabb);
@@ -85,26 +84,26 @@ namespace JonsEngine
             {
                 AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
 
-                for (const Mesh& mesh : node.GetMeshes())
+                for (const Mesh& mesh : node.mMeshes)
                 {
                     meshAABBIntersection = Intersection(mesh.mLocalAABB, aabb);
                     if (meshAABBIntersection == AABBIntersection::Outside)
                         continue;
 
                     if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                        AddMesh(resultMeshes, mesh, node.GetLocalTransformID(), worldTransformID);
+                        AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
                 }
 
                 // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-                for (ModelNode& node : node.GetChildNodes())
-                    CullMeshesAABB(resultMeshes, node, aabb, worldTransformID);
+                for (const ModelNode& node : node.mChildren)
+                    CullMeshesAABB(resultMeshes, node, aabb, worldMatrix);
 
                 break;
             }
 
             case AABBIntersection::Inside:
         {
-            AddAllMeshes(resultMeshes, node, worldTransformID);
+            AddAllMeshes(resultMeshes, node, worldMatrix);
             break;
         }
 
@@ -114,7 +113,7 @@ namespace JonsEngine
         }
     }
 
-    void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, ModelNode& node, const Mat4& worldMatrix, const IDMap<Mat4>::ItemID worldTransformID, const Vec3& sphereCentre, const float sphereRadius)
+    void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius)
     {
 		const AABB worldAABB = worldMatrix * node.mLocalAABB;
 
@@ -126,7 +125,7 @@ namespace JonsEngine
 			{
                 AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
 
-				for (const Mesh& mesh : node.GetMeshes())
+				for (const Mesh& mesh : node.mMeshes)
 				{
 					const AABB meshAABB = worldMatrix * node.mLocalAABB;
 
@@ -135,19 +134,19 @@ namespace JonsEngine
 						continue;
 
                     if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                        AddMesh(resultMeshes, mesh, node.GetLocalTransformID(), worldTransformID);
+                        AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
 				}
 
 				// each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-				for (ModelNode& node : node.GetChildNodes())
-                    CullMeshesSphere(resultMeshes, node, worldMatrix, worldTransformID, sphereCentre, sphereRadius);
+				for (const ModelNode& node : node.mChildren)
+                    CullMeshesSphere(resultMeshes, node, worldMatrix, sphereCentre, sphereRadius);
 
 				break;
 			}
 
             case AABBIntersection::Inside:
 			{
-                AddAllMeshes(resultMeshes, node, worldTransformID);
+                AddAllMeshes(resultMeshes, node, worldMatrix);
 				break;
 			}
 
@@ -158,26 +157,15 @@ namespace JonsEngine
     }
 
 
-    Scene::Scene(const std::string& sceneName, const IDMap<Mat4>& modelTransformCache) :
-        mName(sceneName), mHashedID(boost::hash_value(sceneName)), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()),
+    Scene::Scene(const std::string& sceneName, const ResourceManifest& resourceManifest) :
+        mName(sceneName), mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mResourceManifest(resourceManifest),
         // TODO: lambda expression adds a layer of indirection, but I'm not sure how the bind syntax would look like
-        mRootNode("Root", mTransformCache.GetStorage(), [&](SceneNode* node) { mDirtySceneNodes.push_back(node); }), mAmbientLight(0.2f), mSkybox(nullptr), mRenderQueue(modelTransformCache, mTransformCache.GetStorage())
+        mRootNode("Root", mTransformCache.GetStorage(), [&](SceneNode* node) { mDirtySceneNodes.push_back(node); }), mAmbientLight(0.2f), mSkyboxID(IDMap<Skybox>::INVALID_ITEM_ID)
     {
     }
 
     Scene::~Scene()
     {
-    }
-
-
-    bool Scene::operator==(const Scene& s1)
-    {
-        return mHashedID == s1.mHashedID;
-    }
-
-    bool Scene::operator==(const std::string& sceneName)
-    {
-        return mHashedID == boost::hash_value(sceneName);
     }
 
 
@@ -202,10 +190,9 @@ namespace JonsEngine
 				continue;
 
             const Mat4& worldMatrix = actor->mSceneNode->GetWorldTransform();
-            const IDMap<Mat4>::ItemID worldMatrixID = actor->mSceneNode->GetWorldTransformID();
             const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix * worldMatrix;
 
-            CullMeshesFrustrum<RenderableModel>(mRenderQueue.mCamera.mModels, actor->mModel->GetRootNode(), wvpMatrix, worldMatrixID);
+            CullMeshesFrustrum<RenderableModel>(mRenderQueue.mCamera.mModels, actor->mModel->GetRootNode(), worldMatrix, wvpMatrix);
 		}
 
         // point lights
@@ -226,8 +213,7 @@ namespace JonsEngine
                     continue;
 
                 const Mat4& actorWorldMatrix = actor->mSceneNode->GetWorldTransform();
-                const IDMap<Mat4>::ItemID worldTransformID = actor->mSceneNode->GetWorldTransformID();
-                CullMeshesSphere(renderablePointLight.mMeshes, actor->mModel->GetRootNode(), actorWorldMatrix, worldTransformID, lightPosition, pointLight.mLightRadius);
+                CullMeshesSphere(renderablePointLight.mMeshes, actor->mModel->GetRootNode(), actorWorldMatrix, lightPosition, pointLight.mLightRadius);
             }
         }
 
@@ -250,13 +236,12 @@ namespace JonsEngine
                         continue;
 
                     const Mat4& worldMatrix = actor->mSceneNode->GetWorldTransform();
-                    const IDMap<Mat4>::ItemID worldTransformID = actor->mSceneNode->GetWorldTransformID();
-                    const Mat4 localWorldMatrix = worldMatrix * actor->mModel->GetRootNode().GetLocalTransform();
+                    const Mat4 localWorldMatrix = worldMatrix * actor->mModel->GetRootNode().mLocalTransform;
                     const AABB worldAABB = localWorldMatrix * actor->mModel->GetRootNode().mLocalAABB;
 
                     const auto aabbIntersection = Intersection(worldAABB, kdopIterator);
                     if (aabbIntersection == AABBIntersection::Inside || aabbIntersection == AABBIntersection::Partial)
-                        AddAllMeshes(renderableDirLight.mMeshes, actor->mModel->GetRootNode(), worldTransformID);
+                        AddAllMeshes(renderableDirLight.mMeshes, actor->mModel->GetRootNode(), worldMatrix);
                 }
 
                 renderableDirLight.mCascadeSplits.emplace_back(nearZ, farZ, renderableDirLight.mMeshes.size());
@@ -265,7 +250,9 @@ namespace JonsEngine
 
         // misc
         mRenderQueue.mAmbientLight = mAmbientLight;
-        mRenderQueue.mSkyboxTextureID = mSkybox.get() ? mSkybox->mSkyboxTexture : INVALID_MATERIAL_ID;
+
+        const Skybox& skybox = mResourceManifest.GetSkybox(mSkyboxID);
+        mRenderQueue.mSkyboxTextureID = skybox.mSkyboxTexture;
 
         return mRenderQueue;
     }
@@ -351,14 +338,14 @@ namespace JonsEngine
     }
 
 
-    void Scene::SetSkybox(const SkyboxPtr skybox)
+    void Scene::SetSkybox(const SkyboxID skybox)
     {
-        mSkybox = skybox;
+        mSkyboxID = skybox;
     }
 
-    SkyboxPtr Scene::GetSkybox() const
+    SkyboxID Scene::GetSkybox() const
     {
-        return mSkybox;
+        return mSkyboxID;
     }
 
 

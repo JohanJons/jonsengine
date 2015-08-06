@@ -1,13 +1,8 @@
 #include "include/Scene/SceneManager.h"
-#include "include/Scene/Scene.h"
-#include "include/Core/Memory/HeapAllocator.h"
-#include "include/Core/EngineSettings.h"
-
-#include <algorithm>
 
 namespace JonsEngine
 {
-    SceneManager::SceneManager(const IDMap<Mat4>& modelTransformCache) : mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator()), mModelTransformCache(modelTransformCache), mActiveScene(CreateScene("DefaultScene"))
+    SceneManager::SceneManager(const ResourceManifest& resourceManifest) : mResourceManifest(resourceManifest), mActiveScene(CreateScene("DefaultScene"))
     {
     }
 
@@ -16,50 +11,34 @@ namespace JonsEngine
     }
 
 
-    Scene* SceneManager::CreateScene(const std::string& sceneName)
+    SceneID SceneManager::CreateScene(const std::string& sceneName)
     {
-        auto iter = std::find_if(mScenes.begin(), mScenes.end(), [sceneName](const ScenePtr& scene) { return *scene == sceneName; });
-
-        if (iter == mScenes.end())
-        {
-            mScenes.emplace_back(mMemoryAllocator.AllocateObject<Scene>(sceneName, mModelTransformCache), [=](Scene* scene) { mMemoryAllocator.DeallocateObject(scene); });
-
-            return mScenes.back().get();
-        }
-        else
-            return iter->get();
+        return mScenes.AddItem(sceneName, mResourceManifest);
     }
 
-    void SceneManager::DeleteScene(Scene* scene)
+    Scene& SceneManager::GetScene(const SceneID sceneID)
     {
-        auto iter = std::find_if(mScenes.begin(), mScenes.end(), [scene](const ScenePtr& storedScene) { return storedScene.get() == scene; });
-
-        if (iter != mScenes.end())
-            mScenes.erase(iter);
+        return mScenes.GetItem(sceneID);
     }
 
-    const std::vector<ScenePtr>& SceneManager::GetAllScenes() const
+    void SceneManager::DeleteScene(const SceneID scene)
     {
-        return mScenes;
+        mScenes.MarkAsFree(scene);
     }
 
 
-    Scene* SceneManager::GetActiveScene() const
+    SceneID SceneManager::GetActiveScene() const
     {
         return mActiveScene;
     }
 
-    void SceneManager::SetActiveScene(Scene* scene)
+    Scene& SceneManager::GetActiveScene()
     {
-        mActiveScene = scene;
+        return mScenes.GetItem(mActiveScene);
     }
 
-    void SceneManager::SetActiveScene(const std::string& sceneName)
+    void SceneManager::SetActiveScene(const SceneID scene)
     {
-        auto iter = std::find_if(mScenes.begin(), mScenes.end(), [sceneName](const ScenePtr& storedScene) { return *storedScene == sceneName; });
-
-        assert(iter != mScenes.end());
-            
-        mActiveScene = iter->get();
+        mActiveScene = scene;
     }
 }

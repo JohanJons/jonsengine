@@ -18,7 +18,7 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(mSettings), mGameScene(*mEngine.GetSceneManager().GetActiveScene(), mEngine.GetResourceManifest(), "assets.jons"), mSun(mGameScene.GetSunDirLight()), mRunning(true), mMoveSpeed(0.1f)
+    Game::Game() : mEngine(mSettings), mGameScene(mEngine.GetSceneManager().GetActiveScene(), mEngine.GetResourceManifest(), "assets.jons"), mSun(mGameScene.GetSunDirLight()), mRunning(true), mMoveSpeed(0.1f)
     {
         SetupInputCallbacks();
         mEngine.GetWindow().ShowMouseCursor(false);
