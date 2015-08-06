@@ -3,34 +3,36 @@
 #include "include/Scene/Scene.h"
 #include "include/Core/Containers/IDMap.hpp"
 
-#include <vector>
-#include <memory>
+#include <string>
 
 namespace JonsEngine
 {
     class IMemoryAllocator;
-    struct EngineSettings;
+    class ResourceManifest;
+
+    typedef IDMap<Scene>::ItemID SceneID;
+
+    static const SceneID INVALID_SCENE_ID = IDMap<Scene>::INVALID_ITEM_ID;
 
     class SceneManager
     {
     public:
-        SceneManager(const IDMap<Mat4>& modelTransformCache);
+        SceneManager(const ResourceManifest& resourceManifest);
         ~SceneManager();
 
-        Scene* CreateScene(const std::string& sceneName);
-        void DeleteScene(Scene* scene);
-        const std::vector<ScenePtr>& GetAllScenes() const;
+        SceneID CreateScene(const std::string& sceneName);
+        Scene& GetScene(const SceneID sceneID);
+        void DeleteScene(const SceneID scene);
 
-		Scene* GetActiveScene() const;
-        void SetActiveScene(Scene* scene);
-        void SetActiveScene(const std::string& sceneName);
+		SceneID GetActiveScene() const;
+        Scene& GetActiveScene();
+        void SetActiveScene(const SceneID scene);
 
 
     private:
-        IMemoryAllocator& mMemoryAllocator;
-        const IDMap<Mat4>& mModelTransformCache;
+        const ResourceManifest& mResourceManifest;
 
-        std::vector<ScenePtr> mScenes;
-		Scene* mActiveScene;
+        IDMap<Scene> mScenes;
+        SceneID mActiveScene;
     };
 }

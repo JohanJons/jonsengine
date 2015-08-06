@@ -18,6 +18,10 @@ namespace JonsEngine
     typedef IDMap<Material>::ItemID MaterialID;
     typedef IDMap<Skybox>::ItemID SkyboxID;
 
+    static const ModelID INVALID_MODEL_ID = IDMap<Model>::INVALID_ITEM_ID;
+    static const MaterialID INVALID_MATERIAL_ID = IDMap<Material>::INVALID_ITEM_ID;
+    static const SkyboxID INVALID_SKYBOX_ID = IDMap<Skybox>::INVALID_ITEM_ID;
+
     class ResourceManifest
     {
     public:
@@ -28,15 +32,16 @@ namespace JonsEngine
         ModelID CreateCube(const std::string& modelName, const float size);
         ModelID CreateSphere(const std::string& modelName, const float radius, const uint32_t rings, const uint32_t sectors);
         ModelID LoadModel(const std::string& assetName, const JonsPackagePtr jonsPkg);
-        Model* GetModel(const ModelID modelID);
+        Model& GetModel(const ModelID modelID);
+        const Model& GetModel(const ModelID modelID) const;
 
         MaterialID LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg);
-        Material* GetMaterial(const MaterialID materialID);
+        Material& GetMaterial(const MaterialID materialID);
+        const Material& GetMaterial(const MaterialID materialID) const;
 
         SkyboxID LoadSkybox(const std::string& skyboxName, const JonsPackagePtr jonsPkg);
-        Skybox* GetSkybox(const SkyboxID skyboxID);
-
-        const IDMap<Mat4>& GetTransformStorage() const;
+        Skybox& GetSkybox(const SkyboxID skyboxID);
+        const Skybox& GetSkybox(const SkyboxID skyboxID) const;
 
 
     private:

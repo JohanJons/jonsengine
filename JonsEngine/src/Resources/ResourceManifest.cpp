@@ -30,7 +30,7 @@ namespace JonsEngine
         std::vector<float> vertexData, normalData, texcoordData, tangentData;
         std::vector<uint16_t> indiceData;
         if (!CreateRectangleData(sizeX, sizeY, sizeZ, vertexData, normalData, texcoordData, indiceData))
-            return ModelMap::INVALID_ITEM_ID;
+            return INVALID_MODEL_ID;
 
         const float halfX = sizeX / 2.0f;
         const float halfY = sizeY / 2.0f;
@@ -39,6 +39,7 @@ namespace JonsEngine
         const Vec3 maxBounds(halfX, halfY, halfZ);
 
         const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, indiceData, minBounds, maxBounds);
+        assert(meshID != INVALID_DX11_MESH_ID);
 
         return mModels.AddItem(modelName, Mat4(1.0f), minBounds, maxBounds, meshID);
     }
@@ -55,12 +56,13 @@ namespace JonsEngine
         std::vector<float> vertexData, normalData, texcoordData, tangentData;
         std::vector<uint16_t> indiceData;
         if (!CreateSphereData(radius, rings, sectors, vertexData, normalData, texcoordData, indiceData))
-            return ModelMap::INVALID_ITEM_ID;
+            return INVALID_MODEL_ID;
 
         const Vec3 minBounds(-radius, -radius, -radius);
         const Vec3 maxBounds(radius, radius, radius);
 
         const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, indiceData, minBounds, maxBounds);
+        assert(meshID != INVALID_DX11_MESH_ID);
         
         return mModels.AddItem(modelName, Mat4(1.0f), minBounds, maxBounds, meshID);
     }
@@ -69,7 +71,7 @@ namespace JonsEngine
     {
         auto iter = FindInContainer<PackageModel>(assetName, jonsPkg->mModels);
         if (iter == jonsPkg->mModels.end())
-            return ModelMap::INVALID_ITEM_ID;
+            return INVALID_MODEL_ID;
 
         const PackageModel& pkgModel = *iter;
 
@@ -80,9 +82,14 @@ namespace JonsEngine
         return mModels.AddItem(pkgModel, pairings);
     }
 
-    Model* ResourceManifest::GetModel(const ModelID modelID)
+    Model& ResourceManifest::GetModel(const ModelID modelID)
     {
-        return mModels.TryGetItem(modelID);
+        return mModels.GetItem(modelID);
+    }
+
+    const Model& ResourceManifest::GetModel(const ModelID modelID) const
+    {
+        return mModels.GetItem(modelID);
     }
 
 
@@ -90,12 +97,12 @@ namespace JonsEngine
     {
         auto iter = FindInContainer<PackageMaterial>(assetName, jonsPkg->mMaterials);
         if (iter == jonsPkg->mMaterials.end())
-            return MaterialMap::INVALID_ITEM_ID;
+            return INVALID_MATERIAL_ID;
 
         const PackageMaterial& pkgMaterial = *iter;
 
-        DX11MaterialID diffuseTexture = INVALID_MATERIAL_ID;
-        DX11MaterialID normalTexture  = INVALID_MATERIAL_ID;
+        DX11MaterialID diffuseTexture = INVALID_DX11_MATERIAL_ID;
+        DX11MaterialID normalTexture  = INVALID_DX11_MATERIAL_ID;
 
         if (pkgMaterial.mHasDiffuseTexture)
         	diffuseTexture = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_DIFFUSE, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth, pkgMaterial.mDiffuseTexture.mTextureHeight);
@@ -110,9 +117,14 @@ namespace JonsEngine
         return mMaterials.AddItem(pkgMaterial.mName, diffuseTexture, normalTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, specularFactor);
     }
 
-    Material* ResourceManifest::GetMaterial(const MaterialID materialID)
+    Material& ResourceManifest::GetMaterial(const MaterialID materialID)
     {
-        return mMaterials.TryGetItem(materialID);
+        return mMaterials.GetItem(materialID);
+    }
+
+    const Material& ResourceManifest::GetMaterial(const MaterialID materialID) const
+    {
+        return mMaterials.GetItem(materialID);
     }
 
 
@@ -120,20 +132,26 @@ namespace JonsEngine
     {
         auto iter = FindInContainer<PackageSkybox>(skyboxName, jonsPkg->mSkyBoxes);
         if (iter == jonsPkg->mSkyBoxes.end())
-            return SkyboxMap::INVALID_ITEM_ID;
+            return INVALID_SKYBOX_ID;
 
         const PackageSkybox& pkgSkybox = *iter;
         const PackageTexture& pkgSkyboxTexture = pkgSkybox.mSkyboxTexture;
 
         const DX11MaterialID skyboxTextureID = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_SKYBOX, pkgSkyboxTexture.mTextureData, pkgSkyboxTexture.mTextureWidth, pkgSkyboxTexture.mTextureHeight);
+        assert(skyboxTextureID != INVALID_DX11_MATERIAL_ID);
 
         return mSkyboxes.AddItem(skyboxName, skyboxTextureID);
 
     }
 
-    Skybox* ResourceManifest::GetSkybox(const SkyboxID skyboxID)
+    Skybox& ResourceManifest::GetSkybox(const SkyboxID skyboxID)
     {
-        return mSkyboxes.TryGetItem(skyboxID);
+        return mSkyboxes.GetItem(skyboxID);
+    }
+
+    const Skybox& ResourceManifest::GetSkybox(const SkyboxID skyboxID) const
+    {
+        return mSkyboxes.GetItem(skyboxID);
     }
 
 
@@ -142,13 +160,13 @@ namespace JonsEngine
         for (const PackageMesh& mesh : node.mMeshes)
         {
             const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
-            DX11MaterialID materialID = INVALID_MATERIAL_ID;
+            DX11MaterialID materialID = INVALID_DX11_MATERIAL_ID;
             if (mesh.mHasMaterial)
             {
                 const PackageMaterial& material = jongPkg->mMaterials.at(mesh.mMaterialIndex);
                 materialID = LoadMaterial(material.mName, jongPkg);
 
-                assert(materialID != INVALID_MATERIAL_ID);
+                assert(materialID != INVALID_DX11_MATERIAL_ID);
             }
 
             meshResources.emplace_back(mesh, meshID, materialID);
