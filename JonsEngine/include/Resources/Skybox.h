@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/Types.h"
+#include "include/Core/Containers/IDMap.hpp"
 
 #include <string>
 
@@ -16,4 +17,7 @@ namespace JonsEngine
         const std::string mName;
         const DX11MaterialID mSkyboxTexture;
     };
+
+    typedef IDMap<Skybox>::ItemID SkyboxID;
+    static const SkyboxID INVALID_SKYBOX_ID = IDMap<Skybox>::INVALID_ITEM_ID;
 }

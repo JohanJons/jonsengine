@@ -14,14 +14,6 @@ namespace JonsEngine
 {
     class DX11Renderer;
 
-    typedef IDMap<Model>::ItemID ModelID;
-    typedef IDMap<Material>::ItemID MaterialID;
-    typedef IDMap<Skybox>::ItemID SkyboxID;
-
-    static const ModelID INVALID_MODEL_ID = IDMap<Model>::INVALID_ITEM_ID;
-    static const MaterialID INVALID_MATERIAL_ID = IDMap<Material>::INVALID_ITEM_ID;
-    static const SkyboxID INVALID_SKYBOX_ID = IDMap<Skybox>::INVALID_ITEM_ID;
-
     class ResourceManifest
     {
     public:

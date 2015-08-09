@@ -9,28 +9,28 @@
 
 namespace JonsEngine
 {
-    void AddMesh(std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)
+    void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)
     {
         resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix, mesh.GetMaterial()->mDiffuseTexture, mesh.GetMaterial()->mNormalTexture, mesh.GetMaterial()->mSpecularFactor, mesh.GetTextureTilingFactor());
     }
 
-    void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)
+    void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)
     {
         resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix);
     }
 
     template <typename T>
-    void AddAllMeshes(std::vector<T>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix)
+    void AddAllMeshes(const ResourceManifest& resourceManifest, std::vector<T>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix)
     {
 		for (const Mesh& mesh : node.GetMeshes())
-            AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+            AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.mLocalTransform);
 
 		for (ModelNode& node : node.GetChildNodes())
-            AddAllMeshes(resultMeshes, node, worldMatrix);
+            AddAllMeshes(resourceManifest, resultMeshes, node, worldMatrix);
     }
 
     template <typename T>
-    void CullMeshesFrustrum(std::vector<T>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix)
+    void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<T>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix)
     {
         const Mat4 localWVPMatrix = wvpMatrix * node.GetLocalTransform();
 
@@ -51,19 +51,19 @@ namespace JonsEngine
 						continue;
 
                     if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                        AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+                        AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.mLocalTransform);
 				}
 
                 // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
 				for (const ModelNode& node : node.GetChildNodes())
-                    CullMeshesFrustrum(resultMeshes, node, wvpMatrix, worldMatrixID);
+                    CullMeshesFrustrum(resourceManifest, resultMeshes, node, wvpMatrix, worldMatrixID);
 
 				break;
 			}
 
             case AABBIntersection::Inside:
 			{
-                AddAllMeshes(resultMeshes, node, worldMatrixID);
+                AddAllMeshes(resourceManifest, resultMeshes, node, worldMatrixID);
 				break;
 			}
 
@@ -73,7 +73,7 @@ namespace JonsEngine
 		}
     }
 
-    void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const AABB& aabb, const Mat4& worldMatrix)
+    void CullMeshesAABB(const ResourceManifest& resourceManifest, std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const AABB& aabb, const Mat4& worldMatrix)
     {
         // test node AABB
         AABBIntersection nodeAABBIntersection = Intersection(node.mLocalAABB, aabb);
@@ -91,19 +91,19 @@ namespace JonsEngine
                         continue;
 
                     if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                        AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+                        AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.mLocalTransform);
                 }
 
                 // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
                 for (const ModelNode& node : node.mChildren)
-                    CullMeshesAABB(resultMeshes, node, aabb, worldMatrix);
+                    CullMeshesAABB(resourceManifest, resultMeshes, node, aabb, worldMatrix);
 
                 break;
             }
 
             case AABBIntersection::Inside:
         {
-            AddAllMeshes(resultMeshes, node, worldMatrix);
+            AddAllMeshes(resourceManifest, resultMeshes, node, worldMatrix);
             break;
         }
 
@@ -113,7 +113,7 @@ namespace JonsEngine
         }
     }
 
-    void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius)
+    void CullMeshesSphere(const ResourceManifest& resourceManifest, std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius)
     {
 		const AABB worldAABB = worldMatrix * node.mLocalAABB;
 
@@ -134,19 +134,19 @@ namespace JonsEngine
 						continue;
 
                     if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                        AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+                        AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.mLocalTransform);
 				}
 
 				// each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
 				for (const ModelNode& node : node.mChildren)
-                    CullMeshesSphere(resultMeshes, node, worldMatrix, sphereCentre, sphereRadius);
+                    CullMeshesSphere(resourceManifest, resultMeshes, node, worldMatrix, sphereCentre, sphereRadius);
 
 				break;
 			}
 
             case AABBIntersection::Inside:
 			{
-                AddAllMeshes(resultMeshes, node, worldMatrix);
+                AddAllMeshes(resourceManifest, resultMeshes, node, worldMatrix);
 				break;
 			}
 
@@ -192,7 +192,7 @@ namespace JonsEngine
             const Mat4& worldMatrix = actor->mSceneNode->GetWorldTransform();
             const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix * worldMatrix;
 
-            CullMeshesFrustrum<RenderableModel>(mRenderQueue.mCamera.mModels, actor->mModel->GetRootNode(), worldMatrix, wvpMatrix);
+            CullMeshesFrustrum<RenderableModel>(mResourceManifest, mRenderQueue.mCamera.mModels, actor->mModel->GetRootNode(), worldMatrix, wvpMatrix);
 		}
 
         // point lights
@@ -213,7 +213,7 @@ namespace JonsEngine
                     continue;
 
                 const Mat4& actorWorldMatrix = actor->mSceneNode->GetWorldTransform();
-                CullMeshesSphere(renderablePointLight.mMeshes, actor->mModel->GetRootNode(), actorWorldMatrix, lightPosition, pointLight.mLightRadius);
+                CullMeshesSphere(mResourceManifest, renderablePointLight.mMeshes, actor->mModel->GetRootNode(), actorWorldMatrix, lightPosition, pointLight.mLightRadius);
             }
         }
 
@@ -241,7 +241,7 @@ namespace JonsEngine
 
                     const auto aabbIntersection = Intersection(worldAABB, kdopIterator);
                     if (aabbIntersection == AABBIntersection::Inside || aabbIntersection == AABBIntersection::Partial)
-                        AddAllMeshes(renderableDirLight.mMeshes, actor->mModel->GetRootNode(), worldMatrix);
+                        AddAllMeshes(mResourceManifest, renderableDirLight.mMeshes, actor->mModel->GetRootNode(), worldMatrix);
                 }
 
                 renderableDirLight.mCascadeSplits.emplace_back(nearZ, farZ, renderableDirLight.mMeshes.size());

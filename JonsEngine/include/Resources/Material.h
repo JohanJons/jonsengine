@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/Types.h"
+#include "include/Core/Containers/IDMap.hpp"
 
 #include <string>
 
@@ -22,4 +23,7 @@ namespace JonsEngine
         const Vec3 mEmissiveColor;
         const float mSpecularFactor;
     };
+
+    typedef IDMap<Material>::ItemID MaterialID;
+    static const MaterialID INVALID_MATERIAL_ID = IDMap<Material>::INVALID_ITEM_ID;
 }

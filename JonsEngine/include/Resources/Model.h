@@ -4,6 +4,7 @@
 #include "include/Resources/Mesh.h"
 #include "include/Resources/JonsPackage.h"
 #include "include/Core/Types.h"
+#include "include/Core/Containers/IDMap.hpp"
 
 #include <string>
 #include <vector>
@@ -32,4 +33,7 @@ namespace JonsEngine
         NodeContainer mNodes;
         MeshContainer mMeshes;
     };
+
+    typedef IDMap<Model>::ItemID ModelID;
+    static const ModelID INVALID_MODEL_ID = IDMap<Model>::INVALID_ITEM_ID;
 }
