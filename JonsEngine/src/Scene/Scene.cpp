@@ -11,7 +11,9 @@ namespace JonsEngine
 {
     void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)
     {
-        resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix, mesh.GetMaterial()->mDiffuseTexture, mesh.GetMaterial()->mNormalTexture, mesh.GetMaterial()->mSpecularFactor, mesh.GetTextureTilingFactor());
+        const Material& material = resourceManifest.GetMaterial(mesh.mDefaultMaterialID);
+
+        resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix, material.mDiffuseTexture, material.mNormalTexture, material.mSpecularFactor, mesh.GetTextureTilingFactor());
     }
 
     void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)
@@ -22,7 +24,7 @@ namespace JonsEngine
     template <typename T>
     void AddAllMeshes(const ResourceManifest& resourceManifest, std::vector<T>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix)
     {
-		for (const Mesh& mesh : node.GetMeshes())
+		for (const Mesh& mesh : node.mMeshes)
             AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.mLocalTransform);
 
 		for (ModelNode& node : node.GetChildNodes())
@@ -44,7 +46,7 @@ namespace JonsEngine
 			{
                 AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
 
-				for (const Mesh& mesh : node.GetMeshes())
+				for (const Mesh& mesh : node.mMeshes)
 				{
                     meshAABBIntersection = Intersection(mesh.mLocalAABB, localWVPMatrix);
                     if (meshAABBIntersection == AABBIntersection::Outside)
@@ -184,15 +186,15 @@ namespace JonsEngine
         mRenderQueue.mCamera.mCameraProjectionMatrix = cameraProjectionMatrix;
         mRenderQueue.mCamera.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
 
-		for (const ActorPtr& actor : mActors)
+		for (const Actor& actor : mActors)
 		{
-			if (!actor->mSceneNode)
+			if (!actor.mSceneNode)
 				continue;
 
-            const Mat4& worldMatrix = actor->mSceneNode->GetWorldTransform();
+            const Mat4& worldMatrix = actor.mSceneNode->GetWorldTransform();
             const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix * worldMatrix;
 
-            CullMeshesFrustrum<RenderableModel>(mResourceManifest, mRenderQueue.mCamera.mModels, actor->mModel->GetRootNode(), worldMatrix, wvpMatrix);
+            CullMeshesFrustrum<RenderableModel>(mResourceManifest, mRenderQueue.mCamera.mModels, actor.mModel->GetRootNode(), worldMatrix, wvpMatrix);
 		}
 
         // point lights
@@ -207,13 +209,13 @@ namespace JonsEngine
             RenderablePointLight& renderablePointLight = mRenderQueue.mPointLights.back();
 
             //  cull meshes for each face
-            for (const ActorPtr& actor : mActors)
+            for (const Actor& actor : mActors)
             {
-                if (!actor->mSceneNode)
+                if (!actor.mSceneNode)
                     continue;
 
-                const Mat4& actorWorldMatrix = actor->mSceneNode->GetWorldTransform();
-                CullMeshesSphere(mResourceManifest, renderablePointLight.mMeshes, actor->mModel->GetRootNode(), actorWorldMatrix, lightPosition, pointLight.mLightRadius);
+                const Mat4& actorWorldMatrix = actor.mSceneNode->GetWorldTransform();
+                CullMeshesSphere(mResourceManifest, renderablePointLight.mMeshes, actor.mModel->GetRootNode(), actorWorldMatrix, lightPosition, pointLight.mLightRadius);
             }
         }
 
@@ -230,18 +232,18 @@ namespace JonsEngine
                 dirLight.GetSplitDistance(cascadeIndex, nearZ, farZ);
 
                 auto kdopIterator = dirLight.GetBoundingVolume(cascadeIndex);
-                for (const ActorPtr& actor : mActors)
+                for (const Actor& actor : mActors)
                 {
-                    if (!actor->mSceneNode)
+                    if (!actor.mSceneNode)
                         continue;
 
-                    const Mat4& worldMatrix = actor->mSceneNode->GetWorldTransform();
-                    const Mat4 localWorldMatrix = worldMatrix * actor->mModel->GetRootNode().mLocalTransform;
-                    const AABB worldAABB = localWorldMatrix * actor->mModel->GetRootNode().mLocalAABB;
+                    const Mat4& worldMatrix = actor.mSceneNode->GetWorldTransform();
+                    const Mat4 localWorldMatrix = worldMatrix * actor.mModel->GetRootNode().mLocalTransform;
+                    const AABB worldAABB = localWorldMatrix * actor.mModel->GetRootNode().mLocalAABB;
 
                     const auto aabbIntersection = Intersection(worldAABB, kdopIterator);
                     if (aabbIntersection == AABBIntersection::Inside || aabbIntersection == AABBIntersection::Partial)
-                        AddAllMeshes(mResourceManifest, renderableDirLight.mMeshes, actor->mModel->GetRootNode(), worldMatrix);
+                        AddAllMeshes(mResourceManifest, renderableDirLight.mMeshes, actor.mModel->GetRootNode(), worldMatrix);
                 }
 
                 renderableDirLight.mCascadeSplits.emplace_back(nearZ, farZ, renderableDirLight.mMeshes.size());

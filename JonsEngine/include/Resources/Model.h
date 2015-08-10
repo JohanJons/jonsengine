@@ -17,7 +17,7 @@ namespace JonsEngine
     {
     public:
         Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
-        Model(const PackageModel& pkgModel, const DX11ResourceMeshTuples& meshResources);
+        Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData);
         ~Model();
 
         ModelNode& GetRootNode();

@@ -75,11 +75,10 @@ namespace JonsEngine
 
         const PackageModel& pkgModel = *iter;
 
-        //auto loadMaterialFunc = std::bind(&ResourceManifest::LoadMaterial, this, std::placeholders::_1, std::placeholders::_2);
-        DX11ResourceMeshTuples pairings;
-        ParseDX11Resources(pairings, jonsPkg, pkgModel.mRootNode);
+        ModelNode::InitDataList initDataList;
+        ParseModelInitData(initDataList, jonsPkg, pkgModel.mRootNode);
 
-        return mModels.AddItem(pkgModel, pairings);
+        return mModels.AddItem(pkgModel, initDataList);
     }
 
     Model& ResourceManifest::GetModel(const ModelID modelID)
@@ -155,7 +154,7 @@ namespace JonsEngine
     }
 
 
-    void ResourceManifest::ParseDX11Resources(DX11ResourceMeshTuples& meshResources, const JonsPackagePtr jongPkg, const PackageNode& node)
+    void ResourceManifest::ParseModelInitData(ModelNode::InitDataList& initDataList, const JonsPackagePtr jongPkg, const PackageNode& node)
     {
         for (const PackageMesh& mesh : node.mMeshes)
         {
@@ -169,18 +168,18 @@ namespace JonsEngine
                 assert(materialID != INVALID_DX11_MATERIAL_ID);
             }
 
-            meshResources.emplace_back(mesh, meshID, materialID);
+            initDataList.emplace_back(mesh, meshID, materialID);
         }
 
         for (const PackageNode& child : node.mChildNodes)
-            ParseDX11Resources(meshResources, jongPkg, child);
+            ParseModelInitData(initDataList, jongPkg, child);
     }
 
 
     template <typename PackageStruct>
     typename std::vector<PackageStruct>::const_iterator FindInContainer(const std::string& assetName, const std::vector<PackageStruct>& container)
     {
-        size_t hashedName = boost::hash_value(assetName);
+        const size_t hashedName = boost::hash_value(assetName);
 
         return std::find_if(container.begin(), container.end(), [hashedName](const PackageStruct& asset) { return boost::hash_value(asset.mName) == hashedName; });
     }

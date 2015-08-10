@@ -27,13 +27,13 @@ namespace JonsEngine
         typedef uint32_t ItemID;
         const static ItemID INVALID_ITEM_ID = 0;
 
-        class iterator {
+        class Iterator {
         public:
-            iterator(typename const std::vector<Item>::iterator& iter);
+            Iterator(typename const std::vector<Item>::iterator& iter);
 
-            bool operator!=(const iterator& iterator) const;
-            iterator& operator++();
-            iterator operator++(int);
+            bool operator!=(const Iterator& iterator) const;
+            Iterator& operator++();
+            Iterator operator++(int);
             T& operator*();
             const T& operator*() const;
 
@@ -49,11 +49,12 @@ namespace JonsEngine
         T& GetItem(const ItemID id);
         const T& GetItem(const ItemID id) const;
         T* TryGetItem(const ItemID id);
+        const T* TryGetItem(const ItemID id) const;
 
         void Clear();
 
-        iterator begin();
-        iterator end();
+        Iterator begin();
+        Iterator end();
 
 
     private:
@@ -80,18 +81,18 @@ namespace JonsEngine
 	// IDMap::Iterator
 	//
 	template <typename T>
-	IDMap<T>::iterator::iterator(typename const std::vector<typename IDMap<T>::Item>::iterator& iter) : mIterator(iter)
+    IDMap<T>::Iterator::Iterator(typename const std::vector<typename IDMap<T>::Item>::iterator& iter) : mIterator(iter)
 	{
 	}
 
 	template <typename T>
-	bool IDMap<T>::iterator::operator!=(const iterator& iter) const
+    bool IDMap<T>::Iterator::operator!=(const Iterator& iter) const
 	{
 		return mIterator != iter.mIterator;
 	}
 
 	template <typename T>
-	typename IDMap<T>::iterator& IDMap<T>::iterator::operator++()
+    typename IDMap<T>::Iterator& IDMap<T>::Iterator::operator++()
 	{
 		++mIterator;
 
@@ -99,21 +100,21 @@ namespace JonsEngine
 	}
 
 	template <typename T>
-	typename IDMap<T>::iterator IDMap<T>::iterator::operator++(int)
+    typename IDMap<T>::Iterator IDMap<T>::Iterator::operator++(int)
 	{
-		iterator old(++(*this));
+        Iterator old(++(*this));
 
 		return old;
 	}
 
     template <typename T>
-    T& IDMap<T>::iterator::operator*()
+    T& IDMap<T>::Iterator::operator*()
     {
         return mIterator->mItem;
     }
 
 	template <typename T>
-	const T& IDMap<T>::iterator::operator*() const
+    const T& IDMap<T>::Iterator::operator*() const
 	{
 		return mIterator->mItem;
 	}
@@ -171,12 +172,7 @@ namespace JonsEngine
     template <typename T>
     const T& IDMap<T>::GetItem(const ItemID id) const
     {
-        const uint16_t index = IDMAP_INDEX_MASK(id);
-        const uint16_t version = IDMAP_VERSION_MASK(id);
-
-        assert(mItems[index].mVersion == version);
-
-        return mItems[index].mItem;
+        return GetItem(id);
     }
 
 	template <typename T>
@@ -191,6 +187,12 @@ namespace JonsEngine
 			return nullptr;
 	}
 
+    template <typename T>
+    const T* IDMap<T>::TryGetItem(const ItemID id) const
+    {
+        return TryGetItem(id);
+    }
+
 	template <typename T>
 	void IDMap<T>::Clear()
 	{
@@ -199,13 +201,13 @@ namespace JonsEngine
 	}
 
 	template <typename T>
-	typename IDMap<T>::iterator IDMap<T>::begin()
+    typename IDMap<T>::Iterator IDMap<T>::begin()
 	{
 		return mItems.begin();
 	}
 
 	template <typename T>
-	typename IDMap<T>::iterator IDMap<T>::end()
+    typename IDMap<T>::Iterator IDMap<T>::end()
 	{
 		return mItems.end();
 	}

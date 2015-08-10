@@ -7,9 +7,9 @@ namespace JonsEngine
         mNodes.emplace_back(mNodes, mMeshes, name, minBounds, maxBounds, initialTransform, meshID);
     }
 
-    Model::Model(const PackageModel& pkgModel, const DX11ResourceMeshTuples& meshResources) : mName(pkgModel.mName)
+    Model::Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData) : mName(pkgModel.mName)
     {
-        mNodes.emplace_back(pkgModel.mRootNode, meshResources, mNodes, mMeshes);
+        mNodes.emplace_back(pkgModel.mRootNode, initData, mNodes, mMeshes);
     }
 
     Model::~Model()
