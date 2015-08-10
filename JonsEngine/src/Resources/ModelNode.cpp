@@ -11,12 +11,15 @@ namespace JonsEngine
     typedef ModelNode::MeshContainer MeshContainer;
 
     typedef ModelNode::MeshIterator MeshIterator;
-    //typedef ModelNode::NodeIterator NodeIterator;
 
     NodeIterator ParseChildren(NodeContainer& nodes, MeshContainer& meshes, const PackageNode& pkgNode);
     MeshIterator ParseMeshes(MeshContainer& meshes, const InitDataList& meshResources, const PackageNode& pkgNode);
     MeshIterator ParseMeshes(MeshContainer& meshes, const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
 
+
+    //
+    // ModelNode
+    //
 
     ModelNode::ModelNode(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes) :
         mName(pkgNode.mName), mLocalAABB(pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds), mLocalTransform(pkgNode.mTransform), mChildren(ParseChildren(nodes, meshes, pkgNode)), mMeshes(ParseMeshes(meshes, initData, pkgNode))
@@ -32,6 +35,61 @@ namespace JonsEngine
     {
     }
 
+
+
+    //
+    // ModelNode::ImmediateChildrenIterator
+    //
+
+    ModelNode::ImmediateChildrenIterator::ImmediateChildrenIterator(const ModelNode& begin, const ModelNode& end) : mBegin(begin), mEnd(end)
+    {
+    }
+
+    ModelNode::ImmediateChildrenIterator::~ImmediateChildrenIterator()
+    {
+    }
+
+
+    ModelNode::ImmediateChildrenIterator::Iterator ModelNode::ImmediateChildrenIterator::begin() const
+    {
+
+    }
+
+    ModelNode::ImmediateChildrenIterator::Iterator ModelNode::ImmediateChildrenIterator::end() const
+    {
+
+    }
+
+
+
+    //
+    // ModelNode::AllChildrenIterator
+    // 
+
+    ModelNode::AllChildrenIterator::AllChildrenIterator(const ModelNode& begin, const ModelNode& end) : mBegin(begin), mEnd(end)
+    {
+    }
+
+    ModelNode::AllChildrenIterator::~AllChildrenIterator()
+    {
+    }
+
+
+    ModelNode::AllChildrenIterator::Iterator ModelNode::AllChildrenIterator::begin() const
+    {
+
+    }
+
+    ModelNode::AllChildrenIterator::Iterator ModelNode::AllChildrenIterator::end() const
+    {
+
+    }
+
+
+
+    //
+    // Free functions
+    //
 
     NodeIterator ParseChildren(NodeContainer& nodes, const InitDataList& initDataList, MeshContainer& meshes, const PackageNode& pkgNode)
     {

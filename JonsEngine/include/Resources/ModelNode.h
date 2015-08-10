@@ -22,31 +22,54 @@ namespace JonsEngine
         typedef std::vector<Mesh> MeshContainer;
 
         typedef ConstRangedIterator<MeshContainer> MeshIterator;
-        //typedef ConstRangedIterator<NodeContainer> NodeIterator;
         
-        /*class ImmediateChildrenIterator
+        class ImmediateChildrenIterator
         {
         public:
-            typedef NodeContainer::iterator Iterator;
+            class Iterator
+            {
+            public:
+                bool operator!=(const Iterator& iterator) const;
+                Iterator& operator++();
+                Iterator operator++(int);
+                const ModelNode& operator*() const;
+            };
 
-            bool operator!=(const Iterator& iterator) const;
-            Iterator& operator++();
-            Iterator operator++(int);
-            ModelNode& operator*();
-            const ModelNode& operator*() const;
+            ImmediateChildrenIterator(const ModelNode& begin, const ModelNode& end);
+            ~ImmediateChildrenIterator();
 
-            Iterator begin();
-            Iterator end();
+            Iterator begin() const;
+            Iterator end() const;
+
+
+        private:
+            const ModelNode& mBegin;
+            const ModelNode& mEnd;
         };
 
         class AllChildrenIterator
         {
         public:
-            typedef NodeContainer::iterator Iterator;
+            class Iterator
+            {
+            public:
+                bool operator!=(const Iterator& iterator) const;
+                Iterator& operator++();
+                Iterator operator++(int);
+                const ModelNode& operator*() const;
+            };
 
-            Iterator begin();
-            Iterator end();
-        };*/
+            AllChildrenIterator(const ModelNode& begin, const ModelNode& end);
+            ~AllChildrenIterator();
+
+            Iterator begin() const;
+            Iterator end() const;
+
+
+        private:
+            const ModelNode& mBegin;
+            const ModelNode& mEnd;
+        };
 
         ModelNode(const PackageNode& pkgNode, const InitDataList& meshResources, NodeContainer& nodes, MeshContainer& meshes);
         ModelNode(NodeContainer& nodes, MeshContainer& meshes, const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const DX11MeshID meshID);
@@ -60,5 +83,9 @@ namespace JonsEngine
         const ImmediateChildrenIterator mImmediateChildNodes;
         const AllChildrenIterator mAllChildNodes;
         const MeshIterator mMeshes;
+
+
+    private:
+        ModelNode* mNext;
     };
 }

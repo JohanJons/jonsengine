@@ -21,6 +21,7 @@ namespace JonsEngine
 
     typedef IDMap<PointLight>::ItemID PointLightID;
     typedef IDMap<DirectionalLight>::ItemID DirectionalLightID;
+    typedef IDMap<Actor>::ItemID ActorID;
 
     class Scene
     {
@@ -30,10 +31,10 @@ namespace JonsEngine
 
         const RenderQueue& GetRenderQueue(const Mat4& cameraProjectionMatrix, const float fov, const float aspectRatio, const float minDepth, const float maxDepth);
 
-        Actor* CreateActor(const std::string& actorName, const ModelPtr model, const SceneNodePtr node);
+        /*ActorID CreateActor(const std::string& actorName, const ModelID model, const SceneNodePtr node);
         void DeleteActor(Actor* actor);
         Actor* GetActor(const std::string& actorName);
-		const std::vector<ActorPtr>& GetActors() const;
+		const std::vector<ActorPtr>& GetActors() const;*/
         
 		PointLightID CreatePointLight(const std::string& lightName, SceneNodePtr node);
         void DeletePointLight(const PointLightID pointLightID);
@@ -73,10 +74,9 @@ namespace JonsEngine
         Vec4 mAmbientLight;
         SkyboxID mSkyboxID;
 
-        std::vector<ActorPtr> mActors;
-
 		IDMap<PointLight> mPointLights;
         IDMap<DirectionalLight> mDirectionalLights;
+        IDMap<Actor> mActors;
 
         RenderQueue mRenderQueue;
     };

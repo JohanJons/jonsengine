@@ -12,8 +12,9 @@ namespace JonsEngine
     void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)
     {
         const Material& material = resourceManifest.GetMaterial(mesh.mDefaultMaterialID);
+        const float ___TODOTILING = 1.0f;
 
-        resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix, material.mDiffuseTexture, material.mNormalTexture, material.mSpecularFactor, mesh.GetTextureTilingFactor());
+        resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix, material.mDiffuseTexture, material.mNormalTexture, material.mSpecularFactor, ___TODOTILING);
     }
 
     void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)
@@ -24,11 +25,11 @@ namespace JonsEngine
     template <typename T>
     void AddAllMeshes(const ResourceManifest& resourceManifest, std::vector<T>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix)
     {
-		for (const Mesh& mesh : node.mMeshes)
-            AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.mLocalTransform);
-
-		for (ModelNode& node : node.GetChildNodes())
-            AddAllMeshes(resourceManifest, resultMeshes, node, worldMatrix);
+        for (const ModelNode& child : node.mAllChildNodes)
+        {
+            for (const Mesh& mesh : child.mMeshes)
+                AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+        }
     }
 
     template <typename T>
@@ -97,21 +98,21 @@ namespace JonsEngine
                 }
 
                 // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-                for (const ModelNode& node : node.mChildren)
+                for (const ModelNode& child : node.mImmediateChildNodes)
                     CullMeshesAABB(resourceManifest, resultMeshes, node, aabb, worldMatrix);
 
                 break;
             }
 
             case AABBIntersection::Inside:
-        {
-            AddAllMeshes(resourceManifest, resultMeshes, node, worldMatrix);
-            break;
-        }
+            {
+                AddAllMeshes(resourceManifest, resultMeshes, node, worldMatrix);
+                break;
+            }
 
-        case AABBIntersection::Outside:
-        default:
-            break;
+            case AABBIntersection::Outside:
+            default:
+                break;
         }
     }
 
@@ -140,7 +141,7 @@ namespace JonsEngine
 				}
 
 				// each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-				for (const ModelNode& node : node.mChildren)
+				for (const ModelNode& node : node.mImmediateChildNodes)
                     CullMeshesSphere(resourceManifest, resultMeshes, node, worldMatrix, sphereCentre, sphereRadius);
 
 				break;
@@ -260,7 +261,7 @@ namespace JonsEngine
     }
 
 
-    Actor* Scene::CreateActor(const std::string& actorName, const ModelPtr model, const SceneNodePtr node)
+    /*Actor* Scene::CreateActor(const std::string& actorName, const ModelPtr model, const SceneNodePtr node)
     {
         mActors.emplace_back(mMemoryAllocator.AllocateObject<Actor>(actorName, model, node), std::bind(&HeapAllocator::DeallocateObject<Actor>, &mMemoryAllocator, std::placeholders::_1));
 
@@ -287,7 +288,7 @@ namespace JonsEngine
 	const std::vector<ActorPtr>& Scene::GetActors() const
 	{
 		return mActors;
-	}
+	}*/
 
 
 	PointLightID Scene::CreatePointLight(const std::string& lightName, SceneNodePtr node)
