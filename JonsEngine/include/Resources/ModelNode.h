@@ -21,23 +21,20 @@ namespace JonsEngine
         typedef std::vector<ModelNode> NodeContainer;
         typedef std::vector<Mesh> MeshContainer;
 
-        typedef NodeContainer::const_iterator NodeIterator;
         typedef ConstRangedIterator<MeshContainer> MeshIterator;
         typedef ConstRangedIterator<NodeContainer> AllChildrenIterator;
-        
+
+    private:
+        typedef std::vector<ModelNode>::const_iterator NodeIterator;
         class ImmediateChildrenIter : public NodeIterator
         {
         public:
-            inline ImmediateChildrenIter(const NodeIterator& iter) : NodeIterator(iter)
-            {
-            }
+            ImmediateChildrenIter(const NodeIterator& iter);
 
-            inline ImmediateChildrenIter& operator++()
-            {
-                return *this;
-            }
+            ImmediateChildrenIter& operator++();
         };
 
+    public:
         typedef ConstRangedIterator<NodeContainer, ImmediateChildrenIter> ImmediateChildrenIterator;
 
         /*class ImmediateChildrenIterator

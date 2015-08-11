@@ -2,10 +2,12 @@
 
 namespace JonsEngine
 {
-    template <class Container, class Iterator = typename Container::iterator>
+    template <class Container, class InternalIterator = typename Container::iterator>
     class RangedIterator
     {
     public:
+        typedef InternalIterator Iterator;
+
         RangedIterator(Container& container, const size_t beginIndex, const size_t upToIndex) : mIterBegin(container.begin() + beginIndex), mIterEnd(container.begin() + upToIndex)
         {
             assert(upToIndex >= beginIndex);
@@ -32,10 +34,12 @@ namespace JonsEngine
     };
 
 
-    template <class Container, class Iterator = typename Container::const_iterator>
+    template <class Container, class InternalIterator = typename Container::const_iterator>
     class ConstRangedIterator
     {
     public:
+        typedef InternalIterator Iterator;
+
         ConstRangedIterator(const Container& container, const size_t beginIndex, const size_t upToIndex) : mIterBegin(container.cbegin() + beginIndex), mIterEnd(container.cbegin() + upToIndex)
         {
             assert(upToIndex >= beginIndex);
