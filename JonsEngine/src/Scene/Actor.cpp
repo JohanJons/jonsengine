@@ -2,7 +2,7 @@
 
 namespace JonsEngine
 {
-    Actor::Actor(const std::string& name, const ModelPtr model, const SceneNodePtr node) : mName(name), mHashedID(boost::hash_value(name)), mModel(model), mSceneNode(node)
+    Actor::Actor(const std::string& name, const ModelID model, const SceneNodePtr node) : mName(name), mModelID(model), mSceneNode(node)
     {
     }
 

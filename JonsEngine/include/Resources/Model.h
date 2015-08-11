@@ -20,7 +20,7 @@ namespace JonsEngine
         Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData);
         ~Model();
 
-        ModelNode& GetRootNode();
+        const ModelNode& GetRootNode() const;
 
 
         const std::string mName;

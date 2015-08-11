@@ -17,7 +17,7 @@ namespace JonsEngine
     }
 
 
-    ModelNode& Model::GetRootNode()
+    const ModelNode& Model::GetRootNode() const
     {
         return mNodes.front();
     }

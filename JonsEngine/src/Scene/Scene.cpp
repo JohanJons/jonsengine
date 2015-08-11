@@ -35,7 +35,7 @@ namespace JonsEngine
     template <typename T>
     void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<T>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix)
     {
-        const Mat4 localWVPMatrix = wvpMatrix * node.GetLocalTransform();
+        const Mat4 localWVPMatrix = wvpMatrix * node.mLocalTransform;
 
         // test node frustrum
 		// TODO: does this cull objects behind frustrum that still intersects some planes?
@@ -59,14 +59,14 @@ namespace JonsEngine
 
                 // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
 				for (const ModelNode& node : node.mImmediateChildNodes)
-                    CullMeshesFrustrum(resourceManifest, resultMeshes, node, wvpMatrix, worldMatrixID);
+                    CullMeshesFrustrum(resourceManifest, resultMeshes, node, worldMatrix, wvpMatrix);
 
 				break;
 			}
 
             case AABBIntersection::Inside:
 			{
-                AddAllMeshes(resourceManifest, resultMeshes, node, worldMatrixID);
+                AddAllMeshes(resourceManifest, resultMeshes, node, worldMatrix);
 				break;
 			}
 
@@ -189,13 +189,15 @@ namespace JonsEngine
 
 		for (const Actor& actor : mActors)
 		{
-			if (!actor.mSceneNode)
+			if (!actor.mSceneNode || actor.mModelID == INVALID_MODEL_ID)
 				continue;
 
             const Mat4& worldMatrix = actor.mSceneNode->GetWorldTransform();
             const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix * worldMatrix;
 
-            CullMeshesFrustrum<RenderableModel>(mResourceManifest, mRenderQueue.mCamera.mModels, actor.mModel->GetRootNode(), worldMatrix, wvpMatrix);
+            const Model& model = mResourceManifest.GetModel(actor.mModelID);
+
+            CullMeshesFrustrum<RenderableModel>(mResourceManifest, mRenderQueue.mCamera.mModels, model.GetRootNode(), worldMatrix, wvpMatrix);
 		}
 
         // point lights
@@ -212,11 +214,12 @@ namespace JonsEngine
             //  cull meshes for each face
             for (const Actor& actor : mActors)
             {
-                if (!actor.mSceneNode)
+                if (!actor.mSceneNode || actor.mModelID == INVALID_MODEL_ID)
                     continue;
 
                 const Mat4& actorWorldMatrix = actor.mSceneNode->GetWorldTransform();
-                CullMeshesSphere(mResourceManifest, renderablePointLight.mMeshes, actor.mModel->GetRootNode(), actorWorldMatrix, lightPosition, pointLight.mLightRadius);
+                const Model& model = mResourceManifest.GetModel(actor.mModelID);
+                CullMeshesSphere(mResourceManifest, renderablePointLight.mMeshes, model.GetRootNode(), actorWorldMatrix, lightPosition, pointLight.mLightRadius);
             }
         }
 
@@ -235,16 +238,17 @@ namespace JonsEngine
                 auto kdopIterator = dirLight.GetBoundingVolume(cascadeIndex);
                 for (const Actor& actor : mActors)
                 {
-                    if (!actor.mSceneNode)
+                    if (!actor.mSceneNode || actor.mModelID == INVALID_MODEL_ID)
                         continue;
 
+                    const Model& model = mResourceManifest.GetModel(actor.mModelID);
                     const Mat4& worldMatrix = actor.mSceneNode->GetWorldTransform();
-                    const Mat4 localWorldMatrix = worldMatrix * actor.mModel->GetRootNode().mLocalTransform;
-                    const AABB worldAABB = localWorldMatrix * actor.mModel->GetRootNode().mLocalAABB;
+                    const Mat4 localWorldMatrix = worldMatrix * model.GetRootNode().mLocalTransform;
+                    const AABB worldAABB = localWorldMatrix * model.GetRootNode().mLocalAABB;
 
                     const auto aabbIntersection = Intersection(worldAABB, kdopIterator);
                     if (aabbIntersection == AABBIntersection::Inside || aabbIntersection == AABBIntersection::Partial)
-                        AddAllMeshes(mResourceManifest, renderableDirLight.mMeshes, actor.mModel->GetRootNode(), worldMatrix);
+                        AddAllMeshes(mResourceManifest, renderableDirLight.mMeshes, model.GetRootNode(), worldMatrix);
                 }
 
                 renderableDirLight.mCascadeSplits.emplace_back(nearZ, farZ, renderableDirLight.mMeshes.size());
