@@ -21,21 +21,44 @@ namespace JonsEngine
         typedef std::vector<ModelNode> NodeContainer;
         typedef std::vector<Mesh> MeshContainer;
 
+        typedef NodeContainer::const_iterator NodeIterator;
         typedef ConstRangedIterator<MeshContainer> MeshIterator;
+        typedef ConstRangedIterator<NodeContainer> AllChildrenIterator;
         
-        class ImmediateChildrenIterator
+        class ImmediateChildrenIter : public NodeIterator
+        {
+        public:
+            inline ImmediateChildrenIter(const NodeIterator& iter) : NodeIterator(iter)
+            {
+            }
+
+            inline ImmediateChildrenIter& operator++()
+            {
+                return *this;
+            }
+        };
+
+        typedef ConstRangedIterator<NodeContainer, ImmediateChildrenIter> ImmediateChildrenIterator;
+
+        /*class ImmediateChildrenIterator
         {
         public:
             class Iterator
             {
             public:
+                Iterator(ModelNode* item);
+                ~Iterator();
+
                 bool operator!=(const Iterator& iterator) const;
                 Iterator& operator++();
-                Iterator operator++(int);
                 const ModelNode& operator*() const;
+
+
+            private:
+                ModelNode* mItem;
             };
 
-            ImmediateChildrenIterator(const ModelNode& begin, const ModelNode& end);
+            ImmediateChildrenIterator(ModelNode& begin, ModelNode& end);
             ~ImmediateChildrenIterator();
 
             Iterator begin() const;
@@ -43,23 +66,29 @@ namespace JonsEngine
 
 
         private:
-            const ModelNode& mBegin;
-            const ModelNode& mEnd;
-        };
+            ModelNode& mBegin;
+            ModelNode& mEnd;
+        };*/
 
-        class AllChildrenIterator
+        /*class AllChildrenIterator
         {
         public:
             class Iterator
             {
             public:
+                Iterator(ModelNode* item);
+                ~Iterator();
+
                 bool operator!=(const Iterator& iterator) const;
                 Iterator& operator++();
-                Iterator operator++(int);
                 const ModelNode& operator*() const;
+
+
+            private:
+                ModelNode* mItem;
             };
 
-            AllChildrenIterator(const ModelNode& begin, const ModelNode& end);
+            AllChildrenIterator(ModelNode& begin, ModelNode& end);
             ~AllChildrenIterator();
 
             Iterator begin() const;
@@ -67,9 +96,9 @@ namespace JonsEngine
 
 
         private:
-            const ModelNode& mBegin;
-            const ModelNode& mEnd;
-        };
+            ModelNode& mBegin;
+            ModelNode& mEnd;
+        };*/
 
         ModelNode(const PackageNode& pkgNode, const InitDataList& meshResources, NodeContainer& nodes, MeshContainer& meshes);
         ModelNode(NodeContainer& nodes, MeshContainer& meshes, const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const DX11MeshID meshID);

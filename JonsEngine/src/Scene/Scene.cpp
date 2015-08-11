@@ -28,7 +28,7 @@ namespace JonsEngine
         for (const ModelNode& child : node.mAllChildNodes)
         {
             for (const Mesh& mesh : child.mMeshes)
-                AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+                AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * child.mLocalTransform);
         }
     }
 
@@ -58,7 +58,7 @@ namespace JonsEngine
 				}
 
                 // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-				for (const ModelNode& node : node.GetChildNodes())
+				for (const ModelNode& node : node.mImmediateChildNodes)
                     CullMeshesFrustrum(resourceManifest, resultMeshes, node, wvpMatrix, worldMatrixID);
 
 				break;
