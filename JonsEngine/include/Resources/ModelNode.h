@@ -112,6 +112,9 @@ namespace JonsEngine
 
 
     private:
+        template <typename ChildIterator>
+        ChildIterator ParseChildNodes(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes);
+
         ModelNode* mNext;
     };
 }
