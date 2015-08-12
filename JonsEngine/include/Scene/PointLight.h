@@ -2,6 +2,7 @@
 
 #include "include/Scene/SceneNode.h"
 #include "include/Core/Types.h"
+#include "include/Core/Containers/IDMap.hpp"
 
 #include <string>
 #include <memory>
@@ -29,4 +30,7 @@ namespace JonsEngine
     private:
         const size_t mHashedID;
     };
+
+    typedef IDMap<PointLight>::ItemID PointLightID;
+    static const PointLightID INVALID_POINT_LIGHT_ID = IDMap<PointLight>::INVALID_ITEM_ID;
 }

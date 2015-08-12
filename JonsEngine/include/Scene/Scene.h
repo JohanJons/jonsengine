@@ -19,10 +19,6 @@ namespace JonsEngine
 {
     class IMemoryAllocator;
 
-    typedef IDMap<PointLight>::ItemID PointLightID;
-    typedef IDMap<DirectionalLight>::ItemID DirectionalLightID;
-    typedef IDMap<Actor>::ItemID ActorID;
-
     class Scene
     {
     public:
@@ -31,18 +27,17 @@ namespace JonsEngine
 
         const RenderQueue& GetRenderQueue(const Mat4& cameraProjectionMatrix, const float fov, const float aspectRatio, const float minDepth, const float maxDepth);
 
-        /*ActorID CreateActor(const std::string& actorName, const ModelID model, const SceneNodePtr node);
-        void DeleteActor(Actor* actor);
-        Actor* GetActor(const std::string& actorName);
-		const std::vector<ActorPtr>& GetActors() const;*/
+        ActorID CreateActor(const std::string& actorName, const ModelID modelID, const SceneNodePtr node);
+        void DeleteActor(ActorID& actorID);
+        Actor& GetActor(const ActorID actorID);
         
 		PointLightID CreatePointLight(const std::string& lightName, SceneNodePtr node);
-        void DeletePointLight(const PointLightID pointLightID);
+        void DeletePointLight(PointLightID& pointLightID);
 		PointLight& GetPointLight(const PointLightID pointLightID);
         
         DirectionalLightID CreateDirectionalLight(const std::string& lightName);
         DirectionalLightID CreateDirectionalLight(const std::string& lightName, const uint32_t numShadowmapCascades);
-        void DeleteDirectionalLight(const DirectionalLightID dirLight);
+        void DeleteDirectionalLight(DirectionalLightID& dirLightID);
         DirectionalLight& GetDirectionalLight(const DirectionalLightID dirLightID);
 
 		void SetAmbientLight(const Vec4& ambientLight);

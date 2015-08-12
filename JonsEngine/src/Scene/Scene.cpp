@@ -265,34 +265,21 @@ namespace JonsEngine
     }
 
 
-    /*Actor* Scene::CreateActor(const std::string& actorName, const ModelPtr model, const SceneNodePtr node)
+    ActorID Scene::CreateActor(const std::string& actorName, const ModelID modelID, const SceneNodePtr node)
     {
-        mActors.emplace_back(mMemoryAllocator.AllocateObject<Actor>(actorName, model, node), std::bind(&HeapAllocator::DeallocateObject<Actor>, &mMemoryAllocator, std::placeholders::_1));
-
-        return mActors.back().get();
+        return mActors.AddItem(actorName, modelID, node);
     }
 
-    void Scene::DeleteActor(Actor* actor)
+    void Scene::DeleteActor(ActorID& actorID)
     {
-        auto iter = std::find_if(mActors.begin(), mActors.end(), [actor](const ActorPtr& storedActor) { return storedActor.get() == actor; });
-
-        if (iter != mActors.end())
-            mActors.erase(iter);
+        mActors.MarkAsFree(actorID);
+        actorID = INVALID_ACTOR_ID;
     }
 
-    Actor* Scene::GetActor(const std::string& actorName)
+    Actor& Scene::GetActor(const ActorID actorID)
     {
-        auto iter = std::find_if(mActors.begin(), mActors.end(), [actorName](const ActorPtr& storedActor) { return *storedActor == actorName; });
-        if (iter == mActors.end())
-            return nullptr;
-
-        return iter->get();
+        return mActors.GetItem(actorID);
     }
-
-	const std::vector<ActorPtr>& Scene::GetActors() const
-	{
-		return mActors;
-	}*/
 
 
 	PointLightID Scene::CreatePointLight(const std::string& lightName, SceneNodePtr node)
@@ -300,9 +287,10 @@ namespace JonsEngine
         return mPointLights.AddItem(lightName, node);
     }
     
-	void Scene::DeletePointLight(const PointLightID pointLightID)
+	void Scene::DeletePointLight(PointLightID& pointLightID)
     {
 		mPointLights.MarkAsFree(pointLightID);
+        pointLightID = INVALID_POINT_LIGHT_ID;
     }
     
 	PointLight& Scene::GetPointLight(const PointLightID pointLightID)
@@ -323,9 +311,10 @@ namespace JonsEngine
         return mDirectionalLights.AddItem(lightName, numShadowmapCascades);
     }
 
-    void Scene::DeleteDirectionalLight(const DirectionalLightID dirLight)
+    void Scene::DeleteDirectionalLight(DirectionalLightID& dirLightID)
     {
-        mDirectionalLights.MarkAsFree(dirLight);
+        mDirectionalLights.MarkAsFree(dirLightID);
+        dirLightID = INVALID_DIRECTIONAL_LIGHT_ID;
     }
 
     DirectionalLight& Scene::GetDirectionalLight(const DirectionalLightID dirLightID)

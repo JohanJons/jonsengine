@@ -98,7 +98,7 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix)
+    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix)
     {
         // preserve current state
         D3D11_VIEWPORT prevViewport;
@@ -144,7 +144,7 @@ namespace JonsEngine
             const size_t meshStartIndex = cascadeIndex == 0 ? 0 : directionalLight.mCascadeSplits.at(cascadeIndex - 1).mMeshEndIndex;
             const size_t meshEndIndex = cascadeSplit.mMeshEndIndex;
             ConstRangedIterator<RenderableMeshes> meshIterator(directionalLight.mMeshes, meshStartIndex, meshEndIndex);
-            mVertexTransformPass.RenderMeshes(meshIterator, localTransformStorage, worldTransformStorage, lightVPMatrices[cascadeIndex]);
+            mVertexTransformPass.RenderMeshes(meshIterator, lightVPMatrices[cascadeIndex]);
 
             // store view-projection for shading pass
             lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex] * glm::inverse(cameraViewMatrix);

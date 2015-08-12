@@ -230,7 +230,7 @@ namespace JonsEngine
         assert((indexEnd - indexBegin) > 0);
 
         return ModelNode::AllChildrenIterator(nodes, indexBegin, indexEnd);
-    }
+    }*/
 
     ModelNode::MeshIterator ParseMeshes(MeshContainer& meshes, const InitDataList& initDataList, const PackageNode& pkgNode)
     {
@@ -253,7 +253,7 @@ namespace JonsEngine
         assert((sizeEnd - sizeBegin) > 0);
 
         return ModelNode::MeshIterator(meshes, sizeBegin, sizeEnd);
-    }*/
+    }
 
     ModelNode::MeshIterator ParseMesh(MeshContainer& meshes, const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID)
     {

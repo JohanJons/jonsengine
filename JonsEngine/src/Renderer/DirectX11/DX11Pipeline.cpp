@@ -123,9 +123,7 @@ namespace JonsEngine
             if (hasNormalTexture)
                 mMaterialMap.GetItem(model.mMaterial.mNormalTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_NORMAL);
 
-            const Mat4& localTransform = renderQueue.mLocalTransformStorage.GetItem(model.mMesh.mLocalTransformID);
-            const Mat4& worldTransform = renderQueue.mWorldTransformStorage.GetItem(model.mMesh.mWorldTransformID);
-            const Mat4 localWorldMatrix = worldTransform * localTransform;
+            const Mat4& localWorldMatrix = model.mMesh.mWorldTransform;
 
             mGBuffer.SetConstantData(renderQueue.mCamera.mCameraViewProjectionMatrix * localWorldMatrix, renderQueue.mCamera.mCameraViewMatrix * localWorldMatrix, model.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
             mMeshMap.GetItem(model.mMesh.mMeshID).Draw();
@@ -156,14 +154,14 @@ namespace JonsEngine
 
         // do all directional lights
         for (const RenderableDirLight& directionalLight : renderQueue.mDirectionalLights)
-            mDirectionalLightPass.Render(directionalLight, renderQueue.mLocalTransformStorage, renderQueue.mWorldTransformStorage, shadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix);
+            mDirectionalLightPass.Render(directionalLight, shadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix);
 
         // do all point lights
         mPointLightPass.BindForShading();
         for (const RenderablePointLight& pointLight : renderQueue.mPointLights)
         {
             mContext->ClearDepthStencilView(mDSV, D3D11_CLEAR_STENCIL, 1.0f, 0);
-            mPointLightPass.Render(pointLight, renderQueue.mLocalTransformStorage, renderQueue.mWorldTransformStorage, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix);
+            mPointLightPass.Render(pointLight, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix);
         }
 
         // turn off blending

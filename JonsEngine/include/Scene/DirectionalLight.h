@@ -5,6 +5,7 @@
 #include "include/Core/Math/Frustum.h"
 #include "include/Core/Math/Math.h"
 #include "include/Core/Containers/RangedIterator.hpp"
+#include "include/Core/Containers/IDMap.hpp"
 
 #include <string>
 #include <memory>
@@ -47,5 +48,6 @@ namespace JonsEngine
         float mCascadeSplitLambda;
     };
 
-	typedef std::unique_ptr<DirectionalLight, std::function<void(DirectionalLight*)>> DirectionalLightPtr;
+    typedef IDMap<DirectionalLight>::ItemID DirectionalLightID;
+    static const DirectionalLightID INVALID_DIRECTIONAL_LIGHT_ID = IDMap<DirectionalLight>::INVALID_ITEM_ID;
 }
