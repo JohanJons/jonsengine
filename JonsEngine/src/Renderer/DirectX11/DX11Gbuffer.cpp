@@ -27,7 +27,7 @@ namespace JonsEngine
         
         // color texture
         uint32_t gbufferIndex = DX11GBuffer::GBUFFER_RENDERTARGET_INDEX_DIFFUSE;
-        backbufferTextureDesc.Format = DXGI_FORMAT_R16G16B16A16_UNORM;
+        backbufferTextureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
         DXCALL(device->CreateTexture2D(&backbufferTextureDesc, nullptr, &mTextures.at(gbufferIndex)));
         DXCALL(device->CreateRenderTargetView(mTextures.at(gbufferIndex), nullptr, &mRenderTargets.at(gbufferIndex)));
         DXCALL(device->CreateShaderResourceView(mTextures.at(gbufferIndex), nullptr, &mShaderResourceViews.at(gbufferIndex)));
