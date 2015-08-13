@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    typedef ModelNode::InitDataList InitDataList;
+    /*typedef ModelNode::InitDataList InitDataList;
     typedef ModelNode::NodeContainer NodeContainer;
     typedef ModelNode::MeshContainer MeshContainer;
 
@@ -14,7 +14,7 @@ namespace JonsEngine
     size_t GetStartIndex(const Container& nodes);
 
 
-
+    */
     //
     // ModelNode::ImmediateChildrenIter
     //
@@ -38,15 +38,20 @@ namespace JonsEngine
     // ModelNode
     //
 
-    ModelNode::ModelNode(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes) :
-        mName(pkgNode.mName), mLocalAABB(pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds), mLocalTransform(pkgNode.mTransform), mImmediateChildNodes(ParseChildNodes<ModelNode::ImmediateChildrenIterator>(pkgNode, initData, nodes, meshes)),
+    /*ModelNode::ModelNode(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes) :
+        mName(pkgNode.mName), mLocalAABB(pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds), mLocalTransform(pkgNode.mTransform),// mImmediateChildNodes(ParseChildNodes<ModelNode::ImmediateChildrenIterator>(pkgNode, initData, nodes, meshes)),
         mAllChildNodes(ParseChildNodes<ModelNode::AllChildrenIterator>(pkgNode, initData, nodes, meshes)), mMeshes(ParseMeshes(meshes, initData, pkgNode))
     {
     }
 
     ModelNode::ModelNode(NodeContainer& nodes, MeshContainer& meshes, const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const DX11MeshID meshID) :
-        mName(name), mLocalAABB(minBounds, maxBounds), mLocalTransform(initialTransform), mImmediateChildNodes(ImmediateChildrenIter(nodes.end()), ImmediateChildrenIter(nodes.end())),
+        mName(name), mLocalAABB(minBounds, maxBounds), mLocalTransform(initialTransform), //mImmediateChildNodes(ImmediateChildrenIter(nodes.end()), ImmediateChildrenIter(nodes.end())),
         mAllChildNodes(ImmediateChildrenIter(nodes.end()), ImmediateChildrenIter(nodes.end())), mMeshes(ParseMesh(meshes, name, minBounds, maxBounds, meshID))
+    {
+    }*/
+
+    ModelNode::ModelNode(const PackageNode& pkgNode, const AllChildrenIterator& childIter, const MeshIterator& meshIter) : mName(pkgNode.mName), mLocalAABB(pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds), mLocalTransform(pkgNode.mTransform),
+        mAllChildNodes(childIter), mMeshes(meshIter)
     {
     }
 
@@ -60,26 +65,27 @@ namespace JonsEngine
     // Initialization functions
     //
     
-    template <typename ChildIterator>
+    /*template <typename ChildIterator>
     ChildIterator ModelNode::ParseChildNodes(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes)
     {
         const size_t indexBegin = GetStartIndex<NodeContainer>(nodes);
 
-        ModelNode* prevNode = nullptr;
+        //ModelNode* prevNode = nullptr;
         for (const PackageNode& node : pkgNode.mChildNodes)
         {
             nodes.emplace_back(node, initData, nodes, meshes);
             ModelNode* newNode = &nodes.back();
-
-            if (prevNode)
-                prevNode->mNext = newNode;
-            prevNode = newNode;
+            int i = 0;
+            //if (prevNode)
+            //    prevNode->mNext = newNode;
+            //prevNode = newNode;
         }
-        prevNode->mNext = nullptr;
+        //if (prevNode)
+            //prevNode->mNext = nullptr;
 
         const size_t indexEnd = nodes.size();
 
-        assert((indexEnd - indexBegin) > 0);
+        //assert((indexEnd - indexBegin) > 0);
 
         return ChildIterator(ChildIterator::Iterator(nodes.begin() + indexBegin), ChildIterator::Iterator(nodes.end()));
     }
@@ -102,7 +108,7 @@ namespace JonsEngine
 
         const size_t sizeEnd = meshes.size();
 
-        assert((sizeEnd - sizeBegin) > 0);
+        //assert((sizeEnd - sizeBegin) > 0);
 
         return ModelNode::MeshIterator(meshes, sizeBegin, sizeEnd);
     }
@@ -122,5 +128,5 @@ namespace JonsEngine
     size_t GetStartIndex(const Container& container)
     {
         return container.size() == 0 ? 0 : container.size() - 1;
-    }
+    }*/
 }

@@ -30,6 +30,9 @@ namespace JonsEngine
         typedef std::vector<ModelNode> NodeContainer;
         typedef std::vector<Mesh> MeshContainer;
 
+        void ParseNodes(const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode);
+
+
         NodeContainer mNodes;
         MeshContainer mMeshes;
     };

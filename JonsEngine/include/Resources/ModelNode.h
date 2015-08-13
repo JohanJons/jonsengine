@@ -39,8 +39,9 @@ namespace JonsEngine
     public:
         typedef ConstRangedIterator<NodeContainer, ImmediateChildrenIter> ImmediateChildrenIterator;
 
-        ModelNode(const PackageNode& pkgNode, const InitDataList& meshResources, NodeContainer& nodes, MeshContainer& meshes);
-        ModelNode(NodeContainer& nodes, MeshContainer& meshes, const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const DX11MeshID meshID);
+        //ModelNode(const PackageNode& pkgNode, const InitDataList& meshResources, NodeContainer& nodes, MeshContainer& meshes);
+        //ModelNode(NodeContainer& nodes, MeshContainer& meshes, const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const DX11MeshID meshID);
+        ModelNode(const PackageNode& pkgNode, const AllChildrenIterator& childIter, const MeshIterator& meshIter);
         ~ModelNode();
 
 
@@ -48,7 +49,7 @@ namespace JonsEngine
         const AABB mLocalAABB;
         const Mat4 mLocalTransform;
 
-        const ImmediateChildrenIterator mImmediateChildNodes;
+        //const ImmediateChildrenIterator mImmediateChildNodes;
         const AllChildrenIterator mAllChildNodes;
         const MeshIterator mMeshes;
 
