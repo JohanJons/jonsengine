@@ -87,9 +87,9 @@ namespace JonsGame
         DirectionalLight& sun = mScene.GetDirectionalLight(mMovingPointLightID);
         sun.mLightColor = Vec4(0.55f);
 
-        // create a ground plane
-        // TODO
-        //plane->GetRootNode().GetMeshes()[0].SetTextureTilingFactor(64.0f);
+        // ground plane
+        Actor& actorPlane = mScene.GetActor(mActorPlane);
+        actorPlane.SetMaterialTilingFactor(64.0f);
 
         // create a sphere
         mNodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));

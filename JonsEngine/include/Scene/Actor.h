@@ -14,11 +14,17 @@ namespace JonsEngine
         Actor(const std::string& name, const ModelID modelId, const SceneNodePtr node);
         ~Actor();
 
+        void SetMaterialTilingFactor(const float tilingFactor);
+        float GetMaterialTilingFactor() const;
+
 
         const std::string mName;
+        const ModelID mModelID;
+        const SceneNodePtr mSceneNode;
 
-        ModelID mModelID;
-        SceneNodePtr mSceneNode;
+
+    private:
+        float mMaterialTilingFactor;
     };
 
     typedef IDMap<Actor>::ItemID ActorID;

@@ -9,4 +9,15 @@ namespace JonsEngine
     Actor::~Actor()
     {
     }
+
+
+    void Actor::SetMaterialTilingFactor(const float tilingFactor)
+    {
+        mMaterialTilingFactor = tilingFactor;
+    }
+
+    float Actor::GetMaterialTilingFactor() const
+    {
+        return mMaterialTilingFactor;
+    }
 }

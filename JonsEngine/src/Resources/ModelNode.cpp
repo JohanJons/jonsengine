@@ -75,9 +75,7 @@ namespace JonsEngine
                 prevNode->mNext = newNode;
             prevNode = newNode;
         }
-        // TODO
-        ...
-        //prevNode->mNext = mNext;
+        prevNode->mNext = nullptr;
 
         const size_t indexEnd = nodes.size();
 

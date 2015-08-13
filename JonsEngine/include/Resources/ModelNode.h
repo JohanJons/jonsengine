@@ -26,6 +26,8 @@ namespace JonsEngine
 
     private:
         typedef std::vector<ModelNode>::const_iterator NodeIterator;
+
+        // this iterator is defined because traversing immediate children must be different since the node tree is built depth-first
         class ImmediateChildrenIter : public NodeIterator
         {
         public:
@@ -36,66 +38,6 @@ namespace JonsEngine
 
     public:
         typedef ConstRangedIterator<NodeContainer, ImmediateChildrenIter> ImmediateChildrenIterator;
-
-        /*class ImmediateChildrenIterator
-        {
-        public:
-            class Iterator
-            {
-            public:
-                Iterator(ModelNode* item);
-                ~Iterator();
-
-                bool operator!=(const Iterator& iterator) const;
-                Iterator& operator++();
-                const ModelNode& operator*() const;
-
-
-            private:
-                ModelNode* mItem;
-            };
-
-            ImmediateChildrenIterator(ModelNode& begin, ModelNode& end);
-            ~ImmediateChildrenIterator();
-
-            Iterator begin() const;
-            Iterator end() const;
-
-
-        private:
-            ModelNode& mBegin;
-            ModelNode& mEnd;
-        };*/
-
-        /*class AllChildrenIterator
-        {
-        public:
-            class Iterator
-            {
-            public:
-                Iterator(ModelNode* item);
-                ~Iterator();
-
-                bool operator!=(const Iterator& iterator) const;
-                Iterator& operator++();
-                const ModelNode& operator*() const;
-
-
-            private:
-                ModelNode* mItem;
-            };
-
-            AllChildrenIterator(ModelNode& begin, ModelNode& end);
-            ~AllChildrenIterator();
-
-            Iterator begin() const;
-            Iterator end() const;
-
-
-        private:
-            ModelNode& mBegin;
-            ModelNode& mEnd;
-        };*/
 
         ModelNode(const PackageNode& pkgNode, const InitDataList& meshResources, NodeContainer& nodes, MeshContainer& meshes);
         ModelNode(NodeContainer& nodes, MeshContainer& meshes, const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const DX11MeshID meshID);
@@ -115,6 +57,7 @@ namespace JonsEngine
         template <typename ChildIterator>
         ChildIterator ParseChildNodes(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes);
 
+        // points to the next sibling in the same node depth level or nullptr if none available
         ModelNode* mNext;
     };
 }
