@@ -172,7 +172,12 @@ namespace JonsEngine
     template <typename T>
     const T& IDMap<T>::GetItem(const ItemID id) const
     {
-        return GetItem(id);
+        const uint16_t index = IDMAP_INDEX_MASK(id);
+        const uint16_t version = IDMAP_VERSION_MASK(id);
+
+        assert(mItems[index].mVersion == version);
+
+        return mItems[index].mItem;
     }
 
 	template <typename T>
@@ -190,7 +195,13 @@ namespace JonsEngine
     template <typename T>
     const T* IDMap<T>::TryGetItem(const ItemID id) const
     {
-        return TryGetItem(id);
+        const uint16_t index = IDMAP_INDEX_MASK(id);
+        const uint16_t version = IDMAP_VERSION_MASK(id);
+
+        if (mItems[index].mVersion == version)
+            return &mItems[index].mItem;
+        else
+            return nullptr;
     }
 
 	template <typename T>

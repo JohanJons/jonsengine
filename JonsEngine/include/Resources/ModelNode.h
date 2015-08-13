@@ -112,8 +112,9 @@ namespace JonsEngine
 
 
     private:
-        // points to the next ModelNode with the same parent and depth or nullptr if last node
-        // used to dereference the next immediate child of a ModelNode
+        template <typename ChildIterator>
+        ChildIterator ParseChildNodes(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes);
+
         ModelNode* mNext;
     };
 }

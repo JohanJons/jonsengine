@@ -2,8 +2,7 @@
 
 namespace JonsEngine
 {
-    RenderQueue::RenderQueue(const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage) :
-        mAmbientLight(0.01f), mSkyboxTextureID(INVALID_DX11_MATERIAL_ID), mLocalTransformStorage(localTransformStorage), mWorldTransformStorage(worldTransformStorage)
+    RenderQueue::RenderQueue() : mAmbientLight(0.01f), mSkyboxTextureID(INVALID_DX11_MATERIAL_ID)
     {
     }
 
@@ -12,5 +11,6 @@ namespace JonsEngine
         mCamera.mModels.clear();
         mDirectionalLights.clear();
         mPointLights.clear();
+        mSkyboxTextureID = INVALID_DX11_MATERIAL_ID;
     }
 }

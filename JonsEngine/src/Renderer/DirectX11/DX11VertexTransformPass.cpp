@@ -41,36 +41,30 @@ namespace JonsEngine
     }
 
     template <typename T>
-    void DX11VertexTransformPass::RenderMeshesAux(const T& meshContainer, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix)
+    void DX11VertexTransformPass::RenderMeshesAux(const T& meshContainer, const Mat4& viewProjectionMatrix)
     {
         for (const RenderableMesh& mesh : meshContainer)
         {
-            const Mat4& localTransform = localTransformStorage.GetItem(mesh.mLocalTransformID);
-            const Mat4& worldTransform = worldTransformStorage.GetItem(mesh.mWorldTransformID);
-
-            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * worldTransform * localTransform));
+            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mWorldTransform));
             mMeshMap.GetItem(mesh.mMeshID).DrawPositions();
         }
     }
 
-    void DX11VertexTransformPass::RenderMeshes(const RenderableMeshes& meshes, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix)
+    void DX11VertexTransformPass::RenderMeshes(const RenderableMeshes& meshes, const Mat4& viewProjectionMatrix)
     {
-        RenderMeshesAux(meshes, localTransformStorage, worldTransformStorage, viewProjectionMatrix);
+        RenderMeshesAux(meshes, viewProjectionMatrix);
     }
 
-    void DX11VertexTransformPass::RenderMeshes(ConstRangedIterator<RenderableMeshes>& meshIterator, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix)
+    void DX11VertexTransformPass::RenderMeshes(ConstRangedIterator<RenderableMeshes>& meshIterator, const Mat4& viewProjectionMatrix)
     {
-        RenderMeshesAux(meshIterator, localTransformStorage, worldTransformStorage, viewProjectionMatrix);
+        RenderMeshesAux(meshIterator, viewProjectionMatrix);
     }
 
-    void DX11VertexTransformPass::RenderAABBs(const RenderableModels& models, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix)
+    void DX11VertexTransformPass::RenderAABBs(const RenderableModels& models, const Mat4& viewProjectionMatrix)
     {
         for (const RenderableModel& model : models)
         {
-            const Mat4& localTransform = localTransformStorage.GetItem(model.mMesh.mLocalTransformID);
-            const Mat4& worldTransform = worldTransformStorage.GetItem(model.mMesh.mWorldTransformID);
-
-            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * worldTransform * localTransform));
+            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * model.mMesh.mWorldTransform));
             mMeshMap.GetItem(model.mMesh.mMeshID).DrawAABB();
         }
     }

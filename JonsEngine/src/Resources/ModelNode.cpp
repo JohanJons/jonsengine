@@ -8,10 +8,6 @@ namespace JonsEngine
     typedef ModelNode::NodeContainer NodeContainer;
     typedef ModelNode::MeshContainer MeshContainer;
 
-    template <typename ChildIterator>
-    ChildIterator ParseChildNodes(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes);
-    //ModelNode::ImmediateChildrenIterator ParseImmediateChildNodes(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes);
-    //ModelNode::AllChildrenIterator ParseAllChildNodes(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes);
     ModelNode::MeshIterator ParseMeshes(MeshContainer& meshes, const InitDataList& initData, const PackageNode& pkgNode);
     ModelNode::MeshIterator ParseMesh(MeshContainer& meshes, const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
     template <typename Container>
@@ -61,175 +57,33 @@ namespace JonsEngine
 
 
     //
-    // ModelNode::ImmediateChildrenIterator
-    //
-
-    /*ModelNode::ImmediateChildrenIterator::ImmediateChildrenIterator(ModelNode& begin, ModelNode& end) : mBegin(begin), mEnd(end)
-    {
-    }
-
-    ModelNode::ImmediateChildrenIterator::~ImmediateChildrenIterator()
-    {
-    }
-
-
-    ModelNode::ImmediateChildrenIterator::Iterator ModelNode::ImmediateChildrenIterator::begin() const
-    {
-        return Iterator(&mBegin);
-    }
-
-    ModelNode::ImmediateChildrenIterator::Iterator ModelNode::ImmediateChildrenIterator::end() const
-    {
-        return Iterator(&mEnd);
-    }
-
-
-
-    //
-    // ModelNode::ImmediateChildrenIterator::Iterator
-    //
-
-    ModelNode::ImmediateChildrenIterator::Iterator::Iterator(ModelNode* item) : mItem(item)
-    {
-        assert(item != nullptr);
-    }
-
-    ModelNode::ImmediateChildrenIterator::Iterator::~Iterator()
-    {
-    }
-
-
-    bool ModelNode::ImmediateChildrenIterator::Iterator::operator != (const Iterator& iterator) const
-    {
-        return mItem != iterator.mItem;
-    }
-
-    ModelNode::ImmediateChildrenIterator::Iterator& ModelNode::ImmediateChildrenIterator::Iterator::operator++()
-    {
-        mItem = mItem->mNext;
-
-        assert(mItem->mNext != nullptr);
-
-        return *this;
-    }
-
-    const ModelNode& ModelNode::ImmediateChildrenIterator::Iterator::operator*() const
-    {
-        return *mItem;
-    }*/
-
-
-
-    //
-    // ModelNode::AllChildrenIterator
-    //
-
-    /*ModelNode::AllChildrenIterator::AllChildrenIterator(ModelNode& begin, ModelNode& end) : mBegin(begin), mEnd(end)
-    {
-    }
-
-    ModelNode::AllChildrenIterator::~AllChildrenIterator()
-    {
-    }
-
-
-    ModelNode::AllChildrenIterator::Iterator ModelNode::AllChildrenIterator::begin() const
-    {
-        return Iterator(&mBegin);
-    }
-
-    ModelNode::AllChildrenIterator::Iterator ModelNode::AllChildrenIterator::end() const
-    {
-        return Iterator(&mEnd);
-    }
-
-
-
-    //
-    // ModelNode::ImmediateChildrenIterator::Iterator
-    //
-
-    ModelNode::AllChildrenIterator::Iterator::Iterator(ModelNode* item) : mItem(item)
-    {
-        assert(item != nullptr);
-    }
-
-    ModelNode::AllChildrenIterator::Iterator::~Iterator()
-    {
-    }
-
-
-    bool ModelNode::AllChildrenIterator::Iterator::operator != (const Iterator& iterator) const
-    {
-        auto hashFunction = std::hash<std::string>();
-        const size_t hashedName = hashFunction(mItem->mName);
-
-        return hashedName != hashFunction(iterator.mItem->mName);
-    }
-
-    ModelNode::AllChildrenIterator::Iterator& ModelNode::AllChildrenIterator::Iterator::operator++()
-    {
-        ++mItem;
-
-        assert(mItem != nullptr);
-
-        return *this;
-    }
-
-    const ModelNode& ModelNode::AllChildrenIterator::Iterator::operator*() const
-    {
-        return *mItem;
-    }*/
-
-
-
-    //
     // Initialization functions
     //
     
     template <typename ChildIterator>
-    ChildIterator ParseChildNodes(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes)
+    ChildIterator ModelNode::ParseChildNodes(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes)
     {
         const size_t indexBegin = GetStartIndex<NodeContainer>(nodes);
 
+        ModelNode* prevNode = nullptr;
         for (const PackageNode& node : pkgNode.mChildNodes)
+        {
             nodes.emplace_back(node, initData, nodes, meshes);
+            ModelNode* newNode = &nodes.back();
+
+            if (prevNode)
+                prevNode->mNext = newNode;
+            prevNode = newNode;
+        }
+        // TODO
+        ...
+        //prevNode->mNext = mNext;
 
         const size_t indexEnd = nodes.size();
 
         assert((indexEnd - indexBegin) > 0);
 
         return ChildIterator(ChildIterator::Iterator(nodes.begin() + indexBegin), ChildIterator::Iterator(nodes.end()));
-    }
-
-    //template <typename IteratorType>
-    //IteratorType ParseNodes(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes)
-    ModelNode::ImmediateChildrenIterator ParseImmediateChildNodes(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes)
-    {
-        const size_t indexBegin = GetStartIndex<NodeContainer>(nodes);
-
-        for (const PackageNode& node : pkgNode.mChildNodes)
-            nodes.emplace_back(node, initData, nodes, meshes);
-
-        const size_t indexEnd = nodes.size();
-
-        assert((indexEnd - indexBegin) > 0);
-
-        return ModelNode::ImmediateChildrenIterator(nodes, indexBegin, indexEnd);
-    }
-
-    /*ModelNode::AllChildrenIterator ParseAllChildNodes(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes)
-    {
-        const size_t indexBegin = GetStartIndex<NodeContainer>(nodes);
-
-        for (const PackageNode& node : pkgNode.mChildNodes)
-            nodes.emplace_back(node, initData, nodes, meshes);
-
-        const size_t indexEnd = nodes.size();
-
-        assert((indexEnd - indexBegin) > 0);
-
-        return ModelNode::AllChildrenIterator(nodes, indexBegin, indexEnd);
     }
 
     ModelNode::MeshIterator ParseMeshes(MeshContainer& meshes, const InitDataList& initDataList, const PackageNode& pkgNode)
@@ -253,7 +107,7 @@ namespace JonsEngine
         assert((sizeEnd - sizeBegin) > 0);
 
         return ModelNode::MeshIterator(meshes, sizeBegin, sizeEnd);
-    }*/
+    }
 
     ModelNode::MeshIterator ParseMesh(MeshContainer& meshes, const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID)
     {

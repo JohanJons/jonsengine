@@ -22,9 +22,9 @@ namespace JonsEngine
 
         void BindForTransformPass(const D3D_PRIMITIVE_TOPOLOGY primitiveTopology);
         void RenderMesh(DX11Mesh& mesh, const Mat4& wvpMatrix);
-        void RenderMeshes(const RenderableMeshes& meshes, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix);
-        void RenderMeshes(ConstRangedIterator<RenderableMeshes>& meshIterator, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix);
-        void RenderAABBs(const RenderableModels& models, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix);
+        void RenderMeshes(const RenderableMeshes& meshes, const Mat4& viewProjectionMatrix);
+        void RenderMeshes(ConstRangedIterator<RenderableMeshes>& meshIterator, const Mat4& viewProjectionMatrix);
+        void RenderAABBs(const RenderableModels& models, const Mat4& viewProjectionMatrix);
 
 
     private:
@@ -39,7 +39,7 @@ namespace JonsEngine
         };
 
         template <typename T>
-        void RenderMeshesAux(const T& meshes, const IDMap<Mat4>& localTransformStorage, const IDMap<Mat4>& worldTransformStorage, const Mat4& viewProjectionMatrix);
+        void RenderMeshesAux(const T& meshes, const Mat4& viewProjectionMatrix);
 
 
         ID3D11DeviceContextPtr mContext;

@@ -38,16 +38,16 @@ namespace JonsEngine
     {
         mWindow.Poll();
 
-		Scene* activeScene = mSceneManager.GetActiveScene();
+		Scene& activeScene = mSceneManager.GetActiveScene();
 
         const uint32_t windowWidth = mWindow.GetScreenWidth();
         const uint32_t windowHeight = mWindow.GetScreenHeight();
-        const float cameraFov = activeScene->GetSceneCamera().GetFOV();
+        const float cameraFov = activeScene.GetSceneCamera().GetFOV();
         const float windowAspectRatio = windowWidth / static_cast<float>(windowHeight);
         const Mat4 cameraProjectionMatrix = PerspectiveMatrixFov(cameraFov, windowAspectRatio, mRenderer.GetZNear(), mRenderer.GetZFar());
         
         // get renderqueue from scene
-        const RenderQueue& renderQueue = activeScene->GetRenderQueue(cameraProjectionMatrix, cameraFov, windowAspectRatio, gMinDepth, gMaxDepth);
+        const RenderQueue& renderQueue = activeScene.GetRenderQueue(cameraProjectionMatrix, cameraFov, windowAspectRatio, gMinDepth, gMaxDepth);
 
         // render the scene
         mRenderer.Render(renderQueue, debugOptions.mRenderingFlags);
