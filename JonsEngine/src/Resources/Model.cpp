@@ -3,12 +3,13 @@
 namespace JonsEngine
 {
     uint32_t CountNumMeshes(const PackageNode& node);
-    uint32_t CountNumNodes(const PackageNode& node);
+    uint32_t CountNumChildren(const PackageNode& node);
 
 
     Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID) : mName(name)
     {
-        //mNodes.emplace_back(mNodes, mMeshes, name, minBounds, maxBounds, initialTransform, meshID);
+        mMeshes.emplace_back(name, meshID, INVALID_MATERIAL_ID, minBounds, maxBounds);
+        mNodes.emplace_back(name, minBounds, maxBounds, initialTransform, ModelNode::ImmediateChildrenIterator(mNodes.end(), mNodes.end()), ModelNode::AllChildrenIterator(mNodes.end(), mNodes.end()), ModelNode::MeshIterator(mMeshes.begin(), mMeshes.end()));
     }
 
     Model::Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData) : mName(pkgModel.mName)
@@ -16,7 +17,7 @@ namespace JonsEngine
         // count meshes/nodes and reserve() space in containers before parsing them
         // otherwise iterators gets invalidated as parsing goes on
         const uint32_t numMeshes = CountNumMeshes(pkgModel.mRootNode);
-        const uint32_t numNodes = CountNumNodes(pkgModel.mRootNode);
+        const uint32_t numNodes = CountNumChildren(pkgModel.mRootNode);
         mMeshes.reserve(numMeshes);
         mNodes.reserve(numNodes);
 
@@ -50,14 +51,37 @@ namespace JonsEngine
         }
         const uint32_t meshesSizeEnd = mMeshes.size();
 
+        const uint32_t numChildren = CountNumChildren(pkgNode) - 1;
+        const uint32_t nodesSizeBegin = mNodes.size() + 1;
+        const auto allChildIter = ModelNode::AllChildrenIterator(mNodes.begin() + nodesSizeBegin, mNodes.begin() + nodesSizeBegin + numChildren);
+
+        const auto immChildIter = ModelNode::ImmediateChildrenIterator(mNodes.begin() + nodesSizeBegin, mNodes.begin() + nodesSizeBegin + numChildren);
+
+        const auto meshesIter = ModelNode::MeshIterator(mMeshes.begin() + meshesSizeBegin, mMeshes.begin() + meshesSizeEnd);
+
+        mNodes.emplace_back(pkgNode, immChildIter, allChildIter, meshesIter);
         // dont count oneself
-        const uint32_t numChildren = CountNumNodes(pkgNode) - 1;
+        /*const uint32_t numChildren = CountNumNodes(pkgNode) - 1;
         // first child is one pos ahead
         const uint32_t nodesSizeBegin = mNodes.size() + 1;
+
         mNodes.emplace_back(pkgNode, ModelNode::AllChildrenIterator(mNodes.begin() + nodesSizeBegin, mNodes.begin() + nodesSizeBegin + numChildren), ModelNode::MeshIterator(mMeshes.begin() + meshesSizeBegin, mMeshes.begin() + meshesSizeEnd));
 
+        ModelNode* prevNode = nullptr;
+        uint32_t childNum = 0;
+        const uint32_t numNodesToFirstChild = mNodes.size();
         for (const PackageNode& child : pkgNode.mChildNodes)
+        {
             ParseNodes(initDataList, child);
+
+            ModelNode* newNode = &mNodes.at(numNodesToFirstChild + childNum);
+            if (prevNode)
+                prevNode->mNext = newNode;
+            prevNode = newNode;
+
+            // jumps to the next child of pkgNode which position depends on current childs num children
+            childNum += CountNumNodes(child);
+        }*/
     }
 
 
@@ -74,13 +98,15 @@ namespace JonsEngine
         return numMeshes;
     }
 
-    uint32_t CountNumNodes(const PackageNode& node)
+    uint32_t CountNumChildren(const PackageNode& node)
     {
-        // this node
-        uint32_t numNodes = 1;
+        uint32_t numNodes = 0;
 
         for (const PackageNode& child : node.mChildNodes)
-            numNodes += CountNumNodes(child);
+        {
+            ++numNodes;
+            numNodes += CountNumChildren(child);
+        }
 
         return numNodes;
     }
