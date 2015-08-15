@@ -50,8 +50,8 @@ namespace JonsEngine
     {
     }*/
 
-    ModelNode::ModelNode(const PackageNode& pkgNode, const AllChildrenIterator& childIter, const MeshIterator& meshIter) :
-        mName(pkgNode.mName), mLocalAABB(pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds), mLocalTransform(pkgNode.mTransform), mAllChildNodes(childIter), mMeshes(meshIter)
+    ModelNode::ModelNode(const PackageNode& pkgNode, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& childIter, const MeshIterator& meshIter) :
+        mName(pkgNode.mName), mLocalAABB(pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds), mLocalTransform(pkgNode.mTransform), mImmediateChildNodes(immChildIter), mAllChildNodes(childIter), mMeshes(meshIter)
     {
     }
 

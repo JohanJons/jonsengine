@@ -17,7 +17,8 @@ namespace JonsEngine
         // count meshes/nodes and reserve() space in containers before parsing them
         // otherwise iterators gets invalidated as parsing goes on
         const uint32_t numMeshes = CountNumMeshes(pkgModel.mRootNode);
-        const uint32_t numNodes = CountNumChildren(pkgModel.mRootNode);
+        // + 1 to include root
+        const uint32_t numNodes = CountNumChildren(pkgModel.mRootNode) + 1;
         mMeshes.reserve(numMeshes);
         mNodes.reserve(numNodes);
 
@@ -51,15 +52,16 @@ namespace JonsEngine
         }
         const uint32_t meshesSizeEnd = mMeshes.size();
 
-        const uint32_t numChildren = CountNumChildren(pkgNode) - 1;
+        const uint32_t numChildren = CountNumChildren(pkgNode);
         const uint32_t nodesSizeBegin = mNodes.size() + 1;
         const auto allChildIter = ModelNode::AllChildrenIterator(mNodes.begin() + nodesSizeBegin, mNodes.begin() + nodesSizeBegin + numChildren);
-
         const auto immChildIter = ModelNode::ImmediateChildrenIterator(mNodes.begin() + nodesSizeBegin, mNodes.begin() + nodesSizeBegin + numChildren);
-
         const auto meshesIter = ModelNode::MeshIterator(mMeshes.begin() + meshesSizeBegin, mMeshes.begin() + meshesSizeEnd);
 
         mNodes.emplace_back(pkgNode, immChildIter, allChildIter, meshesIter);
+
+        for (const PackageNode& child : pkgNode.mChildNodes)
+            ParseNodes(initDataList, child);
         // dont count oneself
         /*const uint32_t numChildren = CountNumNodes(pkgNode) - 1;
         // first child is one pos ahead
