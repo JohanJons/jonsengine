@@ -4,6 +4,7 @@ namespace JonsEngine
 {
     uint32_t CountNumMeshes(const PackageNode& node);
     uint32_t CountNumChildren(const PackageNode& node);
+    uint32_t GetNextSibling(const PackageNode& node, const PackageNode& parent);
 
 
     Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID) : mName(name)
@@ -36,7 +37,7 @@ namespace JonsEngine
     }
 
 
-    void Model::ParseNodes(const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode)
+    void Model::ParseNodes(const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode/*, const PackageNode& parent*/)
     {
         const uint32_t meshesSizeBegin = mMeshes.size() == 0 ? 0 : mMeshes.size() - 1;
         for (const PackageMesh& mesh : pkgNode.mMeshes)
@@ -53,12 +54,16 @@ namespace JonsEngine
         const uint32_t meshesSizeEnd = mMeshes.size();
 
         const uint32_t numChildren = CountNumChildren(pkgNode);
-        const uint32_t nodesSizeBegin = mNodes.size() + 1;
-        const auto allChildIter = ModelNode::AllChildrenIterator(mNodes.begin() + nodesSizeBegin, mNodes.begin() + nodesSizeBegin + numChildren);
-        const auto immChildIter = ModelNode::ImmediateChildrenIterator(mNodes.begin() + nodesSizeBegin, mNodes.begin() + nodesSizeBegin + numChildren);
-        const auto meshesIter = ModelNode::MeshIterator(mMeshes.begin() + meshesSizeBegin, mMeshes.begin() + meshesSizeEnd);
+        // not -1 since its not added yet
+        const uint32_t thisNodeIndex = mNodes.size();
+        const uint32_t firstChildIndex = thisNodeIndex + 1;
+        const uint32_t siblingIndex = thisNodeIndex + numChildren + 1;
 
-        mNodes.emplace_back(pkgNode, immChildIter, allChildIter, meshesIter);
+        const auto allChildIter = ModelNode::AllChildrenIterator(mNodes.begin() + firstChildIndex, mNodes.begin() + firstChildIndex + numChildren);
+        const auto immChildIter = ModelNode::ImmediateChildrenIterator(mNodes.begin() + firstChildIndex, mNodes.begin() + firstChildIndex + numChildren);
+        const auto meshesIter = ModelNode::MeshIterator(mMeshes.begin() + meshesSizeBegin, mMeshes.begin() + meshesSizeEnd);
+        ModelNode* nextSibling = &mNodes[siblingIndex];//nullptr;// GetNextSibling(node, parent);
+        mNodes.emplace_back(pkgNode, immChildIter, allChildIter, meshesIter, nextSibling);
 
         for (const PackageNode& child : pkgNode.mChildNodes)
             ParseNodes(initDataList, child);
@@ -111,5 +116,10 @@ namespace JonsEngine
         }
 
         return numNodes;
+    }
+
+    uint32_t GetNextSibling(const PackageNode& node, const PackageNode& parent)
+    {
+        return 0;
     }
 }
