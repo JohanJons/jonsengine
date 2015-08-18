@@ -11,6 +11,7 @@
 
 namespace JonsEngine
 {
+    // TODO: needs to be refactored
     class LogManager
     {
     public:

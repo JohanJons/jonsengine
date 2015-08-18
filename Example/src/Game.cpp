@@ -18,7 +18,7 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(mSettings), mGameScene(mEngine.GetSceneManager().GetActiveScene(), mEngine.GetResourceManifest(), "assets.jons"), mSun(mGameScene.GetSunDirLight()), mRunning(true), mMoveSpeed(0.1f)
+    Game::Game() : mEngine(mSettings), mGameScene(mEngine.GetSceneManager().GetActiveScene(), mEngine.GetResourceManifest(), "assets.jons"), mSun(mGameScene.GetSun()), mRunning(true), mMoveSpeed(0.1f)
     {
         SetupInputCallbacks();
         mEngine.GetWindow().ShowMouseCursor(false);
@@ -76,12 +76,12 @@ namespace JonsGame
                 case Key::D: camera.TranslateCamera(camera.Right() * mMoveSpeed);    break;
                 
                 // moving the point light 
-                case Key::Q: mGameScene.GetMovingPointLight().mSceneNode->TranslateNode(Vec3(-0.05f, 0.0f, 0.0f)); break;
-                case Key::E: mGameScene.GetMovingPointLight().mSceneNode->TranslateNode(Vec3(0.05f, 0.0f, 0.0f));  break;
-                case Key::R: mGameScene.GetMovingPointLight().mSceneNode->TranslateNode(Vec3(0.0f, -0.05f, 0.0f)); break;
-                case Key::T: mGameScene.GetMovingPointLight().mSceneNode->TranslateNode(Vec3(0.0f, 0.05f, 0.0f));  break;
-                case Key::F: mGameScene.GetMovingPointLight().mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, -0.05f)); break;
-                case Key::G: mGameScene.GetMovingPointLight().mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, 0.05f));  break;
+                case Key::Q: mGameScene.GetMovingLight().mSceneNode->TranslateNode(Vec3(-0.05f, 0.0f, 0.0f)); break;
+                case Key::E: mGameScene.GetMovingLight().mSceneNode->TranslateNode(Vec3(0.05f, 0.0f, 0.0f));  break;
+                case Key::R: mGameScene.GetMovingLight().mSceneNode->TranslateNode(Vec3(0.0f, -0.05f, 0.0f)); break;
+                case Key::T: mGameScene.GetMovingLight().mSceneNode->TranslateNode(Vec3(0.0f, 0.05f, 0.0f));  break;
+                case Key::F: mGameScene.GetMovingLight().mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, -0.05f)); break;
+                case Key::G: mGameScene.GetMovingLight().mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, 0.05f));  break;
 
                 //  renderering
                 case Key::ONE: mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_DRAW_AABB); break;

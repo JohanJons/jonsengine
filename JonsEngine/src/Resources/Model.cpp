@@ -36,7 +36,7 @@ namespace JonsEngine
     }
 
 
-    void Model::ParseNodes(const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode, const NodeContainer::const_iterator& next)
+    void Model::ParseNodes(const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode, const ModelNode::NodeIterator& next)
     {
         const uint32_t numChildren = CountNumChildren(pkgNode);
         // not -1 since its not added yet

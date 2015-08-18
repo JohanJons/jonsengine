@@ -25,12 +25,13 @@ namespace JonsEngine
 
     // "is target in source"
     AABBIntersection Intersection(const AABB& target, const AABB& source);
+    // "does aabb intersect ..."
     AABBIntersection Intersection(const AABB& aabb, const Mat4& frustumMatrix);
     AABBIntersection Intersection(const AABB& aabb, const Vec3& sphereCentre, const float sphereRadius);
     AABBIntersection Intersection(const AABB& aabb, const FrustumPlanes& frustumPlanes);
     AABBIntersection Intersection(const AABB& aabb, const KDOP& kdop);
     AABBIntersection Intersection(const AABB& aabb, const ConstRangedIterator<KDOP>& rangedKDOP);
-
+    // "does plane intersect ..."
     PlaneIntersection Intersection(const Plane& plane, const AABB& aabb);
 
     bool IsPointInAABB(const AABB& aabb, const Vec3& point);

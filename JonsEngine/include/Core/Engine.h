@@ -1,12 +1,11 @@
 #pragma once
 
 #include "include/Core/Types.h"
-#include "include/Core/Memory/HeapAllocator.h"
-#include "include/Scene/SceneManager.h"
-#include "include/Resources/ResourceManifest.h"
+#include "include/Core/Memory/IMemoryAllocator.h"
 #include "include/Window/WindowManager.h"
 #include "include/Renderer/DirectX11/DX11Renderer.h"
-
+#include "include/Resources/ResourceManifest.h"
+#include "include/Scene/SceneManager.h"
 
 namespace JonsEngine
 {
@@ -14,10 +13,9 @@ namespace JonsEngine
     struct DebugOptions;
     class Logger;
 
-    /*
-     * Engine is the central controller object.
-     * It creates all subsystems and is responsible for advancing the engine state.
-     */
+
+    // Engine is the central controller object.
+    // It creates all subsystems and is responsible for advancing the engine state.
     class Engine
     {
     public:
@@ -36,15 +34,17 @@ namespace JonsEngine
         Logger& mLog;
         IMemoryAllocatorPtr mMemoryAllocator;
 
-        /* Modules */
         WindowManager mWindow;
         DX11Renderer mRenderer;
         ResourceManifest mResourceManifest;
         SceneManager mSceneManager;
+
+        float mPrevMinDepth;
+        float mPrevMaxDepth;
     };
 
 
-    /* Engine inlines */
+    // Engine inlines
     inline WindowManager& Engine::GetWindow()               { return mWindow; }
     inline DX11Renderer& Engine::GetRenderer()              { return mRenderer; }
     inline ResourceManifest& Engine::GetResourceManifest()  { return mResourceManifest; }

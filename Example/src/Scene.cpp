@@ -109,7 +109,6 @@ namespace JonsGame
 
     Scene::~Scene()
     {
-        // destructor is called at application shutdown anyway so dont bother deleting assets
     }
 
 
@@ -118,12 +117,12 @@ namespace JonsGame
         return mScene;
     }
 
-    JonsEngine::PointLight& Scene::GetMovingPointLight()
+    JonsEngine::PointLight& Scene::GetMovingLight()
     {
         return mScene.GetPointLight(mMovingPointLightID);
     }
 
-    JonsEngine::DirectionalLight& Scene::GetSunDirLight()
+    JonsEngine::DirectionalLight& Scene::GetSun()
     {
         return mScene.GetDirectionalLight(mSunDirLightID);
     }

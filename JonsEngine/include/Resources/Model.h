@@ -30,7 +30,7 @@ namespace JonsEngine
         typedef std::vector<ModelNode> NodeContainer;
         typedef std::vector<Mesh> MeshContainer;
 
-        void ParseNodes(const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode, const NodeContainer::const_iterator& next);
+        void ParseNodes(const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode, const ModelNode::NodeIterator& next);
         ModelNode::MeshIterator ParseMeshes(const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode);
 
 
