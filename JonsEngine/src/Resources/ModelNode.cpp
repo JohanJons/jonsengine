@@ -54,10 +54,17 @@ namespace JonsEngine
     {
     }
 
-    ModelNode::ModelNode(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& allChildIter, const MeshIterator& meshIter) :
-        mName(mName), mLocalAABB(minBounds, maxBounds), mLocalTransform(initialTransform), mImmediateChildNodes(immChildIter), mAllChildNodes(allChildIter), mMeshes(meshIter), mNext(immChildIter.end())
+    ModelNode::ModelNode(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& allChildIter,
+        const MeshIterator& meshIter, const NodeIterator& next) :
+        mName(mName), mLocalAABB(minBounds, maxBounds), mLocalTransform(initialTransform), mImmediateChildNodes(immChildIter), mAllChildNodes(allChildIter), mMeshes(meshIter), mNext(next)
     {
     }
+
+    //ModelNode::ModelNode(const ModelNode& other, const MeshIterator& meshIter, const NodeContainer& nodeContainer) :
+    //    mName(other.mName), mLocalAABB(other.mLocalAABB), mLocalTransform(other.mLocalTransform), mImmediateChildNodes(nodeContainer, other.mImmediateChildNodes.), mAllChildNodes(allChildIter), mMeshes(meshIter), mNext(immChildIter.end())
+    //{
+
+    //}
 
     ModelNode::~ModelNode()
     {

@@ -13,12 +13,8 @@ namespace JonsEngine
      * Common interface for memory allocator schemes such as HeapAllocator
      */
 
-    /*
-     * IMemoryAllocatorPtr definition
-     */
     typedef std::shared_ptr<IMemoryAllocator> IMemoryAllocatorPtr;
 
-    /* IMemoryAllocator definition */
     class IMemoryAllocator
     {
     public:

@@ -4,6 +4,7 @@ namespace JonsEngine
 {
     uint32_t CountNumMeshes(const PackageNode& node);
     uint32_t CountNumChildren(const PackageNode& node);
+    void ReserveStorage(const PackageModel& model, ModelNode::NodeContainer& nodeContainer, ModelNode::MeshContainer& meshContainer);
 
 
     Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID) : mName(name)
@@ -14,15 +15,31 @@ namespace JonsEngine
 
     Model::Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData) : mName(pkgModel.mName)
     {
-        // count meshes/nodes and reserve() space in containers before parsing them
-        // otherwise iterators gets invalidated as parsing goes on and containers grow
-        const uint32_t numMeshes = CountNumMeshes(pkgModel.mRootNode);
-        // + 1 to include root
-        const uint32_t numNodes = CountNumChildren(pkgModel.mRootNode) + 1;
-        mMeshes.reserve(numMeshes);
-        mNodes.reserve(numNodes);
+        ReserveStorage(pkgModel, mNodes, mMeshes);
 
         ParseNodes(initData, pkgModel.mRootNode, mNodes.end());
+    }
+
+    // node container needs special care due to reconstructing valid iterators
+    Model::Model(const Model& other) : mName(other.mName), mMeshes(other.mMeshes)
+    {
+        const uint32_t numNodes = other.mNodes.size();
+        mNodes.reserve(numNodes);
+
+        for (const ModelNode& node : other.mNodes)
+        {
+            // rebuild mesh iter
+            const auto meshBeginIter = node.mMeshes.begin();
+            const auto meshEndIter = node.mMeshes.end();
+            const uint32_t meshBeginIndex = meshBeginIter - other.mMeshes.begin();
+            const uint32_t numMeshes = meshEndIter - meshBeginIter;
+            const auto newMeshIter = ModelNode::MeshIterator(mMeshes.begin() + meshBeginIndex, mMeshes.begin() + meshBeginIndex + numMeshes);
+
+            // immediate- and all node iters
+            ...
+
+            mNodes.emplace_back(node.mName, node.mLocalAABB.Min(), node.mLocalAABB.Max(), node.mLocalTransform, newMeshIter);
+        }
     }
 
     Model::~Model()
@@ -132,5 +149,17 @@ namespace JonsEngine
         }
 
         return numNodes;
+    }
+
+    void ReserveStorage(const PackageModel& model, ModelNode::NodeContainer& nodeContainer, ModelNode::MeshContainer& meshContainer)
+    {
+        // count meshes/nodes and reserve() space in containers before parsing them
+        // otherwise iterators gets invalidated as parsing goes on and containers grow
+        const uint32_t numMeshes = CountNumMeshes(model.mRootNode);
+        // + 1 to include root
+        const uint32_t numNodes = CountNumChildren(model.mRootNode) + 1;
+        
+        meshContainer.reserve(numMeshes);
+        nodeContainer.reserve(numNodes);
     }
 }
