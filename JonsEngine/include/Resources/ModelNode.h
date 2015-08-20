@@ -27,12 +27,20 @@ namespace JonsEngine
 
     private:
         // this iterator is defined because traversing immediate children must be different since the node tree is built depth-first
+        // some standard iterator operators are deleted to make it play nicer
+        // not a perfect solution but good enough for the limited purpose at hand
         class ImmediateChildrenIter : public NodeIterator
         {
         public:
             ImmediateChildrenIter(const NodeIterator& iter);
 
             ImmediateChildrenIter& operator++();
+
+            ImmediateChildrenIter& operator--() = delete;
+            ImmediateChildrenIter operator--(int) = delete;
+            ImmediateChildrenIter& operator+=(difference_type) = delete;
+            ImmediateChildrenIter operator+(difference_type) const = delete;
+            ImmediateChildrenIter& operator-=(difference_type) = delete;
         };
 
     public:
@@ -41,7 +49,6 @@ namespace JonsEngine
         ModelNode(const PackageNode& pkgNode, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& childIter, const MeshIterator& meshIter, const NodeIterator& next);
         ModelNode(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& allChildIter,
             const MeshIterator& meshIter, const NodeIterator& next);
-        //ModelNode(const ModelNode& other, const MeshIterator& meshIter, const NodeContainer& nodeContainer);
         ~ModelNode();
 
 
@@ -55,9 +62,6 @@ namespace JonsEngine
 
 
     private:
-        template <typename ChildIterator>
-        ChildIterator ParseChildNodes(const PackageNode& pkgNode, const InitDataList& initData, NodeContainer& nodes, MeshContainer& meshes);
-
         // points to the next sibling in the same node depth level or end() if none available
         NodeIterator mNext;
     };
