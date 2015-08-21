@@ -56,7 +56,7 @@ namespace JonsEngine
 
     ModelNode::ModelNode(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& allChildIter,
         const MeshIterator& meshIter, const NodeIterator& next) :
-        mName(mName), mLocalAABB(minBounds, maxBounds), mLocalTransform(initialTransform), mImmediateChildNodes(immChildIter), mAllChildNodes(allChildIter), mMeshes(meshIter), mNext(next)
+        mName(name), mLocalAABB(minBounds, maxBounds), mLocalTransform(initialTransform), mImmediateChildNodes(immChildIter), mAllChildNodes(allChildIter), mMeshes(meshIter), mNext(next)
     {
     }
 
