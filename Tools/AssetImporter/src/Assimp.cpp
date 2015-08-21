@@ -9,6 +9,8 @@ using namespace JonsEngine;
 
 namespace JonsAssetImporter
 {
+    void CheckForInvalidAABB(JonsEngine::PackageAABB& aabb);
+
     JonsEngine::Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
     JonsEngine::Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
     JonsEngine::Vec3 aiColor3DToJonsVec3(const aiColor3D& color);
@@ -125,14 +127,16 @@ namespace JonsAssetImporter
         pkgNode.mName = node->mName.C_Str();
         pkgNode.mTransform = aiMat4ToJonsMat4(node->mTransformation);
 
-        for (uint32_t i = 0; i < node->mNumMeshes; i++)
+        const uint32_t numMeshes = node->mNumMeshes;
+        for (uint32_t i = 0; i < numMeshes; i++)
         {
             pkgNode.mMeshes.emplace_back();
             if (!ProcessAssimpMesh(pkgNode.mMeshes.back(), scene->mMeshes[node->mMeshes[i]], materialMap, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds))
                 return false;
         }
 
-        for (uint32_t i = 0; i < node->mNumChildren; i++)
+        const uint32_t numChildren = node->mNumChildren;
+        for (uint32_t i = 0; i < numChildren; i++)
         {
             pkgNode.mChildNodes.emplace_back();
             if (!ProcessAssimpNode(pkgNode.mChildNodes.back(), scene, node->mChildren[i], materialMap, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds))
@@ -142,6 +146,10 @@ namespace JonsAssetImporter
         parentMinBounds = MinVal(parentMinBounds, pkgNode.mAABB.mMinBounds);
         parentMaxBounds = MaxVal(parentMaxBounds, pkgNode.mAABB.mMaxBounds);
 
+        // if node has no legit AABB from either its own mesh or a childrens mesh, zero length it
+        // is done after updating parent aabb bounds since the result might otherwise invalidate the parents aabb when comparing it against its other childrens
+        CheckForInvalidAABB(pkgNode.mAABB);
+
         return true;
     }
 
@@ -149,11 +157,13 @@ namespace JonsAssetImporter
     {
         pkgMesh.mName = m->mName.C_Str();
 
-        pkgMesh.mVertexData.reserve(m->mNumVertices * 3);
-        pkgMesh.mNormalData.reserve(m->mNumVertices * 3);
-        pkgMesh.mTexCoordsData.reserve(m->mNumVertices * 2);
+        const uint32_t numFloatsPerTriangle = 3;
+        const uint32_t numFloatsPerTexcoord = 2;
+        pkgMesh.mVertexData.reserve(m->mNumVertices * numFloatsPerTriangle);
+        pkgMesh.mNormalData.reserve(m->mNumVertices * numFloatsPerTriangle);
+        pkgMesh.mTexCoordsData.reserve(m->mNumVertices * numFloatsPerTexcoord);
         // store both tangents and bitangents in same buffer
-        pkgMesh.mTangentData.reserve(m->mNumVertices * 6);;
+        pkgMesh.mTangentData.reserve(m->mNumVertices * numFloatsPerTriangle * 2);;
 
         // vertice, normal, texcoord, tangents and bitangents data
         for (unsigned int j = 0; j < m->mNumVertices; j++)
@@ -192,14 +202,14 @@ namespace JonsAssetImporter
             pkgMesh.mAABB.mMaxBounds = MaxVal(pkgMesh.mAABB.mMaxBounds, vertex);
         }
 
-        pkgMesh.mIndiceData.reserve(m->mNumFaces * 3);
+        pkgMesh.mIndiceData.reserve(m->mNumFaces * numFloatsPerTriangle);
 
         // index data
         for (uint32_t j = 0; j < m->mNumFaces; j++)
         {
             // only dem triangles
-            assert(m->mFaces[j].mNumIndices == 3);
-            for (uint32_t index = 0; index < 3; index++)
+            assert(m->mFaces[j].mNumIndices == numFloatsPerTriangle);
+            for (uint32_t index = 0; index < numFloatsPerTriangle; index++)
             {
                 assert(m->mFaces[j].mIndices[index] <= UINT16_MAX);
                 pkgMesh.mIndiceData.push_back(m->mFaces[j].mIndices[index]);
@@ -281,6 +291,17 @@ namespace JonsAssetImporter
         }
 
         return true;
+    }
+
+
+    void CheckForInvalidAABB(JonsEngine::PackageAABB& aabb)
+    {
+        // resets AABB to zero length
+        if (aabb.mMinBounds == Vec3(std::numeric_limits<float>::max()) && aabb.mMaxBounds == Vec3(std::numeric_limits<float>::lowest()))
+        {
+            aabb.mMinBounds = Vec3(0.0f);
+            aabb.mMaxBounds = Vec3(0.0f);
+        }
     }
 
 
