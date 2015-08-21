@@ -14,15 +14,10 @@ namespace JonsEngine
             ModelNode::MeshIterator(mMeshes.begin(), mMeshes.end()), mNodes.end());
     }
 
-    Model::Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData) :
-        mName(pkgModel.mName)//,
-        
-        // count meshes/nodes and reserve space in containers before parsing them
-        // otherwise iterators gets invalidated as parsing goes on and containers grow
-        // +1 to include root node
-        //mNodes(CountNumChildren(pkgModel.mRootNode) + 1),
-        //mMeshes(CountNumMeshes(pkgModel.mRootNode))
+    Model::Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData) : mName(pkgModel.mName)
     {
+        ReserveStorage(pkgModel, mNodes, mMeshes);
+
         ParseNodes(initData, pkgModel.mRootNode, mNodes.end());
     }
 
@@ -41,21 +36,23 @@ namespace JonsEngine
             const uint32_t numMeshes = meshEndIter - meshBeginIter;
             const auto meshIter = ModelNode::MeshIterator(mMeshes.begin() + meshBeginIndex, mMeshes.begin() + meshBeginIndex + numMeshes);
 
-            // immediate node iter
-            const auto otherNodesBegin = otherModel.mNodes.begin();
-            const uint32_t immChildFirstIndex = otherNode.mImmediateChildNodes.begin() - otherNodesBegin;
-            const uint32_t immChildEndIndex = otherNode.mImmediateChildNodes.end() - otherNodesBegin;
-            const auto immChildrenIter = ModelNode::ImmediateChildrenIterator(mNodes.begin() + immChildFirstIndex, mNodes.begin() + immChildEndIndex);
+            // /all/immediate node iters
+            // both iters use same begin/last, only advances differently
+            const auto iterNodesBegin = otherModel.mNodes.begin();
+            const uint32_t firstChildIndex = otherNode.mAllChildNodes.begin() - iterNodesBegin;
+            const uint32_t pastLastChildIndex = otherNode.mAllChildNodes.end() - iterNodesBegin;
+            const auto immChildrenIter = ModelNode::ImmediateChildrenIterator(mNodes.begin() + firstChildIndex, mNodes.begin() + pastLastChildIndex);
+            const auto allChildrenIter = ModelNode::AllChildrenIterator(mNodes.begin() + firstChildIndex, mNodes.begin() + pastLastChildIndex);
 
             // all node iter
-            const uint32_t allChildFirstIndex = otherNode.mAllChildNodes.begin() - otherNodesBegin;
-            const uint32_t allChildEndIndex = otherNode.mAllChildNodes.end() - otherNodesBegin;
-            const auto allChildrenIter = ModelNode::AllChildrenIterator(mNodes.begin() + allChildFirstIndex, mNodes.begin() + allChildEndIndex);
+            //const uint32_t allChildFirstIndex = otherNode.mAllChildNodes.begin() - otherNodesBegin;
+            //const uint32_t allChildEndIndex = otherNode.mAllChildNodes.end() - otherNodesBegin;
+            //const auto allChildrenIter = ModelNode::AllChildrenIterator(mNodes.begin() + allChildFirstIndex, mNodes.begin() + allChildEndIndex);
 
             // nodes next iter
             auto immChildNext = otherNode.mImmediateChildNodes.begin();
             ++immChildNext;
-            const uint32_t nextChildIndex = immChildNext - otherNodesBegin;
+            const uint32_t nextChildIndex = immChildNext - iterNodesBegin;
             const auto childNextIter = mNodes.begin() + nextChildIndex;
 
             mNodes.emplace_back(otherNode.mName, otherNode.mLocalAABB.Min(), otherNode.mLocalAABB.Max(), otherNode.mLocalTransform, immChildrenIter, allChildrenIter, meshIter, childNextIter);
@@ -81,8 +78,11 @@ namespace JonsEngine
         const uint32_t firstChildIndex = thisNodeIndex + 1;
         //const uint32_t siblingIndex = thisNodeIndex + numChildren + 1;
 
-        const auto allChildIter = ModelNode::AllChildrenIterator(mNodes.begin() + firstChildIndex, mNodes.begin() + firstChildIndex + numChildren);
-        const auto immChildIter = ModelNode::ImmediateChildrenIterator(mNodes.begin() + firstChildIndex, mNodes.end());
+        const auto iterFirstChild = mNodes.begin() + firstChildIndex;
+        const auto iterPastLastChild = mNodes.begin() + firstChildIndex + numChildren;
+
+        const auto allChildIter = ModelNode::AllChildrenIterator(iterFirstChild, iterPastLastChild);
+        const auto immChildIter = ModelNode::ImmediateChildrenIterator(iterFirstChild, iterPastLastChild);
         const auto meshesIter = ParseMeshes(initDataList, pkgNode);
         //ModelNode* nextSibling = &mNodes[siblingIndex];//nullptr;// GetNextSibling(node, parent);
         mNodes.emplace_back(pkgNode, immChildIter, allChildIter, meshesIter, next);
@@ -169,5 +169,17 @@ namespace JonsEngine
         }
 
         return numNodes;
+    }
+
+    void ReserveStorage(const PackageModel& model, ModelNode::NodeContainer& nodeContainer, ModelNode::MeshContainer& meshContainer)
+    {
+        // count meshes/nodes and reserve() space in containers before parsing them
+        // otherwise iterators gets invalidated as parsing goes on and containers grow
+        const uint32_t numMeshes = CountNumMeshes(model.mRootNode);
+        // + 1 to include root
+        const uint32_t numNodes = CountNumChildren(model.mRootNode) + 1;
+
+        meshContainer.reserve(numMeshes);
+        nodeContainer.reserve(numNodes);
     }
 }
