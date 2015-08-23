@@ -51,8 +51,17 @@ namespace JonsEngine
 
             // nodes next iter
             auto immChildNext = otherNode.mImmediateChildNodes.begin();
-            ++immChildNext;
-            const uint32_t nextChildIndex = immChildNext - iterNodesBegin;
+            auto immChildEnd = otherNode.mImmediateChildNodes.end();
+            uint32_t numChildren = std::distance(immChildNext, immChildEnd);
+            uint32_t nextChildIndex = immChildEnd - iterNodesBegin;
+            if (numChildren > 0)
+            {
+                ++immChildNext;
+                const uint32_t nextChildIndex = immChildNext - iterNodesBegin;
+            }
+
+            //++immChildNext;
+            //const uint32_t nextChildIndex = immChildNext - iterNodesBegin;
             const auto childNextIter = mNodes.begin() + nextChildIndex;
 
             mNodes.emplace_back(otherNode.mName, otherNode.mLocalAABB.Min(), otherNode.mLocalAABB.Max(), otherNode.mLocalTransform, immChildrenIter, allChildrenIter, meshIter, childNextIter);
@@ -127,6 +136,10 @@ namespace JonsEngine
 
     ModelNode::MeshIterator Model::ParseMeshes(const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode)
     {
+        const uint32_t numMeshes = pkgNode.mMeshes.size();
+        if (numMeshes == 0)
+            return ModelNode::MeshIterator(mMeshes.end(), mMeshes.end());
+
         const uint32_t meshesSizeBegin = mMeshes.size() == 0 ? 0 : mMeshes.size() - 1;
         for (const PackageMesh& mesh : pkgNode.mMeshes)
         {

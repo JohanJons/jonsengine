@@ -60,7 +60,6 @@ namespace JonsGame
 
         // sectoid
         mNodeSectoid->TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
-        mNodeSectoid->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
         // cube
         mNodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));

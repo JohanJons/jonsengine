@@ -11,9 +11,19 @@ namespace JonsEngine
 {
     void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix, const float tilingFactor)
     {
-        const Material& material = resourceManifest.GetMaterial(mesh.mDefaultMaterialID);
+        auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
+        auto normalTexture = INVALID_DX11_MATERIAL_ID;
+        // TODO
+        auto specularFactor = 0.02f;
+        if (mesh.mDefaultMaterialID != INVALID_MATERIAL_ID)
+        {
+            const Material& material = resourceManifest.GetMaterial(mesh.mDefaultMaterialID);
+            diffuseTexture = material.mDiffuseTexture;
+            normalTexture = material.mNormalTexture;
+            specularFactor = material.mSpecularFactor;
+        }
 
-        resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix, material.mDiffuseTexture, material.mNormalTexture, material.mSpecularFactor, tilingFactor);
+        resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix, diffuseTexture, normalTexture, specularFactor, tilingFactor);
     }
 
     void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)

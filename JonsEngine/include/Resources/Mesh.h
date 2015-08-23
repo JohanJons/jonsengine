@@ -11,7 +11,7 @@ namespace JonsEngine
     class Mesh
     {
     public:
-        Mesh(const std::string name, const DX11MeshID meshID, const MaterialID defaultMaterialID, const Vec3& minBounds, const Vec3& maxBounds);
+        Mesh(const std::string& name, const DX11MeshID meshID, const MaterialID defaultMaterialID, const Vec3& minBounds, const Vec3& maxBounds);
         ~Mesh();
 
 
