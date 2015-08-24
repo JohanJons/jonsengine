@@ -9,171 +9,17 @@
 
 namespace JonsEngine
 {
-    void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix, const float tilingFactor)
-    {
-        auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
-        auto normalTexture = INVALID_DX11_MATERIAL_ID;
-        // TODO
-        auto specularFactor = 0.02f;
-        if (mesh.mDefaultMaterialID != INVALID_MATERIAL_ID)
-        {
-            const Material& material = resourceManifest.GetMaterial(mesh.mDefaultMaterialID);
-            diffuseTexture = material.mDiffuseTexture;
-            normalTexture = material.mNormalTexture;
-            specularFactor = material.mSpecularFactor;
-        }
-
-        resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix, diffuseTexture, normalTexture, specularFactor, tilingFactor);
-    }
-
-    void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)
-    {
-        resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix);
-    }
-
-    void AddAllMeshes(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const float tilingFactor)
-    {
-        for (const ModelNode& child : node.mAllChildNodes)
-        {
-            for (const Mesh& mesh : child.mMeshes)
-                AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * child.mLocalTransform, tilingFactor);
-        }
-    }
-
-    void AddAllMeshes(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix)
-    {
-        for (const ModelNode& child : node.mAllChildNodes)
-        {
-            for (const Mesh& mesh : child.mMeshes)
-                AddMesh(resultMeshes, mesh, worldMatrix * child.mLocalTransform);
-        }
-    }
-
-    void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix, const float tilingFactor)
-    {
-        const Mat4 localWVPMatrix = wvpMatrix * node.mLocalTransform;
-
-        // test node frustrum
-		// TODO: does this cull objects behind frustrum that still intersects some planes?
-        AABBIntersection nodeAABBIntersection = Intersection(node.mLocalAABB, localWVPMatrix);
-        switch (nodeAABBIntersection)
-        {
-			// if partially inside, recursively test all meshes and child nodes
-			case AABBIntersection::Partial:
-			{
-                AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
-
-				for (const Mesh& mesh : node.mMeshes)
-				{
-                    meshAABBIntersection = Intersection(mesh.mLocalAABB, localWVPMatrix);
-                    if (meshAABBIntersection == AABBIntersection::Outside)
-						continue;
-
-                    if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                        AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.mLocalTransform, tilingFactor);
-				}
-
-                // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-				for (const ModelNode& node : node.mImmediateChildNodes)
-                    CullMeshesFrustrum(resourceManifest, resultMeshes, node, worldMatrix, wvpMatrix, tilingFactor);
-
-				break;
-			}
-
-            case AABBIntersection::Inside:
-			{
-                AddAllMeshes(resourceManifest, resultMeshes, node, worldMatrix, tilingFactor);
-				break;
-			}
-
-            case AABBIntersection::Outside:
-			default:
-				break;
-		}
-    }
-
-    void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const AABB& aabb, const Mat4& worldMatrix)
-    {
-        // test node AABB
-        AABBIntersection nodeAABBIntersection = Intersection(node.mLocalAABB, aabb);
-        switch (nodeAABBIntersection)
-        {
-            // if partially inside, recursively test all meshes and child nodes
-            case AABBIntersection::Partial:
-            {
-                AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
-
-                for (const Mesh& mesh : node.mMeshes)
-                {
-                    meshAABBIntersection = Intersection(mesh.mLocalAABB, aabb);
-                    if (meshAABBIntersection == AABBIntersection::Outside)
-                        continue;
-
-                    if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                        AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
-                }
-
-                // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-                for (const ModelNode& child : node.mImmediateChildNodes)
-                    CullMeshesAABB(resultMeshes, node, aabb, worldMatrix);
-
-                break;
-            }
-
-            case AABBIntersection::Inside:
-            {
-                AddAllMeshes(resultMeshes, node, worldMatrix);
-                break;
-            }
-
-            case AABBIntersection::Outside:
-            default:
-                break;
-        }
-    }
-
-    void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius)
-    {
-		const AABB worldAABB = worldMatrix * node.mLocalAABB;
-
-        // test node frustrum
-        AABBIntersection nodeAABBIntersection = Intersection(worldAABB, sphereCentre, sphereRadius);
-        switch (nodeAABBIntersection)
-        {
-			case AABBIntersection::Partial:
-			{
-                AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
-
-				for (const Mesh& mesh : node.mMeshes)
-				{
-					const AABB meshAABB = worldMatrix * node.mLocalAABB;
-
-                    meshAABBIntersection = Intersection(meshAABB, sphereCentre, sphereRadius);
-                    if (meshAABBIntersection == AABBIntersection::Outside)
-						continue;
-
-                    if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                        AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
-				}
-
-				// each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-				for (const ModelNode& node : node.mImmediateChildNodes)
-                    CullMeshesSphere(resultMeshes, node, worldMatrix, sphereCentre, sphereRadius);
-
-				break;
-			}
-
-            case AABBIntersection::Inside:
-			{
-                AddAllMeshes(resultMeshes, node, worldMatrix);
-				break;
-			}
-
-            case AABBIntersection::Outside:
-			default:
-				break;
-        }
-    }
+    //
+    // TODO: all this code related to culling/building renderqueue should be moved elsewhere
+    //
+    void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix, const float tilingFactor, const MaterialID actorMaterial);
+    void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix);
+    // TODO: evaluate if recursive vs iterative makes a difference
+    void AddAllMeshes(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const float tilingFactor, const MaterialID actorMaterial);
+    void AddAllMeshes(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix);
+    void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix, const float tilingFactor, const MaterialID actorMaterial);
+    void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const AABB& aabb, const Mat4& worldMatrix);
+    void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius);
 
 
     Scene::Scene(const std::string& sceneName, const ResourceManifest& resourceManifest) :
@@ -213,7 +59,7 @@ namespace JonsEngine
 
             const Model& model = mResourceManifest.GetModel(actor.mModelID);
 
-            CullMeshesFrustrum(mResourceManifest, mRenderQueue.mCamera.mModels, model.GetRootNode(), worldMatrix, wvpMatrix, actor.GetMaterialTilingFactor());
+            CullMeshesFrustrum(mResourceManifest, mRenderQueue.mCamera.mModels, model.GetRootNode(), worldMatrix, wvpMatrix, actor.GetMaterialTilingFactor(), actor.GetMaterial());
 		}
 
         // point lights
@@ -383,5 +229,182 @@ namespace JonsEngine
         }
 
         mDirtySceneNodes.clear();
+    }
+
+
+    void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix, const float tilingFactor, const MaterialID actorMaterial)
+    {
+        auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
+        auto normalTexture = INVALID_DX11_MATERIAL_ID;
+        // TODO
+        auto specularFactor = 0.02f;
+
+        const bool actorHasMaterial = actorMaterial != INVALID_MATERIAL_ID;
+        const MaterialID materialID = actorHasMaterial ? actorMaterial : mesh.mDefaultMaterialID;
+        if (materialID != INVALID_MATERIAL_ID)
+        {
+            const Material& material = resourceManifest.GetMaterial(mesh.mDefaultMaterialID);
+            diffuseTexture = material.mDiffuseTexture;
+            normalTexture = material.mNormalTexture;
+            specularFactor = material.mSpecularFactor;
+        }
+
+        resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix, diffuseTexture, normalTexture, specularFactor, tilingFactor);
+    }
+
+    void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)
+    {
+        resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix);
+    }
+
+    // TODO: evaluate if recursive vs iterative makes a difference
+    void AddAllMeshes(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const float tilingFactor, const MaterialID actorMaterial)
+    {
+        for (const Mesh& mesh : node.mMeshes)
+            AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.mLocalTransform, tilingFactor, actorMaterial);
+
+        for (const ModelNode& child : node.mAllChildNodes)
+        {
+            for (const Mesh& mesh : child.mMeshes)
+                AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.mLocalTransform, tilingFactor, actorMaterial);
+        }
+    }
+
+    void AddAllMeshes(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix)
+    {
+        for (const Mesh& mesh : node.mMeshes)
+            AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+
+        for (const ModelNode& child : node.mAllChildNodes)
+        {
+            for (const Mesh& mesh : child.mMeshes)
+                AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+        }
+    }
+
+    void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix, const float tilingFactor, const MaterialID actorMaterial)
+    {
+        const Mat4 localWVPMatrix = wvpMatrix * node.mLocalTransform;
+
+        // test node frustrum
+        // TODO: does this cull objects behind frustrum that still intersects some planes?
+        AABBIntersection nodeAABBIntersection = Intersection(node.mLocalAABB, localWVPMatrix);
+        switch (nodeAABBIntersection)
+        {
+            // if partially inside, recursively test all meshes and child nodes
+        case AABBIntersection::Partial:
+        {
+            AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
+
+            for (const Mesh& mesh : node.mMeshes)
+            {
+                meshAABBIntersection = Intersection(mesh.mLocalAABB, localWVPMatrix);
+                if (meshAABBIntersection == AABBIntersection::Outside)
+                    continue;
+
+                if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
+                    AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.mLocalTransform, tilingFactor, actorMaterial);
+            }
+
+            // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
+            for (const ModelNode& node : node.mImmediateChildNodes)
+                CullMeshesFrustrum(resourceManifest, resultMeshes, node, worldMatrix, wvpMatrix, tilingFactor, actorMaterial);
+
+            break;
+        }
+
+        case AABBIntersection::Inside:
+        {
+            AddAllMeshes(resourceManifest, resultMeshes, node, worldMatrix, tilingFactor, actorMaterial);
+            break;
+        }
+
+        case AABBIntersection::Outside:
+        default:
+            break;
+        }
+    }
+
+    void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const AABB& aabb, const Mat4& worldMatrix)
+    {
+        // test node AABB
+        AABBIntersection nodeAABBIntersection = Intersection(node.mLocalAABB, aabb);
+        switch (nodeAABBIntersection)
+        {
+            // if partially inside, recursively test all meshes and child nodes
+        case AABBIntersection::Partial:
+        {
+            AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
+
+            for (const Mesh& mesh : node.mMeshes)
+            {
+                meshAABBIntersection = Intersection(mesh.mLocalAABB, aabb);
+                if (meshAABBIntersection == AABBIntersection::Outside)
+                    continue;
+
+                if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
+                    AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+            }
+
+            // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
+            for (const ModelNode& child : node.mImmediateChildNodes)
+                CullMeshesAABB(resultMeshes, node, aabb, worldMatrix);
+
+            break;
+        }
+
+        case AABBIntersection::Inside:
+        {
+            AddAllMeshes(resultMeshes, node, worldMatrix);
+            break;
+        }
+
+        case AABBIntersection::Outside:
+        default:
+            break;
+        }
+    }
+
+    void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius)
+    {
+        const AABB worldAABB = worldMatrix * node.mLocalAABB;
+
+        // test node frustrum
+        AABBIntersection nodeAABBIntersection = Intersection(worldAABB, sphereCentre, sphereRadius);
+        switch (nodeAABBIntersection)
+        {
+        case AABBIntersection::Partial:
+        {
+            AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
+
+            for (const Mesh& mesh : node.mMeshes)
+            {
+                const AABB meshAABB = worldMatrix * node.mLocalAABB;
+
+                meshAABBIntersection = Intersection(meshAABB, sphereCentre, sphereRadius);
+                if (meshAABBIntersection == AABBIntersection::Outside)
+                    continue;
+
+                if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
+                    AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+            }
+
+            // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
+            for (const ModelNode& node : node.mImmediateChildNodes)
+                CullMeshesSphere(resultMeshes, node, worldMatrix, sphereCentre, sphereRadius);
+
+            break;
+        }
+
+        case AABBIntersection::Inside:
+        {
+            AddAllMeshes(resultMeshes, node, worldMatrix);
+            break;
+        }
+
+        case AABBIntersection::Outside:
+        default:
+            break;
+        }
     }
 }

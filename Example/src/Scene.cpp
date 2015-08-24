@@ -34,6 +34,7 @@ namespace JonsGame
         mNodeChair(mScene.GetRootNode().CreateChildNode("nodeChair")),
         mNodeHouse(mScene.GetRootNode().CreateChildNode("nodeHouse")),
         mNodeWuson(mScene.GetRootNode().CreateChildNode("wuson")),
+        mNodeWuson2(mScene.GetRootNode().CreateChildNode("wuson2")),
         mNodePointLight(mScene.GetRootNode().CreateChildNode("nodeMovingLight")),
         mNodePlane(mScene.GetRootNode().CreateChildNode("nodePlane")),
         mNodeSphere(mScene.GetRootNode().CreateChildNode("nodeSphere")),
@@ -50,6 +51,7 @@ namespace JonsGame
         mActorChair(mScene.CreateActor("actorChair", mModelChair, mNodeChair)),
         mActorHouse(mScene.CreateActor("actorHouse", mModelHouse, mNodeHouse)),
         mActorWuson(mScene.CreateActor("wuson", mModelWuson, mNodeWuson)),
+        mActorWuson2(mScene.CreateActor("wuson2", mModelWuson, mNodeWuson2)),
         mActorPlane(mScene.CreateActor("actorPlane", mModelPlane, mNodePlane)),
         mActorSphere(mScene.CreateActor("actorSphere", mModelSphere, mNodeSphere)),
         mActorCube2(mScene.CreateActor("actorCube2", mModelCube2, mNodeCube2)),
@@ -72,8 +74,16 @@ namespace JonsGame
         mNodeHouse->TranslateNode(Vec3(-7.0f, 0.5f, -15.0f));
 
         // animated wuson
+        Actor& actorWuson = mScene.GetActor(mActorWuson);
+        actorWuson.SetMaterial(mMaterialCheckers);
         mNodeWuson->TranslateNode(Vec3(-10.0f, 0.5f, -11.0f));
         mNodeWuson->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
+
+        // wuson 2 - not animated
+        // TODO: set some other material
+        // Actor& actorWuson = mScene.GetActor(mActorWuson);
+        // actorWuson.SetMaterial(mMaterialCheckers);
+        mNodeWuson2->TranslateNode(Vec3(7.0f, 0.5f, 5.0f));
 
         // point light
         PointLight& movingLight = mScene.GetPointLight(mMovingPointLightID);
@@ -88,15 +98,23 @@ namespace JonsGame
 
         // ground plane
         Actor& actorPlane = mScene.GetActor(mActorPlane);
+        actorPlane.SetMaterial(mMaterialCheckers);
         actorPlane.SetMaterialTilingFactor(64.0f);
 
-        // create a sphere
+        // sphere
+        Actor& actorSphere = mScene.GetActor(mActorSphere);
+        actorSphere.SetMaterial(mMaterialCheckers);
+        actorSphere.SetMaterialTilingFactor(0.5f);
         mNodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
 
-        // create a  second cube
+        // second cube
+        Actor& actorCube2 = mScene.GetActor(mActorCube2);
+        actorCube2.SetMaterial(mMaterialCheckers);
         mNodeCube2->TranslateNode(Vec3(3.0f, 2.0f, -15.0f));
 
-        // create a third cube, far away casting shadows from the dir light
+        // third cube, far away casting shadows from the dir light
+        Actor& actorCube3 = mScene.GetActor(mActorCube3);
+        actorCube3.SetMaterial(mMaterialCheckers);
         mNodeCube3->TranslateNode(-sun.mLightDirection * 40.0f);
 
         // load skybox
@@ -108,6 +126,7 @@ namespace JonsGame
 
     Scene::~Scene()
     {
+        // TODO: cleanup...
     }
 
 

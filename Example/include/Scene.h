@@ -43,6 +43,7 @@ namespace JonsGame
         JonsEngine::SceneNodePtr mNodeChair;
         JonsEngine::SceneNodePtr mNodeHouse;
         JonsEngine::SceneNodePtr mNodeWuson;
+        JonsEngine::SceneNodePtr mNodeWuson2;
         JonsEngine::SceneNodePtr mNodePointLight;
         JonsEngine::SceneNodePtr mNodePlane;
         JonsEngine::SceneNodePtr mNodeSphere;
@@ -57,6 +58,7 @@ namespace JonsGame
         JonsEngine::ActorID mActorChair;
         JonsEngine::ActorID mActorHouse;
         JonsEngine::ActorID mActorWuson;
+        JonsEngine::ActorID mActorWuson2;
         JonsEngine::ActorID mActorPlane;
         JonsEngine::ActorID mActorSphere;
         JonsEngine::ActorID mActorCube2;

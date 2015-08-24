@@ -14,6 +14,9 @@ namespace JonsEngine
         Actor(const std::string& name, const ModelID modelId, const SceneNodePtr node);
         ~Actor();
 
+        void SetMaterial(const MaterialID materialID);
+        MaterialID GetMaterial() const;
+
         void SetMaterialTilingFactor(const float tilingFactor);
         float GetMaterialTilingFactor() const;
 
@@ -24,6 +27,7 @@ namespace JonsEngine
 
 
     private:
+        MaterialID mModelMaterial;
         float mMaterialTilingFactor;
     };
 
