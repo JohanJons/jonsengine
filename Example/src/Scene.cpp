@@ -74,8 +74,8 @@ namespace JonsGame
         mNodeHouse->TranslateNode(Vec3(-7.0f, 0.5f, -15.0f));
 
         // animated wuson
-        Actor& actorWuson = mScene.GetActor(mActorWuson);
-        actorWuson.SetMaterial(mMaterialCheckers);
+        //Actor& actorWuson = mScene.GetActor(mActorWuson);
+        //actorWuson.SetMaterial(mMaterialCheckers);
         mNodeWuson->TranslateNode(Vec3(-10.0f, 0.5f, -11.0f));
         mNodeWuson->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
@@ -104,7 +104,7 @@ namespace JonsGame
         // sphere
         Actor& actorSphere = mScene.GetActor(mActorSphere);
         actorSphere.SetMaterial(mMaterialCheckers);
-        actorSphere.SetMaterialTilingFactor(0.5f);
+        actorSphere.SetMaterialTilingFactor(3.0f);
         mNodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
 
         // second cube

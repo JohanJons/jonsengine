@@ -243,7 +243,7 @@ namespace JonsEngine
         const MaterialID materialID = actorHasMaterial ? actorMaterial : mesh.mDefaultMaterialID;
         if (materialID != INVALID_MATERIAL_ID)
         {
-            const Material& material = resourceManifest.GetMaterial(mesh.mDefaultMaterialID);
+            const Material& material = resourceManifest.GetMaterial(materialID);
             diffuseTexture = material.mDiffuseTexture;
             normalTexture = material.mNormalTexture;
             specularFactor = material.mSpecularFactor;
