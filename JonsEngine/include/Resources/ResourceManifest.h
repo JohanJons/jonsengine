@@ -24,14 +24,17 @@ namespace JonsEngine
         ModelID CreateCube(const std::string& modelName, const float size);
         ModelID CreateSphere(const std::string& modelName, const float radius, const uint32_t rings, const uint32_t sectors);
         ModelID LoadModel(const std::string& assetName, const JonsPackagePtr jonsPkg);
+        void DeleteModel(const ModelID modelID);
         Model& GetModel(const ModelID modelID);
         const Model& GetModel(const ModelID modelID) const;
 
         MaterialID LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg);
+        void DeleteMaterial(const MaterialID materialID);
         Material& GetMaterial(const MaterialID materialID);
         const Material& GetMaterial(const MaterialID materialID) const;
 
         SkyboxID LoadSkybox(const std::string& skyboxName, const JonsPackagePtr jonsPkg);
+        void DeleteSkybox(const SkyboxID skyboxID);
         Skybox& GetSkybox(const SkyboxID skyboxID);
         const Skybox& GetSkybox(const SkyboxID skyboxID) const;
 

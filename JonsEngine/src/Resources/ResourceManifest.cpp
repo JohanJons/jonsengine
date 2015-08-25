@@ -81,6 +81,13 @@ namespace JonsEngine
         return mModels.AddItem(pkgModel, initDataList);
     }
 
+    void ResourceManifest::DeleteModel(const ModelID modelID)
+    {
+        assert(modelID != INVALID_MODEL_ID);
+
+        mModels.MarkAsFree(modelID);
+    }
+
     Model& ResourceManifest::GetModel(const ModelID modelID)
     {
         return mModels.GetItem(modelID);
@@ -116,6 +123,13 @@ namespace JonsEngine
         return mMaterials.AddItem(pkgMaterial.mName, diffuseTexture, normalTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, specularFactor);
     }
 
+    void ResourceManifest::DeleteMaterial(const MaterialID materialID)
+    {
+        assert(materialID != INVALID_MATERIAL_ID);
+
+        mMaterials.MarkAsFree(materialID);
+    }
+
     Material& ResourceManifest::GetMaterial(const MaterialID materialID)
     {
         return mMaterials.GetItem(materialID);
@@ -140,7 +154,13 @@ namespace JonsEngine
         assert(skyboxTextureID != INVALID_DX11_MATERIAL_ID);
 
         return mSkyboxes.AddItem(skyboxName, skyboxTextureID);
+    }
 
+    void ResourceManifest::DeleteSkybox(const SkyboxID skyboxID)
+    {
+        assert(skyboxID != INVALID_SKYBOX_ID);
+
+        mSkyboxes.MarkAsFree(skyboxID);
     }
 
     Skybox& ResourceManifest::GetSkybox(const SkyboxID skyboxID)

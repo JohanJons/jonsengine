@@ -14,6 +14,8 @@ namespace JonsEngine
         Actor(const std::string& name, const ModelID modelId, const SceneNodePtr node);
         ~Actor();
 
+        // for now only applies material to all meshes
+        // TODO: explicit mapping of mesh/material to only apply material to certain mesh(es)
         void SetMaterial(const MaterialID materialID);
         MaterialID GetMaterial() const;
 
