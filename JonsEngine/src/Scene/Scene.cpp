@@ -277,7 +277,7 @@ namespace JonsEngine
         for (const ModelNode& child : node.mAllChildNodes)
         {
             for (const Mesh& mesh : child.mMeshes)
-                AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+                AddMesh(resultMeshes, mesh, worldMatrix * child.mLocalTransform);
         }
     }
 
@@ -306,8 +306,8 @@ namespace JonsEngine
             }
 
             // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-            for (const ModelNode& node : node.mImmediateChildNodes)
-                CullMeshesFrustrum(resourceManifest, resultMeshes, node, worldMatrix, wvpMatrix, tilingFactor, actorMaterial);
+            for (const ModelNode& child : node.mImmediateChildNodes)
+                CullMeshesFrustrum(resourceManifest, resultMeshes, child, worldMatrix, wvpMatrix, tilingFactor, actorMaterial);
 
             break;
         }
@@ -347,7 +347,7 @@ namespace JonsEngine
 
             // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
             for (const ModelNode& child : node.mImmediateChildNodes)
-                CullMeshesAABB(resultMeshes, node, aabb, worldMatrix);
+                CullMeshesAABB(resultMeshes, child, aabb, worldMatrix);
 
             break;
         }
@@ -389,8 +389,8 @@ namespace JonsEngine
             }
 
             // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-            for (const ModelNode& node : node.mImmediateChildNodes)
-                CullMeshesSphere(resultMeshes, node, worldMatrix, sphereCentre, sphereRadius);
+            for (const ModelNode& child : node.mImmediateChildNodes)
+                CullMeshesSphere(resultMeshes, child, worldMatrix, sphereCentre, sphereRadius);
 
             break;
         }

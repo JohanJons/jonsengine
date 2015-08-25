@@ -84,6 +84,7 @@ namespace JonsGame
         // Actor& actorWuson = mScene.GetActor(mActorWuson);
         // actorWuson.SetMaterial(mMaterialCheckers);
         mNodeWuson2->TranslateNode(Vec3(7.0f, 0.5f, 5.0f));
+        mNodeWuson2->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
         // point light
         PointLight& movingLight = mScene.GetPointLight(mMovingPointLightID);
