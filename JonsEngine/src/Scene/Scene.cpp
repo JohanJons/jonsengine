@@ -257,7 +257,6 @@ namespace JonsEngine
         resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix);
     }
 
-    // TODO: evaluate if recursive vs iterative makes a difference
     void AddAllMeshes(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const float tilingFactor, const MaterialID actorMaterial)
     {
         for (const Mesh& mesh : node.mMeshes)
@@ -266,7 +265,7 @@ namespace JonsEngine
         for (const ModelNode& child : node.mAllChildNodes)
         {
             for (const Mesh& mesh : child.mMeshes)
-                AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.mLocalTransform, tilingFactor, actorMaterial);
+                AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * child.mLocalTransform, tilingFactor, actorMaterial);
         }
     }
 
