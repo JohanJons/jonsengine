@@ -14,7 +14,6 @@ namespace JonsEngine
     //
     void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix, const float tilingFactor, const MaterialID actorMaterial);
     void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix);
-    // TODO: evaluate if recursive vs iterative makes a difference
     void AddAllMeshes(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const float tilingFactor, const MaterialID actorMaterial);
     void AddAllMeshes(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix);
     void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix, const float tilingFactor, const MaterialID actorMaterial);
@@ -134,6 +133,8 @@ namespace JonsEngine
 
     void Scene::DeleteActor(ActorID& actorID)
     {
+        assert(actorID != INVALID_ACTOR_ID);
+
         mActors.MarkAsFree(actorID);
         actorID = INVALID_ACTOR_ID;
     }
@@ -151,6 +152,8 @@ namespace JonsEngine
     
 	void Scene::DeletePointLight(PointLightID& pointLightID)
     {
+        assert(pointLightID != INVALID_POINT_LIGHT_ID);
+
 		mPointLights.MarkAsFree(pointLightID);
         pointLightID = INVALID_POINT_LIGHT_ID;
     }
@@ -175,6 +178,8 @@ namespace JonsEngine
 
     void Scene::DeleteDirectionalLight(DirectionalLightID& dirLightID)
     {
+        assert(dirLightID != INVALID_DIRECTIONAL_LIGHT_ID);
+
         mDirectionalLights.MarkAsFree(dirLightID);
         dirLightID = INVALID_DIRECTIONAL_LIGHT_ID;
     }
