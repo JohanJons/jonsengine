@@ -17,7 +17,7 @@ namespace JonsEngine
     void AddAllMeshes(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const float tilingFactor, const MaterialID actorMaterial);
     void AddAllMeshes(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix);
     void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix, const float tilingFactor, const MaterialID actorMaterial);
-    void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const AABB& aabb, const Mat4& worldMatrix);
+    //void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const AABB& aabb, const Mat4& worldMatrix);
     void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius);
 
 
@@ -289,10 +289,10 @@ namespace JonsEngine
     void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix, const float tilingFactor, const MaterialID actorMaterial)
     {
         const Mat4 localWVPMatrix = wvpMatrix * node.mLocalTransform;
+        const Mat4 localWorldMatrix = worldMatrix * node.mLocalTransform;
+        const AABB nodeWorldAABB = localWorldMatrix * node.mLocalAABB;
 
-        // test node frustrum
-        // TODO: does this cull objects behind frustrum that still intersects some planes?
-        AABBIntersection nodeAABBIntersection = Intersection(node.mLocalAABB, localWVPMatrix);
+        AABBIntersection nodeAABBIntersection = Intersection(nodeWorldAABB, localWVPMatrix);
         switch (nodeAABBIntersection)
         {
             // if partially inside, recursively test all meshes and child nodes
@@ -302,12 +302,14 @@ namespace JonsEngine
 
             for (const Mesh& mesh : node.mMeshes)
             {
-                meshAABBIntersection = Intersection(mesh.mLocalAABB, localWVPMatrix);
+                const AABB meshWorldAABB = localWorldMatrix * mesh.mLocalAABB;
+
+                meshAABBIntersection = Intersection(meshWorldAABB, localWVPMatrix);
                 if (meshAABBIntersection == AABBIntersection::Outside)
                     continue;
 
                 if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                    AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.mLocalTransform, tilingFactor, actorMaterial);
+                    AddMesh(resourceManifest, resultMeshes, mesh, localWorldMatrix, tilingFactor, actorMaterial);
             }
 
             // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
@@ -329,7 +331,7 @@ namespace JonsEngine
         }
     }
 
-    void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const AABB& aabb, const Mat4& worldMatrix)
+    /*void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const AABB& aabb, const Mat4& worldMatrix)
     {
         // test node AABB
         AABBIntersection nodeAABBIntersection = Intersection(node.mLocalAABB, aabb);
@@ -367,14 +369,15 @@ namespace JonsEngine
         default:
             break;
         }
-    }
+    }*/
 
     void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius)
     {
-        const AABB worldAABB = worldMatrix * node.mLocalAABB;
+        const Mat4 localWorldMatrix = worldMatrix * node.mLocalTransform;
+        const AABB nodeWorldAABB = localWorldMatrix * node.mLocalAABB;
 
         // test node frustrum
-        AABBIntersection nodeAABBIntersection = Intersection(worldAABB, sphereCentre, sphereRadius);
+        AABBIntersection nodeAABBIntersection = Intersection(nodeWorldAABB, sphereCentre, sphereRadius);
         switch (nodeAABBIntersection)
         {
         case AABBIntersection::Partial:
@@ -383,14 +386,14 @@ namespace JonsEngine
 
             for (const Mesh& mesh : node.mMeshes)
             {
-                const AABB meshAABB = worldMatrix * node.mLocalAABB;
+                const AABB worldMeshAABB = localWorldMatrix * node.mLocalAABB;
 
-                meshAABBIntersection = Intersection(meshAABB, sphereCentre, sphereRadius);
+                meshAABBIntersection = Intersection(worldMeshAABB, sphereCentre, sphereRadius);
                 if (meshAABBIntersection == AABBIntersection::Outside)
                     continue;
 
                 if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                    AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
+                    AddMesh(resultMeshes, mesh, localWorldMatrix);
             }
 
             // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
