@@ -193,14 +193,19 @@ namespace JonsEngine
 
     FrustumPlanes GetFrustumPlanes(const Mat4& viewFrustum)
     {
+        const Vec4 rowX(viewFrustum[0].x, viewFrustum[1].x, viewFrustum[2].x, viewFrustum[3].x);
+        const Vec4 rowY(viewFrustum[0].y, viewFrustum[1].y, viewFrustum[2].y, viewFrustum[3].y);
+        const Vec4 rowZ(viewFrustum[0].z, viewFrustum[1].z, viewFrustum[2].z, viewFrustum[3].z);
+        const Vec4 rowW(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w);
+
         return FrustumPlanes
         { {
-                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) + Vec4(viewFrustum[0].x, viewFrustum[1].x, viewFrustum[2].x, viewFrustum[3].x)),      // left
-                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) - Vec4(viewFrustum[0].x, viewFrustum[1].x, viewFrustum[2].x, viewFrustum[3].x)),      // right
-                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) - Vec4(viewFrustum[0].y, viewFrustum[1].y, viewFrustum[2].y, viewFrustum[3].y)),      // top
-                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) + Vec4(viewFrustum[0].y, viewFrustum[1].y, viewFrustum[2].y, viewFrustum[3].y)),      // bottom
-                Plane(Vec4(viewFrustum[0].z, viewFrustum[1].z, viewFrustum[2].z, viewFrustum[3].z)),                                                                                     // near
-                Plane(Vec4(viewFrustum[0].w, viewFrustum[1].w, viewFrustum[2].w, viewFrustum[3].w) - Vec4(viewFrustum[0].z, viewFrustum[1].z, viewFrustum[2].z, viewFrustum[3].z)),      // far
+                Plane(rowW + rowX),      // left
+                Plane(rowW - rowX),      // right
+                Plane(rowW - rowY),      // top
+                Plane(rowW + rowY),      // bottom
+                Plane(rowZ),             // near
+                Plane(rowW - rowZ),      // far
             } };
     }
 
