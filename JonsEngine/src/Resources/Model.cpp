@@ -1,5 +1,7 @@
 #include "include/Resources/Model.h"
 
+#include "include/Core/Math/Math.h"
+
 namespace JonsEngine
 {
     uint32_t CountNumMeshes(const PackageNode& node);
@@ -18,7 +20,7 @@ namespace JonsEngine
     {
         ReserveStorage(pkgModel, mNodes, mMeshes);
 
-        ParseNodes(initData, pkgModel.mRootNode, mNodes.end());
+        ParseNodes(initData, gIdentityMatrix, pkgModel.mRootNode, mNodes.end());
     }
 
     // node container needs special care due to reconstructing valid iterators
@@ -79,7 +81,7 @@ namespace JonsEngine
     }
 
 
-    void Model::ParseNodes(const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode, const ModelNode::NodeIterator& next)
+    void Model::ParseNodes(const ModelNode::InitDataList& initDataList, const Mat4& parentTransform, const PackageNode& pkgNode, const ModelNode::NodeIterator& next)
     {
         const uint32_t numChildren = CountNumChildren(pkgNode);
         // not -1 since its not added yet
@@ -94,8 +96,9 @@ namespace JonsEngine
         const auto immChildIter = ModelNode::ImmediateChildrenIterator(iterFirstChild, iterPastLastChild);
         const auto meshesIter = ParseMeshes(initDataList, pkgNode);
         //ModelNode* nextSibling = &mNodes[siblingIndex];//nullptr;// GetNextSibling(node, parent);
-        mNodes.emplace_back(pkgNode, immChildIter, allChildIter, meshesIter, next);
+        mNodes.emplace_back(pkgNode, parentTransform, immChildIter, allChildIter, meshesIter, next);
 
+        const Mat4& localTransform = mNodes.back().mLocalTransform;
         const uint32_t numImmediateChildren = pkgNode.mChildNodes.size();
         uint32_t childNum = 1;
         uint32_t nextChildSiblingOffset = firstChildIndex;
@@ -106,7 +109,7 @@ namespace JonsEngine
 
             const bool isLastSibling = (childNum == numImmediateChildren);
             const auto nextSibling = isLastSibling ? mNodes.end() : mNodes.begin() + nextChildSiblingOffset;
-            ParseNodes(initDataList, child, nextSibling);
+            ParseNodes(initDataList, localTransform, child, nextSibling);
 
             ++childNum;
         }
