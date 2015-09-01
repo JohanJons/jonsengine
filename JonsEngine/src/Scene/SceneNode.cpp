@@ -119,8 +119,7 @@ namespace JonsEngine
 
     void SceneNode::RotateNode(const float angle, const Vec3& rotateVec)       
     { 
-        Quaternion rotation = glm::angleAxis(glm::radians(angle), rotateVec);
-        mOrientation = mOrientation * rotation;
+        mOrientation = glm::rotate(mOrientation, glm::radians(angle), rotateVec);
 
         mOnDirtyFunc(this);
     }

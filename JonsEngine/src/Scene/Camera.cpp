@@ -64,7 +64,7 @@ namespace JonsEngine
        
     Mat4 Camera::GetCameraTransform() const
     {
-        return glm::translate(gIdentityMatrix, -mTranslation) * Orientation();
+        return Orientation() * glm::translate(gIdentityMatrix, -mTranslation);
     }
 
 
