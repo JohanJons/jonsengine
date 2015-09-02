@@ -13,14 +13,14 @@ namespace JonsEngine
     class PointLight
     {
     public:
-        PointLight(const std::string& name, SceneNodePtr node);
+        PointLight(const std::string& name, const SceneNodeID sceneNodeID);
 
         bool operator==(const PointLight& light);
         bool operator==(const std::string& lightName);
 
 
         const std::string mName;
-        SceneNodePtr mSceneNode;
+        SceneNodeID mSceneNodeID;
 
         Vec4 mLightColor;
         float mLightIntensity;

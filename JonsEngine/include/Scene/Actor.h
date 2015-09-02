@@ -11,25 +11,15 @@ namespace JonsEngine
     class Actor
     {
     public:
-        Actor(const std::string& name, const ModelID modelId, const SceneNodePtr node);
+        Actor(const std::string& name, const ModelID modelId, const SceneNodeID sceneNodeID);
         ~Actor();
-
-        // for now only applies material to all meshes
-        // TODO: explicit mapping of mesh/material to only apply material to certain mesh(es)
-        void SetMaterial(const MaterialID materialID);
-        MaterialID GetMaterial() const;
-
-        void SetMaterialTilingFactor(const float tilingFactor);
-        float GetMaterialTilingFactor() const;
 
 
         const std::string mName;
-        const ModelID mModelID;
-        const SceneNodePtr mSceneNode;
+        ModelID mModelID;
+        SceneNodeID mSceneNodeID;
 
-
-    private:
-        MaterialID mModelMaterial;
+        MaterialID mMaterialID;
         float mMaterialTilingFactor;
     };
 

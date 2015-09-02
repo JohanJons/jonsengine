@@ -2,34 +2,29 @@
 
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
-#include "include/Core/Containers/IDMapPointer.hpp"
 
 #include <string>
 #include <vector>
-#include <memory>
 #include <functional>
 
 namespace JonsEngine
 {
-    class IMemoryAllocator;
     class SceneNode;
 
     typedef std::function<void(SceneNode*)> OnSceneNodeDirtyFunc;
-    typedef std::shared_ptr<SceneNode> SceneNodePtr;
+    typedef IDMap<SceneNode>::ItemID SceneNodeID;
+    static const SceneNodeID INVALID_SCENE_NODE_ID = IDMap<SceneNode>::INVALID_ITEM_ID;
 
     class SceneNode
     {
     public:
-        SceneNode(const std::string& nodeName, IDMap<Mat4>& transformStorage, const OnSceneNodeDirtyFunc& onDirty);
+        SceneNode(const std::string& nodeName, const OnSceneNodeDirtyFunc& onDirty);
         ~SceneNode();
-		
-        bool operator==(const SceneNode& s1);
-        bool operator==(const std::string& nodeName);
-
-        SceneNodePtr CreateChildNode(const std::string& nodeName);
-        SceneNodePtr FindChildNode(const std::string& nodeName);
+	
+        /*SceneNodeID CreateChildNode(const std::string& nodeName);
+        SceneNodeID FindChildNode(const std::string& nodeName);
         bool RemoveChildNode(const std::string& nodeName);
-        bool RemoveChildNode(SceneNodePtr node);
+        bool RemoveChildNode(SceneNodePtr node);*/
 
         // TODO: for non-uniform scaling, need change in gbuffer shader
         void ScaleNode(const float scale);
@@ -39,11 +34,13 @@ namespace JonsEngine
         void UpdateWorldMatrix();
 
         Vec3 Position() const;
-
         const Mat4& GetWorldTransform() const;
-        IDMap<Mat4>::ItemID GetWorldTransformID() const;
-        const std::string& GetNodeName() const;
-        const std::vector<SceneNodePtr>& GetChildNodes() const;
+
+
+        const std::string mName;
+        //IDMap<Mat4>::ItemID GetWorldTransformID() const;
+        //const std::string& GetNodeName() const;
+        //const std::vector<SceneNodePtr>& GetChildNodes() const;
 
 
     private:
@@ -51,27 +48,11 @@ namespace JonsEngine
         void UpdateChildren(const Mat4& parentModelMatrix);
 
 
-        // scene-specific data
-        const std::string mName;
-        size_t mHashedID;
-        std::vector<SceneNodePtr> mChildNodes;
-        IMemoryAllocator& mMemoryAllocator;
-
-        // base components
-        IDMap<Mat4>& mTransformStorage;
-        IDMapPointer<Mat4> mTransform;
-
+        Mat4 mWorldTransform;
         Quaternion mOrientation;
         Vec3 mScale;
         Vec3 mTranslation;
 
         const OnSceneNodeDirtyFunc mOnDirtyFunc;
     };
-
-
-    /* SceneNode inlines */
-    inline const Mat4& SceneNode::GetWorldTransform() const                     { return mTransform.Get();   }
-    inline IDMap<Mat4>::ItemID SceneNode::GetWorldTransformID() const           { return mTransform.GetID(); }
-    inline const std::string& SceneNode::GetNodeName() const                    { return mName;              }
-    inline const std::vector<SceneNodePtr>& SceneNode::GetChildNodes() const    { return mChildNodes;        }
 }

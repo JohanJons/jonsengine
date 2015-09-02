@@ -2,7 +2,6 @@
 
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
-#include "include/Core/Containers/DataPool.hpp"
 #include "include/Scene/SceneNode.h"
 #include "include/Scene/Camera.h"
 #include "include/Scene/PointLight.h"
@@ -17,21 +16,25 @@
 
 namespace JonsEngine
 {
-    class IMemoryAllocator;
-
     class Scene
     {
     public:
         Scene(const std::string& sceneName, const ResourceManifest& resourceManifest);
         ~Scene();
 
+        SceneNode& GetRootNode();
+        const SceneNodeID GetRootNodeID() const;
         const RenderQueue& GetRenderQueue(const Mat4& cameraProjectionMatrix, const float fov, const float aspectRatio, const float minDepth, const float maxDepth);
 
-        ActorID CreateActor(const std::string& actorName, const ModelID modelID, const SceneNodePtr node);
+        SceneNodeID CreateSceneNode(const std::string& sceneNodeName, const SceneNodeID sceneNodeID);
+        void DeleteSceneNode(SceneNodeID& sceneNodeID);
+        SceneNode& GetSceneNode(const SceneNodeID sceneNodeID);
+
+        ActorID CreateActor(const std::string& actorName, const ModelID modelID, const SceneNodeID sceneNodeID);
         void DeleteActor(ActorID& actorID);
         Actor& GetActor(const ActorID actorID);
         
-		PointLightID CreatePointLight(const std::string& lightName, SceneNodePtr node);
+        PointLightID CreatePointLight(const std::string& lightName, const SceneNodeID sceneNodeID);
         void DeletePointLight(PointLightID& pointLightID);
 		PointLight& GetPointLight(const PointLightID pointLightID);
         
@@ -48,7 +51,6 @@ namespace JonsEngine
 
         Camera& GetSceneCamera();
         const Camera& GetSceneCamera() const;
-        SceneNode& GetRootNode();
 
 
 		const std::string mName;
@@ -58,21 +60,20 @@ namespace JonsEngine
         void UpdateDirtyObjects();
 
 
-        IMemoryAllocator& mMemoryAllocator;
         const ResourceManifest& mResourceManifest;
-        DataPool<Mat4> mTransformCache;
-
-        std::vector<SceneNode*> mDirtySceneNodes;
 
 		Camera mSceneCamera;
-        SceneNode mRootNode;
         Vec4 mAmbientLight;
         SkyboxID mSkyboxID;
 
+        IDMap<SceneNode> mSceneNodes;
 		IDMap<PointLight> mPointLights;
         IDMap<DirectionalLight> mDirectionalLights;
         IDMap<Actor> mActors;
 
+        std::vector<SceneNode*> mDirtySceneNodes;
+
+        const SceneNodeID mRootNodeID;
         RenderQueue mRenderQueue;
     };
 
