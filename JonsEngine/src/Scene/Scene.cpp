@@ -21,10 +21,7 @@ namespace JonsEngine
 
 
     Scene::Scene(const std::string& sceneName, const ResourceManifest& resourceManifest) :
-        mName(sceneName), mResourceManifest(resourceManifest),
-        // TODO: lambda expression adds a layer of indirection, but I'm not sure how the bind syntax would look like
-        /*mRootNode("Root", mTransformCache.GetStorage(), [&](SceneNode* node) { mDirtySceneNodes.push_back(node); }),*/ mAmbientLight(0.2f), mSkyboxID(IDMap<Skybox>::INVALID_ITEM_ID),
-        mRootNodeID(mSceneNodes.AddItem("Root", [&](SceneNode* node) { mDirtySceneNodes.push_back(node); }))
+        mName(sceneName), mResourceManifest(resourceManifest), mAmbientLight(0.2f), mSkyboxID(IDMap<Skybox>::INVALID_ITEM_ID), mRootNodeID(CreateSceneNode("Root", INVALID_SCENE_NODE_ID))
     {
     }
 
@@ -144,9 +141,9 @@ namespace JonsEngine
     }
 
 
-    SceneNodeID Scene::CreateSceneNode(const std::string& sceneNodeName, const SceneNodeID sceneNodeID)
+    SceneNodeID Scene::CreateSceneNode(const std::string& sceneNodeName, const SceneNodeID parent)
     {
-        return mSceneNodes.AddItem(sceneNodeName, sceneNodeID);
+        return mSceneNodes.AddItem(sceneNodeName, parent, [&](SceneNode* node) { mDirtySceneNodes.push_back(node); });
     }
 
     void Scene::DeleteSceneNode(SceneNodeID& sceneNodeID)

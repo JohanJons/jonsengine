@@ -18,7 +18,7 @@ namespace JonsEngine
     class SceneNode
     {
     public:
-        SceneNode(const std::string& nodeName, const OnSceneNodeDirtyFunc& onDirty);
+        SceneNode(const std::string& nodeName, const SceneNodeID parent, const OnSceneNodeDirtyFunc& onDirty);
         ~SceneNode();
 	
         /*SceneNodeID CreateChildNode(const std::string& nodeName);
@@ -33,7 +33,8 @@ namespace JonsEngine
 
         void UpdateWorldMatrix();
 
-        Vec3 Position() const;
+        const Vec3& Position() const;
+        const Vec3& Scale() const;
         const Mat4& GetWorldTransform() const;
 
 
@@ -53,6 +54,7 @@ namespace JonsEngine
         Vec3 mScale;
         Vec3 mTranslation;
 
+        const SceneNodeID mParent;
         const OnSceneNodeDirtyFunc mOnDirtyFunc;
     };
 }

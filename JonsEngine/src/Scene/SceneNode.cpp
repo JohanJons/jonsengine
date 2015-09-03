@@ -2,12 +2,10 @@
 #include "include/Core/Math/Math.h"
 #include "include/Core/Memory/HeapAllocator.h"
 
-#include <algorithm>
-
 namespace JonsEngine
 {
-    SceneNode::SceneNode(const std::string& nodeName, const OnSceneNodeDirtyFunc& onDirty) :
-        mName(nodeName), mWorldTransform(gIdentityMatrix), mOrientation(1.0f, 0.0f, 0.0f, 0.0f), mScale(1.0f), mTranslation(0.0f), mOnDirtyFunc(onDirty)
+    SceneNode::SceneNode(const std::string& nodeName, const SceneNodeID parent, const OnSceneNodeDirtyFunc& onDirty) :
+        mName(nodeName), mWorldTransform(gIdentityMatrix), mOrientation(1.0f, 0.0f, 0.0f, 0.0f), mScale(1.0f), mTranslation(0.0f), mParent(parent), mOnDirtyFunc(onDirty)
     {
     }
         
@@ -47,12 +45,14 @@ namespace JonsEngine
     }
 
 
-    Vec3 SceneNode::Position() const
+    const Vec3& SceneNode::Position() const
     {
-        Vec3 position(0.0f);
-        position += mTranslation;
+        return mTranslation;
+    }
 
-        return position;
+    const Vec3& SceneNode::Scale() const
+    {
+        return mScale;
     }
 
 

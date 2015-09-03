@@ -26,7 +26,7 @@ namespace JonsEngine
         const SceneNodeID GetRootNodeID() const;
         const RenderQueue& GetRenderQueue(const Mat4& cameraProjectionMatrix, const float fov, const float aspectRatio, const float minDepth, const float maxDepth);
 
-        SceneNodeID CreateSceneNode(const std::string& sceneNodeName, const SceneNodeID sceneNodeID);
+        SceneNodeID CreateSceneNode(const std::string& sceneNodeName, const SceneNodeID parent);
         void DeleteSceneNode(SceneNodeID& sceneNodeID);
         SceneNode& GetSceneNode(const SceneNodeID sceneNodeID);
 
