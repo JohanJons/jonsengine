@@ -29,17 +29,17 @@ namespace JonsGame
         mModelCube3(resManifest.CreateCube("Cube3", 3)),
 
         // scene nodes
-        mNodeSectoid(mScene.GetRootNode().CreateChildNode("nodeSectoid")),
-        mNodeCube(mScene.GetRootNode().CreateChildNode("nodeCube")),
-        mNodeChair(mScene.GetRootNode().CreateChildNode("nodeChair")),
-        mNodeHouse(mScene.GetRootNode().CreateChildNode("nodeHouse")),
-        mNodeWuson(mScene.GetRootNode().CreateChildNode("wuson")),
-        mNodeWuson2(mScene.GetRootNode().CreateChildNode("wuson2")),
-        mNodePointLight(mScene.GetRootNode().CreateChildNode("nodeMovingLight")),
-        mNodePlane(mScene.GetRootNode().CreateChildNode("nodePlane")),
-        mNodeSphere(mScene.GetRootNode().CreateChildNode("nodeSphere")),
-        mNodeCube2(mScene.GetRootNode().CreateChildNode("nodeCube2")),
-        mNodeCube3(mScene.GetRootNode().CreateChildNode("nodeCube3")),
+        mNodeSectoid(mScene.CreateSceneNode("nodeSectoid", mScene.GetRootNodeID())),
+        mNodeCube(mScene.CreateSceneNode("nodeCube", mScene.GetRootNodeID())),
+        mNodeChair(mScene.CreateSceneNode("nodeChair", mScene.GetRootNodeID())),
+        mNodeHouse(mScene.CreateSceneNode("nodeHouse", mScene.GetRootNodeID())),
+        mNodeWuson(mScene.CreateSceneNode("wuson", mScene.GetRootNodeID())),
+        mNodeWuson2(mScene.CreateSceneNode("wuson2", mScene.GetRootNodeID())),
+        mNodePointLight(mScene.CreateSceneNode("nodeMovingLight", mScene.GetRootNodeID())),
+        mNodePlane(mScene.CreateSceneNode("nodePlane", mScene.GetRootNodeID())),
+        mNodeSphere(mScene.CreateSceneNode("nodeSphere", mScene.GetRootNodeID())),
+        mNodeCube2(mScene.CreateSceneNode("nodeCube2", mScene.GetRootNodeID())),
+        mNodeCube3(mScene.CreateSceneNode("nodeCube3", mScene.GetRootNodeID())),
         
         // lights
         mMovingPointLightID(mScene.CreatePointLight("MovingPointLight", mNodePointLight)),
@@ -61,30 +61,36 @@ namespace JonsGame
         mScene.SetAmbientLight(Vec4(0.01f));
 
         // sectoid
-        mNodeSectoid->TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
+        SceneNode& nodeSectoid = mScene.GetSceneNode(mNodeSectoid);
+        nodeSectoid.TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
         //mNodeSectoid->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
         // cube
-        mNodeCube->TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
+        SceneNode& nodeCube = mScene.GetSceneNode(mNodeCube);
+        nodeCube.TranslateNode(Vec3(7.0f, 1.0f, -15.0f));
 
         // chair
-        mNodeChair->TranslateNode(Vec3(-8.0f, 0.5f, -4.0f));
-        mNodeChair->ScaleNode(2.0f);
+        SceneNode& nodeChair = mScene.GetSceneNode(mNodeChair);
+        nodeChair.TranslateNode(Vec3(-8.0f, 0.5f, -4.0f));
+        nodeChair.ScaleNode(2.0f);
 
         // house
-        mNodeHouse->TranslateNode(Vec3(-7.0f, 0.5f, -15.0f));
+        SceneNode& nodeHouse = mScene.GetSceneNode(mNodeHouse);
+        nodeHouse.TranslateNode(Vec3(-7.0f, 0.5f, -15.0f));
 
         // animated wuson
         //Actor& actorWuson = mScene.GetActor(mActorWuson);
         //actorWuson.SetMaterial(mMaterialCheckers);
-        mNodeWuson->TranslateNode(Vec3(-10.0f, 4.5f, -11.0f));
+        SceneNode& nodeWuson = mScene.GetSceneNode(mNodeWuson);
+        nodeWuson.TranslateNode(Vec3(-10.0f, 4.5f, -11.0f));
         //mNodeWuson->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
         // wuson 2 - not animated
         // TODO: set some other material
         // Actor& actorWuson = mScene.GetActor(mActorWuson);
         // actorWuson.SetMaterial(mMaterialCheckers);
-        mNodeWuson2->TranslateNode(Vec3(7.0f, 0.5f, 5.0f));
+        SceneNode& nodeWuson2 = mScene.GetSceneNode(mNodeWuson2);
+        nodeWuson2.TranslateNode(Vec3(7.0f, 0.5f, 5.0f));
         //mNodeWuson2->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
         // point light
@@ -92,7 +98,8 @@ namespace JonsGame
         movingLight.mLightRadius = 10.0f;
         movingLight.mLightIntensity = 2.0f;
         movingLight.mLightColor = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
-        mNodePointLight->TranslateNode(Vec3(5.0f, 3.5f, -15.0f));
+        SceneNode& nodePointLight = mScene.GetSceneNode(mNodePointLight);
+        nodePointLight.TranslateNode(Vec3(5.0f, 3.5f, -15.0f));
 
         // directional light
         DirectionalLight& sun = mScene.GetDirectionalLight(mMovingPointLightID);
@@ -100,24 +107,27 @@ namespace JonsGame
 
         // ground plane
         Actor& actorPlane = mScene.GetActor(mActorPlane);
-        actorPlane.SetMaterial(mMaterialCheckers);
-        actorPlane.SetMaterialTilingFactor(64.0f);
+        actorPlane.mMaterialID = mMaterialCheckers;
+        actorPlane.mMaterialTilingFactor = 64.0f;
 
         // sphere
         Actor& actorSphere = mScene.GetActor(mActorSphere);
-        actorSphere.SetMaterial(mMaterialCheckers);
-        actorSphere.SetMaterialTilingFactor(3.0f);
-        mNodeSphere->TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
+        actorSphere.mMaterialID = mMaterialCheckers;
+        actorSphere.mMaterialTilingFactor = 3.0f;
+        SceneNode& nodeSphere = mScene.GetSceneNode(mNodeSphere);
+        nodeSphere.TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
 
         // second cube
         Actor& actorCube2 = mScene.GetActor(mActorCube2);
-        actorCube2.SetMaterial(mMaterialCheckers);
-        mNodeCube2->TranslateNode(Vec3(3.0f, 2.0f, -15.0f));
+        actorCube2.mMaterialID = mMaterialCheckers;
+        SceneNode& nodeCube2 = mScene.GetSceneNode(mNodeCube2);
+        nodeCube2.TranslateNode(Vec3(3.0f, 2.0f, -15.0f));
 
         // third cube, far away casting shadows from the dir light
         Actor& actorCube3 = mScene.GetActor(mActorCube3);
-        actorCube3.SetMaterial(mMaterialCheckers);
-        mNodeCube3->TranslateNode(-sun.mLightDirection * 40.0f);
+        actorCube3.mMaterialID = mMaterialCheckers;
+        SceneNode& nodeCube3 = mScene.GetSceneNode(mNodeCube3);
+        nodeCube3.TranslateNode(-sun.mLightDirection * 40.0f);
 
         // load skybox
         mScene.SetSkybox(mSkybox);

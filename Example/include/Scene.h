@@ -38,17 +38,17 @@ namespace JonsGame
         JonsEngine::ModelID mModelCube2;
         JonsEngine::ModelID mModelCube3;
 
-        JonsEngine::SceneNodePtr mNodeSectoid;
-        JonsEngine::SceneNodePtr mNodeCube;
-        JonsEngine::SceneNodePtr mNodeChair;
-        JonsEngine::SceneNodePtr mNodeHouse;
-        JonsEngine::SceneNodePtr mNodeWuson;
-        JonsEngine::SceneNodePtr mNodeWuson2;
-        JonsEngine::SceneNodePtr mNodePointLight;
-        JonsEngine::SceneNodePtr mNodePlane;
-        JonsEngine::SceneNodePtr mNodeSphere;
-        JonsEngine::SceneNodePtr mNodeCube2;
-        JonsEngine::SceneNodePtr mNodeCube3;
+        JonsEngine::SceneNodeID mNodeSectoid;
+        JonsEngine::SceneNodeID mNodeCube;
+        JonsEngine::SceneNodeID mNodeChair;
+        JonsEngine::SceneNodeID mNodeHouse;
+        JonsEngine::SceneNodeID mNodeWuson;
+        JonsEngine::SceneNodeID mNodeWuson2;
+        JonsEngine::SceneNodeID mNodePointLight;
+        JonsEngine::SceneNodeID mNodePlane;
+        JonsEngine::SceneNodeID mNodeSphere;
+        JonsEngine::SceneNodeID mNodeCube2;
+        JonsEngine::SceneNodeID mNodeCube3;
 
         JonsEngine::PointLightID mMovingPointLightID;
         JonsEngine::DirectionalLightID mSunDirLightID;
