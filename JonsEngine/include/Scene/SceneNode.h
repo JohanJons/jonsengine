@@ -31,7 +31,7 @@ namespace JonsEngine
         void TranslateNode(const Vec3& translateVec);
         void RotateNode(const float angle, const Vec3& rotateVec);
 
-        void UpdateWorldMatrix();
+        void UpdateWorldMatrix(const Mat4& parentMatrix);
 
         const Vec3& Position() const;
         const Vec3& Scale() const;
@@ -39,22 +39,18 @@ namespace JonsEngine
 
 
         const std::string mName;
+        const SceneNodeID mParent;
         //IDMap<Mat4>::ItemID GetWorldTransformID() const;
         //const std::string& GetNodeName() const;
         //const std::vector<SceneNodePtr>& GetChildNodes() const;
 
 
     private:
-        void UpdateTransform();
-        void UpdateChildren(const Mat4& parentModelMatrix);
-
-
         Mat4 mWorldTransform;
         Quaternion mOrientation;
         Vec3 mScale;
         Vec3 mTranslation;
 
-        const SceneNodeID mParent;
         const OnSceneNodeDirtyFunc mOnDirtyFunc;
     };
 }

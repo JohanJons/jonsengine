@@ -2,7 +2,9 @@
 
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
+#include "include/Core/Containers/IDMapTree.hpp"
 #include "include/Scene/SceneNode.h"
+#include "include/Scene/SceneNodeIterator.h"
 #include "include/Scene/Camera.h"
 #include "include/Scene/PointLight.h"
 #include "include/Scene/DirectionalLight.h"
@@ -58,6 +60,9 @@ namespace JonsEngine
 
     private:
         void UpdateDirtyObjects();
+        void MarkAsDirty(SceneNode* sceneNode);
+        SceneNodeIterator& FindSceneNodeIterator(const SceneNodeID sceneNodeID);
+        SceneNodeIterator* FindLastChild(const SceneNodeID sceneNodeID);
 
 
         const ResourceManifest& mResourceManifest;
@@ -71,7 +76,9 @@ namespace JonsEngine
         IDMap<DirectionalLight> mDirectionalLights;
         IDMap<Actor> mActors;
 
+        std::vector<SceneNodeIterator> mSceneNodeIters;
         std::vector<SceneNode*> mDirtySceneNodes;
+        bool mDirtySceneNode;
 
         const SceneNodeID mRootNodeID;
         RenderQueue mRenderQueue;

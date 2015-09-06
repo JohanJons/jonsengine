@@ -143,7 +143,13 @@ namespace JonsEngine
 
     SceneNodeID Scene::CreateSceneNode(const std::string& sceneNodeName, const SceneNodeID parent)
     {
-        return mSceneNodes.AddItem(sceneNodeName, parent, [&](SceneNode* node) { mDirtySceneNodes.push_back(node); });
+        SceneNodeID ret = mSceneNodes.AddItem(sceneNodeName, parent, std::bind(&Scene::MarkAsDirty, this, std::placeholders::_1));
+       // mSceneNodeIters.emplace_back(ret, parent, nullptr, nullptr);
+
+        //SceneNodeIterator& lastChild = FindLastChild(parent);
+        //lastChild.mNextSibling = ret;
+
+        return ret;
     }
 
     void Scene::DeleteSceneNode(SceneNodeID& sceneNodeID)
@@ -254,15 +260,42 @@ namespace JonsEngine
 
     void Scene::UpdateDirtyObjects()
     {
-        // flag all objects using dirty scene nodes as dirty as well
-        for (SceneNode* node : mDirtySceneNodes)
+        if (mDirtySceneNode)
         {
-            // all children needs to be updated
-            // TODO: sort based on hierarchy to avoid unnecessary operations if children present in mDirtySceneNodes aswell
-            node->UpdateWorldMatrix();
+            //for (auto iter = mSceneNodes.begin() + 1; iter != mSceneNodes.end(); ++iter)
+            //{
+                //iter
+                //const Mat4& parentTransform = mSceneNodes.GetItem(iter->)
+
+                //node.UpdateWorldMatrix(*parentTransform);
+                //parentTransform 
+            //}
         }
 
-        mDirtySceneNodes.clear();
+        mDirtySceneNode = false;
+    }
+
+    void Scene::MarkAsDirty(SceneNode* sceneNode)
+    {
+        
+    }
+
+    SceneNodeIterator& Scene::FindSceneNodeIterator(const SceneNodeID sceneNodeID)
+    {
+        assert(sceneNodeID != INVALID_SCENE_NODE_ID);
+
+        auto iter = std::find_if(mSceneNodeIters.begin(), mSceneNodeIters.end(), [sceneNodeID](const SceneNodeIterator iter) { return sceneNodeID == iter.mSceneNodeID; });
+        assert(iter != mSceneNodeIters.end());
+
+        return *iter;
+    }
+
+    SceneNodeIterator* Scene::FindLastChild(const SceneNodeID parentID)
+    {
+        //auto iter = std::find_if(mSceneNodeIters.begin(), mSceneNodeIters.end(), [parentID](const SceneNodeIterator iter) { return parentID == iter. && iter.mNextSibling == nullptr; });
+
+        //return iter._Ptr;
+        return nullptr;
     }
 
 

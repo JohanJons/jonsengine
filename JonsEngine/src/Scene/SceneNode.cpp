@@ -36,12 +36,18 @@ namespace JonsEngine
     }
 
 
-    void SceneNode::UpdateWorldMatrix()
+    void SceneNode::UpdateWorldMatrix(const Mat4& parentMatrix)
     {
-        UpdateTransform();
+        mWorldTransform = glm::translate(gIdentityMatrix, mTranslation);
+        mWorldTransform *= glm::toMat4(mOrientation);
+        mWorldTransform = glm::scale(mWorldTransform, mScale);
+        mWorldTransform = parentMatrix * mWorldTransform;
 
-        for (SceneNodePtr childNode : mChildNodes)
-            childNode->UpdateChildren(mTransform.Get());
+
+        //UpdateTransform();
+
+        //for (SceneNodePtr childNode : mChildNodes)
+        //    childNode->UpdateChildren(mTransform.Get());
     }
 
 
@@ -53,24 +59,5 @@ namespace JonsEngine
     const Vec3& SceneNode::Scale() const
     {
         return mScale;
-    }
-
-
-    void SceneNode::UpdateTransform()
-    {
-        mWorldTransform = glm::translate(gIdentityMatrix, mTranslation);
-        mWorldTransform *= glm::toMat4(mOrientation);
-        mWorldTransform = glm::scale(mWorldTransform, mScale);
-    }
-
-    void SceneNode::UpdateChildren(const Mat4& parentModelMatrix)
-    {
-        UpdateTransform();
-
-        Mat4& worldMatrix = mTransform.Get();
-        worldMatrix = parentModelMatrix * worldMatrix;
-
-        for (SceneNodePtr childNode : mChildNodes)
-            childNode->UpdateChildren(worldMatrix);
     }
 }

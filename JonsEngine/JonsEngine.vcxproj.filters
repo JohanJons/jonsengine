@@ -478,6 +478,12 @@
     <ClInclude Include="include\Resources\Skybox.h">
       <Filter>Header Files\Resources</Filter>
     </ClInclude>
+    <ClInclude Include="include\Scene\SceneNodeIterator.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Containers\IDMapTree.hpp">
+      <Filter>Header Files\Core\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferPixel.hlsl">
