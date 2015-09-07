@@ -33,6 +33,7 @@ namespace JonsEngine
         void FreeNode(const ItemID nodeID);
 
         size_t Size() const;
+        size_t Capacity() const;
 
 
     private:
@@ -95,7 +96,9 @@ namespace JonsEngine
     template <typename T>
     void IDMapTree<T>::FreeNode(const ItemID nodeID)
     {
-
+        T* i = mBegin;
+        T* i2 = mBegin + 1;
+        T* i3 = mBegin + 2;
     }
 
 
@@ -105,21 +108,30 @@ namespace JonsEngine
         return static_cast<size_t>(mEnd - mBegin);
     }
 
+    template <typename T>
+    size_t IDMapTree<T>::Capacity() const
+    {
+        return static_cast<size_t>(mCapacity - mBegin);
+    }
+
 
     template <typename T>
     void IDMapTree<T>::Grow()
     {
-        const size_t prevSize = mCapacity - mBegin;
-        const size_t newSize = prevSize != 0 ? static_cast<size_t>(1.5f * prevSize) : 1;
-        T* newBuffer = static_cast<T*>(mAllocator.Allocate(newSize));
+        const size_t prevCapacity = Capacity();
+        const size_t prevSize = Size();
+        const size_t newCapacity = prevCapacity != 0 ? static_cast<size_t>(1.5f * prevCapacity) : 2;
+        T* newBuffer = static_cast<T*>(mAllocator.Allocate(newCapacity));
 
-        // initialize new buffer elements with copy constructor using old elements
-        uint32_t itemIndex = 0;
-        std::for_each(newBuffer, newBuffer + prevSize, [&](T& item) { item.T(*(mBegin + itemIndex++)); });
-        // destruct all old elements
+        // copy prev elements
+        std::uninitialized_copy(mBegin, mEnd, newBuffer);
+        
+        // destroy old elements
         std::for_each(mBegin, mEnd, [](T& item) { item.~T(); });
+        mAllocator.Deallocate(mBegin);
 
-
-        // ...
+        mBegin = newBuffer;
+        mEnd = mBegin + prevSize;
+        mCapacity = mBegin + newCapacity;
     }
 }

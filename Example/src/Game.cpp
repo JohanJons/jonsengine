@@ -31,6 +31,12 @@ namespace JonsGame
         
     void Game::Run()
     {
+        IDMapTree<JonsEngine::Actor> tree;
+        tree.AddNode("a", 1, 1);
+        tree.AddNode("b", 1, 1);
+        tree.AddNode("c", 1, 1);
+        tree.FreeNode(1);
+
         while (mRunning)
         {
             mSun.Update();
@@ -76,12 +82,12 @@ namespace JonsGame
                 case Key::D: camera.TranslateCamera(camera.Right() * mMoveSpeed);    break;
                 
                 // moving the point light 
-                case Key::Q: mGameScene.GetMovingLight().mSceneNode->TranslateNode(Vec3(-0.05f, 0.0f, 0.0f)); break;
-                case Key::E: mGameScene.GetMovingLight().mSceneNode->TranslateNode(Vec3(0.05f, 0.0f, 0.0f));  break;
-                case Key::R: mGameScene.GetMovingLight().mSceneNode->TranslateNode(Vec3(0.0f, -0.05f, 0.0f)); break;
-                case Key::T: mGameScene.GetMovingLight().mSceneNode->TranslateNode(Vec3(0.0f, 0.05f, 0.0f));  break;
-                case Key::F: mGameScene.GetMovingLight().mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, -0.05f)); break;
-                case Key::G: mGameScene.GetMovingLight().mSceneNode->TranslateNode(Vec3(0.0f, 0.0f, 0.05f));  break;
+                case Key::Q: mGameScene.GetMovingLightNode().TranslateNode(Vec3(-0.05f, 0.0f, 0.0f)); break;
+                case Key::E: mGameScene.GetMovingLightNode().TranslateNode(Vec3(0.05f, 0.0f, 0.0f));  break;
+                case Key::R: mGameScene.GetMovingLightNode().TranslateNode(Vec3(0.0f, -0.05f, 0.0f)); break;
+                case Key::T: mGameScene.GetMovingLightNode().TranslateNode(Vec3(0.0f, 0.05f, 0.0f));  break;
+                case Key::F: mGameScene.GetMovingLightNode().TranslateNode(Vec3(0.0f, 0.0f, -0.05f)); break;
+                case Key::G: mGameScene.GetMovingLightNode().TranslateNode(Vec3(0.0f, 0.0f, 0.05f));  break;
 
                 //  renderering
                 case Key::ONE: mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_DRAW_AABB); break;

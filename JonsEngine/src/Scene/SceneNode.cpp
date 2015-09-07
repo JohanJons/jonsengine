@@ -60,4 +60,9 @@ namespace JonsEngine
     {
         return mScale;
     }
+
+    const Mat4& SceneNode::GetWorldTransform() const
+    {
+        return mWorldTransform;
+    }
 }

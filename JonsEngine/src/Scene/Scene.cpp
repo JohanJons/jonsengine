@@ -277,8 +277,6 @@ namespace JonsEngine
 
     void Scene::MarkAsDirty(SceneNode* sceneNode)
     {
-        IDMapTree<SceneNode> tree;
-        tree.AddNode("test", 0, std::bind(&Scene::MarkAsDirty, this, std::placeholders::_1));
     }
 
     /*SceneNodeIterator& Scene::FindSceneNodeIterator(const SceneNodeID sceneNodeID)

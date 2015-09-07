@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    PointLight::PointLight(const std::string& name, SceneNodePtr node) : mName(name), mHashedID(boost::hash_value(name)), mSceneNode(node), mLightColor(1.0f), mLightIntensity(1.0f), mLightRadius(0.0f)
+    PointLight::PointLight(const std::string& name, const SceneNodeID sceneNodeID) : mName(name), mHashedID(boost::hash_value(name)), mSceneNodeID(sceneNodeID), mLightColor(1.0f), mLightIntensity(1.0f), mLightRadius(0.0f)
     {
     }
 

@@ -147,9 +147,9 @@ namespace JonsGame
         return mScene;
     }
 
-    JonsEngine::PointLight& Scene::GetMovingLight()
+    JonsEngine::SceneNode& Scene::GetMovingLightNode()
     {
-        return mScene.GetPointLight(mMovingPointLightID);
+        return mScene.GetSceneNode(mNodePointLight);
     }
 
     JonsEngine::DirectionalLight& Scene::GetSun()

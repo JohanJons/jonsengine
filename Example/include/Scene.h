@@ -15,7 +15,7 @@ namespace JonsGame
         ~Scene();
 
         JonsEngine::Scene& GetJonsScene();
-        JonsEngine::PointLight& GetMovingLight();
+        JonsEngine::SceneNode& GetMovingLightNode();
         JonsEngine::DirectionalLight& GetSun();
         JonsEngine::Actor& GetAnimatedWuson();
 
