@@ -277,10 +277,11 @@ namespace JonsEngine
 
     void Scene::MarkAsDirty(SceneNode* sceneNode)
     {
-        
+        IDMapTree<SceneNode> tree;
+        tree.AddNode("test", 0, std::bind(&Scene::MarkAsDirty, this, std::placeholders::_1));
     }
 
-    SceneNodeIterator& Scene::FindSceneNodeIterator(const SceneNodeID sceneNodeID)
+    /*SceneNodeIterator& Scene::FindSceneNodeIterator(const SceneNodeID sceneNodeID)
     {
         assert(sceneNodeID != INVALID_SCENE_NODE_ID);
 
@@ -296,7 +297,7 @@ namespace JonsEngine
 
         //return iter._Ptr;
         return nullptr;
-    }
+    }*/
 
 
     void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix, const float tilingFactor, const MaterialID actorMaterial)
