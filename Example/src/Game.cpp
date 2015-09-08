@@ -33,8 +33,8 @@ namespace JonsGame
     {
         IDMapTree<JonsEngine::Actor> tree;
         tree.AddNode("a", 1, 1);
-        tree.AddNode("b", 1, 1);
-        tree.AddNode("c", 1, 1);
+        tree.AddNode("b", 2, 2);
+        tree.AddNode("c", 3, 3);
         tree.FreeNode(1);
 
         while (mRunning)

@@ -17,6 +17,7 @@ namespace JonsEngine
 
             template <typename... Arguments>
             Item(Arguments&&... args);
+            Item(Item& other);
         };
 
     public:
@@ -53,6 +54,23 @@ namespace JonsEngine
         std::vector<uint32_t> mIndirectionLayer;
     };
 
+
+
+
+    //
+    // IDMapTree::Item
+    //
+
+    template <typename T>
+    template <typename... Arguments>
+    IDMapTree<T>::Item::Item(Arguments&&... args) : mItem(std::forward<Arguments>(args)...), mNext(nullptr)
+    {
+    }
+
+    template <typename T>
+    IDMapTree<T>::Item::Item(Item& other) : mItem(other.mItem), mNext(other.mNext)
+    {
+    }
 
 
     //
