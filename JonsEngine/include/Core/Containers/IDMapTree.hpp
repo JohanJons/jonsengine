@@ -12,11 +12,11 @@ namespace JonsEngine
     {
     private:
         struct Item {
-            uint16_t mVersion;
             T mItem;
+            Item* mNext;
 
             template <typename... Arguments>
-            Item(uint16_t version, Arguments&&... args);
+            Item(Arguments&&... args);
         };
 
     public:
@@ -31,6 +31,9 @@ namespace JonsEngine
         template <typename... Arguments>
         ItemID AddNode(const ItemID parent, Arguments&&... args);
         void FreeNode(const ItemID nodeID);
+        
+        T& GetNode(const ItemID nodeID);
+        const T& GetNode(const ItemID nodeID) const;
 
         size_t Size() const;
         size_t Capacity() const;
@@ -38,13 +41,15 @@ namespace JonsEngine
 
     private:
         void Grow();
+        Item& GetItem(const ItemID nodeID);
 
 
         IMemoryAllocator& mAllocator;
+        ItemID mIDCounter;
 
-        T* mBegin;
-        T* mEnd;
-        T* mCapacity;
+        Item* mBegin;
+        Item* mEnd;
+        Item* mCapacity;
         std::vector<uint32_t> mIndirectionLayer;
     };
 
@@ -57,6 +62,7 @@ namespace JonsEngine
     template <typename T>
     IDMapTree<T>::IDMapTree() :
         mAllocator(HeapAllocator::GetDefaultHeapAllocator()),
+        mIDCounter(1),
         mBegin(nullptr),
         mEnd(nullptr),
         mCapacity(nullptr)
@@ -80,25 +86,40 @@ namespace JonsEngine
 
     template <typename T>
     template <typename... Arguments>
-    typename IDMapTree<T>::ItemID IDMapTree<T>::AddNode(const ItemID parent, Arguments&&... args)
+    typename IDMapTree<T>::ItemID IDMapTree<T>::AddNode(const ItemID parentID, Arguments&&... args)
     {
         // rare case; could reorder statement for performance?
         if (mEnd >= mCapacity)
             Grow();
         
-        const uint16_t initialVersion = 1;
-        new (mEnd++) T( std::forward<Arguments>(args)...);
+        const Item& parent = GetItem(parentID);
+
+        //const uint16_t initialVersion = 1;
+        new (mEnd++) Item(std::forward<Arguments>(args)...);
         
-        return ((Size() - 1) | (static_cast<uint32_t>(initialVersion) << 16));
+        return mIDCounter++;// | (static_cast<uint32_t>(initialVersion) << 16));
 
     }
 
     template <typename T>
     void IDMapTree<T>::FreeNode(const ItemID nodeID)
     {
-        T* i = mBegin;
-        T* i2 = mBegin + 1;
-        T* i3 = mBegin + 2;
+        Item* i = mBegin;
+        Item* i2 = mBegin + 1;
+        Item* i3 = mBegin + 2;
+    }
+
+
+    template <typename T>
+    T& IDMapTree<T>::GetNode(const ItemID nodeID)
+    {
+        return GetItem(nodeID)->mItem;
+    }
+
+    template <typename T>
+    const T& IDMapTree<T>::GetNode(const ItemID nodeID) const
+    {
+        return GetItem(nodeID)->mItem;
     }
 
 
@@ -121,17 +142,27 @@ namespace JonsEngine
         const size_t prevCapacity = Capacity();
         const size_t prevSize = Size();
         const size_t newCapacity = prevCapacity != 0 ? static_cast<size_t>(1.5f * prevCapacity) : 2;
-        T* newBuffer = static_cast<T*>(mAllocator.Allocate(newCapacity));
+        Item* newBuffer = static_cast<Item*>(mAllocator.Allocate(newCapacity));
 
         // copy prev elements
         std::uninitialized_copy(mBegin, mEnd, newBuffer);
         
         // destroy old elements
-        std::for_each(mBegin, mEnd, [](T& item) { item.~T(); });
+        std::for_each(mBegin, mEnd, [](Item& item) { item.~Item(); });
         mAllocator.Deallocate(mBegin);
 
         mBegin = newBuffer;
         mEnd = mBegin + prevSize;
         mCapacity = mBegin + newCapacity;
+    }
+
+    template <typename T>
+    typename IDMapTree<T>::Item& IDMapTree<T>::GetItem(const ItemID nodeID)
+    {
+        assert(nodeID != INVALID_ITEM_ID);
+
+        const uint32_t index = nodeID;
+
+        return *(mBegin + index);
     }
 }
