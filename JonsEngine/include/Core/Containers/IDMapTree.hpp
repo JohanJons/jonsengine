@@ -10,20 +10,21 @@ namespace JonsEngine
     template <typename T>
     class IDMapTree// : private IDMap<T>
     {
-    private:
-        struct Item {
-            T mItem;
-            Item* mNext;
-
-            template <typename... Arguments>
-            Item(Arguments&&... args);
-            Item(Item& other);
-        };
-
     public:
         typedef uint32_t ItemID;
         const static ItemID INVALID_ITEM_ID = 0;
 
+    private:
+        struct Item {
+            ItemID mNext;
+            T mItem;
+
+            template <typename... Arguments>
+            Item(const ItemID next, Arguments&&... args);
+            Item(Item& other);
+        };
+
+    public:
         IDMapTree();
         ~IDMapTree();
 
@@ -63,12 +64,12 @@ namespace JonsEngine
 
     template <typename T>
     template <typename... Arguments>
-    IDMapTree<T>::Item::Item(Arguments&&... args) : mItem(std::forward<Arguments>(args)...), mNext(nullptr)
+    IDMapTree<T>::Item::Item(const ItemID next, Arguments&&... args) : mNext(next), mItem(std::forward<Arguments>(args)...)
     {
     }
 
     template <typename T>
-    IDMapTree<T>::Item::Item(Item& other) : mItem(other.mItem), mNext(other.mNext)
+    IDMapTree<T>::Item::Item(Item& other) : mNext(other.mNext), mItem(other.mItem)
     {
     }
 
@@ -110,13 +111,17 @@ namespace JonsEngine
         if (mEnd >= mCapacity)
             Grow();
         
-        const Item& parent = GetItem(parentID);
+        ItemID next = INVALID_ITEM_ID;
+        if (parentID != INVALID_ITEM_ID)
+        {
+            const Item& parent = GetItem(parentID);
+            next = parent.mNext;
+        }
 
         //const uint16_t initialVersion = 1;
         new (mEnd++) Item(std::forward<Arguments>(args)...);
         
         return mIDCounter++;// | (static_cast<uint32_t>(initialVersion) << 16));
-
     }
 
     template <typename T>
