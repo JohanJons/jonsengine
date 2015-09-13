@@ -31,11 +31,17 @@ namespace JonsGame
         
     void Game::Run()
     {
-        IDMapTree<JonsEngine::Actor> tree;
-        tree.AddNode("a", 1, 1);
-        tree.AddNode("b", 2, 2);
-        tree.AddNode("c", 3, 3);
-        tree.FreeNode(1);
+
+        //                [1]
+        //          [2]             
+        //    [3]         [4]
+        //[5]
+
+        IDMapTree<JonsEngine::Actor> tree("aaaaaaaaa", 1, 1);
+        auto n2 = tree.AddNode(tree.GetRootNodeID(), "bbbbbbbbb", 2, 2);
+        auto n3 = tree.AddNode(n2, "ccccccccc", 3, 3);
+        auto n4 = tree.AddNode(n2, "ddddddddd", 4, 4);
+        tree.FreeNode(n2);
 
         while (mRunning)
         {
