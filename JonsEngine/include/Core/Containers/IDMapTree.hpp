@@ -11,6 +11,8 @@ namespace JonsEngine
     // TODO: extend with all/immediate child iterators when needed
     //
 
+    // Contigous-memory ID-based tree container
+    // Elements must be MoveAssignable
     template <typename T>
     class IDMapTree// : private IDMap<T>
     {
@@ -19,13 +21,31 @@ namespace JonsEngine
         const static ItemID INVALID_ITEM_ID = 0;
 
     private:
-        struct Item {
+        struct Item
+        {
             ItemID mNext;
             T mItem;
 
             template <typename... Arguments>
             Item(const ItemID next, Arguments&&... args);
             Item(Item& other);
+        };
+
+    public:
+        class iterator
+        {
+        public:
+            iterator(typename Item* pointer);
+
+            bool operator!=(const iterator& iter) const;
+            iterator& operator++();
+            iterator operator++(int);
+            T& operator*();
+            const T& operator*() const;
+
+
+        private:
+            typename Item* mPointer;
         };
 
     public:
@@ -43,6 +63,9 @@ namespace JonsEngine
 
         size_t Size() const;
         size_t Capacity() const;
+
+        iterator begin();
+        iterator end();
 
 
     private:
@@ -64,7 +87,6 @@ namespace JonsEngine
     //
     // IDMapTree::Item
     //
-
     template <typename T>
     template <typename... Arguments>
     IDMapTree<T>::Item::Item(const ItemID next, Arguments&&... args) : mNext(next), mItem(std::forward<Arguments>(args)...)
@@ -74,6 +96,49 @@ namespace JonsEngine
     template <typename T>
     IDMapTree<T>::Item::Item(Item& other) : mNext(other.mNext), mItem(other.mItem)
     {
+    }
+
+
+    //
+    // IDMapTree::Iterator
+    //
+    template <typename T>
+    IDMapTree<T>::iterator::iterator(typename Item* pointer) : mPointer(pointer)
+    {
+    }
+
+    template <typename T>
+    bool IDMapTree<T>::iterator::operator!=(const iterator& iter) const
+    {
+        return mPointer != iter.mPointer;
+    }
+
+    template <typename T>
+    typename IDMapTree<T>::iterator& IDMapTree<T>::iterator::operator++()
+    {
+        ++mPointer;
+
+        return *this;
+    }
+
+    template <typename T>
+    typename IDMapTree<T>::iterator IDMapTree<T>::iterator::operator++(int)
+    {
+        iterator old(++(*this));
+
+        return old;
+    }
+
+    template <typename T>
+    T& IDMapTree<T>::iterator::operator*()
+    {
+        return mIterator->mPointer;
+    }
+
+    template <typename T>
+    const T& IDMapTree<T>::iterator::operator*() const
+    {
+        return mIterator->mPointer;
     }
 
 

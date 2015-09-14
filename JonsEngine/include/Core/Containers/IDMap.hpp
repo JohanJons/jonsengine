@@ -27,13 +27,13 @@ namespace JonsEngine
         typedef uint32_t ItemID;
         const static ItemID INVALID_ITEM_ID = 0;
 
-        class Iterator {
+        class iterator {
         public:
-            Iterator(typename const std::vector<Item>::iterator& iter);
+            iterator(typename const std::vector<Item>::iterator& iter);
 
-            bool operator!=(const Iterator& iterator) const;
-            Iterator& operator++();
-            Iterator operator++(int);
+            bool operator!=(const iterator& iter) const;
+            iterator& operator++();
+            iterator operator++(int);
             T& operator*();
             const T& operator*() const;
 
@@ -53,8 +53,8 @@ namespace JonsEngine
 
         void Clear();
 
-        Iterator begin();
-        Iterator end();
+        iterator begin();
+        iterator end();
 
 
     private:
@@ -81,18 +81,18 @@ namespace JonsEngine
 	// IDMap::Iterator
 	//
 	template <typename T>
-    IDMap<T>::Iterator::Iterator(typename const std::vector<typename IDMap<T>::Item>::iterator& iter) : mIterator(iter)
+    IDMap<T>::iterator::iterator(typename const std::vector<typename IDMap<T>::Item>::iterator& iter) : mIterator(iter)
 	{
 	}
 
 	template <typename T>
-    bool IDMap<T>::Iterator::operator!=(const Iterator& iter) const
+    bool IDMap<T>::iterator::operator!=(const iterator& iter) const
 	{
 		return mIterator != iter.mIterator;
 	}
 
 	template <typename T>
-    typename IDMap<T>::Iterator& IDMap<T>::Iterator::operator++()
+    typename IDMap<T>::iterator& IDMap<T>::iterator::operator++()
 	{
 		++mIterator;
 
@@ -100,21 +100,21 @@ namespace JonsEngine
 	}
 
 	template <typename T>
-    typename IDMap<T>::Iterator IDMap<T>::Iterator::operator++(int)
+    typename IDMap<T>::iterator IDMap<T>::iterator::operator++(int)
 	{
-        Iterator old(++(*this));
+        iterator old(++(*this));
 
 		return old;
 	}
 
     template <typename T>
-    T& IDMap<T>::Iterator::operator*()
+    T& IDMap<T>::iterator::operator*()
     {
         return mIterator->mItem;
     }
 
 	template <typename T>
-    const T& IDMap<T>::Iterator::operator*() const
+    const T& IDMap<T>::iterator::operator*() const
 	{
 		return mIterator->mItem;
 	}
@@ -212,13 +212,13 @@ namespace JonsEngine
 	}
 
 	template <typename T>
-    typename IDMap<T>::Iterator IDMap<T>::begin()
+    typename IDMap<T>::iterator IDMap<T>::begin()
 	{
 		return mItems.begin();
 	}
 
 	template <typename T>
-    typename IDMap<T>::Iterator IDMap<T>::end()
+    typename IDMap<T>::iterator IDMap<T>::end()
 	{
 		return mItems.end();
 	}
