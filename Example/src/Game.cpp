@@ -42,6 +42,7 @@ namespace JonsGame
         auto n3 = tree.AddNode(n2, "ccccccccc", 3, 3);
         auto n4 = tree.AddNode(n2, "ddddddddd", 4, 4);
         tree.FreeNode(n2);
+        tree.Clear();
 
         while (mRunning)
         {
