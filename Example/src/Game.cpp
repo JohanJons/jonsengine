@@ -41,8 +41,21 @@ namespace JonsGame
         auto n2 = tree.AddNode(tree.GetRootNodeID(), "bbbbbbbbb", 2, 2);
         auto n3 = tree.AddNode(n2, "ccccccccc", 3, 3);
         auto n4 = tree.AddNode(n2, "ddddddddd", 4, 4);
+        auto n5 = tree.AddNode(n3, "eeeeeeeee", 4, 4);
+        //tree.FreeNode(n2);
+        //tree.Clear();
+
+        //tree.FreeNode(n4);
+
+        //auto a1 = tree.GetNode(tree.GetRootNodeID());
+       // auto a2 = tree.GetNode(n2);
+       // auto a3 = tree.GetNode(n3);
+        //auto a4 = tree.GetNode(n4);
+
+       // auto n5 = tree.AddNode(n3, "eeeeeeee", 5, 5);
+      //  auto a5 = tree.GetNode(n5);
+
         tree.FreeNode(n2);
-        tree.Clear();
 
         while (mRunning)
         {

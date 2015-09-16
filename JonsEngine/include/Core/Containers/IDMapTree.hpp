@@ -155,13 +155,8 @@ namespace JonsEngine
     template <typename T>
     void IDMapTree<T>::FreeNode(ItemID& nodeID)
     {
-        //Item* i = mBegin;
-        //Item* i2 = mBegin + 1;
-        //Item* i3 = mBegin + 2;
-        //Item* i4 = mBegin + 3;
-
         ItemIterator beginNode = GetItem(nodeID);
-        ItemIterator endNode = GetItem(beginNode->mNext);
+        ItemIterator endNode = beginNode->mNext != INVALID_ITEM_ID ? GetItem(beginNode->mNext) : beginNode + 1;
 
         // add node and all children to free index list
         std::for_each(beginNode, endNode, [this](Item& item) { const uint16_t index = IDMAP_INDEX_MASK(item.mID); mFreeIndirectionIndices.push_back(index); });
@@ -212,13 +207,13 @@ namespace JonsEngine
 
 
     template <typename T>
-    typename IDMapTree<T>::iterator IDMapTree<T>::begin()
+    typename IDMapTree<T>::ItemIterator IDMapTree<T>::begin()
     {
         return mItems.begin();
     }
 
     template <typename T>
-    typename IDMapTree<T>::iterator IDMapTree<T>::end()
+    typename IDMapTree<T>::ItemIterator IDMapTree<T>::end()
     {
         return mItems.end();
     }
