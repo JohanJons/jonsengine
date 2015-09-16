@@ -64,8 +64,8 @@ namespace JonsEngine
 
 
 
-	#define IDMAP_INDEX_MASK(id) id & 0xFFFFFFFF
-	#define IDMAP_VERSION_MASK(id) (id >> 16) & 0xFFFFFFFF
+	#define IDMAP_INDEX_MASK(id) (id & 0xFFFFFFFF)
+	#define IDMAP_VERSION_MASK(id) ((id >> 16) & 0xFFFFFFFF)
 
 	//
 	// IDMap::Item

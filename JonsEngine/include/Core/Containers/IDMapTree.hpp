@@ -24,13 +24,16 @@ namespace JonsEngine
     private:
         struct Item
         {
+            ItemID mID;
             ItemID mNext;
             T mItem;
 
             template <typename... Arguments>
-            Item(const ItemID next, Arguments&&... args);
+            Item(const ItemID id, const ItemID next, Arguments&&... args);
         };
 
+        typedef typename std::vector<Item> ItemContainer;
+        typedef typename ItemContainer::iterator ItemIterator;
 
     public:
         template <typename... Arguments>
@@ -50,11 +53,11 @@ namespace JonsEngine
         size_t Size() const;
         size_t Capacity() const;
 
+        ItemIterator begin();
+        ItemIterator end();
+
 
     private:
-        typedef typename std::vector<Item> ItemContainer;
-        typedef typename ItemContainer::iterator ItemIterator;
-
         ItemIterator GetItem(const ItemID nodeID);
 
 
@@ -62,6 +65,7 @@ namespace JonsEngine
 
         ItemContainer mItems;
         std::vector<ItemID> mIndirectionLayer;
+        std::vector<uint16_t> mFreeIndirectionIndices;
     };
 
 
@@ -71,7 +75,7 @@ namespace JonsEngine
     //
     template <typename T>
     template <typename... Arguments>
-    IDMapTree<T>::Item::Item(const ItemID next, Arguments&&... args) : mNext(next), mItem(std::forward<Arguments>(args)...)
+    IDMapTree<T>::Item::Item(const ItemID id, const ItemID next, Arguments&&... args) : mID(id), mNext(next), mItem(std::forward<Arguments>(args)...)
     {
     }
 
@@ -84,10 +88,11 @@ namespace JonsEngine
     IDMapTree<T>::IDMapTree(Arguments&&... args) : mRootNodeID(INVALID_ITEM_ID)
     {
         // Construct the root node
-        mItems.emplace_back(INVALID_ITEM_ID, std::forward<Arguments>(args)...);
+        const uint16_t rootNodeIndex = 0;
 
-        mRootNodeID = (mItems.size() - 1) | (static_cast<uint32_t>(1) << 16);
+        mRootNodeID = rootNodeIndex | (static_cast<uint32_t>(1) << 16);
         mIndirectionLayer.emplace_back(mRootNodeID);
+        mItems.emplace_back(mRootNodeID, INVALID_ITEM_ID, std::forward<Arguments>(args)...);
     }
 
     template <typename T>
@@ -100,23 +105,6 @@ namespace JonsEngine
     template <typename... Arguments>
     typename IDMapTree<T>::ItemID IDMapTree<T>::AddNode(const ItemID parentID, Arguments&&... args)
     {
-        /*Item& parent = GetItem(parentID);
-        const ItemID parentNextID = parent.mNext;
-        Item* end = &mItems.back();
-        Item* parentNextNode = parentNextID != INVALID_ITEM_ID ? &GetItem(parentNextID) : end;
-        Item* newChildNode = &parent + 1;
-
-        // find parents next
-        while (newChildNode != parentNextNode)
-            newChildNode++;*/
-
-        // move all elements one index to make room for new child
-        //std::move_backward(newChildNode, end, end);
-
-        //             [1]
-        //      [2]             
-        // [3]       [4]
-
         assert(mItems.size() < std::numeric_limits<uint16_t>().max());
 
         ItemIterator parentIter = GetItem(parentID);
@@ -128,37 +116,40 @@ namespace JonsEngine
         while (newChildIter != parentNextIter)
             ++newChildIter;
 
-        mItems.emplace(newChildIter, parentNextID, std::forward<Arguments>(args)...);
-
         const uint16_t newChildIndex = newChildIter - mItems.cbegin();
-        //uint16_t newChildVersion = 1;
-        //ItemID newChildID = INVALID_ITEM_ID;
-        //if (mIndirectionLayer.size() < mItems.size())
-        //{
+        ItemID publicChildID = INVALID_ITEM_ID;
+        if (!mFreeIndirectionIndices.empty())
+        {
+            const uint16_t freeIndirectionIndex = mFreeIndirectionIndices.back();
+            mFreeIndirectionIndices.pop_back();
 
-        //    mIndirectionLayer.emplace_back();
-        //}
-        //else
-        //{
+            ItemID& indirectionID = mIndirectionLayer.at(freeIndirectionIndex);
+            const uint16_t version = IDMAP_VERSION_MASK(indirectionID) + 1;
+            indirectionID = newChildIndex | (static_cast<uint32_t>(version) << 16);
 
-        //}
-        
+            publicChildID = freeIndirectionIndex | (static_cast<uint32_t>(version) << 16);
+        }
+        else
+        {
+            const uint16_t version = 1;
+            const ItemID indirectionID = newChildIndex | (static_cast<uint32_t>(version) << 16);
+            mIndirectionLayer.emplace_back(indirectionID);
 
-        const uint16_t newChildIndex = newChildIter - mItems.cbegin();
-        const ItemID newChildID = newChildIndex;
-        //new (newChildNode)Item(parentNextID, std::forward<Arguments>(args)...);
-        //mEnd++;
+            publicChildID = (mIndirectionLayer.size() - 1) | (static_cast<uint32_t>(version) << 16);
+        }
+
+        mItems.emplace(newChildIter, publicChildID, parentNextID, std::forward<Arguments>(args)...);
 
         ItemIterator currChildIter = parentIter + 1;
         if (currChildIter == newChildIter)
-            return newChildID;
+            return publicChildID;
 
         // if parent has other children, update the last one to point to this one
         while (currChildIter->mNext != parentNextID)
             ++currChildIter;
-        currChildIter->mNext = newChildID;
+        currChildIter->mNext = publicChildID;
 
-        return newChildID;
+        return publicChildID;
     }
 
     template <typename T>
@@ -171,6 +162,10 @@ namespace JonsEngine
 
         ItemIterator beginNode = GetItem(nodeID);
         ItemIterator endNode = GetItem(beginNode->mNext);
+
+        // add node and all children to free index list
+        std::for_each(beginNode, endNode, [this](Item& item) { const uint16_t index = IDMAP_INDEX_MASK(item.mID); mFreeIndirectionIndices.push_back(index); });
+
         mItems.erase(beginNode, endNode);
 
         nodeID = INVALID_ITEM_ID;
@@ -213,6 +208,19 @@ namespace JonsEngine
     size_t IDMapTree<T>::Capacity() const
     {
         return mItems.capacity();
+    }
+
+
+    template <typename T>
+    typename IDMapTree<T>::iterator IDMapTree<T>::begin()
+    {
+        return mItems.begin();
+    }
+
+    template <typename T>
+    typename IDMapTree<T>::iterator IDMapTree<T>::end()
+    {
+        return mItems.end();
     }
 
 
