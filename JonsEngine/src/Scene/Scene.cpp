@@ -21,7 +21,12 @@ namespace JonsEngine
 
 
     Scene::Scene(const std::string& sceneName, const ResourceManifest& resourceManifest) :
-        mName(sceneName), mResourceManifest(resourceManifest), mAmbientLight(0.2f), mSkyboxID(IDMap<Skybox>::INVALID_ITEM_ID), mRootNodeID(CreateSceneNode("Root", INVALID_SCENE_NODE_ID))
+        mName(sceneName),
+        mResourceManifest(resourceManifest),
+        mAmbientLight(0.2f),
+        mSkyboxID(IDMap<Skybox>::INVALID_ITEM_ID),
+        mSceneNodeTree("Root", INVALID_SCENE_NODE_ID, std::bind(&Scene::MarkAsDirty, this, std::placeholders::_1)),
+        mRootNodeID(mSceneNodeTree.GetRootNodeID())
     {
     }
 
@@ -32,7 +37,7 @@ namespace JonsEngine
 
     SceneNode& Scene::GetRootNode()
     {
-        return mSceneNodes.GetItem(mRootNodeID);
+        return mSceneNodeTree.GetNode(mRootNodeID);
     }
 
     const SceneNodeID Scene::GetRootNodeID() const
@@ -60,7 +65,7 @@ namespace JonsEngine
             if (actor.mSceneNodeID == INVALID_SCENE_NODE_ID || actor.mModelID == INVALID_MODEL_ID)
 				continue;
 
-            const SceneNode& sceneNode = mSceneNodes.GetItem(actor.mSceneNodeID);
+            const SceneNode& sceneNode = mSceneNodeTree.GetNode(actor.mSceneNodeID);
 
             const Mat4& worldMatrix = sceneNode.GetWorldTransform();
             const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix * worldMatrix;
@@ -76,7 +81,7 @@ namespace JonsEngine
             if (pointLight.mSceneNodeID == INVALID_SCENE_NODE_ID)
                 continue;
 
-            const SceneNode& sceneNode = mSceneNodes.GetItem(pointLight.mSceneNodeID);
+            const SceneNode& sceneNode = mSceneNodeTree.GetNode(pointLight.mSceneNodeID);
 
             const Vec3 lightPosition = sceneNode.Position();
 
@@ -89,7 +94,7 @@ namespace JonsEngine
                 if (actor.mSceneNodeID == INVALID_SCENE_NODE_ID || actor.mModelID == INVALID_MODEL_ID)
                     continue;
 
-                const SceneNode& sceneNode = mSceneNodes.GetItem(actor.mSceneNodeID);
+                const SceneNode& sceneNode = mSceneNodeTree.GetNode(actor.mSceneNodeID);
 
                 const Mat4& actorWorldMatrix = sceneNode.GetWorldTransform();
                 const Model& model = mResourceManifest.GetModel(actor.mModelID);
@@ -115,7 +120,7 @@ namespace JonsEngine
                     if (actor.mSceneNodeID == INVALID_SCENE_NODE_ID || actor.mModelID == INVALID_MODEL_ID)
                         continue;
 
-                    const SceneNode& sceneNode = mSceneNodes.GetItem(actor.mSceneNodeID);
+                    const SceneNode& sceneNode = mSceneNodeTree.GetNode(actor.mSceneNodeID);
                     const Model& model = mResourceManifest.GetModel(actor.mModelID);
 
                     const Mat4& worldMatrix = sceneNode.GetWorldTransform();
@@ -143,26 +148,20 @@ namespace JonsEngine
 
     SceneNodeID Scene::CreateSceneNode(const std::string& sceneNodeName, const SceneNodeID parent)
     {
-        SceneNodeID ret = mSceneNodes.AddItem(sceneNodeName, parent, std::bind(&Scene::MarkAsDirty, this, std::placeholders::_1));
-       // mSceneNodeIters.emplace_back(ret, parent, nullptr, nullptr);
-
-        //SceneNodeIterator& lastChild = FindLastChild(parent);
-        //lastChild.mNextSibling = ret;
-
-        return ret;
+        return mSceneNodeTree.AddNode(parent, sceneNodeName, parent, std::bind(&Scene::MarkAsDirty, this, std::placeholders::_1));
     }
 
     void Scene::DeleteSceneNode(SceneNodeID& sceneNodeID)
     {
         assert(sceneNodeID != INVALID_SCENE_NODE_ID);
 
-        mSceneNodes.MarkAsFree(sceneNodeID);
+        mSceneNodeTree.FreeNode(sceneNodeID);
         sceneNodeID = INVALID_SCENE_NODE_ID;
     }
 
     SceneNode& Scene::GetSceneNode(const SceneNodeID sceneNodeID)
     {
-        return mSceneNodes.GetItem(sceneNodeID);
+        return mSceneNodeTree.GetNode(sceneNodeID);
     }
 
 
@@ -260,8 +259,9 @@ namespace JonsEngine
 
     void Scene::UpdateDirtyObjects()
     {
-        if (mDirtySceneNode)
+        if (mHasDirtySceneNodes)
         {
+
             //for (auto iter = mSceneNodes.begin() + 1; iter != mSceneNodes.end(); ++iter)
             //{
                 //iter
@@ -270,13 +270,13 @@ namespace JonsEngine
                 //node.UpdateWorldMatrix(*parentTransform);
                 //parentTransform 
             //}
+            mHasDirtySceneNodes = false;
         }
-
-        mDirtySceneNode = false;
     }
 
     void Scene::MarkAsDirty(SceneNode* sceneNode)
     {
+        mHasDirtySceneNodes = true;
     }
 
     /*SceneNodeIterator& Scene::FindSceneNodeIterator(const SceneNodeID sceneNodeID)

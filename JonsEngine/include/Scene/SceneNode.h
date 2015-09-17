@@ -1,7 +1,7 @@
 #pragma once
 
 #include "include/Core/Types.h"
-#include "include/Core/Containers/IDMap.hpp"
+#include "include/Core/Containers/IDMapTree.hpp"
 
 #include <string>
 #include <vector>
@@ -12,20 +12,16 @@ namespace JonsEngine
     class SceneNode;
 
     typedef std::function<void(SceneNode*)> OnSceneNodeDirtyFunc;
-    typedef IDMap<SceneNode>::ItemID SceneNodeID;
-    static const SceneNodeID INVALID_SCENE_NODE_ID = IDMap<SceneNode>::INVALID_ITEM_ID;
+    typedef IDMapTree<SceneNode>::ItemID SceneNodeID;
+    static const SceneNodeID INVALID_SCENE_NODE_ID = IDMapTree<SceneNode>::INVALID_ITEM_ID;
 
     class SceneNode
     {
     public:
         SceneNode(const std::string& nodeName, const SceneNodeID parent, const OnSceneNodeDirtyFunc& onDirty);
+        SceneNode& operator=(SceneNode&& otherSceneNode);
         ~SceneNode();
 	
-        /*SceneNodeID CreateChildNode(const std::string& nodeName);
-        SceneNodeID FindChildNode(const std::string& nodeName);
-        bool RemoveChildNode(const std::string& nodeName);
-        bool RemoveChildNode(SceneNodePtr node);*/
-
         // TODO: for non-uniform scaling, need change in gbuffer shader
         void ScaleNode(const float scale);
         void TranslateNode(const Vec3& translateVec);
@@ -37,20 +33,18 @@ namespace JonsEngine
         const Vec3& Scale() const;
         const Mat4& GetWorldTransform() const;
 
-
-        const std::string mName;
-        const SceneNodeID mParent;
-        //IDMap<Mat4>::ItemID GetWorldTransformID() const;
-        //const std::string& GetNodeName() const;
-        //const std::vector<SceneNodePtr>& GetChildNodes() const;
+        const std::string& GetName() const;
+        SceneNodeID GetParentID() const;
 
 
     private:
+        std::string mName;
         Mat4 mWorldTransform;
         Quaternion mOrientation;
         Vec3 mScale;
         Vec3 mTranslation;
 
-        const OnSceneNodeDirtyFunc mOnDirtyFunc;
+        SceneNodeID mParent;
+        OnSceneNodeDirtyFunc mOnDirtyFunc;
     };
 }

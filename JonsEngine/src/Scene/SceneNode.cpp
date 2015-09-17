@@ -8,6 +8,25 @@ namespace JonsEngine
         mName(nodeName), mWorldTransform(gIdentityMatrix), mOrientation(1.0f, 0.0f, 0.0f, 0.0f), mScale(1.0f), mTranslation(0.0f), mParent(parent), mOnDirtyFunc(onDirty)
     {
     }
+
+    SceneNode& SceneNode::operator=(SceneNode&& otherSceneNode)
+    {
+        if (this != &otherSceneNode)
+        {
+            mName = std::move(otherSceneNode.mName);
+            mWorldTransform = std::move(otherSceneNode.mWorldTransform);
+            mOrientation = std::move(otherSceneNode.mOrientation);
+            mScale = std::move(otherSceneNode.mScale);
+            mTranslation = std::move(otherSceneNode.mTranslation);
+
+            mParent = std::move(otherSceneNode.mParent);
+            mOnDirtyFunc = std::move(otherSceneNode.mOnDirtyFunc);
+
+            otherSceneNode.mParent = INVALID_SCENE_NODE_ID;
+        }
+
+        return *this;
+    }
         
     SceneNode::~SceneNode()
     {
@@ -42,12 +61,6 @@ namespace JonsEngine
         mWorldTransform *= glm::toMat4(mOrientation);
         mWorldTransform = glm::scale(mWorldTransform, mScale);
         mWorldTransform = parentMatrix * mWorldTransform;
-
-
-        //UpdateTransform();
-
-        //for (SceneNodePtr childNode : mChildNodes)
-        //    childNode->UpdateChildren(mTransform.Get());
     }
 
 
@@ -64,5 +77,16 @@ namespace JonsEngine
     const Mat4& SceneNode::GetWorldTransform() const
     {
         return mWorldTransform;
+    }
+
+
+    const std::string& SceneNode::GetName() const
+    {
+        return mName;
+    }
+
+    SceneNodeID SceneNode::GetParentID() const
+    {
+        return mParent;
     }
 }

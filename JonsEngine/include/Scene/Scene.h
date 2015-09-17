@@ -60,8 +60,6 @@ namespace JonsEngine
     private:
         void UpdateDirtyObjects();
         void MarkAsDirty(SceneNode* sceneNode);
-        //SceneNodeIterator& FindSceneNodeIterator(const SceneNodeID sceneNodeID);
-        //SceneNodeIterator* FindLastChild(const SceneNodeID sceneNodeID);
 
 
         const ResourceManifest& mResourceManifest;
@@ -70,14 +68,12 @@ namespace JonsEngine
         Vec4 mAmbientLight;
         SkyboxID mSkyboxID;
 
-        IDMap<SceneNode> mSceneNodes;
 		IDMap<PointLight> mPointLights;
         IDMap<DirectionalLight> mDirectionalLights;
         IDMap<Actor> mActors;
+        IDMapTree<SceneNode> mSceneNodeTree;
 
-        //std::vector<SceneNodeIterator> mSceneNodeIters;
-        std::vector<SceneNode*> mDirtySceneNodes;
-        bool mDirtySceneNode;
+        bool mHasDirtySceneNodes;
 
         const SceneNodeID mRootNodeID;
         RenderQueue mRenderQueue;

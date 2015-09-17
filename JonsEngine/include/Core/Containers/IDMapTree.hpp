@@ -89,8 +89,9 @@ namespace JonsEngine
     {
         // Construct the root node
         const uint16_t rootNodeIndex = 0;
+        const uint16_t version = 1;
 
-        mRootNodeID = rootNodeIndex | (static_cast<uint32_t>(1) << 16);
+        mRootNodeID = rootNodeIndex | (static_cast<uint32_t>(version) << 16);
         mIndirectionLayer.emplace_back(mRootNodeID);
         mItems.emplace_back(mRootNodeID, INVALID_ITEM_ID, std::forward<Arguments>(args)...);
     }
@@ -156,7 +157,7 @@ namespace JonsEngine
     void IDMapTree<T>::FreeNode(ItemID& nodeID)
     {
         ItemIterator beginNode = GetItem(nodeID);
-        ItemIterator endNode = beginNode->mNext != INVALID_ITEM_ID ? GetItem(beginNode->mNext) : beginNode + 1;
+        ItemIterator endNode = beginNode->mNext != INVALID_ITEM_ID ? GetItem(beginNode->mNext) : mItems.end();
 
         // add node and all children to free index list
         std::for_each(beginNode, endNode, [this](Item& item) { const uint16_t index = IDMAP_INDEX_MASK(item.mID); mFreeIndirectionIndices.push_back(index); });

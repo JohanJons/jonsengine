@@ -12,27 +12,10 @@ namespace JonsEngine
     {
     public:
         Actor(const std::string& name, const ModelID modelId, const SceneNodeID sceneNodeID);
-        Actor& operator=(Actor&& otherActor)
-        {
-            if (this != &otherActor)
-            {
-                mName = std::move(otherActor.mName);
-                mModelID = std::move(otherActor.mModelID);
-                mSceneNodeID = std::move(otherActor.mSceneNodeID);
-                mMaterialID = std::move(otherActor.mMaterialID);
-                mMaterialTilingFactor = std::move(otherActor.mMaterialTilingFactor);
-
-                otherActor.mModelID = INVALID_MODEL_ID;
-                otherActor.mSceneNodeID = INVALID_SCENE_NODE_ID;
-                otherActor.mMaterialID = INVALID_MATERIAL_ID;
-            }
-
-            return *this;
-        }
         ~Actor();
 
 
-        std::string mName;
+        const std::string mName;
         ModelID mModelID;
         SceneNodeID mSceneNodeID;
 
