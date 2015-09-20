@@ -32,16 +32,31 @@ namespace JonsGame
     void Game::Run()
     {
 
-        //                [1]
-        //          [2]             
-        //    [3]         [4]
-        //[5]
+        //                [0]
+        //          [1]             
+        //    [2]   [3]    [5]     
+        //[4]
+        struct apa
+        {
+            apa(int wi, float wb) : i(wi), b(wb)
+            {
+            }
 
-        IDMapTree<JonsEngine::Actor> tree("aaaaaaaaa", 1, 1);
-        auto n2 = tree.AddNode(tree.GetRootNodeID(), "bbbbbbbbb", 2, 2);
-        auto n3 = tree.AddNode(n2, "ccccccccc", 3, 3);
-        auto n4 = tree.AddNode(n2, "ddddddddd", 4, 4);
-        auto n5 = tree.AddNode(n3, "eeeeeeeee", 4, 4);
+            apa& operator=(apa&& other)
+            {
+                i = other.i;
+                b = other.b;
+            }
+
+            int i;
+            float b;
+        };
+        IDMapTree<apa> tree(0, 0.0f);
+        auto n1 = tree.AddNode(tree.GetRootNodeID(), 1, 1.0f);
+        auto n2 = tree.AddNode(n1, 2, 2.0f);
+        auto n3 = tree.AddNode(n1, 3, 3.0f);
+        auto n4 = tree.AddNode(n2, 4, 4.0f);
+        auto n5 = tree.AddNode(n1, 5, 5.0f);
         //tree.FreeNode(n2);
         //tree.Clear();
 
@@ -55,7 +70,17 @@ namespace JonsGame
        // auto n5 = tree.AddNode(n3, "eeeeeeee", 5, 5);
       //  auto a5 = tree.GetNode(n5);
 
-        tree.FreeNode(n2);
+        tree.FreeNode(n1);
+
+        auto n6 = tree.AddNode(tree.GetRootNodeID(), 6, 6.0f);
+        auto n7 = tree.AddNode(tree.GetRootNodeID(), 7, 7.0f);
+        auto n8 = tree.AddNode(n7, 8, 8.0f);
+
+        for (apa& a : tree.GetImmediateChildrenIterator(n1))
+        {
+
+        }
+
 
         while (mRunning)
         {

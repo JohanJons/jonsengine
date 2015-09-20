@@ -1,10 +1,12 @@
 #pragma once
 
 #include "include/Core/Containers/IDMap.hpp"
+#include "include/Core/Containers/RangedIterator.hpp"
 #include "include/Core/Memory/HeapAllocator.h"
 
 #include <algorithm>
 #include <limits>
+#include <functional>
 
 namespace JonsEngine
 {
@@ -41,11 +43,16 @@ namespace JonsEngine
         public:
             iterator(typename const ItemIterator& iter);
 
-            bool operator!=(const iterator& iter) const;
             iterator& operator++();
             iterator operator++(int);
+
+            void operator+=(const size_t offset);
+            iterator operator+ (const size_t offset);
+
             T& operator*();
             const T& operator*() const;
+
+            bool operator!=(const iterator& iter) const;
 
 
         private:
@@ -55,11 +62,26 @@ namespace JonsEngine
         class ImmediateChildrenIterator : public iterator
         {
         public:
+            typedef std::function<ItemIterator(const ItemID itemID)> GetNodeFunc;
+
+            ImmediateChildrenIterator(const iterator& iter, const GetNodeFunc& getNodeFunc);
+
             ImmediateChildrenIterator& operator++();
-            ImmediateChildrenIterator operator++(int);
+            
+            ImmediateChildrenIterator& operator--() = delete;
+            ImmediateChildrenIterator operator--(int) = delete;
+            ImmediateChildrenIterator& operator+=(typename ItemIterator::difference_type) = delete;
+            ImmediateChildrenIterator operator+(typename ItemIterator::difference_type) const = delete;
+            ImmediateChildrenIterator& operator-=(typename ItemIterator::difference_type) = delete;
+
+
+        private:
+            GetNodeFunc mGetNodeFunc;
         };
 
     public:
+        typename typedef RangedIterator<std::vector<T>, ImmediateChildrenIterator> ImmChildIterator;
+
         template <typename... Arguments>
         IDMapTree(Arguments&&... args);
         ~IDMapTree();
@@ -80,9 +102,13 @@ namespace JonsEngine
         iterator begin();
         iterator end();
 
+        iterator GetAllChildrenIterator(const ItemID nodeID);
+        ImmChildIterator GetImmediateChildrenIterator(const ItemID nodeID);
+
 
     private:
         ItemIterator GetItem(const ItemID nodeID);
+        ItemID& GetIndirectionID(const ItemID publicID);
 
 
         ItemID mRootNodeID;
@@ -135,6 +161,19 @@ namespace JonsEngine
     }
 
     template <typename T>
+    void IDMapTree<T>::operator+=(const size_t offset)
+    {
+
+    }
+
+    template <typename T>
+    typename IDMapTree<T>::iterator IDMapTree<T>::operator+(const size_t offset)
+    {
+
+    }
+
+
+    template <typename T>
     T& IDMapTree<T>::iterator::operator*()
     {
         return mIterator->mItem;
@@ -151,15 +190,16 @@ namespace JonsEngine
     // IDMapTree::ImmediateChildrenIterator
     //
     template <typename T>
+    IDMapTree<T>::ImmediateChildrenIterator::ImmediateChildrenIterator(const iterator& iter, const GetNodeFunc& getNodeFunc) : iterator(iter), mGetNodeFunc(getNodeFunc)
+    {
+    }
+
+    template <typename T>
     typename IDMapTree<T>::ImmediateChildrenIterator& IDMapTree<T>::ImmediateChildrenIterator::operator++()
     {
-        
-    }
-    
-    template <typename T>
-    typename IDMapTree<T>::ImmediateChildrenIterator IDMapTree<T>::ImmediateChildrenIterator::operator++(int)
-    {
+        this->_Ptr = this->_Ptr->mNext._Ptr;
 
+        return *this;
     }
 
 
@@ -222,16 +262,25 @@ namespace JonsEngine
             publicChildID = (mIndirectionLayer.size() - 1) | (static_cast<uint32_t>(version) << 16);
         }
 
+        ItemIterator firstChildIter = parentIter + 1;
+        // if parent already has a child
+        if (firstChildIter->mID != parentNextID)
+        {
+            // if parent has more than one children
+            if (firstChildIter->mNext != parentNextID)
+            {
+                do
+                    ++firstChildIter;
+                while (firstChildIter->mNext != parentNextID);
+            }
+
+            firstChildIter->mNext = publicChildID;
+        }
+
+        // increment indirection layer indexes
+        std::for_each(newChildIter, mItems.end(), [this](Item& item) { ItemID& indirID = GetIndirectionID(item.mID); ++indirID; });
+            
         mItems.emplace(newChildIter, publicChildID, parentNextID, std::forward<Arguments>(args)...);
-
-        ItemIterator currChildIter = parentIter + 1;
-        if (currChildIter == newChildIter)
-            return publicChildID;
-
-        // if parent has other children, update the last one to point to this one
-        while (currChildIter->mNext != parentNextID)
-            ++currChildIter;
-        currChildIter->mNext = publicChildID;
 
         return publicChildID;
     }
@@ -239,13 +288,14 @@ namespace JonsEngine
     template <typename T>
     void IDMapTree<T>::FreeNode(ItemID& nodeID)
     {
-        ItemIterator beginNode = GetItem(nodeID);
-        ItemIterator endNode = beginNode->mNext != INVALID_ITEM_ID ? GetItem(beginNode->mNext) : mItems.end();
+        ItemIterator node = GetItem(nodeID);
+        ItemIterator endNode = node->mNext != INVALID_ITEM_ID ? GetItem(node->mNext) : mItems.end();
 
         // add node and all children to free index list
-        std::for_each(beginNode, endNode, [this](Item& item) { const uint16_t index = IDMAP_INDEX_MASK(item.mID); mFreeIndirectionIndices.push_back(index); });
+        std::for_each(node, endNode, [this](Item& item) { const uint16_t index = IDMAP_INDEX_MASK(item.mID); mFreeIndirectionIndices.push_back(index); });
+        std::for_each(mItems.begin(), node, [this, node](Item& item) { if (item.mNext == node->mID) item.mNext = node->mNext; });
 
-        mItems.erase(beginNode, endNode);
+        mItems.erase(node, endNode);
 
         nodeID = INVALID_ITEM_ID;
     }
@@ -291,325 +341,56 @@ namespace JonsEngine
 
 
     template <typename T>
-    typename IDMapTree<T>::ItemIterator IDMapTree<T>::begin()
+    typename IDMapTree<T>::iterator IDMapTree<T>::begin()
     {
-        return mItems.begin();
+        return iterator(mItems.begin());
     }
 
     template <typename T>
-    typename IDMapTree<T>::ItemIterator IDMapTree<T>::end()
+    typename IDMapTree<T>::iterator IDMapTree<T>::end()
     {
-        return mItems.end();
+        return iterator(mItems.end());
     }
 
 
     template <typename T>
     typename IDMapTree<T>::ItemIterator IDMapTree<T>::GetItem(const ItemID nodeID)
     {
-        assert(nodeID != INVALID_ITEM_ID);
-
-        const uint16_t indirectionIndex = IDMAP_INDEX_MASK(nodeID);
-        const uint16_t version = IDMAP_VERSION_MASK(nodeID);
-
-        const ItemID itemID = mIndirectionLayer.at(indirectionIndex);
+        const ItemID& itemID = GetIndirectionID(nodeID);
         const uint16_t itemIndex = IDMAP_INDEX_MASK(itemID);
-        const uint16_t itemVersion = IDMAP_VERSION_MASK(itemID);
 
-        assert(version == itemVersion);
         assert(itemIndex <= mItems.size());
 
         return mItems.begin() + itemIndex;
     }
 
-
-    /*template <typename T>
-    class IDMapTree// : private IDMap<T>
-    {
-    public:
-        typedef uint32_t ItemID;
-        const static ItemID INVALID_ITEM_ID = 0;
-
-    private:
-        struct Item
-        {
-            ItemID mNext;
-            T mItem;
-
-            template <typename... Arguments>
-            Item(const ItemID next, Arguments&&... args);
-        };
-
-    public:
-        class iterator
-        {
-        public:
-            iterator(typename Item* pointer);
-
-            bool operator!=(const iterator& iter) const;
-            iterator& operator++();
-            iterator operator++(int);
-            T& operator*();
-            const T& operator*() const;
-
-
-        private:
-            typename Item* mPointer;
-        };
-
-    public:
-        template <typename... Arguments>
-        IDMapTree(Arguments&&... args);
-        ~IDMapTree();
-
-        template <typename... Arguments>
-        ItemID AddNode(const ItemID parent, Arguments&&... args);
-        void FreeNode(ItemID& nodeID);
-        
-        ItemID GetRootNodeID() const;
-        T& GetNode(const ItemID nodeID);
-        const T& GetNode(const ItemID nodeID) const;
-
-        void Clear();
-
-        size_t Size() const;
-        size_t Capacity() const;
-
-        iterator begin();
-        iterator end();
-
-
-    private:
-        void Grow();
-        Item& GetItem(const ItemID nodeID);
-
-
-        IMemoryAllocator& mAllocator;
-        ItemID mIDCounter;
-        ItemID mRootNodeID;
-
-        Item* mBegin;
-        Item* mEnd;
-        Item* mCapacity;
-        std::vector<ItemID> mIndirectionLayer;
-    };
-
-
-    //
-    // IDMapTree::Item
-    //
     template <typename T>
-    template <typename... Arguments>
-    IDMapTree<T>::Item::Item(const ItemID next, Arguments&&... args) : mNext(next), mItem(std::forward<Arguments>(args)...)
+    typename IDMapTree<T>::ItemID& IDMapTree<T>::GetIndirectionID(const ItemID publicID)
     {
-    }
+        assert(publicID != INVALID_ITEM_ID);
 
+        const uint16_t indirectionIndex = IDMAP_INDEX_MASK(publicID);
+        const uint16_t version = IDMAP_VERSION_MASK(publicID);
 
-    //
-    // IDMapTree::Iterator
-    //
-    template <typename T>
-    IDMapTree<T>::iterator::iterator(typename Item* pointer) : mPointer(pointer)
-    {
-    }
+        ItemID& indirID = mIndirectionLayer.at(indirectionIndex);
 
-    template <typename T>
-    bool IDMapTree<T>::iterator::operator!=(const iterator& iter) const
-    {
-        return mPointer != iter.mPointer;
-    }
+        assert(version == IDMAP_VERSION_MASK(indirID));
 
-    template <typename T>
-    typename IDMapTree<T>::iterator& IDMapTree<T>::iterator::operator++()
-    {
-        ++mPointer;
-
-        return *this;
-    }
-
-    template <typename T>
-    typename IDMapTree<T>::iterator IDMapTree<T>::iterator::operator++(int)
-    {
-        iterator old(++(*this));
-
-        return old;
-    }
-
-    template <typename T>
-    T& IDMapTree<T>::iterator::operator*()
-    {
-        return mIterator->mPointer;
-    }
-
-    template <typename T>
-    const T& IDMapTree<T>::iterator::operator*() const
-    {
-        return mIterator->mPointer;
-    }
-
-
-    //
-    // IDMapTree
-    //
-    template <typename T>
-    template <typename... Arguments>
-    IDMapTree<T>::IDMapTree(Arguments&&... args) :
-        mAllocator(HeapAllocator::GetDefaultHeapAllocator()),
-        mIDCounter(1),
-        mRootNodeID(mIDCounter++),
-        mBegin(nullptr),
-        mEnd(nullptr),
-        mCapacity(nullptr)
-    {
-        // Construct the root node
-        Grow();
-        new (mEnd++) Item(INVALID_ITEM_ID, std::forward<Arguments>(args)...);
-    }
-
-    template <typename T>
-    IDMapTree<T>::~IDMapTree()
-    {
-        if (mBegin)
-            mAllocator.Deallocate(mBegin);
+        return indirID;
     }
 
 
     template <typename T>
-    template <typename... Arguments>
-    typename IDMapTree<T>::ItemID IDMapTree<T>::AddNode(const ItemID parentID, Arguments&&... args)
+    typename IDMapTree<T>::iterator IDMapTree<T>::GetAllChildrenIterator(const ItemID nodeID)
     {
-        // rare case; could reorder statement for performance?
-        // but insertion is expensive and preferably rare anyway so dont bother
-        if (mEnd >= mCapacity)
-            Grow();
-        
-        Item& parent = GetItem(parentID);
-        const ItemID parentNextID = parent.mNext;
-        Item* parentNextNode = parentNextID != INVALID_ITEM_ID ? &GetItem(parentNextID) : mEnd;
-        Item* newChildNode = &parent + 1;
 
-        // find parents next
-        while (newChildNode != parentNextNode)
-            newChildNode++;
-
-        // move all elements one index to make room for new child
-        std::move_backward(newChildNode, mEnd, mEnd);
-
-        //             [1]
-        //      [2]             
-        // [3]       [4]
-
-        const ItemID newChildID = mIDCounter++;
-        new (newChildNode) Item(parentNextID, std::forward<Arguments>(args)...);
-        mEnd++;
-        
-        Item* currChild = &parent + 1;
-        if (currChild == newChildNode)
-            return newChildID;
-
-        // if parent has other children, update the last one to point to this one
-        while (currChild->mNext != parentNextID)
-            currChild = &GetItem(currChild->mNext);
-        currChild->mNext = newChildID;
-
-        return newChildID;
     }
 
     template <typename T>
-    void IDMapTree<T>::FreeNode(ItemID& nodeID)
+    typename IDMapTree<T>::ImmChildIterator IDMapTree<T>::GetImmediateChildrenIterator(const ItemID nodeID)
     {
-        Item* i = mBegin;
-        Item* i2 = mBegin + 1;
-        Item* i3 = mBegin + 2;
-        Item* i4 = mBegin + 3;
+//        ItemIterator node = GetNode(nodeID);
 
-        Item* freedNode = &GetItem(nodeID);
-        Item* endNode = &GetItem(freedNode->mNext);
-        
-        // destruct node and its children and defragment container
-        std::for_each(freedNode, endNode, [](Item& node) { node.~Item(); });
-        std::move(endNode, mEnd, freedNode);
-
-        const uint32_t numItemsRemoved = endNode - freedNode;
-        mEnd -= numItemsRemoved;
-
-        nodeID = INVALID_ITEM_ID;
+ //       return ImmChildIterator(node);
     }
-
-
-    template <typename T>
-    typename IDMapTree<T>::ItemID IDMapTree<T>::GetRootNodeID() const
-    {
-        return mRootNodeID;
-    }
-
-    template <typename T>
-    T& IDMapTree<T>::GetNode(const ItemID nodeID)
-    {
-        return GetItem(nodeID)->mItem;
-    }
-
-    template <typename T>
-    const T& IDMapTree<T>::GetNode(const ItemID nodeID) const
-    {
-        return GetItem(nodeID)->mItem;
-    }
-
-
-    template <typename T>
-    void IDMapTree<T>::Clear()
-    {
-        std::for_each(mBegin, mEnd, [](Item& node){ node.~Item(); });
-        mEnd = mBegin;
-    }
-
-
-    template <typename T>
-    size_t IDMapTree<T>::Size() const
-    {
-        return static_cast<size_t>(mEnd - mBegin);
-    }
-
-    template <typename T>
-    size_t IDMapTree<T>::Capacity() const
-    {
-        return static_cast<size_t>(mCapacity - mBegin);
-    }
-
-
-    template <typename T>
-    void IDMapTree<T>::Grow()
-    {
-        const size_t prevCapacity = Capacity();
-        const size_t prevSize = Size();
-        const size_t newCapacity = prevCapacity != 0 ? static_cast<size_t>(1.5f * prevCapacity) : 2;
-        Item* newBuffer = static_cast<Item*>(mAllocator.Allocate(newCapacity * sizeof(Item)));
-
-        // copy prev elements
-        std::uninitialized_copy(mBegin, mEnd, newBuffer);
-        
-        // destroy old elements
-        std::for_each(mBegin, mEnd, [](Item& item) { item.~Item(); });
-        mAllocator.Deallocate(mBegin);
-
-        mBegin = newBuffer;
-        mEnd = mBegin + prevSize;
-        mCapacity = mBegin + newCapacity;
-    }
-
-    template <typename T>
-    typename IDMapTree<T>::Item& IDMapTree<T>::GetItem(const ItemID nodeID)
-    {
-        assert(nodeID != INVALID_ITEM_ID);
-
-        const uint16_t indirectionIndex = IDMAP_INDEX_MASK(nodeID);
-        const uint16_t version = IDMAP_VERSION_MASK(nodeID);
-
-        const ItemID itemID = mIndirectionLayer.at(indirectionIndex);
-        const uint16_t itemIndex = IDMAP_INDEX_MASK(itemID);
-        const uint16_t itemVersion = IDMAP_VERSION_MASK(itemID);
-
-        assert(version == itemVersion);
-
-        return *(mBegin + itemIndex);
-    }*/
 }

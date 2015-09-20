@@ -259,19 +259,15 @@ namespace JonsEngine
 
     void Scene::UpdateDirtyObjects()
     {
-        if (mHasDirtySceneNodes)
+        if (!mHasDirtySceneNodes)
+            return;
+
+        for (auto iter = mSceneNodeTree.begin() + 1; iter != mSceneNodeTree.end(); ++iter)
         {
-
-            //for (auto iter = mSceneNodes.begin() + 1; iter != mSceneNodes.end(); ++iter)
-            //{
-                //iter
-                //const Mat4& parentTransform = mSceneNodes.GetItem(iter->)
-
-                //node.UpdateWorldMatrix(*parentTransform);
-                //parentTransform 
-            //}
-            mHasDirtySceneNodes = false;
+            
         }
+
+        mHasDirtySceneNodes = false;
     }
 
     void Scene::MarkAsDirty(SceneNode* sceneNode)
