@@ -23,7 +23,7 @@ namespace JonsEngine
         mName(sceneName),
         mResourceManifest(resourceManifest),
         mAmbientLight(0.2f),
-        mSkyboxID(IDMap<Skybox>::INVALID_ITEM_ID),
+        mSkyboxID(INVALID_SKYBOX_ID),
         mSceneNodeTree("Root", INVALID_SCENE_NODE_ID, std::bind(&Scene::MarkAsDirty, this, std::placeholders::_1)),
         mRootNodeID(mSceneNodeTree.GetRootNodeID())
     {

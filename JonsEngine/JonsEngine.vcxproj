@@ -176,6 +176,7 @@
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
     <ClInclude Include="include\Core\Containers\DataPool.hpp" />
     <ClInclude Include="include\Core\Containers\IDMap.hpp" />
+    <ClInclude Include="include\Core\Containers\IDMapBase.hpp" />
     <ClInclude Include="include\Core\Containers\IDMapPointer.hpp" />
     <ClInclude Include="include\Core\Containers\IDMapTree.hpp" />
     <ClInclude Include="include\Core\Containers\RangedIterator.hpp" />

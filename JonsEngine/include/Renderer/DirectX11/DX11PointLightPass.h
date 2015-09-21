@@ -5,7 +5,6 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
 #include "include/Core/Types.h"
-#include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/Platform/Directx11.h"
 
 #include <vector>

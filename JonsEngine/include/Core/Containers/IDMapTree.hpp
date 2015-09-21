@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/Core/Containers/IDMap.hpp"
+#include "include/Core/Containers/IDMapBase.hpp"
 #include "include/Core/Containers/RangedIterator.hpp"
 #include "include/Core/Memory/HeapAllocator.h"
 
@@ -17,12 +17,8 @@ namespace JonsEngine
     // Contigous-memory ID-based tree container
     // Elements must be MoveAssignable
     template <typename T>
-    class IDMapTree// : private IDMap<T>
+    class IDMapTree : public IDMapBase<T>
     {
-    public:
-        typedef uint32_t ItemID;
-        const static ItemID INVALID_ITEM_ID = 0;
-
     private:
         struct Item
         {
