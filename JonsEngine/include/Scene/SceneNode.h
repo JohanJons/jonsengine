@@ -27,6 +27,7 @@ namespace JonsEngine
         void TranslateNode(const Vec3& translateVec);
         void RotateNode(const float angle, const Vec3& rotateVec);
 
+        void UpdateWorldMatrix();
         void UpdateWorldMatrix(const Mat4& parentMatrix);
 
         const Vec3& Position() const;

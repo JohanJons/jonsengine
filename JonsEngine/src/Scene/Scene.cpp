@@ -16,7 +16,6 @@ namespace JonsEngine
     void AddAllMeshes(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const float tilingFactor, const MaterialID actorMaterial);
     void AddAllMeshes(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix);
     void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix, const float tilingFactor, const MaterialID actorMaterial);
-    //void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const AABB& aabb, const Mat4& worldMatrix);
     void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius);
 
 
@@ -262,9 +261,18 @@ namespace JonsEngine
         if (!mHasDirtySceneNodes)
             return;
 
-        for (auto iter = mSceneNodeTree.begin() + 1; iter != mSceneNodeTree.end(); ++iter)
+        // special case: root has no parent
+        SceneNode& rootNode = mSceneNodeTree.GetNode(mRootNodeID);
+        rootNode.UpdateWorldMatrix();
+
+        // skips root
+        for (auto nodeIter = mSceneNodeTree.begin() + 1; nodeIter != mSceneNodeTree.end(); ++nodeIter)
         {
-            
+            SceneNode& node = *nodeIter;
+            SceneNode& parent = mSceneNodeTree.GetNode(node.GetParentID());
+            const Mat4& parentWorldTransform = parent.GetWorldTransform();
+
+            node.UpdateWorldMatrix(parentWorldTransform);
         }
 
         mHasDirtySceneNodes = false;
@@ -274,24 +282,6 @@ namespace JonsEngine
     {
         mHasDirtySceneNodes = true;
     }
-
-    /*SceneNodeIterator& Scene::FindSceneNodeIterator(const SceneNodeID sceneNodeID)
-    {
-        assert(sceneNodeID != INVALID_SCENE_NODE_ID);
-
-        auto iter = std::find_if(mSceneNodeIters.begin(), mSceneNodeIters.end(), [sceneNodeID](const SceneNodeIterator iter) { return sceneNodeID == iter.mSceneNodeID; });
-        assert(iter != mSceneNodeIters.end());
-
-        return *iter;
-    }
-
-    SceneNodeIterator* Scene::FindLastChild(const SceneNodeID parentID)
-    {
-        //auto iter = std::find_if(mSceneNodeIters.begin(), mSceneNodeIters.end(), [parentID](const SceneNodeIterator iter) { return parentID == iter. && iter.mNextSibling == nullptr; });
-
-        //return iter._Ptr;
-        return nullptr;
-    }*/
 
 
     void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix, const float tilingFactor, const MaterialID actorMaterial)
@@ -387,46 +377,6 @@ namespace JonsEngine
             break;
         }
     }
-
-    /*void CullMeshesAABB(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const AABB& aabb, const Mat4& worldMatrix)
-    {
-        // test node AABB
-        AABBIntersection nodeAABBIntersection = Intersection(node.mLocalAABB, aabb);
-        switch (nodeAABBIntersection)
-        {
-            // if partially inside, recursively test all meshes and child nodes
-        case AABBIntersection::Partial:
-        {
-            AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
-
-            for (const Mesh& mesh : node.mMeshes)
-            {
-                meshAABBIntersection = Intersection(mesh.mLocalAABB, aabb);
-                if (meshAABBIntersection == AABBIntersection::Outside)
-                    continue;
-
-                if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                    AddMesh(resultMeshes, mesh, worldMatrix * node.mLocalTransform);
-            }
-
-            // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-            for (const ModelNode& child : node.mImmediateChildNodes)
-                CullMeshesAABB(resultMeshes, child, aabb, worldMatrix);
-
-            break;
-        }
-
-        case AABBIntersection::Inside:
-        {
-            AddAllMeshes(resultMeshes, node, worldMatrix);
-            break;
-        }
-
-        case AABBIntersection::Outside:
-        default:
-            break;
-        }
-    }*/
 
     void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius)
     {

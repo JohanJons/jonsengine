@@ -76,12 +76,6 @@ namespace JonsGame
         auto n7 = tree.AddNode(tree.GetRootNodeID(), 7, 7.0f);
         auto n8 = tree.AddNode(n7, 8, 8.0f);
 
-        for (apa& a : tree.GetImmediateChildrenIterator(n1))
-        {
-
-        }
-
-
         while (mRunning)
         {
             mSun.Update();

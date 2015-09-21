@@ -80,8 +80,6 @@ namespace JonsEngine
         };
 
     public:
-        typename typedef RangedIterator<std::vector<T>, ImmediateChildrenIterator> ImmChildIterator;
-
         template <typename... Arguments>
         IDMapTree(Arguments&&... args);
         ~IDMapTree();
@@ -101,9 +99,6 @@ namespace JonsEngine
 
         iterator begin();
         iterator end();
-
-        iterator GetAllChildrenIterator(const ItemID nodeID);
-        ImmChildIterator GetImmediateChildrenIterator(const ItemID nodeID);
 
 
     private:
@@ -161,15 +156,9 @@ namespace JonsEngine
     }
 
     template <typename T>
-    void IDMapTree<T>::operator+=(const size_t offset)
+    typename IDMapTree<T>::iterator IDMapTree<T>::iterator::operator+(const size_t offset)
     {
-
-    }
-
-    template <typename T>
-    typename IDMapTree<T>::iterator IDMapTree<T>::operator+(const size_t offset)
-    {
-
+        return mIterator + offset;
     }
 
 
@@ -377,20 +366,5 @@ namespace JonsEngine
         assert(version == IDMAP_VERSION_MASK(indirID));
 
         return indirID;
-    }
-
-
-    template <typename T>
-    typename IDMapTree<T>::iterator IDMapTree<T>::GetAllChildrenIterator(const ItemID nodeID)
-    {
-
-    }
-
-    template <typename T>
-    typename IDMapTree<T>::ImmChildIterator IDMapTree<T>::GetImmediateChildrenIterator(const ItemID nodeID)
-    {
-//        ItemIterator node = GetNode(nodeID);
-
- //       return ImmChildIterator(node);
     }
 }

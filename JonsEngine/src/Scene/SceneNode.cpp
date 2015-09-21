@@ -55,11 +55,17 @@ namespace JonsEngine
     }
 
 
-    void SceneNode::UpdateWorldMatrix(const Mat4& parentMatrix)
+    void SceneNode::UpdateWorldMatrix()
     {
         mWorldTransform = glm::translate(gIdentityMatrix, mTranslation);
         mWorldTransform *= glm::toMat4(mOrientation);
         mWorldTransform = glm::scale(mWorldTransform, mScale);
+    }
+
+    void SceneNode::UpdateWorldMatrix(const Mat4& parentMatrix)
+    {
+        UpdateWorldMatrix();
+
         mWorldTransform = parentMatrix * mWorldTransform;
     }
 
