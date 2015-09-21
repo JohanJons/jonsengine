@@ -63,7 +63,7 @@ namespace JonsGame
         // sectoid
         SceneNode& nodeSectoid = mScene.GetSceneNode(mNodeSectoid);
         nodeSectoid.TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
-        //mNodeSectoid->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
+        nodeSectoid.RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
         // cube
         SceneNode& nodeCube = mScene.GetSceneNode(mNodeCube);
@@ -83,7 +83,7 @@ namespace JonsGame
         //actorWuson.SetMaterial(mMaterialCheckers);
         SceneNode& nodeWuson = mScene.GetSceneNode(mNodeWuson);
         nodeWuson.TranslateNode(Vec3(-10.0f, 4.5f, -11.0f));
-        //mNodeWuson->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
+        nodeWuson.RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
         // wuson 2 - not animated
         // TODO: set some other material
@@ -91,7 +91,7 @@ namespace JonsGame
         // actorWuson.SetMaterial(mMaterialCheckers);
         SceneNode& nodeWuson2 = mScene.GetSceneNode(mNodeWuson2);
         nodeWuson2.TranslateNode(Vec3(7.0f, 0.5f, 5.0f));
-        //mNodeWuson2->RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
+        nodeWuson2.RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
         // point light
         PointLight& movingLight = mScene.GetPointLight(mMovingPointLightID);

@@ -36,45 +36,45 @@ namespace JonsGame
         //          [1]             
         //    [2]   [3]    [5]     
         //[4]
-        struct apa
-        {
-            apa(int wi, float wb) : i(wi), b(wb)
-            {
-            }
+      //  struct apa
+      //  {
+      //      apa(int wi, float wb) : i(wi), b(wb)
+      //      {
+      //      }
 
-            apa& operator=(apa&& other)
-            {
-                i = other.i;
-                b = other.b;
-            }
+      //      apa& operator=(apa&& other)
+      //      {
+      //          i = other.i;
+      //          b = other.b;
+      //      }
 
-            int i;
-            float b;
-        };
-        IDMapTree<apa> tree(0, 0.0f);
-        auto n1 = tree.AddNode(tree.GetRootNodeID(), 1, 1.0f);
-        auto n2 = tree.AddNode(n1, 2, 2.0f);
-        auto n3 = tree.AddNode(n1, 3, 3.0f);
-        auto n4 = tree.AddNode(n2, 4, 4.0f);
-        auto n5 = tree.AddNode(n1, 5, 5.0f);
-        //tree.FreeNode(n2);
-        //tree.Clear();
+      //      int i;
+      //      float b;
+      //  };
+      //  IDMapTree<apa> tree(0, 0.0f);
+      //  auto n1 = tree.AddNode(tree.GetRootNodeID(), 1, 1.0f);
+      //  auto n2 = tree.AddNode(n1, 2, 2.0f);
+      //  auto n3 = tree.AddNode(n1, 3, 3.0f);
+      //  auto n4 = tree.AddNode(n2, 4, 4.0f);
+      //  auto n5 = tree.AddNode(n1, 5, 5.0f);
+      //  //tree.FreeNode(n2);
+      //  //tree.Clear();
 
-        //tree.FreeNode(n4);
+      //  //tree.FreeNode(n4);
 
-        //auto a1 = tree.GetNode(tree.GetRootNodeID());
-       // auto a2 = tree.GetNode(n2);
-       // auto a3 = tree.GetNode(n3);
-        //auto a4 = tree.GetNode(n4);
+      //  //auto a1 = tree.GetNode(tree.GetRootNodeID());
+      // // auto a2 = tree.GetNode(n2);
+      // // auto a3 = tree.GetNode(n3);
+      //  //auto a4 = tree.GetNode(n4);
 
-       // auto n5 = tree.AddNode(n3, "eeeeeeee", 5, 5);
-      //  auto a5 = tree.GetNode(n5);
+      // // auto n5 = tree.AddNode(n3, "eeeeeeee", 5, 5);
+      ////  auto a5 = tree.GetNode(n5);
 
-        tree.FreeNode(n1);
+      //  tree.FreeNode(n1);
 
-        auto n6 = tree.AddNode(tree.GetRootNodeID(), 6, 6.0f);
-        auto n7 = tree.AddNode(tree.GetRootNodeID(), 7, 7.0f);
-        auto n8 = tree.AddNode(n7, 8, 8.0f);
+      //  auto n6 = tree.AddNode(tree.GetRootNodeID(), 6, 6.0f);
+      //  auto n7 = tree.AddNode(tree.GetRootNodeID(), 7, 7.0f);
+      //  auto n8 = tree.AddNode(n7, 8, 8.0f);
 
         while (mRunning)
         {
