@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Core/Containers/IDMapBase.hpp"
 #include "include/Core/Types.h"
 
 #include <vector>
@@ -7,41 +8,22 @@
 
 namespace JonsEngine
 {
-    //
-    // Contigous-memory ID-based container.
-    //
-    template<typename T>
-    class IDMap
+    // Internal storage item
+    template <typename T>
+    struct IDMapItem
     {
-    private:
-        struct Item {
-            uint16_t mVersion;
-            T mItem;
+        uint16_t mVersion;
+        T mItem;
 
-            template <typename... Arguments>
-            Item(uint16_t version, Arguments&&... args);
-        };
+        template <typename... Arguments>
+        IDMapItem(uint16_t version, Arguments&&... args);
+    };
 
-
+    // Contigous-memory ID-based container.
+    template<typename T>
+    class IDMap : public IDMapBase<T, IDMapItem<T>>
+    {
     public:
-        typedef uint32_t ItemID;
-        const static ItemID INVALID_ITEM_ID = 0;
-
-        class iterator {
-        public:
-            iterator(typename const std::vector<Item>::iterator& iter);
-
-            bool operator!=(const iterator& iter) const;
-            iterator& operator++();
-            iterator operator++(int);
-            T& operator*();
-            const T& operator*() const;
-
-
-        private:
-            typename std::vector<Item>::iterator mIterator;
-        };
-
         template <typename... Arguments>
         ItemID AddItem(Arguments&&... args);
         void MarkAsFree(const ItemID id);
@@ -63,61 +45,15 @@ namespace JonsEngine
     };
 
 
-
-	#define IDMAP_INDEX_MASK(id) (id & 0xFFFFFFFF)
-	#define IDMAP_VERSION_MASK(id) ((id >> 16) & 0xFFFFFFFF)
-
 	//
-	// IDMap::Item
+	// IDMapItem
 	//
 	template <typename T>
 	template <typename... Arguments>
-	IDMap<T>::Item::Item(uint16_t version, Arguments&&... args) : mVersion(version), mItem(std::forward<Arguments>(args)...)
+    IDMapItem<T>::IDMapItem(uint16_t version, Arguments&&... args) : mVersion(version), mItem(std::forward<Arguments>(args)...)
 	{
 	}
 
-
-	//
-	// IDMap::Iterator
-	//
-	template <typename T>
-    IDMap<T>::iterator::iterator(typename const std::vector<typename IDMap<T>::Item>::iterator& iter) : mIterator(iter)
-	{
-	}
-
-	template <typename T>
-    bool IDMap<T>::iterator::operator!=(const iterator& iter) const
-	{
-		return mIterator != iter.mIterator;
-	}
-
-	template <typename T>
-    typename IDMap<T>::iterator& IDMap<T>::iterator::operator++()
-	{
-		++mIterator;
-
-		return *this;
-	}
-
-	template <typename T>
-    typename IDMap<T>::iterator IDMap<T>::iterator::operator++(int)
-	{
-        iterator old(++(*this));
-
-		return old;
-	}
-
-    template <typename T>
-    T& IDMap<T>::iterator::operator*()
-    {
-        return mIterator->mItem;
-    }
-
-	template <typename T>
-    const T& IDMap<T>::iterator::operator*() const
-	{
-		return mIterator->mItem;
-	}
 
 
 	//

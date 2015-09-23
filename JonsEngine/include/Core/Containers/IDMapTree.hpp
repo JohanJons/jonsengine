@@ -14,67 +14,23 @@ namespace JonsEngine
     // TODO: extend with all/immediate child iterators when needed
     //
 
+    // Internal storage item
+    template <typename T>
+    struct IDMapTreeItem
+    {
+        ItemID mID;
+        ItemID mNext;
+        T mItem;
+
+        template <typename... Arguments>
+        IDMapTreeItem(const ItemID id, const ItemID next, Arguments&&... args);
+    };
+
     // Contigous-memory ID-based tree container
     // Elements must be MoveAssignable
     template <typename T>
-    class IDMapTree : public IDMapBase<T>
+    class IDMapTree : public IDMapBase<T, IDMapTreeItem<T>>
     {
-    private:
-        struct Item
-        {
-            ItemID mID;
-            ItemID mNext;
-            T mItem;
-
-            template <typename... Arguments>
-            Item(const ItemID id, const ItemID next, Arguments&&... args);
-        };
-
-        typedef typename std::vector<Item> ItemContainer;
-        typedef typename ItemContainer::iterator ItemIterator;
-
-    public:
-        class iterator
-        {
-        public:
-            iterator(typename const ItemIterator& iter);
-
-            iterator& operator++();
-            iterator operator++(int);
-
-            void operator+=(const size_t offset);
-            iterator operator+ (const size_t offset);
-
-            T& operator*();
-            const T& operator*() const;
-
-            bool operator!=(const iterator& iter) const;
-
-
-        private:
-            typename ItemIterator mIterator;
-        };
-
-        class ImmediateChildrenIterator : public iterator
-        {
-        public:
-            typedef std::function<ItemIterator(const ItemID itemID)> GetNodeFunc;
-
-            ImmediateChildrenIterator(const iterator& iter, const GetNodeFunc& getNodeFunc);
-
-            ImmediateChildrenIterator& operator++();
-            
-            ImmediateChildrenIterator& operator--() = delete;
-            ImmediateChildrenIterator operator--(int) = delete;
-            ImmediateChildrenIterator& operator+=(typename ItemIterator::difference_type) = delete;
-            ImmediateChildrenIterator operator+(typename ItemIterator::difference_type) const = delete;
-            ImmediateChildrenIterator& operator-=(typename ItemIterator::difference_type) = delete;
-
-
-        private:
-            GetNodeFunc mGetNodeFunc;
-        };
-
     public:
         template <typename... Arguments>
         IDMapTree(Arguments&&... args);
@@ -112,79 +68,12 @@ namespace JonsEngine
 
 
     //
-    // IDMapTree::Item
+    // IDMapTreeItem
     //
     template <typename T>
     template <typename... Arguments>
-    IDMapTree<T>::Item::Item(const ItemID id, const ItemID next, Arguments&&... args) : mID(id), mNext(next), mItem(std::forward<Arguments>(args)...)
+    IDMapTreeItem<T>::IDMapTreeItem(const ItemID id, const ItemID next, Arguments&&... args) : mID(id), mNext(next), mItem(std::forward<Arguments>(args)...)
     {
-    }
-
-
-    //
-    // IDMapTree::Iterator
-    //
-    template <typename T>
-    IDMapTree<T>::iterator::iterator(typename const ItemIterator& iter) : mIterator(iter)
-    {
-    }
-
-    template <typename T>
-    bool IDMapTree<T>::iterator::operator!=(const iterator& iter) const
-    {
-        return mIterator != iter.mIterator;
-    }
-
-    template <typename T>
-    typename IDMapTree<T>::iterator& IDMapTree<T>::iterator::operator++()
-    {
-        ++mIterator;
-
-        return *this;
-    }
-
-    template <typename T>
-    typename IDMapTree<T>::iterator IDMapTree<T>::iterator::operator++(int)
-    {
-        iterator old(++(*this));
-
-        return old;
-    }
-
-    template <typename T>
-    typename IDMapTree<T>::iterator IDMapTree<T>::iterator::operator+(const size_t offset)
-    {
-        return mIterator + offset;
-    }
-
-
-    template <typename T>
-    T& IDMapTree<T>::iterator::operator*()
-    {
-        return mIterator->mItem;
-    }
-
-    template <typename T>
-    const T& IDMapTree<T>::iterator::operator*() const
-    {
-        return mIterator->mItem;
-    }
-
-
-    //
-    // IDMapTree::ImmediateChildrenIterator
-    //
-    template <typename T>
-    IDMapTree<T>::ImmediateChildrenIterator::ImmediateChildrenIterator(const iterator& iter, const GetNodeFunc& getNodeFunc) : iterator(iter), mGetNodeFunc(getNodeFunc)
-    {
-    }
-
-    template <typename T>
-    typename IDMapTree<T>::ImmediateChildrenIterator& IDMapTree<T>::ImmediateChildrenIterator::operator++()
-    {
-        this->_Ptr = this->_Ptr->mNext._Ptr;
-
-        return *this;
     }
 
 
