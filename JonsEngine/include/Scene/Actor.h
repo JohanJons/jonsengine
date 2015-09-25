@@ -14,8 +14,20 @@ namespace JonsEngine
         Actor(const std::string& name, const ModelID modelId, const SceneNodeID sceneNodeID);
         ~Actor();
 
+        void SetModel(const ModelID modelID);
+        void SetSceneNode(const SceneNodeID sceneNodeID);
+        void SetMaterial(const MaterialID materialID);
+        void SetMaterialTilingFactor(const float tilingFactor);
 
-        const std::string mName;
+        const std::string& GetName() const;
+        ModelID GetModel() const;
+        SceneNodeID GetSceneNode() const;
+        MaterialID GetMaterial() const;
+        float GetMaterialTilingFactor() const;
+
+
+    private:
+        std::string mName;
         ModelID mModelID;
         SceneNodeID mSceneNodeID;
 

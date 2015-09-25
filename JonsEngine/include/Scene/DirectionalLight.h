@@ -18,8 +18,8 @@ namespace JonsEngine
     public:
         DirectionalLight(const std::string& name, const uint32_t numShadowmapCascades);
 
-        bool operator==(const DirectionalLight& light);
-        bool operator==(const std::string& lightName);
+        void SetLightDirection(const Vec3& direction);
+        void SetLightColor(const Vec4& lightColor);
 
         void SetCascadeSplitLambda(const float lambda);
         void UpdateCascadesBoundingVolume(const Mat4& viewMatrix, const float degreesFOV, const float aspectRatio, const float minDepth, const float maxDepth);
@@ -27,12 +27,10 @@ namespace JonsEngine
         ConstRangedIterator<KDOP> GetBoundingVolume(const uint32_t cascadeIndex) const;
         void GetSplitDistance(const uint32_t cascadeIndex, float& nearZ, float& farZ) const;
 
-
-        const std::string mName;
-        const uint32_t mNumShadowmapCascades;
-
-        Vec4 mLightColor;
-        Vec3 mLightDirection;
+        const std::string& GetName() const;
+        uint32_t GetNumCascades() const;
+        const Vec4& GetLightColor() const;
+        const Vec3& GetLightDirection() const;
 
 
 	private:
@@ -40,7 +38,10 @@ namespace JonsEngine
         void UpdateKDOP(const FrustumPlanes& frustumPlanes, const FrustumCorners& frustumCorners);
 
 
-		const size_t mHashedID;
+        std::string mName;
+        uint32_t mNumShadowmapCascades;
+        Vec4 mLightColor;
+        Vec3 mLightDirection;
 
         KDOP mKDOP;
         std::vector<size_t> mCascadeKDOPRange;

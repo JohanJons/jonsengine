@@ -21,10 +21,10 @@ namespace JonsEngine
         return mScenes.GetItem(sceneID);
     }
 
-    void SceneManager::DeleteScene(const SceneID scene)
-    {
-        mScenes.Erase(scene);
-    }
+    //void SceneManager::DeleteScene(SceneID& sceneID)
+    //{
+    //    mScenes.Erase(sceneID);
+    //}
 
 
     SceneID SceneManager::GetActiveScene() const

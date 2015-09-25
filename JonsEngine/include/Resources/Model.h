@@ -22,9 +22,7 @@ namespace JonsEngine
         ~Model();
 
         const ModelNode& GetRootNode() const;
-
-
-        const std::string mName;
+        const std::string& GetName() const;
 
 
     private:
@@ -36,6 +34,7 @@ namespace JonsEngine
         ModelNode::MeshIterator ParseMeshes(const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode);
 
 
+        std::string mName;
         NodeContainer mNodes;
         MeshContainer mMeshes;
     };

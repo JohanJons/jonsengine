@@ -10,4 +10,25 @@ namespace JonsEngine
     Mesh::~Mesh()
     {
     }
+
+
+    const std::string& Mesh::GetName() const
+    {
+        return mName;
+    }
+
+    DX11MeshID Mesh::GetMesh() const
+    {
+        return mMeshID;
+    }
+
+    MaterialID Mesh::GetDefaultMaterial() const
+    {
+        return mDefaultMaterialID;
+    }
+
+    const AABB& Mesh::GetLocalAABB() const
+    {
+        return mLocalAABB;
+    }
 }

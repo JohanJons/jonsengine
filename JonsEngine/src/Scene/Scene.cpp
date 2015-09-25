@@ -61,54 +61,60 @@ namespace JonsEngine
 
 		for (const Actor& actor : mActors)
 		{
-            if (actor.mSceneNodeID == INVALID_SCENE_NODE_ID || actor.mModelID == INVALID_MODEL_ID)
+            const SceneNodeID sceneNodeID = actor.GetSceneNode();
+            const ModelID modelID = actor.GetModel();
+
+            if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
 				continue;
 
-            const SceneNode& sceneNode = mSceneNodeTree.GetNode(actor.mSceneNodeID);
+            const SceneNode& sceneNode = mSceneNodeTree.GetNode(sceneNodeID);
 
             const Mat4& worldMatrix = sceneNode.GetWorldTransform();
             const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix * worldMatrix;
 
-            const Model& model = mResourceManifest.GetModel(actor.mModelID);
+            const Model& model = mResourceManifest.GetModel(modelID);
 
-            CullMeshesFrustrum(mResourceManifest, mRenderQueue.mCamera.mModels, model.GetRootNode(), worldMatrix, wvpMatrix, actor.mMaterialTilingFactor, actor.mMaterialID);
+            CullMeshesFrustrum(mResourceManifest, mRenderQueue.mCamera.mModels, model.GetRootNode(), worldMatrix, wvpMatrix, actor.GetMaterialTilingFactor(), actor.GetMaterial());
 		}
 
         // point lights
         for (const PointLight& pointLight : mPointLights)
         {
-            if (pointLight.mSceneNodeID == INVALID_SCENE_NODE_ID)
+            if (pointLight.GetSceneNode() == INVALID_SCENE_NODE_ID)
                 continue;
 
-            const SceneNode& sceneNode = mSceneNodeTree.GetNode(pointLight.mSceneNodeID);
+            const SceneNode& sceneNode = mSceneNodeTree.GetNode(pointLight.GetSceneNode());
 
             const Vec3 lightPosition = sceneNode.Position();
 
-            mRenderQueue.mPointLights.emplace_back(pointLight.mLightColor, lightPosition, pointLight.mLightIntensity, pointLight.mLightRadius);
+            mRenderQueue.mPointLights.emplace_back(pointLight.GetLightColor(), lightPosition, pointLight.GetIntensity(), pointLight.GetRadius());
             RenderablePointLight& renderablePointLight = mRenderQueue.mPointLights.back();
 
             //  cull meshes for each face
             for (const Actor& actor : mActors)
             {
-                if (actor.mSceneNodeID == INVALID_SCENE_NODE_ID || actor.mModelID == INVALID_MODEL_ID)
+                const SceneNodeID sceneNodeID = actor.GetSceneNode();
+                const ModelID modelID = actor.GetModel();
+
+                if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
                     continue;
 
-                const SceneNode& sceneNode = mSceneNodeTree.GetNode(actor.mSceneNodeID);
+                const SceneNode& sceneNode = mSceneNodeTree.GetNode(sceneNodeID);
 
                 const Mat4& actorWorldMatrix = sceneNode.GetWorldTransform();
-                const Model& model = mResourceManifest.GetModel(actor.mModelID);
-                CullMeshesSphere(renderablePointLight.mMeshes, model.GetRootNode(), actorWorldMatrix, lightPosition, pointLight.mLightRadius);
+                const Model& model = mResourceManifest.GetModel(modelID);
+                CullMeshesSphere(renderablePointLight.mMeshes, model.GetRootNode(), actorWorldMatrix, lightPosition, pointLight.GetRadius());
             }
         }
 
         // dir lights
         for (DirectionalLight& dirLight : mDirectionalLights)
         {
-            mRenderQueue.mDirectionalLights.emplace_back(dirLight.mLightColor, glm::normalize(dirLight.mLightDirection), dirLight.mNumShadowmapCascades);
+            mRenderQueue.mDirectionalLights.emplace_back(dirLight.GetLightColor(), glm::normalize(dirLight.GetLightDirection()), dirLight.GetNumCascades());
             RenderableDirLight& renderableDirLight = mRenderQueue.mDirectionalLights.back();
 
             dirLight.UpdateCascadesBoundingVolume(mRenderQueue.mCamera.mCameraViewMatrix, fov, aspectRatio, minDepth, maxDepth);
-            for (uint32_t cascadeIndex = 0; cascadeIndex < dirLight.mNumShadowmapCascades; ++cascadeIndex)
+            for (uint32_t cascadeIndex = 0; cascadeIndex < dirLight.GetNumCascades(); ++cascadeIndex)
             {
                 float nearZ = 0.0f, farZ = 0.0f;
                 dirLight.GetSplitDistance(cascadeIndex, nearZ, farZ);
@@ -116,15 +122,15 @@ namespace JonsEngine
                 auto kdopIterator = dirLight.GetBoundingVolume(cascadeIndex);
                 for (const Actor& actor : mActors)
                 {
-                    if (actor.mSceneNodeID == INVALID_SCENE_NODE_ID || actor.mModelID == INVALID_MODEL_ID)
+                    if (actor.GetSceneNode() == INVALID_SCENE_NODE_ID || actor.GetModel() == INVALID_MODEL_ID)
                         continue;
 
-                    const SceneNode& sceneNode = mSceneNodeTree.GetNode(actor.mSceneNodeID);
-                    const Model& model = mResourceManifest.GetModel(actor.mModelID);
+                    const SceneNode& sceneNode = mSceneNodeTree.GetNode(actor.GetSceneNode());
+                    const Model& model = mResourceManifest.GetModel(actor.GetModel());
 
                     const Mat4& worldMatrix = sceneNode.GetWorldTransform();
                     const Mat4 localWorldMatrix = worldMatrix;// *model.GetRootNode().mLocalTransform;
-                    const AABB worldAABB = localWorldMatrix * model.GetRootNode().mLocalAABB;
+                    const AABB worldAABB = localWorldMatrix * model.GetRootNode().GetLocalAABB();
 
                     const auto aabbIntersection = Intersection(worldAABB, kdopIterator);
                     if (aabbIntersection == AABBIntersection::Inside || aabbIntersection == AABBIntersection::Partial)
@@ -139,7 +145,7 @@ namespace JonsEngine
         mRenderQueue.mAmbientLight = mAmbientLight;
 
         const Skybox& skybox = mResourceManifest.GetSkybox(mSkyboxID);
-        mRenderQueue.mSkyboxTextureID = skybox.mSkyboxTexture;
+        mRenderQueue.mSkyboxTextureID = skybox.GetSkyboxTexture();
 
         return mRenderQueue;
     }
@@ -292,43 +298,43 @@ namespace JonsEngine
         auto specularFactor = 0.02f;
 
         const bool actorHasMaterial = actorMaterial != INVALID_MATERIAL_ID;
-        const MaterialID materialID = actorHasMaterial ? actorMaterial : mesh.mDefaultMaterialID;
+        const MaterialID materialID = actorHasMaterial ? actorMaterial : mesh.GetDefaultMaterial();
         if (materialID != INVALID_MATERIAL_ID)
         {
             const Material& material = resourceManifest.GetMaterial(materialID);
-            diffuseTexture = material.mDiffuseTexture;
-            normalTexture = material.mNormalTexture;
-            specularFactor = material.mSpecularFactor;
+            diffuseTexture = material.GetDiffuseTexture();
+            normalTexture = material.GetNormalTexture();
+            specularFactor = material.GetSpecularFactor();
         }
 
-        resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix, diffuseTexture, normalTexture, specularFactor, tilingFactor);
+        resultMeshes.emplace_back(mesh.GetMesh(), localWorldMatrix, diffuseTexture, normalTexture, specularFactor, tilingFactor);
     }
 
     void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)
     {
-        resultMeshes.emplace_back(mesh.mMeshID, localWorldMatrix);
+        resultMeshes.emplace_back(mesh.GetMesh(), localWorldMatrix);
     }
 
     void AddAllMeshes(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const float tilingFactor, const MaterialID actorMaterial)
     {
-        for (const Mesh& mesh : node.mMeshes)
+        for (const Mesh& mesh : node.GetMeshes())
             AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix /* node.mLocalTransform*/, tilingFactor, actorMaterial);
 
-        for (const ModelNode& child : node.mAllChildNodes)
+        for (const ModelNode& child : node.GetAllChildren())
         {
-            for (const Mesh& mesh : child.mMeshes)
+            for (const Mesh& mesh : child.GetMeshes())
                 AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix /* child.mLocalTransform*/, tilingFactor, actorMaterial);
         }
     }
 
     void AddAllMeshes(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix)
     {
-        for (const Mesh& mesh : node.mMeshes)
+        for (const Mesh& mesh : node.GetMeshes())
             AddMesh(resultMeshes, mesh, worldMatrix /* node.mLocalTransform*/);
 
-        for (const ModelNode& child : node.mAllChildNodes)
+        for (const ModelNode& child : node.GetAllChildren())
         {
-            for (const Mesh& mesh : child.mMeshes)
+            for (const Mesh& mesh : child.GetMeshes())
                 AddMesh(resultMeshes, mesh, worldMatrix /* child.mLocalTransform*/);
         }
     }
@@ -337,7 +343,7 @@ namespace JonsEngine
     {
         const Mat4 localWVPMatrix = wvpMatrix;// *node.mLocalTransform;
         const Mat4 localWorldMatrix = worldMatrix;// *node.mLocalTransform;
-        const AABB nodeWorldAABB = /*localWorldMatrix **/ node.mLocalAABB;
+        const AABB nodeWorldAABB = /*localWorldMatrix **/ node.GetLocalAABB();
 
         AABBIntersection nodeAABBIntersection = Intersection(nodeWorldAABB, localWVPMatrix);
         switch (nodeAABBIntersection)
@@ -347,9 +353,9 @@ namespace JonsEngine
         {
             AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
 
-            for (const Mesh& mesh : node.mMeshes)
+            for (const Mesh& mesh : node.GetMeshes())
             {
-                const AABB meshWorldAABB = /*localWorldMatrix */ mesh.mLocalAABB;
+                const AABB meshWorldAABB = /*localWorldMatrix */ mesh.GetLocalAABB();
 
                 meshAABBIntersection = Intersection(meshWorldAABB, localWVPMatrix);
                 if (meshAABBIntersection == AABBIntersection::Outside)
@@ -360,7 +366,7 @@ namespace JonsEngine
             }
 
             // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-            for (const ModelNode& child : node.mImmediateChildNodes)
+            for (const ModelNode& child : node.GetImmediateChildren())
                 CullMeshesFrustrum(resourceManifest, resultMeshes, child, worldMatrix, wvpMatrix, tilingFactor, actorMaterial);
 
             break;
@@ -380,8 +386,8 @@ namespace JonsEngine
 
     void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius)
     {
-        const Mat4 localWorldMatrix = worldMatrix * node.mLocalTransform;
-        const AABB nodeWorldAABB = localWorldMatrix * node.mLocalAABB;
+        const Mat4 localWorldMatrix = worldMatrix * node.GetLocalTransform();
+        const AABB nodeWorldAABB = localWorldMatrix * node.GetLocalAABB();
 
         // test node frustrum
         AABBIntersection nodeAABBIntersection = Intersection(nodeWorldAABB, sphereCentre, sphereRadius);
@@ -391,9 +397,9 @@ namespace JonsEngine
         {
             AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
 
-            for (const Mesh& mesh : node.mMeshes)
+            for (const Mesh& mesh : node.GetMeshes())
             {
-                const AABB worldMeshAABB = localWorldMatrix * node.mLocalAABB;
+                const AABB worldMeshAABB = localWorldMatrix * node.GetLocalAABB();
 
                 meshAABBIntersection = Intersection(worldMeshAABB, sphereCentre, sphereRadius);
                 if (meshAABBIntersection == AABBIntersection::Outside)
@@ -404,7 +410,7 @@ namespace JonsEngine
             }
 
             // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-            for (const ModelNode& child : node.mImmediateChildNodes)
+            for (const ModelNode& child : node.GetImmediateChildren())
                 CullMeshesSphere(resultMeshes, child, worldMatrix, sphereCentre, sphereRadius);
 
             break;

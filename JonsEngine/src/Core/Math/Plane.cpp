@@ -17,4 +17,15 @@ namespace JonsEngine
     Plane::~Plane()
     {
     }
+
+
+    const Vec3& Plane::GetNormal() const
+    {
+        return mNormal;
+    }
+
+    float Plane::GetDistance() const
+    {
+        return mDistance;
+    }
 }

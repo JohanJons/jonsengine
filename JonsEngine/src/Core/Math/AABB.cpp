@@ -21,6 +21,17 @@ namespace JonsEngine
     }
 
 
+    const Vec3& AABB::GetCenter() const
+    {
+        return mAABBCenter;
+    }
+
+    const Vec3& AABB::GetExtent() const
+    {
+        return mAABBExtent;
+    }
+
+
     AABB operator*(const Mat4& transform, const AABB& aabb)
     {
         const Vec3 oldMin = aabb.Min();

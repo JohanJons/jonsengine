@@ -17,6 +17,7 @@ namespace JonsEngine
     public:
         typedef typename StorageType Item;
         typedef typename std::vector<Item>::iterator ItemIterator;
+        typedef typename std::vector<Item>::const_iterator ConstItemIterator;
 
         // this is admittedly rather unfortunate
         typedef ItemID ItemID;
@@ -47,7 +48,9 @@ namespace JonsEngine
 
     protected:
         ItemIterator GetItemIter(const ItemID nodeID);
+        ConstItemIterator GetItemIter(const ItemID nodeID) const;
         ItemID& GetIndirectionID(const ItemID publicID);
+        const ItemID& GetIndirectionID(const ItemID publicID) const;
 
 
         std::vector<Item> mItems;
@@ -89,6 +92,20 @@ namespace JonsEngine
 
         return old;
     }
+
+
+    template <typename T, typename StorageType>
+    void IDMapBase<T, StorageType>::iterator::operator+=(const size_t offset)
+    {
+        mIterator += offset;
+    }
+
+    template <typename T, typename StorageType>
+    typename IDMapBase<T, StorageType>::iterator IDMapBase<T, StorageType>::iterator::operator+ (const size_t offset)
+    {
+        return mIterator + offset;
+    }
+
 
     template <typename T, typename StorageType>
     T& IDMapBase<T, StorageType>::iterator::operator*()
@@ -132,44 +149,31 @@ namespace JonsEngine
 
         return indirID;
     }
-    
 
-    /*template <typename T, typename StorageType>
-    void IDMapBase<T, StorageType>::FreeItem(ItemID& nodeID)
-    {
-        //ItemID& indirID = GetIndirectionID(nodeID);
-        
-        const uint16_t indirIndex = IDMAP_INDEX_MASK(nodeID);
-        mFreeIndirectionIndices.push_back(indirIndex);
-        
-        ItemIterator item = GetItem(nodeID);
-        mItems.erase(item);
-        
-        //ItemIterator endNode = node->mNext != INVALID_ITEM_ID ? GetItem(node->mNext) : mItems.end();
 
-        // add node and all children to free index list
-        //std::for_each(node, endNode, [this](Item& item) { const uint16_t index = IDMAP_INDEX_MASK(item.mID); mFreeIndirectionIndices.push_back(index); });
-        //std::for_each(mItems.begin(), node, [this, node](Item& item) { if (item.mNext == node->mID) item.mNext = node->mNext; });
-
-        //mItems.erase(node, endNode);
-
-        nodeID = INVALID_ITEM_ID;
-    }
-    
     template <typename T, typename StorageType>
-    void IDMapBase<T, StorageType>::FreeItems(ItemIterator first, ItemIterator last)
+    typename IDMapBase<T, StorageType>::ConstItemIterator IDMapBase<T, StorageType>::GetItemIter(const ItemID nodeID) const
     {
-        // add node and all children to free index list
-        std::for_each(node, endNode, [this](Item& item) { const uint16_t index = IDMAP_INDEX_MASK(item.mID); mFreeIndirectionIndices.push_back(index); });
+        const ItemID& itemID = GetIndirectionID(nodeID);
+        const uint16_t itemIndex = IDMAP_INDEX_MASK(itemID);
 
-        mItems.erase(node, endNode);
+        assert(itemIndex <= mItems.size());
 
-        nodeID = INVALID_ITEM_ID;
+        return mItems.cbegin() + itemIndex;
     }
 
     template <typename T, typename StorageType>
-    void IDMapBase<T, StorageType>::Insert(const ItemID itemID)
+    const typename IDMapBase<T, StorageType>::ItemID& IDMapBase<T, StorageType>::GetIndirectionID(const ItemID publicID) const
     {
-        
-    }*/
+        assert(publicID != INVALID_ITEM_ID);
+
+        const uint16_t indirectionIndex = IDMAP_INDEX_MASK(publicID);
+        const uint16_t version = IDMAP_VERSION_MASK(publicID);
+
+        const ItemID& indirID = mIndirectionLayer.at(indirectionIndex);
+
+        assert(version == IDMAP_VERSION_MASK(indirID));
+
+        return indirID;
+    }
 }

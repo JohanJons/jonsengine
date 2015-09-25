@@ -13,9 +13,13 @@ namespace JonsEngine
         Skybox(const std::string& name, const DX11MaterialID skyboxTexture);
         ~Skybox();
 
+        const std::string& GetName() const;
+        DX11MaterialID GetSkyboxTexture() const;
 
-        const std::string mName;
-        const DX11MaterialID mSkyboxTexture;
+
+    private:
+         std::string mName;
+         DX11MaterialID mSkyboxTexture;
     };
 
     typedef IDMap<Skybox>::ItemID SkyboxID;

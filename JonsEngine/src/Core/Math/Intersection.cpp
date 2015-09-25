@@ -32,8 +32,8 @@ namespace JonsEngine
         float d = 0.0f, r = 0.0f;
         for (const Vec4& plane : planes)
         {
-            d = glm::dot(Vec3(plane), aabb.mAABBCenter);
-            r = glm::dot(Vec3(glm::abs(plane)), aabb.mAABBExtent);
+            d = glm::dot(Vec3(plane), aabb.GetCenter());
+            r = glm::dot(Vec3(glm::abs(plane)), aabb.GetExtent());
 
             if (d - r < -plane.w)
                 ret = AABBIntersection::Partial;
@@ -106,11 +106,14 @@ namespace JonsEngine
 
     PlaneIntersection Intersection(const Plane& plane, const AABB& aabb)
     {
-        const float radius = aabb.mAABBExtent.x * glm::abs(plane.mNormal.x) +
-                             aabb.mAABBExtent.y * glm::abs(plane.mNormal.y) +
-                             aabb.mAABBExtent.z * glm::abs(plane.mNormal.z);
+        const Vec3& aabbExtent = aabb.GetExtent();
+        const Vec3& planeNormal = plane.GetNormal();
 
-        const float distance = glm::dot(plane.mNormal, aabb.mAABBCenter) - plane.mDistance;
+        const float radius = aabbExtent.x * glm::abs(planeNormal.x) +
+                             aabbExtent.y * glm::abs(planeNormal.y) +
+                             aabbExtent.z * glm::abs(planeNormal.z);
+
+        const float distance = glm::dot(planeNormal, aabb.GetCenter()) - plane.GetDistance();
 
         if (glm::abs(distance) <= radius)
             return PlaneIntersection::Intersect;

@@ -1,21 +1,50 @@
 #include "include/Scene/PointLight.h"
 
-#include "boost/functional/hash.hpp"
-
 namespace JonsEngine
 {
-    PointLight::PointLight(const std::string& name, const SceneNodeID sceneNodeID) : mName(name), mHashedID(boost::hash_value(name)), mSceneNodeID(sceneNodeID), mLightColor(1.0f), mLightIntensity(1.0f), mLightRadius(0.0f)
+    PointLight::PointLight(const std::string& name, const SceneNodeID sceneNodeID) : mName(name), mSceneNodeID(sceneNodeID), mLightColor(1.0f), mLightIntensity(1.0f), mLightRadius(0.0f)
     {
     }
 
 
-    bool PointLight::operator==(const PointLight& light)
+    void PointLight::SetRadius(const float radius)
     {
-        return mHashedID == light.mHashedID;
+        mLightRadius = radius;
     }
 
-    bool PointLight::operator==(const std::string& lightName)
+    void PointLight::SetIntensity(const float intensity)
     {
-        return mHashedID == boost::hash_value(lightName);
+        mLightIntensity = intensity;
+    }
+
+    void PointLight::SetLightColor(const Vec4& lightColor)
+    {
+        mLightColor = lightColor;
+    }
+
+
+    const std::string& PointLight::GetName() const
+    {
+        return mName;
+    }
+
+    SceneNodeID PointLight::GetSceneNode() const
+    {
+        return mSceneNodeID;
+    }
+
+    const Vec4& PointLight::GetLightColor() const
+    {
+        return mLightColor;
+    }
+
+    float PointLight::GetIntensity() const
+    {
+        return mLightIntensity;
+    }
+
+    float PointLight::GetRadius() const
+    {
+        return mLightRadius;
     }
 }

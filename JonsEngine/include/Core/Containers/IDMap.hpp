@@ -88,13 +88,13 @@ namespace JonsEngine
 	}
 
 	template <typename T>
-	void Erase(ItemID& id)
+    void IDMap<T>::Erase(ItemID& id)
 	{
         ItemIterator item = GetItemIter(id);
         mItems.erase(item);
         
         const uint16_t indirectionIndex = IDMAP_INDEX_MASK(id);
-        mFreeIndices.push_back(indirectionIndex);
+        mFreeIndirectionIndices.push_back(indirectionIndex);
 	}
 
 	template <typename T>

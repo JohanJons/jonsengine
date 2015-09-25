@@ -41,7 +41,7 @@ namespace JonsGame
         //const float lightZenith = glm::min(solarZenith, pi / 2 - 0.2f);   no clamping for day/night cycle?
         const float solarAzimuth = static_cast<float>(solarTime);
 
-        mDirLight.mLightDirection = Vec3(glm::sin(solarAzimuth) * glm::sin(solarZenith), glm::cos(solarZenith), glm::cos(solarAzimuth) * glm::sin(solarZenith));
+        mDirLight.SetLightDirection(Vec3(glm::sin(solarAzimuth) * glm::sin(solarZenith), glm::cos(solarZenith), glm::cos(solarAzimuth) * glm::sin(solarZenith)));
     }
 
 

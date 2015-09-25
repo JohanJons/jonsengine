@@ -9,4 +9,51 @@ namespace JonsEngine
     Actor::~Actor()
     {
     }
+
+
+    void Actor::SetModel(const ModelID modelID)
+    {
+        mModelID = modelID;
+    }
+
+    void Actor::SetSceneNode(const SceneNodeID sceneNodeID)
+    {
+        mSceneNodeID = sceneNodeID;
+    }
+
+    void Actor::SetMaterial(const MaterialID materialID)
+    {
+        mMaterialID = materialID;
+    }
+
+    void Actor::SetMaterialTilingFactor(const float tilingFactor)
+    {
+        mMaterialTilingFactor = tilingFactor;
+    }
+
+
+    const std::string& Actor::GetName() const
+    {
+        return mName;
+    }
+
+    ModelID Actor::GetModel() const
+    {
+        return mModelID;
+    }
+
+    SceneNodeID Actor::GetSceneNode() const
+    {
+        return mSceneNodeID;
+    }
+
+    MaterialID Actor::GetMaterial() const
+    {
+        return mMaterialID;
+    }
+
+    float Actor::GetMaterialTilingFactor() const
+    {
+        return mMaterialTilingFactor;
+    }
 }

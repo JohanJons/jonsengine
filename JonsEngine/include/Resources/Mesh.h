@@ -14,10 +14,16 @@ namespace JonsEngine
         Mesh(const std::string& name, const DX11MeshID meshID, const MaterialID defaultMaterialID, const Vec3& minBounds, const Vec3& maxBounds);
         ~Mesh();
 
+        const std::string& GetName() const;
+        DX11MeshID GetMesh() const;
+        MaterialID GetDefaultMaterial() const;
+        const AABB& GetLocalAABB() const;
 
-        const std::string mName;
-        const DX11MeshID mMeshID;
-        const MaterialID mDefaultMaterialID;
-        const AABB mLocalAABB;
+
+    private:
+         std::string mName;
+         DX11MeshID mMeshID;
+         MaterialID mDefaultMaterialID;
+         AABB mLocalAABB;
     };
 }

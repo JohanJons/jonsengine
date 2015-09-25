@@ -9,4 +9,15 @@ namespace JonsEngine
     Skybox::~Skybox()
     {
     }
+
+
+    const std::string& Skybox::GetName() const
+    {
+        return mName;
+    }
+
+    DX11MaterialID Skybox::GetSkyboxTexture() const
+    {
+        return mSkyboxTexture;
+    }
 }

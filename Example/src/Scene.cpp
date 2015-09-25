@@ -95,39 +95,39 @@ namespace JonsGame
 
         // point light
         PointLight& movingLight = mScene.GetPointLight(mMovingPointLightID);
-        movingLight.mLightRadius = 10.0f;
-        movingLight.mLightIntensity = 2.0f;
-        movingLight.mLightColor = Vec4(1.0f, 1.0f, 0.0f, 0.0f);
+        movingLight.SetRadius(10.0f);
+        movingLight.SetIntensity(2.0f);
+        movingLight.SetLightColor(Vec4(1.0f, 1.0f, 0.0f, 0.0f));
         SceneNode& nodePointLight = mScene.GetSceneNode(mNodePointLight);
         nodePointLight.TranslateNode(Vec3(5.0f, 3.5f, -15.0f));
 
         // directional light
         DirectionalLight& sun = mScene.GetDirectionalLight(mMovingPointLightID);
-        sun.mLightColor = Vec4(0.55f);
+        sun.SetLightColor(Vec4(0.55f));
 
         // ground plane
         Actor& actorPlane = mScene.GetActor(mActorPlane);
-        actorPlane.mMaterialID = mMaterialCheckers;
-        actorPlane.mMaterialTilingFactor = 64.0f;
+        actorPlane.SetMaterial(mMaterialCheckers);
+        actorPlane.SetMaterialTilingFactor(64.0f);
 
         // sphere
         Actor& actorSphere = mScene.GetActor(mActorSphere);
-        actorSphere.mMaterialID = mMaterialCheckers;
-        actorSphere.mMaterialTilingFactor = 3.0f;
+        actorSphere.SetMaterial(mMaterialCheckers);
+        actorSphere.SetMaterialTilingFactor(3.0f);
         SceneNode& nodeSphere = mScene.GetSceneNode(mNodeSphere);
         nodeSphere.TranslateNode(Vec3(6.0f, 5.5f, 10.0f));
 
         // second cube
         Actor& actorCube2 = mScene.GetActor(mActorCube2);
-        actorCube2.mMaterialID = mMaterialCheckers;
+        actorCube2.SetMaterial(mMaterialCheckers);
         SceneNode& nodeCube2 = mScene.GetSceneNode(mNodeCube2);
         nodeCube2.TranslateNode(Vec3(3.0f, 2.0f, -15.0f));
 
         // third cube, far away casting shadows from the dir light
         Actor& actorCube3 = mScene.GetActor(mActorCube3);
-        actorCube3.mMaterialID = mMaterialCheckers;
+        actorCube3.SetMaterial(mMaterialCheckers);
         SceneNode& nodeCube3 = mScene.GetSceneNode(mNodeCube3);
-        nodeCube3.TranslateNode(-sun.mLightDirection * 40.0f);
+        nodeCube3.TranslateNode(-sun.GetLightDirection() * 40.0f);
 
         // load skybox
         mScene.SetSkybox(mSkybox);

@@ -51,17 +51,24 @@ namespace JonsEngine
             const MeshIterator& meshIter, const NodeIterator& next);
         ~ModelNode();
 
+        const std::string& GetName() const;
+        const AABB& GetLocalAABB() const;
+        const Mat4& GetLocalTransform() const;
 
-        const std::string mName;
-        const AABB mLocalAABB;
-        const Mat4 mLocalTransform;
-
-        const ImmediateChildrenIterator mImmediateChildNodes;
-        const AllChildrenIterator mAllChildNodes;
-        const MeshIterator mMeshes;
+        const MeshIterator& GetMeshes() const;
+        const AllChildrenIterator& GetAllChildren() const;
+        const ImmediateChildrenIterator& GetImmediateChildren() const;
 
 
     private:
+        std::string mName;
+        AABB mLocalAABB;
+        Mat4 mLocalTransform;
+
+        ImmediateChildrenIterator mImmediateChildNodes;
+        AllChildrenIterator mAllChildNodes;
+        MeshIterator mMeshes;
+
         // points to the next sibling in the same node depth level or end() if none available
         NodeIterator mNext;
     };

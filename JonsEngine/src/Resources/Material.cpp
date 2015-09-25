@@ -11,4 +11,25 @@ namespace JonsEngine
     Material::~Material()
     {
     }
+
+
+    const std::string& Material::GetName() const
+    {
+        return mName;
+    }
+
+    DX11MaterialID Material::GetDiffuseTexture() const
+    {
+        return mDiffuseTexture;
+    }
+
+    DX11MaterialID Material::GetNormalTexture() const
+    {
+        return mNormalTexture;
+    }
+
+    float Material::GetSpecularFactor() const
+    {
+        return mSpecularFactor;
+    }
 }

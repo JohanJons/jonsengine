@@ -3,12 +3,10 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/Math/Math.h"
 
-#include "boost/functional/hash.hpp"
-
 namespace JonsEngine
 {
     DirectionalLight::DirectionalLight(const std::string& name, const uint32_t numShadowmapCascades) :
-        mName(name), mNumShadowmapCascades(numShadowmapCascades), mLightColor(1.0f), mLightDirection(0.0f, -1.0f, -1.0f), mCascadeSplitLambda(0.8f), mHashedID(boost::hash_value(name))
+        mName(name), mNumShadowmapCascades(numShadowmapCascades), mLightColor(1.0f), mLightDirection(0.0f, -1.0f, -1.0f), mCascadeSplitLambda(0.8f)
     {
         assert(numShadowmapCascades >= 1 && numShadowmapCascades <= 4);
 
@@ -17,14 +15,14 @@ namespace JonsEngine
     }
 
 
-    bool DirectionalLight::operator==(const DirectionalLight& light)
+    void DirectionalLight::SetLightDirection(const Vec3& direction)
     {
-        return mHashedID == light.mHashedID;
+        mLightDirection = direction;
     }
 
-    bool DirectionalLight::operator==(const std::string& lightName)
+    void DirectionalLight::SetLightColor(const Vec4& lightColor)
     {
-        return mHashedID == boost::hash_value(lightName);
+        mLightColor = lightColor;
     }
 
 
@@ -77,6 +75,27 @@ namespace JonsEngine
     }
 
 
+    const std::string& DirectionalLight::GetName() const
+    {
+        return mName;
+    }
+
+    uint32_t DirectionalLight::GetNumCascades() const
+    {
+        return mNumShadowmapCascades;
+    }
+
+    const Vec4& DirectionalLight::GetLightColor() const
+    {
+        return mLightColor;
+    }
+
+    const Vec3& DirectionalLight::GetLightDirection() const
+    {
+        return mLightDirection;
+    }
+
+
     void DirectionalLight::UpdateSplitDistances(const float minDepth, const float maxDepth)
     {
         mSplitDistances.clear();
@@ -109,7 +128,7 @@ namespace JonsEngine
 
         // Add planes that are facing towards us
         for (const Plane& plane : frustumPlanes) {
-            const float fDir = glm::dot(plane.mNormal, lightDirNormalized);
+            const float fDir = glm::dot(plane.GetNormal(), lightDirNormalized);
             if (fDir < 0.0f) {
                 mKDOP.emplace_back(plane);
             }
@@ -120,13 +139,13 @@ namespace JonsEngine
         for (uint32_t index = 0; index < frustumPlanes.size(); index++) {
             const Plane& plane = frustumPlanes.at(index);
             // If this plane is facing away from us, move on.
-            float fDir = glm::dot(plane.mNormal, lightDirNormalized);
+            float fDir = glm::dot(plane.GetNormal(), lightDirNormalized);
             if (fDir > 0.0f) { continue; }
 
             // For each neighbor of this plane.
             const auto& neightbourPlanes = GetNeighbouringPlanes(static_cast<FrustumPlane>(index));
             for (const FrustumPlane plane : neightbourPlanes) {
-                float fNeighborDir = glm::dot(frustumPlanes[plane].mNormal, lightDirNormalized);
+                float fNeighborDir = glm::dot(frustumPlanes[plane].GetNormal(), lightDirNormalized);
                 // If this plane is facing away from us, the edge between plane I and plane J
                 //	marks the edge of a plane we need to add.
                 if (fNeighborDir > 0.0f) {

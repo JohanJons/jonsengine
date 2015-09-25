@@ -29,8 +29,8 @@ namespace JonsEngine
 
 
     private:
-        const Iterator mIterBegin;
-        const Iterator mIterEnd;
+        Iterator mIterBegin;
+        Iterator mIterEnd;
     };
 
 
@@ -61,7 +61,7 @@ namespace JonsEngine
 
 
     private:
-        const Iterator mIterBegin;
-        const Iterator mIterEnd;
+        Iterator mIterBegin;
+        Iterator mIterEnd;
     };
 }

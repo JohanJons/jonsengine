@@ -22,7 +22,8 @@ namespace JonsEngine
 
         SceneID CreateScene(const std::string& sceneName);
         Scene& GetScene(const SceneID sceneID);
-        void DeleteScene(const SceneID scene);
+        // TODO
+        //void DeleteScene(SceneID& scene);
 
 		SceneID GetActiveScene() const;
         Scene& GetActiveScene();

@@ -15,20 +15,24 @@ namespace JonsEngine
     public:
         PointLight(const std::string& name, const SceneNodeID sceneNodeID);
 
-        bool operator==(const PointLight& light);
-        bool operator==(const std::string& lightName);
+        void SetRadius(const float radius);
+        void SetIntensity(const float intensity);
+        void SetLightColor(const Vec4& lightColor);
+
+        const std::string& GetName() const;
+        SceneNodeID GetSceneNode() const;
+        const Vec4& GetLightColor() const;
+        float GetIntensity() const;
+        float GetRadius() const;
 
 
-        const std::string mName;
+    private:
+        std::string mName;
         SceneNodeID mSceneNodeID;
 
         Vec4 mLightColor;
         float mLightIntensity;
         float mLightRadius;
-
-
-    private:
-        const size_t mHashedID;
     };
 
     typedef IDMap<PointLight>::ItemID PointLightID;

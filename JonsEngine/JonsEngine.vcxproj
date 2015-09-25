@@ -246,7 +246,6 @@
     <ClInclude Include="include\Scene\Scene.h" />
     <ClInclude Include="include\Scene\SceneManager.h" />
     <ClInclude Include="include\Scene\SceneNode.h" />
-    <ClInclude Include="include\Scene\SceneNodeIterator.h" />
     <ClInclude Include="include\Window\KeyCallback.h" />
     <ClInclude Include="include\Window\KeyDefinition.h" />
     <ClInclude Include="include\Window\MouseCallback.h" />
