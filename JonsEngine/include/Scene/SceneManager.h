@@ -22,7 +22,7 @@ namespace JonsEngine
 
         SceneID CreateScene(const std::string& sceneName);
         Scene& GetScene(const SceneID sceneID);
-        // TODO
+        // TODO - deferred because of fixing moveassignable Scenes...
         //void DeleteScene(SceneID& scene);
 
 		SceneID GetActiveScene() const;
