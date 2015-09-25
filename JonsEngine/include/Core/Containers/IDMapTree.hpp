@@ -54,15 +54,7 @@ namespace JonsEngine
 
 
     private:
-        ItemIterator GetItem(const ItemID nodeID);
-        ItemID& GetIndirectionID(const ItemID publicID);
-
-
         ItemID mRootNodeID;
-
-        ItemContainer mItems;
-        std::vector<ItemID> mIndirectionLayer;
-        std::vector<uint16_t> mFreeIndirectionIndices;
     };
 
 
@@ -72,7 +64,7 @@ namespace JonsEngine
     //
     template <typename T>
     template <typename... Arguments>
-    IDMapTreeItem<T>::IDMapTreeItem(const ItemID id, const ItemID next, Arguments&&... args) : mID(id), mNext(next), mItem(std::forward<Arguments>(args)...)
+    IDMapTreeItem<T>::IDMapTreeItem(const ItemID id, const ItemID next, Arguments&&... args) : mID(id), mNext(next), mItem{ std::forward<Arguments>(args)... }
     {
     }
 
@@ -105,10 +97,10 @@ namespace JonsEngine
     {
         assert(mItems.size() < std::numeric_limits<uint16_t>().max());
 
-        ItemIterator parentIter = GetItem(parentID);
+        ItemIterator parentIter = GetItemIter(parentID);
         const ItemID parentNextID = parentIter->mNext;
         ItemIterator endIter = mItems.end();
-        ItemIterator parentNextIter = parentNextID != INVALID_ITEM_ID ? GetItem(parentNextID) : endIter;
+        ItemIterator parentNextIter = parentNextID != INVALID_ITEM_ID ? GetItemIter(parentNextID) : endIter;
         ItemIterator newChildIter = parentIter + 1;
 
         while (newChildIter != parentNextIter)
@@ -162,8 +154,8 @@ namespace JonsEngine
     template <typename T>
     void IDMapTree<T>::FreeNode(ItemID& nodeID)
     {
-        ItemIterator node = GetItem(nodeID);
-        ItemIterator endNode = node->mNext != INVALID_ITEM_ID ? GetItem(node->mNext) : mItems.end();
+        ItemIterator node = GetItemIter(nodeID);
+        ItemIterator endNode = node->mNext != INVALID_ITEM_ID ? GetItemIter(node->mNext) : mItems.end();
 
         // add node and all children to free index list
         std::for_each(node, endNode, [this](Item& item) { const uint16_t index = IDMAP_INDEX_MASK(item.mID); mFreeIndirectionIndices.push_back(index); });
@@ -184,13 +176,13 @@ namespace JonsEngine
     template <typename T>
     T& IDMapTree<T>::GetNode(const ItemID nodeID)
     {
-        return GetItem(nodeID)->mItem;
+        return GetItemIter(nodeID)->mItem;
     }
 
     template <typename T>
     const T& IDMapTree<T>::GetNode(const ItemID nodeID) const
     {
-        return GetItem(nodeID)->mItem;
+        return GetItemIter(nodeID)->mItem;
     }
 
     
@@ -224,32 +216,5 @@ namespace JonsEngine
     typename IDMapTree<T>::iterator IDMapTree<T>::end()
     {
         return iterator(mItems.end());
-    }
-
-
-    template <typename T>
-    typename IDMapTree<T>::ItemIterator IDMapTree<T>::GetItem(const ItemID nodeID)
-    {
-        const ItemID& itemID = GetIndirectionID(nodeID);
-        const uint16_t itemIndex = IDMAP_INDEX_MASK(itemID);
-
-        assert(itemIndex <= mItems.size());
-
-        return mItems.begin() + itemIndex;
-    }
-
-    template <typename T>
-    typename IDMapTree<T>::ItemID& IDMapTree<T>::GetIndirectionID(const ItemID publicID)
-    {
-        assert(publicID != INVALID_ITEM_ID);
-
-        const uint16_t indirectionIndex = IDMAP_INDEX_MASK(publicID);
-        const uint16_t version = IDMAP_VERSION_MASK(publicID);
-
-        ItemID& indirID = mIndirectionLayer.at(indirectionIndex);
-
-        assert(version == IDMAP_VERSION_MASK(indirID));
-
-        return indirID;
     }
 }

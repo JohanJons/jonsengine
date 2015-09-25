@@ -11,7 +11,7 @@ namespace JonsEngine
     {
     public:
         template <typename... Arguments>
-        IDMapPointer(typename IDMap<T>& storage, Arguments&&... args) : mStorage(storage), mID(storage.AddItem(args...))
+        IDMapPointer(typename IDMap<T>& storage, Arguments&&... args) : mStorage(storage), mID(storage.Insert(args...))
         {
         }
 
@@ -23,7 +23,7 @@ namespace JonsEngine
         ~IDMapPointer()
         {
             if (mID != IDMap<T>::INVALID_ITEM_ID)
-                mStorage.MarkAsFree(mID);
+                mStorage.Erase(mID);
         }
 
 

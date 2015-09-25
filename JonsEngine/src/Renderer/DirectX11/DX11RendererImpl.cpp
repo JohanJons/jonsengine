@@ -150,7 +150,7 @@ namespace JonsEngine
     {
         auto allocator = mMemoryAllocator;
 
-        return mMeshes.AddItem(mDevice, mContext, vertexData, normalData, texCoords, tangentData, indexData, minBounds, maxBounds);
+        return mMeshes.Insert(mDevice, mContext, vertexData, normalData, texCoords, tangentData, indexData, minBounds, maxBounds);
     }
 
     DX11MaterialID DX11RendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
@@ -159,7 +159,7 @@ namespace JonsEngine
 
         const bool isCubemap = textureType == TextureType::TEXTURE_TYPE_SKYBOX;
 
-        return mMaterials.AddItem(mDevice, mContext, textureData, GetTextureFormat(textureType), textureWidth, textureHeight, isCubemap);
+        return mMaterials.Insert(mDevice, mContext, textureData, GetTextureFormat(textureType), textureWidth, textureHeight, isCubemap);
     }
 
 

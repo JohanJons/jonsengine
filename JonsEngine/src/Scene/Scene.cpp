@@ -166,14 +166,14 @@ namespace JonsEngine
 
     ActorID Scene::CreateActor(const std::string& actorName, const ModelID modelID, const SceneNodeID node)
     {
-        return mActors.AddItem(actorName, modelID, node);
+        return mActors.Insert(actorName, modelID, node);
     }
 
     void Scene::DeleteActor(ActorID& actorID)
     {
         assert(actorID != INVALID_ACTOR_ID);
 
-        mActors.MarkAsFree(actorID);
+        mActors.Erase(actorID);
         actorID = INVALID_ACTOR_ID;
     }
 
@@ -185,14 +185,14 @@ namespace JonsEngine
 
 	PointLightID Scene::CreatePointLight(const std::string& lightName, const SceneNodeID node)
     {
-        return mPointLights.AddItem(lightName, node);
+        return mPointLights.Insert(lightName, node);
     }
     
 	void Scene::DeletePointLight(PointLightID& pointLightID)
     {
         assert(pointLightID != INVALID_POINT_LIGHT_ID);
 
-		mPointLights.MarkAsFree(pointLightID);
+		mPointLights.Erase(pointLightID);
         pointLightID = INVALID_POINT_LIGHT_ID;
     }
     
@@ -206,19 +206,19 @@ namespace JonsEngine
     {
         const uint32_t defaultNumCascades = 4;
 
-        return mDirectionalLights.AddItem(lightName, defaultNumCascades);
+        return mDirectionalLights.Insert(lightName, defaultNumCascades);
     }
 
     DirectionalLightID Scene::CreateDirectionalLight(const std::string& lightName, const uint32_t numShadowmapCascades)
     {
-        return mDirectionalLights.AddItem(lightName, numShadowmapCascades);
+        return mDirectionalLights.Insert(lightName, numShadowmapCascades);
     }
 
     void Scene::DeleteDirectionalLight(DirectionalLightID& dirLightID)
     {
         assert(dirLightID != INVALID_DIRECTIONAL_LIGHT_ID);
 
-        mDirectionalLights.MarkAsFree(dirLightID);
+        mDirectionalLights.Erase(dirLightID);
         dirLightID = INVALID_DIRECTIONAL_LIGHT_ID;
     }
 

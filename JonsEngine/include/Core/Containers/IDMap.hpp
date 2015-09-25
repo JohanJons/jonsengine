@@ -12,11 +12,11 @@ namespace JonsEngine
     template <typename T>
     struct IDMapItem
     {
-        uint16_t mVersion;
         T mItem;
 
+        // TODO: fix without the padding...
         template <typename... Arguments>
-        IDMapItem(uint16_t version, Arguments&&... args);
+        IDMapItem(const size_t _padding, Arguments&&... args);
     };
 
     // Contigous-memory ID-based container.
@@ -25,32 +25,26 @@ namespace JonsEngine
     {
     public:
         template <typename... Arguments>
-        ItemID AddItem(Arguments&&... args);
-        void MarkAsFree(const ItemID id);
+        ItemID Insert(Arguments&&... args);
+        void Erase(ItemID& id);
 
         T& GetItem(const ItemID id);
         const T& GetItem(const ItemID id) const;
-        T* TryGetItem(const ItemID id);
-        const T* TryGetItem(const ItemID id) const;
 
         void Clear();
 
         iterator begin();
         iterator end();
-
-
-    private:
-        std::vector<Item> mItems;
-        std::vector<uint16_t> mFreeIndices;
     };
 
 
 	//
 	// IDMapItem
 	//
+
 	template <typename T>
 	template <typename... Arguments>
-    IDMapItem<T>::IDMapItem(uint16_t version, Arguments&&... args) : mVersion(version), mItem(std::forward<Arguments>(args)...)
+    IDMapItem<T>::IDMapItem(const size_t _padding, Arguments&&... args) : mItem{std::forward<Arguments>(args)...}
 	{
 	}
 
@@ -59,103 +53,79 @@ namespace JonsEngine
 	//
 	// IDMap
 	//
-	template <typename T>
+
+    template <typename T>
 	template <typename... Arguments>
-	typename IDMap<T>::ItemID IDMap<T>::AddItem(Arguments&&... args)
+	typename IDMap<T>::ItemID IDMap<T>::Insert(Arguments&&... args)
 	{
-		if (!mFreeIndices.empty())
+        const size_t newChildIndex = mItems.size();
+        const size_t _PADDING = 0;
+
+		if (!mFreeIndirectionIndices.empty())
 		{
-			const uint32_t freeIndex = mFreeIndices.back();
-			mFreeIndices.pop_back();
+            const uint16_t freeIndirectionIndex = mFreeIndirectionIndices.back();
+            mFreeIndirectionIndices.pop_back();
 
-			// destruct old item
-			mItems[freeIndex].mItem.~T();
-
-			Item* item = new(&mItems[freeIndex]) Item(mItems[freeIndex].mVersion + 1, std::forward<Arguments>(args)...);
-
-			return (freeIndex | (static_cast<uint32_t>(item->mVersion) << 16));
+            ItemID& indirectionID = mIndirectionLayer.at(freeIndirectionIndex);
+            const uint32_t version = static_cast<uint32_t>(IDMAP_VERSION_MASK(indirectionID) + 1);
+            indirectionID = newChildIndex | (version << 16);
+            
+            mItems.emplace_back(_PADDING, std::forward<Arguments>(args)...);
+            
+            return freeIndirectionIndex | (version << 16);
 		}
 		else
 		{
-			mItems.emplace_back(1, std::forward<Arguments>(args)...);
+            const uint32_t version = 1;
+            const size_t indirectionIndex = mItems.size();
+            const ItemID indirectionID = newChildIndex | (version << 16);
+            mIndirectionLayer.emplace_back(indirectionID);
 
-			return ((mItems.size() - 1) | (static_cast<uint32_t>(1) << 16));
+            mItems.emplace_back(_PADDING, std::forward<Arguments>(args)...);
+            
+            return indirectionIndex | (version << 16);
 		}
 	}
 
 	template <typename T>
-	void IDMap<T>::MarkAsFree(const ItemID id)
+	void Erase(ItemID& id)
 	{
-		const uint16_t index = IDMAP_INDEX_MASK(id);
-		const uint16_t version = IDMAP_VERSION_MASK(id);
-
-		assert(mItems[index].mVersion == version);
-
-		mFreeIndices.push_back(index);
+        ItemIterator item = GetItemIter(id);
+        mItems.erase(item);
+        
+        const uint16_t indirectionIndex = IDMAP_INDEX_MASK(id);
+        mFreeIndices.push_back(indirectionIndex);
 	}
 
 	template <typename T>
 	T& IDMap<T>::GetItem(const ItemID id)
 	{
-		const uint16_t index = IDMAP_INDEX_MASK(id);
-		const uint16_t version = IDMAP_VERSION_MASK(id);
-
-		assert(mItems[index].mVersion == version);
-
-		return mItems[index].mItem;
+		return GetItemIter(id)->mItem;
 	}
 
     template <typename T>
     const T& IDMap<T>::GetItem(const ItemID id) const
     {
-        const uint16_t index = IDMAP_INDEX_MASK(id);
-        const uint16_t version = IDMAP_VERSION_MASK(id);
-
-        assert(mItems[index].mVersion == version);
-
-        return mItems[index].mItem;
-    }
-
-	template <typename T>
-	T* IDMap<T>::TryGetItem(const ItemID id)
-	{
-		const uint16_t index = IDMAP_INDEX_MASK(id);
-		const uint16_t version = IDMAP_VERSION_MASK(id);
-
-		if (mItems[index].mVersion == version)
-			return &mItems[index].mItem;
-		else
-			return nullptr;
-	}
-
-    template <typename T>
-    const T* IDMap<T>::TryGetItem(const ItemID id) const
-    {
-        const uint16_t index = IDMAP_INDEX_MASK(id);
-        const uint16_t version = IDMAP_VERSION_MASK(id);
-
-        if (mItems[index].mVersion == version)
-            return &mItems[index].mItem;
-        else
-            return nullptr;
+        return GetItemIter(id)->mItem;
     }
 
 	template <typename T>
 	void IDMap<T>::Clear()
 	{
 		mItems.clear();
-		mFreeIndices.clear();
+		mIndirectionLayer.clear();
+        mFreeIndirectionIndices.clear();
 	}
 
 	template <typename T>
     typename IDMap<T>::iterator IDMap<T>::begin()
 	{
-		return mItems.begin();
+		return iterator(mItems.begin());
 	}
 
 	template <typename T>
     typename IDMap<T>::iterator IDMap<T>::end()
 	{
-		return mItems.end();
+		return iterator(mItems.end());
 	}
 }

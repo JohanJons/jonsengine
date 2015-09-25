@@ -41,7 +41,7 @@ namespace JonsEngine
         const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, indiceData, minBounds, maxBounds);
         assert(meshID != INVALID_DX11_MESH_ID);
 
-        return mModels.AddItem(modelName, Mat4(1.0f), minBounds, maxBounds, meshID);
+        return mModels.Insert(modelName, Mat4(1.0f), minBounds, maxBounds, meshID);
     }
 
     ModelID ResourceManifest::CreateCube(const std::string& modelName, const float size)
@@ -64,7 +64,7 @@ namespace JonsEngine
         const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, indiceData, minBounds, maxBounds);
         assert(meshID != INVALID_DX11_MESH_ID);
         
-        return mModels.AddItem(modelName, Mat4(1.0f), minBounds, maxBounds, meshID);
+        return mModels.Insert(modelName, Mat4(1.0f), minBounds, maxBounds, meshID);
     }
 
     ModelID ResourceManifest::LoadModel(const std::string& assetName, const JonsPackagePtr jonsPkg)
@@ -78,14 +78,14 @@ namespace JonsEngine
         ModelNode::InitDataList initDataList;
         ParseModelInitData(initDataList, jonsPkg, pkgModel.mRootNode);
 
-        return mModels.AddItem(pkgModel, initDataList);
+        return mModels.Insert(pkgModel, initDataList);
     }
 
     void ResourceManifest::DeleteModel(ModelID& modelID)
     {
         assert(modelID != INVALID_MODEL_ID);
 
-        mModels.MarkAsFree(modelID);
+        mModels.Erase(modelID);
         modelID = INVALID_MODEL_ID;
     }
 
@@ -121,14 +121,14 @@ namespace JonsEngine
         const float specularFactor = 0.02f;
 
         // TODO: material colors
-        return mMaterials.AddItem(pkgMaterial.mName, diffuseTexture, normalTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, specularFactor);
+        return mMaterials.Insert(pkgMaterial.mName, diffuseTexture, normalTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, specularFactor);
     }
 
     void ResourceManifest::DeleteMaterial(MaterialID& materialID)
     {
         assert(materialID != INVALID_MATERIAL_ID);
 
-        mMaterials.MarkAsFree(materialID);
+        mMaterials.Erase(materialID);
         materialID = INVALID_MATERIAL_ID;
     }
 
@@ -155,14 +155,14 @@ namespace JonsEngine
         const DX11MaterialID skyboxTextureID = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_SKYBOX, pkgSkyboxTexture.mTextureData, pkgSkyboxTexture.mTextureWidth, pkgSkyboxTexture.mTextureHeight);
         assert(skyboxTextureID != INVALID_DX11_MATERIAL_ID);
 
-        return mSkyboxes.AddItem(skyboxName, skyboxTextureID);
+        return mSkyboxes.Insert(skyboxName, skyboxTextureID);
     }
 
     void ResourceManifest::DeleteSkybox(SkyboxID& skyboxID)
     {
         assert(skyboxID != INVALID_SKYBOX_ID);
 
-        mSkyboxes.MarkAsFree(skyboxID);
+        mSkyboxes.Erase(skyboxID);
         skyboxID = INVALID_SKYBOX_ID;
     }
 

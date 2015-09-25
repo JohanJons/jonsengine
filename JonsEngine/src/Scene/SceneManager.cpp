@@ -13,7 +13,7 @@ namespace JonsEngine
 
     SceneID SceneManager::CreateScene(const std::string& sceneName)
     {
-        return mScenes.AddItem(sceneName, mResourceManifest);
+        return mScenes.Insert(sceneName, mResourceManifest);
     }
 
     Scene& SceneManager::GetScene(const SceneID sceneID)
@@ -23,7 +23,7 @@ namespace JonsEngine
 
     void SceneManager::DeleteScene(const SceneID scene)
     {
-        mScenes.MarkAsFree(scene);
+        mScenes.Erase(scene);
     }
 
 
