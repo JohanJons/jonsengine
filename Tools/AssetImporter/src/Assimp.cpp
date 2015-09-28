@@ -242,6 +242,7 @@ namespace JonsAssetImporter
             aiAnimation* animation = *(scene->mAnimations + animationIndex);
 
             // what is this anyway...
+            // shouldn't be present
             assert(animation->mNumMeshChannels == 0);
 
             const double duration = animation->mDuration / animation->mTicksPerSecond;
