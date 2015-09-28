@@ -58,7 +58,6 @@ namespace JonsEngine
     {
         std::string mName;
         PackageAABB mAABB;
-        Mat4 mTransform;
         std::vector<PackageMesh> mMeshes;
         std::vector<PackageNode> mChildNodes;
 
@@ -205,7 +204,6 @@ namespace boost
         {
             ar & node.mName;
             ar & node.mAABB;
-            ar & node.mTransform;
             ar & node.mMeshes;
             ar & node.mChildNodes;
         }

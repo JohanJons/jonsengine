@@ -22,7 +22,7 @@ namespace JonsEngine
     {
     }
 
-    PackageNode::PackageNode() : mTransform(1.0f)
+    PackageNode::PackageNode()
     {
     }
 
