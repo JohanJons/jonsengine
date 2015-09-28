@@ -1,7 +1,6 @@
 #pragma once
 
 #include "include/Scene/Scene.h"
-#include "include/Core/Containers/IDMap.hpp"
 
 #include <string>
 
@@ -10,9 +9,7 @@ namespace JonsEngine
     class IMemoryAllocator;
     class ResourceManifest;
 
-    typedef IDMap<Scene>::ItemID SceneID;
-
-    static const SceneID INVALID_SCENE_ID = IDMap<Scene>::INVALID_ITEM_ID;
+    typedef uint32_t SceneID;
 
     class SceneManager
     {

@@ -4,6 +4,7 @@
 
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Types.h"
+#include "include/Core/Containers/IDMap.hpp"
 #include "include/Scene/Scene.h"
 #include "include/Resources/ResourceManifest.h"
 #include "boost/bind.hpp"
@@ -36,28 +37,39 @@ namespace JonsGame
         //          [1]             
         //    [2]   [3]    [5]     
         //[4]
-      //  struct apa
-      //  {
-      //      apa(int wi, float wb) : i(wi), b(wb)
-      //      {
-      //      }
+        /*struct apa
+        {
+            apa(int wi, float wb) : i(wi), b(wb)
+            {
+            }
 
-      //      apa& operator=(apa&& other)
-      //      {
-      //          i = other.i;
-      //          b = other.b;
-      //      }
+            apa& operator=(apa&& other)
+            {
+                i = other.i;
+                b = other.b;
+            }
 
-      //      int i;
-      //      float b;
-      //  };
-      //  IDMapTree<apa> tree(0, 0.0f);
-      //  auto n1 = tree.AddNode(tree.GetRootNodeID(), 1, 1.0f);
-      //  auto n2 = tree.AddNode(n1, 2, 2.0f);
-      //  auto n3 = tree.AddNode(n1, 3, 3.0f);
-      //  auto n4 = tree.AddNode(n2, 4, 4.0f);
-      //  auto n5 = tree.AddNode(n1, 5, 5.0f);
-      //  //tree.FreeNode(n2);
+            int i;
+            float b;
+        };
+        IDMap<apa> tree;
+        auto n1 = tree.Insert(1, 1.0f);
+        auto n2 = tree.Insert(2, 2.0f);
+        auto n3 = tree.Insert(3, 3.0f);
+        auto n4 = tree.Insert(4, 4.0f);
+        auto n5 = tree.Insert(5, 5.0f);
+        tree.Erase(n2);
+        tree.Erase(n5);
+        auto n6 = tree.Insert(6, 6.0f);
+        auto n7 = tree.Insert(7, 7.0f);
+
+        auto b = tree.GetItem(n1);
+         b = tree.GetItem(n3);
+         b = tree.GetItem(n4);
+         b = tree.GetItem(n6);
+         b = tree.GetItem(n7);
+         b = tree.GetItem(n2);*/
+
       //  //tree.Clear();
 
       //  //tree.FreeNode(n4);
