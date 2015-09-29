@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Resources/JonsPackage.h"
+#include "include/Resources/Animation.h"
 #include "include/Resources/Model.h"
 #include "include/Resources/ModelNode.h"
 #include "include/Resources/Mesh.h"
@@ -40,18 +41,15 @@ namespace JonsEngine
 
 
     private:
-        typedef IDMap<Model> ModelMap;
-        typedef IDMap<Material> MaterialMap;
-        typedef IDMap<Skybox> SkyboxMap;
-
         void ParseModelInitData(ModelNode::InitDataList& initData, const JonsPackagePtr jongPkg, const PackageNode& node);
 
 
 		IMemoryAllocatorPtr mMemoryAllocator;
         DX11Renderer& mRenderer;
 
-        ModelMap mModels;
-        MaterialMap mMaterials;
-        SkyboxMap mSkyboxes;
+        IDMap<Animation> mAnimations;
+        IDMap<Model> mModels;
+        IDMap<Material> mMaterials;
+        IDMap<Skybox> mSkyboxes;
     };
 }

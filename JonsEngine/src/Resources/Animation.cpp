@@ -16,8 +16,19 @@ namespace JonsEngine
         mIsPlaying = doPlay;
     }
 
+
     bool Animation::IsPlaying() const
     {
         return mIsPlaying;
+    }
+
+    double Animation::GetTotalDurationInSeconds() const
+    {
+        return mDurationInSeconds;
+    }
+
+    const std::string& Animation::GetName() const
+    {
+        return mName;
     }
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "include/Core/Types.h"
+
 #include <string>
 
 namespace JonsEngine
@@ -11,13 +13,15 @@ namespace JonsEngine
         ~Animation();
 
         void Play(const bool doPlay);
-        bool IsPlaying() const;
 
-        const std::string mName;
-        const double mDurationInSeconds;
+        bool IsPlaying() const;
+        double GetTotalDurationInSeconds() const;
+        const std::string& GetName() const;
 
 
     private:
+        std::string mName;
+        double mDurationInSeconds;
         bool mIsPlaying;
     };
 }

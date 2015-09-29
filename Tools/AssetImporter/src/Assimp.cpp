@@ -58,7 +58,7 @@ namespace JonsAssetImporter
         if (!scene->HasMaterials())
             return;
 
-        for (uint32_t i = 0; i < scene->mNumMaterials; i++)
+        for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
         {
             const aiMaterial* material = scene->mMaterials[i];
             PackageMaterial pkgMaterial;
@@ -128,7 +128,7 @@ namespace JonsAssetImporter
 
         const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
         const uint32_t numMeshes = node->mNumMeshes;
-        for (uint32_t i = 0; i < numMeshes; i++)
+        for (uint32_t i = 0; i < numMeshes; ++i)
         {
             pkgNode.mMeshes.emplace_back();
             if (!ProcessAssimpMesh(pkgNode.mMeshes.back(), scene->mMeshes[node->mMeshes[i]], materialMap, nodeTransform, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds))
@@ -136,7 +136,7 @@ namespace JonsAssetImporter
         }
 
         const uint32_t numChildren = node->mNumChildren;
-        for (uint32_t i = 0; i < numChildren; i++)
+        for (uint32_t i = 0; i < numChildren; ++i)
         {
             pkgNode.mChildNodes.emplace_back();
             if (!ProcessAssimpNode(pkgNode.mChildNodes.back(), scene, node->mChildren[i], materialMap, nodeTransform, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds))
@@ -166,7 +166,7 @@ namespace JonsAssetImporter
         pkgMesh.mTangentData.reserve(mesh->mNumVertices * numFloatsPerTriangle * 2);;
 
         // vertice, normal, texcoord, tangents and bitangents data
-        for (unsigned int j = 0; j < mesh->mNumVertices; j++)
+        for (unsigned int j = 0; j < mesh->mNumVertices; ++j)
         {
             const Vec3 transformedVertices = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(mesh->mVertices[j]), 1.0f));
             pkgMesh.mVertexData.push_back(transformedVertices.x);
@@ -208,7 +208,7 @@ namespace JonsAssetImporter
         pkgMesh.mIndiceData.reserve(mesh->mNumFaces * numFloatsPerTriangle);
 
         // index data
-        for (uint32_t j = 0; j < mesh->mNumFaces; j++)
+        for (uint32_t j = 0; j < mesh->mNumFaces; ++j)
         {
             // only dem triangles
             assert(mesh->mFaces[j].mNumIndices == numFloatsPerTriangle);
