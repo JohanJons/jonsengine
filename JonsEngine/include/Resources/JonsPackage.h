@@ -56,7 +56,11 @@ namespace JonsEngine
 
     struct PackageNode
     {
+        typedef uint32_t PackageNodeID;
+        static const PackageNodeID INVALID_NODE_ID = 0;
+
         std::string mName;
+        PackageNodeID mNodeID;
         PackageAABB mAABB;
         std::vector<PackageMesh> mMeshes;
         std::vector<PackageNode> mChildNodes;
@@ -114,7 +118,7 @@ namespace JonsEngine
 
     struct PackageAnimatedNode
     {
-        std::string mNodeName;
+        PackageNode::PackageNodeID mNodeID;
         std::vector<PackageAnimatedNodeTransform> mAnimationTransforms;
 
 
@@ -203,6 +207,7 @@ namespace boost
         void serialize(Archive & ar, JonsEngine::PackageNode& node, const unsigned int version)
         {
             ar & node.mName;
+            ar & node.mNodeID;
             ar & node.mAABB;
             ar & node.mMeshes;
             ar & node.mChildNodes;
@@ -247,7 +252,7 @@ namespace boost
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageAnimatedNode& animationNode, const unsigned int version)
         {
-            ar & animationNode.mNodeName;
+            ar & animationNode.mNodeID;
             ar & animationNode.mAnimationTransforms;
         }
         

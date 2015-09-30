@@ -22,7 +22,7 @@ namespace JonsEngine
     {
     }
 
-    PackageNode::PackageNode()
+    PackageNode::PackageNode() : mNodeID(INVALID_NODE_ID)
     {
     }
 

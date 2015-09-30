@@ -9,12 +9,13 @@ using namespace JonsEngine;
 
 namespace JonsAssetImporter
 {
-    void CheckForInvalidAABB(JonsEngine::PackageAABB& aabb);
+    void CheckForInvalidAABB(PackageAABB& aabb);
+    PackageNode::PackageNodeID GetNodeID(const PackageNode& node, const std::string& nodeName);
 
-    JonsEngine::Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
-    JonsEngine::Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
-    JonsEngine::Vec3 aiColor3DToJonsVec3(const aiColor3D& color);
-    JonsEngine::Vec3 aiVec3ToJonsVec3(const aiVector3D& vec);
+    Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
+    Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
+    Vec3 aiColor3DToJonsVec3(const aiColor3D& color);
+    Vec3 aiVec3ToJonsVec3(const aiVector3D& vec);
 
 
     Assimp::Assimp()
@@ -44,7 +45,8 @@ namespace JonsAssetImporter
         // process model hierarchy
         pkg->mModels.emplace_back(modelName);
         auto& model = pkg->mModels.back();
-        if (!ProcessAssimpNode(model.mRootNode, scene, scene->mRootNode, materialMap, gIdentityMatrix, model.mRootNode.mAABB.mMinBounds, model.mRootNode.mAABB.mMaxBounds))
+        PackageNode::PackageNodeID nextNodeID = 1;
+        if (!ProcessAssimpNode(model.mRootNode, scene, scene->mRootNode, materialMap, gIdentityMatrix, model.mRootNode.mAABB.mMinBounds, model.mRootNode.mAABB.mMaxBounds, ++nextNodeID))
             return false;
 
         if (!ProcessAssimpAnimations(model, scene))
@@ -122,9 +124,10 @@ namespace JonsAssetImporter
         }
     }
 
-    bool Assimp::ProcessAssimpNode(JonsEngine::PackageNode& pkgNode, const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, const Mat4& parentTransform, JonsEngine::Vec3& parentMinBounds, JonsEngine::Vec3& parentMaxBounds)
+    bool Assimp::ProcessAssimpNode(JonsEngine::PackageNode& pkgNode, const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, const Mat4& parentTransform, JonsEngine::Vec3& parentMinBounds, JonsEngine::Vec3& parentMaxBounds, PackageNode::PackageNodeID nextNodeID)
     {
         pkgNode.mName = node->mName.C_Str();
+        pkgNode.mNodeID = nextNodeID;
 
         const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
         const uint32_t numMeshes = node->mNumMeshes;
@@ -139,7 +142,7 @@ namespace JonsAssetImporter
         for (uint32_t i = 0; i < numChildren; ++i)
         {
             pkgNode.mChildNodes.emplace_back();
-            if (!ProcessAssimpNode(pkgNode.mChildNodes.back(), scene, node->mChildren[i], materialMap, nodeTransform, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds))
+            if (!ProcessAssimpNode(pkgNode.mChildNodes.back(), scene, node->mChildren[i], materialMap, nodeTransform, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds, ++nextNodeID))
                 return false;
         }
 
@@ -249,7 +252,12 @@ namespace JonsAssetImporter
             assert(animation->mNumMeshChannels == 0);
 
             const double duration = animation->mDuration / animation->mTicksPerSecond;
-            model.mAnimations.emplace_back(animation->mName.C_Str(), duration);
+            const PackageNode::PackageNodeID nodeID = GetNodeID(model.mRootNode, animation->mName.C_Str());
+
+            // make sure node exists, otherwise something screwed up in parsing nodes
+            assert(nodeID != PackageNode::INVALID_NODE_ID);
+
+            model.mAnimations.emplace_back(nodeID, duration);
             PackageAnimation& pkgAnimation = model.mAnimations.back();
 
             aiNode* rootNode = scene->mRootNode;
@@ -308,8 +316,24 @@ namespace JonsAssetImporter
         }
     }
 
+    PackageNode::PackageNodeID GetNodeID(const PackageNode& node, const std::string& nodeName)
+    {
+        if (nodeName == node.mName)
+            return node.mNodeID;
 
-    JonsEngine::Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat)
+        PackageNode::PackageNodeID ret = PackageNode::INVALID_NODE_ID;
+        for (const PackageNode& child : node.mChildNodes)
+        {
+            ret = GetNodeID(child, nodeName);
+            if (ret != PackageNode::INVALID_NODE_ID)
+                break;
+        }
+
+        return ret;
+    }
+
+
+    Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat)
     {
         Mat4 jMat;
 
@@ -321,17 +345,17 @@ namespace JonsAssetImporter
         return jMat;
     }
 
-    JonsEngine::Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat)
+    Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat)
     {
         return Quaternion(aiQuat.x, aiQuat.y, aiQuat.z, aiQuat.w);
     }
 
-    JonsEngine::Vec3 aiColor3DToJonsVec3(const aiColor3D& color)
+    Vec3 aiColor3DToJonsVec3(const aiColor3D& color)
     {
         return Vec3(color.r, color.g, color.b);
     }
 
-    JonsEngine::Vec3 aiVec3ToJonsVec3(const aiVector3D& vec)
+    Vec3 aiVec3ToJonsVec3(const aiVector3D& vec)
     {
         return Vec3(vec.x, vec.y, vec.z);
     }
