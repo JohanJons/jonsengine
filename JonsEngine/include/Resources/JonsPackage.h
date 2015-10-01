@@ -123,7 +123,7 @@ namespace JonsEngine
 
 
         PackageAnimatedNode();
-        PackageAnimatedNode(const std::string& nodeName);
+        PackageAnimatedNode(const PackageNode::PackageNodeID nodeID);
     };
 
     struct PackageAnimation

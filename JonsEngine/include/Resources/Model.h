@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Resources/ModelAnimation.h"
 #include "include/Resources/ModelNode.h"
 #include "include/Resources/Mesh.h"
 #include "include/Resources/JonsPackage.h"

@@ -58,7 +58,7 @@ namespace JonsEngine
     {
     }
 
-    PackageAnimatedNode::PackageAnimatedNode(const std::string& nodeName) : mNodeName(nodeName)
+    PackageAnimatedNode::PackageAnimatedNode(const PackageNode::PackageNodeID nodeID) : mNodeID(nodeID)
     {
     }
 
