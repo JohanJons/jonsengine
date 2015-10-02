@@ -4,6 +4,15 @@ namespace JonsEngine
 {
     ModelAnimation::ModelAnimation(const PackageAnimation& pkgAnimation) : mName(pkgAnimation.mName), mDurationInSeconds(pkgAnimation.mDurationInSeconds)
     {
+        auto nodeBeginIndex = mNodeTransforms.size();
+        for (const PackageAnimatedNode& animNode : pkgAnimation.mAnimatedNodes)
+        {
+            for (const PackageAnimatedNodeTransform& nodeTransform : animNode.mAnimationTransforms)
+                mNodeTransforms.emplace_back(nodeTransform.mTransform, nodeTransform.mTimestamp);
+
+            mNodeIDMapping.emplace_back(animNode.mNodeID, nodeBeginIndex);
+            nodeBeginIndex = mNodeTransforms.size();
+        }
     }
 
     ModelAnimation::~ModelAnimation()
@@ -11,11 +20,13 @@ namespace JonsEngine
     }
 
 
-    bool ModelAnimation::IsPlaying() const
+    const Mat4& ModelAnimation::GetNodeTransform(const ModelNode::NodeID nodeID, const double elapsedTimeInSeconds)
     {
-        return mIsPlaying;
+        // TODO...
+        return mNodeTransforms.front().first;
     }
-
+    
+    
     double ModelAnimation::GetTotalDurationInSeconds() const
     {
         return mDurationInSeconds;

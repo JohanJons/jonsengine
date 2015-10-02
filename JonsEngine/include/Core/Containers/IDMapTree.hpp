@@ -10,10 +10,6 @@
 
 namespace JonsEngine
 {
-    //
-    // TODO: extend with all/immediate child iterators when needed
-    //
-
     // Internal storage item
     template <typename T>
     struct IDMapTreeItem
@@ -28,6 +24,7 @@ namespace JonsEngine
 
     // Contigous-memory ID-based tree container
     // Elements must be MoveAssignable
+    // TODO: Extend with all/immediate child iterators
     template <typename T>
     class IDMapTree : public IDMapBase<T, IDMapTreeItem<T>>
     {

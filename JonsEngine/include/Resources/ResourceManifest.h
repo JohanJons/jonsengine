@@ -1,7 +1,6 @@
 #pragma once
 
 #include "include/Resources/JonsPackage.h"
-#include "include/Resources/Animation.h"
 #include "include/Resources/Model.h"
 #include "include/Resources/ModelNode.h"
 #include "include/Resources/Mesh.h"
@@ -47,7 +46,6 @@ namespace JonsEngine
 		IMemoryAllocatorPtr mMemoryAllocator;
         DX11Renderer& mRenderer;
 
-        IDMap<Animation> mAnimations;
         IDMap<Model> mModels;
         IDMap<Material> mMaterials;
         IDMap<Skybox> mSkyboxes;

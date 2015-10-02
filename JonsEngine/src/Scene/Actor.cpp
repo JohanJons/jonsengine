@@ -11,14 +11,14 @@ namespace JonsEngine
     }
 
 
+    void Actor::SetAnimation(const AnimationID animationID)
+    {
+
+    }
+
     void Actor::SetModel(const ModelID modelID)
     {
         mModelID = modelID;
-    }
-
-    void Actor::SetSceneNode(const SceneNodeID sceneNodeID)
-    {
-        mSceneNodeID = sceneNodeID;
     }
 
     void Actor::SetMaterial(const MaterialID materialID)
@@ -29,6 +29,11 @@ namespace JonsEngine
     void Actor::SetMaterialTilingFactor(const float tilingFactor)
     {
         mMaterialTilingFactor = tilingFactor;
+    }
+
+    void Actor::SetSceneNode(const SceneNodeID sceneNodeID)
+    {
+        mSceneNodeID = sceneNodeID;
     }
 
 

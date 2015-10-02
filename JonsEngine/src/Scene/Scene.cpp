@@ -189,6 +189,25 @@ namespace JonsEngine
     }
 
 
+    AnimationInstanceID Scene::CreateAnimationInstance(const ModelID modelID, const std::string& animationName)
+    {
+        return mAnimationInstances.Insert();
+    }
+
+    void Scene::DeleteAnimationInstace(AnimationInstanceID& animationID)
+    {
+        assert(animationID != INVALID_ANIMATION_INSTANCE_ID);
+
+        mAnimationInstances.Erase(animationID);
+        animationID = INVALID_ANIMATION_INSTANCE_ID;
+    }
+
+    AnimationInstance& Scene::GetAnimation(const AnimationInstanceID animationID)
+    {
+        return mAnimationInstances.GetItem(animationID);
+    }
+
+
 	PointLightID Scene::CreatePointLight(const std::string& lightName, const SceneNodeID node)
     {
         return mPointLights.Insert(lightName, node);

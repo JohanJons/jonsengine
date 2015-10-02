@@ -236,9 +236,6 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Material.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
-    <ClCompile Include="src\Resources\Animation.cpp">
-      <Filter>Source Files\Resources</Filter>
-    </ClCompile>
     <ClCompile Include="src\Resources\Material.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
@@ -252,6 +249,9 @@
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
     <ClCompile Include="src\Resources\Skybox.cpp">
+      <Filter>Source Files\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\ModelAnimation.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -460,9 +460,6 @@
     <ClInclude Include="include\Core\Platform\Directx11.h">
       <Filter>Header Files\Core\Platform</Filter>
     </ClInclude>
-    <ClInclude Include="include\Resources\Animation.h">
-      <Filter>Header Files\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="include\Resources\Material.h">
       <Filter>Header Files\Resources</Filter>
     </ClInclude>
@@ -483,6 +480,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\Containers\IDMapBase.hpp">
       <Filter>Header Files\Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resources\ModelAnimation.h">
+      <Filter>Header Files\Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -3,6 +3,7 @@
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/Containers/IDMapTree.hpp"
+#include "include/Scene/AnimationInstance.h"
 #include "include/Scene/SceneNode.h"
 #include "include/Scene/Camera.h"
 #include "include/Scene/PointLight.h"
@@ -34,6 +35,10 @@ namespace JonsEngine
         ActorID CreateActor(const std::string& actorName, const ModelID modelID, const SceneNodeID sceneNodeID);
         void DeleteActor(ActorID& actorID);
         Actor& GetActor(const ActorID actorID);
+
+        AnimationInstanceID CreateAnimationInstance(const ModelID modelID, const std::string& animationName);
+        void DeleteAnimationInstace(AnimationInstanceID& animationID);
+        AnimationInstance& GetAnimation(const AnimationInstanceID animationID);
         
         PointLightID CreatePointLight(const std::string& lightName, const SceneNodeID sceneNodeID);
         void DeletePointLight(PointLightID& pointLightID);
@@ -68,6 +73,7 @@ namespace JonsEngine
         Vec4 mAmbientLight;
         SkyboxID mSkyboxID;
 
+        IDMap<AnimationInstance> mAnimationInstances;
 		IDMap<PointLight> mPointLights;
         IDMap<DirectionalLight> mDirectionalLights;
         IDMap<Actor> mActors;
