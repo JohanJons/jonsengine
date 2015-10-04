@@ -20,12 +20,16 @@ namespace JonsEngine
     }
 
 
-    const Mat4& ModelAnimation::GetNodeTransform(const ModelNode::NodeID nodeID, const double elapsedTimeInSeconds)
+    const Mat4& ModelAnimation::GetNodeTransform(const ModelNodeID nodeID, const double elapsedTimeInSeconds)
     {
         // TODO...
         return mNodeTransforms.front().first;
     }
     
+    AnimationID ModelAnimation::GetAnimationID() const
+    {
+        return mAnimationID;
+    }
     
     double ModelAnimation::GetTotalDurationInSeconds() const
     {

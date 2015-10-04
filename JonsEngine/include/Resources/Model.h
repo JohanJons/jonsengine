@@ -16,15 +16,22 @@ namespace JonsEngine
 
     class Model
     {
+    private:
+        typedef std::vector<ModelAnimation> AnimationContainer;
+
     public:
+        typedef AnimationContainer::const_iterator AnimationIterator;
+
         Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
         Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData);
         Model(const Model& other);
         ~Model();
 
+        AnimationIterator GetAnimations() const;
+        AnimationID GetAnimation(const std::string& name) const;
         const ModelNode& GetRootNode() const;
         const std::string& GetName() const;
-
+        
 
     private:
         typedef std::vector<ModelNode> NodeContainer;
@@ -38,6 +45,7 @@ namespace JonsEngine
         std::string mName;
         NodeContainer mNodes;
         MeshContainer mMeshes;
+        AnimationContainer mAnimations;
     };
 
     typedef IDMap<Model>::ItemID ModelID;

@@ -45,7 +45,7 @@ namespace JonsAssetImporter
         // process model hierarchy
         pkg->mModels.emplace_back(modelName);
         auto& model = pkg->mModels.back();
-        PackageNode::PackageNodeID nextNodeID = 1;
+        PackageNode::PackageNodeID nextNodeID = 0;
         if (!ProcessAssimpNode(model.mRootNode, scene, scene->mRootNode, materialMap, gIdentityMatrix, model.mRootNode.mAABB.mMinBounds, model.mRootNode.mAABB.mMaxBounds, ++nextNodeID))
             return false;
 
@@ -124,7 +124,7 @@ namespace JonsAssetImporter
         }
     }
 
-    bool Assimp::ProcessAssimpNode(JonsEngine::PackageNode& pkgNode, const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, const Mat4& parentTransform, JonsEngine::Vec3& parentMinBounds, JonsEngine::Vec3& parentMaxBounds, PackageNode::PackageNodeID nextNodeID)
+    bool Assimp::ProcessAssimpNode(JonsEngine::PackageNode& pkgNode, const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, const Mat4& parentTransform, JonsEngine::Vec3& parentMinBounds, JonsEngine::Vec3& parentMaxBounds, PackageNode::PackageNodeID& nextNodeID)
     {
         pkgNode.mName = node->mName.C_Str();
         pkgNode.mNodeID = nextNodeID;
@@ -252,12 +252,7 @@ namespace JonsAssetImporter
             assert(animation->mNumMeshChannels == 0);
 
             const double duration = animation->mDuration / animation->mTicksPerSecond;
-            const PackageNode::PackageNodeID nodeID = GetNodeID(model.mRootNode, animation->mName.C_Str());
-
-            // make sure node exists, otherwise something screwed up in parsing nodes
-            assert(nodeID != PackageNode::INVALID_NODE_ID);
-
-            model.mAnimations.emplace_back(nodeID, duration);
+            model.mAnimations.emplace_back(animation->mName.C_Str(), duration);
             PackageAnimation& pkgAnimation = model.mAnimations.back();
 
             aiNode* rootNode = scene->mRootNode;
@@ -275,7 +270,10 @@ namespace JonsAssetImporter
                 if (nodeAnimation->mNumPositionKeys == nodeAnimation->mNumRotationKeys == noAnimationKeysNum)
                     continue;
 
-                pkgAnimation.mAnimatedNodes.emplace_back(nodeAnimation->mNodeName.C_Str());
+                const PackageNode::PackageNodeID nodeID = GetNodeID(model.mRootNode, nodeAnimation->mNodeName.C_Str());
+                assert(nodeID != PackageNode::INVALID_NODE_ID);
+
+                pkgAnimation.mAnimatedNodes.emplace_back(nodeID);
                 PackageAnimatedNode& pkgAnimatedNode = pkgAnimation.mAnimatedNodes.back();
 
                 const uint32_t numPosKeys = nodeAnimation->mNumPositionKeys;

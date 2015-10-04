@@ -3,12 +3,12 @@
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/Containers/IDMapTree.hpp"
-#include "include/Scene/AnimationInstance.h"
-#include "include/Scene/SceneNode.h"
+#include "include/Scene/AnimatedActor.h"
 #include "include/Scene/Camera.h"
-#include "include/Scene/PointLight.h"
 #include "include/Scene/DirectionalLight.h"
-#include "include/Scene/Actor.h"
+#include "include/Scene/PointLight.h"
+#include "include/Scene/SceneNode.h"
+#include "include/Scene/StaticActor.h"
 #include "include/Resources/ResourceManifest.h"
 #include "include/Renderer/RenderQueue.h"
 
@@ -32,14 +32,14 @@ namespace JonsEngine
         void DeleteSceneNode(SceneNodeID& sceneNodeID);
         SceneNode& GetSceneNode(const SceneNodeID sceneNodeID);
 
-        ActorID CreateActor(const std::string& actorName, const ModelID modelID, const SceneNodeID sceneNodeID);
-        void DeleteActor(ActorID& actorID);
-        Actor& GetActor(const ActorID actorID);
+        StaticActorID CreateStaticActor(const std::string& actorName, const ModelID modelID, const SceneNodeID sceneNodeID);
+        void DeleteStaticActor(StaticActorID& actorID);
+        StaticActor& GetStaticActor(const StaticActorID actorID);
 
-        AnimationInstanceID CreateAnimationInstance(const ModelID modelID, const std::string& animationName);
-        void DeleteAnimationInstace(AnimationInstanceID& animationID);
-        AnimationInstance& GetAnimation(const AnimationInstanceID animationID);
-        
+        AnimatedActorID CreateAnimatedActor(const std::string& actorName, const ModelID modelID, const SceneNodeID sceneNodeID);
+        void DeleteAnimatedActor(AnimatedActorID& actorID);
+        AnimatedActor& GetAnimatedActor(const AnimatedActorID actorID);
+
         PointLightID CreatePointLight(const std::string& lightName, const SceneNodeID sceneNodeID);
         void DeletePointLight(PointLightID& pointLightID);
 		PointLight& GetPointLight(const PointLightID pointLightID);
@@ -73,10 +73,10 @@ namespace JonsEngine
         Vec4 mAmbientLight;
         SkyboxID mSkyboxID;
 
-        IDMap<AnimationInstance> mAnimationInstances;
 		IDMap<PointLight> mPointLights;
         IDMap<DirectionalLight> mDirectionalLights;
-        IDMap<Actor> mActors;
+        IDMap<StaticActor> mStaticActors;
+        IDMap<AnimatedActor> mAnimatedActors;
         IDMapTree<SceneNode> mSceneNodeTree;
 
         bool mHasDirtySceneNodes;

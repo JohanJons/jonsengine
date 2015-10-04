@@ -11,8 +11,10 @@ namespace JonsEngine
 
     Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID) : mName(name)
     {
+        const PackageNode::PackageNodeID onlyNodeID = 1;
+
         mMeshes.emplace_back(name, meshID, INVALID_MATERIAL_ID, minBounds, maxBounds);
-        mNodes.emplace_back(name, minBounds, maxBounds, initialTransform, ModelNode::ImmediateChildrenIterator(mNodes.end(), mNodes.end()), ModelNode::AllChildrenIterator(mNodes.end(), mNodes.end()),
+        mNodes.emplace_back(name, onlyNodeID, minBounds, maxBounds, initialTransform, ModelNode::ImmediateChildrenIterator(mNodes.end(), mNodes.end()), ModelNode::AllChildrenIterator(mNodes.end(), mNodes.end()),
             ModelNode::MeshIterator(mMeshes.begin(), mMeshes.end()), mNodes.end());
     }
 
@@ -21,10 +23,13 @@ namespace JonsEngine
         ReserveStorage(pkgModel, mNodes, mMeshes);
 
         ParseNodes(initData, gIdentityMatrix, pkgModel.mRootNode, mNodes.end());
+        
+        for (const PackageAnimation& pkgAnimation : pkgModel.mAnimations)
+            mAnimations.emplace_back(pkgAnimation);
     }
 
     // node container needs special care due to reconstructing valid iterators
-    Model::Model(const Model& otherModel) : mName(otherModel.mName), mMeshes(otherModel.mMeshes)
+    Model::Model(const Model& otherModel) : mName(otherModel.mName), mMeshes(otherModel.mMeshes), mAnimations(otherModel.mAnimations)
     {
         const uint32_t numNodes = otherModel.mNodes.size();
         mNodes.reserve(numNodes);
@@ -59,7 +64,7 @@ namespace JonsEngine
 
             const auto childNextIter = mNodes.begin() + nextChildIndex;
 
-            mNodes.emplace_back(otherNode.GetName(), otherNode.GetLocalAABB().Min(), otherNode.GetLocalAABB().Max(), otherNode.GetLocalTransform(), immChildrenIter, allChildrenIter, meshIter, childNextIter);
+            mNodes.emplace_back(otherNode.GetName(), otherNode.GetModelNodeID(), otherNode.GetLocalAABB().Min(), otherNode.GetLocalAABB().Max(), otherNode.GetLocalTransform(), immChildrenIter, allChildrenIter, meshIter, childNextIter);
         }
     }
 
@@ -67,6 +72,22 @@ namespace JonsEngine
     {
     }
 
+
+    Model::AnimationIterator Model::GetAnimations() const
+    {
+        return mAnimations.cbegin();
+    }
+
+    AnimationID Model::GetAnimation(const std::string& name) const
+    {
+        AnimationID ret = INVALID_ANIMATION_ID;
+
+        const auto iter = std::find_if(mAnimations.cbegin(), mAnimations.cend(), [&name](const ModelAnimation& animation) { return animation.GetName() == name; });
+        if (iter != mAnimations.end())
+            ret = iter->GetAnimationID();
+
+        return ret;
+    }
 
     const ModelNode& Model::GetRootNode() const
     {

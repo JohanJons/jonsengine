@@ -12,6 +12,9 @@
 
 namespace JonsEngine
 {
+    typedef PackageNode::PackageNodeID ModelNodeID;
+    static const ModelNodeID INVALID_MODEL_NODE_ID = PackageNode::INVALID_NODE_ID;
+
     class ModelNode
     {
     public:
@@ -45,15 +48,14 @@ namespace JonsEngine
 
     public:
         typedef ConstRangedIterator<NodeContainer, ImmediateChildrenIter> ImmediateChildrenIterator;
-        typedef PackageNode::PackageNodeID NodeID;
 
         ModelNode(const PackageNode& pkgNode, const Mat4& parentTransform, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& childIter, const MeshIterator& meshIter, const NodeIterator& next);
-        ModelNode(const std::string& name, const NodeID nodeID, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& allChildIter,
+        ModelNode(const std::string& name, const ModelNodeID nodeID, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& allChildIter,
             const MeshIterator& meshIter, const NodeIterator& next);
         ~ModelNode();
 
         const std::string& GetName() const;
-        const NodeID GetNodeID() const;
+        const ModelNodeID GetModelNodeID() const;
         const AABB& GetLocalAABB() const;
         const Mat4& GetLocalTransform() const;
 
@@ -64,7 +66,7 @@ namespace JonsEngine
 
     private:
         std::string mName;
-        NodeID mNodeID;
+        ModelNodeID mNodeID;
         AABB mLocalAABB;
         Mat4 mLocalTransform;
 

@@ -128,7 +128,11 @@ namespace JonsEngine
 
     struct PackageAnimation
     {
+        typedef uint32_t AnimationID;
+        static const AnimationID INVALID_ANIMATION_ID = 0;
+
         std::string mName;
+        AnimationID mAnimationID;
         double mDurationInSeconds;
         std::vector<PackageAnimatedNode> mAnimatedNodes;
 
@@ -260,6 +264,7 @@ namespace boost
         void serialize(Archive & ar, JonsEngine::PackageAnimation& animation, const unsigned int version)
         {
             ar & animation.mName;
+            ar & animation.mAnimationID;
             ar & animation.mDurationInSeconds;
             ar & animation.mAnimatedNodes;
         }

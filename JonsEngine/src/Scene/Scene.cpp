@@ -59,7 +59,7 @@ namespace JonsEngine
         mRenderQueue.mCamera.mCameraProjectionMatrix = cameraProjectionMatrix;
         mRenderQueue.mCamera.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
 
-		for (const Actor& actor : mActors)
+		for (const StaticActor& actor : mStaticActors)
 		{
             const SceneNodeID sceneNodeID = actor.GetSceneNode();
             const ModelID modelID = actor.GetModel();
@@ -91,7 +91,7 @@ namespace JonsEngine
             RenderablePointLight& renderablePointLight = mRenderQueue.mPointLights.back();
 
             //  cull meshes for each face
-            for (const Actor& actor : mActors)
+            for (const StaticActor& actor : mStaticActors)
             {
                 const SceneNodeID sceneNodeID = actor.GetSceneNode();
                 const ModelID modelID = actor.GetModel();
@@ -120,7 +120,7 @@ namespace JonsEngine
                 dirLight.GetSplitDistance(cascadeIndex, nearZ, farZ);
 
                 auto kdopIterator = dirLight.GetBoundingVolume(cascadeIndex);
-                for (const Actor& actor : mActors)
+                for (const StaticActor& actor : mStaticActors)
                 {
                     if (actor.GetSceneNode() == INVALID_SCENE_NODE_ID || actor.GetModel() == INVALID_MODEL_ID)
                         continue;
@@ -170,41 +170,41 @@ namespace JonsEngine
     }
 
 
-    ActorID Scene::CreateActor(const std::string& actorName, const ModelID modelID, const SceneNodeID node)
+    StaticActorID Scene::CreateStaticActor(const std::string& actorName, const ModelID modelID, const SceneNodeID sceneNodeID)
     {
-        return mActors.Insert(actorName, modelID, node);
+        return mStaticActors.Insert(actorName, modelID, sceneNodeID);
     }
 
-    void Scene::DeleteActor(ActorID& actorID)
+    void Scene::DeleteStaticActor(StaticActorID& actorID)
     {
-        assert(actorID != INVALID_ACTOR_ID);
+        assert(actorID != INVALID_STATIC_ACTOR_ID);
 
-        mActors.Erase(actorID);
-        actorID = INVALID_ACTOR_ID;
+        mStaticActors.Erase(actorID);
+        actorID = INVALID_STATIC_ACTOR_ID;
     }
 
-    Actor& Scene::GetActor(const ActorID actorID)
+    StaticActor& Scene::GetStaticActor(const StaticActorID actorID)
     {
-        return mActors.GetItem(actorID);
+        return mStaticActors.GetItem(actorID);
     }
 
 
-    AnimationInstanceID Scene::CreateAnimationInstance(const ModelID modelID, const std::string& animationName)
+    AnimatedActorID Scene::CreateAnimatedActor(const std::string& actorName, const ModelID modelID, const SceneNodeID sceneNodeID)
     {
-        return mAnimationInstances.Insert();
+        return mAnimatedActors.Insert(actorName, modelID, sceneNodeID);
     }
 
-    void Scene::DeleteAnimationInstace(AnimationInstanceID& animationID)
+    void Scene::DeleteAnimatedActor(AnimatedActorID& actorID)
     {
-        assert(animationID != INVALID_ANIMATION_INSTANCE_ID);
+        assert(actorID != INVALID_ANIMATED_ACTOR_ID);
 
-        mAnimationInstances.Erase(animationID);
-        animationID = INVALID_ANIMATION_INSTANCE_ID;
+        mAnimatedActors.Erase(actorID);
+        actorID = INVALID_ANIMATED_ACTOR_ID;
     }
 
-    AnimationInstance& Scene::GetAnimation(const AnimationInstanceID animationID)
+    AnimatedActor& Scene::GetAnimatedActor(const AnimatedActorID actorID)
     {
-        return mAnimationInstances.GetItem(animationID);
+        return mAnimatedActors.GetItem(actorID);
     }
 
 

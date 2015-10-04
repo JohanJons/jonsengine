@@ -17,7 +17,7 @@ namespace JonsGame
         JonsEngine::Scene& GetJonsScene();
         JonsEngine::SceneNode& GetMovingLightNode();
         JonsEngine::DirectionalLight& GetSun();
-        JonsEngine::Actor& GetAnimatedWuson();
+        JonsEngine::AnimatedActor& GetAnimatedWuson();
 
 
     private:
@@ -53,15 +53,15 @@ namespace JonsGame
         JonsEngine::PointLightID mMovingPointLightID;
         JonsEngine::DirectionalLightID mSunDirLightID;
 
-        JonsEngine::ActorID mActorSectoid;
-        JonsEngine::ActorID mActorCube;
-        JonsEngine::ActorID mActorChair;
-        JonsEngine::ActorID mActorHouse;
-        JonsEngine::ActorID mActorWuson;
-        JonsEngine::ActorID mActorWuson2;
-        JonsEngine::ActorID mActorPlane;
-        JonsEngine::ActorID mActorSphere;
-        JonsEngine::ActorID mActorCube2;
-        JonsEngine::ActorID mActorCube3;
+        JonsEngine::StaticActorID mActorSectoid;
+        JonsEngine::StaticActorID mActorCube;
+        JonsEngine::StaticActorID mActorChair;
+        JonsEngine::StaticActorID mActorHouse;
+        JonsEngine::AnimatedActorID mActorWuson;
+        JonsEngine::StaticActorID mActorWuson2;
+        JonsEngine::StaticActorID mActorPlane;
+        JonsEngine::StaticActorID mActorSphere;
+        JonsEngine::StaticActorID mActorCube2;
+        JonsEngine::StaticActorID mActorCube3;
     };
 }

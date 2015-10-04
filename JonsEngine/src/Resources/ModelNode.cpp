@@ -31,7 +31,7 @@ namespace JonsEngine
     {
     }
 
-    ModelNode::ModelNode(const std::string& name, const NodeID nodeID, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& allChildIter,
+    ModelNode::ModelNode(const std::string& name, const ModelNodeID nodeID, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& allChildIter,
         const MeshIterator& meshIter, const NodeIterator& next) :
         mName(name), mNodeID(nodeID), mLocalAABB(minBounds, maxBounds), mLocalTransform(Mat4(1.0f)), mImmediateChildNodes(immChildIter), mAllChildNodes(allChildIter), mMeshes(meshIter), mNext(next)
     {
@@ -47,7 +47,7 @@ namespace JonsEngine
         return mName;
     }
 
-    const ModelNode::NodeID ModelNode::GetNodeID() const
+    const ModelNodeID ModelNode::GetModelNodeID() const
     {
         return mNodeID;
     }
