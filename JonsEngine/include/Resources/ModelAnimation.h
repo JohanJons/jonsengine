@@ -19,7 +19,7 @@ namespace JonsEngine
         ModelAnimation(const PackageAnimation& pkgAnimation);
         ~ModelAnimation();
         
-        const Mat4& GetNodeTransform(const ModelNodeID nodeID, const double timestampInSeconds);
+        const Mat4& GetNodeTransform(const ModelNodeID nodeID, const double timestampInSeconds) const;
         const std::string& GetName() const;
         AnimationID GetAnimationID() const;
         double GetTotalDurationInSeconds() const;

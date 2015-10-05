@@ -6,6 +6,7 @@
 #include "include/Resources/JonsPackage.h"
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
+#include "include/Core/Containers/RangedIterator.hpp"
 
 #include <string>
 #include <vector>
@@ -20,7 +21,7 @@ namespace JonsEngine
         typedef std::vector<ModelAnimation> AnimationContainer;
 
     public:
-        typedef AnimationContainer::const_iterator AnimationIterator;
+        typedef ConstRangedIterator<AnimationContainer> AnimationIterator;
 
         Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
         Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData);
@@ -29,6 +30,7 @@ namespace JonsEngine
 
         AnimationIterator GetAnimations() const;
         AnimationID GetAnimation(const std::string& name) const;
+
         const ModelNode& GetRootNode() const;
         const std::string& GetName() const;
         

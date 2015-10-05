@@ -79,23 +79,18 @@ namespace JonsGame
         nodeHouse.TranslateNode(Vec3(-7.0f, 0.5f, -15.0f));
 
         // animated wuson
-        //actorWuson.SetMaterial(mMaterialCheckers);
         Model& modelWuson = resManifest.GetModel(mModelWuson);
         AnimatedActor& actorWuson = mScene.GetAnimatedActor(mActorWuson);
         actorWuson.SetAnimation(modelWuson.GetAnimation("Wuson_Run"));
         actorWuson.RepeatAnimation(true);
-        //actorWuson.PlayAnimation(true);
         SceneNode& nodeWuson = mScene.GetSceneNode(mNodeWuson);
         nodeWuson.TranslateNode(Vec3(-10.0f, 4.5f, -11.0f));
         nodeWuson.RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
-        //const std::string& anim2 = *(++animations);
-        //const std::string& anim3 = ++animations;
-
         // wuson 2 - not animated
         // TODO: set some other material
-        // Actor& actorWuson = mScene.GetActor(mActorWuson);
-        // actorWuson.SetMaterial(mMaterialCheckers);
+        StaticActor& actorWuson2 = mScene.GetStaticActor(mActorWuson2);
+        actorWuson2.SetMaterial(mMaterialCheckers);
         SceneNode& nodeWuson2 = mScene.GetSceneNode(mNodeWuson2);
         nodeWuson2.TranslateNode(Vec3(7.0f, 0.5f, 5.0f));
         nodeWuson2.RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));

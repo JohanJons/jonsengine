@@ -75,7 +75,7 @@ namespace JonsEngine
 
     Model::AnimationIterator Model::GetAnimations() const
     {
-        return mAnimations.cbegin();
+        return AnimationIterator(mAnimations.cbegin(), mAnimations.end());
     }
 
     AnimationID Model::GetAnimation(const std::string& name) const
@@ -88,6 +88,7 @@ namespace JonsEngine
 
         return ret;
     }
+
 
     const ModelNode& Model::GetRootNode() const
     {
