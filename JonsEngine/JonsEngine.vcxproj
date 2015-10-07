@@ -128,7 +128,6 @@
     <ClCompile Include="src\Core\Math\Plane.cpp" />
     <ClCompile Include="src\Core\Memory\HeapAllocator.cpp" />
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
-    <ClCompile Include="src\Core\Utils\Time.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11AABBPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11AmbientPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Backbuffer.cpp" />
@@ -203,7 +202,7 @@
     <ClInclude Include="include\Core\Types.h" />
     <ClInclude Include="include\Core\Utils\Error.h" />
     <ClInclude Include="include\Core\Utils\NonCopyable.h" />
-    <ClInclude Include="include\Core\Utils\Time.h" />
+    <ClInclude Include="include\Core\Utils\Timer.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11AABBPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11AmbientPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Backbuffer.h" />

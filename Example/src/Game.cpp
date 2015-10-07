@@ -5,6 +5,7 @@
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
+#include "include/Core/Utils/Timer.hpp"
 #include "include/Scene/Scene.h"
 #include "include/Resources/ResourceManifest.h"
 #include "boost/bind.hpp"
@@ -87,6 +88,11 @@ namespace JonsGame
       //  auto n6 = tree.AddNode(tree.GetRootNodeID(), 6, 6.0f);
       //  auto n7 = tree.AddNode(tree.GetRootNodeID(), 7, 7.0f);
       //  auto n8 = tree.AddNode(n7, 8, 8.0f);
+
+        HiResTimer timer;
+        timer.Start();
+        timer.Stop();
+        timer.ElapsedTime<HiResTimer::Milliseconds>();
 
         while (mRunning)
         {

@@ -131,9 +131,6 @@
     <ClCompile Include="src\Core\Logging\StreamBuf.cpp">
       <Filter>Source Files\Core\Logging</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Utils\Time.cpp">
-      <Filter>Source Files\Core\Utils</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scene\DirectionalLight.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
@@ -328,9 +325,6 @@
     <ClInclude Include="include\Core\Logging\OutputStream.h">
       <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Utils\Time.h">
-      <Filter>Header Files\Core\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\DebugOptions.h">
       <Filter>Header Files\Core</Filter>
     </ClInclude>
@@ -495,6 +489,9 @@
     </ClInclude>
     <ClInclude Include="include\Scene\BaseActor.h">
       <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\Timer.hpp">
+      <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
