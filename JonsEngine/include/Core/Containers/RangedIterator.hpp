@@ -3,17 +3,17 @@
 namespace JonsEngine
 {
     template <class Container, class InternalIterator = typename Container::iterator>
-    class RangedIterator
+    class BaseRangedIterator
     {
     public:
         typedef InternalIterator Iterator;
 
-        RangedIterator(Container& container, const size_t beginIndex, const size_t upToIndex) : mIterBegin(container.begin() + beginIndex), mIterEnd(container.begin() + upToIndex)
+        BaseRangedIterator(Container& container, const size_t beginIndex, const size_t upToIndex) : mIterBegin(container.begin() + beginIndex), mIterEnd(container.begin() + upToIndex)
         {
             assert(upToIndex >= beginIndex);
         }
 
-        RangedIterator(const Iterator& begin, const Iterator& end) : mIterBegin(begin), mIterEnd(end)
+        BaseRangedIterator(const Iterator& begin, const Iterator& end) : mIterBegin(begin), mIterEnd(end)
         {
         }
 
@@ -34,34 +34,9 @@ namespace JonsEngine
     };
 
 
+    template <class Container, class InternalIterator = typename Container::iterator>
+    using Rangediterator = BaseRangedIterator<Container, InternalIterator>;
+
     template <class Container, class InternalIterator = typename Container::const_iterator>
-    class ConstRangedIterator
-    {
-    public:
-        typedef InternalIterator Iterator;
-
-        ConstRangedIterator(const Container& container, const size_t beginIndex, const size_t upToIndex) : mIterBegin(container.cbegin() + beginIndex), mIterEnd(container.cbegin() + upToIndex)
-        {
-            assert(upToIndex >= beginIndex);
-        }
-
-        ConstRangedIterator(const Iterator& begin, const Iterator& end) : mIterBegin(begin), mIterEnd(end)
-        {
-        }
-
-        const Iterator begin() const
-        {
-            return mIterBegin;
-        }
-
-        const Iterator end() const
-        {
-            return mIterEnd;
-        }
-
-
-    private:
-        Iterator mIterBegin;
-        Iterator mIterEnd;
-    };
+    using ConstRangedIterator = BaseRangedIterator<typename Container, typename InternalIterator>;
 }
