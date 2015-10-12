@@ -2,6 +2,7 @@
 
 #include "include/Core/Types.h"
 #include "include/Core/Memory/IMemoryAllocator.h"
+#include "include/Core/Utils/Timer.hpp"
 #include "include/Window/WindowManager.h"
 #include "include/Renderer/DirectX11/DX11Renderer.h"
 #include "include/Resources/ResourceManifest.h"
@@ -39,6 +40,8 @@ namespace JonsEngine
         ResourceManifest mResourceManifest;
         SceneManager mSceneManager;
 
+        HiResTimer mTimer;
+        HiResTimer::TimePoint mLastFrameTime;
         float mPrevMinDepth;
         float mPrevMaxDepth;
     };

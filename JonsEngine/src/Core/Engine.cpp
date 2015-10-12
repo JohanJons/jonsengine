@@ -37,6 +37,9 @@ namespace JonsEngine
 
     void Engine::Tick(const DebugOptions& debugOptions)
     {
+        const HiResTimer::TimePoint currentFrameTime = mTimer.Now();
+        const HiResTimer::Milliseconds deltaTimeMS = mTimer.ElapsedTime<HiResTimer::Milliseconds>(mLastFrameTime, currentFrameTime);
+
         // process input and window events
         mWindow.Poll();
 
@@ -57,5 +60,7 @@ namespace JonsEngine
         // get min/max depth from frame, used in culling and rendering
         // TODO: move elsewhere?
         mRenderer.ReduceDepth(cameraProjectionMatrix, mPrevMinDepth, mPrevMaxDepth);
+
+        mLastFrameTime = currentFrameTime;
     }
 }

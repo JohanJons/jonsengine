@@ -26,6 +26,8 @@ namespace JonsEngine
         TimeUnit ElapsedTime() const;
         template <typename TimeUnit>
         TimeUnit ElapsedTime(const TimePoint& sinceTimePoint) const;
+        template <typename TimeUnit>
+        TimeUnit ElapsedTime(const TimePoint& startTimePoint, const TimePoint& endTimePoint) const;
         TimePoint Now() const;
 
         bool IsRunning() const;
@@ -35,7 +37,7 @@ namespace JonsEngine
         ClockType mClock;
         TimePoint mStartTime;
         TimePoint mStopTime;
-        bool mRunning;
+        bool mIsRunning;
     };
 
     typedef Timer<std::chrono::high_resolution_clock> HiResTimer;
@@ -43,7 +45,7 @@ namespace JonsEngine
 
 
     template <typename ClockType>
-    Timer<ClockType>::Timer() : mRunning(false)
+    Timer<ClockType>::Timer() : mIsRunning(false)
     {
     }
 
@@ -73,28 +75,31 @@ namespace JonsEngine
     typename TimeUnit Timer<ClockType>::ElapsedTime() const
     {
         if (mIsRunning)
-        {
-            const TimePoint currentTime = mClock.now();
-
-            return currentTime - mStartTime;
-        }
+            return ElapsedTime<TimeUnit>(mStartTime);
         else
-        {
-            return mStopTime - mStartTime;
-        }
+            return ElapsedTime<TimeUnit>(mStartTime, mStopTime);
     }
 
     template <typename ClockType>
     template <typename TimeUnit>
     typename TimeUnit Timer<ClockType>::ElapsedTime(const TimePoint& sinceTimePoint) const
     {
-        return TimeUnit();
+        const TimePoint currentTime = Now();
+
+        return ElapsedTime<TimeUnit>(currentTime, sinceTimePoint);
+    }
+
+    template <typename ClockType>
+    template <typename TimeUnit>
+    typename TimeUnit Timer<ClockType>::ElapsedTime(const TimePoint& startTimePoint, const TimePoint& endTimePoint) const
+    {
+        return std::chrono::duration_cast<TimeUnit>(endTimePoint - startTimePoint);
     }
 
     template <typename ClockType>
     typename Timer<ClockType>::TimePoint Timer<ClockType>::Now() const
     {
-        return TimePoint();
+        return mClock.now();
     }
 
 
