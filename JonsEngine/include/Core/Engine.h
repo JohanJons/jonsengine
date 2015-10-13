@@ -42,8 +42,6 @@ namespace JonsEngine
 
         HiResClock mClock;
         HiResClock::TimePoint mLastFrameTime;
-        float mPrevMinDepth;
-        float mPrevMaxDepth;
     };
 
 

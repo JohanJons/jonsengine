@@ -3,6 +3,7 @@
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/Containers/IDMapTree.hpp"
+#include "include/Core/Utils/Time.h"
 #include "include/Scene/AnimatedActor.h"
 #include "include/Scene/Camera.h"
 #include "include/Scene/DirectionalLight.h"
@@ -21,12 +22,14 @@ namespace JonsEngine
     class Scene
     {
     public:
-        Scene(const std::string& sceneName, const ResourceManifest& resourceManifest);
+        Scene(const std::string& sceneName, DX11Renderer& renderer, const ResourceManifest& resourceManifest);
         ~Scene();
+
+        void Tick(const Milliseconds elapsedTime, const float windowWidth, const float windowHeight);
+        const RenderQueue& GetRenderQueue();
 
         SceneNode& GetRootNode();
         const SceneNodeID GetRootNodeID() const;
-        const RenderQueue& GetRenderQueue(const Mat4& cameraProjectionMatrix, const float fov, const float aspectRatio, const float minDepth, const float maxDepth);
 
         SceneNodeID CreateSceneNode(const std::string& sceneNodeName, const SceneNodeID parent);
         void DeleteSceneNode(SceneNodeID& sceneNodeID);
@@ -65,8 +68,10 @@ namespace JonsEngine
     private:
         void UpdateDirtyObjects();
         void MarkAsDirty(SceneNode* sceneNode);
+        void UpdateDirLightSplitRanges(const float windowWidth, const float windowHeight);
 
 
+        DX11Renderer& mRenderer;
         const ResourceManifest& mResourceManifest;
 
 		Camera mSceneCamera;
@@ -83,7 +88,8 @@ namespace JonsEngine
 
         const SceneNodeID mRootNodeID;
         RenderQueue mRenderQueue;
-    };
 
-    typedef std::unique_ptr<Scene, std::function<void(Scene*)>> ScenePtr;
+        float mPrevMinCameraDepth;
+        float mPrevMaxCameraDepth;
+    };
 }

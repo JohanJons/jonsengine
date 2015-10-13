@@ -19,13 +19,16 @@ namespace JonsEngine
     void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius);
 
 
-    Scene::Scene(const std::string& sceneName, const ResourceManifest& resourceManifest) :
+    Scene::Scene(const std::string& sceneName, DX11Renderer& renderer, const ResourceManifest& resourceManifest) :
         mName(sceneName),
+        mRenderer(renderer),
         mResourceManifest(resourceManifest),
         mAmbientLight(0.2f),
         mSkyboxID(INVALID_SKYBOX_ID),
         mSceneNodeTree("Root", INVALID_SCENE_NODE_ID, std::bind(&Scene::MarkAsDirty, this, std::placeholders::_1)),
-        mRootNodeID(mSceneNodeTree.GetRootNodeID())
+        mRootNodeID(mSceneNodeTree.GetRootNodeID()),
+        mPrevMinCameraDepth(0.01f),
+        mPrevMaxCameraDepth(1.0f)
     {
     }
 
@@ -34,20 +37,14 @@ namespace JonsEngine
     }
 
 
-    SceneNode& Scene::GetRootNode()
-    {
-        return mSceneNodeTree.GetNode(mRootNodeID);
-    }
-
-    const SceneNodeID Scene::GetRootNodeID() const
-    {
-        return mRootNodeID;
-    }
-
-    const RenderQueue& Scene::GetRenderQueue(const Mat4& cameraProjectionMatrix, const float fov, const float aspectRatio, const float minDepth, const float maxDepth)
+    void Scene::Tick(const Milliseconds elapsedTime, const float windowWidth, const float windowHeight)
     {
         UpdateDirtyObjects();
+        UpdateDirLightSplitRanges(windowWidth, windowHeight);
+    }
 
+    const RenderQueue& Scene::GetRenderQueue()
+    {
         mRenderQueue.Clear();
 
         const Camera& sceneCamera = GetSceneCamera();
@@ -59,13 +56,13 @@ namespace JonsEngine
         mRenderQueue.mCamera.mCameraProjectionMatrix = cameraProjectionMatrix;
         mRenderQueue.mCamera.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
 
-		for (const StaticActor& actor : mStaticActors)
-		{
+        for (const StaticActor& actor : mStaticActors)
+        {
             const SceneNodeID sceneNodeID = actor.GetSceneNode();
             const ModelID modelID = actor.GetModel();
 
             if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
-				continue;
+                continue;
 
             const SceneNode& sceneNode = mSceneNodeTree.GetNode(sceneNodeID);
 
@@ -75,7 +72,7 @@ namespace JonsEngine
             const Model& model = mResourceManifest.GetModel(modelID);
 
             CullMeshesFrustrum(mResourceManifest, mRenderQueue.mCamera.mModels, model.GetRootNode(), worldMatrix, wvpMatrix, actor.GetMaterialTilingFactor(), actor.GetMaterial());
-		}
+        }
 
         // point lights
         for (const PointLight& pointLight : mPointLights)
@@ -151,6 +148,17 @@ namespace JonsEngine
     }
 
 
+    SceneNode& Scene::GetRootNode()
+    {
+        return mSceneNodeTree.GetNode(mRootNodeID);
+    }
+
+    const SceneNodeID Scene::GetRootNodeID() const
+    {
+        return mRootNodeID;
+    }
+
+    
     SceneNodeID Scene::CreateSceneNode(const std::string& sceneNodeName, const SceneNodeID parent)
     {
         return mSceneNodeTree.AddNode(parent, sceneNodeName, parent, std::bind(&Scene::MarkAsDirty, this, std::placeholders::_1));
@@ -306,6 +314,14 @@ namespace JonsEngine
     void Scene::MarkAsDirty(SceneNode* sceneNode)
     {
         mHasDirtySceneNodes = true;
+    }
+
+    void Scene::UpdateDirLightSplitRanges(const float windowWidth, const float windowHeight)
+    {
+        const Camera& sceneCamera = GetSceneCamera();
+        const float cameraFov = sceneCamera.GetFOV();
+        const float windowAspectRatio = windowWidth / static_cast<float>(windowHeight);
+        const Mat4 cameraProjectionMatrix = PerspectiveMatrixFov(cameraFov, windowAspectRatio, mRenderer.GetZNear(), mRenderer.GetZFar());
     }
 
 

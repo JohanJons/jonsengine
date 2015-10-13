@@ -4,6 +4,7 @@
 #include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/DebugOptions.h"
+#include "include/Core/Utils/Time.h"
 #include "include/Scene/Scene.h"
 #include "include/Window/WindowManager.h"
 #include "include/Resources/ResourceManifest.h"
@@ -22,10 +23,7 @@ namespace JonsEngine
                                                      mWindow(settings, mMemoryAllocator, mLog), 
                                                      mRenderer(settings, mMemoryAllocator, mLog),
                                                      mResourceManifest(mRenderer, mMemoryAllocator), 
-                                                     mSceneManager(mResourceManifest),
-
-                                                     mPrevMinDepth(0.0f),
-                                                     mPrevMaxDepth(1.0f)
+                                                     mSceneManager(mRenderer, mResourceManifest)
     {
         JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
     }
@@ -37,29 +35,22 @@ namespace JonsEngine
 
     void Engine::Tick(const DebugOptions& debugOptions)
     {
-        const HiResTimer::TimePoint currentFrameTime = mTimer.Now();
-        const HiResTimer::Milliseconds deltaTimeMS = mTimer.ElapsedTime<HiResTimer::Milliseconds>(mLastFrameTime, currentFrameTime);
+        const HiResClock::TimePoint currentFrameTime = mClock.Now();
+        const Milliseconds elapstedFrameTime = mClock.ElapsedTime<Milliseconds>(mLastFrameTime, currentFrameTime);
 
         // process input and window events
         mWindow.Poll();
-
-		Scene& activeScene = mSceneManager.GetActiveScene();
-
         const uint32_t windowWidth = mWindow.GetScreenWidth();
         const uint32_t windowHeight = mWindow.GetScreenHeight();
-        const float cameraFov = activeScene.GetSceneCamera().GetFOV();
-        const float windowAspectRatio = windowWidth / static_cast<float>(windowHeight);
-        const Mat4 cameraProjectionMatrix = PerspectiveMatrixFov(cameraFov, windowAspectRatio, mRenderer.GetZNear(), mRenderer.GetZFar());
-        
+
+		Scene& activeScene = mSceneManager.GetActiveScene();
+        activeScene.Tick(elapstedFrameTime, windowWidth, windowHeight);
+
         // get renderqueue from scene
-        const RenderQueue& renderQueue = activeScene.GetRenderQueue(cameraProjectionMatrix, cameraFov, windowAspectRatio, mPrevMinDepth, mPrevMaxDepth);
+        const RenderQueue& renderQueue = activeScene.GetRenderQueue();
 
         // render the scene
         mRenderer.Render(renderQueue, debugOptions.mRenderingFlags);
-
-        // get min/max depth from frame, used in culling and rendering
-        // TODO: move elsewhere?
-        mRenderer.ReduceDepth(cameraProjectionMatrix, mPrevMinDepth, mPrevMaxDepth);
 
         mLastFrameTime = currentFrameTime;
     }

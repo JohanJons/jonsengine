@@ -139,13 +139,13 @@ namespace JonsEngine
         for (uint32_t index = 0; index < frustumPlanes.size(); index++) {
             const Plane& plane = frustumPlanes.at(index);
             // If this plane is facing away from us, move on.
-            float fDir = glm::dot(plane.GetNormal(), lightDirNormalized);
+            const float fDir = glm::dot(plane.GetNormal(), lightDirNormalized);
             if (fDir > 0.0f) { continue; }
 
             // For each neighbor of this plane.
             const auto& neightbourPlanes = GetNeighbouringPlanes(static_cast<FrustumPlane>(index));
             for (const FrustumPlane plane : neightbourPlanes) {
-                float fNeighborDir = glm::dot(frustumPlanes[plane].GetNormal(), lightDirNormalized);
+                const float fNeighborDir = glm::dot(frustumPlanes[plane].GetNormal(), lightDirNormalized);
                 // If this plane is facing away from us, the edge between plane I and plane J
                 //	marks the edge of a plane we need to add.
                 if (fNeighborDir > 0.0f) {
