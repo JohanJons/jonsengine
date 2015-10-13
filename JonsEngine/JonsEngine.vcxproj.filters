@@ -257,6 +257,9 @@
     <ClCompile Include="src\Scene\StaticActor.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\Utils\Timer.cpp">
+      <Filter>Source Files\Core\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -490,7 +493,13 @@
     <ClInclude Include="include\Scene\BaseActor.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Utils\Timer.hpp">
+    <ClInclude Include="include\Core\Utils\Clock.hpp">
+      <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\Time.h">
+      <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\Timer.h">
       <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
   </ItemGroup>

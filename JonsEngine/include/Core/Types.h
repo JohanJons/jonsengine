@@ -1,7 +1,5 @@
 #pragma once
 
-#include "include/Core/Utils/Timer.hpp"
-
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include <cstdint>
