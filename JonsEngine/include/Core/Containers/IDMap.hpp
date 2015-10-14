@@ -35,6 +35,9 @@ namespace JonsEngine
 
         iterator begin();
         iterator end();
+
+        const iterator cbegin() const;
+        const iterator cend() const;
     };
 
 
@@ -133,4 +136,17 @@ namespace JonsEngine
 	{
 		return iterator(mItems.end());
 	}
+
+
+    template <typename T>
+    typename const IDMap<T>::iterator IDMap<T>::cbegin() const
+    {
+        return iterator(mItems.begin());
+    }
+
+    template <typename T>
+    typename const IDMap<T>::iterator IDMap<T>::cend() const
+    {
+        return iterator(mItems.end());
+    }
 }

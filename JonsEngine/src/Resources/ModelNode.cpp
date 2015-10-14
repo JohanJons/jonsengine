@@ -63,17 +63,17 @@ namespace JonsEngine
     }
 
 
-    const ModelNode::MeshIterator& ModelNode::GetMeshes() const
+    ModelNode::MeshIterator ModelNode::GetMeshes() const
     {
         return mMeshes;
     }
 
-    const ModelNode::AllChildrenIterator& ModelNode::GetAllChildren() const
+    ModelNode::AllChildrenIterator ModelNode::GetAllChildren() const
     {
         return mAllChildNodes;
     }
 
-    const ModelNode::ImmediateChildrenIterator& ModelNode::GetImmediateChildren() const
+    ModelNode::ImmediateChildrenIterator ModelNode::GetImmediateChildren() const
     {
         return mImmediateChildNodes;
     }

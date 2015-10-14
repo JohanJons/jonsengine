@@ -312,7 +312,7 @@ namespace JonsEngine
         // skips root
         for (auto nodeIter = mSceneNodeTree.begin() + 1; nodeIter != mSceneNodeTree.end(); ++nodeIter)
         {
-            SceneNode& node = nodeIter->mItem;
+            SceneNode& node = *nodeIter;
             SceneNode& parent = mSceneNodeTree.GetNode(node.GetParentID());
             const Mat4& parentWorldTransform = parent.GetWorldTransform();
 

@@ -21,7 +21,7 @@ namespace JonsEngine
         typedef IDMap<ModelAnimation> AnimationContainer;
 
     public:
-        typedef ConstRangedIterator<AnimationContainer> AnimationIterator;
+        typedef ConstRangedIterator<AnimationContainer, AnimationContainer::iterator> AnimationIterator;
 
         Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
         Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData);

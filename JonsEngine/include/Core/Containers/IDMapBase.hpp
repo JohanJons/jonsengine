@@ -32,10 +32,10 @@ namespace JonsEngine
             bool operator!=(const iterator& iter) const;
 
             iterator& operator++();
-            iterator operator++(int);
+            iterator operator++(int) const;
 
             void operator+=(const size_t offset);
-            iterator operator+ (const size_t offset);
+            iterator operator+ (const size_t offset) const;
 
             T& operator*();
             const T& operator*() const;
@@ -86,7 +86,7 @@ namespace JonsEngine
     }
 
     template <typename T, typename StorageType>
-    typename IDMapBase<T, StorageType>::iterator IDMapBase<T, StorageType>::iterator::operator++(int)
+    typename IDMapBase<T, StorageType>::iterator IDMapBase<T, StorageType>::iterator::operator++(int) const
     {
         iterator old(++(*this));
 
@@ -101,7 +101,7 @@ namespace JonsEngine
     }
 
     template <typename T, typename StorageType>
-    typename IDMapBase<T, StorageType>::iterator IDMapBase<T, StorageType>::iterator::operator+ (const size_t offset)
+    typename IDMapBase<T, StorageType>::iterator IDMapBase<T, StorageType>::iterator::operator+ (const size_t offset) const
     {
         return mIterator + offset;
     }
