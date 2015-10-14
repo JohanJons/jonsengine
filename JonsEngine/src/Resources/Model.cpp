@@ -25,7 +25,7 @@ namespace JonsEngine
         ParseNodes(initData, gIdentityMatrix, pkgModel.mRootNode, mNodes.end());
         
         for (const PackageAnimation& pkgAnimation : pkgModel.mAnimations)
-            mAnimations.emplace_back(pkgAnimation);
+            mAnimations.Insert(pkgAnimation);
     }
 
     // node container needs special care due to reconstructing valid iterators
@@ -75,21 +75,26 @@ namespace JonsEngine
 
     Model::AnimationIterator Model::GetAnimations() const
     {
-        return AnimationIterator(mAnimations.cbegin(), mAnimations.end());
+        return AnimationIterator(mAnimations.cbegin(), mAnimations.cend());
     }
 
-    AnimationID Model::GetAnimation(const std::string& name) const
+    AnimationID Model::GetAnimationID(const std::string& name) const
     {
         AnimationID ret = INVALID_ANIMATION_ID;
 
         const auto iter = std::find_if(mAnimations.cbegin(), mAnimations.cend(), [&name](const ModelAnimation& animation) { return animation.GetName() == name; });
-        if (iter != mAnimations.end())
-            ret = iter->GetAnimationID();
+        if (iter != mAnimations.cend())
+            ret = (*iter).GetAnimationID();
 
         return ret;
     }
 
 
+    //const ModelAnimation& Model::GetAnimation(const AnimationID animationID) const
+    //{
+    //    return mAnimations.
+    //}
+    
     const ModelNode& Model::GetRootNode() const
     {
         return mNodes.front();

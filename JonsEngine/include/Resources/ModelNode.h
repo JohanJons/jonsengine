@@ -59,9 +59,9 @@ namespace JonsEngine
         const AABB& GetLocalAABB() const;
         const Mat4& GetLocalTransform() const;
 
-        const MeshIterator& GetMeshes() const;
-        const AllChildrenIterator& GetAllChildren() const;
-        const ImmediateChildrenIterator& GetImmediateChildren() const;
+        MeshIterator& GetMeshes() const;
+        AllChildrenIterator& GetAllChildren() const;
+        ImmediateChildrenIterator& GetImmediateChildren() const;
 
 
     private:

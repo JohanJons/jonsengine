@@ -18,7 +18,7 @@ namespace JonsEngine
     class Model
     {
     private:
-        typedef std::vector<ModelAnimation> AnimationContainer;
+        typedef IDMap<ModelAnimation> AnimationContainer;
 
     public:
         typedef ConstRangedIterator<AnimationContainer> AnimationIterator;
@@ -29,8 +29,9 @@ namespace JonsEngine
         ~Model();
 
         AnimationIterator GetAnimations() const;
-        AnimationID GetAnimation(const std::string& name) const;
-
+        AnimationID GetAnimationID(const std::string& name) const;
+        
+        //const ModelAnimation& GetAnimation(const AnimationID animationID) const;
         const ModelNode& GetRootNode() const;
         const std::string& GetName() const;
         

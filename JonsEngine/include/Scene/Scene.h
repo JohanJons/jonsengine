@@ -10,7 +10,7 @@
 #include "include/Scene/PointLight.h"
 #include "include/Scene/SceneNode.h"
 #include "include/Scene/StaticActor.h"
-#include "include/Resources/ResourceManifest.h"
+#include "include/Resources/Skybox.h"
 #include "include/Renderer/RenderQueue.h"
 
 #include <string>
@@ -19,6 +19,9 @@
 
 namespace JonsEngine
 {
+    class DX11Renderer;
+    class ResourceManifest;
+
     class Scene
     {
     public:
@@ -66,9 +69,11 @@ namespace JonsEngine
 
 
     private:
-        void UpdateDirtyObjects();
         void MarkAsDirty(SceneNode* sceneNode);
-        void UpdateDirLightSplitRanges(const float windowWidth, const float windowHeight);
+        void UpdateRenderQueueCamera(const float cameraFov, const float windowAspectRatio);
+        void UpdateDirtyObjects();
+        void UpdateDirLightSplitRanges(const float cameraFov, const float windowAspectRatio);
+        void UpdateAnimatedActors(const Milliseconds elapsedTime);
 
 
         DX11Renderer& mRenderer;
@@ -88,8 +93,5 @@ namespace JonsEngine
 
         const SceneNodeID mRootNodeID;
         RenderQueue mRenderQueue;
-
-        float mPrevMinCameraDepth;
-        float mPrevMaxCameraDepth;
     };
 }

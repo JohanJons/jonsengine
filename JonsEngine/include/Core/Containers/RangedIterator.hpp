@@ -35,7 +35,7 @@ namespace JonsEngine
 
 
     template <class Container, class InternalIterator = typename Container::iterator>
-    using Rangediterator = BaseRangedIterator<Container, InternalIterator>;
+    using Rangediterator = BaseRangedIterator<typename Container, typename InternalIterator>;
 
     template <class Container, class InternalIterator = typename Container::const_iterator>
     using ConstRangedIterator = BaseRangedIterator<typename Container, typename InternalIterator>;

@@ -1,5 +1,6 @@
 #include "include/Scene/Scene.h"
 #include "include/Resources/ResourceManifest.h"
+#include "include/Renderer/DirectX11/DX11Renderer.h"
 #include "include/Core/Math/Math.h"
 #include "include/Core/Math/Intersection.h"
 
@@ -26,9 +27,7 @@ namespace JonsEngine
         mAmbientLight(0.2f),
         mSkyboxID(INVALID_SKYBOX_ID),
         mSceneNodeTree("Root", INVALID_SCENE_NODE_ID, std::bind(&Scene::MarkAsDirty, this, std::placeholders::_1)),
-        mRootNodeID(mSceneNodeTree.GetRootNodeID()),
-        mPrevMinCameraDepth(0.01f),
-        mPrevMaxCameraDepth(1.0f)
+        mRootNodeID(mSceneNodeTree.GetRootNodeID())
     {
     }
 
@@ -39,22 +38,19 @@ namespace JonsEngine
 
     void Scene::Tick(const Milliseconds elapsedTime, const float windowWidth, const float windowHeight)
     {
+        const Camera& sceneCamera = GetSceneCamera();
+        const float cameraFov = sceneCamera.GetFOV();
+        const float windowAspectRatio = windowWidth / static_cast<float>(windowHeight);
+
+        UpdateRenderQueueCamera(cameraFov, windowAspectRatio);
         UpdateDirtyObjects();
-        UpdateDirLightSplitRanges(windowWidth, windowHeight);
+        UpdateDirLightSplitRanges(cameraFov, windowAspectRatio);
+        UpdateAnimatedActors(elapsedTime);
     }
 
     const RenderQueue& Scene::GetRenderQueue()
     {
         mRenderQueue.Clear();
-
-        const Camera& sceneCamera = GetSceneCamera();
-
-        // camera
-        mRenderQueue.mCamera.mFOV = fov;
-        mRenderQueue.mCamera.mCameraPosition = sceneCamera.Position();
-        mRenderQueue.mCamera.mCameraViewMatrix = sceneCamera.GetCameraTransform();
-        mRenderQueue.mCamera.mCameraProjectionMatrix = cameraProjectionMatrix;
-        mRenderQueue.mCamera.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
 
         for (const StaticActor& actor : mStaticActors)
         {
@@ -110,7 +106,6 @@ namespace JonsEngine
             mRenderQueue.mDirectionalLights.emplace_back(dirLight.GetLightColor(), glm::normalize(dirLight.GetLightDirection()), dirLight.GetNumCascades());
             RenderableDirLight& renderableDirLight = mRenderQueue.mDirectionalLights.back();
 
-            dirLight.UpdateCascadesBoundingVolume(mRenderQueue.mCamera.mCameraViewMatrix, fov, aspectRatio, minDepth, maxDepth);
             for (uint32_t cascadeIndex = 0; cascadeIndex < dirLight.GetNumCascades(); ++cascadeIndex)
             {
                 float nearZ = 0.0f, farZ = 0.0f;
@@ -289,6 +284,22 @@ namespace JonsEngine
 	}
 
 
+    void Scene::MarkAsDirty(SceneNode* sceneNode)
+    {
+        mHasDirtySceneNodes = true;
+    }
+
+    void Scene::UpdateRenderQueueCamera(const float cameraFov, const float windowAspectRatio)
+    {
+        const Camera& sceneCamera = GetSceneCamera();
+
+        mRenderQueue.mCamera.mFOV = cameraFov;
+        mRenderQueue.mCamera.mCameraPosition = sceneCamera.Position();
+        mRenderQueue.mCamera.mCameraViewMatrix = sceneCamera.GetCameraTransform();
+        mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(cameraFov, windowAspectRatio, mRenderer.GetZNear(), mRenderer.GetZFar());
+        mRenderQueue.mCamera.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
+    }
+
     void Scene::UpdateDirtyObjects()
     {
         if (!mHasDirtySceneNodes)
@@ -301,7 +312,7 @@ namespace JonsEngine
         // skips root
         for (auto nodeIter = mSceneNodeTree.begin() + 1; nodeIter != mSceneNodeTree.end(); ++nodeIter)
         {
-            SceneNode& node = *nodeIter;
+            SceneNode& node = nodeIter->mItem;
             SceneNode& parent = mSceneNodeTree.GetNode(node.GetParentID());
             const Mat4& parentWorldTransform = parent.GetWorldTransform();
 
@@ -311,17 +322,28 @@ namespace JonsEngine
         mHasDirtySceneNodes = false;
     }
 
-    void Scene::MarkAsDirty(SceneNode* sceneNode)
+    void Scene::UpdateDirLightSplitRanges(const float cameraFov, const float windowAspectRatio)
     {
-        mHasDirtySceneNodes = true;
+        float minCameraDepth = 0.01f;
+        float maxCameraDepth = 1.0f;
+    
+        mRenderer.ReduceDepth(mRenderQueue.mCamera.mCameraProjectionMatrix, minCameraDepth, maxCameraDepth);
+        for (DirectionalLight& dirLight : mDirectionalLights)
+            dirLight.UpdateCascadesBoundingVolume(mRenderQueue.mCamera.mCameraViewMatrix, cameraFov, windowAspectRatio, minCameraDepth, maxCameraDepth);
     }
-
-    void Scene::UpdateDirLightSplitRanges(const float windowWidth, const float windowHeight)
+    
+    void Scene::UpdateAnimatedActors(const Milliseconds elapsedTime)
     {
-        const Camera& sceneCamera = GetSceneCamera();
-        const float cameraFov = sceneCamera.GetFOV();
-        const float windowAspectRatio = windowWidth / static_cast<float>(windowHeight);
-        const Mat4 cameraProjectionMatrix = PerspectiveMatrixFov(cameraFov, windowAspectRatio, mRenderer.GetZNear(), mRenderer.GetZFar());
+        for (const AnimatedActor& actor : mAnimatedActors)
+        {
+            const ModelID modelID = actor.GetModel();
+            const AnimationID animationID = actor.GetAnimation();
+            if (modelID == INVALID_MODEL_ID || animationID == INVALID_ANIMATION_ID)
+                continue;
+
+            //const ModelAnimation& animation = mResourceManifest.GetModel(animationID);
+            
+        }
     }
 
 
