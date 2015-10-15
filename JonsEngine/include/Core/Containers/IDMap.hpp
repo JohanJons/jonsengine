@@ -36,8 +36,8 @@ namespace JonsEngine
         iterator begin();
         iterator end();
 
-        const iterator cbegin() const;
-        const iterator cend() const;
+        const_iterator cbegin() const;
+        const_iterator cend() const;
     };
 
 
@@ -139,14 +139,14 @@ namespace JonsEngine
 
 
     template <typename T>
-    typename const IDMap<T>::iterator IDMap<T>::cbegin() const
+    typename IDMap<T>::const_iterator IDMap<T>::cbegin() const
     {
-        return iterator(mItems.begin());
+        return const_iterator(mItems.cbegin());
     }
 
     template <typename T>
-    typename const IDMap<T>::iterator IDMap<T>::cend() const
+    typename IDMap<T>::const_iterator IDMap<T>::cend() const
     {
-        return iterator(mItems.end());
+        return const_iterator(mItems.cend());
     }
 }

@@ -50,7 +50,7 @@ namespace JonsEngine
     {
     }
 
-    PackageAnimatedNodeTransform::PackageAnimatedNodeTransform(const double timestamp, const Mat4& transform) : mTimestamp(timestamp), mTransform(transform)
+    PackageAnimatedNodeTransform::PackageAnimatedNodeTransform(const uint32_t timestampMilliseconds, const Mat4& transform) : mTimestampMilliseconds(timestampMilliseconds), mTransform(transform)
     {
     }
 
@@ -66,7 +66,7 @@ namespace JonsEngine
     {
     }
 
-    PackageAnimation::PackageAnimation(const std::string& name, const double durationSeconds) : mName(name), mDurationInSeconds(durationSeconds)
+    PackageAnimation::PackageAnimation(const std::string& name, const uint32_t durationInMilliseconds) : mName(name), mDurationInMilliseconds(durationInMilliseconds)
     {
     }
 

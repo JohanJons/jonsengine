@@ -334,15 +334,12 @@ namespace JonsEngine
     
     void Scene::UpdateAnimatedActors(const Milliseconds elapsedTime)
     {
-        for (const AnimatedActor& actor : mAnimatedActors)
+        for (AnimatedActor& actor : mAnimatedActors)
         {
-            const ModelID modelID = actor.GetModel();
-            const AnimationID animationID = actor.GetAnimation();
-            if (modelID == INVALID_MODEL_ID || animationID == INVALID_ANIMATION_ID)
+            if (!actor.IsPlaying())
                 continue;
-
-            //const ModelAnimation& animation = mResourceManifest.GetModel(animationID);
             
+            actor.UpdateTimestamp(elapsedTime);
         }
     }
 

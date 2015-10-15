@@ -251,7 +251,7 @@ namespace JonsAssetImporter
             // shouldn't be present
             assert(animation->mNumMeshChannels == 0);
 
-            const double duration = animation->mDuration / animation->mTicksPerSecond;
+            const uint32_t duration = static_cast<uint32_t>(animation->mDuration / animation->mTicksPerSecond);
             model.mAnimations.emplace_back(animation->mName.C_Str(), duration);
             PackageAnimation& pkgAnimation = model.mAnimations.back();
 
@@ -286,14 +286,15 @@ namespace JonsAssetImporter
                     aiVectorKey* aiPos = nodeAnimation->mPositionKeys + posKey;
                     const Vec3 posVec = aiVec3ToJonsVec3(aiPos->mValue);
                     Mat4 transform = glm::translate(posVec);
-                    float keyTime = aiPos->mTime;
 
                     // rotation
                     const uint32_t rotKey = key < numRotkeys ? key : numRotkeys - 1;
                     aiQuatKey* aiRot = nodeAnimation->mRotationKeys + rotKey;
                     const Quaternion rotQuat = aiQuatToJonsQuat(aiRot->mValue);
                     transform *= glm::toMat4(rotQuat);
-                    keyTime = aiRot->mTime;
+
+                    assert(aiPos->mTime == aiRot->mTime);
+                    const uint32_t keyTime = aiPos->mTime;
 
                     pkgAnimatedNode.mAnimationTransforms.emplace_back(keyTime, transform);
                 }

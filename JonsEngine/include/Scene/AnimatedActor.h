@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/Containers/IDMap.hpp"
+#include "include/Core/Utils/Time.h"
 #include "include/Scene/BaseActor.h"
 
 namespace JonsEngine
@@ -13,16 +14,20 @@ namespace JonsEngine
 
         void PlayAnimation(const bool doPlay);
         void RepeatAnimation(const bool repeatAnimation);
-        void SetAnimation(const AnimationID animationId);
+        void SetAnimation(const AnimationID animationId, const Milliseconds animationTime);
 
         AnimationID GetAnimation() const;
         bool IsRepeatingAnimation() const;
+        bool IsPlaying() const;
+
+        void UpdateTimestamp(const Milliseconds elapsedTime);
 
 
     private:
         bool mIsAnimating;
         bool mIsRepeating;
-        double mTimestamp;
+        Milliseconds mTimestamp;
+        Milliseconds mAnimationTime;
         AnimationID mAnimation;
     };
 

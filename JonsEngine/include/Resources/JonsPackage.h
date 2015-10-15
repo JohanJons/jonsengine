@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/Types.h"
+#include "include/Core/Utils/Time.h"
 
 #include <vector>
 #include <memory>
@@ -108,12 +109,12 @@ namespace JonsEngine
 
     struct PackageAnimatedNodeTransform
     {
-        double mTimestamp;
+        uint32_t mTimestampMilliseconds;
         Mat4 mTransform;
 
 
         PackageAnimatedNodeTransform();
-        PackageAnimatedNodeTransform(const double timestamp, const Mat4& transform);
+        PackageAnimatedNodeTransform(const uint32_t timestampMilliseconds, const Mat4& transform);
     };
 
     struct PackageAnimatedNode
@@ -133,12 +134,12 @@ namespace JonsEngine
 
         std::string mName;
         AnimationID mAnimationID;
-        double mDurationInSeconds;
+        uint32_t mDurationInMilliseconds;
         std::vector<PackageAnimatedNode> mAnimatedNodes;
 
 
         PackageAnimation();
-        PackageAnimation(const std::string& name, const double durationSeconds);
+        PackageAnimation(const std::string& name, const uint32_t durationMilliseconds);
     };
 
     struct PackageModel
@@ -249,7 +250,7 @@ namespace boost
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageAnimatedNodeTransform& animationNodeTransform, const unsigned int version)
         {
-            ar & animationNodeTransform.mTimestamp;
+            ar & animationNodeTransform.mTimestampMilliseconds;
             ar & animationNodeTransform.mTransform;
         }
 
@@ -265,7 +266,7 @@ namespace boost
         {
             ar & animation.mName;
             ar & animation.mAnimationID;
-            ar & animation.mDurationInSeconds;
+            ar & animation.mDurationInMilliseconds;
             ar & animation.mAnimatedNodes;
         }
 

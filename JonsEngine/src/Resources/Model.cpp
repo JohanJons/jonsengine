@@ -90,10 +90,10 @@ namespace JonsEngine
     }
 
 
-    //const ModelAnimation& Model::GetAnimation(const AnimationID animationID) const
-    //{
-    //    return mAnimations.
-    //}
+    const ModelAnimation& Model::GetAnimation(const AnimationID animationID) const
+    {
+        return mAnimations.GetItem(animationID);
+    }
     
     const ModelNode& Model::GetRootNode() const
     {

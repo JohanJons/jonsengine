@@ -3,6 +3,7 @@
 #include "include/Resources/ModelNode.h"
 #include "include/Resources/JonsPackage.h"
 #include "include/Core/Types.h"
+#include "include/Core/Utils/Time.h"
 
 #include <string>
 #include <vector>
@@ -22,7 +23,7 @@ namespace JonsEngine
         const Mat4& GetNodeTransform(const ModelNodeID nodeID, const double timestampInSeconds) const;
         const std::string& GetName() const;
         AnimationID GetAnimationID() const;
-        double GetTotalDurationInSeconds() const;
+        Milliseconds GetAnimationDuration() const;
 
 
     private:
@@ -32,8 +33,7 @@ namespace JonsEngine
     
         std::string mName;
         AnimationID mAnimationID;
-        double mDurationInSeconds;
-        bool mIsPlaying;
+        Milliseconds mAnimationDuration;
 
         std::vector<NodeIDMap> mNodeIDMapping;
         NodeTransformsContainer mNodeTransforms;

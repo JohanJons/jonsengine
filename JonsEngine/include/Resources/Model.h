@@ -21,7 +21,7 @@ namespace JonsEngine
         typedef IDMap<ModelAnimation> AnimationContainer;
 
     public:
-        typedef ConstRangedIterator<AnimationContainer, AnimationContainer::iterator> AnimationIterator;
+        typedef ConstRangedIterator<AnimationContainer, AnimationContainer::const_iterator> AnimationIterator;
 
         Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
         Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData);
@@ -31,7 +31,7 @@ namespace JonsEngine
         AnimationIterator GetAnimations() const;
         AnimationID GetAnimationID(const std::string& name) const;
         
-        //const ModelAnimation& GetAnimation(const AnimationID animationID) const;
+        const ModelAnimation& GetAnimation(const AnimationID animationID) const;
         const ModelNode& GetRootNode() const;
         const std::string& GetName() const;
         

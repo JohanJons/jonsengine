@@ -24,26 +24,30 @@ namespace JonsEngine
         const static ItemID INVALID_ITEM_ID = 0;
 
         // TODO: maybe extend to adhere to RandomAccessIterator
-        class iterator
+        // TODO: some of these template parameters are probably redundant. Should be possible to trim down.
+        template <typename ValueRefType, typename InternalIter>
+        class BaseIterator
         {
         public:
-            iterator(typename const ItemIterator& iter);
+            BaseIterator(typename const InternalIter& iter);
 
-            bool operator!=(const iterator& iter) const;
+            bool operator!=(const BaseIterator& iter) const;
 
-            iterator& operator++();
-            iterator operator++(int) const;
+            BaseIterator& operator++();
+            BaseIterator operator++(int) const;
 
             void operator+=(const size_t offset);
-            iterator operator+ (const size_t offset) const;
+            BaseIterator operator+ (const size_t offset) const;
 
-            T& operator*();
-            const T& operator*() const;
+            ValueRefType operator*() const;
 
 
         private:
-            ItemIterator mIterator;
+            InternalIter mIterator;
         };
+
+        typedef BaseIterator<T&, ItemIterator> iterator;
+        typedef BaseIterator<const T&, ConstItemIterator> const_iterator;
 
 
     protected:
@@ -63,22 +67,25 @@ namespace JonsEngine
 
 
     //
-    // IDMapBase::iterator
+    // IDMapBase::BaseIterator
     //
 
     template <typename T, typename StorageType>
-    IDMapBase<T, StorageType>::iterator::iterator(typename const ItemIterator& iter) : mIterator(iter)
+    template <typename ValueRefType, typename InternalIter>
+    IDMapBase<T, StorageType>::BaseIterator<ValueRefType, InternalIter>::BaseIterator(typename const InternalIter& iter) : mIterator(iter)
     {
     }
 
     template <typename T, typename StorageType>
-    bool IDMapBase<T, StorageType>::iterator::operator!=(const iterator& iter) const
+    template <typename ValueRefType, typename InternalIter>
+    bool IDMapBase<T, StorageType>::BaseIterator<ValueRefType, InternalIter>::operator!=(const BaseIterator<ValueRefType, InternalIter>& iter) const
     {
         return mIterator != iter.mIterator;
     }
 
     template <typename T, typename StorageType>
-    typename IDMapBase<T, StorageType>::iterator& IDMapBase<T, StorageType>::iterator::operator++()
+    template <typename ValueRefType, typename InternalIter>
+    typename IDMapBase<T, StorageType>::BaseIterator<ValueRefType, InternalIter>& IDMapBase<T, StorageType>::BaseIterator<ValueRefType, InternalIter>::operator++()
     {
         ++mIterator;
 
@@ -86,35 +93,33 @@ namespace JonsEngine
     }
 
     template <typename T, typename StorageType>
-    typename IDMapBase<T, StorageType>::iterator IDMapBase<T, StorageType>::iterator::operator++(int) const
+    template <typename ValueRefType, typename InternalIter>
+    typename IDMapBase<T, StorageType>::BaseIterator<ValueRefType, InternalIter> IDMapBase<T, StorageType>::BaseIterator<ValueRefType, InternalIter>::operator++(int) const
     {
-        iterator old(++(*this));
+        BaseIterator<InternalIter> old(++(*this));
 
         return old;
     }
 
 
     template <typename T, typename StorageType>
-    void IDMapBase<T, StorageType>::iterator::operator+=(const size_t offset)
+    template <typename ValueRefType, typename InternalIter>
+    void IDMapBase<T, StorageType>::BaseIterator<ValueRefType, InternalIter>::operator+=(const size_t offset)
     {
         mIterator += offset;
     }
 
     template <typename T, typename StorageType>
-    typename IDMapBase<T, StorageType>::iterator IDMapBase<T, StorageType>::iterator::operator+ (const size_t offset) const
+    template <typename ValueRefType, typename InternalIter>
+    typename IDMapBase<T, StorageType>::BaseIterator<ValueRefType, InternalIter> IDMapBase<T, StorageType>::BaseIterator<ValueRefType, InternalIter>::operator+ (const size_t offset) const
     {
         return mIterator + offset;
     }
 
 
     template <typename T, typename StorageType>
-    T& IDMapBase<T, StorageType>::iterator::operator*()
-    {
-        return mIterator->mItem;
-    }
-
-    template <typename T, typename StorageType>
-    const T& IDMapBase<T, StorageType>::iterator::operator*() const
+    template <typename ValueRefType, typename InternalIter>
+    ValueRefType IDMapBase<T, StorageType>::BaseIterator<ValueRefType, InternalIter>::operator*() const
     {
         return mIterator->mItem;
     }

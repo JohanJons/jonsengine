@@ -89,11 +89,6 @@ namespace JonsEngine
         modelID = INVALID_MODEL_ID;
     }
 
-    Model& ResourceManifest::GetModel(const ModelID modelID)
-    {
-        return mModels.GetItem(modelID);
-    }
-
     const Model& ResourceManifest::GetModel(const ModelID modelID) const
     {
         return mModels.GetItem(modelID);
@@ -130,11 +125,6 @@ namespace JonsEngine
 
         mMaterials.Erase(materialID);
         materialID = INVALID_MATERIAL_ID;
-    }
-
-    Material& ResourceManifest::GetMaterial(const MaterialID materialID)
-    {
-        return mMaterials.GetItem(materialID);
     }
 
     const Material& ResourceManifest::GetMaterial(const MaterialID materialID) const

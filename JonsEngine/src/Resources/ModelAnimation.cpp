@@ -2,13 +2,13 @@
 
 namespace JonsEngine
 {
-    ModelAnimation::ModelAnimation(const PackageAnimation& pkgAnimation) : mName(pkgAnimation.mName), mDurationInSeconds(pkgAnimation.mDurationInSeconds)
+    ModelAnimation::ModelAnimation(const PackageAnimation& pkgAnimation) : mName(pkgAnimation.mName), mAnimationDuration(Milliseconds(pkgAnimation.mDurationInMilliseconds))
     {
         auto nodeBeginIndex = mNodeTransforms.size();
         for (const PackageAnimatedNode& animNode : pkgAnimation.mAnimatedNodes)
         {
             for (const PackageAnimatedNodeTransform& nodeTransform : animNode.mAnimationTransforms)
-                mNodeTransforms.emplace_back(nodeTransform.mTransform, nodeTransform.mTimestamp);
+                mNodeTransforms.emplace_back(nodeTransform.mTransform, nodeTransform.mTimestampMilliseconds);
 
             mNodeIDMapping.emplace_back(animNode.mNodeID, nodeBeginIndex);
             nodeBeginIndex = mNodeTransforms.size();
@@ -31,9 +31,9 @@ namespace JonsEngine
         return mAnimationID;
     }
     
-    double ModelAnimation::GetTotalDurationInSeconds() const
+    Milliseconds ModelAnimation::GetAnimationDuration() const
     {
-        return mDurationInSeconds;
+        return mAnimationDuration;
     }
 
     const std::string& ModelAnimation::GetName() const

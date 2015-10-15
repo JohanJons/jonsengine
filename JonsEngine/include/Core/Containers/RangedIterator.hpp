@@ -43,7 +43,7 @@ namespace JonsEngine
     public:
         typedef InternalIterator Iterator;
 
-        ConstRangedIterator(const Container& container, const size_t beginIndex, const size_t upToIndex) : mIterBegin(container.begin() + beginIndex), mIterEnd(container.begin() + upToIndex)
+        ConstRangedIterator(const Container& container, const size_t beginIndex, const size_t upToIndex) : mIterBegin(container.cbegin() + beginIndex), mIterEnd(container.cbegin() + upToIndex)
         {
             assert(upToIndex >= beginIndex);
         }
