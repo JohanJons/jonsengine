@@ -170,6 +170,7 @@
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneManager.cpp" />
     <ClCompile Include="src\Scene\SceneNode.cpp" />
+    <ClCompile Include="src\Scene\SceneParser.cpp" />
     <ClCompile Include="src\Scene\StaticActor.cpp" />
     <ClCompile Include="src\Window\WindowManager.cpp" />
     <ClCompile Include="src\Window\WindowManagerImpl.cpp" />
@@ -251,6 +252,7 @@
     <ClInclude Include="include\Scene\Scene.h" />
     <ClInclude Include="include\Scene\SceneManager.h" />
     <ClInclude Include="include\Scene\SceneNode.h" />
+    <ClInclude Include="include\Scene\SceneParser.h" />
     <ClInclude Include="include\Scene\StaticActor.h" />
     <ClInclude Include="include\Window\KeyCallback.h" />
     <ClInclude Include="include\Window\KeyDefinition.h" />
