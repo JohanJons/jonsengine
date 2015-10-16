@@ -23,7 +23,8 @@ namespace JonsEngine
                                                      mWindow(settings, mMemoryAllocator, mLog), 
                                                      mRenderer(settings, mMemoryAllocator, mLog),
                                                      mResourceManifest(mRenderer, mMemoryAllocator), 
-                                                     mSceneManager(mRenderer, mResourceManifest)
+                                                     mSceneManager(mRenderer, mResourceManifest),
+                                                     mSceneParser(mResourceManifest)
     {
         JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
     }
@@ -43,11 +44,12 @@ namespace JonsEngine
         const uint32_t windowWidth = mWindow.GetScreenWidth();
         const uint32_t windowHeight = mWindow.GetScreenHeight();
 
+        // update scene actors
 		Scene& activeScene = mSceneManager.GetActiveScene();
         activeScene.Tick(elapstedFrameTime, windowWidth, windowHeight);
 
-        // get renderqueue from scene
-        const RenderQueue& renderQueue = activeScene.GetRenderQueue();
+        // parse scene into renderqueue for renderer
+        const RenderQueue& renderQueue = mSceneParser.ParseScene(activeScene);
 
         // render the scene
         mRenderer.Render(renderQueue, debugOptions.mRenderingFlags);

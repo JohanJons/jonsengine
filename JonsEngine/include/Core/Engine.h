@@ -7,6 +7,7 @@
 #include "include/Renderer/DirectX11/DX11Renderer.h"
 #include "include/Resources/ResourceManifest.h"
 #include "include/Scene/SceneManager.h"
+#include "include/Scene/SceneParser.h"
 
 namespace JonsEngine
 {
@@ -39,6 +40,7 @@ namespace JonsEngine
         DX11Renderer mRenderer;
         ResourceManifest mResourceManifest;
         SceneManager mSceneManager;
+        SceneParser mSceneParser;
 
         HiResClock mClock;
         HiResClock::TimePoint mLastFrameTime;

@@ -251,8 +251,8 @@ namespace JonsAssetImporter
             // shouldn't be present
             assert(animation->mNumMeshChannels == 0);
 
-            const uint32_t duration = static_cast<uint32_t>(animation->mDuration / animation->mTicksPerSecond);
-            model.mAnimations.emplace_back(animation->mName.C_Str(), duration);
+            const uint32_t durationMillisec = static_cast<uint32_t>((animation->mDuration / animation->mTicksPerSecond) * 1000);
+            model.mAnimations.emplace_back(animation->mName.C_Str(), durationMillisec);
             PackageAnimation& pkgAnimation = model.mAnimations.back();
 
             aiNode* rootNode = scene->mRootNode;
@@ -260,8 +260,6 @@ namespace JonsAssetImporter
             for (uint32_t nodeKey = 0; nodeKey < animation->mNumChannels; ++nodeKey)
             {
                 aiNodeAnim* nodeAnimation = *(animation->mChannels + nodeKey);
-                aiNode* node = rootNode->FindNode(nodeAnimation->mNodeName);
-                assert(node != NULL);
 
                 // cant do scaling animations
                 assert(nodeAnimation->mNumScalingKeys == noAnimationKeysNum);
@@ -281,6 +279,8 @@ namespace JonsAssetImporter
                 const uint32_t maxNumKeys = glm::max(nodeAnimation->mNumPositionKeys, nodeAnimation->mNumRotationKeys);
                 for (uint32_t key = 0; key < maxNumKeys; ++key)
                 {
+                    // same pos/rot might be used for several pos/rot transforms
+
                     // position
                     const uint32_t posKey = key < numPosKeys ? key : numPosKeys - 1;
                     aiVectorKey* aiPos = nodeAnimation->mPositionKeys + posKey;
@@ -293,10 +293,10 @@ namespace JonsAssetImporter
                     const Quaternion rotQuat = aiQuatToJonsQuat(aiRot->mValue);
                     transform *= glm::toMat4(rotQuat);
 
-                    assert(aiPos->mTime == aiRot->mTime);
-                    const uint32_t keyTime = aiPos->mTime;
+                    const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime);
+                    const uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
 
-                    pkgAnimatedNode.mAnimationTransforms.emplace_back(keyTime, transform);
+                    pkgAnimatedNode.mAnimationTransforms.emplace_back(timestampMillisec, transform);
                 }
             }
         }
