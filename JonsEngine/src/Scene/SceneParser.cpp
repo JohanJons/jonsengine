@@ -11,4 +11,10 @@ namespace JonsEngine
     SceneParser::~SceneParser()
     {
     }
+
+
+    const RenderQueue& SceneParser::ParseScene(const Scene& scene)
+    {
+        return mRenderQueue;
+    }
 }

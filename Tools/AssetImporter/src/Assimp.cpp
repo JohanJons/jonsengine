@@ -293,7 +293,7 @@ namespace JonsAssetImporter
                     const Quaternion rotQuat = aiQuatToJonsQuat(aiRot->mValue);
                     transform *= glm::toMat4(rotQuat);
 
-                    const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime);
+                    const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime) / animation->mTicksPerSecond;
                     const uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
 
                     pkgAnimatedNode.mAnimationTransforms.emplace_back(timestampMillisec, transform);
