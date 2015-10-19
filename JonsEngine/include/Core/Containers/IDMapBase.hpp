@@ -50,6 +50,13 @@ namespace JonsEngine
         typedef BaseIterator<const T&, ConstItemIterator> const_iterator;
 
 
+        iterator begin();
+        iterator end();
+
+        const_iterator cbegin() const;
+        const_iterator cend() const;
+
+
     protected:
         ItemIterator GetItemIter(const ItemID nodeID);
         ConstItemIterator GetItemIter(const ItemID nodeID) const;
@@ -180,5 +187,31 @@ namespace JonsEngine
         assert(version == IDMAP_VERSION_MASK(indirID));
 
         return indirID;
+    }
+
+
+    template <typename T, typename StorageType>
+    typename IDMapBase<T, StorageType>::iterator IDMapBase<T, StorageType>::begin()
+    {
+        return iterator(mItems.begin());
+    }
+
+    template <typename T, typename StorageType>
+    typename IDMapBase<T, StorageType>::iterator IDMapBase<T, StorageType>::end()
+    {
+        return iterator(mItems.end());
+    }
+
+
+    template <typename T, typename StorageType>
+    typename IDMapBase<T, StorageType>::const_iterator IDMapBase<T, StorageType>::cbegin() const
+    {
+        return const_iterator(mItems.cbegin());
+    }
+
+    template <typename T, typename StorageType>
+    typename IDMapBase<T, StorageType>::const_iterator IDMapBase<T, StorageType>::cend() const
+    {
+        return const_iterator(mItems.cend());
     }
 }

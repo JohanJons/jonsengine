@@ -46,9 +46,6 @@ namespace JonsEngine
         size_t Size() const;
         size_t Capacity() const;
 
-        iterator begin();
-        iterator end();
-
 
     private:
         ItemID mRootNodeID;
@@ -200,18 +197,5 @@ namespace JonsEngine
     size_t IDMapTree<T>::Capacity() const
     {
         return mItems.capacity();
-    }
-
-
-    template <typename T>
-    typename IDMapTree<T>::iterator IDMapTree<T>::begin()
-    {
-        return iterator(mItems.begin());
-    }
-
-    template <typename T>
-    typename IDMapTree<T>::iterator IDMapTree<T>::end()
-    {
-        return iterator(mItems.end());
     }
 }

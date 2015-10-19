@@ -32,12 +32,6 @@ namespace JonsEngine
         const T& GetItem(const ItemID id) const;
 
         void Clear();
-
-        iterator begin();
-        iterator end();
-
-        const_iterator cbegin() const;
-        const_iterator cend() const;
     };
 
 
@@ -124,29 +118,4 @@ namespace JonsEngine
 		mIndirectionLayer.clear();
         mFreeIndirectionIndices.clear();
 	}
-
-	template <typename T>
-    typename IDMap<T>::iterator IDMap<T>::begin()
-	{
-		return iterator(mItems.begin());
-	}
-
-	template <typename T>
-    typename IDMap<T>::iterator IDMap<T>::end()
-	{
-		return iterator(mItems.end());
-	}
-
-
-    template <typename T>
-    typename IDMap<T>::const_iterator IDMap<T>::cbegin() const
-    {
-        return const_iterator(mItems.cbegin());
-    }
-
-    template <typename T>
-    typename IDMap<T>::const_iterator IDMap<T>::cend() const
-    {
-        return const_iterator(mItems.cend());
-    }
 }
