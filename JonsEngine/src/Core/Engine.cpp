@@ -41,15 +41,15 @@ namespace JonsEngine
 
         // process input and window events
         mWindow.Poll();
-        const uint32_t windowWidth = mWindow.GetScreenWidth();
-        const uint32_t windowHeight = mWindow.GetScreenHeight();
+        const float windowAspectRatio = mWindow.GetScreenWidth() / static_cast<float>(mWindow.GetScreenHeight());
 
         // update scene actors
 		Scene& activeScene = mSceneManager.GetActiveScene();
-        activeScene.Tick(elapstedFrameTime, windowWidth, windowHeight);
+        activeScene.Tick(elapstedFrameTime, windowAspectRatio);
 
         // parse scene into renderqueue for renderer
-        const RenderQueue& renderQueue = mSceneParser.ParseScene(activeScene);
+        const float zNear = mRenderer.GetZNear(), zFar = mRenderer.GetZFar();
+        const RenderQueue& renderQueue = mSceneParser.ParseScene(activeScene, windowAspectRatio, zNear, zFar);
 
         // render the scene
         mRenderer.Render(renderQueue, debugOptions.mRenderingFlags);

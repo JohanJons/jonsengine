@@ -13,7 +13,7 @@ namespace JonsEngine
         SceneParser(const ResourceManifest& resManifest);
         ~SceneParser();
 
-        const RenderQueue& ParseScene(const Scene& scene);
+        const RenderQueue& ParseScene(const Scene& scene, const float windowAspectRatio, const float zNear, const float zFar);
 
 
     private:

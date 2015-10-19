@@ -174,9 +174,9 @@ namespace JonsEngine
         mPipeline.EndFrame();
     }
 
-    void DX11RendererImpl::ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth)
+    void DX11RendererImpl::ReduceDepth(float& minDepth, float& maxDepth)
     {
-        mDepthReductionPass.ReduceDepth(cameraProjMatrix, minDepth, maxDepth);
+        mDepthReductionPass.ReduceDepth(minDepth, maxDepth);
     }
 
 

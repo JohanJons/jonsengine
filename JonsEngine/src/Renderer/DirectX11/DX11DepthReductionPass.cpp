@@ -2,6 +2,7 @@
 
 #include "include/Renderer/DirectX11/Shaders/Compiled/SDSMInitialCompute.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/SDSMFinalCompute.h"
+#include "include/Core/Math/Math.h"
 
 namespace JonsEngine
 {
@@ -51,13 +52,15 @@ namespace JonsEngine
     }
 
 
-    void DX11DepthReductionPass::ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth)
+    void DX11DepthReductionPass::ReduceDepth(float& minDepth, float& maxDepth)
     {
         mContext->OMSetRenderTargets(0, nullptr, nullptr);
 
         // first pass
         // TODO: why neg. [2].z?
-        mSDSMCBuffer.SetData(SDSMCBuffer(-cameraProjMatrix[2].z, cameraProjMatrix[3].z, 0.1f, 100.0f));
+        const float perspClipNear = PerspectiveClipNear(Z_NEAR, Z_FAR);
+        const float perspClipFar = PerspectiveClipFar(Z_NEAR, Z_FAR);
+        mSDSMCBuffer.SetData(SDSMCBuffer(-perspClipNear, perspClipFar, Z_NEAR, Z_FAR));
 
         auto& initialRTV = mDepthReductionRTVs.front();
         mContext->CSSetUnorderedAccessViews(UAV_SLOT, 1, &initialRTV.mUAV.p, nullptr);

@@ -32,9 +32,9 @@ namespace JonsEngine
         mImplementation->Render(renderQueue, debugFlags);
     }
 
-    void DX11Renderer::ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth)
+    void DX11Renderer::ReduceDepth(float& minDepth, float& maxDepth)
     {
-        mImplementation->ReduceDepth(cameraProjMatrix, minDepth, maxDepth);
+        mImplementation->ReduceDepth(minDepth, maxDepth);
     }
 
 
