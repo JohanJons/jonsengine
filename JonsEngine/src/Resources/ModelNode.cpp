@@ -47,7 +47,7 @@ namespace JonsEngine
         return mName;
     }
 
-    const ModelNodeID ModelNode::GetModelNodeID() const
+    ModelNodeID ModelNode::GetModelNodeID() const
     {
         return mNodeID;
     }

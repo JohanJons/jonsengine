@@ -20,8 +20,14 @@ namespace JonsEngine
     }
 
 
-    const Mat4& ModelAnimation::GetNodeTransform(const ModelNodeID nodeID, const double elapsedTimeInSeconds) const
+    const Mat4& ModelAnimation::GetNodeTransform(const ModelNodeID nodeID, const Milliseconds elapsedTime) const
     {
+        auto nodeMapIter = std::find_if(mNodeIDMapping.cbegin(), mNodeIDMapping.cend(), [nodeID](const NodeIDMap& nodeIDMap) { return nodeID == nodeIDMap.first; });
+        assert(nodeMapIter != mNodeIDMapping.end());
+
+        auto nodeTransformIter = std::find_if(mNodeTransforms.cbegin(), mNodeTransforms.cend(), [elapsedTime](const NodeTransformTimestamp& nodeIDMap) { return nodeID == nodeIDMap.first; });
+        assert(nodeTransformIter != mNodeTransforms.cend());
+
         // TODO...
         return mNodeTransforms.front().first;
     }

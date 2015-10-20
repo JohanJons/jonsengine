@@ -55,7 +55,7 @@ namespace JonsEngine
         ~ModelNode();
 
         const std::string& GetName() const;
-        const ModelNodeID GetModelNodeID() const;
+        ModelNodeID GetModelNodeID() const;
         const AABB& GetLocalAABB() const;
         const Mat4& GetLocalTransform() const;
 

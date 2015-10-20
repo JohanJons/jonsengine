@@ -58,8 +58,8 @@ namespace JonsEngine
 
         // first pass
         // TODO: why neg. [2].z?
-        const float perspClipNear = PerspectiveClipNear(Z_NEAR, Z_FAR);
-        const float perspClipFar = PerspectiveClipFar(Z_NEAR, Z_FAR);
+        const float perspClipNear = PerspectiveNearPlane(Z_NEAR, Z_FAR);
+        const float perspClipFar = PerspectiveFarPlane(Z_NEAR, Z_FAR);
         mSDSMCBuffer.SetData(SDSMCBuffer(-perspClipNear, perspClipFar, Z_NEAR, Z_FAR));
 
         auto& initialRTV = mDepthReductionRTVs.front();
