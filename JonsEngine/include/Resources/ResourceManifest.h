@@ -6,18 +6,18 @@
 #include "include/Resources/Mesh.h"
 #include "include/Resources/Material.h"
 #include "include/Resources/Skybox.h"
-#include "include/Core/Memory/IMemoryAllocator.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Renderer/Shapes.h"
 
 namespace JonsEngine
 {
+    class HeapAllocator;
     class DX11Renderer;
 
     class ResourceManifest
     {
     public:
-        ResourceManifest(DX11Renderer& renderer, IMemoryAllocatorPtr memoryAllocator);
+        ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator);
         ~ResourceManifest();
 
         ModelID CreateRectangle(const std::string& modelName, const float sizeX, const float sizeY, const float sizeZ);
@@ -41,7 +41,7 @@ namespace JonsEngine
         void ParseModelInitData(ModelNode::InitDataList& initData, const JonsPackagePtr jongPkg, const PackageNode& node);
 
 
-		IMemoryAllocatorPtr mMemoryAllocator;
+        HeapAllocator& mMemoryAllocator;
         DX11Renderer& mRenderer;
 
         IDMap<Model> mModels;

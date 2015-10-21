@@ -5,87 +5,56 @@
 
 namespace JonsEngine
 {
-    static HeapAllocator gHeapAllocator("DefaultHeapAllocator", HeapAllocator::DLMALLOC);
+    static HeapAllocator gHeapAllocator("DefaultHeapAllocator");
 
 
-    HeapAllocator::HeapAllocator(const std::string& allocatorName) : HeapAllocator(allocatorName, HeapAllocator::DLMALLOC)
+    HeapAllocator::HeapAllocator(const std::string& allocatorName) : mAllocatorName(allocatorName)
     {
     }
 
-    HeapAllocator::HeapAllocator(const std::string& allocatorName, HeapAllocatorBackend backend) : mAllocatorName(allocatorName), mBackend(backend)
-    {
-    }
-    
     HeapAllocator::~HeapAllocator()
     {
         dlmalloc_trim(0);
     }
 
-    IMemoryAllocator& HeapAllocator::GetDefaultHeapAllocator()
+    HeapAllocator& HeapAllocator::GetDefaultHeapAllocator()
     {
         return gHeapAllocator;
     }
 
-    void* HeapAllocator::Allocate(size_t size)
+
+    void* HeapAllocator::Allocate(const size_t size)
     {
-        void* alloc = nullptr;
-
-        if (mBackend == HeapAllocator::DLMALLOC && size)
-            alloc = dlmalloc(size);
-        else if (mBackend == HeapAllocator::SYSTEM_DEFAULT && size)
-            alloc = malloc(size);
-
-        return alloc;
+        return dlmalloc(size);
     }
 
-    void* HeapAllocator::Reallocate(void* memblock, size_t size)
+    void* HeapAllocator::Allocate(const size_t size, const size_t alignment)
     {
-        void* alloc = nullptr;
+        return dlmemalign(size, alignment);
+    }
 
-        if (mBackend == HeapAllocator::DLMALLOC && memblock && size)
-            alloc = dlrealloc(memblock, size);
-        else if (mBackend == HeapAllocator::SYSTEM_DEFAULT && memblock && size)
-            alloc = realloc(memblock, size);
-        
-        return alloc;
+    void* HeapAllocator::Reallocate(void* memblock, const size_t size)
+    {
+        return dlrealloc(memblock, size);
     }
 
     void HeapAllocator::Deallocate(void* memblock)
     {
-        if (memblock)
-        {
-            if (mBackend == HeapAllocator::DLMALLOC)
-                dlfree(memblock);
-            else if (mBackend == HeapAllocator::SYSTEM_DEFAULT)
-                free(memblock);
-        }
+        assert(memblock);
+
+        dlfree(memblock);
     }
+
 
     uint64_t HeapAllocator::GetAllocatedMemory() const
     {
+        struct mallinfo mi = dlmallinfo();
 
-        if (mBackend == HeapAllocator::DLMALLOC)
-        {
-            struct mallinfo mi = dlmallinfo();
-
-            return (mi.arena + mi.hblkhd);
-        }
-        else if (mBackend == HeapAllocator::SYSTEM_DEFAULT)
-        {
-            return 0;
-        }
-        else
-            return 0;
-
+        return (mi.arena + mi.hblkhd);
     }
 
-    void* HeapAllocator::InternalAllocate(size_t size)
+    const std::string& HeapAllocator::GetAllocatorName() const
     {
-        return Allocate(size);
-    }
-
-    void HeapAllocator::InternalDeallocate(void* memblock)
-    { 
-        Deallocate(memblock);
+        return mAllocatorName;
     }
 }

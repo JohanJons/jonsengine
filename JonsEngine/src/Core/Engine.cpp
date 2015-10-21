@@ -17,8 +17,7 @@
 namespace JonsEngine
 {
     Engine::Engine(const EngineSettings& settings) : mLog(Logger::GetCoreLogger()), 
-                                                     mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<HeapAllocator>("DefaultHeapAllocator"), 
-                                                                      [](HeapAllocator* allocator) { HeapAllocator::GetDefaultHeapAllocator().DeallocateObject(allocator); }),
+                                                     mMemoryAllocator("EngineHeapAllocator"),
 
                                                      mWindow(settings, mMemoryAllocator, mLog), 
                                                      mRenderer(settings, mMemoryAllocator, mLog),

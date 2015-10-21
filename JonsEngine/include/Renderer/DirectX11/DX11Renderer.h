@@ -3,7 +3,6 @@
 #include "include/Renderer/RenderQueue.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
-#include "include/Core/Memory/IMemoryAllocator.h"
 #include "include/Core/DebugOptions.h"
 
 #include <string>
@@ -15,12 +14,13 @@
 namespace JonsEngine
 {
     class Logger;
+    class HeapAllocator;
     class DX11RendererImpl;
 
     class DX11Renderer
     {
     public:
-        DX11Renderer(const EngineSettings& settings, IMemoryAllocatorPtr memoryAllocator, Logger& logger);
+        DX11Renderer(const EngineSettings& settings, HeapAllocator& memoryAllocator, Logger& logger);
         ~DX11Renderer();
 
         DX11MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,
@@ -49,7 +49,7 @@ namespace JonsEngine
 
 
     private:
-        IMemoryAllocatorPtr mMemoryAllocator;
+        HeapAllocator& mMemoryAllocator;
         std::unique_ptr<DX11RendererImpl, std::function<void(DX11RendererImpl*)>> mImplementation;
     };
 }

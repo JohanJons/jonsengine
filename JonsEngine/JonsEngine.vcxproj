@@ -183,7 +183,6 @@
     <ClInclude Include="include\Core\Containers\IDMapPointer.hpp" />
     <ClInclude Include="include\Core\Containers\IDMapTree.hpp" />
     <ClInclude Include="include\Core\Containers\RangedIterator.hpp" />
-    <ClInclude Include="include\Core\Containers\Vector.h" />
     <ClInclude Include="include\Core\DebugOptions.h" />
     <ClInclude Include="include\Core\Engine.h" />
     <ClInclude Include="include\Core\EngineDefs.h" />
@@ -197,8 +196,8 @@
     <ClInclude Include="include\Core\Math\Intersection.h" />
     <ClInclude Include="include\Core\Math\Math.h" />
     <ClInclude Include="include\Core\Math\Plane.h" />
+    <ClInclude Include="include\Core\Memory\HeapAligned.h" />
     <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
-    <ClInclude Include="include\Core\Memory\IMemoryAllocator.h" />
     <ClInclude Include="include\Core\Platform\Directx11.h" />
     <ClInclude Include="include\Core\Platform\Windows.h" />
     <ClInclude Include="include\Core\Types.h" />

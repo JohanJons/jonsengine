@@ -6,7 +6,6 @@
 
 namespace JonsEngine
 {
-    class IMemoryAllocator;
     class ResourceManifest;
 
     typedef uint32_t SceneID;

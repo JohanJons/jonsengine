@@ -10,7 +10,6 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
-#include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/DebugOptions.h"
 #include "include/Core/Platform/Directx11.h"
@@ -24,11 +23,12 @@
 namespace JonsEngine
 {
     class Logger;
+    class HeapAllocator;
 
     class DX11RendererImpl : protected DX11Context
     {
     public:
-        DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator);
+        DX11RendererImpl(const EngineSettings& settings, Logger& logger, HeapAllocator& memoryAllocator);
         ~DX11RendererImpl();
 
         DX11MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,
@@ -61,7 +61,7 @@ namespace JonsEngine
         void SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight);
 
         Logger& mLogger;
-        IMemoryAllocatorPtr mMemoryAllocator;
+        HeapAllocator& mMemoryAllocator;
         IDMap<DX11Mesh> mMeshes;
         IDMap<DX11Material> mMaterials;
 

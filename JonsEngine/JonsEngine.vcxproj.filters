@@ -277,9 +277,6 @@
     <ClInclude Include="include\Core\Memory\HeapAllocator.h">
       <Filter>Header Files\Core\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Containers\Vector.h">
-      <Filter>Header Files\Core\Containers</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Logging\LogManager.h">
       <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
@@ -309,9 +306,6 @@
     </ClInclude>
     <ClInclude Include="include\Core\EngineDefs.h">
       <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Memory\IMemoryAllocator.h">
-      <Filter>Header Files\Core\Memory</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\Shapes.h">
       <Filter>Header Files\Renderer</Filter>
@@ -507,6 +501,9 @@
     </ClInclude>
     <ClInclude Include="include\Scene\SceneParser.h">
       <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Memory\HeapAligned.h">
+      <Filter>Header Files\Core\Memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

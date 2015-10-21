@@ -1,12 +1,13 @@
 #include "include/Renderer/DirectX11/DX11Renderer.h"
 
 #include "include/Renderer/DirectX11/DX11RendererImpl.h"
+#include "include/Core/Memory/HeapAllocator.h"
 
 
 namespace JonsEngine
 {
-    DX11Renderer::DX11Renderer(const EngineSettings& settings, IMemoryAllocatorPtr memoryAllocator, Logger& logger) :
-        mMemoryAllocator(memoryAllocator), mImplementation(mMemoryAllocator->AllocateObject<DX11RendererImpl>(settings, logger, memoryAllocator), [this](DX11RendererImpl* directxImpl) { mMemoryAllocator->DeallocateObject(directxImpl); })
+    DX11Renderer::DX11Renderer(const EngineSettings& settings, HeapAllocator& memoryAllocator, Logger& logger) :
+        mMemoryAllocator(memoryAllocator), mImplementation(mMemoryAllocator.AllocateObject<DX11RendererImpl>(settings, logger, memoryAllocator), [this](DX11RendererImpl* directxImpl) { mMemoryAllocator.DeallocateObject(directxImpl); })
     {
     }
 

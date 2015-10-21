@@ -5,6 +5,7 @@
 
 #include "include/Core/Engine.h"
 #include "include/Core/EngineSettings.h"
+#include "include/Core/Memory/HeapAligned.h"
 #include "include/Window/MouseCallback.h"
 #include "include/Window/KeyCallback.h"
 #include "include/Resources/JonsPackage.h"
@@ -13,7 +14,7 @@
 
 namespace JonsGame
 {
-    class Game
+    class Game : public JonsEngine::HeapAligned<16>
     {
     public:
         Game();

@@ -3,7 +3,6 @@
 #include "include/Window/KeyCallback.h"
 #include "include/Window/KeyDefinition.h"
 #include "include/Window/MouseCallback.h"
-#include "include/Core/Memory/IMemoryAllocator.h"
 
 #include <string>
 #include <vector>
@@ -14,13 +13,14 @@ namespace JonsEngine
 {
     struct EngineSettings;
     class Logger;
+    class HeapAllocator;
     class WindowManagerImpl;
 
     /* WindowManager definition */
     class WindowManager
     {
     public:
-        WindowManager(const EngineSettings& engineSettings, IMemoryAllocatorPtr memoryAllocator, Logger& logger);
+        WindowManager(const EngineSettings& engineSettings, HeapAllocator& memoryAllocator, Logger& logger);
         ~WindowManager();
 
         /*
@@ -51,7 +51,7 @@ namespace JonsEngine
 
 
     private:
-        IMemoryAllocatorPtr mMemoryAllocator;
+        HeapAllocator& mMemoryAllocator;
         std::unique_ptr<WindowManagerImpl, std::function<void(WindowManagerImpl*)>> mImplementation;
     };
 }

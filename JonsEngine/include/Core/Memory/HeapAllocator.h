@@ -1,7 +1,5 @@
 #pragma once
 
-#include "include/Core/Memory/IMemoryAllocator.h"
-
 #include <string.h>
 
 namespace JonsEngine
@@ -10,36 +8,44 @@ namespace JonsEngine
      * HeapAllocator definition
      * Allocates memory on the heap using either system default or DLMALLOC allocation strategy
      */
-    class HeapAllocator : public IMemoryAllocator
+    class HeapAllocator
     {
     public:
-        enum HeapAllocatorBackend
-        {
-            SYSTEM_DEFAULT = 0,
-            DLMALLOC
-        };
-
         HeapAllocator(const std::string& allocatorName);
-        HeapAllocator(const std::string& allocatorName, const HeapAllocatorBackend backend);
         ~HeapAllocator();
-        static IMemoryAllocator& GetDefaultHeapAllocator();
+        static HeapAllocator& GetDefaultHeapAllocator();
 
-        void* Allocate(size_t size);
-        void* Reallocate(void* memblock, size_t size);
+        void* Allocate(const size_t size);
+        void* Allocate(const size_t size, const size_t alignment);
+        void* Reallocate(void* memblock, const size_t size);
         void Deallocate(void* memblock);
+
+        template <class T, typename... Arguments>
+        T* AllocateObject(Arguments&&... args);
+        template <class T>
+        void DeallocateObject(T* obj);
 
         uint64_t GetAllocatedMemory() const;
         const std::string& GetAllocatorName() const;
 
-    private:
-        void* InternalAllocate(size_t size);
-        void InternalDeallocate(void* memblock);
 
-        const HeapAllocatorBackend mBackend;
+    private:
         const std::string mAllocatorName;
     };
 
 
-    /* HeapAllocator inlines */
-    inline const std::string& HeapAllocator::GetAllocatorName() const      { return mAllocatorName; }
+    template <class T, typename... Arguments>
+    T* HeapAllocator::AllocateObject(Arguments&&... args)
+    {
+        return new (Allocate(sizeof(T))) T(std::forward<Arguments>(args)...);
+    }
+
+    template <class T>
+    void HeapAllocator::DeallocateObject(T* obj)
+    {
+        assert(obj);
+
+        obj->~T();
+        Deallocate(obj);
+    }
 }
