@@ -27,7 +27,6 @@ namespace JonsEngine
     {
         const float cameraFov = GetSceneCamera().GetFOV();
 
-        UpdateRenderQueueCamera(cameraFov, windowAspectRatio);
         UpdateDirtyObjects();
         UpdateDirLightSplitRanges(cameraFov, windowAspectRatio);
         UpdateAnimatedActors(elapsedTime);
@@ -97,6 +96,11 @@ namespace JonsEngine
         return mStaticActors.GetItem(actorID);
     }
 
+    Scene::StaticActorIterator Scene::GetStaticActors() const
+    {
+        return StaticActorIterator(mStaticActors.cbegin(), mStaticActors.cend());
+    }
+
 
     AnimatedActorID Scene::CreateAnimatedActor(const std::string& actorName, const ModelID modelID, const SceneNodeID sceneNodeID)
     {
@@ -121,6 +125,11 @@ namespace JonsEngine
         return mAnimatedActors.GetItem(actorID);
     }
 
+    Scene::AnimatedActorIterator Scene::GetAnimatedActors() const
+    {
+        return AnimatedActorIterator(mAnimatedActors.cbegin(), mAnimatedActors.cend());
+    }
+
 
 	PointLightID Scene::CreatePointLight(const std::string& lightName, const SceneNodeID node)
     {
@@ -143,6 +152,11 @@ namespace JonsEngine
     const PointLight& Scene::GetPointLight(const PointLightID pointLightID) const
     {
         return mPointLights.GetItem(pointLightID);
+    }
+
+    Scene::PointLightIterator Scene::GetPointLights() const
+    {
+        return PointLightIterator(mPointLights.cbegin(), mPointLights.cend());
     }
     
 
@@ -176,6 +190,11 @@ namespace JonsEngine
         return mDirectionalLights.GetItem(dirLightID);
     }
 
+    Scene::DirectionalLightIterator Scene::GetDirectionalLights() const
+    {
+        return DirectionalLightIterator(mDirectionalLights.cbegin(), mDirectionalLights.cend());
+    }
+
 
 	void Scene::SetAmbientLight(const Vec4& ambientLight)
     {
@@ -203,6 +222,11 @@ namespace JonsEngine
 	{ 
 		return mSceneCamera;
 	}
+
+    const Camera& Scene::GetSceneCamera() const
+    {
+        return mSceneCamera;
+    }
 
 
     void Scene::MarkAsDirty(SceneNode* sceneNode)

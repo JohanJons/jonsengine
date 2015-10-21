@@ -86,7 +86,6 @@ namespace JonsEngine
 
     private:
         void MarkAsDirty(SceneNode* sceneNode);
-        void UpdateRenderQueueCamera(const float cameraFov, const float windowAspectRatio);
         void UpdateDirtyObjects();
         void UpdateDirLightSplitRanges(const float cameraFov, const float windowAspectRatio);
         void UpdateAnimatedActors(const Milliseconds elapsedTime);

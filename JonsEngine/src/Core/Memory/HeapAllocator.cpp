@@ -30,7 +30,7 @@ namespace JonsEngine
 
     void* HeapAllocator::Allocate(const size_t size, const size_t alignment)
     {
-        return dlmemalign(size, alignment);
+        return dlmemalign(alignment, size);
     }
 
     void* HeapAllocator::Reallocate(void* memblock, const size_t size)

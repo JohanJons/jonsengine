@@ -1,5 +1,7 @@
 #pragma once
 
+#include "include/Core/Types.h"
+
 #include <string.h>
 
 namespace JonsEngine
