@@ -26,14 +26,14 @@ namespace JonsEngine
     //
 
     ModelNode::ModelNode(const PackageNode& pkgNode, const Mat4& parentTransform, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& childIter, const MeshIterator& meshIter, const NodeIterator& next) :
-        mName(pkgNode.mName), mNodeID(pkgNode.mNodeID), mLocalAABB(pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds), mLocalTransform(parentTransform * Mat4(1.0f)), mImmediateChildNodes(immChildIter), mAllChildNodes(childIter),
+        mName(pkgNode.mName), mNodeIndex(pkgNode.mNodeIndex), mLocalAABB(pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds), mLocalTransform(parentTransform * Mat4(1.0f)), mImmediateChildNodes(immChildIter), mAllChildNodes(childIter),
         mMeshes(meshIter), mNext(next)
     {
     }
 
-    ModelNode::ModelNode(const std::string& name, const ModelNodeID nodeID, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& allChildIter,
+    ModelNode::ModelNode(const std::string& name, const ModelNodeIndex nodeIndex, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& initialTransform, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& allChildIter,
         const MeshIterator& meshIter, const NodeIterator& next) :
-        mName(name), mNodeID(nodeID), mLocalAABB(minBounds, maxBounds), mLocalTransform(Mat4(1.0f)), mImmediateChildNodes(immChildIter), mAllChildNodes(allChildIter), mMeshes(meshIter), mNext(next)
+        mName(name), mNodeIndex(nodeIndex), mLocalAABB(minBounds, maxBounds), mLocalTransform(Mat4(1.0f)), mImmediateChildNodes(immChildIter), mAllChildNodes(allChildIter), mMeshes(meshIter), mNext(next)
     {
     }
 
@@ -47,9 +47,9 @@ namespace JonsEngine
         return mName;
     }
 
-    ModelNodeID ModelNode::GetModelNodeID() const
+    ModelNodeIndex ModelNode::GetModelNodeIndex() const
     {
-        return mNodeID;
+        return mNodeIndex;
     }
 
     const AABB& ModelNode::GetLocalAABB() const

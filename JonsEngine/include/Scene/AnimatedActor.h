@@ -14,9 +14,9 @@ namespace JonsEngine
 
         void PlayAnimation(const bool doPlay);
         void RepeatAnimation(const bool repeatAnimation);
-        void SetAnimation(const AnimationID animationId, const Milliseconds animationTime);
+        void SetAnimation(const ModelAnimationIndex animationIndex, const Milliseconds animationTime);
 
-        AnimationID GetAnimation() const;
+        ModelAnimationIndex GetAnimation() const;
         bool IsRepeatingAnimation() const;
         bool IsPlaying() const;
 
@@ -28,7 +28,7 @@ namespace JonsEngine
         bool mIsRepeating;
         Milliseconds mTimestamp;
         Milliseconds mAnimationTime;
-        AnimationID mAnimation;
+        ModelAnimationIndex mAnimationIndex;
     };
 
     typedef IDMap<AnimatedActor>::ItemID AnimatedActorID;
