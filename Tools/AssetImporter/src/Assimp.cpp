@@ -27,7 +27,7 @@ namespace JonsAssetImporter
     }
 
 
-    bool Assimp::ProcessScene(const boost::filesystem::path& modelPath, const std::string& modelName, FreeImage& freeimageImporter, JonsEngine::JonsPackagePtr pkg)
+    bool Assimp::ProcessScene(const boost::filesystem::path& modelPath, const std::string& modelName, FreeImage& freeimageImporter, JonsPackagePtr pkg)
     {
         const aiScene* scene = mImporter.ReadFile(modelPath.string(), aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_MaxQuality);
         if (!scene)
@@ -54,10 +54,12 @@ namespace JonsAssetImporter
         if (!ProcessAssimpAnimations(model, scene))
             return false;
 
+        AddStaticAABB(model);
+
         return true;
     }
 
-    void Assimp::ProcessAssimpMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsEngine::JonsPackagePtr pkg)
+    void Assimp::ProcessAssimpMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsPackagePtr pkg)
     {
         if (!scene->HasMaterials())
             return;
@@ -126,8 +128,8 @@ namespace JonsAssetImporter
         }
     }
 
-    bool Assimp::ProcessAssimpNode(JonsEngine::PackageModel& pkgModel, JonsEngine::PackageNode& pkgNode, const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, const Mat4& parentTransform, JonsEngine::Vec3& parentMinBounds,
-        JonsEngine::Vec3& parentMaxBounds, const uint32_t nextNodeIndex, const uint32_t parentNodeIndex)
+    bool Assimp::ProcessAssimpNode(PackageModel& pkgModel, PackageNode& pkgNode, const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, const Mat4& parentTransform, Vec3& parentMinBounds,
+        Vec3& parentMaxBounds, const uint32_t nextNodeIndex, const uint32_t parentNodeIndex)
     {
         pkgNode.mName = node->mName.C_Str();
         pkgNode.mNodeIndex = nextNodeIndex;
@@ -161,7 +163,7 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessAssimpMesh(JonsEngine::PackageMesh& pkgMesh, const aiMesh* mesh, const MaterialMap& materialMap, const Mat4& nodeTransform, JonsEngine::Vec3& nodeMinBounds, JonsEngine::Vec3& nodeMaxBounds)
+    bool Assimp::ProcessAssimpMesh(PackageMesh& pkgMesh, const aiMesh* mesh, const MaterialMap& materialMap, const Mat4& nodeTransform, Vec3& nodeMinBounds, Vec3& nodeMaxBounds)
     {
         pkgMesh.mName = mesh->mName.C_Str();
 
@@ -243,7 +245,7 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessAssimpAnimations(JonsEngine::PackageModel& model, const aiScene* scene)
+    bool Assimp::ProcessAssimpAnimations(PackageModel& model, const aiScene* scene)
     {
         if (!scene->HasAnimations())
             return true;
@@ -257,7 +259,7 @@ namespace JonsAssetImporter
             assert(animation->mNumMeshChannels == 0);
 
             const uint32_t durationMillisec = static_cast<uint32_t>((animation->mDuration / animation->mTicksPerSecond) * 1000);
-            model.mAnimations.emplace_back(animation->mName.C_Str(), animationIndex, durationMillisec);
+            model.mAnimations.emplace_back(animation->mName.C_Str(), durationMillisec);
             PackageAnimation& pkgAnimation = model.mAnimations.back();
 
             aiNode* rootNode = scene->mRootNode;
@@ -310,8 +312,33 @@ namespace JonsAssetImporter
         return true;
     }
 
+    void Assimp::AddStaticAABB(PackageModel& model)
+    {
+        // two cases: animated vs static model
+        const PackageAABB& rootNodeAABB = model.mNodes.front().mAABB;
 
-    void CheckForInvalidAABB(JonsEngine::PackageAABB& aabb)
+        // static model: use root node AABB as its overall AABB
+        if (model.mAnimations.empty())
+        {
+            model.mStaticAABB = rootNodeAABB;
+            return;
+        }
+
+        // animated model: needs to transform all nodes using all the animations to find the maximum extents
+        Vec3 minExtent(rootNodeAABB.mMinBounds), maxExtent(rootNodeAABB.mMaxBounds);
+        for (const PackageAnimation& animation : model.mAnimations)
+        {
+            for (const PackageAnimatedNode& animNode : animation.mAnimatedNodes)
+            {
+                const PackageNode& node = model.mNodes.at(animNode.mNodeIndex);
+                
+                ...
+            }
+        }
+    }
+
+
+    void CheckForInvalidAABB(PackageAABB& aabb)
     {
         // resets AABB to zero length
         if (aabb.mMinBounds == Vec3(std::numeric_limits<float>::max()) && aabb.mMaxBounds == Vec3(std::numeric_limits<float>::lowest()))

@@ -13,6 +13,9 @@
 
 namespace JonsEngine
 {
+    typedef uint32_t ModelAnimationIndex;
+    static const ModelAnimationIndex INVALID_ANIMATION_INDEX = std::numeric_limits<ModelAnimationIndex>::max();
+
     class Model
     {
     private:
@@ -32,6 +35,7 @@ namespace JonsEngine
         const ModelAnimation& GetAnimation(const ModelAnimationIndex animationIndex) const;
         const ModelNode& GetRootNode() const;
         const std::string& GetName() const;
+        const AABB& GetStaticAABB() const;
         
 
     private:
@@ -44,6 +48,7 @@ namespace JonsEngine
 
 
         std::string mName;
+        AABB mStaticAABB;
         NodeContainer mNodes;
         MeshContainer mMeshes;
         AnimationContainer mAnimations;

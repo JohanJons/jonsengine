@@ -12,9 +12,6 @@
 
 namespace JonsEngine
 {
-    typedef uint32_t ModelAnimationIndex;
-    static const ModelAnimationIndex INVALID_ANIMATION_INDEX = std::numeric_limits<ModelAnimationIndex>::max();
-
     class ModelAnimation
     {
     public:
@@ -23,7 +20,6 @@ namespace JonsEngine
         
         const Mat4& GetNodeTransform(const ModelNodeIndex nodeIndex, const Milliseconds elapsedTime) const;
         const std::string& GetName() const;
-        ModelAnimationIndex GetAnimationIndex() const;
         Milliseconds GetAnimationDuration() const;
 
 
@@ -32,8 +28,8 @@ namespace JonsEngine
         typedef std::vector<NodeTransformTimestamp> NodeTransformsContainer;
         typedef std::pair<ModelNodeIndex, NodeTransformsContainer::size_type> NodeIDMap;
     
+
         std::string mName;
-        ModelAnimationIndex mAnimationIndex;
         Milliseconds mAnimationDuration;
 
         std::vector<NodeIDMap> mNodeIDMapping;

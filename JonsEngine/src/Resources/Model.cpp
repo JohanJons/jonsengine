@@ -10,7 +10,7 @@ namespace JonsEngine
     void ReserveStorage(const PackageModel& model, ModelNode::NodeContainer& nodeContainer, ModelNode::MeshContainer& meshContainer);
 
 
-    Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID) : mName(name)
+    Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID) : mName(name), mStaticAABB(minBounds, maxBounds)
     {
         const ModelNodeIndex rootNodeIndex = 0;
 
@@ -19,7 +19,7 @@ namespace JonsEngine
             ModelNode::MeshIterator(mMeshes.begin(), mMeshes.end()), mNodes.end());
     }
 
-    Model::Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData) : mName(pkgModel.mName)
+    Model::Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData) : mName(pkgModel.mName), mStaticAABB(pkgModel.mStaticAABB.mMinBounds, pkgModel.mStaticAABB.mMaxBounds)
     {
         ReserveStorage(pkgModel, mNodes, mMeshes);
 
@@ -30,7 +30,7 @@ namespace JonsEngine
     }
 
     // node container needs special care due to reconstructing valid iterators
-    Model::Model(const Model& otherModel) : mName(otherModel.mName), mMeshes(otherModel.mMeshes), mAnimations(otherModel.mAnimations)
+    Model::Model(const Model& otherModel) : mName(otherModel.mName), mStaticAABB(otherModel.mStaticAABB), mMeshes(otherModel.mMeshes), mAnimations(otherModel.mAnimations)
     {
         const uint32_t numNodes = otherModel.mNodes.size();
         mNodes.reserve(numNodes);
@@ -85,7 +85,7 @@ namespace JonsEngine
 
         const auto iter = std::find_if(mAnimations.cbegin(), mAnimations.cend(), [&name](const ModelAnimation& animation) { return animation.GetName() == name; });
         if (iter != mAnimations.cend())
-            ret = (*iter).GetAnimationIndex();
+            ret = iter - mAnimations.cbegin();
 
         return ret;
     }
@@ -104,6 +104,11 @@ namespace JonsEngine
     const std::string& Model::GetName() const
     {
         return mName;
+    }
+
+    const AABB& Model::GetStaticAABB() const
+    {
+        return mStaticAABB;
     }
 
 

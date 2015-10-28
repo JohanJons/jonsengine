@@ -32,11 +32,6 @@ namespace JonsEngine
         return mNodeTransforms.front().first;
     }
     
-    ModelAnimationIndex ModelAnimation::GetAnimationIndex() const
-    {
-        return mAnimationIndex;
-    }
-    
     Milliseconds ModelAnimation::GetAnimationDuration() const
     {
         return mAnimationDuration;

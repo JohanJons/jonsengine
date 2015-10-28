@@ -128,18 +128,18 @@ namespace JonsEngine
     struct PackageAnimation
     {
         std::string mName;
-        uint32_t mAnimationIndex;
         uint32_t mDurationInMilliseconds;
         std::vector<PackageAnimatedNode> mAnimatedNodes;
 
 
         PackageAnimation();
-        PackageAnimation(const std::string& name, const uint32_t animationIndex, const uint32_t durationMilliseconds);
+        PackageAnimation(const std::string& name, const uint32_t durationMilliseconds);
     };
 
     struct PackageModel
     {
         std::string mName;
+        PackageAABB mStaticAABB;
         std::vector<PackageNode> mNodes;
         std::vector<PackageAnimation> mAnimations;
 
@@ -260,7 +260,6 @@ namespace boost
         void serialize(Archive & ar, JonsEngine::PackageAnimation& animation, const unsigned int version)
         {
             ar & animation.mName;
-            ar & animation.mAnimationIndex;
             ar & animation.mDurationInMilliseconds;
             ar & animation.mAnimatedNodes;
         }
@@ -269,6 +268,7 @@ namespace boost
         void serialize(Archive & ar, JonsEngine::PackageModel& model, const unsigned int version)
         {
             ar & model.mName;
+            ar & model.mStaticAABB;
             ar & model.mNodes;
             ar & model.mAnimations;
         }

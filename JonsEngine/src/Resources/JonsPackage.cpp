@@ -70,7 +70,7 @@ namespace JonsEngine
     {
     }
 
-    PackageAnimation::PackageAnimation(const std::string& name, const uint32_t animationIndex, const uint32_t durationInMilliseconds) : mName(name), mAnimationIndex(animationIndex), mDurationInMilliseconds(durationInMilliseconds)
+    PackageAnimation::PackageAnimation(const std::string& name, const uint32_t durationInMilliseconds) : mName(name), mDurationInMilliseconds(durationInMilliseconds)
     {
     }
 
