@@ -8,7 +8,7 @@ namespace JonsEngine
         mIsRepeating(false),
         mTimestamp(0),
         mAnimationTime(0),
-        mAnimation(INVALID_ANIMATION_ID)
+        mAnimationIndex(INVALID_ANIMATION_INDEX)
     {
     }
 
@@ -28,17 +28,17 @@ namespace JonsEngine
         mIsRepeating = repeatAnimation;
     }
 
-    void AnimatedActor::SetAnimation(const AnimationID animationId, const Milliseconds animationTime)
+    void AnimatedActor::SetAnimation(const ModelAnimationIndex animationIndex, const Milliseconds animationTime)
     {
-        mAnimation = animationId;
+        mAnimationIndex = animationIndex;
         mAnimationTime = animationTime;
         mTimestamp = Milliseconds(0);
     }
 
 
-    AnimationID AnimatedActor::GetAnimation() const
+    ModelAnimationIndex AnimatedActor::GetAnimation() const
     {
-        return mAnimation;
+        return mAnimationIndex;
     }
 
     bool AnimatedActor::IsRepeatingAnimation() const

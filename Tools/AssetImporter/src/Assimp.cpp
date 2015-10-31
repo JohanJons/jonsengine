@@ -10,7 +10,7 @@ using namespace JonsEngine;
 namespace JonsAssetImporter
 {
     void CheckForInvalidAABB(PackageAABB& aabb);
-    PackageNode::PackageNodeID GetNodeID(const PackageNode& node, const std::string& nodeName);
+    uint32_t GetNodeIndex(const PackageModel& model, const std::string& nodeName);
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
     Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
@@ -27,7 +27,7 @@ namespace JonsAssetImporter
     }
 
 
-    bool Assimp::ProcessScene(const boost::filesystem::path& modelPath, const std::string& modelName, FreeImage& freeimageImporter, JonsEngine::JonsPackagePtr pkg)
+    bool Assimp::ProcessScene(const boost::filesystem::path& modelPath, const std::string& modelName, FreeImage& freeimageImporter, JonsPackagePtr pkg)
     {
         const aiScene* scene = mImporter.ReadFile(modelPath.string(), aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_MaxQuality);
         if (!scene)
@@ -44,18 +44,22 @@ namespace JonsAssetImporter
 
         // process model hierarchy
         pkg->mModels.emplace_back(modelName);
-        auto& model = pkg->mModels.back();
-        PackageNode::PackageNodeID nextNodeID = 0;
-        if (!ProcessAssimpNode(model.mRootNode, scene, scene->mRootNode, materialMap, gIdentityMatrix, model.mRootNode.mAABB.mMinBounds, model.mRootNode.mAABB.mMaxBounds, ++nextNodeID))
+        PackageModel& model = pkg->mModels.back();
+        uint32_t nextNodeIndex = 0;
+        model.mNodes.emplace_back();
+        PackageNode& rootNode = model.mNodes.back();
+        if (!ProcessAssimpNode(model, rootNode, scene, scene->mRootNode, materialMap, gIdentityMatrix, rootNode.mAABB.mMinBounds, rootNode.mAABB.mMaxBounds, nextNodeIndex, nextNodeIndex))
             return false;
 
         if (!ProcessAssimpAnimations(model, scene))
             return false;
 
+        AddStaticAABB(model);
+
         return true;
     }
 
-    void Assimp::ProcessAssimpMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsEngine::JonsPackagePtr pkg)
+    void Assimp::ProcessAssimpMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsPackagePtr pkg)
     {
         if (!scene->HasMaterials())
             return;
@@ -124,10 +128,12 @@ namespace JonsAssetImporter
         }
     }
 
-    bool Assimp::ProcessAssimpNode(JonsEngine::PackageNode& pkgNode, const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, const Mat4& parentTransform, JonsEngine::Vec3& parentMinBounds, JonsEngine::Vec3& parentMaxBounds, PackageNode::PackageNodeID& nextNodeID)
+    bool Assimp::ProcessAssimpNode(PackageModel& pkgModel, PackageNode& pkgNode, const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, const Mat4& parentTransform, Vec3& parentMinBounds,
+        Vec3& parentMaxBounds, const uint32_t nextNodeIndex, const uint32_t parentNodeIndex)
     {
         pkgNode.mName = node->mName.C_Str();
-        pkgNode.mNodeID = nextNodeID;
+        pkgNode.mNodeIndex = nextNodeIndex;
+        pkgNode.mParentNodeIndex = parentNodeIndex;
 
         const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
         const uint32_t numMeshes = node->mNumMeshes;
@@ -141,8 +147,9 @@ namespace JonsAssetImporter
         const uint32_t numChildren = node->mNumChildren;
         for (uint32_t i = 0; i < numChildren; ++i)
         {
-            pkgNode.mChildNodes.emplace_back();
-            if (!ProcessAssimpNode(pkgNode.mChildNodes.back(), scene, node->mChildren[i], materialMap, nodeTransform, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds, ++nextNodeID))
+            pkgModel.mNodes.emplace_back();
+            const uint32_t childIndex = pkgModel.mNodes.size() - 1;
+            if (!ProcessAssimpNode(pkgModel, pkgModel.mNodes.back(), scene, node->mChildren[i], materialMap, nodeTransform, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds, childIndex, nextNodeIndex))
                 return false;
         }
 
@@ -156,7 +163,7 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessAssimpMesh(JonsEngine::PackageMesh& pkgMesh, const aiMesh* mesh, const MaterialMap& materialMap, const Mat4& nodeTransform, JonsEngine::Vec3& nodeMinBounds, JonsEngine::Vec3& nodeMaxBounds)
+    bool Assimp::ProcessAssimpMesh(PackageMesh& pkgMesh, const aiMesh* mesh, const MaterialMap& materialMap, const Mat4& nodeTransform, Vec3& nodeMinBounds, Vec3& nodeMaxBounds)
     {
         pkgMesh.mName = mesh->mName.C_Str();
 
@@ -238,7 +245,7 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessAssimpAnimations(JonsEngine::PackageModel& model, const aiScene* scene)
+    bool Assimp::ProcessAssimpAnimations(PackageModel& model, const aiScene* scene)
     {
         if (!scene->HasAnimations())
             return true;
@@ -268,10 +275,11 @@ namespace JonsAssetImporter
                 if (nodeAnimation->mNumPositionKeys == nodeAnimation->mNumRotationKeys == noAnimationKeysNum)
                     continue;
 
-                const PackageNode::PackageNodeID nodeID = GetNodeID(model.mRootNode, nodeAnimation->mNodeName.C_Str());
-                assert(nodeID != PackageNode::INVALID_NODE_ID);
+                const uint32_t nodeIndex = GetNodeIndex(model, nodeAnimation->mNodeName.C_Str());
+                // index outside range means we didnt find node --> crash
+                assert(nodeIndex < model.mNodes.size());
 
-                pkgAnimation.mAnimatedNodes.emplace_back(nodeID);
+                pkgAnimation.mAnimatedNodes.emplace_back(nodeIndex);
                 PackageAnimatedNode& pkgAnimatedNode = pkgAnimation.mAnimatedNodes.back();
 
                 const uint32_t numPosKeys = nodeAnimation->mNumPositionKeys;
@@ -304,8 +312,33 @@ namespace JonsAssetImporter
         return true;
     }
 
+    void Assimp::AddStaticAABB(PackageModel& model)
+    {
+        // two cases: animated vs static model
+        const PackageAABB& rootNodeAABB = model.mNodes.front().mAABB;
 
-    void CheckForInvalidAABB(JonsEngine::PackageAABB& aabb)
+        // static model: use root node AABB as its overall AABB
+        if (model.mAnimations.empty())
+        {
+            model.mStaticAABB = rootNodeAABB;
+            return;
+        }
+
+        // animated model: needs to transform all nodes using all the animations to find the maximum extents
+        Vec3 minExtent(rootNodeAABB.mMinBounds), maxExtent(rootNodeAABB.mMaxBounds);
+        for (const PackageAnimation& animation : model.mAnimations)
+        {
+            for (const PackageAnimatedNode& animNode : animation.mAnimatedNodes)
+            {
+                const PackageNode& node = model.mNodes.at(animNode.mNodeIndex);
+                
+                ...
+            }
+        }
+    }
+
+
+    void CheckForInvalidAABB(PackageAABB& aabb)
     {
         // resets AABB to zero length
         if (aabb.mMinBounds == Vec3(std::numeric_limits<float>::max()) && aabb.mMaxBounds == Vec3(std::numeric_limits<float>::lowest()))
@@ -315,18 +348,19 @@ namespace JonsAssetImporter
         }
     }
 
-    PackageNode::PackageNodeID GetNodeID(const PackageNode& node, const std::string& nodeName)
+    uint32_t GetNodeIndex(const PackageModel& model, const std::string& nodeName)
     {
-        if (nodeName == node.mName)
-            return node.mNodeID;
-
-        PackageNode::PackageNodeID ret = PackageNode::INVALID_NODE_ID;
-        for (const PackageNode& child : node.mChildNodes)
+        uint32_t ret = model.mNodes.size();
+        for (const PackageNode& node : model.mNodes)
         {
-            ret = GetNodeID(child, nodeName);
-            if (ret != PackageNode::INVALID_NODE_ID)
+            if (node.mName == nodeName)
+            {
+                ret = node.mNodeIndex;
                 break;
+            }
         }
+
+        assert(ret != model.mNodes.size());
 
         return ret;
     }
