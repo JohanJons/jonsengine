@@ -8,31 +8,28 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <limits>
 
 namespace JonsEngine
 {
-    typedef PackageAnimation::AnimationID AnimationID;
-    static const AnimationID INVALID_ANIMATION_ID = PackageAnimation::INVALID_ANIMATION_ID;
-
     class ModelAnimation
     {
     public:
         ModelAnimation(const PackageAnimation& pkgAnimation);
         ~ModelAnimation();
         
-        const Mat4& GetNodeTransform(const ModelNodeID nodeID, const Milliseconds elapsedTime) const;
+        const Mat4& GetNodeTransform(const ModelNodeIndex nodeIndex, const Milliseconds elapsedTime) const;
         const std::string& GetName() const;
-        AnimationID GetAnimationID() const;
         Milliseconds GetAnimationDuration() const;
 
 
     private:
         typedef std::pair<Mat4, double> NodeTransformTimestamp;
         typedef std::vector<NodeTransformTimestamp> NodeTransformsContainer;
-        typedef std::pair<ModelNodeID, NodeTransformsContainer::size_type> NodeIDMap;
+        typedef std::pair<ModelNodeIndex, NodeTransformsContainer::size_type> NodeIDMap;
     
+
         std::string mName;
-        AnimationID mAnimationID;
         Milliseconds mAnimationDuration;
 
         std::vector<NodeIDMap> mNodeIDMapping;

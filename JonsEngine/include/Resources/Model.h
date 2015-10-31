@@ -13,39 +13,42 @@
 
 namespace JonsEngine
 {
-    class DX11Renderer;
+    typedef uint32_t ModelAnimationIndex;
+    static const ModelAnimationIndex INVALID_ANIMATION_INDEX = std::numeric_limits<ModelAnimationIndex>::max();
 
     class Model
     {
     private:
-        typedef IDMap<ModelAnimation> AnimationContainer;
+        typedef std::vector<ModelAnimation> AnimationContainer;
 
     public:
-        typedef ConstRangedIterator<AnimationContainer, AnimationContainer::const_iterator> AnimationIterator;
+        typedef ConstRangedIterator<AnimationContainer, AnimationContainer::const_iterator> ModelAnimationIterator;
 
         Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
         Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData);
         Model(const Model& other);
         ~Model();
 
-        AnimationIterator GetAnimations() const;
-        AnimationID GetAnimationID(const std::string& name) const;
+        ModelAnimationIterator GetAnimations() const;
+        ModelAnimationIndex GetAnimationIndex(const std::string& name) const;
         
-        const ModelAnimation& GetAnimation(const AnimationID animationID) const;
+        const ModelAnimation& GetAnimation(const ModelAnimationIndex animationIndex) const;
         const ModelNode& GetRootNode() const;
         const std::string& GetName() const;
+        const AABB& GetStaticAABB() const;
         
 
     private:
         typedef std::vector<ModelNode> NodeContainer;
         typedef std::vector<Mesh> MeshContainer;
 
-        void ParseNodes(const ModelNode::InitDataList& initDataList, const Mat4& parentTransform, const PackageNode& pkgNode, const ModelNode::NodeIterator& next);
+        void ParseNodes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const Mat4& parentTransform, const PackageNode& pkgNode, const ModelNode::NodeIterator& next);
         void ParseNodes(const Model& other);
         ModelNode::MeshIterator ParseMeshes(const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode);
 
 
         std::string mName;
+        AABB mStaticAABB;
         NodeContainer mNodes;
         MeshContainer mMeshes;
         AnimationContainer mAnimations;
