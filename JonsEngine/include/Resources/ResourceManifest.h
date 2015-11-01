@@ -38,7 +38,7 @@ namespace JonsEngine
 
 
     private:
-        void ParseModelInitData(ModelNode::InitDataList& initData, const JonsPackagePtr jongPkg, const PackageNode& node);
+        void ParseModelInitData(ModelNode::InitDataList& initData, const JonsPackagePtr jongPkg, const PackageModel& model);
 
 
         HeapAllocator& mMemoryAllocator;

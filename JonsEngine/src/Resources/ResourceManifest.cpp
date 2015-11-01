@@ -76,7 +76,7 @@ namespace JonsEngine
         const PackageModel& pkgModel = *iter;
 
         ModelNode::InitDataList initDataList;
-        ParseModelInitData(initDataList, jonsPkg, pkgModel.mRootNode);
+        ParseModelInitData(initDataList, jonsPkg, pkgModel);
 
         return mModels.Insert(pkgModel, initDataList);
     }
@@ -167,8 +167,10 @@ namespace JonsEngine
     }
 
 
-    void ResourceManifest::ParseModelInitData(ModelNode::InitDataList& initDataList, const JonsPackagePtr jongPkg, const PackageNode& node)
+    void ResourceManifest::ParseModelInitData(ModelNode::InitDataList& initDataList, const JonsPackagePtr jongPkg, const PackageModel& model)
     {
+        for (const PackageNode& child : node.mChildNodes)
+
         for (const PackageMesh& mesh : node.mMeshes)
         {
             const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
