@@ -2,6 +2,7 @@
 
 #include "include/Core/Types.h"
 #include "include/Core/Utils/Time.h"
+#include "include/Core/Math/AABB.h"
 
 #include <vector>
 #include <memory>
@@ -30,19 +31,10 @@ namespace JonsEngine
         PackageHeader();
     };
 
-    struct PackageAABB
-    {
-        Vec3 mMinBounds;
-        Vec3 mMaxBounds;
-
-
-        PackageAABB();
-    };
-
     struct PackageMesh
     {
         std::string mName;
-        PackageAABB mAABB;
+        AABB mAABB;
         std::vector<float> mVertexData;
         std::vector<float> mNormalData;
         std::vector<float> mTexCoordsData;
@@ -60,7 +52,7 @@ namespace JonsEngine
         std::string mName;
         uint32_t mNodeIndex;
         uint32_t mParentNodeIndex;
-        PackageAABB mAABB;
+        AABB mAABB;
         std::vector<PackageMesh> mMeshes;
 
 
@@ -139,7 +131,7 @@ namespace JonsEngine
     struct PackageModel
     {
         std::string mName;
-        PackageAABB mStaticAABB;
+        AABB mStaticAABB;
         std::vector<PackageNode> mNodes;
         std::vector<PackageAnimation> mAnimations;
 
@@ -182,7 +174,7 @@ namespace boost
         }
 
         template<class Archive>
-        void serialize(Archive & ar, JonsEngine::PackageAABB& aabb, const unsigned int version)
+        void serialize(Archive & ar, JonsEngine::AABB& aabb, const unsigned int version)
         {
             ar & aabb.mMinBounds;
             ar & aabb.mMaxBounds;
