@@ -169,9 +169,25 @@ namespace JonsEngine
 
     void ResourceManifest::ParseModelInitData(ModelNode::InitDataList& initDataList, const JonsPackagePtr jongPkg, const PackageModel& model)
     {
-        for (const PackageNode& child : node.mChildNodes)
+        for (const PackageNode& node : model.mNodes)
+        {
+            for (const PackageMesh& mesh : node.mMeshes)
+            {
+                const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
+                DX11MaterialID materialID = INVALID_DX11_MATERIAL_ID;
+                if (mesh.mHasMaterial)
+                {
+                    const PackageMaterial& material = jongPkg->mMaterials.at(mesh.mMaterialIndex);
+                    materialID = LoadMaterial(material.mName, jongPkg);
 
-        for (const PackageMesh& mesh : node.mMeshes)
+                    assert(materialID != INVALID_DX11_MATERIAL_ID);
+                }
+
+                initDataList.emplace_back(mesh, meshID, materialID);
+            }
+        }
+
+        /*for (const PackageMesh& mesh : node.mMeshes)
         {
             const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
             DX11MaterialID materialID = INVALID_DX11_MATERIAL_ID;
@@ -187,7 +203,7 @@ namespace JonsEngine
         }
 
         for (const PackageNode& child : node.mChildNodes)
-            ParseModelInitData(initDataList, jongPkg, child);
+            ParseModelInitData(initDataList, jongPkg, child);*/
     }
 
 

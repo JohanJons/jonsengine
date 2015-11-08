@@ -318,14 +318,14 @@ namespace JonsAssetImporter
         const PackageAABB& rootNodeAABB = model.mNodes.front().mAABB;
 
         // static model: use root node AABB as its overall AABB
-        if (model.mAnimations.empty())
-        {
+        //if (model.mAnimations.empty())
+        //{
             model.mStaticAABB = rootNodeAABB;
             return;
-        }
+       // }
 
         // animated model: needs to transform all nodes using all the animations to find the maximum extents
-        Vec3 minExtent(rootNodeAABB.mMinBounds), maxExtent(rootNodeAABB.mMaxBounds);
+        /*Vec3 minExtent(rootNodeAABB.mMinBounds), maxExtent(rootNodeAABB.mMaxBounds);
         for (const PackageAnimation& animation : model.mAnimations)
         {
             for (const PackageAnimatedNode& animNode : animation.mAnimatedNodes)
@@ -334,7 +334,7 @@ namespace JonsAssetImporter
                 
                 ...
             }
-        }
+        }*/
     }
 
 
