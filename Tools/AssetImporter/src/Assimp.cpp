@@ -1,6 +1,7 @@
 #include "include/Assimp.h"
 
 #include "include/Core/Math/Math.h"
+#include "include/Core/Math/AABB.h"
 #include "include/FreeImage.h"
 
 #include <limits>
@@ -318,23 +319,35 @@ namespace JonsAssetImporter
         const PackageAABB& rootNodeAABB = model.mNodes.front().mAABB;
 
         // static model: use root node AABB as its overall AABB
-        //if (model.mAnimations.empty())
-        //{
+        if (model.mAnimations.empty())
+        {
             model.mStaticAABB = rootNodeAABB;
             return;
-       // }
+        }
 
         // animated model: needs to transform all nodes using all the animations to find the maximum extents
-        /*Vec3 minExtent(rootNodeAABB.mMinBounds), maxExtent(rootNodeAABB.mMaxBounds);
+        Vec3 minExtent(rootNodeAABB.mMinBounds), maxExtent(rootNodeAABB.mMaxBounds);
         for (const PackageAnimation& animation : model.mAnimations)
         {
             for (const PackageAnimatedNode& animNode : animation.mAnimatedNodes)
             {
                 const PackageNode& node = model.mNodes.at(animNode.mNodeIndex);
-                
-                ...
+                for (const PackageAnimatedNodeTransform& transform : animNode.mAnimationTransforms)
+                {
+                    AABB aabb(node.mAABB.mMinBounds, node.mAABB.mMaxBounds);
+                    aabb = aabb * transform.mTransform;
+
+                    const Vec3 tempMin = aabb.Min(), tempMax = aabb.Max();
+                    if (tempMin.x < minExtent.x) minExtent.x = tempMin.x;
+                    if (tempMin.y < minExtent.y) minExtent.y = tempMin.y;
+                    if (tempMin.z < minExtent.z) minExtent.z = tempMin.z;
+
+                    if (tempMax.x > maxExtent.x) maxExtent.x = tempMax.x;
+                    if (tempMax.y > maxExtent.y) maxExtent.y = tempMax.y;
+                    if (tempMax.z > maxExtent.z) maxExtent.z = tempMax.z;
+                }
             }
-        }*/
+        }
     }
 
 
