@@ -326,6 +326,7 @@ namespace JonsAssetImporter
         }
 
         // animated model: needs to transform all nodes using all the animations to find the maximum extents
+        // results in a loose, static aabb
         Vec3 minExtent(rootNodeAABB.mMinBounds), maxExtent(rootNodeAABB.mMaxBounds);
         for (const PackageAnimation& animation : model.mAnimations)
         {
@@ -348,6 +349,8 @@ namespace JonsAssetImporter
                 }
             }
         }
+        model.mStaticAABB.mMinBounds = minExtent;
+        model.mStaticAABB.mMaxBounds = maxExtent;
     }
 
 

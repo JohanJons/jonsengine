@@ -58,7 +58,7 @@ namespace JonsEngine
 
         mTimestamp += elapsedTime;
 
-        if (!(mTimestamp >= mAnimationTime))
+        if (mTimestamp < mAnimationTime)
             return;
 
         if (IsRepeatingAnimation())
