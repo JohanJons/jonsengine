@@ -21,7 +21,7 @@ namespace JonsEngine
     void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius);
 
 
-    SceneParser::SceneParser(const ResourceManifest& resManifest) : mResourceManifest(resManifest)
+    SceneParser::SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest) : mResourceManifest(resManifest), mCullingStrategy(engineSettings.mSceneCullingStrategy)
     {
     }
 

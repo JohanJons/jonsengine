@@ -28,7 +28,6 @@ namespace JonsAssetImporter
             JonsEngine::Vec3& modelMaxBounds, const uint32_t nextNodeIndex, const uint32_t parentNodeIndex);
         bool ProcessAssimpMesh(JonsEngine::PackageMesh& pkgMesh, const aiMesh* mesh, const MaterialMap& materialMap, const JonsEngine::Mat4& nodeTransform, JonsEngine::Vec3& nodeMinBounds, JonsEngine::Vec3& nodeMaxBounds);
         bool ProcessAssimpAnimations(JonsEngine::PackageModel& model, const aiScene* scene);
-        void AddStaticAABB(JonsEngine::PackageModel& model);
 
 
         ::Assimp::Importer mImporter;

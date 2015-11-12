@@ -15,27 +15,31 @@ namespace JonsEngine
     struct EngineSettings
     {
         // render settings
-        enum class ShadowResolution {
+        enum class ShadowResolution
+        {
             RESOLUTION_1024,
             RESOLUTION_2048,
             RESOLUTION_4092
         } mShadowResolution;
 
-        enum class ShadowReadbackLatency {
+        enum class ShadowReadbackLatency
+        {
            LATENCY_0,
            LATENCY_1,
            LATENCY_2,
            LATENCY_3
         } mShadowReadbackLatency;
 
-        enum class ShadowFiltering {
+        enum class ShadowFiltering
+        {
             PCF_2X2,
             PCF_3X3,
             PCF_5X5,
             PCF_7X7
         } mShadowFiltering;
 
-        enum class Anisotropic {
+        enum class Anisotropic
+        {
             X1,
             X2,
             X4,
@@ -43,7 +47,8 @@ namespace JonsEngine
             X16
         } mAnisotropicFiltering;
 
-        enum class AntiAliasing{
+        enum class AntiAliasing
+        {
             NONE,
             FXAA
         } mAntiAliasing;
@@ -56,6 +61,14 @@ namespace JonsEngine
         uint16_t mWindowHeight;
         bool mFullscreen;
         uint16_t mFrameLimit;
+
+        // scene settings
+        enum class CullingStrategy
+        {
+            STANDARD,
+            AGGRESSIVE
+        } mSceneCullingStrategy;
+
 
         EngineSettings();
     };
@@ -76,7 +89,10 @@ namespace JonsEngine
         mWindowWidth(1920),
         mWindowHeight(1080),
         mFullscreen(false),
-        mFrameLimit(0)
+        mFrameLimit(0),
+
+        // scene settings
+        mSceneCullingStrategy(CullingStrategy::STANDARD)
     {
     }
 }

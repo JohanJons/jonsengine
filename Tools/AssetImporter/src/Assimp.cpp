@@ -10,6 +10,7 @@ using namespace JonsEngine;
 
 namespace JonsAssetImporter
 {
+    void AddStaticAABB(PackageModel& model);
     void CheckForInvalidAABB(PackageAABB& aabb);
     uint32_t GetNodeIndex(const PackageModel& model, const std::string& nodeName);
 
@@ -313,7 +314,7 @@ namespace JonsAssetImporter
         return true;
     }
 
-    void Assimp::AddStaticAABB(PackageModel& model)
+    void AddStaticAABB(PackageModel& model)
     {
         // two cases: animated vs static model
         const PackageAABB& rootNodeAABB = model.mNodes.front().mAABB;
