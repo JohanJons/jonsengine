@@ -43,6 +43,20 @@ namespace JonsEngine
         mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(cameraFov, windowAspectRatio, zNear, zFar);
         mRenderQueue.mCamera.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
 
+        mRenderQueue.mAmbientLight = scene.GetAmbientLight();
+
+        const Skybox& skybox = mResourceManifest.GetSkybox(scene.GetSkybox());
+        mRenderQueue.mSkyboxTextureID = skybox.GetSkyboxTexture();
+
+        if (mCullingStrategy == EngineSettings::CullingStrategy::STANDARD || mCullingStrategy == EngineSettings::CullingStrategy::AGGRESSIVE)
+            ViewFrustumCulling(scene);
+
+        return mRenderQueue;
+    }
+
+
+    void SceneParser::ViewFrustumCulling(const Scene& scene)
+    {
         for (const StaticActor& actor : scene.GetStaticActors())
         {
             const SceneNodeID sceneNodeID = actor.GetSceneNode();
@@ -67,7 +81,7 @@ namespace JonsEngine
             if (pointLight.GetSceneNode() == INVALID_SCENE_NODE_ID)
                 continue;
 
-            const SceneNode& sceneNode = scene.GetSceneNode(pointLight.GetSceneNode());//mSceneNodeTree.GetNode(pointLight.GetSceneNode());
+            const SceneNode& sceneNode = scene.GetSceneNode(pointLight.GetSceneNode());
 
             const Vec3 lightPosition = sceneNode.Position();
 
@@ -108,7 +122,7 @@ namespace JonsEngine
                     if (actor.GetSceneNode() == INVALID_SCENE_NODE_ID || actor.GetModel() == INVALID_MODEL_ID)
                         continue;
 
-                    const SceneNode& sceneNode = scene.GetSceneNode(actor.GetSceneNode());//mSceneNodeTree.GetNode(actor.GetSceneNode());
+                    const SceneNode& sceneNode = scene.GetSceneNode(actor.GetSceneNode());
                     const Model& model = mResourceManifest.GetModel(actor.GetModel());
 
                     const Mat4& worldMatrix = sceneNode.GetWorldTransform();
@@ -123,14 +137,6 @@ namespace JonsEngine
                 renderableDirLight.mCascadeSplits.emplace_back(nearZ, farZ, renderableDirLight.mMeshes.size());
             }
         }
-
-        // misc
-        mRenderQueue.mAmbientLight = scene.GetAmbientLight();
-
-        const Skybox& skybox = mResourceManifest.GetSkybox(scene.GetSkybox());
-        mRenderQueue.mSkyboxTextureID = skybox.GetSkyboxTexture();
-
-        return mRenderQueue;
     }
 
 

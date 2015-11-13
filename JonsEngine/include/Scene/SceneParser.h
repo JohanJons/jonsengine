@@ -18,6 +18,9 @@ namespace JonsEngine
 
 
     private:
+        void ViewFrustumCulling(const Scene& scene);
+
+
         const ResourceManifest& mResourceManifest;
         const EngineSettings::CullingStrategy mCullingStrategy;
         RenderQueue mRenderQueue;

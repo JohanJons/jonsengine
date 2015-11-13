@@ -23,7 +23,7 @@ namespace JonsEngine
                                                      mRenderer(settings, mMemoryAllocator, mLog),
                                                      mResourceManifest(mRenderer, mMemoryAllocator), 
                                                      mSceneManager(mRenderer, mResourceManifest),
-                                                     mSceneParser(mResourceManifest)
+                                                     mSceneParser(settings, mResourceManifest)
     {
         JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
     }

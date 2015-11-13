@@ -38,9 +38,12 @@ GBufferVSOut vs_main(GBufferVSIn input)
     GBufferVSOut output;
 
     output.mPosition = mul(gWVPMatrix, float4(input.mPosition, 1.0));
+
+    // scaling/translation/uniform scaling is fine, we dont need to normalize in VS
     output.mNormal = mul((float3x3)gWorldViewMatrix, input.mNormal);
     output.mTangent = mul((float3x3)gWorldViewMatrix, input.mTangent);
     output.mBitangent = mul((float3x3)gWorldViewMatrix, input.mBitangent);
+
     output.mTexcoord = gTextureTilingFactor * input.mTexcoord;
 
     return output;
