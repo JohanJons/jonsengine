@@ -22,11 +22,11 @@ namespace JonsEngine
     {
     }
 
-    PackageNode::PackageNode()
+    PackageNode::PackageNode() : mNodeIndex(INVALID_NODE_INDEX), mParentNodeIndex(INVALID_NODE_INDEX)
     {
     }
 
-    PackageNode::PackageNode(const std::string& name, const uint32_t nodeIndex, const uint32_t parentNodeIndex) : mName(name), mNodeIndex(nodeIndex), mParentNodeIndex(parentNodeIndex)
+    PackageNode::PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex) : mName(name), mNodeIndex(nodeIndex), mParentNodeIndex(parentNodeIndex)
     {
     }
 
@@ -58,11 +58,11 @@ namespace JonsEngine
     {
     }
 
-    PackageAnimatedNode::PackageAnimatedNode()
+    PackageAnimatedNode::PackageAnimatedNode() : mNodeIndex(PackageNode::INVALID_NODE_INDEX)
     {
     }
 
-    PackageAnimatedNode::PackageAnimatedNode(const uint32_t nodeIndex) : mNodeIndex(nodeIndex)
+    PackageAnimatedNode::PackageAnimatedNode(const PackageNode::NodeIndex nodeIndex) : mNodeIndex(nodeIndex)
     {
     }
 

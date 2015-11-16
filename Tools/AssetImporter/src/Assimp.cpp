@@ -45,14 +45,10 @@ namespace JonsAssetImporter
         ProcessAssimpMaterials(scene, modelPath, materialMap, freeimageImporter, pkg);
 
         // process model hierarchy
-        pkg->mModels.emplace_back(modelName);
-        PackageModel& model = pkg->mModels.back();
-        uint32_t nextNodeIndex = 0;
-        model.mNodes.emplace_back();
-        PackageNode& rootNode = model.mNodes.back();
-        if (!ProcessAssimpNode(model, rootNode, scene, scene->mRootNode, materialMap, gIdentityMatrix, rootNode.mAABB.mMinBounds, rootNode.mAABB.mMaxBounds, nextNodeIndex, nextNodeIndex))
+        if (!ProcessAssimpModel(scene, modelName, materialMap, pkg))
             return false;
 
+        PackageModel& model = pkg->mModels.back();
         if (!ProcessAssimpAnimations(model, scene))
             return false;
 
@@ -130,8 +126,22 @@ namespace JonsAssetImporter
         }
     }
 
+    bool Assimp::ProcessAssimpModel(const aiScene* scene, const std::string& modelName, const MaterialMap& materialMap, JonsPackagePtr pkg)
+    {
+        pkg->mModels.emplace_back(modelName);
+        PackageModel& model = pkg->mModels.back();
+
+        PackageNode::NodeIndex nextNodeIndex = 0;
+        model.mNodes.emplace_back();
+        PackageNode& rootNode = model.mNodes.back();
+        if (!ProcessAssimpNode(model, rootNode, scene, scene->mRootNode, materialMap, gIdentityMatrix, rootNode.mAABB.mMinBounds, rootNode.mAABB.mMaxBounds, nextNodeIndex, PackageNode::INVALID_NODE_INDEX))
+            return false;
+
+        return true;
+    }
+
     bool Assimp::ProcessAssimpNode(PackageModel& pkgModel, PackageNode& pkgNode, const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, const Mat4& parentTransform, Vec3& parentMinBounds,
-        Vec3& parentMaxBounds, const uint32_t nextNodeIndex, const uint32_t parentNodeIndex)
+        Vec3& parentMaxBounds, const PackageNode::NodeIndex nextNodeIndex, const PackageNode::NodeIndex parentNodeIndex)
     {
         pkgNode.mName = node->mName.C_Str();
         pkgNode.mNodeIndex = nextNodeIndex;

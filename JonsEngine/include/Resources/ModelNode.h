@@ -13,8 +13,8 @@
 
 namespace JonsEngine
 {
-    typedef uint32_t ModelNodeIndex;
-    static const ModelNodeIndex INVALID_MODEL_NODE_INDEX = std::numeric_limits<ModelNodeIndex>::max();
+    typedef PackageNode::NodeIndex ModelNodeIndex;
+    static const ModelNodeIndex INVALID_MODEL_NODE_INDEX = PackageNode::INVALID_NODE_INDEX;
 
     class ModelNode
     {

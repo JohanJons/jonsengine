@@ -57,15 +57,19 @@ namespace JonsEngine
 
     struct PackageNode
     {
+        typedef uint32_t NodeIndex;
+        static const NodeIndex INVALID_NODE_INDEX = UINT32_MAX;
+
         std::string mName;
-        uint32_t mNodeIndex;
-        uint32_t mParentNodeIndex;
+        NodeIndex mNodeIndex;
+        NodeIndex mParentNodeIndex;
         PackageAABB mAABB;
+        // TODO: move mesh into model instead
         std::vector<PackageMesh> mMeshes;
 
 
         PackageNode();
-        PackageNode(const std::string& name, const uint32_t nodeIndex, const uint32_t parentNodeIndex);
+        PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex);
     };
 
     struct PackageTexture
@@ -117,12 +121,12 @@ namespace JonsEngine
 
     struct PackageAnimatedNode
     {
-        uint32_t mNodeIndex;
+        PackageNode::NodeIndex mNodeIndex;
         std::vector<PackageAnimatedNodeTransform> mAnimationTransforms;
 
 
         PackageAnimatedNode();
-        PackageAnimatedNode(const uint32_t nodeIndex);
+        PackageAnimatedNode(const PackageNode::NodeIndex nodeIndex);
     };
 
     struct PackageAnimation
