@@ -1,15 +1,15 @@
 # jonsengine
 DirectX11 game engine
 
-# List of features (2015-07-04)
+# List of features (2015-11-24)
 
 Core:
 - File logging
-- Basic memory management
+- Memory management
 - Basic debugging features
 
 Resources:
-- Custom binary file format for parsing game assets
+- Binary file format for parsing game assets
 - Offline asset exporter tool for above mentioned file format
 - Various thirdparty libraries to parse a wide range of assets into a unified asset format
 - Create basic geometric shapes at runtime
@@ -19,19 +19,20 @@ Rendering:
 - Deferred shading pipeline with phong shading
 - Directional/Point/Ambient lights with shadowmapping
 - Cascaded shadow mapping (CSM) with Sample distribution shadow maps (SDSM)
-- Shadow filtering (OptimizedPCF)
-- Screenspace ambient occlusion (Scalable Ambient Obscurance)
+- Shadowmap filtering (OptimizedPCF)
+- ScreenSpace Ambient Occlusion (Scalable Ambient Obscurance, SAO)
 - Antialiasing (FXAA)
 - Gamma corrected lighting
 - Skyboxes
+- Skeletal animations (WIP)
 
 Scene:
-- Basic hierarchical scenegraph structure
-- Models, materials, cameras, directional/point/ambient lights, skyboxes
-- Basic renderqueue with mesh culling for camera and directional/point lights
+- Scenegraph
+- Models, materials, animations, cameras, directional/point/ambient lights, skyboxes
+- Renderqueue with culling strategies
 
 Window:
-- Basic window management
+- Window management
 - Raw keyboard/mouse input handling
 
 
