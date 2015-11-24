@@ -16,6 +16,9 @@
 
 namespace JonsEngine
 {
+    // TODO: heavily optimize the asset file loading by flattening the container hierarchy
+    // containers of containers is slow especially in debug mode with debug information attached...
+    
     const uint8_t LatestMajorVersion = 0;
     const uint8_t LatestMinorVersion = 1;
 
