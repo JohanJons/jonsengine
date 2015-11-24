@@ -13,6 +13,7 @@ namespace JonsAssetImporter
     void AddStaticAABB(PackageModel& model);
     void CheckForInvalidAABB(PackageAABB& aabb);
     uint32_t GetNodeIndex(const PackageModel& model, const std::string& nodeName);
+    uint32_t CountChildren(const aiNode* node);
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
     Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
@@ -130,6 +131,7 @@ namespace JonsAssetImporter
     {
         pkg->mModels.emplace_back(modelName);
         PackageModel& model = pkg->mModels.back();
+        model.mNodes.reserve(CountChildren(scene->mRootNode) + 1);
 
         PackageNode::NodeIndex nextNodeIndex = 0;
         model.mNodes.emplace_back();
@@ -388,6 +390,20 @@ namespace JonsAssetImporter
         }
 
         assert(ret != model.mNodes.size());
+
+        return ret;
+    }
+
+    uint32_t CountChildren(const aiNode* node)
+    {
+        uint32_t ret = 0;
+
+        for (uint32_t index = 0; index < node->mNumChildren; ++index)
+        {
+            ++ret;
+
+            ret += CountChildren(node->mChildren[index]);
+        }
 
         return ret;
     }

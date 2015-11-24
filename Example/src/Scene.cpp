@@ -92,7 +92,7 @@ namespace JonsGame
         // wuson 2 - not animated
         // TODO: set some other material
         StaticActor& actorWuson2 = mScene.GetStaticActor(mActorWuson2);
-        actorWuson2.SetMaterial(mMaterialCheckers);
+        //actorWuson2.SetMaterial(mMaterialCheckers);
         SceneNode& nodeWuson2 = mScene.GetSceneNode(mNodeWuson2);
         nodeWuson2.TranslateNode(Vec3(7.0f, 0.5f, 5.0f));
         nodeWuson2.RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));

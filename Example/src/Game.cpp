@@ -33,62 +33,6 @@ namespace JonsGame
         
     void Game::Run()
     {
-
-        //                [0]
-        //          [1]             
-        //    [2]   [3]    [5]     
-        //[4]
-        /*struct apa
-        {
-            apa(int wi, float wb) : i(wi), b(wb)
-            {
-            }
-
-            apa& operator=(apa&& other)
-            {
-                i = other.i;
-                b = other.b;
-            }
-
-            int i;
-            float b;
-        };
-        IDMap<apa> tree;
-        auto n1 = tree.Insert(1, 1.0f);
-        auto n2 = tree.Insert(2, 2.0f);
-        auto n3 = tree.Insert(3, 3.0f);
-        auto n4 = tree.Insert(4, 4.0f);
-        auto n5 = tree.Insert(5, 5.0f);
-        tree.Erase(n2);
-        tree.Erase(n5);
-        auto n6 = tree.Insert(6, 6.0f);
-        auto n7 = tree.Insert(7, 7.0f);
-
-        auto b = tree.GetItem(n1);
-         b = tree.GetItem(n3);
-         b = tree.GetItem(n4);
-         b = tree.GetItem(n6);
-         b = tree.GetItem(n7);
-         b = tree.GetItem(n2);*/
-
-      //  //tree.Clear();
-
-      //  //tree.FreeNode(n4);
-
-      //  //auto a1 = tree.GetNode(tree.GetRootNodeID());
-      // // auto a2 = tree.GetNode(n2);
-      // // auto a3 = tree.GetNode(n3);
-      //  //auto a4 = tree.GetNode(n4);
-
-      // // auto n5 = tree.AddNode(n3, "eeeeeeee", 5, 5);
-      ////  auto a5 = tree.GetNode(n5);
-
-      //  tree.FreeNode(n1);
-
-      //  auto n6 = tree.AddNode(tree.GetRootNodeID(), 6, 6.0f);
-      //  auto n7 = tree.AddNode(tree.GetRootNodeID(), 7, 7.0f);
-      //  auto n8 = tree.AddNode(n7, 8, 8.0f);
-
         while (mRunning)
         {
             mSun.Update();
