@@ -10,7 +10,7 @@ Core:
 
 Resources:
 - Binary file format for parsing game assets
-- Offline asset exporter tool for above mentioned file format
+- Offline asset exporter tool
 - Various thirdparty libraries to parse a wide range of assets into a unified asset format
 - Create basic geometric shapes at runtime
 
@@ -23,7 +23,6 @@ Rendering:
 - ScreenSpace Ambient Occlusion (Scalable Ambient Obscurance, SAO)
 - Antialiasing (FXAA)
 - Gamma corrected lighting
-- Skyboxes
 - Skeletal animations (WIP)
 
 Scene:
