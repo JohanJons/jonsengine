@@ -20,6 +20,14 @@ namespace JonsEngine
     void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix, const float tilingFactor, const MaterialID actorMaterial);
     void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius);
 
+    //void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix, const float tilingFactor, const MaterialID actorMaterial)
+
+    //template <typename RENDERABLE, typename ...EXTRA_ARGS>
+    //void FrustumCull(const ResourceManifest& resManifest, const std::vector<RENDERABLE>& resultContainer, const Mat4& wvpMatrix, const Mat4& worldTransform, const ModelNode& node,
+    //    const bool useDefaultMaterial, const EXTRA_ARGS&... extraArgs);
+    template <typename RENDERABLE, typename APA>
+    void FrustumCull(const Scene& scene, RenderQueue& renderQueue, const ResourceManifest& resManifest, const APA& a);
+
 
     SceneParser::SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest) : mResourceManifest(resManifest), mCullingStrategy(engineSettings.mSceneCullingStrategy)
     {
@@ -57,9 +65,44 @@ namespace JonsEngine
 
     void SceneParser::ViewFrustumCulling(const Scene& scene)
     {
-        for (const StaticActor& actor : scene.GetStaticActors())
+        auto staticActors = scene.GetStaticActors();
+        auto animatedActors = scene.GetAnimatedActors();
+
+        FrustumCull<RenderableModel, decltype(staticActors)>(scene, mRenderQueue, mResourceManifest, staticActors);
+        FrustumCull<RenderableModel, decltype(animatedActors)>(scene, mRenderQueue, mResourceManifest, animatedActors);
+
+        /*for (const StaticActor& actor : scene.GetStaticActors())
         {
             const SceneNodeID sceneNodeID = actor.GetSceneNode();
+            const ModelID modelID = actor.GetModel();
+            if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
+                continue;
+
+            const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
+
+            const Mat4& worldMatrix = sceneNode.GetWorldTransform();
+            const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix *worldMatrix;
+
+            const Model& model = mResourceManifest.GetModel(modelID);
+
+            const float specularFactor = 0.02f;
+            auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
+            auto normalTexture = INVALID_DX11_MATERIAL_ID;
+            // TODO
+            auto specularFactor = 0.02f;
+
+            const bool actorHasMaterial = model. != INVALID_MATERIAL_ID;
+            const MaterialID materialID = actorHasMaterial ? actorMaterial : mesh.GetDefaultMaterial();
+            if (materialID != INVALID_MATERIAL_ID)
+            {
+                const Material& material = mResourceManifest.GetMaterial(materialID);
+                diffuseTexture = material.GetDiffuseTexture();
+                normalTexture = material.GetNormalTexture();
+                specularFactor = material.GetSpecularFactor();
+            }
+
+            FrustumCull<RenderableModel>(mResourceManifest, mRenderQueue.mCamera.mModels, wvpMatrix, worldMatrix, model.GetRootNode(), );
+            /*const SceneNodeID sceneNodeID = actor.GetSceneNode();
             const ModelID modelID = actor.GetModel();
 
             if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
@@ -72,8 +115,8 @@ namespace JonsEngine
 
             const Model& model = mResourceManifest.GetModel(modelID);
 
-            CullMeshesFrustrum(mResourceManifest, mRenderQueue.mCamera.mModels, model.GetRootNode(), worldMatrix, wvpMatrix, actor.GetMaterialTilingFactor(), actor.GetMaterial());
-        }
+            CullMeshesFrustrum(mResourceManifest, mRenderQueue.mCamera.mModels, model.GetRootNode(), worldMatrix, wvpMatrix, actor.GetMaterialTilingFactor(), actor.GetMaterial());*/
+        //}
 
         // point lights
         for (const PointLight& pointLight : scene.GetPointLights())
@@ -139,7 +182,7 @@ namespace JonsEngine
         }
     }
 
-
+    /*
     void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix, const float tilingFactor, const MaterialID actorMaterial)
     {
         auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
@@ -188,49 +231,100 @@ namespace JonsEngine
                 AddMesh(resultMeshes, mesh, worldMatrix * child.GetLocalTransform());
         }
     }
-
-    void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix, const float tilingFactor, const MaterialID actorMaterial)
+    */
+    /*void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix, const float tilingFactor, const MaterialID actorMaterial)
     {
         const Mat4 localWVPMatrix = wvpMatrix * node.GetLocalTransform();// *node.GetLocalTransform();// *node.mLocalTransform;
         const Mat4 localWorldMatrix = worldMatrix * node.GetLocalTransform();// *node.mLocalTransform;
-        const AABB nodeWorldAABB = /*localWorldMatrix */ node.GetLocalAABB();
+        const AABB nodeWorldAABB = /*localWorldMatrix */// node.GetLocalAABB();
 
-        AABBIntersection nodeAABBIntersection = Intersection(nodeWorldAABB, localWVPMatrix);
-        switch (nodeAABBIntersection)
+    //    AABBIntersection nodeAABBIntersection = Intersection(nodeWorldAABB, localWVPMatrix);
+    //    switch (nodeAABBIntersection)
+    //    {
+    //        // if partially inside, recursively test all meshes and child nodes
+    //    case AABBIntersection::Partial:
+    //    {
+    //        AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
+
+    //        for (const Mesh& mesh : node.GetMeshes())
+    //        {
+    //            const AABB meshWorldAABB = /*localWorldMatrix */ mesh.GetLocalAABB();
+
+    //            meshAABBIntersection = Intersection(meshWorldAABB, localWVPMatrix);
+    //            if (meshAABBIntersection == AABBIntersection::Outside)
+    //                continue;
+
+    //            if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
+    //                AddMesh(resourceManifest, resultMeshes, mesh, /*worldMatrix */ localWorldMatrix, tilingFactor, actorMaterial);
+    //        }
+
+    //        // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
+    //        for (const ModelNode& child : node.GetImmediateChildren())
+    //            CullMeshesFrustrum(resourceManifest, resultMeshes, child, worldMatrix, wvpMatrix, tilingFactor, actorMaterial);
+
+    //        break;
+    //    }
+
+    //    case AABBIntersection::Inside:
+    //    {
+    //        AddAllMeshes(resourceManifest, resultMeshes, node, worldMatrix, tilingFactor, actorMaterial);
+    //        break;
+    //    }
+
+    //    case AABBIntersection::Outside:
+    //    default:
+    //        break;
+    //    }
+    //}
+
+    /*void AddMeshes(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const float tilingFactor, const MaterialID actorMaterial)
+    {
+        for (const Mesh& mesh : node.GetMeshes())
+            AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.GetLocalTransform(), tilingFactor, actorMaterial);
+
+        for (const ModelNode& child : node.GetAllChildren())
         {
-            // if partially inside, recursively test all meshes and child nodes
-        case AABBIntersection::Partial:
-        {
-            AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
-
-            for (const Mesh& mesh : node.GetMeshes())
-            {
-                const AABB meshWorldAABB = /*localWorldMatrix */ mesh.GetLocalAABB();
-
-                meshAABBIntersection = Intersection(meshWorldAABB, localWVPMatrix);
-                if (meshAABBIntersection == AABBIntersection::Outside)
-                    continue;
-
-                if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                    AddMesh(resourceManifest, resultMeshes, mesh, /*worldMatrix */ localWorldMatrix, tilingFactor, actorMaterial);
-            }
-
-            // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-            for (const ModelNode& child : node.GetImmediateChildren())
-                CullMeshesFrustrum(resourceManifest, resultMeshes, child, worldMatrix, wvpMatrix, tilingFactor, actorMaterial);
-
-            break;
+            for (const Mesh& mesh : child.GetMeshes())
+                AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * child.GetLocalTransform(), tilingFactor, actorMaterial);
         }
+    }
 
-        case AABBIntersection::Inside:
+    void AddMeshes(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix)
+    {
+        for (const Mesh& mesh : node.GetMeshes())
+            AddMesh(resultMeshes, mesh, worldMatrix * node.GetLocalTransform());
+
+        for (const ModelNode& child : node.GetAllChildren())
         {
-            AddAllMeshes(resourceManifest, resultMeshes, node, worldMatrix, tilingFactor, actorMaterial);
-            break;
+            for (const Mesh& mesh : child.GetMeshes())
+                AddMesh(resultMeshes, mesh, worldMatrix * child.GetLocalTransform());
         }
+    }*/
 
-        case AABBIntersection::Outside:
-        default:
-            break;
+    void AddMeshes(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix)
+    {
+        /*for (const Mesh& mesh : node.GetMeshes())
+            AddMesh(resultMeshes, mesh, worldMatrix * node.GetLocalTransform());
+
+        for (const ModelNode& child : node.GetAllChildren())
+        {
+            for (const Mesh& mesh : child.GetMeshes())
+                AddMesh(resultMeshes, mesh, worldMatrix * child.GetLocalTransform());
+        }*/
+
+        auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
+        auto normalTexture = INVALID_DX11_MATERIAL_ID;
+        // TODO
+        auto specularFactor = 0.02f;
+
+        const bool actorHasMaterial = actorMaterial != INVALID_MATERIAL_ID;
+        const MaterialID materialID = actorHasMaterial ? actorMaterial : mesh.GetDefaultMaterial();
+        if (materialID != INVALID_MATERIAL_ID)
+        {
+            const Material& material = resourceManifest.GetMaterial(materialID);
+            diffuseTexture = material.GetDiffuseTexture();
+            normalTexture = material.GetNormalTexture();
+            specularFactor = material.GetSpecularFactor();
         }
     }
 
@@ -276,5 +370,103 @@ namespace JonsEngine
         default:
             break;
         }
+    }
+
+    template <typename RENDERABLE, typename ...EXTRA_ARGS>
+    void CullMeshesFrustrum(const ResourceManifest& resManifest, std::vector<RENDERABLE>& resultContainer, const Mat4& wvpMatrix, const Mat4& worldTransform, const ModelNode& node,
+        const bool useDefaultMaterial, const EXTRA_ARGS&... extraArgs)
+    {
+        const Mat4& localTransform = node.GetLocalTransform();
+        const Mat4 localWVPMatrix = wvpMatrix * localTransform;
+
+        AABBIntersection nodeAABBIntersection = Intersection(node.GetLocalAABB(), localWVPMatrix);
+        switch (nodeAABBIntersection)
+        {
+            case AABBIntersection::Partial:
+            case AABBIntersection::Inside:
+            {
+                for (const Mesh& mesh : node.GetMeshes())
+                {
+                    const Mat4 localWorldMatrix = worldTransform * localTransform;
+
+                    AddMeshes<RENDERABLE>();
+                    //resultContainer.emplace_back(mesh.GetMesh(), localWorldMatrix, extraArgs...);
+                }
+
+                break;
+            }
+
+            case AABBIntersection::Outside:
+            default:
+                break;
+        }
+    }
+
+    template <typename RENDERABLE_TYPE, typename ACTOR_ITER_TYPE>
+    void FrustumCull(const Scene& scene, RenderQueue& renderQueue, const ResourceManifest& resManifest, const ACTOR_ITER_TYPE& actorIterator)
+    {
+        for (const auto& actor : actorIterator)
+        {
+            const SceneNodeID sceneNodeID = actor.GetSceneNode();
+            const ModelID modelID = actor.GetModel();
+            if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
+                continue;
+
+            const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
+
+            const Mat4& worldMatrix = sceneNode.GetWorldTransform();
+            const Mat4 wvpMatrix = renderQueue.mCamera.mCameraViewProjectionMatrix * worldMatrix;
+
+            const Model& model = resManifest.GetModel(modelID);
+
+            CullMeshesFrustrum<RENDERABLE_TYPE>(resManifest, renderQueue.mCamera.mModels, wvpMatrix, worldMatrix, model.GetRootNode(), true, 1, 1, 1.0f, 1.0f);
+        }
+
+        /*for (const StaticActor& actor : scene.GetStaticActors())
+        {
+        const SceneNodeID sceneNodeID = actor.GetSceneNode();
+        const ModelID modelID = actor.GetModel();
+        if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
+        continue;
+
+        const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
+
+        const Mat4& worldMatrix = sceneNode.GetWorldTransform();
+        const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix *worldMatrix;
+
+        const Model& model = mResourceManifest.GetModel(modelID);
+
+        const float specularFactor = 0.02f;
+        auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
+        auto normalTexture = INVALID_DX11_MATERIAL_ID;
+        // TODO
+        auto specularFactor = 0.02f;
+
+        const bool actorHasMaterial = model. != INVALID_MATERIAL_ID;
+        const MaterialID materialID = actorHasMaterial ? actorMaterial : mesh.GetDefaultMaterial();
+        if (materialID != INVALID_MATERIAL_ID)
+        {
+        const Material& material = mResourceManifest.GetMaterial(materialID);
+        diffuseTexture = material.GetDiffuseTexture();
+        normalTexture = material.GetNormalTexture();
+        specularFactor = material.GetSpecularFactor();
+        }
+
+        FrustumCull<RenderableModel>(mResourceManifest, mRenderQueue.mCamera.mModels, wvpMatrix, worldMatrix, model.GetRootNode(), );
+        /*const SceneNodeID sceneNodeID = actor.GetSceneNode();
+        const ModelID modelID = actor.GetModel();
+
+        if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
+        continue;
+
+        const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
+
+        const Mat4& worldMatrix = sceneNode.GetWorldTransform();
+        const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix *worldMatrix;
+
+        const Model& model = mResourceManifest.GetModel(modelID);
+
+        CullMeshesFrustrum(mResourceManifest, mRenderQueue.mCamera.mModels, model.GetRootNode(), worldMatrix, wvpMatrix, actor.GetMaterialTilingFactor(), actor.GetMaterial());*/
+        //}
     }
 }
