@@ -10,23 +10,19 @@
 
 namespace JonsEngine
 {
-    //
-    // TODO: all this code related to culling/building renderqueue should be moved elsewhere
-    //
-    void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix, const float tilingFactor, const MaterialID actorMaterial);
-    void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix);
-    void AddAllMeshes(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const float tilingFactor, const MaterialID actorMaterial);
-    void AddAllMeshes(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix);
-    void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix, const float tilingFactor, const MaterialID actorMaterial);
-    void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius);
+    template <typename ACTOR_ITER_TYPE, typename RENDERABLE_TYPE, typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
+    void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator,
+        std::vector<RENDERABLE_TYPE>& meshContainer, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
 
-    //void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix, const float tilingFactor, const MaterialID actorMaterial)
+    template <typename VISIBILITY_RESULT_TYPE>
+    bool DetermineIfAddAllMeshes(const EngineSettings::CullingStrategy cullingStrat, const VISIBILITY_RESULT_TYPE visibilityResult);
 
-    //template <typename RENDERABLE, typename ...EXTRA_ARGS>
-    //void FrustumCull(const ResourceManifest& resManifest, const std::vector<RENDERABLE>& resultContainer, const Mat4& wvpMatrix, const Mat4& worldTransform, const ModelNode& node,
-    //    const bool useDefaultMaterial, const EXTRA_ARGS&... extraArgs);
-    template <typename RENDERABLE, typename APA>
-    void FrustumCull(const Scene& scene, RenderQueue& renderQueue, const ResourceManifest& resManifest, const APA& a);
+    AABBIntersection FrustumCull(const ModelNode& node, const Mat4& worldTransform, const Mat4& viewProjectionMatrix);
+    AABBIntersection PointLightCull(const ModelNode& node, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius);
+    AABBIntersection DirectionalLightCull(const ModelNode& node, const Mat4& worldTransform, const DirectionalLight::BoundingVolume boundingVolume);
+
+    template <typename RENDERABLE, typename ACTOR_TYPE>
+    void AddAllMeshes(const ResourceManifest& resManifest, std::vector<RENDERABLE>& resultContainer, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix);
 
 
     SceneParser::SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest) : mResourceManifest(resManifest), mCullingStrategy(engineSettings.mSceneCullingStrategy)
@@ -42,6 +38,17 @@ namespace JonsEngine
     {
         mRenderQueue.Clear();
 
+        ViewFrustumCulling(scene, windowAspectRatio, zNear, zFar);
+        PointLightCulling(scene);
+        DirectionalLightCulling(scene);
+        ParseMiscSceneInfo(scene);
+
+        return mRenderQueue;
+    }
+
+
+    void SceneParser::ViewFrustumCulling(const Scene& scene, const float windowAspectRatio, const float zNear, const float zFar)
+    {
         const Camera& sceneCamera = scene.GetSceneCamera();
         const float cameraFov = sceneCamera.GetFOV();
 
@@ -51,105 +58,42 @@ namespace JonsEngine
         mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(cameraFov, windowAspectRatio, zNear, zFar);
         mRenderQueue.mCamera.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
 
-        mRenderQueue.mAmbientLight = scene.GetAmbientLight();
+        const auto staticActors = scene.GetStaticActors();
+        const auto animatedActors = scene.GetAnimatedActors();
 
-        const Skybox& skybox = mResourceManifest.GetSkybox(scene.GetSkybox());
-        mRenderQueue.mSkyboxTextureID = skybox.GetSkyboxTexture();
-
-        // TODO: per-node mesh culling for 'AGGRESSIVE' rather than per-model
-        if (mCullingStrategy == EngineSettings::CullingStrategy::STANDARD || mCullingStrategy == EngineSettings::CullingStrategy::AGGRESSIVE)
-            ViewFrustumCulling(scene);
-
-        return mRenderQueue;
+        CullActors<decltype(staticActors), RenderableModel>(scene, mResourceManifest, mCullingStrategy, staticActors, mRenderQueue.mCamera.mModels, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
+        CullActors<decltype(animatedActors), RenderableModel>(scene, mResourceManifest, mCullingStrategy, animatedActors, mRenderQueue.mCamera.mModels, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
     }
 
-
-    void SceneParser::ViewFrustumCulling(const Scene& scene)
+    void SceneParser::PointLightCulling(const Scene& scene)
     {
-        auto staticActors = scene.GetStaticActors();
-        auto animatedActors = scene.GetAnimatedActors();
+        const auto staticActors = scene.GetStaticActors();
+        const auto animatedActors = scene.GetAnimatedActors();
 
-        FrustumCull<RenderableModel, decltype(staticActors)>(scene, mRenderQueue, mResourceManifest, staticActors);
-        FrustumCull<RenderableModel, decltype(animatedActors)>(scene, mRenderQueue, mResourceManifest, animatedActors);
-
-        /*for (const StaticActor& actor : scene.GetStaticActors())
-        {
-            const SceneNodeID sceneNodeID = actor.GetSceneNode();
-            const ModelID modelID = actor.GetModel();
-            if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
-                continue;
-
-            const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
-
-            const Mat4& worldMatrix = sceneNode.GetWorldTransform();
-            const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix *worldMatrix;
-
-            const Model& model = mResourceManifest.GetModel(modelID);
-
-            const float specularFactor = 0.02f;
-            auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
-            auto normalTexture = INVALID_DX11_MATERIAL_ID;
-            // TODO
-            auto specularFactor = 0.02f;
-
-            const bool actorHasMaterial = model. != INVALID_MATERIAL_ID;
-            const MaterialID materialID = actorHasMaterial ? actorMaterial : mesh.GetDefaultMaterial();
-            if (materialID != INVALID_MATERIAL_ID)
-            {
-                const Material& material = mResourceManifest.GetMaterial(materialID);
-                diffuseTexture = material.GetDiffuseTexture();
-                normalTexture = material.GetNormalTexture();
-                specularFactor = material.GetSpecularFactor();
-            }
-
-            FrustumCull<RenderableModel>(mResourceManifest, mRenderQueue.mCamera.mModels, wvpMatrix, worldMatrix, model.GetRootNode(), );
-            /*const SceneNodeID sceneNodeID = actor.GetSceneNode();
-            const ModelID modelID = actor.GetModel();
-
-            if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
-                continue;
-
-            const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
-
-            const Mat4& worldMatrix = sceneNode.GetWorldTransform();
-            const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix *worldMatrix;
-
-            const Model& model = mResourceManifest.GetModel(modelID);
-
-            CullMeshesFrustrum(mResourceManifest, mRenderQueue.mCamera.mModels, model.GetRootNode(), worldMatrix, wvpMatrix, actor.GetMaterialTilingFactor(), actor.GetMaterial());*/
-        //}
-
-        // point lights
         for (const PointLight& pointLight : scene.GetPointLights())
         {
             if (pointLight.GetSceneNode() == INVALID_SCENE_NODE_ID)
                 continue;
 
             const SceneNode& sceneNode = scene.GetSceneNode(pointLight.GetSceneNode());
-
             const Vec3 lightPosition = sceneNode.Position();
+            const float lightRadius = pointLight.GetRadius();
+            const float lightIntensity = pointLight.GetIntensity();
+            const Vec4& lightColor = pointLight.GetLightColor();
 
-            mRenderQueue.mPointLights.emplace_back(pointLight.GetLightColor(), lightPosition, pointLight.GetIntensity(), pointLight.GetRadius());
+            mRenderQueue.mPointLights.emplace_back(lightColor, lightPosition, lightIntensity, lightRadius);
             RenderablePointLight& renderablePointLight = mRenderQueue.mPointLights.back();
 
-            //  cull meshes for each face
-            for (const StaticActor& actor : scene.GetStaticActors())
-            {
-                const SceneNodeID sceneNodeID = actor.GetSceneNode();
-                const ModelID modelID = actor.GetModel();
-
-                if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
-                    continue;
-
-                const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
-
-                const Mat4& actorWorldMatrix = sceneNode.GetWorldTransform();
-                const Model& model = mResourceManifest.GetModel(modelID);
-                CullMeshesSphere(renderablePointLight.mMeshes, model.GetRootNode(), actorWorldMatrix, lightPosition, pointLight.GetRadius());
-            }
+            CullActors<decltype(staticActors), RenderableMesh>(scene, mResourceManifest, mCullingStrategy, staticActors, renderablePointLight.mMeshes, PointLightCull, lightPosition, lightRadius);
+            CullActors<decltype(animatedActors), RenderableMesh>(scene, mResourceManifest, mCullingStrategy, animatedActors, renderablePointLight.mMeshes, PointLightCull, lightPosition, lightRadius);
         }
+    }
 
-        // dir lights
+    void SceneParser::DirectionalLightCulling(const Scene& scene)
+    {
+        const auto staticActors = scene.GetStaticActors();
+        const auto animatedActors = scene.GetAnimatedActors();
+
         for (const DirectionalLight& dirLight : scene.GetDirectionalLights())
         {
             mRenderQueue.mDirectionalLights.emplace_back(dirLight.GetLightColor(), glm::normalize(dirLight.GetLightDirection()), dirLight.GetNumCascades());
@@ -159,242 +103,150 @@ namespace JonsEngine
             {
                 float nearZ = 0.0f, farZ = 0.0f;
                 dirLight.GetSplitDistance(cascadeIndex, nearZ, farZ);
+                const auto kdopIterator = dirLight.GetBoundingVolume(cascadeIndex);
 
-                auto kdopIterator = dirLight.GetBoundingVolume(cascadeIndex);
-                for (const StaticActor& actor : scene.GetStaticActors())
-                {
-                    if (actor.GetSceneNode() == INVALID_SCENE_NODE_ID || actor.GetModel() == INVALID_MODEL_ID)
-                        continue;
-
-                    const SceneNode& sceneNode = scene.GetSceneNode(actor.GetSceneNode());
-                    const Model& model = mResourceManifest.GetModel(actor.GetModel());
-
-                    const Mat4& worldMatrix = sceneNode.GetWorldTransform();
-                    const Mat4 localWorldMatrix = worldMatrix;// *model.GetRootNode().mLocalTransform;
-                    const AABB worldAABB = localWorldMatrix * model.GetRootNode().GetLocalAABB();
-
-                    const auto aabbIntersection = Intersection(worldAABB, kdopIterator);
-                    if (aabbIntersection == AABBIntersection::Inside || aabbIntersection == AABBIntersection::Partial)
-                        AddAllMeshes(renderableDirLight.mMeshes, model.GetRootNode(), worldMatrix);
-                }
+                CullActors<decltype(staticActors), RenderableMesh>(scene, mResourceManifest, mCullingStrategy, staticActors, renderableDirLight.mMeshes, DirectionalLightCull, kdopIterator);
+                CullActors<decltype(animatedActors), RenderableMesh>(scene, mResourceManifest, mCullingStrategy, animatedActors, renderableDirLight.mMeshes, DirectionalLightCull, kdopIterator);
 
                 renderableDirLight.mCascadeSplits.emplace_back(nearZ, farZ, renderableDirLight.mMeshes.size());
             }
         }
     }
 
-    /*
-    void AddMesh(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix, const float tilingFactor, const MaterialID actorMaterial)
+    void SceneParser::ParseMiscSceneInfo(const Scene& scene)
     {
-        auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
-        auto normalTexture = INVALID_DX11_MATERIAL_ID;
-        // TODO
-        auto specularFactor = 0.02f;
+        mRenderQueue.mAmbientLight = scene.GetAmbientLight();
 
-        const bool actorHasMaterial = actorMaterial != INVALID_MATERIAL_ID;
-        const MaterialID materialID = actorHasMaterial ? actorMaterial : mesh.GetDefaultMaterial();
-        if (materialID != INVALID_MATERIAL_ID)
-        {
-            const Material& material = resourceManifest.GetMaterial(materialID);
-            diffuseTexture = material.GetDiffuseTexture();
-            normalTexture = material.GetNormalTexture();
-            specularFactor = material.GetSpecularFactor();
-        }
-
-        resultMeshes.emplace_back(mesh.GetMesh(), localWorldMatrix, diffuseTexture, normalTexture, specularFactor, tilingFactor);
+        const Skybox& skybox = mResourceManifest.GetSkybox(scene.GetSkybox());
+        mRenderQueue.mSkyboxTextureID = skybox.GetSkyboxTexture();
     }
 
-    void AddMesh(std::vector<RenderableMesh>& resultMeshes, const Mesh& mesh, const Mat4& localWorldMatrix)
-    {
-        resultMeshes.emplace_back(mesh.GetMesh(), localWorldMatrix);
-    }
 
-    void AddAllMeshes(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const float tilingFactor, const MaterialID actorMaterial)
+    template <typename ACTOR_ITER_TYPE, typename RENDERABLE_TYPE, typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
+    void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator,
+        std::vector<RENDERABLE_TYPE>& meshContainer, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args)
     {
-        for (const Mesh& mesh : node.GetMeshes())
-            AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.GetLocalTransform(), tilingFactor, actorMaterial);
-
-        for (const ModelNode& child : node.GetAllChildren())
+        for (const auto& actor : actorIterator)
         {
-            for (const Mesh& mesh : child.GetMeshes())
-                AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * child.GetLocalTransform(), tilingFactor, actorMaterial);
+            const SceneNodeID sceneNodeID = actor.GetSceneNode();
+            const ModelID modelID = actor.GetModel();
+            if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
+                continue;
+
+            const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
+            const Model& model = resManifest.GetModel(modelID);
+            const Mat4& worldMatrix = sceneNode.GetWorldTransform();
+
+            const auto visibilityResult = testVisibilityFunc(model.GetRootNode(), worldMatrix, std::forward<VISIBILITY_ARGS>(args)...);
+
+            // TODO: extend with fine-grained culling, such as adding meshes per-node rather than per-model for AGGRESSIVE culling strategy,
+            const bool addAllMeshes = DetermineIfAddAllMeshes(cullingStrat, visibilityResult);
+            if (addAllMeshes)
+                AddAllMeshes<RENDERABLE_TYPE>(resManifest, meshContainer, actor, model, worldMatrix);
+            //    AddAllMeshes<RENDERABLE_TYPE>(model, renderQueue.mCamera.mModels, resManifest, worldMatrix, actor.GetMaterial(), actor.GetMaterialTilingFactor());
         }
     }
 
-    void AddAllMeshes(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix)
-    {
-        for (const Mesh& mesh : node.GetMeshes())
-            AddMesh(resultMeshes, mesh, worldMatrix * node.GetLocalTransform());
 
-        for (const ModelNode& child : node.GetAllChildren())
+    template <>
+    bool DetermineIfAddAllMeshes<AABBIntersection>(const EngineSettings::CullingStrategy cullingStrat, const AABBIntersection aabbIntersection)
+    {
+        switch (cullingStrat)
         {
-            for (const Mesh& mesh : child.GetMeshes())
-                AddMesh(resultMeshes, mesh, worldMatrix * child.GetLocalTransform());
-        }
-    }
-    */
-    /*void CullMeshesFrustrum(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Mat4& wvpMatrix, const float tilingFactor, const MaterialID actorMaterial)
-    {
-        const Mat4 localWVPMatrix = wvpMatrix * node.GetLocalTransform();// *node.GetLocalTransform();// *node.mLocalTransform;
-        const Mat4 localWorldMatrix = worldMatrix * node.GetLocalTransform();// *node.mLocalTransform;
-        const AABB nodeWorldAABB = /*localWorldMatrix */// node.GetLocalAABB();
+            case EngineSettings::CullingStrategy::STANDARD:
+            case EngineSettings::CullingStrategy::AGGRESSIVE:
+                return aabbIntersection == AABBIntersection::Inside || aabbIntersection == AABBIntersection::Partial;
 
-    //    AABBIntersection nodeAABBIntersection = Intersection(nodeWorldAABB, localWVPMatrix);
-    //    switch (nodeAABBIntersection)
-    //    {
-    //        // if partially inside, recursively test all meshes and child nodes
-    //    case AABBIntersection::Partial:
-    //    {
-    //        AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
-
-    //        for (const Mesh& mesh : node.GetMeshes())
-    //        {
-    //            const AABB meshWorldAABB = /*localWorldMatrix */ mesh.GetLocalAABB();
-
-    //            meshAABBIntersection = Intersection(meshWorldAABB, localWVPMatrix);
-    //            if (meshAABBIntersection == AABBIntersection::Outside)
-    //                continue;
-
-    //            if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-    //                AddMesh(resourceManifest, resultMeshes, mesh, /*worldMatrix */ localWorldMatrix, tilingFactor, actorMaterial);
-    //        }
-
-    //        // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-    //        for (const ModelNode& child : node.GetImmediateChildren())
-    //            CullMeshesFrustrum(resourceManifest, resultMeshes, child, worldMatrix, wvpMatrix, tilingFactor, actorMaterial);
-
-    //        break;
-    //    }
-
-    //    case AABBIntersection::Inside:
-    //    {
-    //        AddAllMeshes(resourceManifest, resultMeshes, node, worldMatrix, tilingFactor, actorMaterial);
-    //        break;
-    //    }
-
-    //    case AABBIntersection::Outside:
-    //    default:
-    //        break;
-    //    }
-    //}
-
-    /*void AddMeshes(const ResourceManifest& resourceManifest, std::vector<RenderableModel>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const float tilingFactor, const MaterialID actorMaterial)
-    {
-        for (const Mesh& mesh : node.GetMeshes())
-            AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * node.GetLocalTransform(), tilingFactor, actorMaterial);
-
-        for (const ModelNode& child : node.GetAllChildren())
-        {
-            for (const Mesh& mesh : child.GetMeshes())
-                AddMesh(resourceManifest, resultMeshes, mesh, worldMatrix * child.GetLocalTransform(), tilingFactor, actorMaterial);
+            default:
+                return false;
         }
     }
 
-    void AddMeshes(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix)
-    {
-        for (const Mesh& mesh : node.GetMeshes())
-            AddMesh(resultMeshes, mesh, worldMatrix * node.GetLocalTransform());
 
-        for (const ModelNode& child : node.GetAllChildren())
-        {
-            for (const Mesh& mesh : child.GetMeshes())
-                AddMesh(resultMeshes, mesh, worldMatrix * child.GetLocalTransform());
-        }
-    }*/
-
-    void CullMeshesSphere(std::vector<RenderableMesh>& resultMeshes, const ModelNode& node, const Mat4& worldMatrix, const Vec3& sphereCentre, const float sphereRadius)
+    AABBIntersection FrustumCull(const ModelNode& node, const Mat4& worldTransform, const Mat4& viewProjMatrix)
     {
-        const Mat4 localWorldMatrix = worldMatrix * node.GetLocalTransform();
+        const Mat4& localTransform = node.GetLocalTransform();
+        const Mat4 localWVPMatrix = viewProjMatrix * worldTransform * localTransform;
+
+        return Intersection(node.GetLocalAABB(), localWVPMatrix);
+    }
+
+    AABBIntersection PointLightCull(const ModelNode& node, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius)
+    {
+        const Mat4 localWorldMatrix = worldTransform * node.GetLocalTransform();
         const AABB nodeWorldAABB = localWorldMatrix * node.GetLocalAABB();
 
-        // test node frustrum
-        AABBIntersection nodeAABBIntersection = Intersection(nodeWorldAABB, sphereCentre, sphereRadius);
-        switch (nodeAABBIntersection)
-        {
-        case AABBIntersection::Partial:
-        {
-            AABBIntersection meshAABBIntersection(AABBIntersection::Inside);
-
-            for (const Mesh& mesh : node.GetMeshes())
-            {
-                const AABB worldMeshAABB = localWorldMatrix * node.GetLocalAABB();
-
-                meshAABBIntersection = Intersection(worldMeshAABB, sphereCentre, sphereRadius);
-                if (meshAABBIntersection == AABBIntersection::Outside)
-                    continue;
-
-                if (meshAABBIntersection == AABBIntersection::Inside || meshAABBIntersection == AABBIntersection::Partial)
-                    AddMesh(resultMeshes, mesh, localWorldMatrix);
-            }
-
-            // each modelnodes transform is assumed to be pre-multiplied, so pass the unmodified function params
-            for (const ModelNode& child : node.GetImmediateChildren())
-                CullMeshesSphere(resultMeshes, child, worldMatrix, sphereCentre, sphereRadius);
-
-            break;
-        }
-
-        case AABBIntersection::Inside:
-        {
-            AddAllMeshes(resultMeshes, node, worldMatrix);
-            break;
-        }
-
-        case AABBIntersection::Outside:
-        default:
-            break;
-        }
+        return Intersection(nodeWorldAABB, sphereCentre, sphereRadius);
     }
 
-    template <RenderableModel>
-    void AddMeshes(const Model& model, std::vector<RenderableModel>& resultModels, const Mat4& worldMatrix)
+    AABBIntersection DirectionalLightCull(const ModelNode& node, const Mat4& worldTransform, const DirectionalLight::BoundingVolume boundingVolume)
+    {
+        const Mat4 localWorldMatrix = worldTransform * node.GetLocalTransform();
+        const AABB nodeWorldAABB = localWorldMatrix * node.GetLocalAABB();
+
+        return Intersection(nodeWorldAABB, boundingVolume);
+    }
+
+
+    template <typename ACTOR_TYPE>
+    void AddAllMeshes<RenderableModel, ACTOR_TYPE>(const ResourceManifest& resManifest, std::vector<RenderableModel>& resultContainer, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix)
     {
         for (const Mesh& mesh : model.GetMeshes())
         {
+            auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
+            auto normalTexture = INVALID_DX11_MATERIAL_ID;
+            // TODO
+            auto specularFactor = 0.02f;
 
-        }
-        //model.GetRootNode().
-        //for (const ModelNode& node : model.GetRootNode().GetAllChildren())
-        //{
-        //    for ()
-        //}
+            MaterialID materialID = actor.GetMaterial();
+            const MaterialID explicitActorMaterial = actor.GetMaterial();
+            if (explicitActorMaterial != INVALID_MATERIAL_ID)
+                materialID = explicitActorMaterial;
 
-        /*for (const Mesh& mesh : node.GetMeshes())
-        AddMesh(resultMeshes, mesh, worldMatrix * node.GetLocalTransform());
+            if (materialID != INVALID_MATERIAL_ID)
+            {
+                const Material& material = resManifest.GetMaterial(materialID);
+                diffuseTexture = material.GetDiffuseTexture();
+                normalTexture = material.GetNormalTexture();
+                specularFactor = material.GetSpecularFactor();
+            }
 
-        for (const ModelNode& child : node.GetAllChildren())
-        {
-        for (const Mesh& mesh : child.GetMeshes())
-        AddMesh(resultMeshes, mesh, worldMatrix * child.GetLocalTransform());
-        }*/
-
-        auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
-        auto normalTexture = INVALID_DX11_MATERIAL_ID;
-        // TODO
-        auto specularFactor = 0.02f;
-
-        const bool actorHasMaterial = actorMaterial != INVALID_MATERIAL_ID;
-        const MaterialID materialID = actorHasMaterial ? actorMaterial : mesh.GetDefaultMaterial();
-        if (materialID != INVALID_MATERIAL_ID)
-        {
-            const Material& material = resourceManifest.GetMaterial(materialID);
-            diffuseTexture = material.GetDiffuseTexture();
-            normalTexture = material.GetNormalTexture();
-            specularFactor = material.GetSpecularFactor();
+            resultModels.emplace_back(mesh.GetMesh(), worldMatrix, diffuseTexture, normalTexture, specularFactor, tilingFactor);
         }
     }
-    
-    bool IsNodeVisible(const Mat4& wvpMatrix, const Mat4& worldTransform, const ModelNode& node)
+
+    /*template <>
+    void AddAllMeshes<RenderableModel>(const Model& model, std::vector<RenderableModel>& resultModels, const ResourceManifest& resManifest, const Mat4& worldMatrix, const MaterialID explicitActorMaterial, const float tilingFactor)
     {
-        const Mat4& localTransform = node.GetLocalTransform();
-        const Mat4 localWVPMatrix = wvpMatrix * localTransform;
+        for (const Mesh& mesh : model.GetMeshes())
+        {
+            auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
+            auto normalTexture = INVALID_DX11_MATERIAL_ID;
+            // TODO
+            auto specularFactor = 0.02f;
 
-        AABBIntersection nodeAABBIntersection = Intersection(node.GetLocalAABB(), localWVPMatrix);
+            const bool actorHasMaterial = explicitActorMaterial != INVALID_MATERIAL_ID;
+            const MaterialID materialID = actorHasMaterial ? explicitActorMaterial : mesh.GetDefaultMaterial();
+            if (materialID != INVALID_MATERIAL_ID)
+            {
+                const Material& material = resManifest.GetMaterial(materialID);
+                diffuseTexture = material.GetDiffuseTexture();
+                normalTexture = material.GetNormalTexture();
+                specularFactor = material.GetSpecularFactor();
+            }
 
-        return nodeAABBIntersection == AABBIntersection::Partial || nodeAABBIntersection == AABBIntersection::Inside;
+            resultModels.emplace_back(mesh.GetMesh(), worldMatrix, diffuseTexture, normalTexture, specularFactor, tilingFactor);
+        }
     }
 
-    template <typename RENDERABLE_TYPE, typename ACTOR_ITER_TYPE>
+    template <>
+    void AddAllMeshes<RenderableMesh>(const Model& model, std::vector<RenderableMesh>& resultMeshes, const ResourceManifest& resManifest, const Mat4& worldMatrix, const MaterialID explicitActorMaterial, const float tilingFactor)
+    {
+        for (const Mesh& mesh : model.GetMeshes())
+            resultMeshes.emplace_back(mesh.GetMesh(), worldMatrix);
+    }*/
+
+    /*template <typename RENDERABLE_TYPE, typename ACTOR_ITER_TYPE>
     void FrustumCull(const Scene& scene, RenderQueue& renderQueue, const ResourceManifest& resManifest, const ACTOR_ITER_TYPE& actorIterator)
     {
         for (const auto& actor : actorIterator)
@@ -411,57 +263,7 @@ namespace JonsEngine
             const Mat4 wvpMatrix = renderQueue.mCamera.mCameraViewProjectionMatrix * worldMatrix;
 
             if (IsNodeVisible(wvpMatrix, worldMatrix, model.GetRootNode()))
-                AddAllMeshes<RENDERABLE_TYPE>(model, worldMatrix, renderQueue.mCamera.mModels);
-
-            //CullMeshesFrustrum<RENDERABLE_TYPE>(resManifest, renderQueue.mCamera.mModels, wvpMatrix, worldMatrix, model.GetRootNode(), true, 1, 1, 1.0f, 1.0f);
-
+                AddAllMeshes<RENDERABLE_TYPE>(model, renderQueue.mCamera.mModels, resManifest, worldMatrix, actor.GetMaterial(), actor.GetMaterialTilingFactor());
         }
-
-        /*for (const StaticActor& actor : scene.GetStaticActors())
-        {
-        const SceneNodeID sceneNodeID = actor.GetSceneNode();
-        const ModelID modelID = actor.GetModel();
-        if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
-        continue;
-
-        const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
-
-        const Mat4& worldMatrix = sceneNode.GetWorldTransform();
-        const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix *worldMatrix;
-
-        const Model& model = mResourceManifest.GetModel(modelID);
-
-        const float specularFactor = 0.02f;
-        auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
-        auto normalTexture = INVALID_DX11_MATERIAL_ID;
-        // TODO
-        auto specularFactor = 0.02f;
-
-        const bool actorHasMaterial = model. != INVALID_MATERIAL_ID;
-        const MaterialID materialID = actorHasMaterial ? actorMaterial : mesh.GetDefaultMaterial();
-        if (materialID != INVALID_MATERIAL_ID)
-        {
-        const Material& material = mResourceManifest.GetMaterial(materialID);
-        diffuseTexture = material.GetDiffuseTexture();
-        normalTexture = material.GetNormalTexture();
-        specularFactor = material.GetSpecularFactor();
-        }
-
-        FrustumCull<RenderableModel>(mResourceManifest, mRenderQueue.mCamera.mModels, wvpMatrix, worldMatrix, model.GetRootNode(), );
-        /*const SceneNodeID sceneNodeID = actor.GetSceneNode();
-        const ModelID modelID = actor.GetModel();
-
-        if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
-        continue;
-
-        const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
-
-        const Mat4& worldMatrix = sceneNode.GetWorldTransform();
-        const Mat4 wvpMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix *worldMatrix;
-
-        const Model& model = mResourceManifest.GetModel(modelID);
-
-        CullMeshesFrustrum(mResourceManifest, mRenderQueue.mCamera.mModels, model.GetRootNode(), worldMatrix, wvpMatrix, actor.GetMaterialTilingFactor(), actor.GetMaterial());*/
-        //}
-    }
+    }*/
 }

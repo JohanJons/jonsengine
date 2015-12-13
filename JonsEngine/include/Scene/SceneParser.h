@@ -18,7 +18,10 @@ namespace JonsEngine
 
 
     private:
-        void ViewFrustumCulling(const Scene& scene);
+        void ViewFrustumCulling(const Scene& scene, const float windowAspectRatio, const float zNear, const float zFar);
+        void PointLightCulling(const Scene& scene);
+        void DirectionalLightCulling(const Scene& scene);
+        void ParseMiscSceneInfo(const Scene& scene);
 
 
         const ResourceManifest& mResourceManifest;

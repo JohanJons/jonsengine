@@ -90,11 +90,17 @@ namespace JonsEngine
         return ret;
     }
 
-
     const ModelAnimation& Model::GetAnimation(const ModelAnimationIndex animationIndex) const
     {
         return mAnimations.at(animationIndex);
     }
+
+
+    Model::MeshIterator Model::GetMeshes() const
+    {
+        return MeshIterator(mMeshes.cbegin(), mMeshes.cend());
+    }
+
     
     const ModelNode& Model::GetRootNode() const
     {

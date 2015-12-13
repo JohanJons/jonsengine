@@ -20,9 +20,11 @@ namespace JonsEngine
     {
     private:
         typedef std::vector<ModelAnimation> AnimationContainer;
+        typedef std::vector<Mesh> MeshContainer;
 
     public:
         typedef ConstRangedIterator<AnimationContainer, AnimationContainer::const_iterator> ModelAnimationIterator;
+        typedef ConstRangedIterator<MeshContainer, MeshContainer::const_iterator> MeshIterator;
 
         Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
         Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData);
@@ -31,8 +33,10 @@ namespace JonsEngine
 
         ModelAnimationIterator GetAnimations() const;
         ModelAnimationIndex GetAnimationIndex(const std::string& name) const;
-        
         const ModelAnimation& GetAnimation(const ModelAnimationIndex animationIndex) const;
+        
+        MeshIterator GetMeshes() const;
+
         const ModelNode& GetRootNode() const;
         const std::string& GetName() const;
         const AABB& GetStaticAABB() const;
@@ -40,7 +44,6 @@ namespace JonsEngine
 
     private:
         typedef std::vector<ModelNode> NodeContainer;
-        typedef std::vector<Mesh> MeshContainer;
 
         void ParseNodes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const Mat4& parentTransform, const PackageNode& pkgNode, const ModelNode::NodeIterator& next);
         void ParseNodes(const Model& other);

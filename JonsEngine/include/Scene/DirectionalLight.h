@@ -16,6 +16,8 @@ namespace JonsEngine
     class DirectionalLight
     {
     public:
+        typedef ConstRangedIterator<KDOP> BoundingVolume;
+
         DirectionalLight(const std::string& name, const uint32_t numShadowmapCascades);
 
         void SetLightDirection(const Vec3& direction);
@@ -24,7 +26,7 @@ namespace JonsEngine
         void SetCascadeSplitLambda(const float lambda);
         void UpdateCascadesBoundingVolume(const Mat4& viewMatrix, const float degreesFOV, const float aspectRatio, const float minDepth, const float maxDepth);
         
-        ConstRangedIterator<KDOP> GetBoundingVolume(const uint32_t cascadeIndex) const;
+        BoundingVolume GetBoundingVolume(const uint32_t cascadeIndex) const;
         void GetSplitDistance(const uint32_t cascadeIndex, float& nearZ, float& farZ) const;
 
         const std::string& GetName() const;

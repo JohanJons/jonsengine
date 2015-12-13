@@ -56,14 +56,14 @@ namespace JonsEngine
     }
 
 
-    ConstRangedIterator<KDOP> DirectionalLight::GetBoundingVolume(const uint32_t cascadeIndex) const
+    DirectionalLight::BoundingVolume DirectionalLight::GetBoundingVolume(const uint32_t cascadeIndex) const
     {
         assert(cascadeIndex < mNumShadowmapCascades);
 
         const size_t startIndex = cascadeIndex == 0 ? 0 : mCascadeKDOPRange.at(cascadeIndex - 1);
         const size_t endIndex = mCascadeKDOPRange.at(cascadeIndex);
 
-        return ConstRangedIterator<KDOP>(mKDOP, startIndex, endIndex);
+        return BoundingVolume(mKDOP, startIndex, endIndex);
     }
 
     void DirectionalLight::GetSplitDistance(const uint32_t cascadeIndex, float& nearZ, float& farZ) const
