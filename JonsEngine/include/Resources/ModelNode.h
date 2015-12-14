@@ -55,6 +55,7 @@ namespace JonsEngine
             const MeshIterator& meshIter, const NodeIterator& next);
         ~ModelNode();
 
+        uint32_t GetNumMeshes() const;
         const std::string& GetName() const;
         ModelNodeIndex GetModelNodeIndex() const;
         const AABB& GetLocalAABB() const;
@@ -70,6 +71,7 @@ namespace JonsEngine
         ModelNodeIndex mNodeIndex;
         AABB mLocalAABB;
         Mat4 mLocalTransform;
+        uint32_t mNumMeshes;
 
         ImmediateChildrenIterator mImmediateChildNodes;
         AllChildrenIterator mAllChildNodes;

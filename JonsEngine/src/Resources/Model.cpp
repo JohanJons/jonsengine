@@ -74,10 +74,21 @@ namespace JonsEngine
     }
 
 
+    Model::MeshIterator Model::GetMeshes() const
+    {
+        return MeshIterator(mMeshes.cbegin(), mMeshes.cend());
+    }
+
+    Model::NodeIterator Model::GetNodes() const
+    {
+        return NodeIterator(mNodes.cbegin(), mNodes.cend());
+    }
+
     Model::ModelAnimationIterator Model::GetAnimations() const
     {
         return ModelAnimationIterator(mAnimations.cbegin(), mAnimations.cend());
     }
+
 
     ModelAnimationIndex Model::GetAnimationIndex(const std::string& name) const
     {
@@ -93,12 +104,6 @@ namespace JonsEngine
     const ModelAnimation& Model::GetAnimation(const ModelAnimationIndex animationIndex) const
     {
         return mAnimations.at(animationIndex);
-    }
-
-
-    Model::MeshIterator Model::GetMeshes() const
-    {
-        return MeshIterator(mMeshes.cbegin(), mMeshes.cend());
     }
 
     

@@ -14,6 +14,9 @@ namespace JonsEngine
     void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator,
         std::vector<RENDERABLE_TYPE>& meshContainer, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
 
+    template <typename ACTOR_TYPE>
+    const Mat4& GetLocalTransform(const ACTOR_TYPE& actor, const Model& model);
+
     template <typename VISIBILITY_RESULT_TYPE>
     bool DetermineIfAddAllMeshes(const EngineSettings::CullingStrategy cullingStrat, const VISIBILITY_RESULT_TYPE visibilityResult);
 
@@ -143,8 +146,23 @@ namespace JonsEngine
             const bool addAllMeshes = DetermineIfAddAllMeshes(cullingStrat, visibilityResult);
             if (addAllMeshes)
                 AddAllMeshes<RENDERABLE_TYPE>(resManifest, meshContainer, actor, model, worldMatrix);
-            //    AddAllMeshes<RENDERABLE_TYPE>(model, renderQueue.mCamera.mModels, resManifest, worldMatrix, actor.GetMaterial(), actor.GetMaterialTilingFactor());
         }
+    }
+
+
+    template <>
+    const Mat4& GetLocalTransform<StaticActor>(const StaticActor& actor, const Model& model)
+    {
+        
+    }
+
+    template <>
+    const Mat4& GetLocalTransform<AnimatedActor>(const AnimatedActor& actor, const Model& model)
+    {
+        if (!actor.IsPlaying())
+            ....
+
+
     }
 
 
@@ -189,81 +207,54 @@ namespace JonsEngine
 
 
     template <typename ACTOR_TYPE>
-    void AddAllMeshes<RenderableModel, ACTOR_TYPE>(const ResourceManifest& resManifest, std::vector<RenderableModel>& resultContainer, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix)
+    void AddAllMeshes(const ResourceManifest& resManifest, std::vector<RenderableModel>& resultContainer, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldTransform)
     {
-        for (const Mesh& mesh : model.GetMeshes())
+        for (const ModelNode& node : model.GetNodes())
         {
-            auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
-            auto normalTexture = INVALID_DX11_MATERIAL_ID;
-            // TODO
-            auto specularFactor = 0.02f;
-
-            MaterialID materialID = actor.GetMaterial();
-            const MaterialID explicitActorMaterial = actor.GetMaterial();
-            if (explicitActorMaterial != INVALID_MATERIAL_ID)
-                materialID = explicitActorMaterial;
-
-            if (materialID != INVALID_MATERIAL_ID)
-            {
-                const Material& material = resManifest.GetMaterial(materialID);
-                diffuseTexture = material.GetDiffuseTexture();
-                normalTexture = material.GetNormalTexture();
-                specularFactor = material.GetSpecularFactor();
-            }
-
-            resultModels.emplace_back(mesh.GetMesh(), worldMatrix, diffuseTexture, normalTexture, specularFactor, tilingFactor);
-        }
-    }
-
-    /*template <>
-    void AddAllMeshes<RenderableModel>(const Model& model, std::vector<RenderableModel>& resultModels, const ResourceManifest& resManifest, const Mat4& worldMatrix, const MaterialID explicitActorMaterial, const float tilingFactor)
-    {
-        for (const Mesh& mesh : model.GetMeshes())
-        {
-            auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
-            auto normalTexture = INVALID_DX11_MATERIAL_ID;
-            // TODO
-            auto specularFactor = 0.02f;
-
-            const bool actorHasMaterial = explicitActorMaterial != INVALID_MATERIAL_ID;
-            const MaterialID materialID = actorHasMaterial ? explicitActorMaterial : mesh.GetDefaultMaterial();
-            if (materialID != INVALID_MATERIAL_ID)
-            {
-                const Material& material = resManifest.GetMaterial(materialID);
-                diffuseTexture = material.GetDiffuseTexture();
-                normalTexture = material.GetNormalTexture();
-                specularFactor = material.GetSpecularFactor();
-            }
-
-            resultModels.emplace_back(mesh.GetMesh(), worldMatrix, diffuseTexture, normalTexture, specularFactor, tilingFactor);
-        }
-    }
-
-    template <>
-    void AddAllMeshes<RenderableMesh>(const Model& model, std::vector<RenderableMesh>& resultMeshes, const ResourceManifest& resManifest, const Mat4& worldMatrix, const MaterialID explicitActorMaterial, const float tilingFactor)
-    {
-        for (const Mesh& mesh : model.GetMeshes())
-            resultMeshes.emplace_back(mesh.GetMesh(), worldMatrix);
-    }*/
-
-    /*template <typename RENDERABLE_TYPE, typename ACTOR_ITER_TYPE>
-    void FrustumCull(const Scene& scene, RenderQueue& renderQueue, const ResourceManifest& resManifest, const ACTOR_ITER_TYPE& actorIterator)
-    {
-        for (const auto& actor : actorIterator)
-        {
-            const SceneNodeID sceneNodeID = actor.GetSceneNode();
-            const ModelID modelID = actor.GetModel();
-            if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
+            if (node.GetNumMeshes() == 0)
                 continue;
 
-            const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
-            const Model& model = resManifest.GetModel(modelID);
+            const Mat4& localTransform = node.GetLocalTransform();
+            const Mat4 localWorldTransform = worldTransform * localTransform;
 
-            const Mat4& worldMatrix = sceneNode.GetWorldTransform();
-            const Mat4 wvpMatrix = renderQueue.mCamera.mCameraViewProjectionMatrix * worldMatrix;
+            for (const Mesh& mesh : node.GetMeshes())
+            {
+                auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
+                auto normalTexture = INVALID_DX11_MATERIAL_ID;
+                // TODO
+                auto specularFactor = 0.02f;
 
-            if (IsNodeVisible(wvpMatrix, worldMatrix, model.GetRootNode()))
-                AddAllMeshes<RENDERABLE_TYPE>(model, renderQueue.mCamera.mModels, resManifest, worldMatrix, actor.GetMaterial(), actor.GetMaterialTilingFactor());
+                MaterialID materialID = actor.GetMaterial();
+                const MaterialID explicitActorMaterial = actor.GetMaterial();
+                if (explicitActorMaterial != INVALID_MATERIAL_ID)
+                    materialID = explicitActorMaterial;
+
+                if (materialID != INVALID_MATERIAL_ID)
+                {
+                    const Material& material = resManifest.GetMaterial(materialID);
+                    diffuseTexture = material.GetDiffuseTexture();
+                    normalTexture = material.GetNormalTexture();
+                    specularFactor = material.GetSpecularFactor();
+                }
+
+                resultContainer.emplace_back(mesh.GetMesh(), localWorldTransform, diffuseTexture, normalTexture, specularFactor, tilingFactor);
+            }
         }
-    }*/
+    }
+
+    template <typename ACTOR_TYPE>
+    void AddAllMeshes(const ResourceManifest& resManifest, std::vector<RenderableMesh>& resultContainer, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldTransform)
+    {
+        for (const ModelNode& node : model.GetNodes())
+        {
+            if (node.GetNumMeshes() == 0)
+                continue;
+
+            const Mat4& localTransform = node.GetLocalTransform();
+            const Mat4 localWorldTransform = worldTransform * localTransform;
+
+            for (const Mesh& mesh : node.GetMeshes())
+                resultContainer.emplace_back(mesh.GetMesh(), localWorldTransform);
+        }
+    }
 }
