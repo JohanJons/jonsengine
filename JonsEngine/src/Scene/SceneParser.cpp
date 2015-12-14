@@ -24,8 +24,10 @@ namespace JonsEngine
     AABBIntersection PointLightCull(const ModelNode& node, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius);
     AABBIntersection DirectionalLightCull(const ModelNode& node, const Mat4& worldTransform, const DirectionalLight::BoundingVolume boundingVolume);
 
-    template <typename RENDERABLE, typename ACTOR_TYPE>
-    void AddAllMeshes(const ResourceManifest& resManifest, std::vector<RENDERABLE>& resultContainer, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix);
+    template <typename ACTOR_TYPE>
+    void AddAllMeshes(const ResourceManifest& resManifest, std::vector<RenderableModel>& resultContainer, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix);
+    template <typename ACTOR_TYPE>
+    void AddAllMeshes(const ResourceManifest& resManifest, std::vector<RenderableMesh>& resultContainer, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix);
 
 
     SceneParser::SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest) : mResourceManifest(resManifest), mCullingStrategy(engineSettings.mSceneCullingStrategy)
@@ -145,7 +147,7 @@ namespace JonsEngine
             // TODO: extend with fine-grained culling, such as adding meshes per-node rather than per-model for AGGRESSIVE culling strategy,
             const bool addAllMeshes = DetermineIfAddAllMeshes(cullingStrat, visibilityResult);
             if (addAllMeshes)
-                AddAllMeshes<RENDERABLE_TYPE>(resManifest, meshContainer, actor, model, worldMatrix);
+                AddAllMeshes<decltype(actor)>(resManifest, meshContainer, actor, model, worldMatrix);
         }
     }
 
@@ -153,16 +155,16 @@ namespace JonsEngine
     template <>
     const Mat4& GetLocalTransform<StaticActor>(const StaticActor& actor, const Model& model)
     {
-        
+        return Mat4(1.0f);
     }
 
     template <>
     const Mat4& GetLocalTransform<AnimatedActor>(const AnimatedActor& actor, const Model& model)
     {
-        if (!actor.IsPlaying())
-            ....
+        //if (!actor.IsPlaying())
+        //    ....
 
-
+        return Mat4(1.0f);
     }
 
 
@@ -237,7 +239,7 @@ namespace JonsEngine
                     specularFactor = material.GetSpecularFactor();
                 }
 
-                resultContainer.emplace_back(mesh.GetMesh(), localWorldTransform, diffuseTexture, normalTexture, specularFactor, tilingFactor);
+                resultContainer.emplace_back(mesh.GetMesh(), localWorldTransform, diffuseTexture, normalTexture, specularFactor, actor.GetMaterialTilingFactor());
             }
         }
     }
