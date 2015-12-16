@@ -12,13 +12,13 @@ namespace JonsEngine
         AnimatedActor(const std::string& name, const ModelID modelId, const SceneNodeID sceneNodeID);
         ~AnimatedActor();
 
-        void PlayAnimation(const bool doPlay);
-        void RepeatAnimation(const bool repeatAnimation);
-        void SetAnimation(const ModelAnimationIndex animationIndex, const Milliseconds animationTime);
+        void PlayAnimation(const ModelAnimationIndex animationIndex, const Milliseconds animationTime, const bool repeat);
+        void StopAnimation();
 
         ModelAnimationIndex GetAnimation() const;
         bool IsRepeatingAnimation() const;
         bool IsPlaying() const;
+        Milliseconds ElapstedAnimationTime() const;
 
         void UpdateTimestamp(const Milliseconds elapsedTime);
 
@@ -27,7 +27,7 @@ namespace JonsEngine
         bool mIsAnimating;
         bool mIsRepeating;
         Milliseconds mTimestamp;
-        Milliseconds mAnimationTime;
+        Milliseconds mAnimationDuration;
         ModelAnimationIndex mAnimationIndex;
     };
 

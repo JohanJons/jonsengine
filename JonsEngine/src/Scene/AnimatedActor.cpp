@@ -7,7 +7,7 @@ namespace JonsEngine
         mIsAnimating(false),
         mIsRepeating(false),
         mTimestamp(0),
-        mAnimationTime(0),
+        mAnimationDuration(0),
         mAnimationIndex(INVALID_ANIMATION_INDEX)
     {
     }
@@ -17,22 +17,19 @@ namespace JonsEngine
     }
 
 
-    void AnimatedActor::PlayAnimation(const bool doPlay)
-    {
-        mIsAnimating = doPlay;
-        mTimestamp = Milliseconds(0);
-    }
-
-    void AnimatedActor::RepeatAnimation(const bool repeatAnimation)
-    {
-        mIsRepeating = repeatAnimation;
-    }
-
-    void AnimatedActor::SetAnimation(const ModelAnimationIndex animationIndex, const Milliseconds animationTime)
+    void AnimatedActor::PlayAnimation(const ModelAnimationIndex animationIndex, const Milliseconds animationTime, const bool repeat)
     {
         mAnimationIndex = animationIndex;
-        mAnimationTime = animationTime;
+        mIsAnimating = true;
+        mIsRepeating = repeat;
         mTimestamp = Milliseconds(0);
+        mAnimationDuration = animationTime;
+    }
+
+    void AnimatedActor::StopAnimation()
+    {
+        mIsAnimating = false;
+        mIsRepeating = false;
     }
 
 
@@ -51,6 +48,11 @@ namespace JonsEngine
         return mIsAnimating;
     }
 
+    Milliseconds AnimatedActor::ElapstedAnimationTime() const
+    {
+        return mTimestamp;
+    }
+
 
     void AnimatedActor::UpdateTimestamp(const Milliseconds elapsedTime)
     {
@@ -58,12 +60,12 @@ namespace JonsEngine
 
         mTimestamp += elapsedTime;
 
-        if (mTimestamp < mAnimationTime)
+        if (mTimestamp < mAnimationDuration)
             return;
 
         if (IsRepeatingAnimation())
             mTimestamp = Milliseconds(0);
         else
-            PlayAnimation(false);
+            StopAnimation();
     }
 }

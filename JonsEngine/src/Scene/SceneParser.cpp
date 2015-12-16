@@ -15,14 +15,14 @@ namespace JonsEngine
         std::vector<RENDERABLE_TYPE>& meshContainer, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
 
     template <typename ACTOR_TYPE>
-    const Mat4& GetLocalTransform(const ACTOR_TYPE& actor, const Model& model);
+    const Mat4& GetLocalTransform(const ACTOR_TYPE& actor, const Model& model, const ModelNode& node);
 
     template <typename VISIBILITY_RESULT_TYPE>
     bool DetermineIfAddAllMeshes(const EngineSettings::CullingStrategy cullingStrat, const VISIBILITY_RESULT_TYPE visibilityResult);
 
-    AABBIntersection FrustumCull(const ModelNode& node, const Mat4& worldTransform, const Mat4& viewProjectionMatrix);
-    AABBIntersection PointLightCull(const ModelNode& node, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius);
-    AABBIntersection DirectionalLightCull(const ModelNode& node, const Mat4& worldTransform, const DirectionalLight::BoundingVolume boundingVolume);
+    AABBIntersection FrustumCull(const Model& model, const Mat4& worldTransform, const Mat4& viewProjectionMatrix);
+    AABBIntersection PointLightCull(const Model& model, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius);
+    AABBIntersection DirectionalLightCull(const Model& model, const Mat4& worldTransform, const DirectionalLight::BoundingVolume boundingVolume);
 
     template <typename ACTOR_TYPE>
     void AddAllMeshes(const ResourceManifest& resManifest, std::vector<RenderableModel>& resultContainer, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix);
@@ -142,7 +142,7 @@ namespace JonsEngine
             const Model& model = resManifest.GetModel(modelID);
             const Mat4& worldMatrix = sceneNode.GetWorldTransform();
 
-            const auto visibilityResult = testVisibilityFunc(model.GetRootNode(), worldMatrix, std::forward<VISIBILITY_ARGS>(args)...);
+            const auto visibilityResult = testVisibilityFunc(model, worldMatrix, std::forward<VISIBILITY_ARGS>(args)...);
 
             // TODO: extend with fine-grained culling, such as adding meshes per-node rather than per-model for AGGRESSIVE culling strategy,
             const bool addAllMeshes = DetermineIfAddAllMeshes(cullingStrat, visibilityResult);
@@ -153,18 +153,20 @@ namespace JonsEngine
 
 
     template <>
-    const Mat4& GetLocalTransform<StaticActor>(const StaticActor& actor, const Model& model)
+    const Mat4& GetLocalTransform<StaticActor>(const StaticActor& actor, const Model& model, const ModelNode& node)
     {
-        return Mat4(1.0f);
+        return node.GetLocalTransform();
     }
 
     template <>
-    const Mat4& GetLocalTransform<AnimatedActor>(const AnimatedActor& actor, const Model& model)
+    const Mat4& GetLocalTransform<AnimatedActor>(const AnimatedActor& actor, const Model& model, const ModelNode& node)
     {
-        //if (!actor.IsPlaying())
-        //    ....
+        if (!actor.IsPlaying())
+            return node.GetLocalTransform();
 
-        return Mat4(1.0f);
+        const ModelAnimation& animation = model.GetAnimation(actor.GetAnimation());
+        
+        return animation.GetNodeTransform(node.GetModelNodeIndex(), actor.ElapstedAnimationTime());
     }
 
 
@@ -183,28 +185,25 @@ namespace JonsEngine
     }
 
 
-    AABBIntersection FrustumCull(const ModelNode& node, const Mat4& worldTransform, const Mat4& viewProjMatrix)
+    AABBIntersection FrustumCull(const Model& model, const Mat4& worldTransform, const Mat4& viewProjMatrix)
     {
-        const Mat4& localTransform = node.GetLocalTransform();
-        const Mat4 localWVPMatrix = viewProjMatrix * worldTransform * localTransform;
+        const Mat4 wvpMatrix = viewProjMatrix * worldTransform;
 
-        return Intersection(node.GetLocalAABB(), localWVPMatrix);
+        return Intersection(model.GetStaticAABB(), wvpMatrix);
     }
 
-    AABBIntersection PointLightCull(const ModelNode& node, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius)
+    AABBIntersection PointLightCull(const Model& model, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius)
     {
-        const Mat4 localWorldMatrix = worldTransform * node.GetLocalTransform();
-        const AABB nodeWorldAABB = localWorldMatrix * node.GetLocalAABB();
+        const AABB worldAABB = worldTransform * model.GetStaticAABB();
 
-        return Intersection(nodeWorldAABB, sphereCentre, sphereRadius);
+        return Intersection(worldAABB, sphereCentre, sphereRadius);
     }
 
-    AABBIntersection DirectionalLightCull(const ModelNode& node, const Mat4& worldTransform, const DirectionalLight::BoundingVolume boundingVolume)
+    AABBIntersection DirectionalLightCull(const Model& model, const Mat4& worldTransform, const DirectionalLight::BoundingVolume boundingVolume)
     {
-        const Mat4 localWorldMatrix = worldTransform * node.GetLocalTransform();
-        const AABB nodeWorldAABB = localWorldMatrix * node.GetLocalAABB();
+        const AABB worldAABB = worldTransform * model.GetStaticAABB();
 
-        return Intersection(nodeWorldAABB, boundingVolume);
+        return Intersection(worldAABB, boundingVolume);
     }
 
 
@@ -216,7 +215,7 @@ namespace JonsEngine
             if (node.GetNumMeshes() == 0)
                 continue;
 
-            const Mat4& localTransform = node.GetLocalTransform();
+            const Mat4& localTransform = GetLocalTransform(actor, model, node);
             const Mat4 localWorldTransform = worldTransform * localTransform;
 
             for (const Mesh& mesh : node.GetMeshes())
@@ -252,7 +251,7 @@ namespace JonsEngine
             if (node.GetNumMeshes() == 0)
                 continue;
 
-            const Mat4& localTransform = node.GetLocalTransform();
+            const Mat4& localTransform = GetLocalTransform(actor, model, node);
             const Mat4 localWorldTransform = worldTransform * localTransform;
 
             for (const Mesh& mesh : node.GetMeshes())
