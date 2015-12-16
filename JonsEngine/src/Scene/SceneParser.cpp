@@ -225,7 +225,7 @@ namespace JonsEngine
                 // TODO
                 auto specularFactor = 0.02f;
 
-                MaterialID materialID = actor.GetMaterial();
+                MaterialID materialID = mesh.GetDefaultMaterial();
                 const MaterialID explicitActorMaterial = actor.GetMaterial();
                 if (explicitActorMaterial != INVALID_MATERIAL_ID)
                     materialID = explicitActorMaterial;
