@@ -26,7 +26,8 @@ namespace JonsEngine
     private:
         typedef std::pair<Mat4, double> NodeTransformTimestamp;
         typedef std::vector<NodeTransformTimestamp> NodeTransformsContainer;
-        typedef std::pair<ModelNodeIndex, NodeTransformsContainer::size_type> NodeIDMap;
+        typedef NodeTransformsContainer::size_type NodeTransformIndex;
+        typedef std::pair<ModelNodeIndex, NodeTransformIndex> NodeIDMap;
     
 
         std::string mName;

@@ -25,7 +25,9 @@ namespace JonsEngine
         auto nodeMapIter = std::find_if(mNodeIDMapping.cbegin(), mNodeIDMapping.cend(), [nodeIndex](const NodeIDMap& nodeIDMap) { return nodeIndex == nodeIDMap.first; });
         assert(nodeMapIter != mNodeIDMapping.end());
 
-        //auto nodeTransformIter = std::find_if(mNodeTransforms.cbegin(), mNodeTransforms.cend(), [elapsedTime](const NodeTransformTimestamp& nodeIDMap) { return nodeID == nodeIDMap.first; });
+        //const NodeTransformIndex nodeIndex = nodeMapIter->
+
+       // auto nodeTransformIter = std::find_if(mNodeTransforms.cbegin(), mNodeTransforms.cend(), [elapsedTime](const NodeTransformTimestamp& nodeIDMap) { return nodeID == nodeIDMap.first; });
         //assert(nodeTransformIter != mNodeTransforms.cend());
 
         // TODO...
