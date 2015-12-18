@@ -188,9 +188,8 @@ namespace JonsEngine
     AABBIntersection FrustumCull(const Model& model, const Mat4& worldTransform, const Mat4& viewProjMatrix)
     {
         const Mat4 wvpMatrix = viewProjMatrix * worldTransform;
-        const AABB worldAABB = worldTransform * model.GetStaticAABB();
 
-        return Intersection(worldAABB, wvpMatrix);
+        return Intersection(model.GetStaticAABB(), wvpMatrix);
     }
 
     AABBIntersection PointLightCull(const Model& model, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius)

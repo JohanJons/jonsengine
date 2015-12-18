@@ -15,7 +15,7 @@ namespace JonsEngine
     class ModelAnimation
     {
     public:
-        ModelAnimation(const PackageAnimation& pkgAnimation);
+        ModelAnimation(const PackageAnimation& pkgAnimation, const uint32_t maxNumNodes);
         ~ModelAnimation();
         
         const Mat4& GetNodeTransform(const ModelNodeIndex nodeIndex, const Milliseconds elapsedTime) const;
@@ -24,16 +24,20 @@ namespace JonsEngine
 
 
     private:
-        typedef std::pair<Mat4, double> NodeTransformTimestamp;
-        typedef std::vector<NodeTransformTimestamp> NodeTransformsContainer;
-        typedef NodeTransformsContainer::size_type NodeTransformIndex;
-        typedef std::pair<ModelNodeIndex, NodeTransformIndex> NodeIDMap;
+        typedef std::pair<Mat4, double> AnimTransform;
+        typedef std::vector<AnimTransform> AnimTransformContainer;
+        typedef AnimTransformContainer::size_type AnimTransformIndex;
+        typedef std::pair<AnimTransformIndex, AnimTransformIndex> NodeAnimTransformRange;
+        //typedef std::pair<Mat4, double> NodeTransformTimestamp;
+        //typedef std::vector<NodeTransformTimestamp> NodeTransformsContainer;
+        //typedef NodeTransformsContainer::size_type NodeTransformIndex;
+        //typedef std::pair<ModelNodeIndex, NodeTransformIndex> NodeIDMap;
     
 
         std::string mName;
         Milliseconds mAnimationDuration;
 
-        std::vector<NodeIDMap> mNodeIDMapping;
-        NodeTransformsContainer mNodeTransforms;
+        std::vector<NodeAnimTransformRange> mNodeAnimTransformMap;
+        AnimTransformContainer mAnimationTransforms;
     };
 }

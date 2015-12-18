@@ -1,17 +1,26 @@
 #include "include/Resources/ModelAnimation.h"
 
+#include "include/Core/Math/Math.h"
+
 namespace JonsEngine
 {
-    ModelAnimation::ModelAnimation(const PackageAnimation& pkgAnimation) : mName(pkgAnimation.mName), mAnimationDuration(Milliseconds(pkgAnimation.mDurationInMilliseconds))
+    ModelAnimation::ModelAnimation(const PackageAnimation& pkgAnimation, const uint32_t maxNumNodes) :
+        mName(pkgAnimation.mName),
+        mAnimationDuration(Milliseconds(pkgAnimation.mDurationInMilliseconds)),
+        mNodeAnimTransformMap(maxNumNodes)
     {
-        auto nodeBeginIndex = mNodeTransforms.size();
+        // std::pair default constructor guarantees basic types are initialized
+        // so even if an index in mNodeAnimTransformMap isnt touched the range will be zero
+
+        auto animRangeBeginIndex = mAnimationTransforms.size();
         for (const PackageAnimatedNode& animNode : pkgAnimation.mAnimatedNodes)
         {
             for (const PackageAnimatedNodeTransform& nodeTransform : animNode.mAnimationTransforms)
-                mNodeTransforms.emplace_back(nodeTransform.mTransform, nodeTransform.mTimestampMilliseconds);
+                mAnimationTransforms.emplace_back(nodeTransform.mTransform, nodeTransform.mTimestampMilliseconds);
 
-            mNodeIDMapping.emplace_back(animNode.mNodeIndex, nodeBeginIndex);
-            nodeBeginIndex = mNodeTransforms.size();
+            const auto animRangeEndIndex = mAnimationTransforms.size();
+            mNodeAnimTransformMap.at(animNode.mNodeIndex) = NodeAnimTransformRange(animRangeBeginIndex, animRangeEndIndex);
+            animRangeBeginIndex = animRangeEndIndex;
         }
     }
 
@@ -22,10 +31,26 @@ namespace JonsEngine
 
     const Mat4& ModelAnimation::GetNodeTransform(const ModelNodeIndex nodeIndex, const Milliseconds elapsedTime) const
     {
-        auto nodeMapIter = std::find_if(mNodeIDMapping.cbegin(), mNodeIDMapping.cend(), [nodeIndex](const NodeIDMap& nodeIDMap) { return nodeIndex == nodeIDMap.first; });
-        assert(nodeMapIter != mNodeIDMapping.end());
+        // make sure elapsted time isn't out of bounds
+        assert(mAnimationDuration >= elapsedTime);
 
-        //const NodeTransformIndex nodeIndex = nodeMapIter->
+        const NodeAnimTransformRange& transformRange = mNodeAnimTransformMap.at(nodeIndex);
+        const AnimTransformIndex startIndex = transformRange.first;
+        const AnimTransformIndex endIndex = transformRange.second;
+
+        assert(endIndex >= startIndex);
+        assert(endIndex <= mAnimationTransforms.size());
+
+        // zero range means no animation transforms
+        if (startIndex == endIndex)
+            return gIdentityMatrix;
+
+        const auto firstNotElapsedTransform = std::find_if(mAnimationTransforms.cbegin() + startIndex, mAnimationTransforms.cbegin() + endIndex,
+            [elapsedTime]() {});
+
+
+        //auto nodeMapIter = std::find_if(mNodeIDMapping.cbegin(), mNodeIDMapping.cend(), [nodeIndex](const NodeIDMap& nodeIDMap) { return nodeIndex == nodeIDMap.first; });
+        //assert(nodeMapIter != mNodeIDMapping.end());
 
        // auto nodeTransformIter = std::find_if(mNodeTransforms.cbegin(), mNodeTransforms.cend(), [elapsedTime](const NodeTransformTimestamp& nodeIDMap) { return nodeID == nodeIDMap.first; });
         //assert(nodeTransformIter != mNodeTransforms.cend());
