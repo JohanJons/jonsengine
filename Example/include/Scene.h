@@ -14,10 +14,11 @@ namespace JonsGame
         Scene(JonsEngine::Scene& jonsScene, JonsEngine::ResourceManifest& resManifest, const std::string& jonsPkgName);
         ~Scene();
 
+        void PlayAnimationWuson();
+
         JonsEngine::Scene& GetJonsScene();
         JonsEngine::SceneNode& GetMovingLightNode();
         JonsEngine::DirectionalLight& GetSun();
-        JonsEngine::AnimatedActor& GetAnimatedWuson();
 
 
     private:
@@ -42,7 +43,7 @@ namespace JonsGame
         JonsEngine::SceneNodeID mNodeCube;
         JonsEngine::SceneNodeID mNodeChair;
         JonsEngine::SceneNodeID mNodeHouse;
-        JonsEngine::SceneNodeID mNodeWuson;
+        JonsEngine::SceneNodeID mNodeAnimWuson;
         JonsEngine::SceneNodeID mNodeWuson2;
         JonsEngine::SceneNodeID mNodePointLight;
         JonsEngine::SceneNodeID mNodePlane;
@@ -57,11 +58,14 @@ namespace JonsGame
         JonsEngine::StaticActorID mActorCube;
         JonsEngine::StaticActorID mActorChair;
         JonsEngine::StaticActorID mActorHouse;
-        JonsEngine::AnimatedActorID mActorWuson;
+        JonsEngine::AnimatedActorID mActorAnimWuson;
         JonsEngine::StaticActorID mActorWuson2;
         JonsEngine::StaticActorID mActorPlane;
         JonsEngine::StaticActorID mActorSphere;
         JonsEngine::StaticActorID mActorCube2;
         JonsEngine::StaticActorID mActorCube3;
+
+        JonsEngine::ModelAnimationIndex mAnimIndexWuson;
+        JonsEngine::Milliseconds mAnimDurationWuson;
     };
 }

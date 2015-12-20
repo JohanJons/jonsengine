@@ -46,17 +46,10 @@ namespace JonsEngine
             return gIdentityMatrix;
 
         const auto firstNotElapsedTransform = std::find_if(mAnimationTransforms.cbegin() + startIndex, mAnimationTransforms.cbegin() + endIndex,
-            [elapsedTime]() {});
+            [elapsedTime](const AnimTransform& transform) { return elapsedTime.count() <= transform.second; });
 
-
-        //auto nodeMapIter = std::find_if(mNodeIDMapping.cbegin(), mNodeIDMapping.cend(), [nodeIndex](const NodeIDMap& nodeIDMap) { return nodeIndex == nodeIDMap.first; });
-        //assert(nodeMapIter != mNodeIDMapping.end());
-
-       // auto nodeTransformIter = std::find_if(mNodeTransforms.cbegin(), mNodeTransforms.cend(), [elapsedTime](const NodeTransformTimestamp& nodeIDMap) { return nodeID == nodeIDMap.first; });
-        //assert(nodeTransformIter != mNodeTransforms.cend());
-
-        // TODO...
-        return mNodeTransforms.front().first;
+        // TODO - interpolate...
+        return (*firstNotElapsedTransform).first;
     }
     
     Milliseconds ModelAnimation::GetAnimationDuration() const

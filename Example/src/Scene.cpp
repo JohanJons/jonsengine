@@ -33,7 +33,7 @@ namespace JonsGame
         mNodeCube(mScene.CreateSceneNode("nodeCube", mScene.GetRootNodeID())),
         mNodeChair(mScene.CreateSceneNode("nodeChair", mScene.GetRootNodeID())),
         mNodeHouse(mScene.CreateSceneNode("nodeHouse", mScene.GetRootNodeID())),
-        mNodeWuson(mScene.CreateSceneNode("wuson", mScene.GetRootNodeID())),
+        mNodeAnimWuson(mScene.CreateSceneNode("animWuson", mScene.GetRootNodeID())),
         mNodeWuson2(mScene.CreateSceneNode("wuson2", mScene.GetRootNodeID())),
         mNodePointLight(mScene.CreateSceneNode("nodeMovingLight", mScene.GetRootNodeID())),
         mNodePlane(mScene.CreateSceneNode("nodePlane", mScene.GetRootNodeID())),
@@ -50,12 +50,16 @@ namespace JonsGame
         mActorCube(mScene.CreateStaticActor("actorCube", mModelCube, mNodeCube)),
         mActorChair(mScene.CreateStaticActor("actorChair", mModelChair, mNodeChair)),
         mActorHouse(mScene.CreateStaticActor("actorHouse", mModelHouse, mNodeHouse)),
-        mActorWuson(mScene.CreateAnimatedActor("wuson", mModelWuson, mNodeWuson)),
+        mActorAnimWuson(mScene.CreateAnimatedActor("animWuson", mModelWuson, mNodeAnimWuson)),
         mActorWuson2(mScene.CreateStaticActor("wuson2", mModelWuson, mNodeWuson2)),
         mActorPlane(mScene.CreateStaticActor("actorPlane", mModelPlane, mNodePlane)),
         mActorSphere(mScene.CreateStaticActor("actorSphere", mModelSphere, mNodeSphere)),
         mActorCube2(mScene.CreateStaticActor("actorCube2", mModelCube2, mNodeCube2)),
-        mActorCube3(mScene.CreateStaticActor("actorCube3", mModelCube3, mNodeCube3))
+        mActorCube3(mScene.CreateStaticActor("actorCube3", mModelCube3, mNodeCube3)),
+
+        // misc animation
+        mAnimIndexWuson(INVALID_ANIMATION_INDEX),
+        mAnimDurationWuson(0)
     {
         // ambient light
         mScene.SetAmbientLight(Vec4(0.01f));
@@ -80,12 +84,13 @@ namespace JonsGame
 
         // animated wuson
         const Model& modelWuson = resManifest.GetModel(mModelWuson);
-        const auto animID = modelWuson.GetAnimationIndex("Wuson_Run");
-        const ModelAnimation& modelAnimation = modelWuson.GetAnimation(animID);
-        AnimatedActor& actorWuson = mScene.GetAnimatedActor(mActorWuson);
+        mAnimIndexWuson = modelWuson.GetAnimationIndex("Wuson_Run");
+        const ModelAnimation& modelAnimation = modelWuson.GetAnimation(mAnimIndexWuson);
+        mAnimDurationWuson = modelAnimation.GetAnimationDuration();
+        //AnimatedActor& actorWuson = mScene.GetAnimatedActor(mActorAnimWuson);
         //actorWuson.SetAnimation(animID, modelAnimation.GetAnimationDuration());
         //actorWuson.RepeatAnimation(true);
-        SceneNode& nodeWuson = mScene.GetSceneNode(mNodeWuson);
+        SceneNode& nodeWuson = mScene.GetSceneNode(mNodeAnimWuson);
         nodeWuson.TranslateNode(Vec3(-10.0f, 4.5f, -11.0f));
         nodeWuson.RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
@@ -146,6 +151,13 @@ namespace JonsGame
     }
 
 
+    void Scene::PlayAnimationWuson()
+    {
+        AnimatedActor& animWuson = mScene.GetAnimatedActor(mActorAnimWuson);
+        animWuson.PlayAnimation(mAnimIndexWuson, mAnimDurationWuson, false);
+    }
+
+
     JonsEngine::Scene& Scene::GetJonsScene()
     {
         return mScene;
@@ -159,10 +171,5 @@ namespace JonsGame
     JonsEngine::DirectionalLight& Scene::GetSun()
     {
         return mScene.GetDirectionalLight(mSunDirLightID);
-    }
-
-    JonsEngine::AnimatedActor& Scene::GetAnimatedWuson()
-    {
-        return mScene.GetAnimatedActor(mActorWuson);
     }
 }

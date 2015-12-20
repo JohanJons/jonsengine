@@ -26,7 +26,7 @@ namespace JonsEngine
         ParseNodes(pkgModel, initData, gIdentityMatrix, pkgModel.mNodes.front(), mNodes.end());
         
         for (const PackageAnimation& pkgAnimation : pkgModel.mAnimations)
-            mAnimations.emplace_back(pkgAnimation);
+            mAnimations.emplace_back(pkgAnimation, mNodes.size());
     }
 
     // node container needs special care due to reconstructing valid iterators
