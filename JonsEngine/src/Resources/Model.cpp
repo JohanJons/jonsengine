@@ -10,12 +10,12 @@ namespace JonsEngine
     void ReserveStorage(const PackageModel& model, ModelNode::NodeContainer& nodeContainer, ModelNode::MeshContainer& meshContainer);
 
 
-    Model::Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID) : mName(name), mStaticAABB(minBounds, maxBounds)
+    Model::Model(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID) : mName(name), mStaticAABB(minBounds, maxBounds)
     {
         const ModelNodeIndex rootNodeIndex = 0;
 
         mMeshes.emplace_back(name, meshID, INVALID_MATERIAL_ID, minBounds, maxBounds);
-        mNodes.emplace_back(name, rootNodeIndex, minBounds, maxBounds, initialTransform, ModelNode::ImmediateChildrenIterator(mNodes.end(), mNodes.end()), ModelNode::AllChildrenIterator(mNodes.end(), mNodes.end()),
+        mNodes.emplace_back(name, rootNodeIndex, minBounds, maxBounds, ModelNode::ImmediateChildrenIterator(mNodes.end(), mNodes.end()), ModelNode::AllChildrenIterator(mNodes.end(), mNodes.end()),
             ModelNode::MeshIterator(mMeshes.begin(), mMeshes.end()), mNodes.end());
     }
 
@@ -23,7 +23,7 @@ namespace JonsEngine
     {
         ReserveStorage(pkgModel, mNodes, mMeshes);
 
-        ParseNodes(pkgModel, initData, gIdentityMatrix, pkgModel.mNodes.front(), mNodes.end());
+        ParseNodes(pkgModel, initData, pkgModel.mNodes.front(), mNodes.end());
         
         for (const PackageAnimation& pkgAnimation : pkgModel.mAnimations)
             mAnimations.emplace_back(pkgAnimation, mNodes.size());
@@ -65,7 +65,7 @@ namespace JonsEngine
 
             const auto childNextIter = mNodes.begin() + nextChildIndex;
 
-            mNodes.emplace_back(otherNode.GetName(), otherNode.GetModelNodeIndex(), otherNode.GetLocalAABB().Min(), otherNode.GetLocalAABB().Max(), otherNode.GetLocalTransform(), immChildrenIter, allChildrenIter, meshIter, childNextIter);
+            mNodes.emplace_back(otherNode.GetName(), otherNode.GetModelNodeIndex(), otherNode.GetLocalAABB().Min(), otherNode.GetLocalAABB().Max(), immChildrenIter, allChildrenIter, meshIter, childNextIter);
         }
     }
 
@@ -123,7 +123,7 @@ namespace JonsEngine
     }
 
 
-    void Model::ParseNodes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const Mat4& parentTransform, const PackageNode& pkgNode, const ModelNode::NodeIterator& next)
+    void Model::ParseNodes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode, const ModelNode::NodeIterator& next)
     {
         const uint32_t numChildren = CountNumChildren(model, pkgNode);
         // not -1 since its not added yet
@@ -136,9 +136,8 @@ namespace JonsEngine
         const auto allChildIter = ModelNode::AllChildrenIterator(iterFirstChild, iterPastLastChild);
         const auto immChildIter = ModelNode::ImmediateChildrenIterator(iterFirstChild, iterPastLastChild);
         const auto meshesIter = ParseMeshes(initDataList, pkgNode);
-        mNodes.emplace_back(pkgNode, parentTransform, immChildIter, allChildIter, meshesIter, next);
+        mNodes.emplace_back(pkgNode, immChildIter, allChildIter, meshesIter, next);
 
-        const Mat4& localTransform = mNodes.back().GetLocalTransform();
         const uint32_t numImmediateChildren = CountNumImmediateChildren(model, pkgNode);
         uint32_t childNum = 1;
         uint32_t nextChildSiblingOffset = firstChildIndex;
@@ -151,7 +150,7 @@ namespace JonsEngine
 
             const bool isLastSibling = (childNum == numImmediateChildren);
             const auto nextSibling = isLastSibling ? mNodes.end() : mNodes.begin() + nextChildSiblingOffset;
-            ParseNodes(model, initDataList, localTransform, child, nextSibling);
+            ParseNodes(model, initDataList, child, nextSibling);
 
             ++childNum;
         }

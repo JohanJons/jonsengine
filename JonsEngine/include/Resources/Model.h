@@ -28,7 +28,7 @@ namespace JonsEngine
         typedef ConstRangedIterator<MeshContainer, MeshContainer::const_iterator> MeshIterator;
         typedef ConstRangedIterator<NodeContainer, NodeContainer::const_iterator> NodeIterator;
 
-        Model(const std::string& name, const Mat4& initialTransform, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
+        Model(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
         Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData);
         Model(const Model& other);
         ~Model();
@@ -46,7 +46,7 @@ namespace JonsEngine
         
 
     private:
-        void ParseNodes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const Mat4& parentTransform, const PackageNode& pkgNode, const ModelNode::NodeIterator& next);
+        void ParseNodes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode, const ModelNode::NodeIterator& next);
         void ParseNodes(const Model& other);
         ModelNode::MeshIterator ParseMeshes(const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode);
 

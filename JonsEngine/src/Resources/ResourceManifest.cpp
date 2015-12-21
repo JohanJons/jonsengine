@@ -41,7 +41,7 @@ namespace JonsEngine
         const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, indiceData, minBounds, maxBounds);
         assert(meshID != INVALID_DX11_MESH_ID);
 
-        return mModels.Insert(modelName, Mat4(1.0f), minBounds, maxBounds, meshID);
+        return mModels.Insert(modelName, minBounds, maxBounds, meshID);
     }
 
     ModelID ResourceManifest::CreateCube(const std::string& modelName, const float size)
@@ -64,7 +64,7 @@ namespace JonsEngine
         const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, indiceData, minBounds, maxBounds);
         assert(meshID != INVALID_DX11_MESH_ID);
         
-        return mModels.Insert(modelName, Mat4(1.0f), minBounds, maxBounds, meshID);
+        return mModels.Insert(modelName, minBounds, maxBounds, meshID);
     }
 
     ModelID ResourceManifest::LoadModel(const std::string& assetName, const JonsPackagePtr jonsPkg)
@@ -186,24 +186,6 @@ namespace JonsEngine
                 initDataList.emplace_back(mesh, meshID, materialID);
             }
         }
-
-        /*for (const PackageMesh& mesh : node.mMeshes)
-        {
-            const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
-            DX11MaterialID materialID = INVALID_DX11_MATERIAL_ID;
-            if (mesh.mHasMaterial)
-            {
-                const PackageMaterial& material = jongPkg->mMaterials.at(mesh.mMaterialIndex);
-                materialID = LoadMaterial(material.mName, jongPkg);
-
-                assert(materialID != INVALID_DX11_MATERIAL_ID);
-            }
-
-            initDataList.emplace_back(mesh, meshID, materialID);
-        }
-
-        for (const PackageNode& child : node.mChildNodes)
-            ParseModelInitData(initDataList, jongPkg, child);*/
     }
 
 
