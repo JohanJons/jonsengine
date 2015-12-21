@@ -149,6 +149,7 @@ namespace JonsAssetImporter
         pkgNode.mNodeIndex = nextNodeIndex;
         pkgNode.mParentNodeIndex = parentNodeIndex;
 
+        // premultiply the transforms
         const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
         const uint32_t numMeshes = node->mNumMeshes;
         for (uint32_t i = 0; i < numMeshes; ++i)
