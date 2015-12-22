@@ -238,13 +238,13 @@ namespace JonsEngine
     }
 
     template <typename RENDERABLE_TYPE, typename ...MESH_ARGS>
-    void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const StaticActor& actor, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args)
+    void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const StaticActor& actor, const Model& model, const ModelNode& node, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args)
     {
         resultContainer.emplace_back(meshID, worldTransform, std::forward<MESH_ARGS>(args)...);
     }
 
     template <typename RENDERABLE_TYPE, typename ...MESH_ARGS>
-    void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const AnimatedActor& actor, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args)
+    void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const AnimatedActor& actor, const Model& model, const ModelNode& node, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args)
     {
         if (actor.IsPlaying())
         {
