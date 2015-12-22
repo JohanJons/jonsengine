@@ -88,9 +88,6 @@ namespace JonsGame
         mAnimIndexWuson = modelWuson.GetAnimationIndex("Wuson_Run");
         const ModelAnimation& modelAnimation = modelWuson.GetAnimation(mAnimIndexWuson);
         mAnimDurationWuson = modelAnimation.GetAnimationDuration();
-        //AnimatedActor& actorWuson = mScene.GetAnimatedActor(mActorAnimWuson);
-        //actorWuson.SetAnimation(animID, modelAnimation.GetAnimationDuration());
-        //actorWuson.RepeatAnimation(true);
         SceneNode& nodeWuson = mScene.GetSceneNode(mNodeAnimWuson);
         nodeWuson.TranslateNode(Vec3(-10.0f, 4.5f, -11.0f));
         nodeWuson.RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
@@ -98,7 +95,7 @@ namespace JonsGame
         // wuson 2 - not animated
         // TODO: set some other material
         StaticActor& actorWuson2 = mScene.GetStaticActor(mActorWuson2);
-        //actorWuson2.SetMaterial(mMaterialCheckers);
+        actorWuson2.SetMaterial(mMaterialCheckers);
         SceneNode& nodeWuson2 = mScene.GetSceneNode(mNodeWuson2);
         nodeWuson2.TranslateNode(Vec3(7.0f, 0.5f, 5.0f));
         nodeWuson2.RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));

@@ -36,7 +36,7 @@ namespace JonsEngine
     {
         const Vec3 oldMin = aabb.Min();
         const Vec3 oldMax = aabb.Max();
-
+        /*
         float av, bv;
         Vec3 min(transform[3].x, transform[3].y, transform[3].z);
         Vec3 max(transform[3].x, transform[3].y, transform[3].z);
@@ -59,7 +59,18 @@ namespace JonsEngine
             }
         }
 
-        return AABB(min, max);
+        return AABB(min, max);*/
+        Vec4 xa = transform[0] * oldMin.x;
+        Vec4 xb = transform[0] * oldMax.x;
+
+        Vec4 ya = transform[1] * oldMin.y;
+        Vec4 yb = transform[1] * oldMax.y;
+
+        Vec4 za = transform[2] * oldMin.z;
+        Vec4 zb = transform[2] * oldMax.z;
+
+        return AABB(Vec3(MinVal(xa, xb) + MinVal(ya, yb) + MinVal(za, zb) + transform[3]),
+                    Vec3(MaxVal(xa, xb) + MaxVal(ya, yb) + MaxVal(za, zb) + transform[3]));
     }
 
     AABB operator*(const AABB& aabb, const Mat4& transform)
