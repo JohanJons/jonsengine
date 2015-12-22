@@ -36,30 +36,7 @@ namespace JonsEngine
     {
         const Vec3 oldMin = aabb.Min();
         const Vec3 oldMax = aabb.Max();
-        /*
-        float av, bv;
-        Vec3 min(transform[3].x, transform[3].y, transform[3].z);
-        Vec3 max(transform[3].x, transform[3].y, transform[3].z);
-        for (uint32_t i = 0; i < 3; i++)
-        {
-            for (uint32_t j = 0; j < 3; j++)
-            {
-                av = transform[i][j] * oldMin[j];
-                bv = transform[i][j] * oldMax[j];
 
-                if (av < bv)
-                {
-                    min[i] += av;
-                    max[i] += bv;
-                }
-                else {
-                    min[i] += bv;
-                    max[i] += av;
-                }
-            }
-        }
-
-        return AABB(min, max);*/
         Vec4 xa = transform[0] * oldMin.x;
         Vec4 xb = transform[0] * oldMax.x;
 
@@ -69,6 +46,7 @@ namespace JonsEngine
         Vec4 za = transform[2] * oldMin.z;
         Vec4 zb = transform[2] * oldMax.z;
 
+        // TODO: unnecessary temp objects - why dosnt glm provide mat4/vec3 multiplication?
         return AABB(Vec3(MinVal(xa, xb) + MinVal(ya, yb) + MinVal(za, zb) + transform[3]),
                     Vec3(MaxVal(xa, xb) + MaxVal(ya, yb) + MaxVal(za, zb) + transform[3]));
     }
