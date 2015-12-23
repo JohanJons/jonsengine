@@ -16,7 +16,7 @@ namespace JonsEngine
         for (const PackageAnimatedNode& animNode : pkgAnimation.mAnimatedNodes)
         {
             for (const PackageAnimatedNodeTransform& nodeTransform : animNode.mAnimationTransforms)
-                mAnimationTransforms.emplace_back(nodeTransform.mTransform, nodeTransform.mTimestampMilliseconds);
+                mAnimationTransforms.emplace_back(nodeTransform.mTransform, Milliseconds(nodeTransform.mTimestampMilliseconds));
 
             const auto animRangeEndIndex = mAnimationTransforms.size();
             mNodeAnimTransformMap.at(animNode.mNodeIndex) = NodeAnimTransformRange(animRangeBeginIndex, animRangeEndIndex);
@@ -46,7 +46,7 @@ namespace JonsEngine
             return gIdentityMatrix;
 
         const auto firstNotElapsedTransform = std::find_if(mAnimationTransforms.cbegin() + startIndex, mAnimationTransforms.cbegin() + endIndex,
-            [elapsedTime](const AnimTransform& transform) { return elapsedTime.count() <= transform.second; });
+            [elapsedTime](const AnimTransform& transform) { return elapsedTime <= transform.second; });
 
         // TODO - interpolate...
         return (*firstNotElapsedTransform).first;

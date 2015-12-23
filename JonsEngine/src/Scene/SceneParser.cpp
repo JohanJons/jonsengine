@@ -21,7 +21,7 @@ namespace JonsEngine
     AABBIntersection PointLightCull(const Model& model, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius);
     AABBIntersection DirectionalLightCull(const Model& model, const Mat4& worldTransform, const DirectionalLight::BoundingVolume boundingVolume);
 
-    // there is some juggling with templates types due to not having partial template specialization...
+    // there is some juggling with template types due to not having partial template specialization...
     template <typename ACTOR_TYPE>
     void AddAllMeshes(const ResourceManifest& resManifest, std::vector<RenderableModel>& resultContainer, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix);
     template <typename ACTOR_TYPE>

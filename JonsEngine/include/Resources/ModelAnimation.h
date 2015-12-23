@@ -24,14 +24,10 @@ namespace JonsEngine
 
 
     private:
-        typedef std::pair<Mat4, double> AnimTransform;
+        typedef std::pair<Mat4, Milliseconds> AnimTransform;
         typedef std::vector<AnimTransform> AnimTransformContainer;
         typedef AnimTransformContainer::size_type AnimTransformIndex;
         typedef std::pair<AnimTransformIndex, AnimTransformIndex> NodeAnimTransformRange;
-        //typedef std::pair<Mat4, double> NodeTransformTimestamp;
-        //typedef std::vector<NodeTransformTimestamp> NodeTransformsContainer;
-        //typedef NodeTransformsContainer::size_type NodeTransformIndex;
-        //typedef std::pair<ModelNodeIndex, NodeTransformIndex> NodeIDMap;
     
 
         std::string mName;
