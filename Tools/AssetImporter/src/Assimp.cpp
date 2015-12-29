@@ -12,6 +12,10 @@ namespace JonsAssetImporter
 {
     void AddStaticAABB(PackageModel& model);
     void CheckForInvalidAABB(PackageAABB& aabb);
+
+    bool OnlyOneNodePerMesh(const aiScene* scene);
+    Mat4 GetMeshNodeTransform(const aiScene* scene, const aiNode* node, const uint32_t meshIndex, const Mat4& parentTransform);
+    uint32_t CountMeshOccurances(const aiNode* node, const uint32_t aiMeshIndex, const bool recursive);
     uint32_t GetNodeIndex(const PackageModel& model, const std::string& nodeName);
     uint32_t CountChildren(const aiNode* node);
 
@@ -131,132 +135,171 @@ namespace JonsAssetImporter
     {
         pkg->mModels.emplace_back(modelName);
         PackageModel& model = pkg->mModels.back();
-        model.mNodes.reserve(CountChildren(scene->mRootNode) + 1);
 
-        PackageNode::NodeIndex nextNodeIndex = 0;
-        model.mNodes.emplace_back();
-        PackageNode& rootNode = model.mNodes.back();
-        if (!ProcessAssimpNode(model, rootNode, scene, scene->mRootNode, materialMap, gIdentityMatrix, rootNode.mAABB.mMinBounds, rootNode.mAABB.mMaxBounds, nextNodeIndex, PackageNode::INVALID_NODE_INDEX))
+        // reserve storage
+        const uint32_t numNodes = CountChildren(scene->mRootNode) + 1;
+        model.mNodes.reserve(numNodes);
+        model.mMeshes.reserve(scene->mNumMeshes);
+        model.mAnimations.reserve(scene->mNumAnimations);
+
+        // we assume only one node per mesh - means we can pre-transform vertices for bind pose, makes rendering static actors faster
+        if (!OnlyOneNodePerMesh(scene))
+        {
+            Log("ERROR: Assimp parser assumes only one node per mesh");
+            return false;
+        }
+
+        if (!ProcessAssimpMeshes(model.mMeshes, scene, materialMap))
+            return false;
+
+        // recursively go through assimp node tree
+        const auto rootParentIndex = PackageNode::INVALID_NODE_INDEX;
+        if (!ProcessAssimpNode(model.mNodes, model.mMeshes, scene, scene->mRootNode, rootParentIndex))
             return false;
 
         return true;
     }
 
-    bool Assimp::ProcessAssimpNode(PackageModel& pkgModel, PackageNode& pkgNode, const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, const Mat4& parentTransform, Vec3& parentMinBounds,
-        Vec3& parentMaxBounds, const PackageNode::NodeIndex nextNodeIndex, const PackageNode::NodeIndex parentNodeIndex)
+    bool Assimp::ProcessAssimpNode(std::vector<JonsEngine::PackageNode>& nodeContainer, const std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode, const JonsEngine::PackageNode::NodeIndex parentNodeIndex)
     {
-        pkgNode.mName = node->mName.C_Str();
-        pkgNode.mNodeIndex = nextNodeIndex;
-        pkgNode.mParentNodeIndex = parentNodeIndex;
+        const uint32_t nodeIndex = nodeContainer.size();
+        nodeContainer.emplace_back(assimpNode->mName.C_Str(), nodeIndex, parentNodeIndex);
+        PackageNode& jonsNode = nodeContainer.back();
 
-        // premultiply the transforms
-        const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
-        const uint32_t numMeshes = node->mNumMeshes;
-        for (uint32_t i = 0; i < numMeshes; ++i)
+        // jonsPkg uses same mesh indices as aiScene
+        for (uint32_t meshIndex = 0; meshIndex < assimpNode->mNumMeshes; ++meshIndex)
         {
-            pkgNode.mMeshes.emplace_back();
-            if (!ProcessAssimpMesh(pkgNode.mMeshes.back(), scene->mMeshes[node->mMeshes[i]], materialMap, nodeTransform, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds))
-                return false;
+            jonsNode.mMeshes.emplace_back(assimpNode->mMeshes[meshIndex]);
+
+            const PackageMesh& mesh = meshContainer.at(meshIndex);
+            jonsNode.mAABB.mMinBounds = MinVal(jonsNode.mAABB.mMinBounds, mesh.mAABB.mMinBounds);
+            jonsNode.mAABB.mMaxBounds = MaxVal(jonsNode.mAABB.mMaxBounds, mesh.mAABB.mMaxBounds);
         }
 
-        const uint32_t numChildren = node->mNumChildren;
-        for (uint32_t i = 0; i < numChildren; ++i)
+        const uint32_t firstChildIndex = nodeContainer.size();
+        for (uint32_t childIndex = 0; childIndex < assimpNode->mNumChildren; ++childIndex)
         {
-            pkgModel.mNodes.emplace_back();
-            const uint32_t childIndex = pkgModel.mNodes.size() - 1;
-            if (!ProcessAssimpNode(pkgModel, pkgModel.mNodes.back(), scene, node->mChildren[i], materialMap, nodeTransform, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds, childIndex, nextNodeIndex))
+            const aiNode* child = assimpNode->mChildren[childIndex];
+
+            if (!ProcessAssimpNode(nodeContainer, meshContainer, scene, child, nodeIndex))
                 return false;
         }
+        const uint32_t lastChildIndex = nodeContainer.size() - 1;
 
-        parentMinBounds = MinVal(parentMinBounds, pkgNode.mAABB.mMinBounds);
-        parentMaxBounds = MaxVal(parentMaxBounds, pkgNode.mAABB.mMaxBounds);
+        // update node AABB
+        for (uint32_t childIndex = firstChildIndex; childIndex <= lastChildIndex; ++childIndex)
+        {
+            const PackageNode& child = nodeContainer.at(childIndex);
+            jonsNode.mAABB.mMinBounds = MinVal(jonsNode.mAABB.mMinBounds, child.mAABB.mMinBounds);
+            jonsNode.mAABB.mMaxBounds = MaxVal(jonsNode.mAABB.mMaxBounds, child.mAABB.mMaxBounds);
+        }
 
         // if node has no legit AABB from either its own mesh or a childrens mesh, zero length it
         // is done after updating parent aabb bounds since the result might otherwise invalidate the parents aabb when comparing it against its other childrens
-        CheckForInvalidAABB(pkgNode.mAABB);
+        CheckForInvalidAABB(jonsNode.mAABB);
 
         return true;
     }
 
-    bool Assimp::ProcessAssimpMesh(PackageMesh& pkgMesh, const aiMesh* mesh, const MaterialMap& materialMap, const Mat4& nodeTransform, Vec3& nodeMinBounds, Vec3& nodeMaxBounds)
+    bool Assimp::ProcessAssimpMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap)
     {
-        pkgMesh.mName = mesh->mName.C_Str();
-
         const uint32_t numFloatsPerTriangle = 3;
         const uint32_t numFloatsPerTexcoord = 2;
-        pkgMesh.mVertexData.reserve(mesh->mNumVertices * numFloatsPerTriangle);
-        pkgMesh.mNormalData.reserve(mesh->mNumVertices * numFloatsPerTriangle);
-        pkgMesh.mTexCoordsData.reserve(mesh->mNumVertices * numFloatsPerTexcoord);
-        // store both tangents and bitangents in same buffer
-        pkgMesh.mTangentData.reserve(mesh->mNumVertices * numFloatsPerTriangle * 2);;
 
-        // vertice, normal, texcoord, tangents and bitangents data
-        for (unsigned int j = 0; j < mesh->mNumVertices; ++j)
+        for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
         {
-            const Vec3 transformedVertices = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(mesh->mVertices[j]), 1.0f));
-            pkgMesh.mVertexData.push_back(transformedVertices.x);
-            pkgMesh.mVertexData.push_back(transformedVertices.y);
-            pkgMesh.mVertexData.push_back(transformedVertices.z);
+            aiMesh* assimpMesh = scene->mMeshes[meshIndex];
+            meshContainer.emplace_back(assimpMesh->mName.C_Str());
+            PackageMesh& jonsMesh = meshContainer.back();
 
-            if (mesh->HasNormals())
+            // reserve storage
+            jonsMesh.mVertexData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle);
+            jonsMesh.mNormalData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle);
+            jonsMesh.mTexCoordsData.reserve(assimpMesh->mNumVertices * numFloatsPerTexcoord);
+            // store both tangents and bitangents in same buffer
+            jonsMesh.mTangentData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle * 2);
+            jonsMesh.mIndiceData.reserve(assimpMesh->mNumFaces * numFloatsPerTriangle);
+
+            // get the transform of the node associated with this mesh to pre-multiply all the vertices
+            const Mat4 nodeTransform = GetMeshNodeTransform(scene, scene->mRootNode, meshIndex, gIdentityMatrix);
+
+            // vertice, normal, texcoord, tangents and bitangents data
+            for (unsigned int j = 0; j < assimpMesh->mNumVertices; ++j)
             {
-                const Vec3 transformedNormals = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(mesh->mNormals[j]), 0.0f));
-                pkgMesh.mNormalData.push_back(transformedNormals.x);
-                pkgMesh.mNormalData.push_back(transformedNormals.y);
-                pkgMesh.mNormalData.push_back(transformedNormals.z);
+                const Vec3 transformedVertices = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mVertices[j]), 1.0f));
+                jonsMesh.mVertexData.push_back(transformedVertices.x);
+                jonsMesh.mVertexData.push_back(transformedVertices.y);
+                jonsMesh.mVertexData.push_back(transformedVertices.z);
+
+                if (assimpMesh->HasNormals())
+                {
+                    const Vec3 transformedNormals = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mNormals[j]), 0.0f));
+                    jonsMesh.mNormalData.push_back(transformedNormals.x);
+                    jonsMesh.mNormalData.push_back(transformedNormals.y);
+                    jonsMesh.mNormalData.push_back(transformedNormals.z);
+                }
+
+                if (assimpMesh->HasTextureCoords(0))
+                {
+                    jonsMesh.mTexCoordsData.push_back(assimpMesh->mTextureCoords[0][j].x);
+                    jonsMesh.mTexCoordsData.push_back(assimpMesh->mTextureCoords[0][j].y);
+                }
+
+                if (assimpMesh->HasTangentsAndBitangents())
+                {
+                    const Vec3 transformedTangents = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mTangents[j]), 0.0f));
+                    jonsMesh.mTangentData.push_back(transformedTangents.x);
+                    jonsMesh.mTangentData.push_back(transformedTangents.y);
+                    jonsMesh.mTangentData.push_back(transformedTangents.z);
+
+                    const Vec3 transformedBitangents = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mBitangents[j]), 0.0f));
+                    jonsMesh.mTangentData.push_back(transformedBitangents.x);
+                    jonsMesh.mTangentData.push_back(transformedBitangents.y);
+                    jonsMesh.mTangentData.push_back(transformedBitangents.z);
+                }
+
+                // mesh AABB
+                jonsMesh.mAABB.mMinBounds = MinVal(jonsMesh.mAABB.mMinBounds, transformedVertices);
+                jonsMesh.mAABB.mMaxBounds = MaxVal(jonsMesh.mAABB.mMaxBounds, transformedVertices);
             }
 
-            if (mesh->HasTextureCoords(0))
+            // index data
+            for (uint32_t j = 0; j < assimpMesh->mNumFaces; ++j)
             {
-                pkgMesh.mTexCoordsData.push_back(mesh->mTextureCoords[0][j].x);
-                pkgMesh.mTexCoordsData.push_back(mesh->mTextureCoords[0][j].y);
+                // only dem triangles
+                assert(assimpMesh->mFaces[j].mNumIndices == numFloatsPerTriangle);
+                for (uint32_t index = 0; index < numFloatsPerTriangle; index++)
+                {
+                    assert(assimpMesh->mFaces[j].mIndices[index] <= UINT16_MAX);
+                    jonsMesh.mIndiceData.push_back(assimpMesh->mFaces[j].mIndices[index]);
+                }
             }
 
-            if (mesh->HasTangentsAndBitangents())
+            if (materialMap.find(assimpMesh->mMaterialIndex) == materialMap.end())
             {
-                const Vec3 transformedTangents = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(mesh->mTangents[j]), 0.0f));
-                pkgMesh.mTangentData.push_back(transformedTangents.x);
-                pkgMesh.mTangentData.push_back(transformedTangents.y);
-                pkgMesh.mTangentData.push_back(transformedTangents.z);
-
-                const Vec3 transformedBitangents = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(mesh->mBitangents[j]), 0.0f));
-                pkgMesh.mTangentData.push_back(transformedBitangents.x);
-                pkgMesh.mTangentData.push_back(transformedBitangents.y);
-                pkgMesh.mTangentData.push_back(transformedBitangents.z);
+                Log("ERROR: Unable to find mesh material in materialMap");
+                return false;
             }
 
-            // mesh AABB
-            pkgMesh.mAABB.mMinBounds = MinVal(pkgMesh.mAABB.mMinBounds, transformedVertices);
-            pkgMesh.mAABB.mMaxBounds = MaxVal(pkgMesh.mAABB.mMaxBounds, transformedVertices);
+            jonsMesh.mMaterialIndex = materialMap.at(assimpMesh->mMaterialIndex);
+            jonsMesh.mHasMaterial = true;
         }
 
-        pkgMesh.mIndiceData.reserve(mesh->mNumFaces * numFloatsPerTriangle);
+        return true;
+    }
 
-        // index data
-        for (uint32_t j = 0; j < mesh->mNumFaces; ++j)
-        {
-            // only dem triangles
-            assert(mesh->mFaces[j].mNumIndices == numFloatsPerTriangle);
-            for (uint32_t index = 0; index < numFloatsPerTriangle; index++)
-            {
-                assert(mesh->mFaces[j].mIndices[index] <= UINT16_MAX);
-                pkgMesh.mIndiceData.push_back(mesh->mFaces[j].mIndices[index]);
-            }
-        }
-
-        if (materialMap.find(mesh->mMaterialIndex) == materialMap.end())
-        {
-            Log("ERROR: Unable to find mesh material in materialMap");
-            return false;
-        }
-
-        pkgMesh.mMaterialIndex = materialMap.at(mesh->mMaterialIndex);
-        pkgMesh.mHasMaterial = true;
+    /*bool Assimp::ProcessAssimpMesh(PackageMesh& pkgMesh, const aiMesh* mesh, const MaterialMap& materialMap, const Mat4& nodeTransform, Vec3& nodeMinBounds, Vec3& nodeMaxBounds)
+    {
 
         // node AABB
         nodeMinBounds = MinVal(nodeMinBounds, pkgMesh.mAABB.mMinBounds);
         nodeMaxBounds = MaxVal(nodeMaxBounds, pkgMesh.mAABB.mMaxBounds);
 
+        return true;
+    }*/
+
+    bool ProcessAssimpSkeleton(const aiMesh* mesh)
+    {
         return true;
     }
 
@@ -376,6 +419,59 @@ namespace JonsAssetImporter
             aabb.mMinBounds = Vec3(0.0f);
             aabb.mMaxBounds = Vec3(0.0f);
         }
+    }
+
+    bool OnlyOneNodePerMesh(const aiScene* scene)
+    {
+        for (uint32_t meshNum = 0; meshNum < scene->mNumMeshes; ++meshNum)
+        {
+            const bool recursive = true;
+            const uint32_t occurances = CountMeshOccurances(scene->mRootNode, meshNum, recursive);
+            if (occurances > 1)
+                return false;
+        }
+
+        return true;
+    }
+
+    // assumes aiMeshIndex actually exists in node hierarchy
+    Mat4 GetMeshNodeTransform(const aiScene* scene, const aiNode* node, const uint32_t aiMeshIndex, const Mat4& parentTransform)
+    {
+        const bool recursive = false;
+        const uint32_t occurances = CountMeshOccurances(node, aiMeshIndex, recursive);
+        const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
+        if (occurances != 1)
+        {
+            for (uint32_t childNum = 0; childNum < node->mNumChildren; ++childNum)
+            {
+                const aiNode* child = node->mChildren[childNum];
+                if (CountMeshOccurances(child, aiMeshIndex, recursive) == 1)
+                    return GetMeshNodeTransform(scene, child, aiMeshIndex, nodeTransform);
+            }
+        }
+
+        return nodeTransform;
+    }
+
+    uint32_t CountMeshOccurances(const aiNode* node, const uint32_t aiMeshIndex, const bool recursive)
+    {
+        uint32_t occurances = 0;
+        for (uint32_t meshNum = 0; meshNum < node->mNumMeshes; ++meshNum)
+        {
+            if (*(node->mMeshes + meshNum) == aiMeshIndex)
+                ++occurances;
+        }
+
+        if (recursive)
+        {
+            for (uint32_t childNum = 0; childNum < node->mNumChildren; ++childNum)
+            {
+                const aiNode* child = node->mChildren[childNum];
+                occurances += CountMeshOccurances(child, aiMeshIndex, recursive);
+            }
+        }
+
+        return occurances;
     }
 
     uint32_t GetNodeIndex(const PackageModel& model, const std::string& nodeName)

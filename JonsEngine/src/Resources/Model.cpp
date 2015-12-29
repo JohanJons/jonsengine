@@ -135,7 +135,7 @@ namespace JonsEngine
 
         const auto allChildIter = ModelNode::AllChildrenIterator(iterFirstChild, iterPastLastChild);
         const auto immChildIter = ModelNode::ImmediateChildrenIterator(iterFirstChild, iterPastLastChild);
-        const auto meshesIter = ParseMeshes(initDataList, pkgNode);
+        const auto meshesIter = ParseMeshes(model, initDataList, pkgNode);
         mNodes.emplace_back(pkgNode, immChildIter, allChildIter, meshesIter, next);
 
         const uint32_t numImmediateChildren = CountNumImmediateChildren(model, pkgNode);
@@ -156,15 +156,17 @@ namespace JonsEngine
         }
     }
 
-    ModelNode::MeshIterator Model::ParseMeshes(const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode)
+    ModelNode::MeshIterator Model::ParseMeshes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode)
     {
         const uint32_t numMeshes = pkgNode.mMeshes.size();
         if (numMeshes == 0)
             return ModelNode::MeshIterator(mMeshes.end(), mMeshes.end());
 
         const uint32_t meshesSizeBegin = mMeshes.size() == 0 ? 0 : mMeshes.size() - 1;
-        for (const PackageMesh& mesh : pkgNode.mMeshes)
+        for (const PackageMesh::MeshIndex meshIndex : pkgNode.mMeshes)
         {
+            const PackageMesh& mesh = model.mMeshes.at(meshIndex);
+
             auto iter = std::find_if(initDataList.cbegin(), initDataList.cend(), [mesh](const ModelNode::InitData& data) { return mesh.mName.compare(std::get<0>(data).mName) == 0; });
             assert(iter != initDataList.cend());
 

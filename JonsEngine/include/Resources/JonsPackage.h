@@ -41,6 +41,9 @@ namespace JonsEngine
 
     struct PackageMesh
     {
+        typedef uint32_t MeshIndex;
+        static const MeshIndex INVALID_MESH_INDEX = UINT32_MAX;
+
         std::string mName;
         PackageAABB mAABB;
         std::vector<float> mVertexData;
@@ -53,6 +56,7 @@ namespace JonsEngine
 
 
         PackageMesh();
+        PackageMesh(const std::string& name);
     };
 
     struct PackageNode
@@ -64,8 +68,7 @@ namespace JonsEngine
         NodeIndex mNodeIndex;
         NodeIndex mParentNodeIndex;
         PackageAABB mAABB;
-        // TODO: move mesh into model instead
-        std::vector<PackageMesh> mMeshes;
+        std::vector<PackageMesh::MeshIndex> mMeshes;
 
 
         PackageNode();
@@ -144,6 +147,7 @@ namespace JonsEngine
     {
         std::string mName;
         PackageAABB mStaticAABB;
+        std::vector<PackageMesh> mMeshes;
         std::vector<PackageNode> mNodes;
         std::vector<PackageAnimation> mAnimations;
 
@@ -273,6 +277,7 @@ namespace boost
         {
             ar & model.mName;
             ar & model.mStaticAABB;
+            ar & model.mMeshes;
             ar & model.mNodes;
             ar & model.mAnimations;
         }

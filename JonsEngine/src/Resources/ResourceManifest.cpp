@@ -171,8 +171,10 @@ namespace JonsEngine
     {
         for (const PackageNode& node : model.mNodes)
         {
-            for (const PackageMesh& mesh : node.mMeshes)
+            for (const PackageMesh::MeshIndex meshIndex : node.mMeshes)
             {
+                const PackageMesh& mesh = model.mMeshes.at(meshIndex);
+
                 const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
                 DX11MaterialID materialID = INVALID_DX11_MATERIAL_ID;
                 if (mesh.mHasMaterial)

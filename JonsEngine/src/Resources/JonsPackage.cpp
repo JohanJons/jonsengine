@@ -18,11 +18,15 @@ namespace JonsEngine
     {
     }
 
-    PackageMesh::PackageMesh() : mMaterialIndex(0), mHasMaterial(false)
+    PackageMesh::PackageMesh() : PackageMesh("")
     {
     }
 
-    PackageNode::PackageNode() : mNodeIndex(INVALID_NODE_INDEX), mParentNodeIndex(INVALID_NODE_INDEX)
+    PackageMesh::PackageMesh(const std::string& name) : mName(name), mMaterialIndex(0), mHasMaterial(false)
+    {
+    }
+
+    PackageNode::PackageNode() : PackageNode("", INVALID_NODE_INDEX, INVALID_NODE_INDEX)
     {
     }
 
@@ -42,11 +46,12 @@ namespace JonsEngine
     {
     }
 
-    PackageMaterial::PackageMaterial() : mHasDiffuseTexture(false), mHasNormalTexture(false), mDiffuseColor(1.0f), mAmbientColor(1.0f), mSpecularColor(1.0f), mEmissiveColor(0.0f)
+    PackageMaterial::PackageMaterial() : PackageMaterial("", false, false)
     {
     }
 
-    PackageMaterial::PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture) : mName(name), mHasDiffuseTexture(hasDiffTexture), mHasNormalTexture(hasNormalTexture)
+    PackageMaterial::PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture) : mName(name), mHasDiffuseTexture(hasDiffTexture), mHasNormalTexture(hasNormalTexture),
+        mDiffuseColor(1.0f), mAmbientColor(1.0f), mSpecularColor(1.0f), mEmissiveColor(0.0f)
     {
     }
 
@@ -58,7 +63,7 @@ namespace JonsEngine
     {
     }
 
-    PackageAnimatedNode::PackageAnimatedNode() : mNodeIndex(PackageNode::INVALID_NODE_INDEX)
+    PackageAnimatedNode::PackageAnimatedNode() : PackageAnimatedNode(PackageNode::INVALID_NODE_INDEX)
     {
     }
 
