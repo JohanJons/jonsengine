@@ -55,6 +55,7 @@ namespace JonsEngine
 
         std::string mName;
         PackageAABB mAABB;
+        std::vector<PackageBone> mBones;
         std::vector<float> mVertexData;
         std::vector<float> mNormalData;
         std::vector<float> mTexCoordsData;
@@ -157,7 +158,6 @@ namespace JonsEngine
         std::string mName;
         PackageAABB mStaticAABB;
         std::vector<PackageMesh> mMeshes;
-        std::vector<PackageBone> mBones;
         std::vector<PackageNode> mNodes;
         std::vector<PackageAnimation> mAnimations;
 
