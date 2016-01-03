@@ -39,6 +39,15 @@ namespace JonsEngine
         PackageAABB();
     };
 
+    struct PackageBone
+    {
+        std::string mName;
+        Mat4 mTransform;
+
+
+        PackageBone();
+    };
+
     struct PackageMesh
     {
         typedef uint32_t MeshIndex;
@@ -148,6 +157,7 @@ namespace JonsEngine
         std::string mName;
         PackageAABB mStaticAABB;
         std::vector<PackageMesh> mMeshes;
+        std::vector<PackageBone> mBones;
         std::vector<PackageNode> mNodes;
         std::vector<PackageAnimation> mAnimations;
 

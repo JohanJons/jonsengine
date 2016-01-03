@@ -149,7 +149,7 @@ namespace JonsAssetImporter
             return false;
         }
 
-        if (!ProcessAssimpMeshes(model.mMeshes, scene, materialMap))
+        if (!ProcessAssimpMeshes(model.mMeshes, model.mBones, scene, materialMap))
             return false;
 
         // recursively go through assimp node tree
@@ -201,7 +201,7 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessAssimpMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap)
+    bool Assimp::ProcessAssimpMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, std::vector<JonsEngine::PackageBone>& boneContainer, const aiScene* scene, const MaterialMap& materialMap)
     {
         const uint32_t numFloatsPerTriangle = 3;
         const uint32_t numFloatsPerTexcoord = 2;
@@ -211,6 +211,9 @@ namespace JonsAssetImporter
             aiMesh* assimpMesh = scene->mMeshes[meshIndex];
             meshContainer.emplace_back(assimpMesh->mName.C_Str());
             PackageMesh& jonsMesh = meshContainer.back();
+
+            if (!ProcessAssimpBones(boneContainer, assimpMesh))
+                return false;
 
             // reserve storage
             jonsMesh.mVertexData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle);
@@ -288,18 +291,18 @@ namespace JonsAssetImporter
         return true;
     }
 
-    /*bool Assimp::ProcessAssimpMesh(PackageMesh& pkgMesh, const aiMesh* mesh, const MaterialMap& materialMap, const Mat4& nodeTransform, Vec3& nodeMinBounds, Vec3& nodeMaxBounds)
+    bool Assimp::ProcessAssimpBones(std::vector<JonsEngine::PackageBone>& boneContainer, const aiMesh* assimpMesh)
     {
+        const auto numBones = assimpMesh->mNumBones;
+        for (uint32_t index = 0; index < numBones; ++index)
+        {
+            const auto bone = assimpMesh->mBones[index];
 
-        // node AABB
-        nodeMinBounds = MinVal(nodeMinBounds, pkgMesh.mAABB.mMinBounds);
-        nodeMaxBounds = MaxVal(nodeMaxBounds, pkgMesh.mAABB.mMaxBounds);
+            auto asd = bone->mWeights[index];
+            if (asd.mWeight < 1.0f)
+                auto aw = 1.0f;
+        }
 
-        return true;
-    }*/
-
-    bool ProcessAssimpSkeleton(const aiMesh* mesh)
-    {
         return true;
     }
 

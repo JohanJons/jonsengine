@@ -25,12 +25,9 @@ namespace JonsAssetImporter
     private:
         void ProcessAssimpMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsEngine::JonsPackagePtr pkg);
         bool ProcessAssimpModel(const aiScene* scene, const std::string& modelName, const MaterialMap& materialMap, JonsEngine::JonsPackagePtr pkg);
-        //bool ProcessAssimpNode(JonsEngine::PackageModel& pkgModel, JonsEngine::PackageNode& pkgNode, const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, const JonsEngine::Mat4& parentTransform, JonsEngine::Vec3& modelMinBounds,
-        //    JonsEngine::Vec3& modelMaxBounds, const JonsEngine::PackageNode::NodeIndex nextNodeIndex, const JonsEngine::PackageNode::NodeIndex parentNodeIndex);
-        //bool ProcessAssimpMeshes(JonsEngine::PackageModel& pkgModel, const aiMesh* mesh, const MaterialMap& materialMap, const JonsEngine::Mat4& nodeTransform, JonsEngine::Vec3& nodeMinBounds, JonsEngine::Vec3& nodeMaxBounds);
         bool ProcessAssimpNode(std::vector<JonsEngine::PackageNode>& nodeContainer, const std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode, const JonsEngine::PackageNode::NodeIndex parentNodeIndex);
-        bool ProcessAssimpMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap);
-        bool ProcessAssimpSkeleton(const aiMesh* mesh);
+        bool ProcessAssimpMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, std::vector<JonsEngine::PackageBone>& boneContainer, const aiScene* scene, const MaterialMap& materialMap);
+        bool ProcessAssimpBones(std::vector<JonsEngine::PackageBone>& boneContainer, const aiMesh* assimpMesh);
         bool ProcessAssimpAnimations(JonsEngine::PackageModel& model, const aiScene* scene);
 
 

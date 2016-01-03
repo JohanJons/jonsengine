@@ -1,5 +1,7 @@
 #include "include/Resources/JonsPackage.h"
+
 #include "include/Core/Memory/HeapAllocator.h"
+#include "include/Core/Math/Math.h"
 
 #include <string>
 #include <iostream>
@@ -15,6 +17,10 @@ namespace JonsEngine
     }
 
     PackageAABB::PackageAABB() : mMinBounds(std::numeric_limits<float>::max()), mMaxBounds(std::numeric_limits<float>::lowest())
+    {
+    }
+
+    PackageBone::PackageBone() : mName(""), mTransform(gIdentityMatrix)
     {
     }
 
