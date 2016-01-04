@@ -149,7 +149,7 @@ namespace JonsAssetImporter
             return false;
         }
 
-        if (!ProcessAssimpMeshes(model.mMeshes, model.mBones, scene, materialMap))
+        if (!ProcessAssimpMeshes(model.mMeshes, scene, materialMap))
             return false;
 
         // recursively go through assimp node tree
@@ -242,6 +242,7 @@ namespace JonsAssetImporter
                     jonsMesh.mNormalData.push_back(transformedNormals.z);
                 }
 
+                // multiple texture coordinates only used in special scenarios so only use first row by default
                 if (assimpMesh->HasTextureCoords(0))
                 {
                     jonsMesh.mTexCoordsData.push_back(assimpMesh->mTextureCoords[0][j].x);
@@ -285,7 +286,6 @@ namespace JonsAssetImporter
             }
 
             jonsMesh.mMaterialIndex = materialMap.at(assimpMesh->mMaterialIndex);
-            jonsMesh.mHasMaterial = true;
         }
 
         return true;

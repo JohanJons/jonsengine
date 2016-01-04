@@ -39,52 +39,6 @@ namespace JonsEngine
         PackageAABB();
     };
 
-    struct PackageBone
-    {
-        std::string mName;
-        Mat4 mTransform;
-
-
-        PackageBone();
-    };
-
-    struct PackageMesh
-    {
-        typedef uint32_t MeshIndex;
-        static const MeshIndex INVALID_MESH_INDEX = UINT32_MAX;
-
-        std::string mName;
-        PackageAABB mAABB;
-        std::vector<PackageBone> mBones;
-        std::vector<float> mVertexData;
-        std::vector<float> mNormalData;
-        std::vector<float> mTexCoordsData;
-        std::vector<float> mTangentData;
-        std::vector<uint16_t> mIndiceData;
-        uint16_t mMaterialIndex;
-        bool mHasMaterial;
-
-
-        PackageMesh();
-        PackageMesh(const std::string& name);
-    };
-
-    struct PackageNode
-    {
-        typedef uint32_t NodeIndex;
-        static const NodeIndex INVALID_NODE_INDEX = UINT32_MAX;
-
-        std::string mName;
-        NodeIndex mNodeIndex;
-        NodeIndex mParentNodeIndex;
-        PackageAABB mAABB;
-        std::vector<PackageMesh::MeshIndex> mMeshes;
-
-
-        PackageNode();
-        PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex);
-    };
-
     struct PackageTexture
     {
         std::vector<uint8_t> mTextureData;
@@ -107,6 +61,9 @@ namespace JonsEngine
 
     struct PackageMaterial
     {
+        typedef uint32_t MaterialIndex;
+        static const MaterialIndex INVALID_MATERIAL_INDEX = UINT32_MAX;
+
         std::string mName;
         bool mHasDiffuseTexture;
         bool mHasNormalTexture;
@@ -120,6 +77,51 @@ namespace JonsEngine
 
         PackageMaterial();
         PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture);
+    };
+
+    struct PackageBone
+    {
+        std::string mName;
+        Mat4 mTransform;
+
+
+        PackageBone();
+    };
+
+    struct PackageMesh
+    {
+        typedef uint32_t MeshIndex;
+        static const MeshIndex INVALID_MESH_INDEX = UINT32_MAX;
+
+        std::string mName;
+        PackageAABB mAABB;
+        std::vector<PackageBone> mBones;
+        std::vector<float> mVertexData;
+        std::vector<float> mNormalData;
+        std::vector<float> mTexCoordsData;
+        std::vector<float> mTangentData;
+        std::vector<uint16_t> mIndiceData;
+        PackageMaterial::MaterialIndex mMaterialIndex;
+
+
+        PackageMesh();
+        PackageMesh(const std::string& name);
+    };
+
+    struct PackageNode
+    {
+        typedef uint32_t NodeIndex;
+        static const NodeIndex INVALID_NODE_INDEX = UINT32_MAX;
+
+        std::string mName;
+        NodeIndex mNodeIndex;
+        NodeIndex mParentNodeIndex;
+        PackageAABB mAABB;
+        std::vector<PackageMesh::MeshIndex> mMeshes;
+
+
+        PackageNode();
+        PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex);
     };
 
     struct PackageAnimatedNodeTransform
