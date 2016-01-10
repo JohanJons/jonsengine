@@ -20,7 +20,7 @@ namespace JonsEngine
     {
     }
 
-    PackageBone::PackageBone() : mName(""), mTransform(gIdentityMatrix)
+    PackageTexture::PackageTexture() : mTextureWidth(0), mTextureHeight(0)
     {
     }
 
@@ -33,25 +33,6 @@ namespace JonsEngine
     }
 
     PackageMesh::PackageMesh(const std::string& name) : mName(name), mMaterialIndex(0), mHasMaterial(false)
-    {
-    }
-
-    PackageNode::PackageNode() : PackageNode("", INVALID_NODE_INDEX, INVALID_NODE_INDEX)
-    {
-    }
-
-    PackageNode::PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex) : mName(name), mNodeIndex(nodeIndex), mParentNodeIndex(parentNodeIndex)
-    {
-    }
-
-    PackageTexture::PackageTexture() : mTextureWidth(0), mTextureHeight(0)
-    {
-    }
-
-    PackageSkybox::PackageSkybox()
-    {
-    }
-
     PackageSkybox::PackageSkybox(const std::string& name) : mName(name)
     {
     }
@@ -62,6 +43,26 @@ namespace JonsEngine
 
     PackageMaterial::PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture) : mName(name), mHasDiffuseTexture(hasDiffTexture), mHasNormalTexture(hasNormalTexture),
         mDiffuseColor(1.0f), mAmbientColor(1.0f), mSpecularColor(1.0f), mEmissiveColor(0.0f)
+    {
+    }
+
+    PackageBone::PackageBone() : mName(""), mTransform(gIdentityMatrix)
+    {
+    }
+
+    PackageMesh::PackageMesh() : PackageMesh("")
+    {
+    }
+
+    PackageMesh::PackageMesh(const std::string& name) : mName(name), mMaterialIndex(PackageMaterial::INVALID_MATERIAL_INDEX)
+    {
+    }
+
+    PackageNode::PackageNode() : PackageNode("", INVALID_NODE_INDEX, INVALID_NODE_INDEX)
+    {
+    }
+
+    PackageNode::PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex) : mName(name), mNodeIndex(nodeIndex), mParentNodeIndex(parentNodeIndex)
     {
     }
 

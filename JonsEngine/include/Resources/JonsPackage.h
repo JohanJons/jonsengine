@@ -40,6 +40,46 @@ namespace JonsEngine
         PackageAABB();
     };
 
+    struct PackageTexture
+    {
+        std::vector<uint8_t> mTextureData;
+        uint32_t mTextureWidth;         // width/height in pixels
+        uint32_t mTextureHeight;
+
+
+        PackageTexture();
+    };
+
+    struct PackageSkybox
+    {
+        std::string mName;
+        PackageTexture mSkyboxTexture;
+
+
+        PackageSkybox();
+        PackageSkybox(const std::string& name);
+    };
+
+    struct PackageMaterial
+    {
+        typedef uint32_t MaterialIndex;
+        static const MaterialIndex INVALID_MATERIAL_INDEX = UINT32_MAX;
+
+        std::string mName;
+        bool mHasDiffuseTexture;
+        bool mHasNormalTexture;
+        PackageTexture mDiffuseTexture;
+        PackageTexture mNormalTexture;
+        Vec3 mDiffuseColor;
+        Vec3 mAmbientColor;
+        Vec3 mSpecularColor;
+        Vec3 mEmissiveColor;
+
+
+        PackageMaterial();
+        PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture);
+    };
+
     struct PackageBone
     {
         typedef uint32_t BoneIndex;
@@ -70,13 +110,13 @@ namespace JonsEngine
 
         std::string mName;
         PackageAABB mAABB;
+        std::vector<PackageBone> mBones;
         std::vector<float> mVertexData;
         std::vector<float> mNormalData;
         std::vector<float> mTexCoordsData;
         std::vector<float> mTangentData;
         std::vector<uint16_t> mIndiceData;
-        uint16_t mMaterialIndex;
-        bool mHasMaterial;
+        PackageMaterial::MaterialIndex mMaterialIndex;
 
 
         PackageMesh();
@@ -97,43 +137,6 @@ namespace JonsEngine
 
         PackageNode();
         PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex);
-    };
-
-    struct PackageTexture
-    {
-        std::vector<uint8_t> mTextureData;
-        uint32_t mTextureWidth;         // width/height in pixels
-        uint32_t mTextureHeight;
-
-
-        PackageTexture();
-    };
-
-    struct PackageSkybox
-    {
-        std::string mName;
-        PackageTexture mSkyboxTexture;
-
-
-        PackageSkybox();
-        PackageSkybox(const std::string& name);
-    };
-
-    struct PackageMaterial
-    {
-        std::string mName;
-        bool mHasDiffuseTexture;
-        bool mHasNormalTexture;
-        PackageTexture mDiffuseTexture;
-        PackageTexture mNormalTexture;
-        Vec3 mDiffuseColor;
-        Vec3 mAmbientColor;
-        Vec3 mSpecularColor;
-        Vec3 mEmissiveColor;
-
-
-        PackageMaterial();
-        PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture);
     };
 
     struct PackageAnimatedNodeTransform
@@ -172,7 +175,6 @@ namespace JonsEngine
         std::string mName;
         PackageAABB mStaticAABB;
         std::vector<PackageMesh> mMeshes;
-        std::vector<PackageBone> mBones;
         std::vector<PackageNode> mNodes;
         std::vector<PackageAnimation> mAnimations;
 

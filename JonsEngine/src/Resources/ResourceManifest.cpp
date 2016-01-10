@@ -177,7 +177,8 @@ namespace JonsEngine
 
                 const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
                 DX11MaterialID materialID = INVALID_DX11_MATERIAL_ID;
-                if (mesh.mHasMaterial)
+                const bool meshHasMaterial = mesh.mMaterialIndex != PackageMaterial::INVALID_MATERIAL_INDEX;
+                if (meshHasMaterial)
                 {
                     const PackageMaterial& material = jongPkg->mMaterials.at(mesh.mMaterialIndex);
                     materialID = LoadMaterial(material.mName, jongPkg);

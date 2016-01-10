@@ -149,7 +149,7 @@ namespace JonsAssetImporter
             return false;
         }
 
-        if (!ProcessAssimpMeshes(model.mMeshes, model.mBones, scene, materialMap))
+        if (!ProcessAssimpMeshes(model.mMeshes, scene, materialMap))
             return false;
 
         // recursively go through assimp node tree
@@ -201,7 +201,7 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessAssimpMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, std::vector<JonsEngine::PackageBone>& boneContainer, const aiScene* scene, const MaterialMap& materialMap)
+    bool Assimp::ProcessAssimpMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap)
     {
         const uint32_t numFloatsPerTriangle = 3;
         const uint32_t numFloatsPerTexcoord = 2;
@@ -212,7 +212,7 @@ namespace JonsAssetImporter
             meshContainer.emplace_back(assimpMesh->mName.C_Str());
             PackageMesh& jonsMesh = meshContainer.back();
 
-            if (!ProcessAssimpBones(boneContainer, assimpMesh))
+            if (!ProcessAssimpBones(jonsMesh.mBones, assimpMesh))
                 return false;
 
             // reserve storage
@@ -227,7 +227,7 @@ namespace JonsAssetImporter
             const Mat4 nodeTransform = GetMeshNodeTransform(scene, scene->mRootNode, meshIndex, gIdentityMatrix);
 
             // vertice, normal, texcoord, tangents and bitangents data
-            for (unsigned int j = 0; j < assimpMesh->mNumVertices; ++j)
+            for (uint32_t j = 0; j < assimpMesh->mNumVertices; ++j)
             {
                 const Vec3 transformedVertices = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mVertices[j]), 1.0f));
                 jonsMesh.mVertexData.push_back(transformedVertices.x);
@@ -242,6 +242,7 @@ namespace JonsAssetImporter
                     jonsMesh.mNormalData.push_back(transformedNormals.z);
                 }
 
+                // multiple texture coordinates only used in special scenarios so only use first row by default
                 if (assimpMesh->HasTextureCoords(0))
                 {
                     jonsMesh.mTexCoordsData.push_back(assimpMesh->mTextureCoords[0][j].x);
@@ -285,7 +286,6 @@ namespace JonsAssetImporter
             }
 
             jonsMesh.mMaterialIndex = materialMap.at(assimpMesh->mMaterialIndex);
-            jonsMesh.mHasMaterial = true;
         }
 
         return true;
@@ -298,9 +298,7 @@ namespace JonsAssetImporter
         {
             const auto bone = assimpMesh->mBones[index];
 
-            auto asd = bone->mWeights[index];
-            if (asd.mWeight < 1.0f)
-                auto aw = 1.0f;
+            boneContainer.emplace_back(bone->mName.C_Str(), aiMat4ToJonsMat4(bone->mOffsetMatrix));
         }
 
         return true;
