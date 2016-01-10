@@ -3,6 +3,7 @@
 #include "include/Core/Types.h"
 #include "include/Core/Utils/Time.h"
 
+#include <array>
 #include <vector>
 #include <memory>
 
@@ -41,11 +42,25 @@ namespace JonsEngine
 
     struct PackageBone
     {
+        typedef uint32_t BoneIndex;
+        static const BoneIndex INVALID_BONE_INDEX = UINT32_MAX;
+
         std::string mName;
         Mat4 mTransform;
 
 
         PackageBone();
+    };
+
+    struct PackageVertexBones
+    {
+        static const uint32_t MAX_NUM_BONES = 4;
+
+        std::array<PackageBone::BoneIndex, MAX_NUM_BONES> mBoneIndices;
+        std::array<uint32_t, MAX_NUM_BONES> mBoneWeights;
+
+
+        PackageVertexBones();
     };
 
     struct PackageMesh

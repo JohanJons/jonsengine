@@ -24,6 +24,10 @@ namespace JonsEngine
     {
     }
 
+    PackageVertexBones::PackageVertexBones()
+    {
+    }
+
     PackageMesh::PackageMesh() : PackageMesh("")
     {
     }
