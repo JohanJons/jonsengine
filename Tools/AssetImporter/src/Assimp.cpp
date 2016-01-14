@@ -47,14 +47,14 @@ namespace JonsAssetImporter
         // process materials
         // map scene material indexes to actual package material indexes
         MaterialMap materialMap;
-        ProcessAssimpMaterials(scene, modelPath, materialMap, freeimageImporter, pkg);
+        ProcessMaterials(scene, modelPath, materialMap, freeimageImporter, pkg);
 
         // process model hierarchy
-        if (!ProcessAssimpModel(scene, modelName, materialMap, pkg))
+        if (!ProcessModel(scene, modelName, materialMap, pkg))
             return false;
 
         PackageModel& model = pkg->mModels.back();
-        if (!ProcessAssimpAnimations(model, scene))
+        if (!ProcessAnimations(model, scene))
             return false;
 
         AddStaticAABB(model);
@@ -62,7 +62,7 @@ namespace JonsAssetImporter
         return true;
     }
 
-    void Assimp::ProcessAssimpMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsPackagePtr pkg)
+    void Assimp::ProcessMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsPackagePtr pkg)
     {
         if (!scene->HasMaterials())
             return;
@@ -131,7 +131,7 @@ namespace JonsAssetImporter
         }
     }
 
-    bool Assimp::ProcessAssimpModel(const aiScene* scene, const std::string& modelName, const MaterialMap& materialMap, JonsPackagePtr pkg)
+    bool Assimp::ProcessModel(const aiScene* scene, const std::string& modelName, const MaterialMap& materialMap, JonsPackagePtr pkg)
     {
         pkg->mModels.emplace_back(modelName);
         PackageModel& model = pkg->mModels.back();
@@ -149,18 +149,18 @@ namespace JonsAssetImporter
             return false;
         }
 
-        if (!ProcessAssimpMeshes(model.mMeshes, scene, materialMap))
+        if (!ProcessMeshes(model.mMeshes, scene, materialMap))
             return false;
 
         // recursively go through assimp node tree
         const auto rootParentIndex = PackageNode::INVALID_NODE_INDEX;
-        if (!ProcessAssimpNode(model.mNodes, model.mMeshes, scene, scene->mRootNode, rootParentIndex))
+        if (!ProcessNode(model.mNodes, model.mMeshes, scene, scene->mRootNode, rootParentIndex))
             return false;
 
         return true;
     }
 
-    bool Assimp::ProcessAssimpNode(std::vector<JonsEngine::PackageNode>& nodeContainer, const std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode, const JonsEngine::PackageNode::NodeIndex parentNodeIndex)
+    bool Assimp::ProcessNode(std::vector<JonsEngine::PackageNode>& nodeContainer, const std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode, const JonsEngine::PackageNode::NodeIndex parentNodeIndex)
     {
         const uint32_t nodeIndex = nodeContainer.size();
         nodeContainer.emplace_back(assimpNode->mName.C_Str(), nodeIndex, parentNodeIndex);
@@ -181,7 +181,7 @@ namespace JonsAssetImporter
         {
             const aiNode* child = assimpNode->mChildren[childIndex];
 
-            if (!ProcessAssimpNode(nodeContainer, meshContainer, scene, child, nodeIndex))
+            if (!ProcessNode(nodeContainer, meshContainer, scene, child, nodeIndex))
                 return false;
         }
         const uint32_t lastChildIndex = nodeContainer.size() - 1;
@@ -201,7 +201,7 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessAssimpMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap)
+    bool Assimp::ProcessMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap)
     {
         const uint32_t numFloatsPerTriangle = 3;
         const uint32_t numFloatsPerTexcoord = 2;
@@ -212,7 +212,7 @@ namespace JonsAssetImporter
             meshContainer.emplace_back(assimpMesh->mName.C_Str());
             PackageMesh& jonsMesh = meshContainer.back();
 
-            if (!ProcessAssimpBones(jonsMesh.mBones, assimpMesh))
+            if (!ProcessBones(jonsMesh.mBones, assimpMesh))
                 return false;
 
             // reserve storage
@@ -267,6 +267,10 @@ namespace JonsAssetImporter
                 jonsMesh.mAABB.mMaxBounds = MaxVal(jonsMesh.mAABB.mMaxBounds, transformedVertices);
             }
 
+            // bone weights
+            if (!ProcessVertexBoneWeights(jonsMesh.mVertexBoneWeights, assimpMesh))
+                return false;
+
             // index data
             for (uint32_t j = 0; j < assimpMesh->mNumFaces; ++j)
             {
@@ -291,7 +295,7 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessAssimpBones(std::vector<JonsEngine::PackageBone>& boneContainer, const aiMesh* assimpMesh)
+    bool Assimp::ProcessBones(std::vector<JonsEngine::PackageBone>& boneContainer, const aiMesh* assimpMesh)
     {
         const auto numBones = assimpMesh->mNumBones;
         for (uint32_t index = 0; index < numBones; ++index)
@@ -304,7 +308,14 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessAssimpAnimations(PackageModel& model, const aiScene* scene)
+    bool ProcessVertexBoneWeights(std::vector<PackageVertexBoneWeights>& boneWeightsContainer, const aiMesh* assimpMesh)
+    {
+
+
+        return true;
+    }
+
+    bool Assimp::ProcessAnimations(PackageModel& model, const aiScene* scene)
     {
         if (!scene->HasAnimations())
             return true;

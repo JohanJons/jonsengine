@@ -90,9 +90,10 @@ namespace JonsEngine
 
 
         PackageBone();
+        PackageBone(const std::string& name, const Mat4& transform);
     };
 
-    struct PackageVertexBones
+    struct PackageVertexBoneWeights
     {
         static const uint32_t MAX_NUM_BONES = 4;
 
@@ -100,7 +101,7 @@ namespace JonsEngine
         std::array<uint32_t, MAX_NUM_BONES> mBoneWeights;
 
 
-        PackageVertexBones();
+        PackageVertexBoneWeights();
     };
 
     struct PackageMesh
@@ -115,6 +116,7 @@ namespace JonsEngine
         std::vector<float> mNormalData;
         std::vector<float> mTexCoordsData;
         std::vector<float> mTangentData;
+        std::vector<PackageVertexBoneWeights> mVertexBoneWeights;
         std::vector<uint16_t> mIndiceData;
         PackageMaterial::MaterialIndex mMaterialIndex;
 

@@ -24,15 +24,10 @@ namespace JonsEngine
     {
     }
 
-    PackageVertexBones::PackageVertexBones()
+    PackageVertexBoneWeights::PackageVertexBoneWeights()
     {
     }
 
-    PackageMesh::PackageMesh() : PackageMesh("")
-    {
-    }
-
-    PackageMesh::PackageMesh(const std::string& name) : mName(name), mMaterialIndex(0), mHasMaterial(false)
     PackageSkybox::PackageSkybox(const std::string& name) : mName(name)
     {
     }
@@ -47,6 +42,10 @@ namespace JonsEngine
     }
 
     PackageBone::PackageBone() : mName(""), mTransform(gIdentityMatrix)
+    {
+    }
+
+    PackageBone::PackageBone(const std::string& name, const Mat4& transform) : mName(name), mTransform(transform)
     {
     }
 
