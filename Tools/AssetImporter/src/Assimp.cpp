@@ -297,7 +297,7 @@ namespace JonsAssetImporter
 
     bool Assimp::ProcessBones(std::vector<JonsEngine::PackageBone>& boneContainer, const aiMesh* assimpMesh)
     {
-        const auto numBones = assimpMesh->mNumBones;
+        const uint32_t numBones = assimpMesh->mNumBones;
         for (uint32_t index = 0; index < numBones; ++index)
         {
             const auto bone = assimpMesh->mBones[index];
@@ -310,7 +310,29 @@ namespace JonsAssetImporter
 
     bool ProcessVertexBoneWeights(std::vector<PackageVertexBoneWeights>& boneWeightsContainer, const aiMesh* assimpMesh)
     {
+        const uint32_t numVertices = assimpMesh->mNumVertices;
+        boneWeightsContainer.reserve(numVertices);
 
+        const uint32_t numBones = assimpMesh->mNumBones;
+        for (uint32_t boneIndex = 0; boneIndex < numBones; ++boneIndex)
+        {
+            const auto bone = assimpMesh->mBones[boneIndex];
+            
+            const uint32_t numWeights = bone->mNumWeights;
+            for (uint32_t weightIndex = 0; weightIndex < numWeights; ++weightIndex)
+            {
+                const auto weight = bone->mWeights[weightIndex];
+                const auto vertexBoneWeight = boneWeightsContainer.at(weight.mVertexId);
+                
+                uint32_t unusedIndex = 0;
+                do
+                {
+                    ++unusedIndex;
+                } while (unusedIndex < PackageVertexBoneWeights::MAX_NUM_BONES);
+                //boneWeightsContainer.at(weight.mVertexId).mBoneWeights.pus
+            }
+            //boneContainer.emplace_back(bone->mName.C_Str(), aiMat4ToJonsMat4(bone->mOffsetMatrix));
+        }
 
         return true;
     }
