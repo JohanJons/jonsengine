@@ -28,6 +28,10 @@ namespace JonsEngine
     {
     }
 
+    PackageSkybox::PackageSkybox() : PackageSkybox("")
+    {
+    }
+
     PackageSkybox::PackageSkybox(const std::string& name) : mName(name)
     {
     }

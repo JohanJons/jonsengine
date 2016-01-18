@@ -226,18 +226,32 @@ namespace boost
         }
 
         template<class Archive>
+        void serialize(Archive & ar, JonsEngine::PackageBone& bone, const unsigned int version)
+        {
+            ar & bone.mName;
+            ar & bone.mTransform;
+        }
+
+        template<class Archive>
+        void serialize(Archive & ar, JonsEngine::PackageVertexBoneWeights& vertexBoneWeights, const unsigned int version)
+        {
+            ar & vertexBoneWeights.mBoneIndices;
+            ar & vertexBoneWeights.mBoneWeights;
+        }
+
+        template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageMesh& mesh, const unsigned int version)
         {
             ar & mesh.mName;
             ar & mesh.mAABB;
-
+            ar & mesh.mBones;
             ar & mesh.mVertexData;
             ar & mesh.mNormalData;
             ar & mesh.mTexCoordsData;
             ar & mesh.mTangentData;
+            ar & mesh.mVertexBoneWeights;
             ar & mesh.mIndiceData;
             ar & mesh.mMaterialIndex;
-            ar & mesh.mHasMaterial;
         }
 
         template<class Archive>

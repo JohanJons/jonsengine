@@ -28,7 +28,7 @@ namespace JonsAssetImporter
         bool ProcessNode(std::vector<JonsEngine::PackageNode>& nodeContainer, const std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode, const JonsEngine::PackageNode::NodeIndex parentNodeIndex);
         bool ProcessMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap);
         bool ProcessBones(std::vector<JonsEngine::PackageBone>& boneContainer, const aiMesh* assimpMesh);
-        bool ProcessVertexBoneWeights(std::vector<PackageVertexBoneWeights>& boneWeightsContainer, const aiMesh* assimpMesh);
+        bool ProcessVertexBoneWeights(std::vector<JonsEngine::PackageVertexBoneWeights>& boneWeightsContainer, const aiMesh* assimpMesh);
         bool ProcessAnimations(JonsEngine::PackageModel& model, const aiScene* scene);
 
 
