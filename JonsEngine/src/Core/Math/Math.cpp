@@ -61,4 +61,19 @@ namespace JonsEngine
     {
         return zNear * PerspectiveNearPlane(zNear, zFar);
     }
+
+
+    bool IsEqual(const float val1, const float val2)
+    {
+        const double epsilon = 0.0000000001;
+
+        return std::abs(val1 - val2) <= epsilon * std::abs(val1);
+    }
+
+    bool IsEqual(const double val1, const double val2)
+    {
+        const float epsilon = 0.0000000001f;
+
+        return std::abs(val1 - val2) <= epsilon * std::abs(val1);
+    }
 }

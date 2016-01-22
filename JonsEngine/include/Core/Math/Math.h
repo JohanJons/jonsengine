@@ -30,4 +30,7 @@ namespace JonsEngine
 
     float PerspectiveNearPlane(const float zNear, const float zFar);
     float PerspectiveFarPlane(const float zNear, const float zFar);
+
+    bool IsEqual(const float val1, const float val2);
+    bool IsEqual(const double val1, const double val2);
 }

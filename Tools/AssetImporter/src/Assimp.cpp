@@ -18,6 +18,7 @@ namespace JonsAssetImporter
     uint32_t CountMeshOccurances(const aiNode* node, const uint32_t aiMeshIndex, const bool recursive);
     uint32_t GetNodeIndex(const PackageModel& model, const std::string& nodeName);
     uint32_t CountChildren(const aiNode* node);
+    bool UsedLessThanMaxNumBones(const PackageVertexBoneWeights& vertexBoneWeights);
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
     Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
@@ -324,11 +325,13 @@ namespace JonsAssetImporter
                 const auto weight = bone->mWeights[weightIndex];
                 const auto vertexBoneWeight = boneWeightsContainer.at(weight.mVertexId);
                 
-                uint32_t unusedIndex = 0;
-                do
+                const bool notExceededNumBones = UsedLessThanMaxNumBones(vertexBoneWeight);
+                if (!notExceededNumBones)
                 {
-                    ++unusedIndex;
-                } while (unusedIndex < PackageVertexBoneWeights::MAX_NUM_BONES);
+                    Log("ERROR: More bone weights used than capacity for");
+                    return false;
+                }
+                ...
                 //boneWeightsContainer.at(weight.mVertexId).mBoneWeights.pus
             }
             //boneContainer.emplace_back(bone->mName.C_Str(), aiMat4ToJonsMat4(bone->mOffsetMatrix));
@@ -537,6 +540,19 @@ namespace JonsAssetImporter
         }
 
         return ret;
+    }
+
+    bool UsedLessThanMaxNumBones(const PackageVertexBoneWeights& vertexBoneWeights)
+    {
+        for (uint32_t index = 0; index < PackageVertexBoneWeights::MAX_NUM_BONES; ++index)
+        {
+            // weight zero means unused index
+            if (IsEqual(vertexBoneWeights.mBoneWeights.at(index), 0.0f))
+                return true;
+        }
+
+        // all indices used
+        return false;
     }
 
 
