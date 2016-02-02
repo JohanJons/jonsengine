@@ -325,13 +325,18 @@ namespace JonsAssetImporter
                 const auto weight = bone->mWeights[weightIndex];
                 const auto vertexBoneWeight = boneWeightsContainer.at(weight.mVertexId);
                 
+                // make sure we havn't reached bone weight cap per bone
                 const bool notExceededNumBones = UsedLessThanMaxNumBones(vertexBoneWeight);
                 if (!notExceededNumBones)
                 {
                     Log("ERROR: More bone weights used than capacity for");
                     return false;
                 }
-                ...
+                
+                uint32_t firstFreeIndex = 0;
+                while (!IsEqual(vertexBoneWeight.mBoneWeights.at(firstFreeIndex), 0.0f))
+                    ++firstFreeIndex;
+
                 //boneWeightsContainer.at(weight.mVertexId).mBoneWeights.pus
             }
             //boneContainer.emplace_back(bone->mName.C_Str(), aiMat4ToJonsMat4(bone->mOffsetMatrix));
