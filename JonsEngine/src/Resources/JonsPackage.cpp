@@ -24,7 +24,7 @@ namespace JonsEngine
     {
     }
 
-    PackageVertexBoneWeights::PackageVertexBoneWeights()
+    PackageVertexBoneWeights::PackageVertexBoneWeights() : mBoneIndices({}), mBoneWeights({})
     {
     }
 

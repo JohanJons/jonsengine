@@ -309,10 +309,10 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool ProcessVertexBoneWeights(std::vector<PackageVertexBoneWeights>& boneWeightsContainer, const aiMesh* assimpMesh)
+    bool Assimp::ProcessVertexBoneWeights(std::vector<PackageVertexBoneWeights>& boneWeightsContainer, const aiMesh* assimpMesh)
     {
         const uint32_t numVertices = assimpMesh->mNumVertices;
-        boneWeightsContainer.reserve(numVertices);
+        boneWeightsContainer.resize(numVertices);
 
         const uint32_t numBones = assimpMesh->mNumBones;
         for (uint32_t boneIndex = 0; boneIndex < numBones; ++boneIndex)
@@ -322,8 +322,8 @@ namespace JonsAssetImporter
             const uint32_t numWeights = bone->mNumWeights;
             for (uint32_t weightIndex = 0; weightIndex < numWeights; ++weightIndex)
             {
-                const auto weight = bone->mWeights[weightIndex];
-                const auto vertexBoneWeight = boneWeightsContainer.at(weight.mVertexId);
+                const auto assimpWeight = bone->mWeights[weightIndex];
+                auto vertexBoneWeight = boneWeightsContainer.at(assimpWeight.mVertexId);
                 
                 // make sure we havn't reached bone weight cap per bone
                 const bool notExceededNumBones = UsedLessThanMaxNumBones(vertexBoneWeight);
@@ -337,9 +337,9 @@ namespace JonsAssetImporter
                 while (!IsEqual(vertexBoneWeight.mBoneWeights.at(firstFreeIndex), 0.0f))
                     ++firstFreeIndex;
 
-                //boneWeightsContainer.at(weight.mVertexId).mBoneWeights.pus
+                vertexBoneWeight.mBoneWeights.at(firstFreeIndex) = assimpWeight.mWeight;
+                vertexBoneWeight.mBoneIndices.at(firstFreeIndex) = boneIndex;
             }
-            //boneContainer.emplace_back(bone->mName.C_Str(), aiMat4ToJonsMat4(bone->mOffsetMatrix));
         }
 
         return true;
