@@ -24,10 +24,6 @@ namespace JonsEngine
     {
     }
 
-    PackageVertexBoneWeights::PackageVertexBoneWeights()
-    {
-    }
-
     PackageSkybox::PackageSkybox() : PackageSkybox("")
     {
     }

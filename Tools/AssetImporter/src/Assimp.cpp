@@ -18,7 +18,7 @@ namespace JonsAssetImporter
     uint32_t CountMeshOccurances(const aiNode* node, const uint32_t aiMeshIndex, const bool recursive);
     uint32_t GetNodeIndex(const PackageModel& model, const std::string& nodeName);
     uint32_t CountChildren(const aiNode* node);
-    bool UsedLessThanMaxNumBones(const PackageVertexBoneWeights& vertexBoneWeights);
+    bool UsedLessThanMaxNumBones(const std::vector<float>& boneWeights, const uint32_t offset);
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
     Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
@@ -204,85 +204,21 @@ namespace JonsAssetImporter
 
     bool Assimp::ProcessMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap)
     {
-        const uint32_t numFloatsPerTriangle = 3;
-        const uint32_t numFloatsPerTexcoord = 2;
-
         for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
         {
             aiMesh* assimpMesh = scene->mMeshes[meshIndex];
             meshContainer.emplace_back(assimpMesh->mName.C_Str());
             PackageMesh& jonsMesh = meshContainer.back();
 
+            if (!ProcessMeshGeometricData(jonsMesh, assimpMesh, scene, meshIndex))
+                return false;
+
             if (!ProcessBones(jonsMesh.mBones, assimpMesh))
                 return false;
 
-            // reserve storage
-            jonsMesh.mVertexData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle);
-            jonsMesh.mNormalData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle);
-            jonsMesh.mTexCoordsData.reserve(assimpMesh->mNumVertices * numFloatsPerTexcoord);
-            // store both tangents and bitangents in same buffer
-            jonsMesh.mTangentData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle * 2);
-            jonsMesh.mIndiceData.reserve(assimpMesh->mNumFaces * numFloatsPerTriangle);
-
-            // get the transform of the node associated with this mesh to pre-multiply all the vertices
-            const Mat4 nodeTransform = GetMeshNodeTransform(scene, scene->mRootNode, meshIndex, gIdentityMatrix);
-
-            // vertice, normal, texcoord, tangents and bitangents data
-            for (uint32_t j = 0; j < assimpMesh->mNumVertices; ++j)
-            {
-                const Vec3 transformedVertices = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mVertices[j]), 1.0f));
-                jonsMesh.mVertexData.push_back(transformedVertices.x);
-                jonsMesh.mVertexData.push_back(transformedVertices.y);
-                jonsMesh.mVertexData.push_back(transformedVertices.z);
-
-                if (assimpMesh->HasNormals())
-                {
-                    const Vec3 transformedNormals = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mNormals[j]), 0.0f));
-                    jonsMesh.mNormalData.push_back(transformedNormals.x);
-                    jonsMesh.mNormalData.push_back(transformedNormals.y);
-                    jonsMesh.mNormalData.push_back(transformedNormals.z);
-                }
-
-                // multiple texture coordinates only used in special scenarios so only use first row by default
-                if (assimpMesh->HasTextureCoords(0))
-                {
-                    jonsMesh.mTexCoordsData.push_back(assimpMesh->mTextureCoords[0][j].x);
-                    jonsMesh.mTexCoordsData.push_back(assimpMesh->mTextureCoords[0][j].y);
-                }
-
-                if (assimpMesh->HasTangentsAndBitangents())
-                {
-                    const Vec3 transformedTangents = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mTangents[j]), 0.0f));
-                    jonsMesh.mTangentData.push_back(transformedTangents.x);
-                    jonsMesh.mTangentData.push_back(transformedTangents.y);
-                    jonsMesh.mTangentData.push_back(transformedTangents.z);
-
-                    const Vec3 transformedBitangents = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mBitangents[j]), 0.0f));
-                    jonsMesh.mTangentData.push_back(transformedBitangents.x);
-                    jonsMesh.mTangentData.push_back(transformedBitangents.y);
-                    jonsMesh.mTangentData.push_back(transformedBitangents.z);
-                }
-
-                // mesh AABB
-                jonsMesh.mAABB.mMinBounds = MinVal(jonsMesh.mAABB.mMinBounds, transformedVertices);
-                jonsMesh.mAABB.mMaxBounds = MaxVal(jonsMesh.mAABB.mMaxBounds, transformedVertices);
-            }
-
             // bone weights
-            if (!ProcessVertexBoneWeights(jonsMesh.mVertexBoneWeights, assimpMesh))
+            if (!ProcessVertexBoneWeights(jonsMesh.mBoneIndices, jonsMesh.mBoneWeights, assimpMesh))
                 return false;
-
-            // index data
-            for (uint32_t j = 0; j < assimpMesh->mNumFaces; ++j)
-            {
-                // only dem triangles
-                assert(assimpMesh->mFaces[j].mNumIndices == numFloatsPerTriangle);
-                for (uint32_t index = 0; index < numFloatsPerTriangle; index++)
-                {
-                    assert(assimpMesh->mFaces[j].mIndices[index] <= UINT16_MAX);
-                    jonsMesh.mIndiceData.push_back(assimpMesh->mFaces[j].mIndices[index]);
-                }
-            }
 
             if (materialMap.find(assimpMesh->mMaterialIndex) == materialMap.end())
             {
@@ -291,6 +227,78 @@ namespace JonsAssetImporter
             }
 
             jonsMesh.mMaterialIndex = materialMap.at(assimpMesh->mMaterialIndex);
+        }
+
+        return true;
+    }
+
+    bool ProcessMeshGeometricData(PackageMesh& jonsMesh, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex)
+    {
+        const uint32_t numFloatsPerTriangle = 3;
+        const uint32_t numFloatsPerTexcoord = 2;
+
+        // reserve storage
+        jonsMesh.mVertexData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle);
+        jonsMesh.mNormalData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle);
+        jonsMesh.mTexCoordsData.reserve(assimpMesh->mNumVertices * numFloatsPerTexcoord);
+        // store both tangents and bitangents in same buffer
+        jonsMesh.mTangentData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle * 2);
+        jonsMesh.mIndiceData.reserve(assimpMesh->mNumFaces * numFloatsPerTriangle);
+
+        // get the transform of the node associated with this mesh to pre-multiply all the vertices
+        const Mat4 nodeTransform = GetMeshNodeTransform(scene, scene->mRootNode, meshIndex, gIdentityMatrix);
+
+        // vertice, normal, texcoord, tangents and bitangents data
+        for (uint32_t j = 0; j < assimpMesh->mNumVertices; ++j)
+        {
+            const Vec3 transformedVertices = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mVertices[j]), 1.0f));
+            jonsMesh.mVertexData.push_back(transformedVertices.x);
+            jonsMesh.mVertexData.push_back(transformedVertices.y);
+            jonsMesh.mVertexData.push_back(transformedVertices.z);
+
+            if (assimpMesh->HasNormals())
+            {
+                const Vec3 transformedNormals = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mNormals[j]), 0.0f));
+                jonsMesh.mNormalData.push_back(transformedNormals.x);
+                jonsMesh.mNormalData.push_back(transformedNormals.y);
+                jonsMesh.mNormalData.push_back(transformedNormals.z);
+            }
+
+            // multiple texture coordinates only used in special scenarios so only use first row by default
+            if (assimpMesh->HasTextureCoords(0))
+            {
+                jonsMesh.mTexCoordsData.push_back(assimpMesh->mTextureCoords[0][j].x);
+                jonsMesh.mTexCoordsData.push_back(assimpMesh->mTextureCoords[0][j].y);
+            }
+
+            if (assimpMesh->HasTangentsAndBitangents())
+            {
+                const Vec3 transformedTangents = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mTangents[j]), 0.0f));
+                jonsMesh.mTangentData.push_back(transformedTangents.x);
+                jonsMesh.mTangentData.push_back(transformedTangents.y);
+                jonsMesh.mTangentData.push_back(transformedTangents.z);
+
+                const Vec3 transformedBitangents = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mBitangents[j]), 0.0f));
+                jonsMesh.mTangentData.push_back(transformedBitangents.x);
+                jonsMesh.mTangentData.push_back(transformedBitangents.y);
+                jonsMesh.mTangentData.push_back(transformedBitangents.z);
+            }
+
+            // mesh AABB
+            jonsMesh.mAABB.mMinBounds = MinVal(jonsMesh.mAABB.mMinBounds, transformedVertices);
+            jonsMesh.mAABB.mMaxBounds = MaxVal(jonsMesh.mAABB.mMaxBounds, transformedVertices);
+        }
+
+        // index data
+        for (uint32_t j = 0; j < assimpMesh->mNumFaces; ++j)
+        {
+            // only dem triangles
+            assert(assimpMesh->mFaces[j].mNumIndices == numFloatsPerTriangle);
+            for (uint32_t index = 0; index < numFloatsPerTriangle; index++)
+            {
+                assert(assimpMesh->mFaces[j].mIndices[index] <= UINT16_MAX);
+                jonsMesh.mIndiceData.push_back(assimpMesh->mFaces[j].mIndices[index]);
+            }
         }
 
         return true;
@@ -309,37 +317,41 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool ProcessVertexBoneWeights(std::vector<PackageVertexBoneWeights>& boneWeightsContainer, const aiMesh* assimpMesh)
+    bool ProcessVertexBoneWeights(std::vector<uint32_t>& boneIndices, std::vector<float>& boneWeights, const aiMesh* assimpMesh)
     {
+        // make sure containers are large enough as we will access indices directly when iterating the bones
         const uint32_t numVertices = assimpMesh->mNumVertices;
-        boneWeightsContainer.reserve(numVertices);
+        const uint32_t maxContainerSize = numVertices * PackageMesh::MAX_NUM_BONES;
+        boneIndices.resize(maxContainerSize);
+        boneWeights.resize(maxContainerSize);
 
         const uint32_t numBones = assimpMesh->mNumBones;
         for (uint32_t boneIndex = 0; boneIndex < numBones; ++boneIndex)
         {
-            const auto bone = assimpMesh->mBones[boneIndex];
+            const auto assimpBone = assimpMesh->mBones[boneIndex];
             
-            const uint32_t numWeights = bone->mNumWeights;
+            const uint32_t numWeights = assimpBone->mNumWeights;
             for (uint32_t weightIndex = 0; weightIndex < numWeights; ++weightIndex)
             {
-                const auto weight = bone->mWeights[weightIndex];
-                const auto vertexBoneWeight = boneWeightsContainer.at(weight.mVertexId);
-                
+                const auto assimpWeight = assimpBone->mWeights[weightIndex];
+                const uint32_t vertexStartIndex = assimpWeight.mVertexId * PackageMesh::MAX_NUM_BONES;
+
                 // make sure we havn't reached bone weight cap per bone
-                const bool notExceededNumBones = UsedLessThanMaxNumBones(vertexBoneWeight);
+                const bool notExceededNumBones = UsedLessThanMaxNumBones(boneWeights, vertexStartIndex);
                 if (!notExceededNumBones)
                 {
                     Log("ERROR: More bone weights used than capacity for");
                     return false;
                 }
                 
-                uint32_t firstFreeIndex = 0;
-                while (!IsEqual(vertexBoneWeight.mBoneWeights.at(firstFreeIndex), 0.0f))
+                // get the first unused bone index
+                uint32_t firstFreeIndex = vertexStartIndex;
+                while (!IsEqual(boneWeights.at(firstFreeIndex), 0.0f))
                     ++firstFreeIndex;
 
-                //boneWeightsContainer.at(weight.mVertexId).mBoneWeights.pus
+                boneWeights.at(firstFreeIndex) = assimpWeight.mWeight;
+                boneIndices.at(firstFreeIndex) = boneIndex;
             }
-            //boneContainer.emplace_back(bone->mName.C_Str(), aiMat4ToJonsMat4(bone->mOffsetMatrix));
         }
 
         return true;
@@ -547,12 +559,12 @@ namespace JonsAssetImporter
         return ret;
     }
 
-    bool UsedLessThanMaxNumBones(const PackageVertexBoneWeights& vertexBoneWeights)
+    bool UsedLessThanMaxNumBones(const std::vector<float>& boneWeights, const uint32_t offset)
     {
-        for (uint32_t index = 0; index < PackageVertexBoneWeights::MAX_NUM_BONES; ++index)
+        for (uint32_t index = offset; index < offset + PackageMesh::MAX_NUM_BONES; ++index)
         {
             // weight zero means unused index
-            if (IsEqual(vertexBoneWeights.mBoneWeights.at(index), 0.0f))
+            if (IsEqual(boneWeights.at(index), 0.0f))
                 return true;
         }
 

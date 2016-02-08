@@ -14,23 +14,25 @@ namespace JonsEngine
 
     static DX11MeshID gNextMeshID = 1;
 
+    void AppendAABBVertices(std::vector<float>& vertexContainer, const Vec3& minBounds, const Vec3& maxBounds);
+
 
     DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
-        const std::vector<float>& tangentData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
-        : 
-        mContext(context), mVertexBuffer(nullptr), mNormalBuffer(nullptr), mTangentBuffer(nullptr), mTexcoordBuffer(nullptr), mIndexBuffer(nullptr), mMeshID(gNextMeshID++), mNumVertices(vertexData.size()), mNumIndices(indexData.size())
+        const std::vector<uint32_t>& boneIndices, const std::vector<float>& boneWeights, const std::vector<float>& tangentData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds) : 
+        mContext(context),
+        mVertexBuffer(nullptr),
+        mNormalBuffer(nullptr),
+        mTangentBuffer(nullptr),
+        mTexcoordBuffer(nullptr),
+        mIndexBuffer(nullptr),
+        mMeshID(gNextMeshID++),
+        mNumVertices(vertexData.size()),
+        mNumIndices(indexData.size())
     {
         // vertex buffer
         // use a temporary vector to merge vertices and AABB points
         std::vector<float> tempVertexData(vertexData);
-        tempVertexData.push_back(minBounds.x); tempVertexData.push_back(minBounds.y); tempVertexData.push_back(minBounds.z);
-        tempVertexData.push_back(minBounds.x); tempVertexData.push_back(maxBounds.y); tempVertexData.push_back(minBounds.z);
-        tempVertexData.push_back(minBounds.x); tempVertexData.push_back(maxBounds.y); tempVertexData.push_back(maxBounds.z);
-        tempVertexData.push_back(minBounds.x); tempVertexData.push_back(minBounds.y); tempVertexData.push_back(maxBounds.z);
-        tempVertexData.push_back(maxBounds.x); tempVertexData.push_back(minBounds.y); tempVertexData.push_back(maxBounds.z);
-        tempVertexData.push_back(maxBounds.x); tempVertexData.push_back(minBounds.y); tempVertexData.push_back(minBounds.z);
-        tempVertexData.push_back(maxBounds.x); tempVertexData.push_back(maxBounds.y); tempVertexData.push_back(minBounds.z);
-        tempVertexData.push_back(maxBounds.x); tempVertexData.push_back(maxBounds.y); tempVertexData.push_back(maxBounds.z);
+        AppendAABBVertices(tempVertexData, minBounds, maxBounds);
 
         D3D11_BUFFER_DESC bufferDescription;
         ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
@@ -134,5 +136,18 @@ namespace JonsEngine
         mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gVertexSize, &offset);
         mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, mNumIndices * sizeof(uint16_t));
         mContext->DrawIndexed(numAABBPoints, 0, 0);
+    }
+
+
+    void AppendAABBVertices(std::vector<float>& vertexContainer, const Vec3& minBounds, const Vec3& maxBounds)
+    {
+        vertexContainer.push_back(minBounds.x); vertexContainer.push_back(minBounds.y); vertexContainer.push_back(minBounds.z);
+        vertexContainer.push_back(minBounds.x); vertexContainer.push_back(maxBounds.y); vertexContainer.push_back(minBounds.z);
+        vertexContainer.push_back(minBounds.x); vertexContainer.push_back(maxBounds.y); vertexContainer.push_back(maxBounds.z);
+        vertexContainer.push_back(minBounds.x); vertexContainer.push_back(minBounds.y); vertexContainer.push_back(maxBounds.z);
+        vertexContainer.push_back(maxBounds.x); vertexContainer.push_back(minBounds.y); vertexContainer.push_back(maxBounds.z);
+        vertexContainer.push_back(maxBounds.x); vertexContainer.push_back(minBounds.y); vertexContainer.push_back(minBounds.z);
+        vertexContainer.push_back(maxBounds.x); vertexContainer.push_back(maxBounds.y); vertexContainer.push_back(minBounds.z);
+        vertexContainer.push_back(maxBounds.x); vertexContainer.push_back(maxBounds.y); vertexContainer.push_back(maxBounds.z);
     }
 }

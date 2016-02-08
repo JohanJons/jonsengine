@@ -18,6 +18,8 @@
 
 namespace JonsEngine
 {
+    // TODO: currently a mix of SoA and AoS - refactor into AoS for better performance?
+
     const uint8_t LatestMajorVersion = 0;
     const uint8_t LatestMinorVersion = 1;
 
@@ -93,21 +95,11 @@ namespace JonsEngine
         PackageBone(const std::string& name, const Mat4& transform);
     };
 
-    struct PackageVertexBoneWeights
-    {
-        static const uint32_t MAX_NUM_BONES = 4;
-
-        std::array<PackageBone::BoneIndex, MAX_NUM_BONES> mBoneIndices;
-        std::array<uint32_t, MAX_NUM_BONES> mBoneWeights;
-
-
-        PackageVertexBoneWeights();
-    };
-
     struct PackageMesh
     {
         typedef uint32_t MeshIndex;
         static const MeshIndex INVALID_MESH_INDEX = UINT32_MAX;
+        static const uint32_t MAX_NUM_BONES = 4;
 
         std::string mName;
         PackageAABB mAABB;
@@ -116,7 +108,8 @@ namespace JonsEngine
         std::vector<float> mNormalData;
         std::vector<float> mTexCoordsData;
         std::vector<float> mTangentData;
-        std::vector<PackageVertexBoneWeights> mVertexBoneWeights;
+        std::vector<float> mBoneWeights;
+        std::vector<uint32_t> mBoneIndices;
         std::vector<uint16_t> mIndiceData;
         PackageMaterial::MaterialIndex mMaterialIndex;
 
@@ -233,13 +226,6 @@ namespace boost
         }
 
         template<class Archive>
-        void serialize(Archive & ar, JonsEngine::PackageVertexBoneWeights& vertexBoneWeights, const unsigned int version)
-        {
-            ar & vertexBoneWeights.mBoneIndices;
-            ar & vertexBoneWeights.mBoneWeights;
-        }
-
-        template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageMesh& mesh, const unsigned int version)
         {
             ar & mesh.mName;
@@ -249,7 +235,8 @@ namespace boost
             ar & mesh.mNormalData;
             ar & mesh.mTexCoordsData;
             ar & mesh.mTangentData;
-            ar & mesh.mVertexBoneWeights;
+            ar & mesh.mBoneIndices;
+            ar & mesh.mBoneWeights;
             ar & mesh.mIndiceData;
             ar & mesh.mMaterialIndex;
         }

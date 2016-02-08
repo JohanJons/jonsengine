@@ -147,11 +147,11 @@ namespace JonsEngine
 
 
     DX11MeshID DX11RendererImpl::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,
-        const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
+        const std::vector<uint32_t>& boneIndices, const std::vector<float>& boneWeights, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
     {
         auto allocator = mMemoryAllocator;
 
-        return mMeshes.Insert(mDevice, mContext, vertexData, normalData, texCoords, tangentData, indexData, minBounds, maxBounds);
+        return mMeshes.Insert(mDevice, mContext, vertexData, normalData, texCoords, tangentData, boneIndices, boneWeights, indexData, minBounds, maxBounds);
     }
 
     DX11MaterialID DX11RendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
