@@ -21,6 +21,8 @@ namespace JonsEngine
             VERTEX_BUFFER_SLOT_NORMALS,
             VERTEX_BUFFER_SLOT_TEXCOORDS,
             VERTEX_BUFFER_SLOT_TANGENTS,
+            VERTEX_BUFFER_SLOT_BONE_INDICES,
+            VERTEX_BUFFER_SLOT_BONE_WEIGHTS,
             NUM_VERTEX_BUFFER_SLOTS
         };
 
@@ -43,9 +45,11 @@ namespace JonsEngine
         ID3D11BufferPtr mNormalBuffer;
         ID3D11BufferPtr mTangentBuffer;
         ID3D11BufferPtr mTexcoordBuffer;
+        ID3D11BufferPtr mBoneIndexBuffer;
+        ID3D11BufferPtr mBoneWeightBuffer;
         ID3D11BufferPtr mIndexBuffer;
 
-        uint32_t mNumVertices;
-        uint16_t mNumIndices;
+        const uint32_t mNumVertices;
+        const uint16_t mNumIndices;
     };
 }

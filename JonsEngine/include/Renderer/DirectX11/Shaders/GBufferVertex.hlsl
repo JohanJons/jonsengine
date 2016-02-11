@@ -10,6 +10,8 @@ struct GBufferVSIn
     float2 mTexcoord : TEXCOORD;
     float3 mTangent : TANGENT;
     float3 mBitangent : BITANGENT;
+    float mBoneIndices[MAX_BONES] : BONE_INDICES;
+    float mBoneWeights[MAX_BONES] : BONE_WEIGHTS;
 };
 
 struct GBufferVSOut
@@ -30,6 +32,7 @@ cbuffer GBufferConstants : register(CBUFFER_REGISTER_VERTEX)
     float gTextureTilingFactor;
     bool gHasDiffuseTexture;
     bool gHasNormalTexture;
+    bool gHasBones;
 };
 
 

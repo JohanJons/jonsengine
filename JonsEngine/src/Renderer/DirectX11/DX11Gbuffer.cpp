@@ -14,6 +14,8 @@ namespace JonsEngine
         TEXCOORD,
         TANGENT,
         BITANGENT,
+        BONE_INDEX,
+        BONE_WEIGHT,
         NUM_INPUT_LAYOUTS
     };
 
@@ -82,6 +84,22 @@ namespace JonsEngine
         inputDescription[VSInputLayout::BITANGENT].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
         inputDescription[VSInputLayout::BITANGENT].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
         inputDescription[VSInputLayout::BITANGENT].InstanceDataStepRate = 0;
+
+        inputDescription[VSInputLayout::BONE_INDEX].SemanticName = "BONE_INDICES";
+        inputDescription[VSInputLayout::BONE_INDEX].SemanticIndex = 0;
+        inputDescription[VSInputLayout::BONE_INDEX].Format = DXGI_FORMAT_R32_UINT;
+        inputDescription[VSInputLayout::BONE_INDEX].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_BONE_INDICES;
+        inputDescription[VSInputLayout::BONE_INDEX].AlignedByteOffset = 0;
+        inputDescription[VSInputLayout::BONE_INDEX].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[VSInputLayout::BONE_INDEX].InstanceDataStepRate = 0;
+
+        inputDescription[VSInputLayout::BONE_WEIGHT].SemanticName = "BONE_WEIGHTS";
+        inputDescription[VSInputLayout::BONE_WEIGHT].SemanticIndex = 0;
+        inputDescription[VSInputLayout::BONE_WEIGHT].Format = DXGI_FORMAT_R32_FLOAT;
+        inputDescription[VSInputLayout::BONE_WEIGHT].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_BONE_WEIGHTS;
+        inputDescription[VSInputLayout::BONE_WEIGHT].AlignedByteOffset = 0;
+        inputDescription[VSInputLayout::BONE_WEIGHT].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        inputDescription[VSInputLayout::BONE_WEIGHT].InstanceDataStepRate = 0;
         DXCALL(device->CreateInputLayout(inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gGBufferVertexShader, sizeof(gGBufferVertexShader), &mInputLayout));
 
         // create shader objects

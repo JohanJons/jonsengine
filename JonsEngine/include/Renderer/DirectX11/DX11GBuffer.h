@@ -36,10 +36,15 @@ namespace JonsEngine
             float mTextureTilingFactor;
             uint32_t mHasDiffuseTexture;
             uint32_t mHasNormalTexture;
-            float __padding;
+            uint32_t mHasBones;
 
-            GBufferCBuffer(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuse, const bool hasNormal) :
-                mWVPMatrix(wvpMatrix), mWorldViewMatrix(worldViewMatrix), mTextureTilingFactor(textureTilingFactor), mHasDiffuseTexture(hasDiffuse), mHasNormalTexture(hasNormal)
+            GBufferCBuffer(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuse, const bool hasNormal, const bool hasBones) :
+                mWVPMatrix(wvpMatrix),
+                mWorldViewMatrix(worldViewMatrix),
+                mTextureTilingFactor(textureTilingFactor),
+                mHasDiffuseTexture(hasDiffuse),
+                mHasNormalTexture(hasNormal),
+                mHasBones(hasBones)
             {
             }
         };

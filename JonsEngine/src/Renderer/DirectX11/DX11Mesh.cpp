@@ -1,6 +1,7 @@
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/DirectX11/Shaders/Constants.h"
 
 #include <array>
 
@@ -9,6 +10,8 @@ namespace JonsEngine
     const static uint32_t gVertexSize = sizeof(float) * 3;
     const static uint32_t gTangentSize = gVertexSize * 2;
     const static uint32_t gTexcoordSize = sizeof(float) * 2;
+    const static uint32_t gBoneIndexSize = sizeof(uint32_t) * MAX_BONES;
+    const static uint32_t gBoneWeightSize = sizeof(float) * MAX_BONES;
     const static uint32_t gStaticOffset = 0;
     const std::array<uint16_t, 16> gAABBIndices = { 0, 1, 2, 3, 0, 5, 4, 3, 2, 7, 4, 7, 6, 5, 6, 1 };
 
@@ -24,6 +27,8 @@ namespace JonsEngine
         mNormalBuffer(nullptr),
         mTangentBuffer(nullptr),
         mTexcoordBuffer(nullptr),
+        mBoneIndexBuffer(nullptr),
+        mBoneWeightBuffer(nullptr),
         mIndexBuffer(nullptr),
         mMeshID(gNextMeshID++),
         mNumVertices(vertexData.size()),
@@ -85,6 +90,30 @@ namespace JonsEngine
             DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mTexcoordBuffer));
         }
 
+        // bone data
+        if (boneIndices.size() && boneWeights.size())
+        {
+            // indices
+            ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
+            bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
+            bufferDescription.ByteWidth = boneIndices.size() * sizeof(uint32_t);
+            bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+            ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
+            initData.pSysMem = &boneIndices.at(0);
+            DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mBoneIndexBuffer));
+
+            // weights
+            ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
+            bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
+            bufferDescription.ByteWidth = boneWeights.size() * sizeof(float);
+            bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+            ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
+            initData.pSysMem = &boneWeights.at(0);
+            DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mBoneWeightBuffer));
+        }
+
         // index buffer
         // use a temporary vector to merge vertex indices and AABB indices
         std::vector<uint16_t> tempIndiceData(indexData);
@@ -110,11 +139,15 @@ namespace JonsEngine
         mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gVertexSize, &gStaticOffset);
         if (mNormalBuffer)
             mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer.p, &gVertexSize, &gStaticOffset);
-        if (mTangentBuffer)
-            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer.p, &gTangentSize, &gStaticOffset);
         if (mTexcoordBuffer)
             mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer.p, &gTexcoordSize, &gStaticOffset);
-        
+        if (mTangentBuffer)
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer.p, &gTangentSize, &gStaticOffset);
+        if (mBoneIndexBuffer)
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_INDICES, 1, &mBoneIndexBuffer.p, &gBoneIndexSize, &gStaticOffset);
+        if (mBoneWeightBuffer)
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_WEIGHTS, 1, &mBoneWeightBuffer.p, &gBoneWeightSize, &gStaticOffset);
+
         mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
         mContext->DrawIndexed(mNumIndices, 0, 0);
     }

@@ -38,7 +38,9 @@ namespace JonsEngine
         const Vec3 minBounds(-halfX, -halfY, -halfZ);
         const Vec3 maxBounds(halfX, halfY, halfZ);
 
-        const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, indiceData, minBounds, maxBounds);
+        std::vector<uint32_t> boneIndices;
+        std::vector<float> boneWeights;
+        const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, boneIndices, boneWeights, indiceData, minBounds, maxBounds);
         assert(meshID != INVALID_DX11_MESH_ID);
 
         return mModels.Insert(modelName, minBounds, maxBounds, meshID);
@@ -61,7 +63,9 @@ namespace JonsEngine
         const Vec3 minBounds(-radius, -radius, -radius);
         const Vec3 maxBounds(radius, radius, radius);
 
-        const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, indiceData, minBounds, maxBounds);
+        std::vector<uint32_t> boneIndices;
+        std::vector<float> boneWeights;
+        const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, boneIndices, boneWeights, indiceData, minBounds, maxBounds);
         assert(meshID != INVALID_DX11_MESH_ID);
         
         return mModels.Insert(modelName, minBounds, maxBounds, meshID);
@@ -175,7 +179,7 @@ namespace JonsEngine
             {
                 const PackageMesh& mesh = model.mMeshes.at(meshIndex);
 
-                const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
+                const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mBoneIndices, mesh.mBoneWeights, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
                 DX11MaterialID materialID = INVALID_DX11_MATERIAL_ID;
                 const bool meshHasMaterial = mesh.mMaterialIndex != PackageMaterial::INVALID_MATERIAL_INDEX;
                 if (meshHasMaterial)
