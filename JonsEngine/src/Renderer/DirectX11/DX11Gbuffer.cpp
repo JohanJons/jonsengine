@@ -87,7 +87,7 @@ namespace JonsEngine
 
         inputDescription[VSInputLayout::BONE_INDEX].SemanticName = "BONE_INDICES";
         inputDescription[VSInputLayout::BONE_INDEX].SemanticIndex = 0;
-        inputDescription[VSInputLayout::BONE_INDEX].Format = DXGI_FORMAT_R32_UINT;
+        inputDescription[VSInputLayout::BONE_INDEX].Format = DXGI_FORMAT_R8G8B8A8_UINT;
         inputDescription[VSInputLayout::BONE_INDEX].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_BONE_INDICES;
         inputDescription[VSInputLayout::BONE_INDEX].AlignedByteOffset = 0;
         inputDescription[VSInputLayout::BONE_INDEX].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -95,7 +95,7 @@ namespace JonsEngine
 
         inputDescription[VSInputLayout::BONE_WEIGHT].SemanticName = "BONE_WEIGHTS";
         inputDescription[VSInputLayout::BONE_WEIGHT].SemanticIndex = 0;
-        inputDescription[VSInputLayout::BONE_WEIGHT].Format = DXGI_FORMAT_R32_FLOAT;
+        inputDescription[VSInputLayout::BONE_WEIGHT].Format = DXGI_FORMAT_R16G16B16A16_UNORM;
         inputDescription[VSInputLayout::BONE_WEIGHT].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_BONE_WEIGHTS;
         inputDescription[VSInputLayout::BONE_WEIGHT].AlignedByteOffset = 0;
         inputDescription[VSInputLayout::BONE_WEIGHT].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -112,14 +112,14 @@ namespace JonsEngine
     }
 
 
-    void DX11GBuffer::SetConstantData(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture)
+    void DX11GBuffer::SetConstantData(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture, const bool hasBones)
     {
-        mConstantBuffer.SetData({ wvpMatrix, worldViewMatrix, textureTilingFactor, hasDiffuseTexture, hasNormalTexture });
+        mConstantBuffer.SetData({ wvpMatrix, worldViewMatrix, textureTilingFactor, hasDiffuseTexture, hasNormalTexture, hasBones });
     }
 
     void DX11GBuffer::BindForGeometryStage(ID3D11DepthStencilViewPtr dsv)
     {
-        for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
+        for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; ++index)
         {
             // unbind gbuffer textures as input, it is now rendertarget
             mContext->PSSetShaderResources(index, 1, &gNullSRV.p);
@@ -143,7 +143,7 @@ namespace JonsEngine
 
     void DX11GBuffer::BindGeometryTextures()
     {
-        for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; index++)
+        for (uint32_t index = 0; index < DX11GBuffer::GBUFFER_NUM_RENDERTARGETS; ++index)
             mContext->PSSetShaderResources(index, 1, &mShaderResourceViews.at(index).p);
     }
 }

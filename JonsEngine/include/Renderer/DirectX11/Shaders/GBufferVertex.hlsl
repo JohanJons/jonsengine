@@ -10,8 +10,8 @@ struct GBufferVSIn
     float2 mTexcoord : TEXCOORD;
     float3 mTangent : TANGENT;
     float3 mBitangent : BITANGENT;
-    float mBoneIndices[MAX_BONES] : BONE_INDICES;
-    float mBoneWeights[MAX_BONES] : BONE_WEIGHTS;
+    uint mBoneIndices : BONE_INDICES;
+    float4 mBoneWeights : BONE_WEIGHTS;
 };
 
 struct GBufferVSOut
