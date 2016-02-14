@@ -8,13 +8,14 @@ namespace JonsEngine
 {
     struct RenderableMesh
     {
-        RenderableMesh(const DX11MeshID mesh, const Mat4& worldTransform) : mMeshID(mesh), mWorldTransform(worldTransform)
+        RenderableMesh(const DX11MeshID mesh, const Mat4& worldTransform, const bool isAnimating) : mMeshID(mesh), mWorldTransform(worldTransform), mIsAnimating(isAnimating)
         {
         }
 
 
         DX11MeshID mMeshID;
         Mat4 mWorldTransform;
+        bool mIsAnimating;
     };
     
     typedef std::vector<RenderableMesh> RenderableMeshes;
@@ -33,8 +34,8 @@ namespace JonsEngine
 
     struct RenderableModel
     {
-        RenderableModel(const DX11MeshID mesh, const Mat4& worldTransform, const DX11MaterialID diffuseTexture, const DX11MaterialID normalTexture, const float specFactor, const float tilingFactor) :
-            mMesh(mesh, worldTransform), mMaterial(diffuseTexture, normalTexture, specFactor), mTextureTilingFactor(tilingFactor)
+        RenderableModel(const DX11MeshID mesh, const Mat4& worldTransform, const bool isStatic, const DX11MaterialID diffuseTexture, const DX11MaterialID normalTexture, const float specFactor, const float tilingFactor) :
+            mMesh(mesh, worldTransform, isStatic), mMaterial(diffuseTexture, normalTexture, specFactor), mTextureTilingFactor(tilingFactor)
         {
         }
 

@@ -38,9 +38,7 @@ namespace JonsEngine
         const Vec3 minBounds(-halfX, -halfY, -halfZ);
         const Vec3 maxBounds(halfX, halfY, halfZ);
 
-        std::vector<uint32_t> boneIndices;
-        std::vector<float> boneWeights;
-        const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, boneIndices, boneWeights, indiceData, minBounds, maxBounds);
+        const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, indiceData, minBounds, maxBounds);
         assert(meshID != INVALID_DX11_MESH_ID);
 
         return mModels.Insert(modelName, minBounds, maxBounds, meshID);
@@ -63,9 +61,7 @@ namespace JonsEngine
         const Vec3 minBounds(-radius, -radius, -radius);
         const Vec3 maxBounds(radius, radius, radius);
 
-        std::vector<uint32_t> boneIndices;
-        std::vector<float> boneWeights;
-        const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, boneIndices, boneWeights, indiceData, minBounds, maxBounds);
+        const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, indiceData, minBounds, maxBounds);
         assert(meshID != INVALID_DX11_MESH_ID);
         
         return mModels.Insert(modelName, minBounds, maxBounds, meshID);

@@ -116,6 +116,7 @@ namespace JonsEngine
 
             const bool hasDiffuseTexture = model.mMaterial.mDiffuseTextureID != INVALID_DX11_MATERIAL_ID;
             const bool hasNormalTexture = model.mMaterial.mNormalTextureID != INVALID_DX11_MATERIAL_ID;
+            const bool isAnimating = model.mMesh.mIsAnimating;
 
             if (hasDiffuseTexture)
                 mMaterialMap.GetItem(model.mMaterial.mDiffuseTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_DIFFUSE);
@@ -125,7 +126,8 @@ namespace JonsEngine
 
             const Mat4& localWorldMatrix = model.mMesh.mWorldTransform;
 
-            mGBuffer.SetConstantData(renderQueue.mCamera.mCameraViewProjectionMatrix * localWorldMatrix, renderQueue.mCamera.mCameraViewMatrix * localWorldMatrix, model.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
+            mGBuffer.SetConstantData(renderQueue.mCamera.mCameraViewProjectionMatrix * localWorldMatrix, renderQueue.mCamera.mCameraViewMatrix * localWorldMatrix, model.mTextureTilingFactor,
+                hasDiffuseTexture, hasNormalTexture, isAnimating);
             mMeshMap.GetItem(model.mMesh.mMeshID).Draw();
         }
     }

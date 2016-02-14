@@ -23,7 +23,7 @@ namespace JonsEngine
         DX11GBuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc);
         ~DX11GBuffer();
 
-        void SetConstantData(const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture, const bool hasBones);
+        void SetConstantData(const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture, const bool isAnimating);
         void BindForGeometryStage(ID3D11DepthStencilViewPtr dsv);
         void BindGeometryTextures();
 
@@ -36,15 +36,15 @@ namespace JonsEngine
             float mTextureTilingFactor;
             uint32_t mHasDiffuseTexture;
             uint32_t mHasNormalTexture;
-            uint32_t mHasBones;
+            uint32_t mIsAnimating;
 
-            GBufferCBuffer(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuse, const bool hasNormal, const bool hasBones) :
+            GBufferCBuffer(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuse, const bool hasNormal, const bool isAnimating) :
                 mWVPMatrix(wvpMatrix),
                 mWorldViewMatrix(worldViewMatrix),
                 mTextureTilingFactor(textureTilingFactor),
                 mHasDiffuseTexture(hasDiffuse),
                 mHasNormalTexture(hasNormal),
-                mHasBones(hasBones)
+                mIsAnimating(isAnimating)
             {
             }
         };

@@ -32,7 +32,7 @@ cbuffer GBufferConstants : register(CBUFFER_REGISTER_VERTEX)
     float gTextureTilingFactor;
     bool gHasDiffuseTexture;
     bool gHasNormalTexture;
-    bool gHasBones;
+    bool gIsAnimating;
 };
 
 

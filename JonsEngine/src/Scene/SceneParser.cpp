@@ -240,20 +240,24 @@ namespace JonsEngine
     template <typename RENDERABLE_TYPE, typename ...MESH_ARGS>
     void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const StaticActor& actor, const Model& model, const ModelNode& node, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args)
     {
-        resultContainer.emplace_back(meshID, worldTransform, std::forward<MESH_ARGS>(args)...);
+        const bool isAnimating = false;
+
+        resultContainer.emplace_back(meshID, worldTransform, isAnimating, std::forward<MESH_ARGS>(args)...);
     }
 
     template <typename RENDERABLE_TYPE, typename ...MESH_ARGS>
     void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const AnimatedActor& actor, const Model& model, const ModelNode& node, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args)
     {
-        if (actor.IsPlaying())
+        const bool isAnimating = actor.IsPlaying();
+
+        if (isAnimating)
         {
             const ModelAnimation& animation = model.GetAnimation(actor.GetAnimation());
             const Mat4& localTransform = animation.GetNodeTransform(node.GetModelNodeIndex(), actor.ElapstedAnimationTime());
 
-            resultContainer.emplace_back(meshID, worldTransform * localTransform, std::forward<MESH_ARGS>(args)...);
+            resultContainer.emplace_back(meshID, worldTransform * localTransform, isAnimating, std::forward<MESH_ARGS>(args)...);
         }
         else
-            resultContainer.emplace_back(meshID, worldTransform, std::forward<MESH_ARGS>(args)...);
+            resultContainer.emplace_back(meshID, worldTransform, isAnimating, std::forward<MESH_ARGS>(args)...);
     }
 }

@@ -17,7 +17,13 @@ namespace JonsEngine
 
 
     DX11MeshID DX11Renderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,
-        const std::vector<uint32_t>& boneIndices, const std::vector<float>& boneWeights, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
+        const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
+    {
+        return mImplementation->CreateMesh(vertexData, normalData, texCoords, tangentData, indexData, minBounds, maxBounds);
+    }
+
+    DX11MeshID DX11Renderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,
+        const std::vector<uint16_t>& boneIndices, const std::vector<float>& boneWeights, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
     {
         return mImplementation->CreateMesh(vertexData, normalData, texCoords, tangentData, boneIndices, boneWeights, indexData, minBounds, maxBounds);
     }

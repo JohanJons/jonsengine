@@ -21,7 +21,13 @@ namespace JonsEngine
 
 
     DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
-        const std::vector<uint32_t>& boneIndices, const std::vector<float>& boneWeights, const std::vector<float>& tangentData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds) : 
+        const std::vector<float>& tangentData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds) :
+        DX11Mesh(device, context, vertexData, normalData, texCoords, tangentData, std::vector<uint16_t>(), std::vector<float>(), indexData, minBounds, maxBounds)
+    {
+    }
+
+    DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
+        const std::vector<float>& tangentData, const std::vector<uint16_t>& boneIndices, const std::vector<float>& boneWeights, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds) :
         mContext(context),
         mVertexBuffer(nullptr),
         mNormalBuffer(nullptr),
@@ -96,7 +102,7 @@ namespace JonsEngine
             // indices
             ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
             bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-            bufferDescription.ByteWidth = boneIndices.size() * sizeof(uint32_t);
+            bufferDescription.ByteWidth = boneIndices.size() * sizeof(uint16_t);
             bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
             ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
