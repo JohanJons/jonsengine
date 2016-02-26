@@ -36,10 +36,13 @@ namespace JonsEngine
         mBoneIndexBuffer(nullptr),
         mBoneWeightBuffer(nullptr),
         mIndexBuffer(nullptr),
+        mBoneBuffer(nullptr),
         mMeshID(gNextMeshID++),
         mNumVertices(vertexData.size()),
         mNumIndices(indexData.size())
     {
+        // TODO: split into more manageable code chunks
+
         // vertex buffer
         // use a temporary vector to merge vertices and AABB points
         std::vector<float> tempVertexData(vertexData);
@@ -96,7 +99,7 @@ namespace JonsEngine
             DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mTexcoordBuffer));
         }
 
-        // bone data
+        // bone indices and weights
         if (boneIndices.size() && boneWeights.size())
         {
             // indices
@@ -119,6 +122,16 @@ namespace JonsEngine
             initData.pSysMem = &boneWeights.at(0);
             DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mBoneWeightBuffer));
         }
+
+        // bone matrices
+        //ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
+        //bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
+        //bufferDescription.ByteWidth = boneIndices.size() * sizeof(Mat4);
+        //bufferDescription.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+        //ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
+        //initData.pSysMem = &boneIndices.at(0);
+        //DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mBoneIndexBuffer));
 
         // index buffer
         // use a temporary vector to merge vertex indices and AABB indices
