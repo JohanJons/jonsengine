@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_HLSL
 #define CONSTANTS_HLSL
 
+// TODO: refactor this into a more efficient system
+
 #define CBUFFER_SLOT_VERTEX 0
 #define CBUFFER_SLOT_PIXEL 1
 #define CBUFFER_SLOT_COMPUTE 2
@@ -23,6 +25,8 @@
 #define TEXTURE_REGISTER_NORMAL t1
 #define TEXTURE_REGISTER_DEPTH t2
 #define TEXTURE_REGISTER_EXTRA t3
+
+#define SBUFFER_REGISTER_VERTEX t4
 
 #define UAV_SLOT 0
 #define UAV_REGISTER u0

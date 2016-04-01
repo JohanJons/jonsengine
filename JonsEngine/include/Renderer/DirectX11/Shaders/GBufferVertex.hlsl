@@ -35,6 +35,8 @@ cbuffer GBufferConstants : register(CBUFFER_REGISTER_VERTEX)
     bool gIsAnimating;
 };
 
+StructuredBuffer<float4x4> gBones : register (SBUFFER_REGISTER_VERTEX);
+
 
 GBufferVSOut vs_main(GBufferVSIn input)
 {
