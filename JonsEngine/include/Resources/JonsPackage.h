@@ -291,7 +291,7 @@ namespace boost
         void serialize(Archive & ar, JonsEngine::PackageAnimatedNode& animationNode, const unsigned int version)
         {
             ar & animationNode.mNodeIndex;
-            ar & animationNode.mAnimationTransforms;
+            ar & animationNode.mKeyframes;
         }
         
         template<class Archive>
