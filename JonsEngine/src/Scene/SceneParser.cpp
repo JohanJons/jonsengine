@@ -253,9 +253,9 @@ namespace JonsEngine
         if (isAnimating)
         {
             const ModelAnimation& animation = model.GetAnimation(actor.GetAnimation());
-            const Mat4& localTransform = animation.GetNodeTransform(node.GetModelNodeIndex(), actor.ElapstedAnimationTime());
+            const Mat4& animationTransform = animation.GetNodeTransform(node.GetModelNodeIndex(), actor.ElapstedAnimationTime());
 
-            resultContainer.emplace_back(meshID, worldTransform * localTransform, isAnimating, std::forward<MESH_ARGS>(args)...);
+            resultContainer.emplace_back(meshID, worldTransform * animationTransform, isAnimating, std::forward<MESH_ARGS>(args)...);
         }
         else
             resultContainer.emplace_back(meshID, worldTransform, isAnimating, std::forward<MESH_ARGS>(args)...);

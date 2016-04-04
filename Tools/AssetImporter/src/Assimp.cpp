@@ -444,10 +444,10 @@ namespace JonsAssetImporter
             for (const PackageAnimatedNode& animNode : animation.mAnimatedNodes)
             {
                 const PackageNode& node = model.mNodes.at(animNode.mNodeIndex);
-                for (const PackageAnimatedNodeTransform& transform : animNode.mAnimationTransforms)
+                for (const PackageAnimationKeyframe& keyframe : animNode.mKeyframes)
                 {
                     AABB aabb(node.mAABB.mMinBounds, node.mAABB.mMaxBounds);
-                    aabb = aabb * transform.mTransform;
+                    aabb = aabb * keyframe.mTransform;
 
                     const Vec3 tempMin = aabb.Min(), tempMax = aabb.Max();
                     if (tempMin.x < minExtent.x) minExtent.x = tempMin.x;
@@ -460,6 +460,7 @@ namespace JonsAssetImporter
                 }
             }
         }
+
         model.mStaticAABB.mMinBounds = minExtent;
         model.mStaticAABB.mMaxBounds = maxExtent;
     }

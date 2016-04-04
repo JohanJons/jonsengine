@@ -134,20 +134,20 @@ namespace JonsEngine
         PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex);
     };
 
-    struct PackageAnimatedNodeTransform
+    struct PackageAnimationKeyframe
     {
         uint32_t mTimestampMilliseconds;
         Mat4 mTransform;
 
 
-        PackageAnimatedNodeTransform();
-        PackageAnimatedNodeTransform(const uint32_t timestampMilliseconds, const Mat4& transform);
+        PackageAnimationKeyframe();
+        PackageAnimationKeyframe(const uint32_t timestampMilliseconds, const Mat4& transform);
     };
 
     struct PackageAnimatedNode
     {
         PackageNode::NodeIndex mNodeIndex;
-        std::vector<PackageAnimatedNodeTransform> mAnimationTransforms;
+        std::vector<PackageAnimationKeyframe> mKeyframes;
 
 
         PackageAnimatedNode();
@@ -281,10 +281,10 @@ namespace boost
         }
 
         template<class Archive>
-        void serialize(Archive & ar, JonsEngine::PackageAnimatedNodeTransform& animationNodeTransform, const unsigned int version)
+        void serialize(Archive & ar, JonsEngine::PackageAnimationKeyframe& keyframe, const unsigned int version)
         {
-            ar & animationNodeTransform.mTimestampMilliseconds;
-            ar & animationNodeTransform.mTransform;
+            ar & keyframe.mTimestampMilliseconds;
+            ar & keyframe.mTransform;
         }
 
         template<class Archive>

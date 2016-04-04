@@ -124,10 +124,10 @@ namespace JonsEngine
             if (hasNormalTexture)
                 mMaterialMap.GetItem(model.mMaterial.mNormalTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_NORMAL);
 
-            const Mat4& localWorldMatrix = model.mMesh.mWorldTransform;
-
-            mGBuffer.SetConstantData(renderQueue.mCamera.mCameraViewProjectionMatrix * localWorldMatrix, renderQueue.mCamera.mCameraViewMatrix * localWorldMatrix, model.mTextureTilingFactor,
-                hasDiffuseTexture, hasNormalTexture, isAnimating);
+            const Mat4 wvpMatrix = renderQueue.mCamera.mCameraViewProjectionMatrix * model.mMesh.mWorldTransform;
+            const Mat4 worldViewMatrix = renderQueue.mCamera.mCameraViewMatrix * model.mMesh.mWorldTransform;
+            
+            mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, model.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture, isAnimating);
             mMeshMap.GetItem(model.mMesh.mMeshID).Draw();
         }
     }

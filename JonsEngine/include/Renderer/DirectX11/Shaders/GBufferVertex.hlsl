@@ -5,12 +5,12 @@
 
 struct GBufferVSIn
 {
-    float3 mPosition : POSITION;
+    float4 mPosition : POSITION;
     float3 mNormal : NORMAL;
     float2 mTexcoord : TEXCOORD;
     float3 mTangent : TANGENT;
     float3 mBitangent : BITANGENT;
-    uint mBoneIndices : BONE_INDICES;
+    uint4 mBoneIndices : BONE_INDICES;
     float4 mBoneWeights : BONE_WEIGHTS;
 };
 
@@ -37,21 +37,61 @@ cbuffer GBufferConstants : register(CBUFFER_REGISTER_VERTEX)
 
 StructuredBuffer<float4x4> gBones : register (SBUFFER_REGISTER_VERTEX);
 
+float3 ApplyBone(float3 inputNormal, uint4 boneIndices, float4 boneWeights, uint boneNum);
+float4 ApplyBone(float4 inputPosition, uint4 boneIndices, float4 boneWeights, uint boneNum);
+
 
 GBufferVSOut vs_main(GBufferVSIn input)
 {
-    GBufferVSOut output;
+    GBufferVSOut output = (GBufferVSOut)0;
 
-    output.mPosition = mul(gWVPMatrix, float4(input.mPosition, 1.0));
+    // temporary solution
+    if (gIsAnimating)
+    {
+        for (uint boneNum = 0; boneNum < MAX_BONES; ++boneNum)
+        {
+            output.mPosition += ApplyBone(input.mPosition, input.mBoneIndices, input.mBoneWeights, boneNum);
+            output.mNormal += ApplyBone(input.mNormal, input.mBoneIndices, input.mBoneWeights, boneNum);
 
-    // scaling/translation/uniform scaling is fine, we dont need to normalize in VS
-    output.mNormal = mul((float3x3)gWorldViewMatrix, input.mNormal);
-    output.mTangent = mul((float3x3)gWorldViewMatrix, input.mTangent);
-    output.mBitangent = mul((float3x3)gWorldViewMatrix, input.mBitangent);
+            if (gHasNormalTexture)
+            {
+                output.mTangent += ApplyBone(input.mTangent, input.mBoneIndices, input.mBoneWeights, boneNum);
+                output.mBitangent += ApplyBone(input.mBitangent, input.mBoneIndices, input.mBoneWeights, boneNum);
+            }
+        }
+    }
+    else
+    {
+        output.mPosition = input.mPosition;
+        output.mNormal = input.mNormal;
+        output.mTangent = input.mTangent;
+        output.mBitangent = input.mBitangent;
+    }
+        
+    output.mPosition = mul(gWVPMatrix, output.mPosition);
+
+    // rotating/translation/uniform scaling is fine, we dont need to normalize in VS
+    output.mNormal = mul((float3x3)gWorldViewMatrix, output.mNormal);
+    output.mTangent = mul((float3x3)gWorldViewMatrix, output.mTangent);
+    output.mBitangent = mul((float3x3)gWorldViewMatrix, output.mBitangent);
 
     output.mTexcoord = gTextureTilingFactor * input.mTexcoord;
 
     return output;
+}
+
+
+float3 ApplyBone(float3 inputNormal, uint4 boneIndices, float4 boneWeights, uint boneNum)
+{
+    return ApplyBone(float4(inputNormal, 0.0), boneIndices, boneWeights, boneNum).xyz;
+}
+
+float4 ApplyBone(float4 inputPosition, uint4 boneIndices, float4 boneWeights, uint boneNum)
+{
+    const uint boneIndex = boneIndices[boneNum];
+    const uint boneWeight = boneWeights[boneNum];
+
+    return mul(inputPosition, gBones[boneIndex]) * boneWeight;
 }
 
 #endif

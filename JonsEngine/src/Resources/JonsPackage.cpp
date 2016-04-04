@@ -65,11 +65,11 @@ namespace JonsEngine
     {
     }
 
-    PackageAnimatedNodeTransform::PackageAnimatedNodeTransform()
+    PackageAnimationKeyframe::PackageAnimationKeyframe()
     {
     }
 
-    PackageAnimatedNodeTransform::PackageAnimatedNodeTransform(const uint32_t timestampMilliseconds, const Mat4& transform) : mTimestampMilliseconds(timestampMilliseconds), mTransform(transform)
+    PackageAnimationKeyframe::PackageAnimationKeyframe(const uint32_t timestampMilliseconds, const Mat4& transform) : mTimestampMilliseconds(timestampMilliseconds), mTransform(transform)
     {
     }
 

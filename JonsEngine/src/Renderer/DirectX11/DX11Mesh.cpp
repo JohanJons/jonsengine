@@ -169,7 +169,8 @@ namespace JonsEngine
         {
             mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_INDICES, 1, &mBoneIndexBuffer.p, &gBoneIndexSize, &gStaticOffset);
             mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_WEIGHTS, 1, &mBoneWeightBuffer.p, &gBoneWeightSize, &gStaticOffset);
-            mContext->VSSetShaderResources(, 1, &mBoneMatrixBuffer.p);
+            // temp: register c0
+            mContext->VSSetShaderResources(0, 1, &mBoneMatrixBuffer.p);
         }
 
         mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
