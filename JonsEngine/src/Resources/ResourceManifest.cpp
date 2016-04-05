@@ -174,8 +174,12 @@ namespace JonsEngine
             for (const PackageMesh::MeshIndex meshIndex : node.mMeshes)
             {
                 const PackageMesh& mesh = model.mMeshes.at(meshIndex);
+                // temp solution
+                std::vector<Mat4> bones(mesh.mBones.size());
+                for (const PackageBone& bone : mesh.mBones)
+                    bones.emplace_back(bone.mTransform);
 
-                const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mBoneIndices, mesh.mBoneWeights, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
+                const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, bones, mesh.mBoneIndices, mesh.mBoneWeights, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
                 DX11MaterialID materialID = INVALID_DX11_MATERIAL_ID;
                 const bool meshHasMaterial = mesh.mMaterialIndex != PackageMaterial::INVALID_MATERIAL_INDEX;
                 if (meshHasMaterial)
