@@ -38,6 +38,7 @@ namespace JonsEngine
         mBoneWeightBuffer(nullptr),
         mIndexBuffer(nullptr),
         mMeshID(gNextMeshID++),
+        mBoneSRV(nullptr),
         mNumVertices(vertexData.size()),
         mNumIndices(indexData.size()),
         mHasBones(boneMatrices.size() && boneIndices.size() && boneWeights.size())
@@ -134,6 +135,9 @@ namespace JonsEngine
             ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
             initData.pSysMem = &boneWeights.at(0);
             DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mBoneWeightBuffer));
+
+            // bone matrix SRV
+            DXCALL(device->CreateShaderResourceView(mBoneMatrixBuffer, nullptr, &mBoneSRV));
         }
 
         // index buffer
@@ -170,7 +174,7 @@ namespace JonsEngine
             mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_INDICES, 1, &mBoneIndexBuffer.p, &gBoneIndexSize, &gStaticOffset);
             mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_WEIGHTS, 1, &mBoneWeightBuffer.p, &gBoneWeightSize, &gStaticOffset);
             // temp: register c0
-            mContext->VSSetShaderResources(0, 1, &mBoneMatrixBuffer.p);
+            mContext->VSSetShaderResources(0, 1, &mBoneSRV.p);
         }
 
         mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);

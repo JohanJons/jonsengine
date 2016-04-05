@@ -48,6 +48,7 @@ namespace JonsEngine
         ID3D11BufferPtr mBoneIndexBuffer;
         ID3D11BufferPtr mBoneWeightBuffer;
         ID3D11BufferPtr mIndexBuffer;
+        ID3D11ShaderResourceViewPtr mBoneSRV;
 
         const uint32_t mNumVertices;
         const uint16_t mNumIndices;

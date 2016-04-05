@@ -37,8 +37,8 @@ cbuffer GBufferConstants : register(CBUFFER_REGISTER_VERTEX)
 
 StructuredBuffer<float4x4> gBones : register (SBUFFER_REGISTER_VERTEX);
 
-float3 ApplyBone(float3 inputNormal, uint4 boneIndices, float4 boneWeights, uint boneNum);
-float4 ApplyBone(float4 inputPosition, uint4 boneIndices, float4 boneWeights, uint boneNum);
+float3 ApplyBone(float3 normal, uint4 boneIndices, float4 boneWeights, uint boneNum);
+float4 ApplyBone(float4 position, uint4 boneIndices, float4 boneWeights, uint boneNum);
 
 
 GBufferVSOut vs_main(GBufferVSIn input)
@@ -81,17 +81,17 @@ GBufferVSOut vs_main(GBufferVSIn input)
 }
 
 
-float3 ApplyBone(float3 inputNormal, uint4 boneIndices, float4 boneWeights, uint boneNum)
+float3 ApplyBone(float3 normal, uint4 boneIndices, float4 boneWeights, uint boneNum)
 {
-    return ApplyBone(float4(inputNormal, 0.0), boneIndices, boneWeights, boneNum).xyz;
+    return ApplyBone(float4(normal, 0.0), boneIndices, boneWeights, boneNum).xyz;
 }
 
-float4 ApplyBone(float4 inputPosition, uint4 boneIndices, float4 boneWeights, uint boneNum)
+float4 ApplyBone(float4 position, uint4 boneIndices, float4 boneWeights, uint boneNum)
 {
     const uint boneIndex = boneIndices[boneNum];
     const uint boneWeight = boneWeights[boneNum];
 
-    return mul(inputPosition, gBones[boneIndex]) * boneWeight;
+    return mul(position, gBones[boneIndex]) * boneWeight;
 }
 
 #endif

@@ -32,7 +32,8 @@ namespace JonsEngine
     const Mat4& ModelAnimation::GetNodeTransform(const ModelNodeIndex nodeIndex, const Milliseconds elapsedTime) const
     {
         // make sure elapsted time isn't out of bounds
-        assert(mAnimationDuration >= elapsedTime);
+        if (elapsedTime >= mAnimationDuration)
+            return gIdentityMatrix;
 
         const NodeAnimTransformRange& transformRange = mNodeAnimTransformMap.at(nodeIndex);
         const AnimTransformIndex startIndex = transformRange.first;
