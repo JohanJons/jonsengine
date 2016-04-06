@@ -124,8 +124,12 @@ namespace JonsEngine
     {
         mRenderQueue.mAmbientLight = scene.GetAmbientLight();
 
-        const Skybox& skybox = mResourceManifest.GetSkybox(scene.GetSkybox());
-        mRenderQueue.mSkyboxTextureID = skybox.GetSkyboxTexture();
+        const SkyboxID skyboxID = scene.GetSkybox();
+        if (skyboxID != INVALID_SKYBOX_ID)
+        {
+            const Skybox& skybox = mResourceManifest.GetSkybox(skyboxID);
+            mRenderQueue.mSkyboxTextureID = skybox.GetSkyboxTexture();
+        }
     }
 
 
