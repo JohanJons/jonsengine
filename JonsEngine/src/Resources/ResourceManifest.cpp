@@ -175,7 +175,7 @@ namespace JonsEngine
             {
                 const PackageMesh& mesh = model.mMeshes.at(meshIndex);
                 // temp solution
-                std::vector<Mat4> bones(mesh.mBones.size());
+                std::vector<Mat4> bones;
                 for (const PackageBone& bone : mesh.mBones)
                     bones.emplace_back(bone.mTransform);
 
