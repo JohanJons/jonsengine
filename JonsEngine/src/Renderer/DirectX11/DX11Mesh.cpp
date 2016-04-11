@@ -109,6 +109,7 @@ namespace JonsEngine
             ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
             bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
             bufferDescription.ByteWidth = boneMatrices.size() * sizeof(Mat4);
+            bufferDescription.StructureByteStride = sizeof(Mat4);
             bufferDescription.BindFlags = D3D11_BIND_SHADER_RESOURCE;
             bufferDescription.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 
