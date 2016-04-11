@@ -151,6 +151,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Shadowmap.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11SkyboxPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Utils.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11VertexBufferSet.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp" />
     <ClCompile Include="src\Renderer\RenderQueue.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />
@@ -210,6 +211,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11AmbientPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Backbuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11BoxBlurPass.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11Buffer.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11ConstantBuffer.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Context.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11DepthReductionPass.h" />
@@ -229,6 +231,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Shadowmap.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11SkyboxPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11VertexBufferSet.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11VertexTransformPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\Shaders\Constants.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>

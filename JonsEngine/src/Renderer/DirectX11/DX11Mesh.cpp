@@ -1,5 +1,6 @@
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 
+#include "include/Renderer/DirectX11/DX11VertexBufferSet.hpp"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/Shaders/Constants.h"
 
