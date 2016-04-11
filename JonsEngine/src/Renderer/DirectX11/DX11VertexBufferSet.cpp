@@ -4,7 +4,7 @@ namespace JonsEngine
 {
     DX11VertexBufferSet::~DX11VertexBufferSet()
     {
-        for (auto buffer : mBuffers)
+        for (ID3D11Buffer& buffer : mBuffers)
             buffer.Release();
     }
 
@@ -13,8 +13,9 @@ namespace JonsEngine
     {
         const uint32_t startSlot = 0;
         const uint32_t offset = 0;
+        ID3D11Buffer* buffers = &mBuffers.at(0);
 
-        mContext->IASetVertexBuffers(startSlot, mNumBuffers, &mBuffers, &mStrides, &offset);
+        mContext->IASetVertexBuffers(startSlot, mNumBuffers, &buffers, &mStrides.at(0), &offset);
         /*mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gVertexSize, &gStaticOffset);
         if (mNormalBuffer)
             mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer.p, &gVertexSize, &gStaticOffset);
