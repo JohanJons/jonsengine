@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/DirectX11/DX11VertexBufferSet.hpp"
 #include "include/Core/Types.h"
 #include "include/Core/Platform/Directx11.h"
 
@@ -49,6 +50,8 @@ namespace JonsEngine
         ID3D11BufferPtr mBoneWeightBuffer;
         ID3D11BufferPtr mIndexBuffer;
         ID3D11ShaderResourceViewPtr mBoneSRV;
+
+        //DX11VertexBufferSet mvs;
 
         const uint32_t mNumVertices;
         const uint16_t mNumIndices;
