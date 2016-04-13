@@ -317,7 +317,7 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessVertexBoneWeights(std::vector<uint16_t>& boneIndices, std::vector<float>& boneWeights, const aiMesh* assimpMesh)
+    bool Assimp::ProcessVertexBoneWeights(std::vector<uint8_t>& boneIndices, std::vector<float>& boneWeights, const aiMesh* assimpMesh)
     {
         // make sure containers are large enough as we will access indices directly when iterating the bones
         const uint32_t numVertices = assimpMesh->mNumVertices;
@@ -326,7 +326,9 @@ namespace JonsAssetImporter
         boneWeights.resize(maxContainerSize);
 
         const uint32_t numBones = assimpMesh->mNumBones;
-        for (uint16_t boneIndex = 0; boneIndex < numBones; ++boneIndex)
+        assert(numBones <= std::numeric_limits<uint8_t>::max());
+
+        for (uint8_t boneIndex = 0; boneIndex < numBones; ++boneIndex)
         {
             const auto assimpBone = assimpMesh->mBones[boneIndex];
             

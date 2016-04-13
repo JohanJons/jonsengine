@@ -99,7 +99,7 @@ namespace JonsEngine
     {
         typedef uint32_t MeshIndex;
         static const MeshIndex INVALID_MESH_INDEX = UINT32_MAX;
-        static const uint16_t MAX_NUM_BONES = 4;
+        static const uint8_t MAX_NUM_BONES = 4;
 
         std::string mName;
         PackageAABB mAABB;
@@ -109,7 +109,7 @@ namespace JonsEngine
         std::vector<float> mTexCoordsData;
         std::vector<float> mTangentData;
         std::vector<float> mBoneWeights;
-        std::vector<uint16_t> mBoneIndices;
+        std::vector<uint8_t> mBoneIndices;
         std::vector<uint16_t> mIndiceData;
         PackageMaterial::MaterialIndex mMaterialIndex;
 

@@ -138,6 +138,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11DirectionalLightPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11FullscreenTrianglePass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Gbuffer.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11IndexBuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11LightAccumulationbuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Material.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Mesh.cpp" />
@@ -218,6 +219,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11DirectionalLightPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11FullscreenTrianglePass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11GBuffer.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11IndexBuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11LightAccumulationbuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Material.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Mesh.h" />

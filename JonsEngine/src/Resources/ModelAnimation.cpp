@@ -45,7 +45,7 @@ namespace JonsEngine
         // zero range means no animation transforms
         if (startIndex == endIndex)
             return gIdentityMatrix;
-
+        
         // TODO: remove searching
         const auto firstNotElapsedTransform = std::find_if(mAnimationTransforms.cbegin() + startIndex, mAnimationTransforms.cbegin() + endIndex,
             [elapsedTime](const AnimTransform& transform) { return elapsedTime <= transform.second; });

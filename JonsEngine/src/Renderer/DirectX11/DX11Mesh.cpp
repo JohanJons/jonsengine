@@ -8,11 +8,12 @@
 
 namespace JonsEngine
 {
-    const static uint32_t gVertexSize = sizeof(float) * 3;
-    const static uint32_t gTangentSize = gVertexSize * 2;
-    const static uint32_t gTexcoordSize = sizeof(float) * 2;
-    const static uint32_t gBoneIndexSize = sizeof(uint16_t) * MAX_BONES;
-    const static uint32_t gBoneWeightSize = sizeof(float) * MAX_BONES;
+    const static uint32_t gPositionStride = sizeof(float) * 3;
+    const static uint32_t gNormalStride = gPositionStride;
+    const static uint32_t gTangentStride = gPositionStride * 2;
+    const static uint32_t gTexcoordStride = sizeof(float) * 2;
+    const static uint32_t gBoneIndexStride = sizeof(uint8_t) * MAX_BONES;
+    const static uint32_t gBoneWeightStride = sizeof(float) * MAX_BONES;
     const static uint32_t gStaticOffset = 0;
     const std::array<uint16_t, 16> gAABBIndices = { 0, 1, 2, 3, 0, 5, 4, 3, 2, 7, 4, 7, 6, 5, 6, 1 };
 
@@ -23,12 +24,12 @@ namespace JonsEngine
 
     DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
         const std::vector<float>& tangentData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds) :
-        DX11Mesh(device, context, vertexData, normalData, texCoords, tangentData, std::vector<Mat4>(), std::vector<uint16_t>(), std::vector<float>(), indexData, minBounds, maxBounds)
+        DX11Mesh(device, context, vertexData, normalData, texCoords, tangentData, std::vector<Mat4>(), std::vector<uint8_t>(), std::vector<float>(), indexData, minBounds, maxBounds)
     {
     }
 
     DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
-        const std::vector<float>& tangentData, const std::vector<Mat4>& boneMatrices, const std::vector<uint16_t>& boneIndices, const std::vector<float>& boneWeights, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds) :
+        const std::vector<float>& tangentData, const std::vector<Mat4>& boneMatrices, const std::vector<uint8_t>& boneIndices, const std::vector<float>& boneWeights, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds) :
         mContext(context),
         mVertexBuffer(nullptr),
         mNormalBuffer(nullptr),
@@ -121,7 +122,7 @@ namespace JonsEngine
             // indices
             ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
             bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-            bufferDescription.ByteWidth = boneIndices.size() * sizeof(uint16_t);
+            bufferDescription.ByteWidth = boneIndices.size() * sizeof(uint8_t);
             bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
             ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
@@ -164,17 +165,17 @@ namespace JonsEngine
 
     void DX11Mesh::Draw()
     {
-        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gVertexSize, &gStaticOffset);
+        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gPositionStride, &gStaticOffset);
         if (mNormalBuffer)
-            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer.p, &gVertexSize, &gStaticOffset);
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer.p, &gNormalStride, &gStaticOffset);
         if (mTexcoordBuffer)
-            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer.p, &gTexcoordSize, &gStaticOffset);
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer.p, &gTexcoordStride, &gStaticOffset);
         if (mTangentBuffer)
-            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer.p, &gTangentSize, &gStaticOffset);
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer.p, &gTangentStride, &gStaticOffset);
         if (mHasBones)
         {
-            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_INDICES, 1, &mBoneIndexBuffer.p, &gBoneIndexSize, &gStaticOffset);
-            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_WEIGHTS, 1, &mBoneWeightBuffer.p, &gBoneWeightSize, &gStaticOffset);
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_INDICES, 1, &mBoneIndexBuffer.p, &gBoneIndexStride, &gStaticOffset);
+            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_WEIGHTS, 1, &mBoneWeightBuffer.p, &gBoneWeightStride, &gStaticOffset);
             // temp: register c0
             mContext->VSSetShaderResources(0, 1, &mBoneSRV.p);
         }
@@ -185,7 +186,7 @@ namespace JonsEngine
 
     void DX11Mesh::DrawPositions()
     {
-        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gVertexSize, &gStaticOffset);
+        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gPositionStride, &gStaticOffset);
 
         mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
         mContext->DrawIndexed(mNumIndices, 0, 0);
@@ -197,7 +198,7 @@ namespace JonsEngine
         const uint32_t offset = mNumVertices * sizeof(float);
         const uint32_t numAABBPoints = gAABBIndices.size();
 
-        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gVertexSize, &offset);
+        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gPositionStride, &offset);
         mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, mNumIndices * sizeof(uint16_t));
         mContext->DrawIndexed(numAABBPoints, 0, 0);
     }

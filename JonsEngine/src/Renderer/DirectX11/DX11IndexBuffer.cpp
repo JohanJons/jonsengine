@@ -23,6 +23,6 @@ namespace JonsEngine
 
     void DX11IndexBuffer::Bind()
     {
-
+        mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
     }
 }

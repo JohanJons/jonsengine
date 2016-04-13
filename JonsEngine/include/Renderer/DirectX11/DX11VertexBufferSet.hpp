@@ -16,7 +16,7 @@ namespace JonsEngine
         DX11VertexBufferSet(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, T_ARGS&&... args);
         ~DX11VertexBufferSet();
 
-        void Bind();
+        void Bind(const uint32_t numBuffers);
 
 
     private:
@@ -29,15 +29,13 @@ namespace JonsEngine
         ID3D11DeviceContextPtr mContext;
         std::vector<ID3D11Buffer> mBuffers;
         std::vector<uint32_t> mStrides;
-        uint32_t mNumBuffers;
     };
 
 
 
     template <typename... T_ARGS>
     DX11VertexBufferSet::DX11VertexBufferSet(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, T_ARGS&&... args) :
-        mContext(context),
-        mNumBuffers(0)
+        mContext(context)
     {
         AddVertexBuffers(device, args...);
     }
@@ -50,23 +48,25 @@ namespace JonsEngine
     template <typename T, typename... T_ARGS>
     void DX11VertexBufferSet::AddVertexBuffers(ID3D11DevicePtr device, const std::vector<T>& data, const uint32_t stride, T_ARGS&&... args)
     {
-        mStrides.emplace_back(stride);
+        if (data.size() > 0)
+        {
+            mStrides.emplace_back(stride);
 
-        mBuffers.emplace_back();
-        ID3D11Buffer& buffer = mBuffers.back();
+            mBuffers.emplace_back();
+            ID3D11Buffer& buffer = mBuffers.back();
 
-        D3D11_BUFFER_DESC bufferDescription;
-        ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
-        bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-        bufferDescription.ByteWidth = data.size() * sizeof(T);
-        bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+            D3D11_BUFFER_DESC bufferDescription;
+            ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
+            bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
+            bufferDescription.ByteWidth = data.size() * sizeof(T);
+            bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
-        D3D11_SUBRESOURCE_DATA initData;
-        ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
-        initData.pSysMem = &data.at(0);
-        DXCALL(device->CreateBuffer(&bufferDescription, &initData, &buffer));
+            D3D11_SUBRESOURCE_DATA initData;
+            ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
+            initData.pSysMem = &data.at(0);
+            DXCALL(device->CreateBuffer(&bufferDescription, &initData, &buffer));
+        }
 
-        ++mNumBuffers;
         AddVertexBuffers(device, args...);
     }
 }
