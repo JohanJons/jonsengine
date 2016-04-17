@@ -1,7 +1,7 @@
 #include "include/Resources/ModelAnimation.h"
 
 #include "include/Core/Math/Math.h"
-
+#include "include/Core/Logging/Logger.h"
 namespace JonsEngine
 {
     ModelAnimation::ModelAnimation(const PackageAnimation& pkgAnimation, const uint32_t maxNumNodes) :

@@ -12,8 +12,8 @@ namespace JonsEngine
     const static uint32_t gNormalStride = gPositionStride;
     const static uint32_t gTangentStride = gPositionStride * 2;
     const static uint32_t gTexcoordStride = sizeof(float) * 2;
-    const static uint32_t gBoneIndexStride = sizeof(uint8_t) * MAX_BONES;
-    const static uint32_t gBoneWeightStride = sizeof(float) * MAX_BONES;
+    const static uint32_t gBoneIndexStride = sizeof(uint8_t) * MAX_BONES_PER_VERTEX;
+    const static uint32_t gBoneWeightStride = sizeof(float) * MAX_BONES_PER_VERTEX;
     const static uint32_t gStaticOffset = 0;
     const std::array<uint16_t, 16> gAABBIndices = { 0, 1, 2, 3, 0, 5, 4, 3, 2, 7, 4, 7, 6, 5, 6, 1 };
 

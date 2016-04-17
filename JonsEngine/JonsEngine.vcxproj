@@ -156,6 +156,9 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp" />
     <ClCompile Include="src\Renderer\RenderQueue.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />
+    <ClCompile Include="src\Resources\Animation.cpp" />
+    <ClCompile Include="src\Resources\AnimationInstance.cpp" />
+    <ClCompile Include="src\Resources\AnimationManager.cpp" />
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
     <ClCompile Include="src\Resources\Material.cpp" />
     <ClCompile Include="src\Resources\Mesh.cpp" />
@@ -240,6 +243,9 @@
     </ClInclude>
     <ClInclude Include="include\Renderer\RenderQueue.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
+    <ClInclude Include="include\Resources\Animation.h" />
+    <ClInclude Include="include\Resources\AnimationInstance.h" />
+    <ClInclude Include="include\Resources\AnimationManager.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />
     <ClInclude Include="include\Resources\Material.h" />
     <ClInclude Include="include\Resources\Mesh.h" />

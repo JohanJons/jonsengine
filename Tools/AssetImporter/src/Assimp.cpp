@@ -2,6 +2,7 @@
 
 #include "include/Core/Math/Math.h"
 #include "include/Core/Math/AABB.h"
+#include "include/Resources/Animation.h"
 #include "include/FreeImage.h"
 
 #include <limits>
@@ -326,7 +327,7 @@ namespace JonsAssetImporter
         boneWeights.resize(maxContainerSize);
 
         const uint32_t numBones = assimpMesh->mNumBones;
-        assert(numBones <= std::numeric_limits<uint8_t>::max());
+        assert(numBones <= Animation::MAX_NUM_BONES);
 
         for (uint8_t boneIndex = 0; boneIndex < numBones; ++boneIndex)
         {

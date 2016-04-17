@@ -48,7 +48,7 @@ GBufferVSOut vs_main(GBufferVSIn input)
     // temporary solution
     if (gIsAnimating)
     {
-        for (uint boneNum = 0; boneNum < MAX_BONES; ++boneNum)
+        for (uint boneNum = 0; boneNum < MAX_BONES_PER_VERTEX; ++boneNum)
         {
             output.mPosition += ApplyBone(input.mPosition, input.mBoneIndices, input.mBoneWeights, boneNum);
             output.mNormal += ApplyBone(input.mNormal, input.mBoneIndices, input.mBoneWeights, boneNum);
