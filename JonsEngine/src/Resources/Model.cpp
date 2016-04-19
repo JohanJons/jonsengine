@@ -167,7 +167,7 @@ namespace JonsEngine
         {
             const PackageMesh& mesh = model.mMeshes.at(meshIndex);
 
-            auto iter = std::find_if(initDataList.cbegin(), initDataList.cend(), [mesh](const ModelNode::InitData& data) { return mesh.mName.compare(std::get<0>(data).mName) == 0; });
+            auto iter = std::find_if(initDataList.cbegin(), initDataList.cend(), [&mesh](const ModelNode::InitData& data) { return mesh.mName.compare(std::get<0>(data).mName) == 0; });
             assert(iter != initDataList.cend());
 
             const ModelNode::InitData& initData = *iter;

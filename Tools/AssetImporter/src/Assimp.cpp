@@ -2,7 +2,6 @@
 
 #include "include/Core/Math/Math.h"
 #include "include/Core/Math/AABB.h"
-#include "include/Resources/Animation.h"
 #include "include/FreeImage.h"
 
 #include <limits>
@@ -305,14 +304,15 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessBones(std::vector<JonsEngine::PackageBone>& boneContainer, const aiMesh* assimpMesh)
+    bool Assimp::ProcessBones(std::array<JonsEngine::PackageBone, Animation::MAX_NUM_BONES>& boneContainer, const aiMesh* assimpMesh)
     {
         const uint32_t numBones = assimpMesh->mNumBones;
         for (uint32_t index = 0; index < numBones; ++index)
         {
             const auto bone = assimpMesh->mBones[index];
 
-            boneContainer.emplace_back(bone->mName.C_Str(), aiMat4ToJonsMat4(bone->mOffsetMatrix));
+            boneContainer.at(index).mName = bone->mName.C_Str();
+            boneContainer.at(index).mOffsetMatrix = aiMat4ToJonsMat4(bone->mOffsetMatrix);
         }
 
         return true;
@@ -397,8 +397,8 @@ namespace JonsAssetImporter
                 assert(nodeIndex < model.mNodes.size());
                 // index outside range means we didnt find node --> crash
 
-                pkgAnimation.mAnimatedNodes.emplace_back(nodeIndex);
-                PackageAnimatedNode& pkgAnimatedNode = pkgAnimation.mAnimatedNodes.back();
+                pkgAnimation.mBoneAnimations.at(nodeKey) = nodeIndex;
+                PackageBoneAnimation& pkgBoneAnimation = pkgAnimation.mBoneAnimations.back();
 
                 const uint32_t numPosKeys = nodeAnimation->mNumPositionKeys;
                 const uint32_t numRotkeys = nodeAnimation->mNumRotationKeys;
@@ -422,7 +422,7 @@ namespace JonsAssetImporter
                     const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime) / animation->mTicksPerSecond;
                     const uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
 
-                    pkgAnimatedNode.mKeyframes.emplace_back(timestampMillisec, transform);
+                    pkgBoneAnimation.mKeyframes.emplace_back(timestampMillisec, transform);
                 }
             }
         }
@@ -447,9 +447,9 @@ namespace JonsAssetImporter
         Vec3 minExtent(rootNodeAABB.mMinBounds), maxExtent(rootNodeAABB.mMaxBounds);
         for (const PackageAnimation& animation : model.mAnimations)
         {
-            for (const PackageAnimatedNode& animNode : animation.mAnimatedNodes)
+            for (const PackageBoneAnimation& animNode : animation.mBoneAnimations)
             {
-                const PackageNode& node = model.mNodes.at(animNode.mNodeIndex);
+                const PackageNode& node = model.mNodes.at(animNode.mNodeIndex);     ..............................
                 for (const PackageAnimationKeyframe& keyframe : animNode.mKeyframes)
                 {
                     AABB aabb(node.mAABB.mMinBounds, node.mAABB.mMaxBounds);

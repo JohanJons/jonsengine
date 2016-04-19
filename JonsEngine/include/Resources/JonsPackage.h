@@ -2,6 +2,7 @@
 
 #include "include/Core/Types.h"
 #include "include/Core/Utils/Time.h"
+#include "include/Resources/Animation.h"
 
 #include <array>
 #include <vector>
@@ -103,7 +104,7 @@ namespace JonsEngine
 
         std::string mName;
         PackageAABB mAABB;
-        std::vector<PackageBone> mBones;
+        std::array<PackageBone, Animation::MAX_NUM_BONES> mBones;
         std::vector<float> mVertexData;
         std::vector<float> mNormalData;
         std::vector<float> mTexCoordsData;
@@ -144,14 +145,14 @@ namespace JonsEngine
         PackageAnimationKeyframe(const uint32_t timestampMilliseconds, const Mat4& transform);
     };
 
-    struct PackageAnimatedNode
+    struct PackageBoneAnimation
     {
         PackageNode::NodeIndex mNodeIndex;
         std::vector<PackageAnimationKeyframe> mKeyframes;
 
 
-        PackageAnimatedNode();
-        PackageAnimatedNode(const PackageNode::NodeIndex nodeIndex);
+        PackageBoneAnimation();
+        PackageBoneAnimation(const PackageNode::NodeIndex nodeIndex);
     };
 
     struct PackageAnimation
@@ -159,7 +160,8 @@ namespace JonsEngine
         std::string mName;
         Mat4 mInverseRootMatrix;
         uint32_t mDurationInMilliseconds;
-        std::vector<PackageAnimatedNode> mAnimatedNodes;
+        uint32_t mNumBonesUsed;
+        std::array<PackageBoneAnimation, Animation::MAX_NUM_BONES> mBoneAnimations;
 
 
         PackageAnimation();
@@ -289,10 +291,10 @@ namespace boost
         }
 
         template<class Archive>
-        void serialize(Archive & ar, JonsEngine::PackageAnimatedNode& animationNode, const unsigned int version)
+        void serialize(Archive & ar, JonsEngine::PackageBoneAnimation& boneAnimation, const unsigned int version)
         {
-            ar & animationNode.mNodeIndex;
-            ar & animationNode.mKeyframes;
+            ar & boneAnimation.mNodeIndex;
+            ar & boneAnimation.mKeyframes;
         }
         
         template<class Archive>
@@ -301,7 +303,7 @@ namespace boost
             ar & animation.mName;
             ar & animation.mInverseRootMatrix;
             ar & animation.mDurationInMilliseconds;
-            ar & animation.mAnimatedNodes;
+            ar & animation.mBoneAnimations;
         }
 
         template<class Archive>

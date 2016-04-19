@@ -2,6 +2,7 @@
 
 #include "include/Utils.h"
 #include "include/Resources/JonsPackage.h"
+#include "include/Resources/Animation.h"
 #include "include/Core/Types.h"
 
 #include <assimp/postprocess.h>
@@ -28,7 +29,7 @@ namespace JonsAssetImporter
         bool ProcessNode(std::vector<JonsEngine::PackageNode>& nodeContainer, const std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode, const JonsEngine::PackageNode::NodeIndex parentNodeIndex);
         bool ProcessMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap);
         bool ProcessMeshGeometricData(JonsEngine::PackageMesh& jonsMesh, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex);
-        bool ProcessBones(std::vector<JonsEngine::PackageBone>& boneContainer, const aiMesh* assimpMesh);
+        bool ProcessBones(std::array<JonsEngine::PackageBone, JonsEngine::Animation::MAX_NUM_BONES>& boneContainer, const aiMesh* assimpMesh);
         bool ProcessVertexBoneWeights(std::vector<uint8_t>& boneIndices, std::vector<float>& boneWeights, const aiMesh* assimpMesh);
         bool ProcessAnimations(JonsEngine::PackageModel& model, const aiScene* scene);
 

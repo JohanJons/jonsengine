@@ -13,7 +13,7 @@ namespace JonsEngine
         // so even if an index in mNodeAnimTransformMap isnt touched the range will be zero
 
         auto animRangeBeginIndex = mAnimationTransforms.size();
-        for (const PackageAnimatedNode& animNode : pkgAnimation.mAnimatedNodes)
+        for (const PackageBoneAnimation& animNode : pkgAnimation.mBoneAnimations)
         {
             for (const PackageAnimationKeyframe& keyframe : animNode.mKeyframes)
                 mAnimationTransforms.emplace_back(keyframe.mTransform, Milliseconds(keyframe.mTimestampMilliseconds));

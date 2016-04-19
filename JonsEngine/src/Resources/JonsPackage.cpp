@@ -98,12 +98,12 @@ namespace JonsEngine
     {
     }
 
-    PackageAnimatedNode::PackageAnimatedNode() :
-        PackageAnimatedNode(PackageNode::INVALID_NODE_INDEX)
+    PackageBoneAnimation::PackageBoneAnimation() :
+        PackageBoneAnimation(PackageNode::INVALID_NODE_INDEX)
     {
     }
 
-    PackageAnimatedNode::PackageAnimatedNode(const PackageNode::NodeIndex nodeIndex) :
+    PackageBoneAnimation::PackageBoneAnimation(const PackageNode::NodeIndex nodeIndex) :
         mNodeIndex(nodeIndex)
     {
     }
