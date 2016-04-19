@@ -12,40 +12,57 @@
 
 namespace JonsEngine
 {
-    PackageHeader::PackageHeader() : mSignature("jons"), mMajorVersion(LatestMajorVersion), mMinorVersion(LatestMinorVersion)
+    PackageHeader::PackageHeader() :
+        mSignature("jons"),
+        mMajorVersion(LatestMajorVersion),
+        mMinorVersion(LatestMinorVersion)
     {
     }
 
-    PackageAABB::PackageAABB() : mMinBounds(std::numeric_limits<float>::max()), mMaxBounds(std::numeric_limits<float>::lowest())
+    PackageAABB::PackageAABB() :
+        mMinBounds(std::numeric_limits<float>::max()),
+        mMaxBounds(std::numeric_limits<float>::lowest())
     {
     }
 
-    PackageTexture::PackageTexture() : mTextureWidth(0), mTextureHeight(0)
+    PackageTexture::PackageTexture() :
+        mTextureWidth(0),
+        mTextureHeight(0)
     {
     }
 
-    PackageSkybox::PackageSkybox() : PackageSkybox("")
+    PackageSkybox::PackageSkybox() :
+        PackageSkybox("")
     {
     }
 
-    PackageSkybox::PackageSkybox(const std::string& name) : mName(name)
+    PackageSkybox::PackageSkybox(const std::string& name) :
+        mName(name)
     {
     }
 
-    PackageMaterial::PackageMaterial() : PackageMaterial("", false, false)
+    PackageMaterial::PackageMaterial() :
+        PackageMaterial("", false, false)
     {
     }
 
     PackageMaterial::PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture) : mName(name), mHasDiffuseTexture(hasDiffTexture), mHasNormalTexture(hasNormalTexture),
-        mDiffuseColor(1.0f), mAmbientColor(1.0f), mSpecularColor(1.0f), mEmissiveColor(0.0f)
+        mDiffuseColor(1.0f),
+        mAmbientColor(1.0f),
+        mSpecularColor(1.0f),
+        mEmissiveColor(0.0f)
     {
     }
 
-    PackageBone::PackageBone() : mName(""), mTransform(gIdentityMatrix)
+    PackageBone::PackageBone() :
+        mName(""),
+        mOffsetMatrix(gIdentityMatrix)
     {
     }
 
-    PackageBone::PackageBone(const std::string& name, const Mat4& transform) : mName(name), mTransform(transform)
+    PackageBone::PackageBone(const std::string& name, const Mat4& transform) :
+        mName(name),
+        mOffsetMatrix(transform)
     {
     }
 
@@ -53,15 +70,21 @@ namespace JonsEngine
     {
     }
 
-    PackageMesh::PackageMesh(const std::string& name) : mName(name), mMaterialIndex(PackageMaterial::INVALID_MATERIAL_INDEX)
+    PackageMesh::PackageMesh(const std::string& name) :
+        mName(name),
+        mMaterialIndex(PackageMaterial::INVALID_MATERIAL_INDEX)
     {
     }
 
-    PackageNode::PackageNode() : PackageNode("", INVALID_NODE_INDEX, INVALID_NODE_INDEX)
+    PackageNode::PackageNode() :
+        PackageNode("", INVALID_NODE_INDEX, INVALID_NODE_INDEX)
     {
     }
 
-    PackageNode::PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex) : mName(name), mNodeIndex(nodeIndex), mParentNodeIndex(parentNodeIndex)
+    PackageNode::PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex) :
+        mName(name),
+        mNodeIndex(nodeIndex),
+        mParentNodeIndex(parentNodeIndex)
     {
     }
 
@@ -69,15 +92,19 @@ namespace JonsEngine
     {
     }
 
-    PackageAnimationKeyframe::PackageAnimationKeyframe(const uint32_t timestampMilliseconds, const Mat4& transform) : mTimestampMilliseconds(timestampMilliseconds), mTransform(transform)
+    PackageAnimationKeyframe::PackageAnimationKeyframe(const uint32_t timestampMilliseconds, const Mat4& transform) :
+        mTimestampMilliseconds(timestampMilliseconds),
+        mTransform(transform)
     {
     }
 
-    PackageAnimatedNode::PackageAnimatedNode() : PackageAnimatedNode(PackageNode::INVALID_NODE_INDEX)
+    PackageAnimatedNode::PackageAnimatedNode() :
+        PackageAnimatedNode(PackageNode::INVALID_NODE_INDEX)
     {
     }
 
-    PackageAnimatedNode::PackageAnimatedNode(const PackageNode::NodeIndex nodeIndex) : mNodeIndex(nodeIndex)
+    PackageAnimatedNode::PackageAnimatedNode(const PackageNode::NodeIndex nodeIndex) :
+        mNodeIndex(nodeIndex)
     {
     }
 
@@ -85,7 +112,10 @@ namespace JonsEngine
     {
     }
 
-    PackageAnimation::PackageAnimation(const std::string& name, const uint32_t durationInMilliseconds) : mName(name), mDurationInMilliseconds(durationInMilliseconds)
+    PackageAnimation::PackageAnimation(const std::string& name, const Mat4& invRootMatrix, const uint32_t durationInMilliseconds) :
+        mName(name),
+        mInverseRootMatrix(mInverseRootMatrix),
+        mDurationInMilliseconds(durationInMilliseconds)
     {
     }
 
@@ -93,7 +123,8 @@ namespace JonsEngine
     {
     }
 
-    PackageModel::PackageModel(const std::string& modelName) : mName(modelName)
+    PackageModel::PackageModel(const std::string& modelName) :
+        mName(modelName)
     {
     }
 

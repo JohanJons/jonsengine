@@ -177,7 +177,7 @@ namespace JonsEngine
                 // temp solution
                 std::vector<Mat4> bones;
                 for (const PackageBone& bone : mesh.mBones)
-                    bones.emplace_back(bone.mTransform);
+                    bones.emplace_back(bone.mOffsetMatrix);
 
                 const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, bones, mesh.mBoneIndices, mesh.mBoneWeights, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
                 DX11MaterialID materialID = INVALID_DX11_MATERIAL_ID;

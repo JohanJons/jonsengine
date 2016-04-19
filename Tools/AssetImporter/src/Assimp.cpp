@@ -365,6 +365,9 @@ namespace JonsAssetImporter
         if (!scene->HasAnimations())
             return true;
 
+        const Mat4 rootNodeTransform = aiMat4ToJonsMat4(scene->mRootNode->mTransformation);
+        const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);
+
         for (uint32_t animationIndex = 0; animationIndex < scene->mNumAnimations; ++animationIndex)
         {
             aiAnimation* animation = *(scene->mAnimations + animationIndex);
@@ -374,7 +377,7 @@ namespace JonsAssetImporter
             assert(animation->mNumMeshChannels == 0);
 
             const uint32_t durationMillisec = static_cast<uint32_t>((animation->mDuration / animation->mTicksPerSecond) * 1000);
-            model.mAnimations.emplace_back(animation->mName.C_Str(), durationMillisec);
+            model.mAnimations.emplace_back(animation->mName.C_Str(), invRootNodeTransform, durationMillisec);
             PackageAnimation& pkgAnimation = model.mAnimations.back();
 
             aiNode* rootNode = scene->mRootNode;
@@ -391,8 +394,8 @@ namespace JonsAssetImporter
                     continue;
 
                 const uint32_t nodeIndex = GetNodeIndex(model, nodeAnimation->mNodeName.C_Str());
-                // index outside range means we didnt find node --> crash
                 assert(nodeIndex < model.mNodes.size());
+                // index outside range means we didnt find node --> crash
 
                 pkgAnimation.mAnimatedNodes.emplace_back(nodeIndex);
                 PackageAnimatedNode& pkgAnimatedNode = pkgAnimation.mAnimatedNodes.back();

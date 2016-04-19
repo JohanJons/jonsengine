@@ -88,11 +88,11 @@ namespace JonsEngine
         static const BoneIndex INVALID_BONE_INDEX = UINT32_MAX;
 
         std::string mName;
-        Mat4 mTransform;
+        Mat4 mOffsetMatrix;
 
 
         PackageBone();
-        PackageBone(const std::string& name, const Mat4& transform);
+        PackageBone(const std::string& name, const Mat4& offsetMatrix);
     };
 
     struct PackageMesh
@@ -157,12 +157,13 @@ namespace JonsEngine
     struct PackageAnimation
     {
         std::string mName;
+        Mat4 mInverseRootMatrix;
         uint32_t mDurationInMilliseconds;
         std::vector<PackageAnimatedNode> mAnimatedNodes;
 
 
         PackageAnimation();
-        PackageAnimation(const std::string& name, const uint32_t durationMilliseconds);
+        PackageAnimation(const std::string& name, const Mat4& invRootMatrix, const uint32_t durationMilliseconds);
     };
 
     struct PackageModel
@@ -222,7 +223,7 @@ namespace boost
         void serialize(Archive & ar, JonsEngine::PackageBone& bone, const unsigned int version)
         {
             ar & bone.mName;
-            ar & bone.mTransform;
+            ar & bone.mOffsetMatrix;
         }
 
         template<class Archive>
@@ -298,6 +299,7 @@ namespace boost
         void serialize(Archive & ar, JonsEngine::PackageAnimation& animation, const unsigned int version)
         {
             ar & animation.mName;
+            ar & animation.mInverseRootMatrix;
             ar & animation.mDurationInMilliseconds;
             ar & animation.mAnimatedNodes;
         }
