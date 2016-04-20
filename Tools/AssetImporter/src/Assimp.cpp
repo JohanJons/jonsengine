@@ -2,6 +2,7 @@
 
 #include "include/Core/Math/Math.h"
 #include "include/Core/Math/AABB.h"
+#include "include/Resources/Animation.h"
 #include "include/FreeImage.h"
 
 #include <limits>
@@ -17,6 +18,7 @@ namespace JonsAssetImporter
     Mat4 GetMeshNodeTransform(const aiScene* scene, const aiNode* node, const uint32_t meshIndex, const Mat4& parentTransform);
     uint32_t CountMeshOccurances(const aiNode* node, const uint32_t aiMeshIndex, const bool recursive);
     uint32_t GetNodeIndex(const PackageModel& model, const std::string& nodeName);
+    PackageBone::BoneIndex GetBoneIndex(const PackageModel& model, const std::string& boneName);
     uint32_t CountChildren(const aiNode* node);
     bool UsedLessThanMaxNumBones(const std::vector<float>& boneWeights, const uint32_t offset);
 
@@ -213,7 +215,7 @@ namespace JonsAssetImporter
             if (!ProcessMeshGeometricData(jonsMesh, assimpMesh, scene, meshIndex))
                 return false;
 
-            if (!ProcessBones(jonsMesh.mBones, assimpMesh))
+            if (!ProcessBones(jonsMesh.mSkeleton, assimpMesh))
                 return false;
 
             // bone weights
@@ -322,7 +324,7 @@ namespace JonsAssetImporter
     {
         // make sure containers are large enough as we will access indices directly when iterating the bones
         const uint32_t numVertices = assimpMesh->mNumVertices;
-        const uint32_t maxContainerSize = numVertices * PackageMesh::MAX_NUM_BONES;
+        const uint32_t maxContainerSize = numVertices * Animation::MAX_BONES_PER_VERTEX;
         boneIndices.resize(maxContainerSize);
         boneWeights.resize(maxContainerSize);
 
@@ -337,7 +339,7 @@ namespace JonsAssetImporter
             for (uint32_t weightIndex = 0; weightIndex < numWeights; ++weightIndex)
             {
                 const auto assimpWeight = assimpBone->mWeights[weightIndex];
-                const uint32_t vertexStartIndex = assimpWeight.mVertexId * PackageMesh::MAX_NUM_BONES;
+                const uint32_t vertexStartIndex = assimpWeight.mVertexId * Animation::MAX_BONES_PER_VERTEX;
 
                 // make sure we havn't reached bone weight cap per bone
                 const bool notExceededNumBones = UsedLessThanMaxNumBones(boneWeights, vertexStartIndex);
@@ -380,11 +382,49 @@ namespace JonsAssetImporter
             model.mAnimations.emplace_back(animation->mName.C_Str(), invRootNodeTransform, durationMillisec);
             PackageAnimation& pkgAnimation = model.mAnimations.back();
 
-            aiNode* rootNode = scene->mRootNode;
             const uint32_t noAnimationKeysNum = 1;
-            for (uint32_t nodeKey = 0; nodeKey < animation->mNumChannels; ++nodeKey)
+            for (uint32_t nodeAnimIndex = 0; nodeAnimIndex < animation->mNumChannels; ++nodeAnimIndex)
             {
-                aiNodeAnim* nodeAnimation = *(animation->mChannels + nodeKey);
+                aiNodeAnim* nodeAnimation = *(animation->mChannels + nodeAnimIndex);
+            
+                // cant do scaling animations
+                assert(nodeAnimation->mNumScalingKeys == noAnimationKeysNum);
+                
+                // if no rotation and translation, continue
+                if (nodeAnimation->mNumPositionKeys == nodeAnimation->mNumRotationKeys == noAnimationKeysNum)
+                    continue;
+
+                const auto boneIndex = GetBoneIndex(model, nodeAnimation->mNodeName);
+                pkgAnimation.mBoneAnimations.emplace_back(boneIndex);
+                PackageBoneAnimation& boneAnimation = pkgAnimation.mBoneAnimations.back();
+                    
+                const uint32_t numPosKeys = nodeAnimation->mNumPositionKeys;
+                const uint32_t numRotkeys = nodeAnimation->mNumRotationKeys;
+                const uint32_t maxNumKeys = glm::max(nodeAnimation->mNumPositionKeys, nodeAnimation->mNumRotationKeys);
+                for (uint32_t key = 0; key < maxNumKeys; ++key)
+                {
+                    // same pos/rot might be used for several pos/rot transforms
+                    
+                    // NOTE: use mTransformation after last key encountered????
+                    
+                    // position
+                    const uint32_t posKey = key < numPosKeys ? key : numPosKeys - 1;
+                    aiVectorKey* aiPos = nodeAnimation->mPositionKeys + posKey;
+                    const Vec3 translateVector = aiVec3ToJonsVec3(aiPos->mValue);
+                    //Mat4 transform = glm::translate(posVec);
+
+                    // rotation
+                    const uint32_t rotKey = key < numRotkeys ? key : numRotkeys - 1;
+                    aiQuatKey* aiRot = nodeAnimation->mRotationKeys + rotKey;
+                    const Quaternion rotationQuat = aiQuatToJonsQuat(aiRot->mValue);
+                    //transform *= glm::toMat4(rotQuat);
+
+                    const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime) / animation->mTicksPerSecond;
+                    const uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
+
+                    pkgBoneAnimation.mKeyframes.emplace_back(timestampMillisec, translateVector, rotationQuat);
+                }
+                /*aiNodeAnim* nodeAnimation = *(animation->mChannels + nodeKey);
 
                 // cant do scaling animations
                 assert(nodeAnimation->mNumScalingKeys == noAnimationKeysNum);
@@ -424,7 +464,7 @@ namespace JonsAssetImporter
 
                     pkgBoneAnimation.mKeyframes.emplace_back(timestampMillisec, transform);
                 }
-            }
+            }*/
         }
 
         return true;
@@ -449,7 +489,7 @@ namespace JonsAssetImporter
         {
             for (const PackageBoneAnimation& animNode : animation.mBoneAnimations)
             {
-                const PackageNode& node = model.mNodes.at(animNode.mNodeIndex);     ..............................
+                const PackageNode& node = model.mNodes.at(animNode.mNodeIndex);
                 for (const PackageAnimationKeyframe& keyframe : animNode.mKeyframes)
                 {
                     AABB aabb(node.mAABB.mMinBounds, node.mAABB.mMaxBounds);
@@ -551,6 +591,36 @@ namespace JonsAssetImporter
 
         return ret;
     }
+    
+    PackageBone::BoneIndex GetBoneIndex(const PackageModel& model, const std::string& boneName)
+    {
+        PackageBone::BoneIndex ret = PackageBone::INVALID_BONE_INDEX;
+        for (const PackageMesh& mesh : model.mMeshes)
+        {
+            const uint32_t numBones = mesh.mSkeleton.size();
+            for (uint32_t boneIndex = 0; boneIndex < numBones)
+            {
+                const PackageBone& bone = mesh.mSkeleton.at(boneIndex);
+                if (bone.mName == boneName)
+                {
+                    ret = bone.mBoneIndex;
+                    break;
+                }
+            }
+            /*for (const PackageBone& bone : mesh.mSkeleton)
+            {
+                if (bone.mName == boneName)
+                {
+                    ret = bone.mBoneIndex;
+                    break;
+                }
+            }*/
+        }
+        
+        assert(ret != PackageBone::INVALID_BONE_INDEX);
+
+        return ret;
+    }
 
     uint32_t CountChildren(const aiNode* node)
     {
@@ -568,7 +638,7 @@ namespace JonsAssetImporter
 
     bool UsedLessThanMaxNumBones(const std::vector<float>& boneWeights, const uint32_t offset)
     {
-        for (uint32_t index = offset; index < offset + PackageMesh::MAX_NUM_BONES; ++index)
+        for (uint32_t index = offset; index < offset + Animation::MAX_BONES_PER_VERTEX; ++index)
         {
             // weight zero means unused index
             if (IsEqual(boneWeights.at(index), 0.0f))

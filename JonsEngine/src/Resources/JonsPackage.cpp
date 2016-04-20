@@ -88,23 +88,24 @@ namespace JonsEngine
     {
     }
 
-    PackageAnimationKeyframe::PackageAnimationKeyframe()
+    PackageBoneKeyframe::PackageBoneKeyframe()
     {
     }
 
-    PackageAnimationKeyframe::PackageAnimationKeyframe(const uint32_t timestampMilliseconds, const Mat4& transform) :
+    PackageBoneKeyframe::PackageBoneKeyframe(const uint32_t timestampMilliseconds, const Vec3& translation, const Quaternion& rotation) : 
         mTimestampMilliseconds(timestampMilliseconds),
-        mTransform(transform)
+        mTranslation(translation),
+        mRotation(rotation)
     {
     }
 
     PackageBoneAnimation::PackageBoneAnimation() :
-        PackageBoneAnimation(PackageNode::INVALID_NODE_INDEX)
+        PackageBoneAnimation(PackageBone::INVALID_BONE_INDEX)
     {
     }
 
-    PackageBoneAnimation::PackageBoneAnimation(const PackageNode::NodeIndex nodeIndex) :
-        mNodeIndex(nodeIndex)
+    PackageBoneAnimation::PackageBoneAnimation(const PackageBone::BoneIndex boneIndex) :
+        mBoneIndex(boneIndex)
     {
     }
 

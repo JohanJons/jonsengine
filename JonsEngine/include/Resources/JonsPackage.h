@@ -100,11 +100,10 @@ namespace JonsEngine
     {
         typedef uint32_t MeshIndex;
         static const MeshIndex INVALID_MESH_INDEX = UINT32_MAX;
-        static const uint8_t MAX_NUM_BONES = 4;
 
         std::string mName;
         PackageAABB mAABB;
-        std::array<PackageBone, Animation::MAX_NUM_BONES> mBones;
+        std::vector<PackageBone> mSkeleton;
         std::vector<float> mVertexData;
         std::vector<float> mNormalData;
         std::vector<float> mTexCoordsData;
@@ -135,24 +134,25 @@ namespace JonsEngine
         PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex);
     };
 
-    struct PackageAnimationKeyframe
+    struct PackageBoneKeyframe
     {
         uint32_t mTimestampMilliseconds;
-        Mat4 mTransform;
+        Vec3 mTranslation;
+        Quaternion mRotation;
 
 
-        PackageAnimationKeyframe();
-        PackageAnimationKeyframe(const uint32_t timestampMilliseconds, const Mat4& transform);
+        PackageBoneKeyframe();
+        PackageBoneKeyframe(const uint32_t timestampMilliseconds, const Vec3& translation, const Quaternion& rotation);
     };
 
     struct PackageBoneAnimation
     {
-        PackageNode::NodeIndex mNodeIndex;
-        std::vector<PackageAnimationKeyframe> mKeyframes;
+        PackageBone::BoneIndex mBoneIndex;
+        std::vector<PackageBoneKeyframe> mKeyframes;
 
 
         PackageBoneAnimation();
-        PackageBoneAnimation(const PackageNode::NodeIndex nodeIndex);
+        PackageBoneAnimation(const PackageBone::BoneIndex boneIndex);
     };
 
     struct PackageAnimation
@@ -160,8 +160,7 @@ namespace JonsEngine
         std::string mName;
         Mat4 mInverseRootMatrix;
         uint32_t mDurationInMilliseconds;
-        uint32_t mNumBonesUsed;
-        std::array<PackageBoneAnimation, Animation::MAX_NUM_BONES> mBoneAnimations;
+        std::vector<PackageBoneAnimation> mBoneAnimations;
 
 
         PackageAnimation();
@@ -233,7 +232,7 @@ namespace boost
         {
             ar & mesh.mName;
             ar & mesh.mAABB;
-            ar & mesh.mBones;
+            ar & mesh.mSkeleton;
             ar & mesh.mVertexData;
             ar & mesh.mNormalData;
             ar & mesh.mTexCoordsData;
@@ -284,16 +283,17 @@ namespace boost
         }
 
         template<class Archive>
-        void serialize(Archive & ar, JonsEngine::PackageAnimationKeyframe& keyframe, const unsigned int version)
+        void serialize(Archive & ar, JonsEngine::PackageBoneKeyframe& keyframe, const unsigned int version)
         {
             ar & keyframe.mTimestampMilliseconds;
-            ar & keyframe.mTransform;
+            ar & keyframe.mTranslation;
+            ar & keyframe.mRotation;
         }
 
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageBoneAnimation& boneAnimation, const unsigned int version)
         {
-            ar & boneAnimation.mNodeIndex;
+            ar & boneAnimation.mBoneIndex;
             ar & boneAnimation.mKeyframes;
         }
         
@@ -356,6 +356,15 @@ namespace boost
         {
             ar & vec.x;
             ar & vec.y;
+        }
+
+        template<class Archive>
+        void serialize(Archive & ar, JonsEngine::Quaternion& quat, const unsigned int version)
+        {
+            ar & quat.x;
+            ar & quat.y;
+            ar & quat.z;
+            ar & quat.w;
         }
     } // namespace serialization
 } // namespace boost
