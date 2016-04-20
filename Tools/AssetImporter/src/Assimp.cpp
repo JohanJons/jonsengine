@@ -152,7 +152,7 @@ namespace JonsAssetImporter
             return false;
         }
 
-        if (!ProcessMeshes(model.mMeshes, scene, materialMap))
+        if (!ProcessMeshes(model.mMeshes, model.mSkeleton, scene, materialMap))
             return false;
 
         // recursively go through assimp node tree
@@ -204,18 +204,20 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap)
+    bool Assimp::ProcessMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, std::vector<JonsEngine::PackageBone>& skeleton, const aiScene* scene, const MaterialMap& materialMap)
     {
+        uint32_t boneStartIndex = 0, boneEndIndex = 0;
         for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
         {
             aiMesh* assimpMesh = scene->mMeshes[meshIndex];
-            meshContainer.emplace_back(assimpMesh->mName.C_Str());
+            boneEndIndex = boneStartIndex + assimpMesh->mNumBones;
+            meshContainer.emplace_back(assimpMesh->mName.C_Str(), boneStartIndex, boneEndIndex);
             PackageMesh& jonsMesh = meshContainer.back();
 
             if (!ProcessMeshGeometricData(jonsMesh, assimpMesh, scene, meshIndex))
                 return false;
 
-            if (!ProcessBones(jonsMesh.mSkeleton, assimpMesh))
+            if (!ProcessBones(skeleton, assimpMesh))
                 return false;
 
             // bone weights
@@ -229,6 +231,8 @@ namespace JonsAssetImporter
             }
 
             jonsMesh.mMaterialIndex = materialMap.at(assimpMesh->mMaterialIndex);
+
+            boneStartIndex = boneEndIndex;
         }
 
         return true;
@@ -306,15 +310,13 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessBones(std::array<JonsEngine::PackageBone, Animation::MAX_NUM_BONES>& boneContainer, const aiMesh* assimpMesh)
+    bool Assimp::ProcessBones(std::vector<JonsEngine::PackageBone>& skeleton, const aiMesh* assimpMesh)
     {
         const uint32_t numBones = assimpMesh->mNumBones;
         for (uint32_t index = 0; index < numBones; ++index)
         {
             const auto bone = assimpMesh->mBones[index];
-
-            boneContainer.at(index).mName = bone->mName.C_Str();
-            boneContainer.at(index).mOffsetMatrix = aiMat4ToJonsMat4(bone->mOffsetMatrix);
+            skeleton.emplace_back(bone->mName.C_Str(), aiMat4ToJonsMat4(bone->mOffsetMatrix));
         }
 
         return true;
@@ -386,27 +388,27 @@ namespace JonsAssetImporter
             for (uint32_t nodeAnimIndex = 0; nodeAnimIndex < animation->mNumChannels; ++nodeAnimIndex)
             {
                 aiNodeAnim* nodeAnimation = *(animation->mChannels + nodeAnimIndex);
-            
+
                 // cant do scaling animations
                 assert(nodeAnimation->mNumScalingKeys == noAnimationKeysNum);
-                
+
                 // if no rotation and translation, continue
                 if (nodeAnimation->mNumPositionKeys == nodeAnimation->mNumRotationKeys == noAnimationKeysNum)
                     continue;
 
-                const auto boneIndex = GetBoneIndex(model, nodeAnimation->mNodeName);
+                const auto boneIndex = GetBoneIndex(model, nodeAnimation->mNodeName.C_Str());
                 pkgAnimation.mBoneAnimations.emplace_back(boneIndex);
                 PackageBoneAnimation& boneAnimation = pkgAnimation.mBoneAnimations.back();
-                    
+
                 const uint32_t numPosKeys = nodeAnimation->mNumPositionKeys;
                 const uint32_t numRotkeys = nodeAnimation->mNumRotationKeys;
                 const uint32_t maxNumKeys = glm::max(nodeAnimation->mNumPositionKeys, nodeAnimation->mNumRotationKeys);
                 for (uint32_t key = 0; key < maxNumKeys; ++key)
                 {
                     // same pos/rot might be used for several pos/rot transforms
-                    
+
                     // NOTE: use mTransformation after last key encountered????
-                    
+
                     // position
                     const uint32_t posKey = key < numPosKeys ? key : numPosKeys - 1;
                     aiVectorKey* aiPos = nodeAnimation->mPositionKeys + posKey;
@@ -422,7 +424,7 @@ namespace JonsAssetImporter
                     const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime) / animation->mTicksPerSecond;
                     const uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
 
-                    pkgBoneAnimation.mKeyframes.emplace_back(timestampMillisec, translateVector, rotationQuat);
+                    boneAnimation.mKeyframes.emplace_back(timestampMillisec, translateVector, rotationQuat);
                 }
                 /*aiNodeAnim* nodeAnimation = *(animation->mChannels + nodeKey);
 
@@ -431,7 +433,7 @@ namespace JonsAssetImporter
 
                 // if no rotation/translation, continue
                 if (nodeAnimation->mNumPositionKeys == nodeAnimation->mNumRotationKeys == noAnimationKeysNum)
-                    continue;
+                continue;
 
                 const uint32_t nodeIndex = GetNodeIndex(model, nodeAnimation->mNodeName.C_Str());
                 assert(nodeIndex < model.mNodes.size());
@@ -445,26 +447,27 @@ namespace JonsAssetImporter
                 const uint32_t maxNumKeys = glm::max(nodeAnimation->mNumPositionKeys, nodeAnimation->mNumRotationKeys);
                 for (uint32_t key = 0; key < maxNumKeys; ++key)
                 {
-                    // same pos/rot might be used for several pos/rot transforms
+                // same pos/rot might be used for several pos/rot transforms
 
-                    // position
-                    const uint32_t posKey = key < numPosKeys ? key : numPosKeys - 1;
-                    aiVectorKey* aiPos = nodeAnimation->mPositionKeys + posKey;
-                    const Vec3 posVec = aiVec3ToJonsVec3(aiPos->mValue);
-                    Mat4 transform = glm::translate(posVec);
+                // position
+                const uint32_t posKey = key < numPosKeys ? key : numPosKeys - 1;
+                aiVectorKey* aiPos = nodeAnimation->mPositionKeys + posKey;
+                const Vec3 posVec = aiVec3ToJonsVec3(aiPos->mValue);
+                Mat4 transform = glm::translate(posVec);
 
-                    // rotation
-                    const uint32_t rotKey = key < numRotkeys ? key : numRotkeys - 1;
-                    aiQuatKey* aiRot = nodeAnimation->mRotationKeys + rotKey;
-                    const Quaternion rotQuat = aiQuatToJonsQuat(aiRot->mValue);
-                    transform *= glm::toMat4(rotQuat);
+                // rotation
+                const uint32_t rotKey = key < numRotkeys ? key : numRotkeys - 1;
+                aiQuatKey* aiRot = nodeAnimation->mRotationKeys + rotKey;
+                const Quaternion rotQuat = aiQuatToJonsQuat(aiRot->mValue);
+                transform *= glm::toMat4(rotQuat);
 
-                    const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime) / animation->mTicksPerSecond;
-                    const uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
+                const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime) / animation->mTicksPerSecond;
+                const uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
 
-                    pkgBoneAnimation.mKeyframes.emplace_back(timestampMillisec, transform);
+                pkgBoneAnimation.mKeyframes.emplace_back(timestampMillisec, transform);
                 }
-            }*/
+                }*/
+            }
         }
 
         return true;
@@ -594,32 +597,18 @@ namespace JonsAssetImporter
     
     PackageBone::BoneIndex GetBoneIndex(const PackageModel& model, const std::string& boneName)
     {
-        PackageBone::BoneIndex ret = PackageBone::INVALID_BONE_INDEX;
         for (const PackageMesh& mesh : model.mMeshes)
         {
-            const uint32_t numBones = mesh.mSkeleton.size();
-            for (uint32_t boneIndex = 0; boneIndex < numBones)
+            const uint32_t numBones = model.mSkeleton.size();
+            for (PackageBone::BoneIndex boneIndex = 0; boneIndex < numBones; ++boneIndex)
             {
-                const PackageBone& bone = mesh.mSkeleton.at(boneIndex);
+                const PackageBone& bone = model.mSkeleton.at(boneIndex);
                 if (bone.mName == boneName)
-                {
-                    ret = bone.mBoneIndex;
-                    break;
-                }
+                    return boneIndex;
             }
-            /*for (const PackageBone& bone : mesh.mSkeleton)
-            {
-                if (bone.mName == boneName)
-                {
-                    ret = bone.mBoneIndex;
-                    break;
-                }
-            }*/
         }
         
-        assert(ret != PackageBone::INVALID_BONE_INDEX);
-
-        return ret;
+        return PackageBone::INVALID_BONE_INDEX;
     }
 
     uint32_t CountChildren(const aiNode* node)

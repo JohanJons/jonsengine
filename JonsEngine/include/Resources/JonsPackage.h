@@ -103,7 +103,8 @@ namespace JonsEngine
 
         std::string mName;
         PackageAABB mAABB;
-        std::vector<PackageBone> mSkeleton;
+        PackageBone::BoneIndex mStartBoneIndex;
+        PackageBone::BoneIndex mEndBoneIndex;
         std::vector<float> mVertexData;
         std::vector<float> mNormalData;
         std::vector<float> mTexCoordsData;
@@ -115,7 +116,7 @@ namespace JonsEngine
 
 
         PackageMesh();
-        PackageMesh(const std::string& name);
+        PackageMesh(const std::string& name, PackageBone::BoneIndex boneStartIndex, PackageBone::BoneIndex boneEndIndex);
     };
 
     struct PackageNode
@@ -173,6 +174,7 @@ namespace JonsEngine
         PackageAABB mStaticAABB;
         std::vector<PackageMesh> mMeshes;
         std::vector<PackageNode> mNodes;
+        std::vector<PackageBone> mSkeleton;
         std::vector<PackageAnimation> mAnimations;
 
 
@@ -232,7 +234,8 @@ namespace boost
         {
             ar & mesh.mName;
             ar & mesh.mAABB;
-            ar & mesh.mSkeleton;
+            ar & mesh.mStartBoneIndex;
+            ar & mesh.mEndBoneIndex;
             ar & mesh.mVertexData;
             ar & mesh.mNormalData;
             ar & mesh.mTexCoordsData;
@@ -313,6 +316,7 @@ namespace boost
             ar & model.mStaticAABB;
             ar & model.mMeshes;
             ar & model.mNodes;
+            ar & model.mSkeleton;
             ar & model.mAnimations;
         }
 

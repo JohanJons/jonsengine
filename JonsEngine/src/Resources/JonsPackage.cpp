@@ -66,12 +66,14 @@ namespace JonsEngine
     {
     }
 
-    PackageMesh::PackageMesh() : PackageMesh("")
+    PackageMesh::PackageMesh() : PackageMesh("", PackageBone::INVALID_BONE_INDEX, PackageBone::INVALID_BONE_INDEX)
     {
     }
 
-    PackageMesh::PackageMesh(const std::string& name) :
+    PackageMesh::PackageMesh(const std::string& name, PackageBone::BoneIndex boneStartIndex, PackageBone::BoneIndex boneEndIndex) :
         mName(name),
+        mStartBoneIndex(boneStartIndex),
+        mEndBoneIndex(boneEndIndex),
         mMaterialIndex(PackageMaterial::INVALID_MATERIAL_INDEX)
     {
     }
