@@ -477,9 +477,11 @@ namespace JonsAssetImporter
     {
         // two cases: animated vs static model
         const PackageAABB& rootNodeAABB = model.mNodes.front().mAABB;
+        model.mStaticAABB = rootNodeAABB;
 
+        // TODO
         // static model: use root node AABB as its overall AABB
-        if (model.mAnimations.empty())
+       /* if (model.mAnimations.empty())
         {
             model.mStaticAABB = rootNodeAABB;
             return;
@@ -492,8 +494,7 @@ namespace JonsAssetImporter
         {
             for (const PackageBoneAnimation& animNode : animation.mBoneAnimations)
             {
-                const PackageNode& node = model.mNodes.at(animNode.mNodeIndex);
-                for (const PackageAnimationKeyframe& keyframe : animNode.mKeyframes)
+                for (const PackageBoneKeyframe& keyframe : animNode.mKeyframes)
                 {
                     AABB aabb(node.mAABB.mMinBounds, node.mAABB.mMaxBounds);
                     aabb = aabb * keyframe.mTransform;
@@ -511,7 +512,7 @@ namespace JonsAssetImporter
         }
 
         model.mStaticAABB.mMinBounds = minExtent;
-        model.mStaticAABB.mMaxBounds = maxExtent;
+        model.mStaticAABB.mMaxBounds = maxExtent;*/
     }
 
 

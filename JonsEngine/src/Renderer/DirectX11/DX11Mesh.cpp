@@ -24,26 +24,26 @@ namespace JonsEngine
 
     DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
         const std::vector<float>& tangentData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds) :
-        DX11Mesh(device, context, vertexData, normalData, texCoords, tangentData, std::vector<Mat4>(), std::vector<uint8_t>(), std::vector<float>(), indexData, minBounds, maxBounds)
+        DX11Mesh(device, context, vertexData, normalData, texCoords, tangentData, std::vector<uint8_t>(), std::vector<float>(), indexData, minBounds, maxBounds)
     {
     }
 
     DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
-        const std::vector<float>& tangentData, const std::vector<Mat4>& boneMatrices, const std::vector<uint8_t>& boneIndices, const std::vector<float>& boneWeights, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds) :
+        const std::vector<float>& tangentData, const std::vector<uint8_t>& boneIndices, const std::vector<float>& boneWeights, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds) :
         mContext(context),
         mVertexBuffer(nullptr),
         mNormalBuffer(nullptr),
         mTangentBuffer(nullptr),
         mTexcoordBuffer(nullptr),
-        mBoneMatrixBuffer(nullptr),
+      //  mBoneMatrixBuffer(nullptr),
         mBoneIndexBuffer(nullptr),
         mBoneWeightBuffer(nullptr),
         mIndexBuffer(nullptr),
         mMeshID(gNextMeshID++),
-        mBoneSRV(nullptr),
+      //  mBoneSRV(nullptr),
         mNumVertices(vertexData.size()),
         mNumIndices(indexData.size()),
-        mHasBones(boneMatrices.size() && boneIndices.size() && boneWeights.size())
+        mHasBones(/*boneMatrices.size() &&*/ boneIndices.size() && boneWeights.size())
     {
         // TODO: split into more manageable code chunks
         // TODO: refactor slots etc
@@ -104,11 +104,11 @@ namespace JonsEngine
             DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mTexcoordBuffer));
         }
 
-        // bone matrices/indices/weights
+        // bone indices/weights
         if (mHasBones)
         {
             // matrices
-            ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
+            /*ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
             bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
             bufferDescription.ByteWidth = boneMatrices.size() * sizeof(Mat4);
             bufferDescription.StructureByteStride = sizeof(Mat4);
@@ -117,7 +117,7 @@ namespace JonsEngine
 
             ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
             initData.pSysMem = &boneMatrices.at(0);
-            DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mBoneMatrixBuffer));
+            DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mBoneMatrixBuffer));*/
 
             // indices
             ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
@@ -140,7 +140,7 @@ namespace JonsEngine
             DXCALL(device->CreateBuffer(&bufferDescription, &initData, &mBoneWeightBuffer));
 
             // bone matrix SRV
-            DXCALL(device->CreateShaderResourceView(mBoneMatrixBuffer, nullptr, &mBoneSRV));
+            //DXCALL(device->CreateShaderResourceView(mBoneMatrixBuffer, nullptr, &mBoneSRV));
         }
 
         // index buffer
@@ -177,7 +177,7 @@ namespace JonsEngine
             mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_INDICES, 1, &mBoneIndexBuffer.p, &gBoneIndexStride, &gStaticOffset);
             mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_WEIGHTS, 1, &mBoneWeightBuffer.p, &gBoneWeightStride, &gStaticOffset);
             // temp: register c0
-            mContext->VSSetShaderResources(0, 1, &mBoneSRV.p);
+        //    mContext->VSSetShaderResources(0, 1, &mBoneSRV.p);
         }
 
         mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
