@@ -95,6 +95,22 @@ namespace JonsEngine
     }
 
 
+    AnimationID ResourceManifest::LoadAnimation(const ModelID modelID, const std::string& animationName)
+    {
+
+    }
+
+    void ResourceManifest::DeleteAnimation(AnimationID& animationID)
+    {
+
+    }
+
+    const Animation& ResourceManifest::GetAnimation(const AnimationID animationID) const
+    {
+
+    }
+
+
     MaterialID ResourceManifest::LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg)
     {
         auto iter = FindInContainer<PackageMaterial>(assetName, jonsPkg->mMaterials);

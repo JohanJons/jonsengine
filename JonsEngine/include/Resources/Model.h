@@ -1,6 +1,5 @@
 #pragma once
 
-#include "include/Resources/ModelAnimation.h"
 #include "include/Resources/ModelNode.h"
 #include "include/Resources/Mesh.h"
 #include "include/Resources/JonsPackage.h"
@@ -19,12 +18,10 @@ namespace JonsEngine
     class Model
     {
     private:
-        typedef std::vector<ModelAnimation> AnimationContainer;
         typedef std::vector<Mesh> MeshContainer;
         typedef std::vector<ModelNode> NodeContainer;
 
     public:
-        typedef ConstRangedIterator<AnimationContainer, AnimationContainer::const_iterator> ModelAnimationIterator;
         typedef ConstRangedIterator<MeshContainer, MeshContainer::const_iterator> MeshIterator;
         typedef ConstRangedIterator<NodeContainer, NodeContainer::const_iterator> NodeIterator;
 
@@ -35,10 +32,8 @@ namespace JonsEngine
 
         MeshIterator GetMeshes() const;
         NodeIterator GetNodes() const;
-        ModelAnimationIterator GetAnimations() const;
 
         ModelAnimationIndex GetAnimationIndex(const std::string& name) const;
-        const ModelAnimation& GetAnimation(const ModelAnimationIndex animationIndex) const;
 
         const ModelNode& GetRootNode() const;
         const std::string& GetName() const;
@@ -55,7 +50,6 @@ namespace JonsEngine
         AABB mStaticAABB;
         NodeContainer mNodes;
         MeshContainer mMeshes;
-        AnimationContainer mAnimations;
     };
 
     typedef IDMap<Model>::ItemID ModelID;

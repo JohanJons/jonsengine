@@ -163,7 +163,6 @@
     <ClCompile Include="src\Resources\Material.cpp" />
     <ClCompile Include="src\Resources\Mesh.cpp" />
     <ClCompile Include="src\Resources\Model.cpp" />
-    <ClCompile Include="src\Resources\ModelAnimation.cpp" />
     <ClCompile Include="src\Resources\ModelNode.cpp" />
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
     <ClCompile Include="src\Resources\Skybox.cpp" />
@@ -250,7 +249,6 @@
     <ClInclude Include="include\Resources\Material.h" />
     <ClInclude Include="include\Resources\Mesh.h" />
     <ClInclude Include="include\Resources\Model.h" />
-    <ClInclude Include="include\Resources\ModelAnimation.h" />
     <ClInclude Include="include\Resources\ModelNode.h" />
     <ClInclude Include="include\Resources\ResourceManifest.h" />
     <ClInclude Include="include\Resources\Skybox.h" />

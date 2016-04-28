@@ -245,9 +245,6 @@
     <ClCompile Include="src\Resources\Skybox.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Resources\ModelAnimation.cpp">
-      <Filter>Source Files\Resources</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scene\BaseActor.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
@@ -492,9 +489,6 @@
     </ClInclude>
     <ClInclude Include="include\Core\Containers\IDMapBase.hpp">
       <Filter>Header Files\Core\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Resources\ModelAnimation.h">
-      <Filter>Header Files\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Scene\AnimatedActor.h">
       <Filter>Header Files\Scene</Filter>

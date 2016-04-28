@@ -27,6 +27,10 @@ namespace JonsEngine
         void DeleteModel(ModelID& modelID);
         const Model& GetModel(const ModelID modelID) const;
 
+        AnimationID LoadAnimation(const ModelID modelID, const std::string& animationName);
+        void DeleteAnimation(AnimationID& animationID);
+        const Animation& GetAnimation(const AnimationID animationID) const;
+
         MaterialID LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg);
         void DeleteMaterial(MaterialID& materialID);
         const Material& GetMaterial(const MaterialID materialID) const;
@@ -45,6 +49,7 @@ namespace JonsEngine
         DX11Renderer& mRenderer;
 
         IDMap<Model> mModels;
+        IDMap<Animation> mAnimations;
         IDMap<Material> mMaterials;
         IDMap<Skybox> mSkyboxes;
     };
