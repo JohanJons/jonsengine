@@ -8,6 +8,9 @@
 
 namespace JonsEngine
 {
+    // Stable map-like container with contigous memory using IDs for keys
+    // Useful for when both instant lookup of keys and fast container iteration is needed
+
     // Internal storage item
     template <typename T>
     struct IDMapItem

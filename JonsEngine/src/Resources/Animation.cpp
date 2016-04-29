@@ -1,14 +1,12 @@
-#pragma once
+#include "include/Resources/Animation.h"
 
 namespace JonsEngine
 {
-    class Animation
+    Animation::Animation()
     {
-    public:
-        Animation();
-        ~Animation();
-
-
-    private:
-    };
+    }
+    
+    Animation::~Animation()
+    {
+    }
 }

@@ -10,7 +10,9 @@ namespace JonsEngine
     void ReserveStorage(const PackageModel& model, ModelNode::NodeContainer& nodeContainer, ModelNode::MeshContainer& meshContainer);
 
 
-    Model::Model(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID) : mName(name), mStaticAABB(minBounds, maxBounds)
+    Model::Model(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID) :
+        mName(name),
+        mStaticAABB(minBounds, maxBounds)
     {
         const ModelNodeIndex rootNodeIndex = 0;
 
@@ -19,7 +21,10 @@ namespace JonsEngine
             ModelNode::MeshIterator(mMeshes.begin(), mMeshes.end()), mNodes.end());
     }
 
-    Model::Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData) : mName(pkgModel.mName), mStaticAABB(pkgModel.mStaticAABB.mMinBounds, pkgModel.mStaticAABB.mMaxBounds)
+    Model::Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData, const AnimationList& animations) :
+        mName(pkgModel.mName),
+        mStaticAABB(pkgModel.mStaticAABB.mMinBounds, pkgModel.mStaticAABB.mMaxBounds),
+        mAnimations(animations)
     {
         ReserveStorage(pkgModel, mNodes, mMeshes);
 
@@ -30,7 +35,11 @@ namespace JonsEngine
     }
 
     // node container needs special care due to reconstructing valid iterators
-    Model::Model(const Model& otherModel) : mName(otherModel.mName), mStaticAABB(otherModel.mStaticAABB), mMeshes(otherModel.mMeshes), mAnimations(otherModel.mAnimations)
+    Model::Model(const Model& otherModel) :
+        mName(otherModel.mName),
+        mStaticAABB(otherModel.mStaticAABB),
+        mAnimations(otherModel.mAnimations),
+        mMeshes(otherModel.mMeshes)
     {
         const uint32_t numNodes = otherModel.mNodes.size();
         mNodes.reserve(numNodes);

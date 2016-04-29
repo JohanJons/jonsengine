@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Resources/Animation.h"
 #include "include/Resources/ModelNode.h"
 #include "include/Resources/Mesh.h"
 #include "include/Resources/JonsPackage.h"
@@ -9,12 +10,10 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 
 namespace JonsEngine
 {
-    typedef uint32_t ModelAnimationIndex;
-    static const ModelAnimationIndex INVALID_ANIMATION_INDEX = std::numeric_limits<ModelAnimationIndex>::max();
-
     class Model
     {
     private:
@@ -24,16 +23,17 @@ namespace JonsEngine
     public:
         typedef ConstRangedIterator<MeshContainer, MeshContainer::const_iterator> MeshIterator;
         typedef ConstRangedIterator<NodeContainer, NodeContainer::const_iterator> NodeIterator;
+        typedef std::vector<std::pair<std::string, AnimationID>> AnimationList;
 
         Model(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
-        Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData);
+        Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData, const AnimationList& animations);
         Model(const Model& other);
         ~Model();
 
         MeshIterator GetMeshes() const;
         NodeIterator GetNodes() const;
 
-        ModelAnimationIndex GetAnimationIndex(const std::string& name) const;
+        //ModelAnimationIndex GetAnimationIndex(const std::string& name) const;
 
         const ModelNode& GetRootNode() const;
         const std::string& GetName() const;
@@ -48,6 +48,7 @@ namespace JonsEngine
 
         std::string mName;
         AABB mStaticAABB;
+        AnimationList mAnimations;
         NodeContainer mNodes;
         MeshContainer mMeshes;
     };

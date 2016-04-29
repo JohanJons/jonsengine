@@ -14,7 +14,9 @@ namespace JonsEngine
     typename std::vector<PackageStruct>::const_iterator FindInContainer(const std::string& assetName, const std::vector<PackageStruct>& container);
 
 
-    ResourceManifest::ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator) : mMemoryAllocator(memoryAllocator), mRenderer(renderer)
+    ResourceManifest::ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator) :
+        mMemoryAllocator(memoryAllocator),
+        mRenderer(renderer)
     {
     }
        
@@ -75,10 +77,20 @@ namespace JonsEngine
 
         const PackageModel& pkgModel = *iter;
 
+        // load animations, if any
+        Model::AnimationList modelAnimations;
+        for (const PackageAnimation& animation : pkgModel.mAnimations)
+        {
+            const AnimationID animationID = LoadAnimation(animation.mName, animation);
+            modelAnimations.emplace_back(animation.mName, animationID);
+        }
+
         ModelNode::InitDataList initDataList;
         ParseModelInitData(initDataList, jonsPkg, pkgModel);
+        const ModelID modelID = mModels.Insert(pkgModel, initDataList);
 
-        return mModels.Insert(pkgModel, initDataList);
+
+        return modelID;
     }
 
     void ResourceManifest::DeleteModel(ModelID& modelID)
@@ -95,17 +107,14 @@ namespace JonsEngine
     }
 
 
-    AnimationID ResourceManifest::LoadAnimation(const ModelID modelID, const std::string& animationName)
-    {
-
-    }
-
-    void ResourceManifest::DeleteAnimation(AnimationID& animationID)
-    {
-
-    }
-
     const Animation& ResourceManifest::GetAnimation(const AnimationID animationID) const
+    {
+        assert(animationID != INVALID_ANIMATION_ID);
+
+        return mAnimations.at(animationID);
+    }
+
+    const Animation& ResourceManifest::GetAnimation(const ModelID modelID, const std::string& animationName) const
     {
 
     }
@@ -180,6 +189,18 @@ namespace JonsEngine
     const Skybox& ResourceManifest::GetSkybox(const SkyboxID skyboxID) const
     {
         return mSkyboxes.GetItem(skyboxID);
+    }
+
+
+    AnimationID ResourceManifest::LoadAnimation(const std::string& animationName, const PackageAnimation& animation)
+    {
+        
+    }
+
+    void ResourceManifest::DeleteAnimation(AnimationID& animationID)
+    {
+        mAnimations.erase(animationID);
+        animationID = INVALID_ANIMATION_ID;
     }
 
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/Utils/Time.h"
 #include "include/Core/Types.h"
 #include "include/Renderer/DirectX11/Shaders/Constants.h"
@@ -9,6 +8,9 @@
 
 namespace JonsEngine
 {
+    typedef uint32_t AnimationID;
+    static const AnimationID INVALID_ANIMATION_ID = 0;
+
     class Animation
     {
     public:
@@ -29,7 +31,4 @@ namespace JonsEngine
         // TODO: array?
         std::vector<Mat4> mTransforms;
     };
-
-    typedef IDMap<Animation>::ItemID AnimationID;
-    static const AnimationID INVALID_ANIMATION_ID = IDMap<Animation>::INVALID_ITEM_ID;
 }

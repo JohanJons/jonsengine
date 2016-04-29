@@ -2,12 +2,15 @@
 
 #include "include/Resources/JonsPackage.h"
 #include "include/Resources/Model.h"
+#include "include/Resources/Animation.h"
 #include "include/Resources/ModelNode.h"
 #include "include/Resources/Mesh.h"
 #include "include/Resources/Material.h"
 #include "include/Resources/Skybox.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Renderer/Shapes.h"
+
+#include <unordered_map>
 
 namespace JonsEngine
 {
@@ -27,9 +30,8 @@ namespace JonsEngine
         void DeleteModel(ModelID& modelID);
         const Model& GetModel(const ModelID modelID) const;
 
-        AnimationID LoadAnimation(const ModelID modelID, const std::string& animationName);
-        void DeleteAnimation(AnimationID& animationID);
         const Animation& GetAnimation(const AnimationID animationID) const;
+        const Animation& GetAnimation(const ModelID modelID, const std::string& animationName) const;
 
         MaterialID LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg);
         void DeleteMaterial(MaterialID& materialID);
@@ -42,6 +44,9 @@ namespace JonsEngine
 
 
     private:
+        AnimationID LoadAnimation(const ModelID modelID, const std::string& animationName);
+        void DeleteAnimation(AnimationID& animationID);
+
         void ParseModelInitData(ModelNode::InitDataList& initData, const JonsPackagePtr jongPkg, const PackageModel& model);
 
 
@@ -49,7 +54,7 @@ namespace JonsEngine
         DX11Renderer& mRenderer;
 
         IDMap<Model> mModels;
-        IDMap<Animation> mAnimations;
+        std::unordered_map<AnimationID, Animation> mAnimations;
         IDMap<Material> mMaterials;
         IDMap<Skybox> mSkyboxes;
     };
