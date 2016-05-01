@@ -44,8 +44,8 @@ namespace JonsEngine
 
 
     private:
-        AnimationID LoadAnimation(const ModelID modelID, const std::string& animationName);
-        void DeleteAnimation(AnimationID& animationID);
+        AnimationID LoadAnimation(const PackageAnimation& animation);
+        void DeleteAnimation(const AnimationID animationID);
 
         void ParseModelInitData(ModelNode::InitDataList& initData, const JonsPackagePtr jongPkg, const PackageModel& model);
 
@@ -57,5 +57,7 @@ namespace JonsEngine
         std::unordered_map<AnimationID, Animation> mAnimations;
         IDMap<Material> mMaterials;
         IDMap<Skybox> mSkyboxes;
+
+        AnimationID mNextAnimationID;
     };
 }

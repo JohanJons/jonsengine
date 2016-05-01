@@ -10,7 +10,7 @@
 
 #include <string>
 #include <vector>
-#include <utility>
+#include <unordered_map>
 
 namespace JonsEngine
 {
@@ -23,7 +23,8 @@ namespace JonsEngine
     public:
         typedef ConstRangedIterator<MeshContainer, MeshContainer::const_iterator> MeshIterator;
         typedef ConstRangedIterator<NodeContainer, NodeContainer::const_iterator> NodeIterator;
-        typedef std::vector<std::pair<std::string, AnimationID>> AnimationList;
+        typedef std::unordered_map<std::string, AnimationID> AnimationList;
+        typedef ConstRangedIterator<AnimationList, AnimationList::const_iterator> AnimationIterator;
 
         Model(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
         Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData, const AnimationList& animations);
@@ -32,8 +33,9 @@ namespace JonsEngine
 
         MeshIterator GetMeshes() const;
         NodeIterator GetNodes() const;
+        AnimationIterator GetAnimations() const;
 
-        //ModelAnimationIndex GetAnimationIndex(const std::string& name) const;
+        AnimationID GetAnimationID(const std::string& name) const;
 
         const ModelNode& GetRootNode() const;
         const std::string& GetName() const;

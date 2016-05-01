@@ -29,9 +29,6 @@ namespace JonsEngine
         ReserveStorage(pkgModel, mNodes, mMeshes);
 
         ParseNodes(pkgModel, initData, pkgModel.mNodes.front(), mNodes.end());
-        
-        for (const PackageAnimation& pkgAnimation : pkgModel.mAnimations)
-            mAnimations.emplace_back(pkgAnimation, mNodes.size());
     }
 
     // node container needs special care due to reconstructing valid iterators
@@ -93,26 +90,15 @@ namespace JonsEngine
         return NodeIterator(mNodes.cbegin(), mNodes.cend());
     }
 
-    Model::ModelAnimationIterator Model::GetAnimations() const
+    Model::AnimationIterator Model::GetAnimations() const
     {
-        return ModelAnimationIterator(mAnimations.cbegin(), mAnimations.cend());
+        return AnimationIterator(mAnimations.cbegin(), mAnimations.cend());
     }
 
 
-    ModelAnimationIndex Model::GetAnimationIndex(const std::string& name) const
+    AnimationID Model::GetAnimationID(const std::string& name) const
     {
-        ModelAnimationIndex ret = INVALID_ANIMATION_INDEX;
-
-        const auto iter = std::find_if(mAnimations.cbegin(), mAnimations.cend(), [&name](const ModelAnimation& animation) { return animation.GetName() == name; });
-        if (iter != mAnimations.cend())
-            ret = iter - mAnimations.cbegin();
-
-        return ret;
-    }
-
-    const ModelAnimation& Model::GetAnimation(const ModelAnimationIndex animationIndex) const
-    {
-        return mAnimations.at(animationIndex);
+        return mAnimations.at(name);
     }
 
     

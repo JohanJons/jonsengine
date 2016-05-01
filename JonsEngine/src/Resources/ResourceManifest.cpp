@@ -7,16 +7,22 @@
 #include <algorithm>
 #include <sstream>
 #include <functional>
+#include <tuple>
+#include <utility>
 
 namespace JonsEngine
 {
     template <typename PackageStruct>
     typename std::vector<PackageStruct>::const_iterator FindInContainer(const std::string& assetName, const std::vector<PackageStruct>& container);
 
+    template <typename IDType>
+    IDType IncrementID(const IDType prevID);
+
 
     ResourceManifest::ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator) :
         mMemoryAllocator(memoryAllocator),
-        mRenderer(renderer)
+        mRenderer(renderer),
+        mNextAnimationID(0)
     {
     }
        
@@ -81,21 +87,25 @@ namespace JonsEngine
         Model::AnimationList modelAnimations;
         for (const PackageAnimation& animation : pkgModel.mAnimations)
         {
-            const AnimationID animationID = LoadAnimation(animation.mName, animation);
-            modelAnimations.emplace_back(animation.mName, animationID);
+            const AnimationID animationID = LoadAnimation(animation);
+            modelAnimations.emplace(animation.mName, animationID);
         }
 
         ModelNode::InitDataList initDataList;
         ParseModelInitData(initDataList, jonsPkg, pkgModel);
-        const ModelID modelID = mModels.Insert(pkgModel, initDataList);
 
-
-        return modelID;
+        return mModels.Insert(pkgModel, initDataList, modelAnimations);
     }
 
     void ResourceManifest::DeleteModel(ModelID& modelID)
     {
         assert(modelID != INVALID_MODEL_ID);
+        const Model& model = GetModel(modelID);
+
+        // delete any animations associated with the model
+        auto animations = model.GetAnimations();
+        for (auto& animation : animations)
+            DeleteAnimation(animation.second);
 
         mModels.Erase(modelID);
         modelID = INVALID_MODEL_ID;
@@ -116,7 +126,13 @@ namespace JonsEngine
 
     const Animation& ResourceManifest::GetAnimation(const ModelID modelID, const std::string& animationName) const
     {
+        assert(modelID != INVALID_MODEL_ID);
+        const Model& model = mModels.GetItem(modelID);
+        
+        const AnimationID animationID = model.GetAnimationID(animationName);
+        assert(animationID != INVALID_ANIMATION_ID);
 
+        return GetAnimation(animationID);
     }
 
 
@@ -192,15 +208,19 @@ namespace JonsEngine
     }
 
 
-    AnimationID ResourceManifest::LoadAnimation(const std::string& animationName, const PackageAnimation& animation)
+    AnimationID ResourceManifest::LoadAnimation(const PackageAnimation& animation)
     {
-        
+        mNextAnimationID = IncrementID(mNextAnimationID);
+        const Milliseconds animationDuration(animation.mDurationInMilliseconds);
+
+        mAnimations.emplace(std::piecewise_construct, std::forward_as_tuple(mNextAnimationID), std::forward_as_tuple(animation.mName, animationDuration, animation.mInverseRootMatrix));
+
+        return mNextAnimationID;
     }
 
-    void ResourceManifest::DeleteAnimation(AnimationID& animationID)
+    void ResourceManifest::DeleteAnimation(const AnimationID animationID)
     {
         mAnimations.erase(animationID);
-        animationID = INVALID_ANIMATION_ID;
     }
 
 
@@ -235,5 +255,11 @@ namespace JonsEngine
         const size_t hashedName = boost::hash_value(assetName);
 
         return std::find_if(container.begin(), container.end(), [hashedName](const PackageStruct& asset) { return boost::hash_value(asset.mName) == hashedName; });
+    }
+
+    template <typename IDType>
+    IDType IncrementID(const IDType prevID)
+    {
+        return (prevID + 1) % INVALID_ANIMATION_ID;
     }
 }
