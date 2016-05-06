@@ -10,21 +10,26 @@
 
 namespace JonsEngine
 {
-    class AnimationManager
+    class ResourceManifest;
+
+    class AnimationHandler
     {
     public:
-        AnimationManager();
-        ~AnimationManager();
+        AnimationHandler(const ResourceManifest& resourceManifest);
+        ~AnimationHandler();
 
         void Update(const Milliseconds elapsedTime);
 
-
+        AnimationInstanceID PlayAnimation(const AnimationID animationID);
+        void StopAnimation(AnimationInstanceID& animationInstance);
 
 
     private:
         Mat4& InterpolateTransform(const uint32_t transformIndex, const Milliseconds elapsedTime);
 
-        IDMap<Animation> mAnimations;
-        std::vector<AnimationInstance> mActiveAnimations;
+
+        const ResourceManifest& mResourceManifest;
+
+        IDMap<AnimationInstance> mActiveAnimations;
     };
 }

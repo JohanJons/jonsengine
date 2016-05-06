@@ -22,7 +22,6 @@ namespace JonsEngine
         IDMapItem(const ItemID id, Arguments&&... args);
     };
 
-    // Contigous-memory ID-based container.
     template<typename T>
     class IDMap : public IDMapBase<T, IDMapItem<T>>
     {

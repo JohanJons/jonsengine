@@ -11,6 +11,7 @@
 #include "include/Scene/PointLight.h"
 #include "include/Scene/SceneNode.h"
 #include "include/Scene/StaticActor.h"
+#include "include/Scene/AnimationHandler.h"
 #include "include/Resources/Skybox.h"
 #include "include/Renderer/RenderQueue.h"
 
@@ -80,6 +81,8 @@ namespace JonsEngine
         Camera& GetSceneCamera();
         const Camera& GetSceneCamera() const;
 
+        const AnimationHandler& GetAnimationHandler() const;
+
 
 		const std::string mName;
 
@@ -94,6 +97,7 @@ namespace JonsEngine
         DX11Renderer& mRenderer;
         const ResourceManifest& mResourceManifest;
 
+        AnimationHandler mAnimationHandler;
 		Camera mSceneCamera;
         Vec4 mAmbientLight;
         SkyboxID mSkyboxID;

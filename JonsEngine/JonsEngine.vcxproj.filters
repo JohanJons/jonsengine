@@ -272,8 +272,8 @@
     <ClCompile Include="src\Resources\AnimationInstance.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Resources\AnimationManager.cpp">
-      <Filter>Source Files\Resources</Filter>
+    <ClCompile Include="src\Scene\AnimationHandler.cpp">
+      <Filter>Source Files\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -523,14 +523,14 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11IndexBuffer.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Resources\AnimationManager.h">
-      <Filter>Header Files\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="include\Resources\Animation.h">
       <Filter>Header Files\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Resources\AnimationInstance.h">
       <Filter>Header Files\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\AnimationHandler.h">
+      <Filter>Header Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

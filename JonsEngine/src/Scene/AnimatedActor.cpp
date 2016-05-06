@@ -2,13 +2,16 @@
 
 namespace JonsEngine
 {
-    AnimatedActor::AnimatedActor(const std::string& name, const ModelID modelId, const SceneNodeID sceneNodeID) :
+    AnimatedActor::AnimatedActor(const OnPlayAnimationFunc& onPlayAnimation, const OnStopAnimationFunc& onStopAnimation, const std::string& name, const ModelID modelId, const SceneNodeID sceneNodeID) :
         BaseActor(name, modelId, sceneNodeID),
+        mOnPlayAnimationFunc(onPlayAnimation),
+        mOnStopAnimationFunc(onStopAnimation),
+        mAnimationData(INVALID_ANIMATION_INSTANCE_ID),
         mIsAnimating(false),
         mIsRepeating(false),
         mTimestamp(0),
         mAnimationDuration(0),
-        mAnimationIndex(INVALID_ANIMATION_INDEX)
+        mAnimation(INVALID_ANIMATION_ID)
     {
     }
 
@@ -17,25 +20,30 @@ namespace JonsEngine
     }
 
 
-    void AnimatedActor::PlayAnimation(const ModelAnimationIndex animationIndex, const Milliseconds animationTime, const bool repeat)
+    void AnimatedActor::PlayAnimation(const AnimationID animationID, const Milliseconds animationTime, const bool repeat)
     {
-        mAnimationIndex = animationIndex;
+        mAnimation = animationID;
         mIsAnimating = true;
         mIsRepeating = repeat;
         mTimestamp = Milliseconds(0);
         mAnimationDuration = animationTime;
+
+        mAnimationData = mOnPlayAnimationFunc(animationID);
     }
 
     void AnimatedActor::StopAnimation()
     {
         mIsAnimating = false;
         mIsRepeating = false;
+
+        mOnStopAnimationFunc(mAnimationData);
+        mAnimationData = INVALID_ANIMATION_INSTANCE_ID;
     }
 
 
-    ModelAnimationIndex AnimatedActor::GetAnimation() const
+    AnimationID AnimatedActor::GetActiveAnimation() const
     {
-        return mAnimationIndex;
+        return mAnimation;
     }
 
     bool AnimatedActor::IsRepeatingAnimation() const
