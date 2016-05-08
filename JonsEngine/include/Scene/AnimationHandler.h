@@ -22,10 +22,11 @@ namespace JonsEngine
 
         AnimationInstanceID PlayAnimation(const AnimationID animationID);
         void StopAnimation(AnimationInstanceID& animationInstance);
+        const AnimationInstance::BoneData& GetBoneData(const AnimationID animationID) const;
 
 
     private:
-        Mat4& InterpolateTransform(const uint32_t transformIndex, const Milliseconds elapsedTime);
+        Mat4 InterpolateTransform(const uint32_t transformIndex, const Milliseconds elapsedTime);
 
 
         const ResourceManifest& mResourceManifest;

@@ -48,4 +48,15 @@ namespace JonsEngine
     {
         mActiveAnimations.Erase(animationInstance);
     }
+
+    const AnimationInstance::BoneData& AnimationHandler::GetBoneData(const AnimationID animationID) const
+    {
+        mActiveAnimations.GetItem(animationID).mBoneTransforms;
+    }
+
+
+    Mat4 AnimationHandler::InterpolateTransform(const uint32_t transformIndex, const Milliseconds elapsedTime)
+    {
+        return Mat4();
+    }
 }

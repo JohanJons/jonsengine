@@ -11,9 +11,11 @@ namespace JonsEngine
 {
     struct AnimationInstance
     {
+        typedef std::array<Mat4, Animation::MAX_NUM_BONES> BoneData;
+
         AnimationID mAnimationID;
         Milliseconds mTimestamp;
-        std::array<Mat4, Animation::MAX_NUM_BONES> mBoneTransforms;
+        BoneData mBoneTransforms;
 
 
         AnimationInstance(const AnimationID animationID);

@@ -28,6 +28,7 @@ namespace JonsEngine
         Milliseconds ElapstedAnimationTime() const;
 
         void UpdateTimestamp(const Milliseconds elapsedTime);
+        AnimationInstanceID GetAnimationInstance() const;
 
 
     private:

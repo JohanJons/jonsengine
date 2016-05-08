@@ -17,6 +17,8 @@ namespace JonsEngine
 
     AnimatedActor::~AnimatedActor()
     {
+        if (IsPlaying())
+            StopAnimation();
     }
 
 
@@ -75,5 +77,10 @@ namespace JonsEngine
             mTimestamp = Milliseconds(0);
         else
             StopAnimation();
+    }
+
+    AnimationInstanceID AnimatedActor::GetAnimationInstance() const
+    {
+        return mAnimationData;
     }
 }
