@@ -23,9 +23,9 @@ namespace JonsEngine
 
     // there is some juggling with template types due to not having partial template specialization...
     template <typename ACTOR_TYPE>
-    void AddAllMeshes(const ResourceManifest& resManifest, std::vector<RenderableModel>& resultContainer, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix);
+    void AddAllMeshes(std::vector<RenderableModel>& resultContainer, const AnimationHandler& animationHandler, const ResourceManifest& resManifest, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix);
     template <typename ACTOR_TYPE>
-    void AddAllMeshes(const ResourceManifest& resManifest, std::vector<RenderableMesh>& resultContainer, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix);
+    void AddAllMeshes(std::vector<RenderableMesh>& resultContainer, const AnimationHandler& animationHandler, const ResourceManifest& resManifest, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix);
     template <typename RENDERABLE_TYPE, typename ...MESH_ARGS>
     void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const StaticActor& actor, const Model& model, const ModelNode& node, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args);
     template <typename RENDERABLE_TYPE, typename ...MESH_ARGS>
@@ -137,6 +137,8 @@ namespace JonsEngine
     void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator,
         std::vector<RENDERABLE_TYPE>& meshContainer, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args)
     {
+        const AnimationHandler& animationHandler = scene.GetAnimationHandler();
+
         for (const auto& actor : actorIterator)
         {
             const SceneNodeID sceneNodeID = actor.GetSceneNode();
@@ -153,7 +155,7 @@ namespace JonsEngine
             // TODO: extend with fine-grained culling, such as adding meshes per-node rather than per-model for AGGRESSIVE culling strategy,
             const bool addAllMeshes = DetermineIfAddAllMeshes(cullingStrat, visibilityResult);
             if (addAllMeshes)
-                AddAllMeshes<decltype(actor)>(resManifest, meshContainer, actor, model, worldMatrix);
+                AddAllMeshes<decltype(actor)>(meshContainer, animationHandler, resManifest, actor, model, worldMatrix);
         }
     }
 
@@ -176,8 +178,9 @@ namespace JonsEngine
     AABBIntersection FrustumCull(const Model& model, const Mat4& worldTransform, const Mat4& viewProjMatrix)
     {
         const Mat4 wvpMatrix = viewProjMatrix * worldTransform;
+        const AABB modelAABB = model.GetStaticAABB();
 
-        return Intersection(model.GetStaticAABB(), wvpMatrix);
+        return Intersection(modelAABB, wvpMatrix);
     }
 
     AABBIntersection PointLightCull(const Model& model, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius)
@@ -196,7 +199,7 @@ namespace JonsEngine
 
 
     template <typename ACTOR_TYPE>
-    void AddAllMeshes(const ResourceManifest& resManifest, std::vector<RenderableModel>& resultContainer, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldTransform)
+    void AddAllMeshes(std::vector<RenderableModel>& resultContainer, const AnimationHandler& animationHandler, const ResourceManifest& resManifest, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldTransform)
     {
         for (const ModelNode& node : model.GetNodes())
         {
@@ -223,13 +226,13 @@ namespace JonsEngine
                     specularFactor = material.GetSpecularFactor();
                 }
 
-                AddMesh<RenderableModel>(resultContainer, actor, model, node, mesh.GetMesh(), worldTransform, diffuseTexture, normalTexture, specularFactor, actor.GetMaterialTilingFactor());
+                AddMesh<RenderableModel>(resultContainer, animationHandler, actor, model, node, mesh.GetMesh(), worldTransform, diffuseTexture, normalTexture, specularFactor, actor.GetMaterialTilingFactor());
             }
         }
     }
 
     template <typename ACTOR_TYPE>
-    void AddAllMeshes(const ResourceManifest& resManifest, std::vector<RenderableMesh>& resultContainer, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldTransform)
+    void AddAllMeshes(std::vector<RenderableMesh>& resultContainer, const AnimationHandler& animationHandler, ResourceManifest& resManifest, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldTransform)
     {
         for (const ModelNode& node : model.GetNodes())
         {
@@ -237,12 +240,12 @@ namespace JonsEngine
                 continue;
 
             for (const Mesh& mesh : node.GetMeshes())
-                AddMesh<RenderableMesh>(resultContainer, actor, model, node, mesh.GetMesh(), worldTransform);
+                AddMesh<RenderableMesh>(resultContainer, animationHandler, actor, model, node, mesh.GetMesh(), worldTransform);
         }
     }
 
     template <typename RENDERABLE_TYPE, typename ...MESH_ARGS>
-    void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const StaticActor& actor, const Model& model, const ModelNode& node, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args)
+    void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const AnimationHandler& animationHandler, const StaticActor& actor, const Model& model, const ModelNode& node, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args)
     {
         const bool isAnimating = false;
 
@@ -250,16 +253,16 @@ namespace JonsEngine
     }
 
     template <typename RENDERABLE_TYPE, typename ...MESH_ARGS>
-    void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const AnimatedActor& actor, const Model& model, const ModelNode& node, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args)
+    void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const AnimationHandler& animationHandler, const AnimatedActor& actor, const Model& model, const ModelNode& node, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args)
     {
         const bool isAnimating = actor.IsPlaying();
 
         if (isAnimating)
         {
-            const ModelAnimation& animation = model.GetAnimation(actor.GetAnimation());
-            const Mat4& animationTransform = animation.GetNodeTransform(node.GetModelNodeIndex(), actor.ElapstedAnimationTime());
-
-            resultContainer.emplace_back(meshID, worldTransform * animationTransform, isAnimating, std::forward<MESH_ARGS>(args)...);
+            const auto animInstanceID = actor.GetAnimationInstance();
+            const auto& boneData = animationHandler.GetBoneData(animInstanceID);
+            
+            resultContainer.emplace_back(meshID, worldTransform, isAnimating, std::forward<MESH_ARGS>(args)...);
         }
         else
             resultContainer.emplace_back(meshID, worldTransform, isAnimating, std::forward<MESH_ARGS>(args)...);

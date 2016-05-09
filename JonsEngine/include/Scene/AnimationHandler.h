@@ -22,7 +22,7 @@ namespace JonsEngine
 
         AnimationInstanceID PlayAnimation(const AnimationID animationID);
         void StopAnimation(AnimationInstanceID& animationInstance);
-        const AnimationInstance::BoneData& GetBoneData(const AnimationID animationID) const;
+        const AnimationInstance::BoneData& GetBoneData(const AnimationInstanceID animationInstance) const;
 
 
     private:

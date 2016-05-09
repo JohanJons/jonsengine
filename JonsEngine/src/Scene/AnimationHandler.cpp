@@ -41,17 +41,23 @@ namespace JonsEngine
 
     AnimationInstanceID AnimationHandler::PlayAnimation(const AnimationID animationID)
     {
+        assert(animationID != INVALID_ANIMATION_ID);
+
         return mActiveAnimations.Insert(animationID);
     }
 
     void AnimationHandler::StopAnimation(AnimationInstanceID& animationInstance)
     {
+        assert(animationInstance != INVALID_ANIMATION_INSTANCE_ID);
+
         mActiveAnimations.Erase(animationInstance);
     }
 
-    const AnimationInstance::BoneData& AnimationHandler::GetBoneData(const AnimationID animationID) const
+    const AnimationInstance::BoneData& AnimationHandler::GetBoneData(const AnimationInstanceID animationInstance) const
     {
-        mActiveAnimations.GetItem(animationID).mBoneTransforms;
+        assert(animationInstance != INVALID_ANIMATION_INSTANCE_ID);
+
+        mActiveAnimations.GetItem(animationInstance).mBoneTransforms;
     }
 
 
