@@ -3,18 +3,39 @@
 #include "include/Core/Types.h"
 
 #include <vector>
+#include <limits>
 
 namespace JonsEngine
 {
+    typedef std::vector<Mat4> RenderableBones;
+
+    struct RenderableSkeleton
+    {
+        typedef RenderableBones::size_type BoneIndex;
+        static const BoneIndex INVALID_BONE_INDEX = std::numeric_limits<BoneIndex>::max();
+        
+        RenderableSkeleton();
+        RenderableSkeleton(const BoneIndex begin, const BoneIndex end);
+        
+    
+        BoneIndex mBoneIndexBegin;
+        BoneIndex mBoneIndexEnd;
+    }
+    
     struct RenderableMesh
     {
-        RenderableMesh(const DX11MeshID mesh, const Mat4& worldTransform, const bool isAnimating) : mMeshID(mesh), mWorldTransform(worldTransform), mIsAnimating(isAnimating)
+        RenderableMesh(const DX11MeshID mesh, const Mat4& worldTransform, const bool isAnimating) :
+            mWorldTransform(worldTransform),
+            mSkeleton(),
+            mMeshID(mesh),
+            mIsAnimating(isAnimating)
         {
         }
 
 
-        DX11MeshID mMeshID;
         Mat4 mWorldTransform;
+        RenderableSkeleton mSkeleton;
+        DX11MeshID mMeshID;
         bool mIsAnimating;
     };
     
@@ -22,8 +43,10 @@ namespace JonsEngine
 
     struct RenderableMaterial
     {
-        RenderableMaterial(const DX11MaterialID diffuseTexture, const DX11MaterialID normalTexture, const float specFactor)
-            : mDiffuseTextureID(diffuseTexture), mNormalTextureID(normalTexture), mSpecularFactor(specFactor)
+        RenderableMaterial(const DX11MaterialID diffuseTexture, const DX11MaterialID normalTexture, const float specFactor) :
+            mDiffuseTextureID(diffuseTexture),
+            mNormalTextureID(normalTexture),
+            mSpecularFactor(specFactor)
         {
         }
 
@@ -35,7 +58,9 @@ namespace JonsEngine
     struct RenderableModel
     {
         RenderableModel(const DX11MeshID mesh, const Mat4& worldTransform, const bool isStatic, const DX11MaterialID diffuseTexture, const DX11MaterialID normalTexture, const float specFactor, const float tilingFactor) :
-            mMesh(mesh, worldTransform, isStatic), mMaterial(diffuseTexture, normalTexture, specFactor), mTextureTilingFactor(tilingFactor)
+            mMesh(mesh, worldTransform, isStatic),
+            mMaterial(diffuseTexture, normalTexture, specFactor),
+            mTextureTilingFactor(tilingFactor)
         {
         }
 
@@ -61,7 +86,10 @@ namespace JonsEngine
     {
         struct CascadeSplit
         {
-            CascadeSplit(const float nearZ, const float farZ, const size_t meshEndIndex) : mNearZ(nearZ), mFarZ(farZ), mMeshEndIndex(meshEndIndex)
+            CascadeSplit(const float nearZ, const float farZ, const size_t meshEndIndex) :
+                mNearZ(nearZ),
+                mFarZ(farZ),
+                mMeshEndIndex(meshEndIndex)
             {
             }
 
@@ -72,7 +100,10 @@ namespace JonsEngine
         };
 
 
-        RenderableDirLight(const Vec4& lightColor, const Vec3& lightDir, const uint32_t numCascades) : mLightColor(lightColor), mLightDirection(lightDir), mNumCascades(numCascades)
+        RenderableDirLight(const Vec4& lightColor, const Vec3& lightDir, const uint32_t numCascades) :
+            mLightColor(lightColor),
+            mLightDirection(lightDir),
+            mNumCascades(numCascades)
         {
         }
 
@@ -90,7 +121,10 @@ namespace JonsEngine
     struct RenderablePointLight
     {
         RenderablePointLight(const Vec4& lightColor, const Vec3& lightPosition, const float intensity, const float radius) :
-            mLightColor(lightColor), mLightPosition(lightPosition), mLightIntensity(intensity), mLightRadius(radius)
+            mLightColor(lightColor),
+            mLightPosition(lightPosition),
+            mLightIntensity(intensity),
+            mLightRadius(radius)
         {
         }
 
@@ -120,5 +154,6 @@ namespace JonsEngine
         RenderableCamera mCamera;
         RenderableDirLights mDirectionalLights;
         RenderablePointLights mPointLights;
+        RenderableBones mBones;
     };
 }

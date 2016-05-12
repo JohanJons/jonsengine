@@ -2,7 +2,20 @@
 
 namespace JonsEngine
 {
-    RenderQueue::RenderQueue() : mAmbientLight(0.01f), mSkyboxTextureID(INVALID_DX11_MATERIAL_ID)
+    RenderableSkeleton() : 
+        RenderableSkeleton(INVALID_BONE_INDEX, INVALID_BONE_INDEX)
+    {
+    }
+        
+    RenderableSkeleton(const BoneIndex begin, const BoneIndex end) :
+        mBoneIndexBegin(begin),
+        mBoneIndexEnd(end)
+    {
+    }
+    
+    RenderQueue::RenderQueue() :
+        mAmbientLight(0.01f),
+        mSkyboxTextureID(INVALID_DX11_MATERIAL_ID)
     {
     }
 
