@@ -3,43 +3,46 @@
 #include "include/Core/Types.h"
 
 #include <vector>
-#include <limits>
 
 namespace JonsEngine
 {
-    typedef std::vector<Mat4> RenderableBones;
-
-    struct RenderableSkeleton
+    struct RenderQueue
     {
-        typedef RenderableBones::size_type BoneIndex;
-        static const BoneIndex INVALID_BONE_INDEX = std::numeric_limits<BoneIndex>::max();
-        
-        RenderableSkeleton();
-        RenderableSkeleton(const BoneIndex begin, const BoneIndex end);
-        
+        typedef std::vector<Mat4> RenderableBones;
     
-        BoneIndex mBoneIndexBegin;
-        BoneIndex mBoneIndexEnd;
-    }
-    
-    struct RenderableMesh
-    {
-        RenderableMesh(const DX11MeshID mesh, const Mat4& worldTransform, const bool isAnimating) :
-            mWorldTransform(worldTransform),
-            mSkeleton(),
-            mMeshID(mesh),
-            mIsAnimating(isAnimating)
+        struct RenderableSkeleton
         {
-        }
+            typedef RenderableBones::size_type BoneIndex;
+            static const BoneIndex INVALID_BONE_INDEX;
+            
+            RenderableSkeleton();
+            RenderableSkeleton(const BoneIndex begin, const BoneIndex end);
+            
+        
+            BoneIndex mBoneIndexBegin;
+            BoneIndex mBoneIndexEnd;
+        };
+        
+        struct RenderableMesh
+        {
+            RenderableMesh(const DX11MeshID mesh, const Mat4& worldTransform, const bool isAnimating) :
+                mWorldTransform(worldTransform),
+                mSkeleton(),
+                mMeshID(mesh),
+                mIsAnimating(isAnimating)
+            {
+            }
 
 
-        Mat4 mWorldTransform;
-        RenderableSkeleton mSkeleton;
-        DX11MeshID mMeshID;
-        bool mIsAnimating;
+            Mat4 mWorldTransform;
+            RenderableSkeleton mSkeleton;
+            DX11MeshID mMeshID;
+            bool mIsAnimating;
+        };
     };
+}
     
-    typedef std::vector<RenderableMesh> RenderableMeshes;
+    /*typedef std::vector<RenderableMesh> RenderableMeshes;
 
     struct RenderableMaterial
     {
@@ -155,5 +158,4 @@ namespace JonsEngine
         RenderableDirLights mDirectionalLights;
         RenderablePointLights mPointLights;
         RenderableBones mBones;
-    };
-}
+    };*/

@@ -272,7 +272,7 @@
     <ClCompile Include="src\Resources\AnimationInstance.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene\AnimationHandler.cpp">
+    <ClCompile Include="src\Scene\AnimationUpdater.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
   </ItemGroup>
@@ -529,7 +529,7 @@
     <ClInclude Include="include\Resources\AnimationInstance.h">
       <Filter>Header Files\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Scene\AnimationHandler.h">
+    <ClInclude Include="include\Scene\AnimationUpdater.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>

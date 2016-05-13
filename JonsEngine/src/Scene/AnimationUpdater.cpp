@@ -1,20 +1,20 @@
-#include "include/Scene/AnimationHandler.h"
+#include "include/Scene/AnimationUpdater.h"
 
 #include "include/Resources/ResourceManifest.h"
 
 namespace JonsEngine
 {
-    AnimationHandler::AnimationHandler(const ResourceManifest& resourceManifest) :
+    AnimationUpdater::AnimationUpdater(const ResourceManifest& resourceManifest) :
         mResourceManifest(resourceManifest)
     {
     }
 
-    AnimationHandler::~AnimationHandler()
+    AnimationUpdater::~AnimationUpdater()
     {
     }
 
 
-    void AnimationHandler::Update(const Milliseconds elapsedTime)
+    void AnimationUpdater::Update(const Milliseconds elapsedTime)
     {
         for (AnimationInstance& animInstance : mActiveAnimations)
         {
@@ -25,6 +25,7 @@ namespace JonsEngine
             Mat4& rootTransform = animInstance.mBoneTransforms.front();
             rootTransform = InterpolateTransform(0, elapsedTime);
 
+            // TODO: only use real number of bones
             const auto& parentMap = anim.GetParentMapping();
             const uint32_t numTransforms = animInstance.mBoneTransforms.size();
             for (uint32_t transformNum = 1; transformNum < numTransforms; ++transformNum)
@@ -39,30 +40,32 @@ namespace JonsEngine
     }
 
 
-    AnimationInstanceID AnimationHandler::PlayAnimation(const AnimationID animationID)
+    AnimationInstanceID AnimationUpdater::PlayAnimation(const AnimationID animationID)
     {
         assert(animationID != INVALID_ANIMATION_ID);
 
         return mActiveAnimations.Insert(animationID);
     }
 
-    void AnimationHandler::StopAnimation(AnimationInstanceID& animationInstance)
+    void AnimationUpdater::StopAnimation(AnimationInstanceID& animationInstance)
     {
         assert(animationInstance != INVALID_ANIMATION_INSTANCE_ID);
 
         mActiveAnimations.Erase(animationInstance);
     }
 
-    const AnimationInstance::BoneData& AnimationHandler::GetBoneData(const AnimationInstanceID animationInstance) const
+
+    const AnimationInstance::BoneData& AnimationUpdater::GetBoneData(const AnimationInstanceID animationInstance) const
     {
         assert(animationInstance != INVALID_ANIMATION_INSTANCE_ID);
 
-        mActiveAnimations.GetItem(animationInstance).mBoneTransforms;
+        return mActiveAnimations.GetItem(animationInstance).mBoneTransforms;
     }
 
 
-    Mat4 AnimationHandler::InterpolateTransform(const uint32_t transformIndex, const Milliseconds elapsedTime)
+    Mat4 AnimationUpdater::InterpolateTransform(const uint32_t transformIndex, const Milliseconds elapsedTime)
     {
+        // TODO
         return Mat4();
     }
 }

@@ -166,7 +166,7 @@
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
     <ClCompile Include="src\Resources\Skybox.cpp" />
     <ClCompile Include="src\Scene\AnimatedActor.cpp" />
-    <ClCompile Include="src\Scene\AnimationHandler.cpp" />
+    <ClCompile Include="src\Scene\AnimationUpdater.cpp" />
     <ClCompile Include="src\Scene\BaseActor.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
     <ClCompile Include="src\Scene\DirectionalLight.cpp" />
@@ -252,7 +252,7 @@
     <ClInclude Include="include\Resources\ResourceManifest.h" />
     <ClInclude Include="include\Resources\Skybox.h" />
     <ClInclude Include="include\Scene\AnimatedActor.h" />
-    <ClInclude Include="include\Scene\AnimationHandler.h" />
+    <ClInclude Include="include\Scene\AnimationUpdater.h" />
     <ClInclude Include="include\Scene\BaseActor.h" />
     <ClInclude Include="include\Scene\Camera.h" />
     <ClInclude Include="include\Scene\DirectionalLight.h" />

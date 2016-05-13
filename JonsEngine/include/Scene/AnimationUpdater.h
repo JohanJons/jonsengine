@@ -12,16 +12,17 @@ namespace JonsEngine
 {
     class ResourceManifest;
 
-    class AnimationHandler
+    class AnimationUpdater
     {
     public:
-        AnimationHandler(const ResourceManifest& resourceManifest);
-        ~AnimationHandler();
+        AnimationUpdater(const ResourceManifest& resourceManifest);
+        ~AnimationUpdater();
 
         void Update(const Milliseconds elapsedTime);
 
         AnimationInstanceID PlayAnimation(const AnimationID animationID);
         void StopAnimation(AnimationInstanceID& animationInstance);
+
         const AnimationInstance::BoneData& GetBoneData(const AnimationInstanceID animationInstance) const;
 
 

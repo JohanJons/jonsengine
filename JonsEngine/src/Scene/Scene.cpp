@@ -11,7 +11,7 @@ namespace JonsEngine
         mName(sceneName),
         mRenderer(renderer),
         mResourceManifest(resourceManifest),
-        mAnimationHandler(resourceManifest),
+        mAnimationUpdater(resourceManifest),
         mAmbientLight(0.2f),
         mSkyboxID(INVALID_SKYBOX_ID),
         mSceneNodeTree("Root", INVALID_SCENE_NODE_ID, std::bind(&Scene::MarkAsDirty, this, std::placeholders::_1)),
@@ -105,8 +105,8 @@ namespace JonsEngine
 
     AnimatedActorID Scene::CreateAnimatedActor(const std::string& actorName, const ModelID modelID, const SceneNodeID sceneNodeID)
     {
-        auto onPlayAnim = std::bind(&AnimationHandler::PlayAnimation, &mAnimationHandler, std::placeholders::_1);
-        auto onStopAnim = std::bind(&AnimationHandler::StopAnimation, &mAnimationHandler, std::placeholders::_1);
+        auto onPlayAnim = std::bind(&AnimationUpdater::PlayAnimation, &mAnimationUpdater, std::placeholders::_1);
+        auto onStopAnim = std::bind(&AnimationUpdater::StopAnimation, &mAnimationUpdater, std::placeholders::_1);
 
         return mAnimatedActors.Insert(onPlayAnim, onStopAnim, actorName, modelID, sceneNodeID);
     }
@@ -232,9 +232,9 @@ namespace JonsEngine
         return mSceneCamera;
     }
 
-    const AnimationHandler& Scene::GetAnimationHandler() const
+    const AnimationUpdater& Scene::GetAnimationUpdater() const
     {
-        return mAnimationHandler;
+        return mAnimationUpdater;
     }
 
 
