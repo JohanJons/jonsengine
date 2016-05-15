@@ -66,26 +66,29 @@
     <Filter Include="Source Files\Core\Math">
       <UniqueIdentifier>{b074f7aa-71f8-4a51-b4e6-83de54bfc707}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Renderer\Core">
+    <Filter Include="Header Files\Core">
       <UniqueIdentifier>{5a494202-1728-4048-a253-a0de5440ecd2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Renderer\Core\Logging">
+    <Filter Include="Header Files\Core\Logging">
       <UniqueIdentifier>{a68ce750-d5ef-433a-a7b9-c6b7b87f1cd4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Renderer\Core\Memory">
+    <Filter Include="Header Files\Core\Memory">
       <UniqueIdentifier>{f9fdbb70-9e32-4b69-b412-2b72faf7d6b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Renderer\Core\Utils">
+    <Filter Include="Header Files\Core\Utils">
       <UniqueIdentifier>{ab910717-264a-445e-8545-85e3e20a505b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Renderer\Core\Containers">
+    <Filter Include="Header Files\Core\Containers">
       <UniqueIdentifier>{8f7619c7-3070-47dd-9384-05d95b47af54}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Renderer\Core\Math">
+    <Filter Include="Header Files\Core\Math">
       <UniqueIdentifier>{715a4116-fd7a-4d30-b42d-f6be5508ceaa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Renderer\Core\Platform">
+    <Filter Include="Header Files\Core\Platform">
       <UniqueIdentifier>{a433238b-126a-45f5-bfa8-a8106e7b41ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\RenderQueue">
+      <UniqueIdentifier>{b819a765-d574-4b0d-81ab-1995cd9f9959}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -278,22 +281,22 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
-      <Filter>Header Files\Renderer\Core</Filter>
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h">
       <Filter>Thirdparty\dlmalloc</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\EngineSettings.h">
-      <Filter>Header Files\Renderer\Core</Filter>
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Memory\HeapAllocator.h">
-      <Filter>Header Files\Renderer\Core\Memory</Filter>
+      <Filter>Header Files\Core\Memory</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Logging\LogManager.h">
-      <Filter>Header Files\Renderer\Core\Logging</Filter>
+      <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Logging\Logger.h">
-      <Filter>Header Files\Renderer\Core\Logging</Filter>
+      <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
     <ClInclude Include="include\Scene\Camera.h">
       <Filter>Header Files\Scene</Filter>
@@ -308,7 +311,7 @@
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Types.h">
-      <Filter>Header Files\Renderer\Core</Filter>
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Resources\ResourceManifest.h">
       <Filter>Header Files\Resources</Filter>
@@ -317,7 +320,7 @@
       <Filter>Header Files\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\EngineDefs.h">
-      <Filter>Header Files\Renderer\Core</Filter>
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\Shapes.h">
       <Filter>Header Files\Renderer</Filter>
@@ -332,13 +335,13 @@
       <Filter>Header Files\Window</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Logging\StreamBuf.h">
-      <Filter>Header Files\Renderer\Core\Logging</Filter>
+      <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Logging\OutputStream.h">
-      <Filter>Header Files\Renderer\Core\Logging</Filter>
+      <Filter>Header Files\Core\Logging</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\DebugOptions.h">
-      <Filter>Header Files\Renderer\Core</Filter>
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Scene\DirectionalLight.h">
       <Filter>Header Files\Scene</Filter>
@@ -422,40 +425,40 @@
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Utils\Error.h">
-      <Filter>Header Files\Renderer\Core\Utils</Filter>
+      <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Math\Math.h">
-      <Filter>Header Files\Renderer\Core\Math</Filter>
+      <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Math\AABB.h">
-      <Filter>Header Files\Renderer\Core\Math</Filter>
+      <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11DepthReductionPass.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Math\Plane.h">
-      <Filter>Header Files\Renderer\Core\Math</Filter>
+      <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Math\Intersection.h">
-      <Filter>Header Files\Renderer\Core\Math</Filter>
+      <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Containers\RangedIterator.hpp">
-      <Filter>Header Files\Renderer\Core\Containers</Filter>
+      <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Containers\IDMapPointer.hpp">
-      <Filter>Header Files\Renderer\Core\Containers</Filter>
+      <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Utils\NonCopyable.h">
-      <Filter>Header Files\Renderer\Core\Utils</Filter>
+      <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Containers\DataPool.hpp">
-      <Filter>Header Files\Renderer\Core\Containers</Filter>
+      <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Math\Frustum.h">
-      <Filter>Header Files\Renderer\Core\Math</Filter>
+      <Filter>Header Files\Core\Math</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Containers\IDMap.hpp">
-      <Filter>Header Files\Renderer\Core\Containers</Filter>
+      <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11SkyboxPass.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
@@ -464,10 +467,10 @@
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Platform\Windows.h">
-      <Filter>Header Files\Renderer\Core\Platform</Filter>
+      <Filter>Header Files\Core\Platform</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Platform\Directx11.h">
-      <Filter>Header Files\Renderer\Core\Platform</Filter>
+      <Filter>Header Files\Core\Platform</Filter>
     </ClInclude>
     <ClInclude Include="include\Resources\Material.h">
       <Filter>Header Files\Resources</Filter>
@@ -485,10 +488,10 @@
       <Filter>Header Files\Resources</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Containers\IDMapTree.hpp">
-      <Filter>Header Files\Renderer\Core\Containers</Filter>
+      <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Containers\IDMapBase.hpp">
-      <Filter>Header Files\Renderer\Core\Containers</Filter>
+      <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
     <ClInclude Include="include\Scene\AnimatedActor.h">
       <Filter>Header Files\Scene</Filter>
@@ -500,19 +503,19 @@
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Utils\Clock.hpp">
-      <Filter>Header Files\Renderer\Core\Utils</Filter>
+      <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Utils\Time.h">
-      <Filter>Header Files\Renderer\Core\Utils</Filter>
+      <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Utils\Timer.h">
-      <Filter>Header Files\Renderer\Core\Utils</Filter>
+      <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
     <ClInclude Include="include\Scene\SceneParser.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Memory\HeapAligned.h">
-      <Filter>Header Files\Renderer\Core\Memory</Filter>
+      <Filter>Header Files\Core\Memory</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11Buffer.hpp">
       <Filter>Header Files\Renderer\DirectX11</Filter>
@@ -531,6 +534,33 @@
     </ClInclude>
     <ClInclude Include="include\Scene\AnimationUpdater.h">
       <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\Renderable.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableCamera.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableDirectionalLigth.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableMaterial.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableMesh.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderablePointLight.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableSkeleton.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderQueue.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableCollection.h">
+      <Filter>Header Files\RenderQueue</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

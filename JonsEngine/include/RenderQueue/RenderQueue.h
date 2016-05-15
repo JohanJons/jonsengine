@@ -12,7 +12,8 @@ namespace JonsEngine
 {
     struct RenderQueue
     {
-
+        RenderableMeshes mMeshes;
+        RenderableMaterials mMaterials;
         RenderableBones mBones;
     };
 }

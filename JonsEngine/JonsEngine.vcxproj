@@ -242,6 +242,15 @@
     </ClInclude>
     <ClInclude Include="include\Renderer\RenderQueue.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
+    <ClInclude Include="include\RenderQueue\Renderable.h" />
+    <ClInclude Include="include\RenderQueue\RenderableCamera.h" />
+    <ClInclude Include="include\RenderQueue\RenderableCollection.h" />
+    <ClInclude Include="include\RenderQueue\RenderableDirectionalLigth.h" />
+    <ClInclude Include="include\RenderQueue\RenderableMaterial.h" />
+    <ClInclude Include="include\RenderQueue\RenderableMesh.h" />
+    <ClInclude Include="include\RenderQueue\RenderablePointLight.h" />
+    <ClInclude Include="include\RenderQueue\RenderableSkeleton.h" />
+    <ClInclude Include="include\RenderQueue\RenderQueue.h" />
     <ClInclude Include="include\Resources\Animation.h" />
     <ClInclude Include="include\Resources\AnimationInstance.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />
