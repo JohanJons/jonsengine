@@ -2,8 +2,8 @@
 
 namespace JonsEngine
 {
-    struct RenderQueue
+    struct RenderablePointLight
     {
-
+        RenderablePointLight();
     };
 }

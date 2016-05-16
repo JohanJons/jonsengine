@@ -90,6 +90,9 @@
     <Filter Include="Header Files\RenderQueue">
       <UniqueIdentifier>{b819a765-d574-4b0d-81ab-1995cd9f9959}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\RenderQueue">
+      <UniqueIdentifier>{d2394e95-5003-4689-aba2-740258517682}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Engine.cpp">
@@ -200,9 +203,6 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Pipeline.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\RenderQueue.cpp">
-      <Filter>Source Files\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\DirectX11\DX11RenderTarget2D.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
@@ -277,6 +277,33 @@
     </ClCompile>
     <ClCompile Include="src\Scene\AnimationUpdater.cpp">
       <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderableCamera.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderableCollection.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderableDirectionalLight.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderableMaterial.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderableMesh.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderablePointLight.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderableSkeleton.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderQueue.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderableBone.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -535,9 +562,6 @@
     <ClInclude Include="include\Scene\AnimationUpdater.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="include\RenderQueue\Renderable.h">
-      <Filter>Header Files\RenderQueue</Filter>
-    </ClInclude>
     <ClInclude Include="include\RenderQueue\RenderableCamera.h">
       <Filter>Header Files\RenderQueue</Filter>
     </ClInclude>
@@ -560,6 +584,9 @@
       <Filter>Header Files\RenderQueue</Filter>
     </ClInclude>
     <ClInclude Include="include\RenderQueue\RenderableCollection.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableBone.h">
       <Filter>Header Files\RenderQueue</Filter>
     </ClInclude>
   </ItemGroup>

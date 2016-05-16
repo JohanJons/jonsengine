@@ -154,8 +154,16 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Utils.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexBufferSet.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp" />
-    <ClCompile Include="src\Renderer\RenderQueue.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderableBone.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderableCamera.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderableCollection.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderableDirectionalLight.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderableMaterial.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderableMesh.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderablePointLight.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderableSkeleton.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderQueue.cpp" />
     <ClCompile Include="src\Resources\Animation.cpp" />
     <ClCompile Include="src\Resources\AnimationInstance.cpp" />
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
@@ -242,7 +250,7 @@
     </ClInclude>
     <ClInclude Include="include\Renderer\RenderQueue.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
-    <ClInclude Include="include\RenderQueue\Renderable.h" />
+    <ClInclude Include="include\RenderQueue\RenderableBone.h" />
     <ClInclude Include="include\RenderQueue\RenderableCamera.h" />
     <ClInclude Include="include\RenderQueue\RenderableCollection.h" />
     <ClInclude Include="include\RenderQueue\RenderableDirectionalLigth.h" />

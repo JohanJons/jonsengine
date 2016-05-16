@@ -2,7 +2,7 @@
 
 namespace JonsEngine
 {
-    struct RenderQueue
+    struct RenderableDirectionalLight
     {
 
     };

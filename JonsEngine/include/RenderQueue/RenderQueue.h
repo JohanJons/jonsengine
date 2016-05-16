@@ -1,19 +1,32 @@
 #pragma once
 
-#include "include/RenderQueue/Renderable.h"
 #include "include/RenderQueue/RenderableCamera.h"
 #include "include/RenderQueue/RenderableDirectionalLigth.h"
 #include "include/RenderQueue/RenderablePointLight.h"
 #include "include/RenderQueue/RenderableMaterial.h"
 #include "include/RenderQueue/RenderableMesh.h"
-#include "include/RenderQueue/RenderableSkeleton.h"
+#include "include/RenderQueue/RenderableBone.h"
+
+#include <vector>
 
 namespace JonsEngine
 {
     struct RenderQueue
     {
-        RenderableMeshes mMeshes;
-        RenderableMaterials mMaterials;
-        RenderableBones mBones;
+        typedef std::vector<RenderableCamera> RenderableCameras;
+        typedef std::vector<RenderablePointLight> RenderablePointLights;
+        typedef std::vector<RenderableDirectionalLight> RenderableDirectionalLights;
+
+
+        Vec4 mAmbientLight;
+        DX11MaterialID mSkyboxTextureID;
+
+        RenderableCameras mCameras;
+        RenderablePointLights mPointLight;
+        RenderableDirectionalLights mDirectionalLights;
+
+        RenderableMesh::Collection mMeshes;
+        RenderableMaterial::Collection mMaterials;
+        RenderableBone::Collection mBones;
     };
 }
