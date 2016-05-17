@@ -1,7 +1,6 @@
 #pragma once
 
 #include "include/Resources/JonsPackage.h"
-#include "include/Core/EngineDefs.h"
 
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
