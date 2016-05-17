@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -20,7 +20,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <UseOfAtl>false</UseOfAtl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -28,7 +28,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -154,6 +154,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Utils.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexBufferSet.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp" />
+    <ClCompile Include="src\Renderer\RenderDefs.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />
     <ClCompile Include="src\RenderQueue\RenderableBone.cpp" />
     <ClCompile Include="src\RenderQueue\RenderableCamera.cpp" />
@@ -197,7 +198,6 @@
     <ClInclude Include="include\Core\Containers\RangedIterator.hpp" />
     <ClInclude Include="include\Core\DebugOptions.h" />
     <ClInclude Include="include\Core\Engine.h" />
-    <ClInclude Include="include\Core\EngineDefs.h" />
     <ClInclude Include="include\Core\EngineSettings.h" />
     <ClInclude Include="include\Core\Logging\OutputStream.h" />
     <ClInclude Include="include\Core\Logging\StreamBuf.h" />
@@ -248,12 +248,14 @@
     <ClInclude Include="include\Renderer\DirectX11\Shaders\Constants.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="include\Renderer\RenderDefs.h" />
     <ClInclude Include="include\Renderer\RenderQueue.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
     <ClInclude Include="include\RenderQueue\RenderableBone.h" />
     <ClInclude Include="include\RenderQueue\RenderableCamera.h" />
     <ClInclude Include="include\RenderQueue\RenderableCollection.h" />
-    <ClInclude Include="include\RenderQueue\RenderableDirectionalLigth.h" />
+    <ClInclude Include="include\RenderQueue\RenderableContainer.h" />
+    <ClInclude Include="include\RenderQueue\RenderableDirectionalLight.h" />
     <ClInclude Include="include\RenderQueue\RenderableMaterial.h" />
     <ClInclude Include="include\RenderQueue\RenderableMesh.h" />
     <ClInclude Include="include\RenderQueue\RenderablePointLight.h" />

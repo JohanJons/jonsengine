@@ -1,10 +1,8 @@
 #include "include/Core/Logging/LogManager.h"
 
-#include "include/Core/EngineDefs.h"
-
 namespace JonsEngine
 {
-    static LogManager gLogManager(gGameEngineTag);
+    static LogManager gLogManager("JonsEngine");
 
 
     LogManager::LogManager(const std::string logPrefix) : mLogPrefix(logPrefix), mLogStream(&mStreamBuf), mLogPath(InternalGetLogName()), mLogFilter(LogLevel::Info)

@@ -2,7 +2,7 @@
 
 namespace JonsEngine
 {
-    RenderableSkeleton::RenderableSkeleton() : RenderableSkeleton(INVALID_BONE_INDEX, INVALID_BONE_INDEX)
+    RenderableSkeleton::RenderableSkeleton() : RenderableSkeleton(RenderableBone::INVALID_INDEX, RenderableBone::INVALID_INDEX)
     {
     }
 

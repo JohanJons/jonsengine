@@ -1,6 +1,5 @@
 #pragma once
 
-#include "include/Renderer/RenderQueue.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/DebugOptions.h"
@@ -15,6 +14,7 @@ namespace JonsEngine
 {
     class Logger;
     class HeapAllocator;
+    struct RenderQueue;
     class DX11RendererImpl;
 
     class DX11Renderer

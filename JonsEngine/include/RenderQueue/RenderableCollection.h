@@ -1,15 +1,19 @@
 #pragma once
 
-#include <limits>
-#include <vector>
+#include "include/RenderQueue/RenderableMesh.h"
 
 namespace JonsEngine
 {
-    template <typename RENDERABLE>
     struct RenderableCollection
     {
-        typedef std::vector<RENDERABLE> Collection;
-        typename typedef Collection::size_type Index;
-        constexpr static Index INVALID_INDEX = std::numeric_limits<Index>::max();
+        typedef RenderableMesh::Index MeshIndex;
+
+        RenderableCollection();
+
+
+        MeshIndex mStaticMeshesBegin;
+        MeshIndex mStaticMeshesEnd;
+        MeshIndex mAnimatedMeshesBegin;
+        MeshIndex mAnimatedMeshesEnd;
     };
 }

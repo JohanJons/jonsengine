@@ -1,7 +1,7 @@
 #pragma once
 
 #include "include/Core/EngineSettings.h"
-#include "include/Renderer/RenderQueue.h"
+#include "include/RenderQueue/RenderQueue.h"
 
 namespace JonsEngine
 {

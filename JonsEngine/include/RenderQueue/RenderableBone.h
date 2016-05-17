@@ -1,14 +1,17 @@
 #pragma once
 
-#include "include/RenderQueue/RenderableCollection.h"
+#include "include/RenderQueue/RenderableContainer.h"
 #include "include/Core/Types.h"
 
 #include <vector>
 
 namespace JonsEngine
 {
-    struct RenderableBone : RenderableCollection<RenderableBone>
+    struct RenderableBone : RenderableContainer<RenderableBone>
     {
+        RenderableBone();
+
+
         Mat4 mBoneTransform;
     };
 }

@@ -22,6 +22,8 @@
 
 namespace JonsEngine
 {
+    struct RenderQueue;
+
     class DX11Pipeline
     {
     public:

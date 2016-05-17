@@ -1,13 +1,13 @@
 #pragma once
 
-#include "include/RenderQueue/RenderableMesh.h"
+#include "include/RenderQueue/RenderableCollection.h"
 #include "include/Core/Types.h"
 
 namespace JonsEngine
 {
-    struct RenderableCamera
+    struct RenderableCamera : RenderableCollection
     {
-        typedef RenderableMesh::Index MeshIndex;
+        RenderableCamera();
 
 
         Mat4 mCameraViewMatrix;
@@ -15,10 +15,5 @@ namespace JonsEngine
         Mat4 mCameraViewProjectionMatrix;
         Vec3 mCameraPosition;
         float mFOV;
-
-        MeshIndex mStaticMeshesBegin;
-        MeshIndex mStaticMeshesEnd;
-        MeshIndex mAnimatedMeshesBegin;
-        MeshIndex mAnimatedMeshesEnd;
     };
 }

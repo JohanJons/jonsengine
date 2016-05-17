@@ -1,6 +1,5 @@
 #pragma once
 
-#include "include/Renderer/RenderQueue.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Material.h"
 #include "include/Renderer/DirectX11/DX11Context.h"
@@ -24,6 +23,7 @@ namespace JonsEngine
 {
     class Logger;
     class HeapAllocator;
+    struct RenderQueue;
 
     class DX11RendererImpl : protected DX11Context
     {

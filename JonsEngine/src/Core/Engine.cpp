@@ -8,7 +8,6 @@
 #include "include/Scene/Scene.h"
 #include "include/Window/WindowManager.h"
 #include "include/Resources/ResourceManifest.h"
-#include "include/Renderer/RenderQueue.h"
 
 #include <exception>
 #include <functional>

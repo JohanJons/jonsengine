@@ -305,6 +305,9 @@
     <ClCompile Include="src\RenderQueue\RenderableBone.cpp">
       <Filter>Source Files\RenderQueue</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\RenderDefs.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -345,9 +348,6 @@
     </ClInclude>
     <ClInclude Include="include\Resources\JonsPackage.h">
       <Filter>Header Files\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\EngineDefs.h">
-      <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\Shapes.h">
       <Filter>Header Files\Renderer</Filter>
@@ -565,9 +565,6 @@
     <ClInclude Include="include\RenderQueue\RenderableCamera.h">
       <Filter>Header Files\RenderQueue</Filter>
     </ClInclude>
-    <ClInclude Include="include\RenderQueue\RenderableDirectionalLigth.h">
-      <Filter>Header Files\RenderQueue</Filter>
-    </ClInclude>
     <ClInclude Include="include\RenderQueue\RenderableMaterial.h">
       <Filter>Header Files\RenderQueue</Filter>
     </ClInclude>
@@ -588,6 +585,15 @@
     </ClInclude>
     <ClInclude Include="include\RenderQueue\RenderableBone.h">
       <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableContainer.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableDirectionalLight.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\RenderDefs.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,8 +1,8 @@
-#include "include/RenderQueue/RenderQueue.h"
+#include "include/RenderQueue/RenderableCamera.h"
 
 namespace JonsEngine
 {
-    RenderQueue::RenderQueue()
+    RenderableCamera::RenderableCamera()
     {
     }
 }

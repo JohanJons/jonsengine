@@ -6,6 +6,7 @@
 
 namespace JonsEngine
 {
+    /*
     struct RenderQueue
     {
         typedef std::vector<Mat4> RenderableBones;
@@ -39,9 +40,9 @@ namespace JonsEngine
             DX11MeshID mMeshID;
             bool mIsAnimating;
         };
-    };
+    };*/
 }
-    
+ 
     /*typedef std::vector<RenderableMesh> RenderableMeshes;
 
     struct RenderableMaterial

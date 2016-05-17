@@ -1,7 +1,7 @@
 #pragma once
 
 #include "include/RenderQueue/RenderableCamera.h"
-#include "include/RenderQueue/RenderableDirectionalLigth.h"
+#include "include/RenderQueue/RenderableDirectionalLight.h"
 #include "include/RenderQueue/RenderablePointLight.h"
 #include "include/RenderQueue/RenderableMaterial.h"
 #include "include/RenderQueue/RenderableMesh.h"
@@ -16,6 +16,10 @@ namespace JonsEngine
         typedef std::vector<RenderableCamera> RenderableCameras;
         typedef std::vector<RenderablePointLight> RenderablePointLights;
         typedef std::vector<RenderableDirectionalLight> RenderableDirectionalLights;
+
+        RenderQueue();
+
+        void Clear();
 
 
         Vec4 mAmbientLight;

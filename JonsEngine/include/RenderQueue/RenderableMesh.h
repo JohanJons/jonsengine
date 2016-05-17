@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/RenderQueue/RenderableCollection.h"
+#include "include/RenderQueue/RenderableContainer.h"
 #include "include/RenderQueue/RenderableSkeleton.h"
 #include "include/RenderQueue/RenderableMaterial.h"
 #include "include/Core/Types.h"
@@ -9,7 +9,7 @@
 
 namespace JonsEngine
 {
-    struct RenderableMesh : RenderableCollection<RenderableMesh>
+    struct RenderableMesh : RenderableContainer<RenderableMesh>
     {
         RenderableMesh();
 

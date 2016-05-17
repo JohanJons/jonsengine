@@ -1,6 +1,7 @@
 #include "include/Scene/Scene.h"
 #include "include/Resources/ResourceManifest.h"
 #include "include/Renderer/DirectX11/DX11Renderer.h"
+#include "include/Renderer/RenderDefs.h"
 
 #include <algorithm>
 #include <functional>
@@ -167,12 +168,16 @@ namespace JonsEngine
     DirectionalLightID Scene::CreateDirectionalLight(const std::string& lightName)
     {
         const uint32_t defaultNumCascades = 4;
+        assert(defaultNumCascades < gMaxNumShadowmapCascades);
 
         return mDirectionalLights.Insert(lightName, defaultNumCascades);
     }
 
     DirectionalLightID Scene::CreateDirectionalLight(const std::string& lightName, const uint32_t numShadowmapCascades)
     {
+        if (numShadowmapCascades > gMaxNumShadowmapCascades)
+            return mDirectionalLights.INVALID_ITEM_ID;
+
         return mDirectionalLights.Insert(lightName, numShadowmapCascades);
     }
 

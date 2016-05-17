@@ -1,8 +1,12 @@
-#include "include/RenderQueue/RenderQueue.h"
+#include "include/RenderQueue/RenderableCollection.h"
 
 namespace JonsEngine
 {
-    RenderQueue::RenderQueue()
+    RenderableCollection::RenderableCollection() :
+        mStaticMeshesBegin(RenderableMesh::INVALID_INDEX),
+        mStaticMeshesEnd(RenderableMesh::INVALID_INDEX),
+        mAnimatedMeshesBegin(RenderableMesh::INVALID_INDEX),
+        mAnimatedMeshesEnd(RenderableMesh::INVALID_INDEX)
     {
     }
 }
