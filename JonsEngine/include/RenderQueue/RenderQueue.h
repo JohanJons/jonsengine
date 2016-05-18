@@ -13,7 +13,6 @@ namespace JonsEngine
 {
     struct RenderQueue
     {
-        typedef std::vector<RenderableCamera> RenderableCameras;
         typedef std::vector<RenderablePointLight> RenderablePointLights;
         typedef std::vector<RenderableDirectionalLight> RenderableDirectionalLights;
 
@@ -25,7 +24,7 @@ namespace JonsEngine
         Vec4 mAmbientLight;
         DX11MaterialID mSkyboxTextureID;
 
-        RenderableCameras mCameras;
+        RenderableCamera mCamera;
         RenderablePointLights mPointLight;
         RenderableDirectionalLights mDirectionalLights;
 

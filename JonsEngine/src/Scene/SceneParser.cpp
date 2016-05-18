@@ -13,9 +13,9 @@ namespace JonsEngine
     // TODO: some cleanup/refactoring is needed
     // ditch RENDERABLE_TYPE?
 
-    template <typename ACTOR_ITER_TYPE, typename RENDERABLE_TYPE, typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
+    template <typename ACTOR_ITER_TYPE, typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
     void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator,
-        std::vector<RENDERABLE_TYPE>& meshContainer, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
+		RenderableMesh::Collection& meshContainer, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
 
     template <typename VISIBILITY_RESULT_TYPE>
     bool DetermineIfAddAllMeshes(const EngineSettings::CullingStrategy cullingStrat, const VISIBILITY_RESULT_TYPE visibilityResult);
@@ -65,17 +65,20 @@ namespace JonsEngine
         const Camera& sceneCamera = scene.GetSceneCamera();
         const float cameraFov = sceneCamera.GetFOV();
 
+		const Mat4 viewMatrix = sceneCamera.GetCameraTransform();
+		const Mat4 projMatrix = PerspectiveMatrixFov(cameraFov, windowAspectRatio, zNear, zFar);
+
         mRenderQueue.mCamera.mFOV = cameraFov;
         mRenderQueue.mCamera.mCameraPosition = sceneCamera.Position();
-        mRenderQueue.mCamera.mCameraViewMatrix = sceneCamera.GetCameraTransform();
-        mRenderQueue.mCamera.mCameraProjectionMatrix = PerspectiveMatrixFov(cameraFov, windowAspectRatio, zNear, zFar);
-        mRenderQueue.mCamera.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraProjectionMatrix * mRenderQueue.mCamera.mCameraViewMatrix;
+		mRenderQueue.mCamera.mCameraViewMatrix = viewMatrix;
+		mRenderQueue.mCamera.mCameraProjectionMatrix = projMatrix;
+        mRenderQueue.mCamera.mCameraViewProjectionMatrix = projMatrix * viewMatrix;
 
         const auto staticActors = scene.GetStaticActors();
         const auto animatedActors = scene.GetAnimatedActors();
 
-        CullActors<decltype(staticActors), RenderableModel>(scene, mResourceManifest, mCullingStrategy, staticActors, mRenderQueue.mCamera.mModels, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
-        CullActors<decltype(animatedActors), RenderableModel>(scene, mResourceManifest, mCullingStrategy, animatedActors, mRenderQueue.mCamera.mModels, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
+        CullActors<decltype(staticActors)>(scene, mResourceManifest, mCullingStrategy, staticActors, mRenderQueue.mMeshes, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
+        CullActors<decltype(animatedActors)>(scene, mResourceManifest, mCullingStrategy, animatedActors, mRenderQueue.mMeshes, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
     }
 
     void SceneParser::PointLightCulling(const Scene& scene)
@@ -139,9 +142,9 @@ namespace JonsEngine
     }
 
 
-    template <typename ACTOR_ITER_TYPE, typename RENDERABLE_TYPE, typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
+    template <typename ACTOR_ITER_TYPE, typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
     void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator,
-        std::vector<RENDERABLE_TYPE>& meshContainer, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args)
+		RenderableMesh::Collection& meshContainer, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args)
     {
         const AnimationUpdater& AnimationUpdater = scene.GetAnimationUpdater();
 
