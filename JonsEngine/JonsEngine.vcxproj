@@ -249,7 +249,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="include\Renderer\RenderDefs.h" />
-    <ClInclude Include="include\Renderer\RenderQueue.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
     <ClInclude Include="include\RenderQueue\RenderableBone.h" />
     <ClInclude Include="include\RenderQueue\RenderableCamera.h" />

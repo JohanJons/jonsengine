@@ -445,9 +445,6 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Pipeline.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\RenderQueue.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11RenderTarget2D.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
