@@ -13,7 +13,6 @@
 #include "include/Scene/StaticActor.h"
 #include "include/Scene/AnimationUpdater.h"
 #include "include/Resources/Skybox.h"
-#include "include/Renderer/RenderQueue.h"
 
 #include <string>
 #include <vector>

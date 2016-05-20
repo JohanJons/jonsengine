@@ -10,9 +10,9 @@ namespace JonsEngine
     {
     }
 
-    RenderableDirectionalLight::RenderableDirectionalLight(const Vec4& lightColor, const Vec3& lightDir, const uint32_t numCascades) :
-        mLightColor(lightColor),
-        mLightDirection(lightDir),
+    RenderableDirectionalLight::RenderableDirectionalLight(const Vec4& color, const Vec3& direction, const uint32_t numCascades) :
+        mColor(color),
+        mDirection(direction),
         mNumCascadesUsed(numCascades)
     {
     }

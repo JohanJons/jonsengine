@@ -98,7 +98,7 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix)
+    void DX11DirectionalLightPass::Render(const RenderableDirectionalLight& directionalLight, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix)
     {
         // preserve current state
         D3D11_VIEWPORT prevViewport;
@@ -168,10 +168,10 @@ namespace JonsEngine
         // bind shadowmap SRV for reading
         mShadowmap.BindForReading();
 
-        const Vec4 camLightDir = glm::normalize(cameraViewMatrix * Vec4(-directionalLight.mLightDirection, 0));
+        const Vec4 camLightDir = glm::normalize(cameraViewMatrix * Vec4(-directionalLight.mDirection, 0));
 
         // set dir light cbuffer data
-        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, invCameraProjMatrix, splitDistances, directionalLight.mLightColor, camLightDir, mWindowSize, static_cast<float>(mShadowmap.GetTextureSize())));
+        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, invCameraProjMatrix, splitDistances, directionalLight.mColor, camLightDir, mWindowSize, static_cast<float>(mShadowmap.GetTextureSize())));
         
         // bind appropiate shading pixel shader for shadow filtering argument
         BindShadingPixelShader(shadowFiltering);

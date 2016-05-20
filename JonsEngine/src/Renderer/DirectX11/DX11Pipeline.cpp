@@ -1,7 +1,7 @@
 #include "include/Renderer/DirectX11/DX11Pipeline.h"
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
-
+#include "include/RenderQueue/RenderQueue.h"
 
 namespace JonsEngine
 {
@@ -110,7 +110,41 @@ namespace JonsEngine
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-		for (const RenderableModel& model : renderQueue.mCamera.mModels)
+		// TEMP SOLUTION !!!
+
+		const uint32_t numStaticMeshes = renderQueue.mCamera.mStaticMeshesEnd - renderQueue.mCamera.mStaticMeshesBegin;
+		const uint32_t staticMeshOffset = renderQueue.mCamera.mStaticMeshesBegin;
+		for (uint32_t meshNum = 0; meshNum < numStaticMeshes; ++meshNum)
+		{
+			const RenderableMesh& mesh = renderQueue.mRenderData.mMeshes.at(staticMeshOffset + meshNum);
+			assert(mesh.mMeshID != INVALID_DX11_MESH_ID);
+
+			bool hasDiffuseTexture = false, hasNormalTexture = false;
+			if (mesh.mMaterial != RenderableMaterial::INVALID_INDEX)
+			{
+				const RenderableMaterial& material = renderQueue.mRenderData.mMaterials.at(mesh.mMaterial);
+				hasDiffuseTexture = material.mDiffuseTextureID != INVALID_DX11_MATERIAL_ID;
+				hasNormalTexture = material.mNormalTextureID != INVALID_DX11_MATERIAL_ID;
+
+				if (hasDiffuseTexture)
+					mMaterialMap.GetItem(material.mDiffuseTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_DIFFUSE);
+
+				if (hasNormalTexture)
+					mMaterialMap.GetItem(material.mNormalTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_NORMAL);
+			}
+
+			const bool isAnimating = false;
+
+			const Mat4 wvpMatrix = renderQueue.mCamera.mCameraViewProjectionMatrix * mesh.mWorldTransform;
+			const Mat4 worldViewMatrix = renderQueue.mCamera.mCameraViewMatrix * mesh.mWorldTransform;
+
+			mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, mesh.mMaterialTilingFactor, hasDiffuseTexture, hasNormalTexture, isAnimating);
+			mMeshMap.GetItem(mesh.mMeshID).Draw();
+		}
+
+		//const uint32_t numAnimatedMeshes = renderQueue.mCamera.mAnimatedMeshesEnd - renderQueue.mCamera.mAnimatedMeshesBegin;
+
+		/*for (const RenderableModel& model : renderQueue.mCamera.mModels)
         {
             assert(model.mMesh.mMeshID != INVALID_DX11_MESH_ID);
 
@@ -129,7 +163,7 @@ namespace JonsEngine
             
             mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, model.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture, isAnimating);
             mMeshMap.GetItem(model.mMesh.mMeshID).Draw();
-        }
+        }*/
     }
 
     void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugExtra, const EngineSettings::ShadowFiltering shadowFiltering, const bool SSAOEnabled)
@@ -155,7 +189,7 @@ namespace JonsEngine
         mContext->OMSetBlendState(mAdditiveBlending, nullptr, 0xffffffff);
 
         // do all directional lights
-        for (const RenderableDirLight& directionalLight : renderQueue.mDirectionalLights)
+        for (const RenderableDirectionalLight& directionalLight : renderQueue.mDirectionalLights)
             mDirectionalLightPass.Render(directionalLight, shadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix);
 
         // do all point lights

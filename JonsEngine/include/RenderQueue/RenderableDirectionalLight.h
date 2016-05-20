@@ -6,24 +6,22 @@
 
 namespace JonsEngine
 {
-    struct RenderableDirectionalLight : RenderableCollection
+    struct RenderableDirectionalLight
     {
-        struct CascadeSplit
+        struct CascadeSplit : RenderableCollection
         {
             CascadeSplit();
 
 
             float mNearZ;
             float mFarZ;
-            uint32_t mNumStaticMeshes;
-            uint32_t mNumAnimatedMeshes;
         };
 
-        RenderableDirectionalLight(const Vec4& lightColor, const Vec3& lightDir, const uint32_t numCascades);
+        RenderableDirectionalLight(const Vec4& color, const Vec3& direction, const uint32_t numCascades);
         
 
-        Vec4 mLightColor;
-        Vec3 mLightDirection;
+        Vec4 mColor;
+        Vec3 mDirection;
         uint32_t mNumCascadesUsed;
         std::array<CascadeSplit, gMaxNumShadowmapCascades> mCascades;
     };
