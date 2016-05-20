@@ -7,12 +7,12 @@ namespace JonsEngine
 {
     struct RenderablePointLight : RenderableCollection
     {
-        RenderablePointLight();
+        RenderablePointLight(const Vec4& color, const Vec3& position, const float intensity, const float radius);
 
 
-        Vec4 mLightColor;
-        Vec3 mLightPosition;
-        float mLightIntensity;
-        float mLightRadius;
+        Vec4 mColor;
+        Vec3 mPosition;
+        float mIntensity;
+        float mRadius;
     };
 }

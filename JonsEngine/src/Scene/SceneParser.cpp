@@ -11,11 +11,10 @@
 namespace JonsEngine
 {
     // TODO: some cleanup/refactoring is needed
-    // ditch RENDERABLE_TYPE?
 
     template <typename ACTOR_ITER_TYPE, typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
-    void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator,
-		RenderableMesh::Collection& meshContainer, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
+	void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator, const bool parseMaterials,
+		RenderQueue::RenderData& renderData, RenderableCollection& rangedMeshCollection, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
 
     template <typename VISIBILITY_RESULT_TYPE>
     bool DetermineIfAddAllMeshes(const EngineSettings::CullingStrategy cullingStrat, const VISIBILITY_RESULT_TYPE visibilityResult);
@@ -24,18 +23,18 @@ namespace JonsEngine
     AABBIntersection PointLightCull(const Model& model, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius);
     AABBIntersection DirectionalLightCull(const Model& model, const Mat4& worldTransform, const DirectionalLight::BoundingVolume boundingVolume);
 
-    // there is some juggling with template types due to not having partial template specialization...
-    template <typename ACTOR_TYPE>
-    void AddAllMeshes(std::vector<RenderableModel>& resultContainer, const AnimationUpdater& AnimationUpdater, const ResourceManifest& resManifest, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix);
-    template <typename ACTOR_TYPE>
-    void AddAllMeshes(std::vector<RenderableMesh>& resultContainer, const AnimationUpdater& AnimationUpdater, const ResourceManifest& resManifest, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix);
-    template <typename RENDERABLE_TYPE, typename ...MESH_ARGS>
-    void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const AnimationUpdater& AnimationUpdater, const ResourceManifest& resManifest, const StaticActor& actor, const Model& model, const ModelNode& node, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args);
-    template <typename RENDERABLE_TYPE, typename ...MESH_ARGS>
-    void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const AnimationUpdater& AnimationUpdater, const ResourceManifest& resManifest, const AnimatedActor& actor, const Model& model, const ModelNode& node, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args);
-    
-    void AddStaticMesh();
-    void AddAnimatedMesh();
+	template <typename ACTOR_TYPE>
+	void AddAllMeshes(const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix, const bool parseMaterials, const AnimationUpdater& AnimationUpdater, const ResourceManifest& resManifest,
+		RenderQueue::RenderData& renderData, RenderableCollection& rangedMeshCollection);
+
+	template <typename ACTOR_TYPE>
+    void AddMesh(const ACTOR_TYPE& actor, const Mat4& worldTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData);
+
+	template <typename ACTOR_TYPE>
+	RenderableMaterial::Index ParseMaterial(const ACTOR_TYPE& actor, const Mesh& mesh, const bool parseMaterial, const ResourceManifest& resManifest, RenderableMaterial::ContainerType& materialContainer);
+
+	template <typename ACTOR_TYPE>
+	void AddMeshRange(const RenderableMesh::Index startIndex, const RenderableMesh::Index endIndex, RenderableCollection& rangedMeshCollection);
 
 
     SceneParser::SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest) : mResourceManifest(resManifest), mCullingStrategy(engineSettings.mSceneCullingStrategy)
@@ -76,9 +75,10 @@ namespace JonsEngine
 
         const auto staticActors = scene.GetStaticActors();
         const auto animatedActors = scene.GetAnimatedActors();
+		const bool parseMaterials = true;
 
-        CullActors<decltype(staticActors)>(scene, mResourceManifest, mCullingStrategy, staticActors, mRenderQueue.mMeshes, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
-        CullActors<decltype(animatedActors)>(scene, mResourceManifest, mCullingStrategy, animatedActors, mRenderQueue.mMeshes, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
+        CullActors<decltype(staticActors)>(scene, mResourceManifest, mCullingStrategy, staticActors, parseMaterials, mRenderQueue.mRenderData, mRenderQueue.mCamera, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
+        CullActors<decltype(animatedActors)>(scene, mResourceManifest, mCullingStrategy, animatedActors, parseMaterials, mRenderQueue.mRenderData, mRenderQueue.mCamera, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
     }
 
     void SceneParser::PointLightCulling(const Scene& scene)
@@ -92,16 +92,19 @@ namespace JonsEngine
                 continue;
 
             const SceneNode& sceneNode = scene.GetSceneNode(pointLight.GetSceneNode());
-            const Vec3 lightPosition = sceneNode.Position();
-            const float lightRadius = pointLight.GetRadius();
-            const float lightIntensity = pointLight.GetIntensity();
-            const Vec4& lightColor = pointLight.GetLightColor();
+			const Vec4& color = pointLight.GetLightColor();
+            const Vec3 position = sceneNode.Position();
+            const float intensity = pointLight.GetIntensity();
+			const float radius = pointLight.GetRadius();
 
-            mRenderQueue.mPointLights.emplace_back(lightColor, lightPosition, lightIntensity, lightRadius);
+            mRenderQueue.mPointLights.emplace_back(color, position, intensity, radius);
             RenderablePointLight& renderablePointLight = mRenderQueue.mPointLights.back();
 
-            CullActors<decltype(staticActors), RenderableMesh>(scene, mResourceManifest, mCullingStrategy, staticActors, renderablePointLight.mMeshes, PointLightCull, lightPosition, lightRadius);
-            CullActors<decltype(animatedActors), RenderableMesh>(scene, mResourceManifest, mCullingStrategy, animatedActors, renderablePointLight.mMeshes, PointLightCull, lightPosition, lightRadius);
+			// dont need materials for shadowmapping
+			const bool parseMaterials = false;
+
+            CullActors<decltype(staticActors)>(scene, mResourceManifest, mCullingStrategy, staticActors, parseMaterials, mRenderQueue.mRenderData, renderablePointLight, PointLightCull, position, radius);
+            CullActors<decltype(animatedActors)>(scene, mResourceManifest, mCullingStrategy, animatedActors, parseMaterials, mRenderQueue.mRenderData, renderablePointLight, PointLightCull, position, radius);
         }
     }
 
@@ -113,18 +116,24 @@ namespace JonsEngine
         for (const DirectionalLight& dirLight : scene.GetDirectionalLights())
         {
             mRenderQueue.mDirectionalLights.emplace_back(dirLight.GetLightColor(), glm::normalize(dirLight.GetLightDirection()), dirLight.GetNumCascades());
-            RenderableDirLight& renderableDirLight = mRenderQueue.mDirectionalLights.back();
+            RenderableDirectionalLight& renderableDirLight = mRenderQueue.mDirectionalLights.back();
 
-            for (uint32_t cascadeIndex = 0; cascadeIndex < dirLight.GetNumCascades(); ++cascadeIndex)
+			// dont need materials for shadowmapping
+			const bool parseMaterials = false;
+
+			const uint32_t numCascades = dirLight.GetNumCascades();
+            for (uint32_t cascadeIndex = 0; cascadeIndex < numCascades; ++cascadeIndex)
             {
                 float nearZ = 0.0f, farZ = 0.0f;
                 dirLight.GetSplitDistance(cascadeIndex, nearZ, farZ);
+				auto& cascade = renderableDirLight.mCascades.at(cascadeIndex);
+				cascade.mNearZ = nearZ;
+				cascade.mFarZ = farZ;
+
                 const auto kdopIterator = dirLight.GetBoundingVolume(cascadeIndex);
 
-                CullActors<decltype(staticActors), RenderableMesh>(scene, mResourceManifest, mCullingStrategy, staticActors, renderableDirLight.mMeshes, DirectionalLightCull, kdopIterator);
-                CullActors<decltype(animatedActors), RenderableMesh>(scene, mResourceManifest, mCullingStrategy, animatedActors, renderableDirLight.mMeshes, DirectionalLightCull, kdopIterator);
-
-                renderableDirLight.mCascadeSplits.emplace_back(nearZ, farZ, renderableDirLight.mMeshes.size());
+                CullActors<decltype(staticActors)>(scene, mResourceManifest, mCullingStrategy, staticActors, parseMaterials, mRenderQueue.mRenderData, cascade, DirectionalLightCull, kdopIterator);
+                CullActors<decltype(animatedActors)>(scene, mResourceManifest, mCullingStrategy, animatedActors, parseMaterials, mRenderQueue.mRenderData, cascade, DirectionalLightCull, kdopIterator);
             }
         }
     }
@@ -143,10 +152,10 @@ namespace JonsEngine
 
 
     template <typename ACTOR_ITER_TYPE, typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
-    void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator,
-		RenderableMesh::Collection& meshContainer, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args)
+    void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator, const bool parseMaterials,
+		RenderQueue::RenderData& renderData, RenderableCollection& rangedMeshCollection, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args)
     {
-        const AnimationUpdater& AnimationUpdater = scene.GetAnimationUpdater();
+        const AnimationUpdater& animationUpdater = scene.GetAnimationUpdater();
 
         for (const auto& actor : actorIterator)
         {
@@ -164,7 +173,7 @@ namespace JonsEngine
             // TODO: extend with fine-grained culling, such as adding meshes per-node rather than per-model for AGGRESSIVE culling strategy,
             const bool addAllMeshes = DetermineIfAddAllMeshes(cullingStrat, visibilityResult);
             if (addAllMeshes)
-                AddAllMeshes<decltype(actor)>(meshContainer, AnimationUpdater, resManifest, actor, model, worldMatrix);
+                AddAllMeshes(actor, model, worldMatrix, parseMaterials, animationUpdater, resManifest, renderData, rangedMeshCollection);
         }
     }
 
@@ -207,73 +216,89 @@ namespace JonsEngine
     }
 
 
-    template <typename ACTOR_TYPE>
-    void AddAllMeshes(std::vector<RenderableModel>& resultContainer, const AnimationUpdater& AnimationUpdater, const ResourceManifest& resManifest, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldTransform)
-    {
-        for (const ModelNode& node : model.GetNodes())
-        {
-            if (node.GetNumMeshes() == 0)
-                continue;
+	template <typename ACTOR_TYPE>
+	void AddAllMeshes(const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix, const bool parseMaterials, const AnimationUpdater& animationUpdater, const ResourceManifest& resManifest,
+		RenderQueue::RenderData& renderData, RenderableCollection& rangedMeshCollection)
+	{
+		const RenderableMesh::Index startIndex = renderData.mMeshes.size();
 
-            for (const Mesh& mesh : node.GetMeshes())
-            {
-                auto diffuseTexture = INVALID_DX11_MATERIAL_ID;
-                auto normalTexture = INVALID_DX11_MATERIAL_ID;
-                // TODO
-                auto specularFactor = 0.02f;
+		for (const ModelNode& node : model.GetNodes())
+		{
+			if (node.GetNumMeshes() == 0)
+				continue;
 
-                MaterialID materialID = mesh.GetDefaultMaterial();
-                const MaterialID explicitActorMaterial = actor.GetMaterial();
-                if (explicitActorMaterial != INVALID_MATERIAL_ID)
-                    materialID = explicitActorMaterial;
+			for (const Mesh& mesh : node.GetMeshes())
+			{
+				const RenderableMaterial::Index materialID = ParseMaterial(actor, mesh, parseMaterials, resManifest, renderData.mMaterials);
+				const float materialTilingFactor = actor.GetMaterialTilingFactor();
+				const DX11MeshID meshID = mesh.GetMesh();
 
-                if (materialID != INVALID_MATERIAL_ID)
-                {
-                    const Material& material = resManifest.GetMaterial(materialID);
-                    diffuseTexture = material.GetDiffuseTexture();
-                    normalTexture = material.GetNormalTexture();
-                    specularFactor = material.GetSpecularFactor();
-                }
+				AddMesh(actor, worldMatrix, materialID, materialTilingFactor, meshID, animationUpdater, renderData);
+			}
+		}
 
-                AddMesh<RenderableModel>(resultContainer, AnimationUpdater, resManifest, actor, model, node, mesh.GetMesh(), worldTransform, diffuseTexture, normalTexture, specularFactor, actor.GetMaterialTilingFactor());
-            }
-        }
-    }
+		const RenderableMesh::Index endIndex = renderData.mMeshes.size() - 1;
+		AddMeshRange<ACTOR_TYPE>(startIndex, endIndex, rangedMeshCollection);
+	}
+	
 
-    template <typename ACTOR_TYPE>
-    void AddAllMeshes(std::vector<RenderableMesh>& resultContainer, const AnimationUpdater& AnimationUpdater, ResourceManifest& resManifest, const ACTOR_TYPE& actor, const Model& model, const Mat4& worldTransform)
-    {
-        for (const ModelNode& node : model.GetNodes())
-        {
-            if (node.GetNumMeshes() == 0)
-                continue;
+	template <>
+	void AddMesh(const StaticActor& actor, const Mat4& worldTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& AnimationUpdater, RenderQueue::RenderData& renderData)
+	{
+		renderData.mMeshes.emplace_back(worldTransform, materialIndex, materialTilingFactor, mesh);
+	}
 
-            for (const Mesh& mesh : node.GetMeshes())
-                AddMesh<RenderableMesh>(resultContainer, AnimationUpdater, resManifest, actor, model, node, mesh.GetMesh(), worldTransform);
-        }
-    }
+	template <>
+	void AddMesh(const AnimatedActor& actor, const Mat4& worldTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& AnimationUpdater, RenderQueue::RenderData& renderData)
+	{
+		const auto animInstanceID = actor.GetAnimationInstance();
+		const auto& boneData = AnimationUpdater.GetBoneData(animInstanceID);
 
-    template <typename RENDERABLE_TYPE, typename ...MESH_ARGS>
-    void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const AnimationUpdater& AnimationUpdater, const ResourceManifest& resManifest, const StaticActor& actor, const Model& model, const ModelNode& node, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args)
-    {
-        const bool isAnimating = false;
+		// TODO
 
-        resultContainer.emplace_back(meshID, worldTransform, isAnimating, std::forward<MESH_ARGS>(args)...);
-    }
+		renderData.mMeshes.emplace_back(worldTransform, materialIndex, materialTilingFactor, mesh);
+	}
 
-    template <typename RENDERABLE_TYPE, typename ...MESH_ARGS>
-    void AddMesh(std::vector<RENDERABLE_TYPE>& resultContainer, const AnimationUpdater& AnimationUpdater, const ResourceManifest& resManifest, const AnimatedActor& actor, const Model& model, const ModelNode& node, const DX11MeshID meshID, const Mat4& worldTransform, MESH_ARGS&&... args)
-    {
-        const bool isAnimating = actor.IsPlaying();
 
-        if (isAnimating)
-        {
-            const auto animInstanceID = actor.GetAnimationInstance();
-            const auto& boneData = AnimationUpdater.GetBoneData(animInstanceID);
-            
-            resultContainer.emplace_back(meshID, worldTransform, isAnimating, std::forward<MESH_ARGS>(args)...);
-        }
-        else
-            resultContainer.emplace_back(meshID, worldTransform, isAnimating, std::forward<MESH_ARGS>(args)...);
-    }
+	template <typename ACTOR_TYPE>
+	RenderableMaterial::Index ParseMaterial(const ACTOR_TYPE& actor, const Mesh& mesh, const bool parseMaterial, const ResourceManifest& resManifest, RenderableMaterial::ContainerType& materialContainer)
+	{
+		if (!parseMaterial)
+			return RenderableMaterial::INVALID_INDEX;
+
+		MaterialID materialID = mesh.GetDefaultMaterial();
+		const MaterialID explicitActorMaterial = actor.GetMaterial();
+
+		// an explicit material set on the actor will override the meshes default material
+		if (explicitActorMaterial != INVALID_MATERIAL_ID)
+			materialID = explicitActorMaterial;
+
+		if (materialID == INVALID_MATERIAL_ID)
+			return RenderableMaterial::INVALID_INDEX;
+
+		const Material& material = resManifest.GetMaterial(materialID);
+		const DX11MaterialID diffuseTexture = material.GetDiffuseTexture();
+		const DX11MaterialID normalTexture = material.GetNormalTexture();
+		const float specularFactor = material.GetSpecularFactor();
+
+		materialContainer.emplace_back(diffuseTexture, normalTexture, specularFactor);
+		const RenderableMaterial::Index index = materialContainer.size() - 1;
+
+		return index;
+	}
+
+
+	template <>
+	void AddMeshRange<StaticActor>(const RenderableMesh::Index startIndex, const RenderableMesh::Index endIndex, RenderableCollection& rangedMeshCollection)
+	{
+		rangedMeshCollection.mStaticMeshesBegin = startIndex;
+		rangedMeshCollection.mStaticMeshesEnd = endIndex;
+	}
+
+	template <>
+	void AddMeshRange<AnimatedActor>(const RenderableMesh::Index startIndex, const RenderableMesh::Index endIndex, RenderableCollection& rangedMeshCollection)
+	{
+		rangedMeshCollection.mAnimatedMeshesBegin = startIndex;
+		rangedMeshCollection.mAnimatedMeshesEnd = endIndex;
+	}
 }

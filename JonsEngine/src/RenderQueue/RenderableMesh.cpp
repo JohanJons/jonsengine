@@ -2,7 +2,21 @@
 
 namespace JonsEngine
 {
-    RenderableMesh::RenderableMesh()
-    {
-    }
+	RenderableMesh::RenderableMesh(const Mat4& worldTransform, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID) :
+		mWorldTransform(worldTransform),
+		mSkeleton(RenderableBone::INVALID_INDEX, RenderableBone::INVALID_INDEX),
+		mMaterial(materialIndex),
+		mMaterialTilingFactor(materialTilingFactor),
+		mMeshID(meshID)
+	{
+	}
+
+	RenderableMesh::RenderableMesh(const Mat4& worldTransform, const BoneIndex beginBone, const BoneIndex endBone, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID) :
+		mWorldTransform(worldTransform),
+		mSkeleton(beginBone, endBone),
+		mMaterial(materialIndex),
+		mMaterialTilingFactor(materialTilingFactor),
+		mMeshID(meshID)
+	{
+	}
 }

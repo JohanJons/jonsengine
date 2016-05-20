@@ -16,6 +16,13 @@ namespace JonsEngine
         typedef std::vector<RenderablePointLight> RenderablePointLights;
         typedef std::vector<RenderableDirectionalLight> RenderableDirectionalLights;
 
+		struct RenderData
+		{
+			RenderableMesh::ContainerType mMeshes;
+			RenderableMaterial::ContainerType mMaterials;
+			RenderableBone::ContainerType mBones;
+		};
+
         RenderQueue();
 
         void Clear();
@@ -25,11 +32,9 @@ namespace JonsEngine
         DX11MaterialID mSkyboxTextureID;
 
         RenderableCamera mCamera;
-        RenderablePointLights mPointLight;
+        RenderablePointLights mPointLights;
         RenderableDirectionalLights mDirectionalLights;
 
-        RenderableMesh::Collection mMeshes;
-        RenderableMaterial::Collection mMaterials;
-        RenderableBone::Collection mBones;
+		RenderData mRenderData;
     };
 }
