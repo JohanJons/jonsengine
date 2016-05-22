@@ -74,8 +74,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>assimp.lib;JonsEngine.lib;FreeImageLib.lib;libboost_filesystem-vc120-mt-sgd-1_56.lib;libboost_system-vc120-mt-sgd-1_56.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)/Thirdparty/boost_1_56_0/bin.v2/libs/system/build/msvc-12.0/debug/link-static/runtime-link-static/threading-multi;$(SolutionDir)/Thirdparty/boost_1_56_0/bin.v2/libs/filesystem/build/msvc-12.0/debug/link-static/runtime-link-static/threading-multi;$(SolutionDir)/bin/$(Configuration)/$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp.lib;JonsEngine.lib;FreeImageLib.lib;libboost_filesystem-vc140-mt-sgd-1_56.lib;libboost_system-vc140-mt-sgd-1_56.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)/Thirdparty/boost_1_56_0/bin.v2/libs/system/build/msvc-14.0/debug/link-static/runtime-link-static/threading-multi;$(SolutionDir)/Thirdparty/boost_1_56_0/bin.v2/libs/filesystem/build/msvc-14.0/debug/link-static/runtime-link-static/threading-multi;$(SolutionDir)/bin/$(Configuration)/$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>

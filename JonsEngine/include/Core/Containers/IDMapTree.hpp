@@ -18,6 +18,8 @@ namespace JonsEngine
         ItemID mNext;
         T mItem;
 
+
+		IDMapTreeItem(const IDMapTreeItem&);
         template <typename... Arguments>
         IDMapTreeItem(const ItemID id, const ItemID next, Arguments&&... args);
     };
@@ -61,6 +63,13 @@ namespace JonsEngine
     IDMapTreeItem<T>::IDMapTreeItem(const ItemID id, const ItemID next, Arguments&&... args) : mID(id), mNext(next), mItem{ std::forward<Arguments>(args)... }
     {
     }
+
+
+	template <typename T>
+	IDMapTreeItem<T>::IDMapTreeItem(const IDMapTreeItem& other) : mID(other.mID), mNext(other.mNext), mItem(std::move(other.mItem))
+	{
+	}
+
 
 
     //

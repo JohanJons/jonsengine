@@ -3,9 +3,9 @@
 #include "include/Resources/Animation.h"
 #include "include/Core/Utils/Time.h"
 #include "include/Core/Types.h"
-#include "include/Core/Containers/IDMap.hpp"
 
 #include <array>
+#include <limits>
 
 namespace JonsEngine
 {
@@ -21,6 +21,6 @@ namespace JonsEngine
         AnimationInstance(const AnimationID animationID);
     };
 
-    typedef IDMap<AnimationInstance>::ItemID AnimationInstanceID;
-    static const AnimationInstanceID INVALID_ANIMATION_INSTANCE_ID = IDMap<AnimationInstance>::INVALID_ITEM_ID;
+	typedef uint32_t AnimationInstanceID;
+    static constexpr AnimationInstanceID INVALID_ANIMATION_INSTANCE_ID = std::numeric_limits<AnimationInstanceID>::max();
 }

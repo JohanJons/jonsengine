@@ -7,6 +7,7 @@
 #include "include/Core/Utils/Time.h"
 
 #include <vector>
+#include <unordered_map>
 
 namespace JonsEngine
 {
@@ -15,6 +16,9 @@ namespace JonsEngine
     class AnimationUpdater
     {
     public:
+		typedef std::vector<Mat4> BoneTransforms;
+		typedef std::unordered_map<AnimationInstanceID, BoneTransforms::size_type> AnimationInstanceMap;
+
         AnimationUpdater(const ResourceManifest& resourceManifest);
         ~AnimationUpdater();
 
@@ -32,6 +36,7 @@ namespace JonsEngine
 
         const ResourceManifest& mResourceManifest;
 
-        IDMap<AnimationInstance> mActiveAnimations;
+		AnimationInstanceMap mInstanceMap;
+		BoneTransforms mBoneTransforms;
     };
 }

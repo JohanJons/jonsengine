@@ -112,11 +112,11 @@ namespace JonsEngine
 
 		// TEMP SOLUTION !!!
 
-		const uint32_t numStaticMeshes = renderQueue.mCamera.mStaticMeshesEnd - renderQueue.mCamera.mStaticMeshesBegin;
-		const uint32_t staticMeshOffset = renderQueue.mCamera.mStaticMeshesBegin;
-		for (uint32_t meshNum = 0; meshNum < numStaticMeshes; ++meshNum)
+		const uint32_t staticBeginIndex = renderQueue.mCamera.mStaticMeshesBegin;
+		const uint32_t staticEndIndex = renderQueue.mCamera.mStaticMeshesEnd;
+		for (uint32_t meshIndex = staticBeginIndex; meshIndex < staticEndIndex; ++meshIndex)
 		{
-			const RenderableMesh& mesh = renderQueue.mRenderData.mMeshes.at(staticMeshOffset + meshNum);
+			const RenderableMesh& mesh = renderQueue.mRenderData.mMeshes.at(meshIndex);
 			assert(mesh.mMeshID != INVALID_DX11_MESH_ID);
 
 			bool hasDiffuseTexture = false, hasNormalTexture = false;
@@ -190,14 +190,14 @@ namespace JonsEngine
 
         // do all directional lights
         for (const RenderableDirectionalLight& directionalLight : renderQueue.mDirectionalLights)
-            mDirectionalLightPass.Render(directionalLight, shadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix);
+            mDirectionalLightPass.Render(directionalLight, renderQueue.mRenderData, shadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix);
 
         // do all point lights
         mPointLightPass.BindForShading();
         for (const RenderablePointLight& pointLight : renderQueue.mPointLights)
         {
             mContext->ClearDepthStencilView(mDSV, D3D11_CLEAR_STENCIL, 1.0f, 0);
-            mPointLightPass.Render(pointLight, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix);
+            mPointLightPass.Render(pointLight, renderQueue.mRenderData, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix);
         }
 
         // turn off blending
@@ -222,6 +222,6 @@ namespace JonsEngine
             mSkyboxPass.Render(renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraProjectionMatrix, mMaterialMap.GetItem(renderQueue.mSkyboxTextureID));
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
-            mAABBPass.Render(renderQueue);
+            mAABBPass.Render(renderQueue.mRenderData, renderQueue.mCamera);
     }
 }

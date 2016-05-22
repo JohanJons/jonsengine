@@ -4,6 +4,7 @@
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
+#include "include/RenderQueue/RenderQueue.h"
 #include "include/Core/Types.h"
 #include "include/Core/Platform/Directx11.h"
 
@@ -32,7 +33,7 @@ namespace JonsEngine
         DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const EngineSettings::ShadowResolution shadowmapRes, const uint32_t windowWidth, const uint32_t windowHeight);
         ~DX11PointLightPass();
 
-        void Render(const RenderablePointLight& pointLight, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix);
+        void Render(const RenderablePointLight& pointLight, const RenderQueue::RenderData& renderData, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix);
 
         void BindForShading();
 

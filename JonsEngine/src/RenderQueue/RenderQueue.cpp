@@ -11,12 +11,11 @@ namespace JonsEngine
     
     void RenderQueue::Clear()
     {
-        mCameras.clear();
         mDirectionalLights.clear();
-        mPointLight.clear();
+        mPointLights.clear();
 
-        mMeshes.clear();
-        mMaterials.clear();
-        mBones.clear();
+        mRenderData.mMeshes.clear();
+		mRenderData.mMaterials.clear();
+		mRenderData.mBones.clear();
     }
 }

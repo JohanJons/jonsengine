@@ -58,7 +58,7 @@ namespace JonsGame
         mActorCube3(mScene.CreateStaticActor("actorCube3", mModelCube3, mNodeCube3)),
 
         // misc animation
-        mAnimIndexWuson(INVALID_ANIMATION_INDEX),
+		mAnimWuson(INVALID_ANIMATION_ID),
         mAnimDurationWuson(0)
     {
         // ambient light
@@ -84,9 +84,13 @@ namespace JonsGame
 
         // animated wuson
         const Model& modelWuson = resManifest.GetModel(mModelWuson);
-        mAnimIndexWuson = modelWuson.GetAnimationIndex("Wuson_Run");
-        const ModelAnimation& modelAnimation = modelWuson.GetAnimation(mAnimIndexWuson);
-        mAnimDurationWuson = modelAnimation.GetAnimationDuration();
+		mAnimWuson = modelWuson.GetAnimationID("Wuson_Run");
+		const Animation& animWuson = resManifest.GetAnimation(mAnimWuson);
+		mAnimDurationWuson = animWuson.GetAnimationDuration();
+
+        //mAnimIndexWuson = modelWuson.GetAnimationIndex("Wuson_Run");
+        //const ModelAnimation& modelAnimation = modelWuson.GetAnimation(mAnimIndexWuson);
+        //mAnimDurationWuson = modelAnimation.GetAnimationDuration();
         SceneNode& nodeWuson = mScene.GetSceneNode(mNodeAnimWuson);
         nodeWuson.TranslateNode(Vec3(-10.0f, 4.5f, -11.0f));
         nodeWuson.RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
@@ -151,7 +155,7 @@ namespace JonsGame
     void Scene::PlayAnimationWuson()
     {
         AnimatedActor& animWuson = mScene.GetAnimatedActor(mActorAnimWuson);
-        animWuson.PlayAnimation(mAnimIndexWuson, mAnimDurationWuson, false);
+        animWuson.PlayAnimation(mActorAnimWuson, mAnimDurationWuson, false);
     }
 
 

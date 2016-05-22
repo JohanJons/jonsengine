@@ -4,9 +4,7 @@ namespace JonsEngine
 {
     RenderableDirectionalLight::CascadeSplit::CascadeSplit() :
         mNearZ(0.0f),
-        mFarZ(0.0f),
-        mNumStaticMeshes(0),
-        mNumAnimatedMeshes(0)
+        mFarZ(0.0f)
     {
     }
 

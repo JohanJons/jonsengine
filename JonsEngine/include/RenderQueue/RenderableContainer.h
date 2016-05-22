@@ -10,6 +10,6 @@ namespace JonsEngine
     {
         typedef std::vector<RENDERABLE> ContainerType;
         typename typedef ContainerType::size_type Index;
-        constexpr static Index INVALID_INDEX = std::numeric_limits<Index>::max();
+        static constexpr Index INVALID_INDEX = std::numeric_limits<Index>::max();
     };
 }

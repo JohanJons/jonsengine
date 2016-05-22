@@ -7,7 +7,7 @@ namespace JonsEngine
 {
     // TODO: make NonCopyable if VS2015 >= due to noexcept not being present in VS2013 which makes moveconstructors and containers not play nice
     template <typename T>
-    class IDMapPointer// : NonCopyable
+    class IDMapPointer : NonCopyable
     {
     public:
         template <typename... Arguments>

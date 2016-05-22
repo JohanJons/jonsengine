@@ -65,7 +65,7 @@ namespace JonsGame
         JonsEngine::StaticActorID mActorCube2;
         JonsEngine::StaticActorID mActorCube3;
 
-        JonsEngine::ModelAnimationIndex mAnimIndexWuson;
+        JonsEngine::AnimationID mAnimWuson;
         JonsEngine::Milliseconds mAnimDurationWuson;
     };
 }
