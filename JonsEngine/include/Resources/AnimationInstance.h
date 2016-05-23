@@ -15,7 +15,7 @@ namespace JonsEngine
 
         AnimationID mAnimationID;
         Milliseconds mTimestamp;
-        BoneData mBoneTransforms;
+        //BoneData mBoneTransforms;
 
 
         AnimationInstance(const AnimationID animationID);

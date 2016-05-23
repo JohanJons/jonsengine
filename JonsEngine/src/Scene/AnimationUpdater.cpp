@@ -44,6 +44,8 @@ namespace JonsEngine
     {
         assert(animationID != INVALID_ANIMATION_ID);
 
+
+
         return mActiveAnimations.Insert(animationID);
     }
 
