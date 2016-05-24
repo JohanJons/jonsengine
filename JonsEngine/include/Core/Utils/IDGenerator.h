@@ -12,17 +12,17 @@ namespace JonsEngine
         typedef uint32_t ID;
         static constexpr ID INVALID_ID = std::numeric_limits<ID>::max();
         
-		static ID GetNextID() const;
+		static ID GetNextID();
         
     
     private:
         static constexpr ID FIRST_VALID_ID = std::numeric_limits<ID>::min();
-        static mGlobalNext = FIRST_VALID_ID;
+        static constexpr ID mGlobalNext = FIRST_VALID_ID;
 	};
 
 
 	template <typename T>
-	IDGenerator<T>::ID IDGenerator<T>::GetNextID() const
+	typename IDGenerator<T>::ID IDGenerator<T>::GetNextID()
 	{
 		return mGlobalNext == INVALID_ID ? FIRST_VALID_ID : mGlobalNext++;
 	}

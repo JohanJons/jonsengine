@@ -54,7 +54,7 @@ namespace JonsEngine
         //DX11VertexBufferSet mvs;
 
         const uint32_t mNumVertices;
-        const uint16_t mNumIndices;
+        const uint32_t mNumIndices;
         const bool mHasBones;
     };
 }
