@@ -2,9 +2,10 @@
 
 namespace JonsEngine
 {
-    Animation::Animation(const std::string& name, const Milliseconds duration, const Mat4& inverseRootMatrix) :
+    Animation::Animation(const std::string& name, const Milliseconds duration, const uint32_t numBones, const Mat4& inverseRootMatrix) :
         mName(name),
         mAnimationDuration(duration),
+		mNumBones(numBones),
         mInverseRootMatrix(inverseRootMatrix)
     {
     }
@@ -23,6 +24,11 @@ namespace JonsEngine
     {
         return mAnimationDuration;
     }
+
+	uint32_t Animation::GetNumberOfBones() const
+	{
+		return mNumBones;
+	}
 
     const Mat4& Animation::GetInverseRootMatrix() const
     {

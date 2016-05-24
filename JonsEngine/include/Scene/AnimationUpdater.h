@@ -19,7 +19,7 @@ namespace JonsEngine
     public:
 		typedef std::vector<Mat4> BoneTransforms;
 		typedef BoneTransforms::size_type BoneIndex;
-		// [begin, end)
+		// the range is [begin, end)
 		typedef std::pair<BoneIndex, BoneIndex> BoneIndexRange;
 		typedef std::unordered_map<AnimationInstanceID, BoneIndexRange> AnimationInstanceMap;
 
@@ -31,7 +31,9 @@ namespace JonsEngine
         AnimationInstanceID PlayAnimation(const AnimationID animationID);
         void StopAnimation(AnimationInstanceID& animationInstance);
 
-        const AnimationInstance::BoneData& GetBoneData(const AnimationInstanceID animationInstance) const;
+		const BoneTransforms& GetBonedata() const;
+		const BoneIndexRange& GetBoneRange(const AnimationInstanceID animationInstance) const;
+        //const BoneTransforms& GetBoneData(const AnimationInstanceID animationInstance) const;
 
 
     private:

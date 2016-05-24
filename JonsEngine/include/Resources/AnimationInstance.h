@@ -3,16 +3,12 @@
 #include "include/Resources/Animation.h"
 #include "include/Core/Utils/Time.h"
 #include "include/Core/Types.h"
-
-#include <array>
-#include <limits>
+#include "include/Core/Utils/IDGenerator.h"
 
 namespace JonsEngine
 {
     struct AnimationInstance
     {
-        typedef std::array<Mat4, Animation::MAX_NUM_BONES> BoneData;
-
         AnimationID mAnimationID;
         Milliseconds mTimestamp;
         //BoneData mBoneTransforms;
@@ -21,6 +17,6 @@ namespace JonsEngine
         AnimationInstance(const AnimationID animationID);
     };
 
-	typedef uint32_t AnimationInstanceID;
-    static constexpr AnimationInstanceID INVALID_ANIMATION_INSTANCE_ID = std::numeric_limits<AnimationInstanceID>::max();
+	typedef IDGenerator<AnimationInstance>::ID AnimationInstanceID;
+	static constexpr AnimationInstanceID INVALID_ANIMATION_INSTANCE_ID = IDGenerator<AnimationInstance>::INVALID_ID;
 }

@@ -592,6 +592,9 @@
     <ClInclude Include="include\Renderer\RenderDefs.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="include\Core\Utils\IDGenerator.h">
+      <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferPixel.hlsl">

@@ -11,6 +11,8 @@
 
 namespace JonsEngine
 {
+	// TODO: split animation into skeleton/animation
+
     typedef uint32_t AnimationID;
     static const AnimationID INVALID_ANIMATION_ID = std::numeric_limits<AnimationID>::max();
 
@@ -22,11 +24,12 @@ namespace JonsEngine
         static const uint32_t MAX_BONES_PER_VERTEX = NUM_BONES_PER_VERTEX;
         typedef std::array<TransformIndex, MAX_NUM_BONES> ParentMap;
 
-        Animation(const std::string& name, const Milliseconds duration, const Mat4& inverseRootMatrix);
+        Animation(const std::string& name, const Milliseconds duration, const uint32_t numBones, const Mat4& inverseRootMatrix);
         ~Animation();
 
         const std::string& GetName() const;
         Milliseconds GetAnimationDuration() const;
+		uint32_t GetNumberOfBones() const;
         const Mat4& GetInverseRootMatrix() const;
         const ParentMap& GetParentMapping() const;
 
@@ -34,6 +37,7 @@ namespace JonsEngine
     private:
         std::string mName;
         Milliseconds mAnimationDuration;
+		uint32_t mNumBones;
         Mat4 mInverseRootMatrix;
         ParentMap mParentMap;
         // TODO: array?

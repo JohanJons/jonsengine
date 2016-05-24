@@ -17,6 +17,7 @@ namespace JonsEngine
     const static uint32_t gStaticOffset = 0;
     const std::array<uint16_t, 16> gAABBIndices = { 0, 1, 2, 3, 0, 5, 4, 3, 2, 7, 4, 7, 6, 5, 6, 1 };
 
+	// NOTE: not thread-safe, but wont be an issue
     static DX11MeshID gNextMeshID = 1;
 
     void AppendAABBVertices(std::vector<float>& vertexContainer, const Vec3& minBounds, const Vec3& maxBounds);

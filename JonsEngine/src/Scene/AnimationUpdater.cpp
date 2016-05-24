@@ -44,25 +44,46 @@ namespace JonsEngine
     {
         assert(animationID != INVALID_ANIMATION_ID);
 
+		const Animation& animation = mResourceManifest.GetAnimation(animationID);
+		const uint32_t numBonesForAnimation = animation.GetNumberOfBones();
+		
+		const BoneIndex begin = mBoneTransforms.size();
+		const BoneIndex end = begin + numBonesForAnimation;
+		const AnimationInstanceID animInstanceID = IDGenerator<AnimationInstance>::GetNextID();
+		mInstanceMap.emplace(animInstanceID, begin, end);
 
-
-        return mActiveAnimations.Insert(animationID);
+		return animInstanceID;
     }
 
     void AnimationUpdater::StopAnimation(AnimationInstanceID& animationInstance)
     {
         assert(animationInstance != INVALID_ANIMATION_INSTANCE_ID);
 
-        mActiveAnimations.Erase(animationInstance);
+		mInstanceMap.erase(animationInstance);
+		animationInstance = INVALID_ANIMATION_INSTANCE_ID;
+
+		// TODO: remove transforms, update indices
     }
 
 
-    const AnimationInstance::BoneData& AnimationUpdater::GetBoneData(const AnimationInstanceID animationInstance) const
+	const AnimationUpdater::BoneTransforms& AnimationUpdater::GetBonedata() const
+	{
+		return mBoneTransforms;
+	}
+
+	const AnimationUpdater::BoneIndexRange& AnimationUpdater::GetBoneRange(const AnimationInstanceID animationInstance) const
+	{
+		assert(animationInstance != INVALID_ANIMATION_INSTANCE_ID);
+
+		return mInstanceMap.at(animationInstance);
+	}
+
+    /*const AnimationUpdater::BoneTransforms& AnimationUpdater::GetBoneData(const AnimationInstanceID animationInstance) const
     {
         assert(animationInstance != INVALID_ANIMATION_INSTANCE_ID);
 
         return mActiveAnimations.GetItem(animationInstance).mBoneTransforms;
-    }
+    }*/
 
 
     Mat4 AnimationUpdater::InterpolateTransform(const uint32_t transformIndex, const Milliseconds elapsedTime)
