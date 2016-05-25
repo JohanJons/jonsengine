@@ -50,10 +50,13 @@ namespace JonsEngine
     {
         mRenderQueue.Clear();
 
+		GetAmbientLight(scene);
+		GetSkybox(scene);
+		CopyBoneTransforms(scene);
+
         ViewFrustumCulling(scene, windowAspectRatio, zNear, zFar);
         PointLightCulling(scene);
         DirectionalLightCulling(scene);
-        ParseMiscSceneInfo(scene);
 
         return mRenderQueue;
     }
@@ -138,17 +141,30 @@ namespace JonsEngine
         }
     }
 
-    void SceneParser::ParseMiscSceneInfo(const Scene& scene)
-    {
-        mRenderQueue.mAmbientLight = scene.GetAmbientLight();
+	void SceneParser::CopyBoneTransforms(const Scene& scene)
+	{
+		const AnimationUpdater& animUpdater = scene.GetAnimationUpdater();
+		const AnimationUpdater::BoneTransforms& bones = animUpdater.GetBonedata();
+		std::copy(bones.begin(), bones.end(), mRenderQueue.mRenderData.mBones);
+	}
 
-        const SkyboxID skyboxID = scene.GetSkybox();
-        if (skyboxID != INVALID_SKYBOX_ID)
-        {
-            const Skybox& skybox = mResourceManifest.GetSkybox(skyboxID);
-            mRenderQueue.mSkyboxTextureID = skybox.GetSkyboxTexture();
-        }
-    }
+	void SceneParser::GetSkybox(const Scene& scene)
+	{
+		const SkyboxID skyboxID = scene.GetSkybox();
+		DX11MaterialID skyboxTexture = INVALID_DX11_MATERIAL_ID;
+		if (skyboxID != INVALID_SKYBOX_ID)
+		{
+			const Skybox& skybox = mResourceManifest.GetSkybox(skyboxID);
+		    skyboxTexture = skybox.GetSkyboxTexture();
+		}
+
+		mRenderQueue.mSkyboxTextureID = skyboxTexture;
+	}
+
+	void SceneParser::GetAmbientLight(const Scene& scene)
+	{
+		mRenderQueue.mAmbientLight = scene.GetAmbientLight();
+	}
 
 
     template <typename ACTOR_ITER_TYPE, typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>

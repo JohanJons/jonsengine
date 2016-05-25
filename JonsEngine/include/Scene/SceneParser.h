@@ -21,7 +21,9 @@ namespace JonsEngine
         void ViewFrustumCulling(const Scene& scene, const float windowAspectRatio, const float zNear, const float zFar);
         void PointLightCulling(const Scene& scene);
         void DirectionalLightCulling(const Scene& scene);
-        void ParseMiscSceneInfo(const Scene& scene);
+		void CopyBoneTransforms(const Scene& scene);
+		void GetSkybox(const Scene& scene);
+		void GetAmbientLight(const Scene& scene);
 
 
         const ResourceManifest& mResourceManifest;
