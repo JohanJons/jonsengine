@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/RenderQueue/RenderableBone.h"
+#include "include/Resources/Bone.h"
 #include "include/Core/Types.h"
 
 #include <vector>
@@ -9,13 +9,10 @@ namespace JonsEngine
 {
     struct RenderableSkeleton
     {
-        typedef RenderableBone::Index BoneIndex;
-
         RenderableSkeleton();
-        RenderableSkeleton(const BoneIndex begin, const BoneIndex end);
+        RenderableSkeleton(const BoneIndexRange& boneRange);
 
 
-        BoneIndex mBonesBegin;
-        BoneIndex mBonesEnd;
+		BoneIndexRange mBoneRange;
     };
 }

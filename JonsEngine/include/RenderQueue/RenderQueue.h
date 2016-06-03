@@ -5,7 +5,7 @@
 #include "include/RenderQueue/RenderablePointLight.h"
 #include "include/RenderQueue/RenderableMaterial.h"
 #include "include/RenderQueue/RenderableMesh.h"
-#include "include/RenderQueue/RenderableBone.h"
+#include "include/Resources/Bone.h"
 
 #include <vector>
 
@@ -20,7 +20,7 @@ namespace JonsEngine
 		{
 			RenderableMesh::ContainerType mMeshes;
 			RenderableMaterial::ContainerType mMaterials;
-			RenderableBone::ContainerType mBones;
+			BoneTransforms mBones;
 		};
 
         RenderQueue();

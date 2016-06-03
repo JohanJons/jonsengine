@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Resources/Bone.h"
 #include "include/Resources/Animation.h"
 #include "include/Resources/AnimationInstance.h"
 #include "include/Core/Containers/IDMap.hpp"
@@ -7,7 +8,6 @@
 #include "include/Core/Utils/Time.h"
 
 #include <vector>
-#include <utility>
 #include <unordered_map>
 
 namespace JonsEngine
@@ -17,10 +17,6 @@ namespace JonsEngine
     class AnimationUpdater
     {
     public:
-		typedef std::vector<Mat4> BoneTransforms;
-		typedef BoneTransforms::size_type BoneIndex;
-		// the range is [begin, end)
-		typedef std::pair<BoneIndex, BoneIndex> BoneIndexRange;
 		typedef std::unordered_map<AnimationInstanceID, BoneIndexRange> AnimationInstanceMap;
 
         AnimationUpdater(const ResourceManifest& resourceManifest);

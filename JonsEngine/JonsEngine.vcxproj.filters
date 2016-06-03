@@ -302,9 +302,6 @@
     <ClCompile Include="src\RenderQueue\RenderQueue.cpp">
       <Filter>Source Files\RenderQueue</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderQueue\RenderableBone.cpp">
-      <Filter>Source Files\RenderQueue</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\RenderDefs.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
@@ -580,9 +577,6 @@
     <ClInclude Include="include\RenderQueue\RenderableCollection.h">
       <Filter>Header Files\RenderQueue</Filter>
     </ClInclude>
-    <ClInclude Include="include\RenderQueue\RenderableBone.h">
-      <Filter>Header Files\RenderQueue</Filter>
-    </ClInclude>
     <ClInclude Include="include\RenderQueue\RenderableContainer.h">
       <Filter>Header Files\RenderQueue</Filter>
     </ClInclude>
@@ -594,6 +588,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\Utils\IDGenerator.h">
       <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resources\Bone.h">
+      <Filter>Header Files\Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -144,8 +144,8 @@ namespace JonsEngine
 	void SceneParser::CopyBoneTransforms(const Scene& scene)
 	{
 		const AnimationUpdater& animUpdater = scene.GetAnimationUpdater();
-		const AnimationUpdater::BoneTransforms& bones = animUpdater.GetBonedata();
-		std::copy(bones.begin(), bones.end(), mRenderQueue.mRenderData.mBones);
+		const BoneTransforms& bones = animUpdater.GetBonedata();
+		std::copy(bones.begin(), bones.end(), mRenderQueue.mRenderData.mBones.begin());
 	}
 
 	void SceneParser::GetSkybox(const Scene& scene)
@@ -259,16 +259,17 @@ namespace JonsEngine
 	
 
 	template <>
-	void AddMesh(const StaticActor& actor, const Mat4& worldTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& AnimationUpdater, RenderQueue::RenderData& renderData)
+	void AddMesh(const StaticActor& actor, const Mat4& worldTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData)
 	{
 		renderData.mMeshes.emplace_back(worldTransform, materialIndex, materialTilingFactor, mesh);
 	}
 
 	template <>
-	void AddMesh(const AnimatedActor& actor, const Mat4& worldTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& AnimationUpdater, RenderQueue::RenderData& renderData)
+	void AddMesh(const AnimatedActor& actor, const Mat4& worldTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData)
 	{
 		const auto animInstanceID = actor.GetAnimationInstance();
-		const auto& boneData = AnimationUpdater.GetBoneData(animInstanceID);
+		const auto animBoneRange = animationUpdater.GetBoneRange(animInstanceID);
+		//const auto& boneData = AnimationUpdater.GetBoneData(animInstanceID);
 
 		// TODO
 

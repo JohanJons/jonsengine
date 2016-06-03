@@ -11,7 +11,7 @@ namespace JonsEngine
 	{
 	}
 
-	RenderableMesh::RenderableMesh(const Mat4& worldTransform, const BoneIndex beginBone, const BoneIndex endBone, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID) :
+	RenderableMesh::RenderableMesh(const Mat4& worldTransform, const BoneIndexRange& boneRange, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID) :
 		mWorldTransform(worldTransform),
 		mSkeleton(beginBone, endBone),
 		mMaterial(materialIndex),
