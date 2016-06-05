@@ -66,12 +66,12 @@ namespace JonsEngine
     }
 
 
-	const AnimationUpdater::BoneTransforms& AnimationUpdater::GetBonedata() const
+	const BoneTransforms& AnimationUpdater::GetBonedata() const
 	{
 		return mBoneTransforms;
 	}
 
-	const AnimationUpdater::BoneIndexRange& AnimationUpdater::GetBoneRange(const AnimationInstanceID animationInstance) const
+	const BoneIndexRange& AnimationUpdater::GetBoneRange(const AnimationInstanceID animationInstance) const
 	{
 		assert(animationInstance != INVALID_ANIMATION_INSTANCE_ID);
 

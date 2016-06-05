@@ -10,6 +10,7 @@ namespace JonsEngine
     struct RenderableSkeleton
     {
         RenderableSkeleton();
+        RenderableSkeleton(const BoneIndex begin, const BoneIndex end);
         RenderableSkeleton(const BoneIndexRange& boneRange);
 
 

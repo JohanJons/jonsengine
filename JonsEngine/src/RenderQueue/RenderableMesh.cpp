@@ -4,7 +4,7 @@ namespace JonsEngine
 {
 	RenderableMesh::RenderableMesh(const Mat4& worldTransform, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID) :
 		mWorldTransform(worldTransform),
-		mSkeleton(RenderableBone::INVALID_INDEX, RenderableBone::INVALID_INDEX),
+		mSkeleton(INVALID_BONE_INDEX, INVALID_BONE_INDEX),
 		mMaterial(materialIndex),
 		mMaterialTilingFactor(materialTilingFactor),
 		mMeshID(meshID)
@@ -13,7 +13,7 @@ namespace JonsEngine
 
 	RenderableMesh::RenderableMesh(const Mat4& worldTransform, const BoneIndexRange& boneRange, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID) :
 		mWorldTransform(worldTransform),
-		mSkeleton(beginBone, endBone),
+		mSkeleton(boneRange),
 		mMaterial(materialIndex),
 		mMaterialTilingFactor(materialTilingFactor),
 		mMeshID(meshID)
