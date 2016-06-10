@@ -14,21 +14,24 @@ namespace JonsEngine
     }
 
 
+    // TODO: animation instances should be sorted by animation id for performance
     void AnimationUpdater::Update(const Milliseconds elapsedTime)
     {
-        for (AnimationInstance& animInstance : mActiveAnimations)
+        for (AnimationInstance& animationInstance : mActiveAnimations)
         {
-            const Animation& anim = mResourceManifest.GetAnimation(animInstance.mAnimationID);
+            const Animation& animation = mResourceManifest.GetAnimation(animationInstance.mAnimationID);
+
+            const BoneIndex bonesBegin = animationInstance.mBoneRange.first;
+            const BoneIndex bonesEnd = animationInstance.mBoneRange.second;
 
             // root has no parent
             // note: root is always front
-            Mat4& rootTransform = animInstance.mBoneTransforms.front();
-            rootTransform = InterpolateTransform(0, elapsedTime);
+            Mat4& rootTransform = mBoneTransforms.at(bonesBegin);
+            rootTransform = InterpolateTransform(bonesBegin, elapsedTime);
 
-            // TODO: only use real number of bones
-            const auto& parentMap = anim.GetParentMapping();
-            const uint32_t numTransforms = animInstance.mBoneTransforms.size();
-            for (uint32_t transformNum = 1; transformNum < numTransforms; ++transformNum)
+            const auto& parentMap = animation.GetParentMapping();
+            const uint32_t numTransforms = bonesEnd - bonesBegin;
+            for (BoneIndex boneIndex = bonesBegin; boneIndex < bonesEnd; ++transformNum)
             {
                 Mat4& transform = animInstance.mBoneTransforms.at(transformNum);
                 const auto parentIndex = parentMap.at(transformNum);
@@ -49,8 +52,10 @@ namespace JonsEngine
 		
 		const BoneIndex begin = mBoneTransforms.size();
 		const BoneIndex end = begin + numBonesForAnimation;
-		const AnimationInstanceID animInstanceID = IDGenerator<AnimationInstance>::GetNextID();
-		mInstanceMap.emplace(animInstanceID, begin, end);
+		mActiveAnimations.emplace_back(animationID, begin, end);
+
+        const AnimationInstanceID animInstanceID = IDGenerator<AnimationInstance>::GetNextID();
+		mInstanceMap.emplace(animInstanceID, mActiveAnimations.back());
 
 		return animInstanceID;
     }
@@ -75,7 +80,7 @@ namespace JonsEngine
 	{
 		assert(animationInstance != INVALID_ANIMATION_INSTANCE_ID);
 
-		return mInstanceMap.at(animationInstance);
+		return mInstanceMap.at(animationInstance).mBoneRange;
 	}
 
     /*const AnimationUpdater::BoneTransforms& AnimationUpdater::GetBoneData(const AnimationInstanceID animationInstance) const
@@ -86,7 +91,7 @@ namespace JonsEngine
     }*/
 
 
-    Mat4 AnimationUpdater::InterpolateTransform(const uint32_t transformIndex, const Milliseconds elapsedTime)
+    Mat4 AnimationUpdater::InterpolateTransform(const BoneIndex index, const Milliseconds elapsedTime)
     {
         // TODO
         return Mat4();

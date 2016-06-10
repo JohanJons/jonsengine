@@ -17,9 +17,7 @@ namespace JonsEngine
     class AnimationUpdater
     {
     public:
-		typedef std::unordered_map<AnimationInstanceID, BoneIndexRange> AnimationInstanceMap;
-
-        AnimationUpdater(const ResourceManifest& resourceManifest);
+		AnimationUpdater(const ResourceManifest& resourceManifest);
         ~AnimationUpdater();
 
         void Update(const Milliseconds elapsedTime);
@@ -29,16 +27,19 @@ namespace JonsEngine
 
 		const BoneTransforms& GetBonedata() const;
 		const BoneIndexRange& GetBoneRange(const AnimationInstanceID animationInstance) const;
-        //const BoneTransforms& GetBoneData(const AnimationInstanceID animationInstance) const;
 
 
     private:
-        Mat4 InterpolateTransform(const uint32_t transformIndex, const Milliseconds elapsedTime);
+        typedef std::vector<AnimationInstance> AnimationInstances;
+        typedef std::unordered_map<AnimationInstanceID, AnimationInstance&> AnimationInstanceMap;
+
+        Mat4 InterpolateTransform(const BoneIndex index, const Milliseconds elapsedTime);
 
 
         const ResourceManifest& mResourceManifest;
 
-		AnimationInstanceMap mInstanceMap;
+        AnimationInstances mActiveAnimations;
+        AnimationInstanceMap mInstanceMap;
 		BoneTransforms mBoneTransforms;
     };
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Resources/Animation.h"
+#include "include/Resources/Bone.h"
 #include "include/Core/Utils/Time.h"
 #include "include/Core/Types.h"
 #include "include/Core/Utils/IDGenerator.h"
@@ -11,10 +12,11 @@ namespace JonsEngine
     {
         AnimationID mAnimationID;
         Milliseconds mTimestamp;
-        //BoneData mBoneTransforms;
+        BoneIndexRange mBoneRange;
 
 
-        AnimationInstance(const AnimationID animationID);
+        AnimationInstance(const AnimationID animationID, const BoneIndex begin, const BoneIndex end);
+        AnimationInstance(const AnimationID animationID, const Milliseconds timestamp, const BoneIndex begin, const BoneIndex end);
     };
 
 	typedef IDGenerator<AnimationInstance>::ID AnimationInstanceID;
