@@ -273,7 +273,7 @@ namespace JonsEngine
 
 		// TODO
 
-		renderData.mMeshes.emplace_back(worldTransform, materialIndex, materialTilingFactor, mesh);
+		renderData.mMeshes.emplace_back(worldTransform, animBoneRange, materialIndex, materialTilingFactor, mesh);
 	}
 
 

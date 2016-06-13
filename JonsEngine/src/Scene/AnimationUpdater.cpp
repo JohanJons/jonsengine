@@ -29,15 +29,15 @@ namespace JonsEngine
             Mat4& rootTransform = mBoneTransforms.at(bonesBegin);
             rootTransform = InterpolateTransform(bonesBegin, elapsedTime);
 
-            const auto& parentMap = animation.GetParentMapping();
             const uint32_t numTransforms = bonesEnd - bonesBegin;
-            for (BoneIndex boneIndex = bonesBegin; boneIndex < bonesEnd; ++transformNum)
+            for (uint32_t boneOffset = 0; boneOffset < numTransforms; ++boneOffset)
             {
-                Mat4& transform = animInstance.mBoneTransforms.at(transformNum);
-                const auto parentIndex = parentMap.at(transformNum);
-                const Mat4& parentTransform = animInstance.mBoneTransforms.at(parentIndex);
+                Mat4& transform = mBoneTransforms.at(bonesBegin + boneOffset);
+				
+                const BoneIndex parentIndex = animation.GetParentIndex(boneOffset);
+                const Mat4& parentTransform = mBoneTransforms.at(parentIndex);
 
-                transform = InterpolateTransform(transformNum, elapsedTime) * parentTransform;
+                transform = InterpolateTransform(boneOffset, elapsedTime) * parentTransform;
             }
         }
     }
@@ -50,10 +50,16 @@ namespace JonsEngine
 		const Animation& animation = mResourceManifest.GetAnimation(animationID);
 		const uint32_t numBonesForAnimation = animation.GetNumberOfBones();
 		
-		const BoneIndex begin = mBoneTransforms.size();
-		const BoneIndex end = begin + numBonesForAnimation;
-		mActiveAnimations.emplace_back(animationID, begin, end);
+		const BoneIndex firstIndex = mBoneTransforms.size();
 
+		// initialize instance transforms to bind pose transforms
+		const auto& bindPoseTransforms = animation.GetBindPoseTransforms();
+		mBoneTransforms.insert(mBoneTransforms.end(), bindPoseTransforms.begin(), bindPoseTransforms.end());
+
+		const BoneIndex lastIndex = firstIndex + numBonesForAnimation;
+		mActiveAnimations.emplace_back(animationID, firstIndex, lastIndex);
+
+		// map instance ID
         const AnimationInstanceID animInstanceID = IDGenerator<AnimationInstance>::GetNextID();
 		mInstanceMap.emplace(animInstanceID, mActiveAnimations.back());
 

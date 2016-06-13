@@ -35,8 +35,13 @@ namespace JonsEngine
         return mInverseRootMatrix;
     }
 
-    const Animation::ParentMap& Animation::GetParentMapping() const
+	const BoneIndex Animation::GetParentIndex(const BoneIndex bone) const
     {
-        return mParentMap;
+        return mParentMap.at(bone);
     }
+
+	const BoneTransforms& Animation::GetBindPoseTransforms() const
+	{
+		return mBindPoseTransforms;
+	}
 }

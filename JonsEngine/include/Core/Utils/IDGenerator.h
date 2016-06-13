@@ -5,6 +5,7 @@
 namespace JonsEngine
 {
     // note: not thread-safe, make one if needed
+	// note: does not keep track of active/inactive IDs, possible duplicates
     template <typename T>
     class IDGenerator
     {
