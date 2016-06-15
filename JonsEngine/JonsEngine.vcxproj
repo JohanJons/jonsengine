@@ -214,7 +214,7 @@
     <ClInclude Include="include\Core\Types.h" />
     <ClInclude Include="include\Core\Utils\Clock.hpp" />
     <ClInclude Include="include\Core\Utils\Error.h" />
-    <ClInclude Include="include\Core\Utils\IDGenerator.h" />
+    <ClInclude Include="include\Core\Utils\IDGenerator.hpp" />
     <ClInclude Include="include\Core\Utils\NonCopyable.h" />
     <ClInclude Include="include\Core\Utils\Time.h" />
     <ClInclude Include="include\Core\Utils\Timer.h" />

@@ -586,11 +586,11 @@
     <ClInclude Include="include\Renderer\RenderDefs.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Utils\IDGenerator.h">
-      <Filter>Header Files\Core\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="include\Resources\Bone.h">
       <Filter>Header Files\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\IDGenerator.hpp">
+      <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -268,7 +268,7 @@ namespace JonsEngine
 	void AddMesh(const AnimatedActor& actor, const Mat4& worldTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData)
 	{
 		const auto animInstanceID = actor.GetAnimationInstance();
-		const auto animBoneRange = animationUpdater.GetBoneRange(animInstanceID);
+		const auto& animBoneRange = animationUpdater.GetBoneRange(animInstanceID);
 		//const auto& boneData = AnimationUpdater.GetBoneData(animInstanceID);
 
 		// TODO

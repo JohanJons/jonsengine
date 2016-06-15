@@ -60,7 +60,7 @@ namespace JonsEngine
 		mActiveAnimations.emplace_back(animationID, firstIndex, lastIndex);
 
 		// map instance ID
-        const AnimationInstanceID animInstanceID = IDGenerator<AnimationInstance>::GetNextID();
+		const AnimationInstanceID animInstanceID = mInstanceIDGenerator.GenerateID();
 		mInstanceMap.emplace(animInstanceID, mActiveAnimations.back());
 
 		return animInstanceID;
@@ -71,7 +71,7 @@ namespace JonsEngine
         assert(animationInstance != INVALID_ANIMATION_INSTANCE_ID);
 
 		mInstanceMap.erase(animationInstance);
-		animationInstance = INVALID_ANIMATION_INSTANCE_ID;
+		mInstanceIDGenerator.UnregisterID(animationInstance);
 
 		// TODO: remove transforms, update indices
     }

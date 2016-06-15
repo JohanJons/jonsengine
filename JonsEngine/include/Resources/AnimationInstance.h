@@ -4,7 +4,7 @@
 #include "include/Resources/Bone.h"
 #include "include/Core/Utils/Time.h"
 #include "include/Core/Types.h"
-#include "include/Core/Utils/IDGenerator.h"
+#include "include/Core/Utils/IDGenerator.hpp"
 
 namespace JonsEngine
 {

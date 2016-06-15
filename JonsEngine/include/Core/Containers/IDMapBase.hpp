@@ -19,7 +19,7 @@ namespace JonsEngine
         typedef typename std::vector<Item>::iterator ItemIterator;
         typedef typename std::vector<Item>::const_iterator ConstItemIterator;
 
-        // this is admittedly rather unfortunate
+        // this is admittedly rather ugly...
         typedef ItemID ItemID;
         const static ItemID INVALID_ITEM_ID = 0;
 

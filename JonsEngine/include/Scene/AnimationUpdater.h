@@ -6,6 +6,7 @@
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/Types.h"
 #include "include/Core/Utils/Time.h"
+#include "include/Core/Utils/IDGenerator.hpp"
 
 #include <vector>
 #include <unordered_map>
@@ -37,6 +38,7 @@ namespace JonsEngine
 
 
         const ResourceManifest& mResourceManifest;
+		IDGenerator<AnimationInstance> mInstanceIDGenerator;
 
         AnimationInstances mActiveAnimations;
         AnimationInstanceMap mInstanceMap;
