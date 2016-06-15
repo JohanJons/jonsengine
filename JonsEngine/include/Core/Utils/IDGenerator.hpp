@@ -7,7 +7,7 @@
 
 namespace JonsEngine
 {
-	// note: max number of IDs registered at one time can be 65535
+    // note: max number of IDs registered at one time can be 65535
     template <typename T>
     class IDGenerator
     {
@@ -15,68 +15,62 @@ namespace JonsEngine
         typedef uint32_t ID;
         static constexpr ID INVALID_ID = 0;
 
-		IDGenerator();
+        IDGenerator();
 
-		ID GenerateID();
-		void UnregisterID(ID& id);
-        
-    
+        ID GenerateID();
+        void FreeID(ID& id);
+
+
     private:
-		// ID is a 32-bit uint which consists of two parts;
-		// - upper 16bit: version nr
-		// - lower 16bit: id counter
-		typedef uint16_t NUM_PART;
-		typedef uint16_t VERSION_PART;
+        // ID is a 32-bit uint which consists of two parts;
+        // - upper 16bit: id counter
+        // - lower 16bit: version number
+        typedef uint16_t NUM_PART;
+        typedef uint16_t VERSION_PART;
 
-		static constexpr NUM_PART mMaxNumRegisteredIDs = std::numeric_limits<NUM_PART>::max();
-
-		VERSION_PART GetIDVersion(const ID id) const;
+        static constexpr NUM_PART mMaxNumRegisteredIDs = std::numeric_limits<NUM_PART>::max();
 
 
-		NUM_PART mNumRegisteredIDs;
-		std::queue<ID> mFreeIDs;
-	};
+        NUM_PART mNumRegisteredIDs;
+        std::queue<ID> mFreeIDs;
+    };
 
 
-	template <typename T>
-	IDGenerator<T>::IDGenerator() : mNumRegisteredIDs(0)
-	{
-	}
+    template <typename T>
+    IDGenerator<T>::IDGenerator() : mNumRegisteredIDs(0)
+    {
+    }
 
-	template <typename T>
-	typename IDGenerator<T>::ID IDGenerator<T>::GenerateID()
-	{
-		if (!empty(mFreeIDs))
-		{
-			ID recycledID = mFreeIDs.front();
-			mFreeIDs.pop();
+    template <typename T>
+    typename IDGenerator<T>::ID IDGenerator<T>::GenerateID()
+    {
+        if (!empty(mFreeIDs))
+        {
+            ID recycledID = mFreeIDs.front();
+            mFreeIDs.pop();
 
-			const VERSION_PART oldVersion = GetIDVersion(recycledID);
-			const VERSION_PART newVersion = oldVersion + 1;
-			
-			return recycledID | (16 << newVersion);
-		}
-		else
-		{
-			// if we reach max number of IDs assigned at the same time
-			assert(mNumRegisteredIDs < mMaxNumRegisteredIDs);
+            const VERSION_PART oldVersion = static_cast<VERSION_PART>(recycledID);
+            const VERSION_PART newVersion = oldVersion + 1;
 
-			return static_cast<ID>(++mNumRegisteredIDs);
-		}
-	}
+            ID newID = recycledID & 0xFFFF0000;
+            newID += newVersion;
 
-	template <typename T>
-	void IDGenerator<T>::UnregisterID(typename IDGenerator<T>::ID& id)
-	{
-		mFreeIDs.push(id);
+            return newID;
+        }
+        else
+        {
+            // if we reach max number of IDs assigned at the same time
+            assert(mNumRegisteredIDs < mMaxNumRegisteredIDs);
 
-		id = INVALID_ID;
-	}
+            return static_cast<ID>(++mNumRegisteredIDs) << 16;
+        }
+    }
 
+    template <typename T>
+    void IDGenerator<T>::FreeID(typename IDGenerator<T>::ID& id)
+    {
+        mFreeIDs.push(id);
 
-	template <typename T>
-	typename IDGenerator<T>::VERSION_PART IDGenerator<T>::GetIDVersion(const ID id) const
-	{
-		return static_cast<ID>((id >> 16) & 0xFFFFFFFF);
-	}
+        id = INVALID_ID;
+    }
 }
