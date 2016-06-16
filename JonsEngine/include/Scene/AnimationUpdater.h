@@ -27,7 +27,7 @@ namespace JonsEngine
         void StopAnimation(AnimationInstanceID& animationInstance);
 
 		const BoneTransforms& GetBonedata() const;
-		const BoneIndexRange& GetBoneRange(const AnimationInstanceID animationInstance) const;
+		const BoneIndexRange& GetBoneRange(const AnimationInstanceID instanceID) const;
 
 
     private:
@@ -38,10 +38,10 @@ namespace JonsEngine
 
 
         const ResourceManifest& mResourceManifest;
-		IDGenerator<AnimationInstance> mInstanceIDGenerator;
+		IDGenerator32 mAnimInstanceIDGen;
 
         AnimationInstances mActiveAnimations;
-        AnimationInstanceMap mInstanceMap;
+        AnimationInstanceMap mAnimationInstanceMap;
 		BoneTransforms mBoneTransforms;
     };
 }

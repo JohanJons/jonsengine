@@ -19,6 +19,6 @@ namespace JonsEngine
         AnimationInstance(const AnimationID animationID, const Milliseconds timestamp, const BoneIndex begin, const BoneIndex end);
     };
 
-	typedef IDGenerator<AnimationInstance>::ID AnimationInstanceID;
-	static constexpr AnimationInstanceID INVALID_ANIMATION_INSTANCE_ID = IDGenerator<AnimationInstance>::INVALID_ID;
+	typedef IDGenerator32::ID AnimationInstanceID;
+	static constexpr AnimationInstanceID INVALID_ANIMATION_INSTANCE_ID = IDGenerator32::INVALID_ID;
 }

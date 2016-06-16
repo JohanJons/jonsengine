@@ -269,9 +269,6 @@ namespace JonsEngine
 	{
 		const auto animInstanceID = actor.GetAnimationInstance();
 		const auto& animBoneRange = animationUpdater.GetBoneRange(animInstanceID);
-		//const auto& boneData = AnimationUpdater.GetBoneData(animInstanceID);
-
-		// TODO
 
 		renderData.mMeshes.emplace_back(worldTransform, animBoneRange, materialIndex, materialTilingFactor, mesh);
 	}

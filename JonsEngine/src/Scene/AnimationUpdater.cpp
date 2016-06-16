@@ -60,20 +60,29 @@ namespace JonsEngine
 		mActiveAnimations.emplace_back(animationID, firstIndex, lastIndex);
 
 		// map instance ID
-		const AnimationInstanceID animInstanceID = mInstanceIDGenerator.GenerateID();
-		mInstanceMap.emplace(animInstanceID, mActiveAnimations.back());
+		const AnimationInstanceID animInstanceID = mAnimInstanceIDGen.GenerateID();
+		mAnimationInstanceMap.emplace(animInstanceID, mActiveAnimations.back());
 
 		return animInstanceID;
     }
 
-    void AnimationUpdater::StopAnimation(AnimationInstanceID& animationInstance)
+    void AnimationUpdater::StopAnimation(AnimationInstanceID& instanceID)
     {
-        assert(animationInstance != INVALID_ANIMATION_INSTANCE_ID);
+        assert(instanceID != INVALID_ANIMATION_INSTANCE_ID);
 
-		mInstanceMap.erase(animationInstance);
-		mInstanceIDGenerator.UnregisterID(animationInstance);
+		// copy bone range before deleting instance
+		const BoneIndexRange boneRange = mAnimationInstanceMap.at(instanceID).mBoneRange;
 
-		// TODO: remove transforms, update indices
+		mAnimationInstanceMap.erase(instanceID);
+		mAnimInstanceIDGen.FreeID(instanceID);
+
+		// remove transforms, update indices, etc
+		mBoneTransforms.erase(mBoneTransforms.begin() + boneRange.first, mBoneTransforms.begin() + boneRange.second);
+
+		for (AnimationInstance& animInstance : mActiveAnimations)
+		{
+			
+		}
     }
 
 
@@ -86,20 +95,13 @@ namespace JonsEngine
 	{
 		assert(animationInstance != INVALID_ANIMATION_INSTANCE_ID);
 
-		return mInstanceMap.at(animationInstance).mBoneRange;
+		return mAnimationInstanceMap.at(animationInstance).mBoneRange;
 	}
-
-    /*const AnimationUpdater::BoneTransforms& AnimationUpdater::GetBoneData(const AnimationInstanceID animationInstance) const
-    {
-        assert(animationInstance != INVALID_ANIMATION_INSTANCE_ID);
-
-        return mActiveAnimations.GetItem(animationInstance).mBoneTransforms;
-    }*/
 
 
     Mat4 AnimationUpdater::InterpolateTransform(const BoneIndex index, const Milliseconds elapsedTime)
     {
         // TODO
-        return Mat4();
+        return Mat4(1.0f);
     }
 }
