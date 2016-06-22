@@ -79,9 +79,14 @@ namespace JonsEngine
 		// remove transforms, update indices, etc
 		mBoneTransforms.erase(mBoneTransforms.begin() + boneRange.first, mBoneTransforms.begin() + boneRange.second);
 
+		const std::size_t numBonesRemoved = boneRange.second - boneRange.first;
 		for (AnimationInstance& animInstance : mActiveAnimations)
 		{
-			
+			if (animInstance.mBoneRange.first > boneRange.first)
+			{
+				animInstance.mBoneRange.first -= numBonesRemoved;
+				animInstance.mBoneRange.second -= numBonesRemoved;
+			}
 		}
     }
 

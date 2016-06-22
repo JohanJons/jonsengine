@@ -227,6 +227,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Context.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11DepthReductionPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11DirectionalLightPass.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11DynamicBuffer.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11FullscreenTrianglePass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11GBuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11IndexBuffer.h" />
@@ -242,6 +243,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Sampler.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Shadowmap.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11SkyboxPass.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11StaticBuffer.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11VertexBufferSet.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11VertexTransformPass.h" />

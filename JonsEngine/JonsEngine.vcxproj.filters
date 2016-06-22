@@ -592,6 +592,12 @@
     <ClInclude Include="include\Core\Utils\IDGenerator.hpp">
       <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11StaticBuffer.hpp">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11DynamicBuffer.hpp">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferPixel.hlsl">
