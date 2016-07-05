@@ -212,8 +212,9 @@ namespace JonsEngine
     {
         mNextAnimationID = IncrementID(mNextAnimationID);
         const Milliseconds animationDuration(animation.mDurationInMilliseconds);
+		const uint32_t numBones = animation.mBoneAnimations.size();
 
-        mAnimations.emplace(std::piecewise_construct, std::forward_as_tuple(mNextAnimationID), std::forward_as_tuple(animation.mName, animationDuration, animation.mInverseRootMatrix));
+        mAnimations.emplace(std::piecewise_construct, std::forward_as_tuple(mNextAnimationID), std::forward_as_tuple(animation.mName, animationDuration, numBones, animation.mInverseRootMatrix));
 
         return mNextAnimationID;
     }

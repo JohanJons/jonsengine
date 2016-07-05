@@ -331,8 +331,6 @@ namespace JonsAssetImporter
         boneWeights.resize(maxContainerSize);
 
         const uint32_t numBones = assimpMesh->mNumBones;
-        assert(numBones <= Animation::MAX_NUM_BONES);
-
         for (uint8_t boneIndex = 0; boneIndex < numBones; ++boneIndex)
         {
             const auto assimpBone = assimpMesh->mBones[boneIndex];
