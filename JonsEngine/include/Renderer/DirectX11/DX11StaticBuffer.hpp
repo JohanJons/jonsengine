@@ -1,6 +1,6 @@
 #pragma once
 
-#include "include/Renderer/DirectX11/DX11Buffer.h"
+#include "include/Renderer/DirectX11/DX11Buffer.hpp"
 #include "include/Core/Platform/Directx11.h"
 
 #include <vector>
@@ -16,7 +16,7 @@ namespace JonsEngine
     
     
     template <typename T>
-    DX11StaticBuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const BindFlag bindFlag, const std::vector<T>& data) : DX11Buffer<T>(device, context, bindFlag, data)
+    DX11StaticBuffer<T>::DX11StaticBuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const BindFlag bindFlag, const std::vector<T>& data) : DX11Buffer<T>(device, context, bindFlag, data)
     {
     }
 }

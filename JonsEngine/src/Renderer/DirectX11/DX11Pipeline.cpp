@@ -24,6 +24,7 @@ namespace JonsEngine
         mDepthStencilState(nullptr),
         mAdditiveBlending(nullptr),
 
+        mBoneTransformsBuffer(device, context, 123),
         mVertexTransformPass(device, context, meshMap),
         mAABBPass(device, context, mVertexTransformPass),
         mFullscreenTrianglePass(device, context),

@@ -18,19 +18,19 @@ namespace JonsEngine
         DX11Buffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::size_t bufferSizeInBytes);
 
         
-    private:
+    protected:
         D3D11_BUFFER_DESC GetBufferDesc(const std::size_t bufferSizeInBytes);
     
     
-        ID3D11BufferPtr mBuffer;
         ID3D11DeviceContextPtr mContext;
+        ID3D11BufferPtr mBuffer;
     };
     
     
     template <typename T, D3D11_USAGE usage, D3D11_BIND_FLAG bindFlag>
     DX11Buffer<T, usage, bindFlag>::DX11Buffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<T>& data) :
-        mBuffer(nullptr),
-        mContext(context)
+        mContext(context),
+        mBuffer(nullptr)
     {
         assert(!data.empty());
         

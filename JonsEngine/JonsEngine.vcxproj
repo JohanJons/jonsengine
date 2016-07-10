@@ -136,6 +136,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Context.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11DepthReductionPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11DirectionalLightPass.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11DynamicBuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11FullscreenTrianglePass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Gbuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11IndexBuffer.cpp" />
@@ -227,7 +228,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Context.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11DepthReductionPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11DirectionalLightPass.h" />
-    <ClInclude Include="include\Renderer\DirectX11\DX11DynamicBuffer.hpp" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11DynamicBuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11FullscreenTrianglePass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11GBuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11IndexBuffer.h" />

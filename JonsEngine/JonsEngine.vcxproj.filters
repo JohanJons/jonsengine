@@ -305,6 +305,9 @@
     <ClCompile Include="src\Renderer\RenderDefs.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11DynamicBuffer.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -595,7 +598,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11StaticBuffer.hpp">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DX11DynamicBuffer.hpp">
+    <ClInclude Include="include\Renderer\DirectX11\DX11DynamicBuffer.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
   </ItemGroup>
