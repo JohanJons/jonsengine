@@ -24,7 +24,7 @@ namespace JonsEngine
         mDepthStencilState(nullptr),
         mAdditiveBlending(nullptr),
 
-        mBoneTransformsBuffer(device, context, 123),
+        mBoneTransformsBuffer(device, context),
         mVertexTransformPass(device, context, meshMap),
         mAABBPass(device, context, mVertexTransformPass),
         mFullscreenTrianglePass(device, context),
@@ -109,6 +109,9 @@ namespace JonsEngine
 
     void DX11Pipeline::GeometryStage(const RenderQueue& renderQueue)
     {
+        // Send all bone transforms to GPU
+        mBoneTransformsBuffer.SetData(renderQueue.mRenderData.mBones);
+
         mGBuffer.BindForGeometryStage(mDSV);
 
 		// TEMP SOLUTION !!!
