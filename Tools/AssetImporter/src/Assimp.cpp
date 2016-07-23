@@ -327,6 +327,7 @@ namespace JonsAssetImporter
         // make sure containers are large enough as we will access indices directly when iterating the bones
         const uint32_t numVertices = assimpMesh->mNumVertices;
         const uint32_t maxContainerSize = numVertices * Animation::MAX_BONES_PER_VERTEX;
+		// TODO: this maybe overallocates memory?
         boneIndices.resize(maxContainerSize);
         boneWeights.resize(maxContainerSize);
 
@@ -424,47 +425,6 @@ namespace JonsAssetImporter
 
                     boneAnimation.mKeyframes.emplace_back(timestampMillisec, translateVector, rotationQuat);
                 }
-                /*aiNodeAnim* nodeAnimation = *(animation->mChannels + nodeKey);
-
-                // cant do scaling animations
-                assert(nodeAnimation->mNumScalingKeys == noAnimationKeysNum);
-
-                // if no rotation/translation, continue
-                if (nodeAnimation->mNumPositionKeys == nodeAnimation->mNumRotationKeys == noAnimationKeysNum)
-                continue;
-
-                const uint32_t nodeIndex = GetNodeIndex(model, nodeAnimation->mNodeName.C_Str());
-                assert(nodeIndex < model.mNodes.size());
-                // index outside range means we didnt find node --> crash
-
-                pkgAnimation.mBoneAnimations.at(nodeKey) = nodeIndex;
-                PackageBoneAnimation& pkgBoneAnimation = pkgAnimation.mBoneAnimations.back();
-
-                const uint32_t numPosKeys = nodeAnimation->mNumPositionKeys;
-                const uint32_t numRotkeys = nodeAnimation->mNumRotationKeys;
-                const uint32_t maxNumKeys = glm::max(nodeAnimation->mNumPositionKeys, nodeAnimation->mNumRotationKeys);
-                for (uint32_t key = 0; key < maxNumKeys; ++key)
-                {
-                // same pos/rot might be used for several pos/rot transforms
-
-                // position
-                const uint32_t posKey = key < numPosKeys ? key : numPosKeys - 1;
-                aiVectorKey* aiPos = nodeAnimation->mPositionKeys + posKey;
-                const Vec3 posVec = aiVec3ToJonsVec3(aiPos->mValue);
-                Mat4 transform = glm::translate(posVec);
-
-                // rotation
-                const uint32_t rotKey = key < numRotkeys ? key : numRotkeys - 1;
-                aiQuatKey* aiRot = nodeAnimation->mRotationKeys + rotKey;
-                const Quaternion rotQuat = aiQuatToJonsQuat(aiRot->mValue);
-                transform *= glm::toMat4(rotQuat);
-
-                const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime) / animation->mTicksPerSecond;
-                const uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
-
-                pkgBoneAnimation.mKeyframes.emplace_back(timestampMillisec, transform);
-                }
-                }*/
             }
         }
 

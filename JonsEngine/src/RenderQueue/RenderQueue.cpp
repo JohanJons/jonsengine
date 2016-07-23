@@ -14,7 +14,8 @@ namespace JonsEngine
         mDirectionalLights.clear();
         mPointLights.clear();
 
-        mRenderData.mMeshes.clear();
+        mRenderData.mStaticMeshes.clear();
+		mRenderData.mAnimatedMeshes.clear();
 		mRenderData.mMaterials.clear();
 		mRenderData.mBones.clear();
 

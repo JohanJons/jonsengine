@@ -110,7 +110,9 @@ namespace JonsEngine
     void DX11Pipeline::GeometryStage(const RenderQueue& renderQueue)
     {
         // Send all bone transforms to GPU
-        mBoneTransformsBuffer.SetData(renderQueue.mRenderData.mBones);
+		const bool hasBoneData = !renderQueue.mRenderData.mBones.empty();
+		if (hasBoneData)
+			mBoneTransformsBuffer.SetData(renderQueue.mRenderData.mBones);
 
         mGBuffer.BindForGeometryStage(mDSV);
 
@@ -120,7 +122,7 @@ namespace JonsEngine
 		const uint32_t staticEndIndex = renderQueue.mCamera.mStaticMeshesEnd;
 		for (uint32_t meshIndex = staticBeginIndex; meshIndex < staticEndIndex; ++meshIndex)
 		{
-			const RenderableMesh& mesh = renderQueue.mRenderData.mMeshes.at(meshIndex);
+			const RenderableMesh& mesh = renderQueue.mRenderData.mStaticMeshes.at(meshIndex);
 			assert(mesh.mMeshID != INVALID_DX11_MESH_ID);
 
 			bool hasDiffuseTexture = false, hasNormalTexture = false;

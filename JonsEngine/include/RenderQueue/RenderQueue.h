@@ -18,7 +18,8 @@ namespace JonsEngine
 
 		struct RenderData
 		{
-			RenderableMesh::ContainerType mMeshes;
+			RenderableMeshContainer mStaticMeshes;
+			RenderableMeshContainer mAnimatedMeshes;
 			RenderableMaterial::ContainerType mMaterials;
 			BoneTransforms mBones;
 		};

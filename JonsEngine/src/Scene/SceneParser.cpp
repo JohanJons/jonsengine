@@ -14,7 +14,7 @@ namespace JonsEngine
 
     template <typename ACTOR_ITER_TYPE, typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
 	void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator, const bool parseMaterials,
-		RenderQueue::RenderData& renderData, RenderableCollection& rangedMeshCollection, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
+		RenderQueue::RenderData& renderData, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
 
     template <typename VISIBILITY_RESULT_TYPE>
     bool DetermineIfAddAllMeshes(const EngineSettings::CullingStrategy cullingStrat, const VISIBILITY_RESULT_TYPE visibilityResult);
@@ -25,16 +25,13 @@ namespace JonsEngine
 
 	template <typename ACTOR_TYPE>
 	void AddAllMeshes(const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix, const bool parseMaterials, const AnimationUpdater& AnimationUpdater, const ResourceManifest& resManifest,
-		RenderQueue::RenderData& renderData, RenderableCollection& rangedMeshCollection);
+		RenderQueue::RenderData& renderData);
 
 	template <typename ACTOR_TYPE>
     void AddMesh(const ACTOR_TYPE& actor, const Mat4& worldTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData);
 
 	template <typename ACTOR_TYPE>
 	RenderableMaterial::Index ParseMaterial(const ACTOR_TYPE& actor, const Mesh& mesh, const bool parseMaterial, const ResourceManifest& resManifest, RenderableMaterial::ContainerType& materialContainer);
-
-	template <typename ACTOR_TYPE>
-	void AddMeshRange(const RenderableMesh::Index startIndex, const RenderableMesh::Index endIndex, RenderableCollection& rangedMeshCollection);
 
 
     SceneParser::SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest) : mResourceManifest(resManifest), mCullingStrategy(engineSettings.mSceneCullingStrategy)
@@ -76,12 +73,18 @@ namespace JonsEngine
 		mRenderQueue.mCamera.mCameraProjectionMatrix = projMatrix;
         mRenderQueue.mCamera.mCameraViewProjectionMatrix = projMatrix * viewMatrix;
 
+		mRenderQueue.mCamera.mStaticMeshesBegin = mRenderQueue.mRenderData.mStaticMeshes.size();
+		mRenderQueue.mCamera.mAnimatedMeshesBegin = mRenderQueue.mRenderData.mAnimatedMeshes.size();
+
         const auto staticActors = scene.GetStaticActors();
         const auto animatedActors = scene.GetAnimatedActors();
 		const bool parseMaterials = true;
 
-        CullActors<decltype(staticActors)>(scene, mResourceManifest, mCullingStrategy, staticActors, parseMaterials, mRenderQueue.mRenderData, mRenderQueue.mCamera, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
-        CullActors<decltype(animatedActors)>(scene, mResourceManifest, mCullingStrategy, animatedActors, parseMaterials, mRenderQueue.mRenderData, mRenderQueue.mCamera, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
+        CullActors<decltype(staticActors)>(scene, mResourceManifest, mCullingStrategy, staticActors, parseMaterials, mRenderQueue.mRenderData, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
+        CullActors<decltype(animatedActors)>(scene, mResourceManifest, mCullingStrategy, animatedActors, parseMaterials, mRenderQueue.mRenderData, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
+
+		mRenderQueue.mCamera.mStaticMeshesEnd =  mRenderQueue.mRenderData.mStaticMeshes.size();
+		mRenderQueue.mCamera.mAnimatedMeshesEnd = mRenderQueue.mRenderData.mAnimatedMeshes.size();
     }
 
     void SceneParser::PointLightCulling(const Scene& scene)
@@ -103,11 +106,17 @@ namespace JonsEngine
             mRenderQueue.mPointLights.emplace_back(color, position, intensity, radius);
             RenderablePointLight& renderablePointLight = mRenderQueue.mPointLights.back();
 
+			renderablePointLight.mStaticMeshesBegin = mRenderQueue.mRenderData.mStaticMeshes.size();
+			renderablePointLight.mAnimatedMeshesBegin = mRenderQueue.mRenderData.mAnimatedMeshes.size();
+
 			// dont need materials for shadowmapping
 			const bool parseMaterials = false;
 
-            CullActors<decltype(staticActors)>(scene, mResourceManifest, mCullingStrategy, staticActors, parseMaterials, mRenderQueue.mRenderData, renderablePointLight, PointLightCull, position, radius);
-            CullActors<decltype(animatedActors)>(scene, mResourceManifest, mCullingStrategy, animatedActors, parseMaterials, mRenderQueue.mRenderData, renderablePointLight, PointLightCull, position, radius);
+            CullActors<decltype(staticActors)>(scene, mResourceManifest, mCullingStrategy, staticActors, parseMaterials, mRenderQueue.mRenderData, PointLightCull, position, radius);
+            CullActors<decltype(animatedActors)>(scene, mResourceManifest, mCullingStrategy, animatedActors, parseMaterials, mRenderQueue.mRenderData, PointLightCull, position, radius);
+
+			renderablePointLight.mStaticMeshesEnd = mRenderQueue.mRenderData.mStaticMeshes.size();
+			renderablePointLight.mAnimatedMeshesEnd = mRenderQueue.mRenderData.mAnimatedMeshes.size();
         }
     }
 
@@ -133,10 +142,16 @@ namespace JonsEngine
 				cascade.mNearZ = nearZ;
 				cascade.mFarZ = farZ;
 
+				cascade.mStaticMeshesBegin = mRenderQueue.mRenderData.mStaticMeshes.size();
+				cascade.mAnimatedMeshesBegin = mRenderQueue.mRenderData.mAnimatedMeshes.size();
+
                 const auto kdopIterator = dirLight.GetBoundingVolume(cascadeIndex);
 
-                CullActors<decltype(staticActors)>(scene, mResourceManifest, mCullingStrategy, staticActors, parseMaterials, mRenderQueue.mRenderData, cascade, DirectionalLightCull, kdopIterator);
-                CullActors<decltype(animatedActors)>(scene, mResourceManifest, mCullingStrategy, animatedActors, parseMaterials, mRenderQueue.mRenderData, cascade, DirectionalLightCull, kdopIterator);
+                CullActors<decltype(staticActors)>(scene, mResourceManifest, mCullingStrategy, staticActors, parseMaterials, mRenderQueue.mRenderData, DirectionalLightCull, kdopIterator);
+                CullActors<decltype(animatedActors)>(scene, mResourceManifest, mCullingStrategy, animatedActors, parseMaterials, mRenderQueue.mRenderData, DirectionalLightCull, kdopIterator);
+
+				cascade.mStaticMeshesEnd = mRenderQueue.mRenderData.mStaticMeshes.size();
+				cascade.mAnimatedMeshesEnd = mRenderQueue.mRenderData.mAnimatedMeshes.size();
             }
         }
     }
@@ -169,7 +184,7 @@ namespace JonsEngine
 
     template <typename ACTOR_ITER_TYPE, typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
     void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator, const bool parseMaterials,
-		RenderQueue::RenderData& renderData, RenderableCollection& rangedMeshCollection, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args)
+		RenderQueue::RenderData& renderData, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args)
     {
         const AnimationUpdater& animationUpdater = scene.GetAnimationUpdater();
 
@@ -189,7 +204,7 @@ namespace JonsEngine
             // TODO: extend with fine-grained culling, such as adding meshes per-node rather than per-model for AGGRESSIVE culling strategy,
             const bool addAllMeshes = DetermineIfAddAllMeshes(cullingStrat, visibilityResult);
             if (addAllMeshes)
-                AddAllMeshes(actor, model, worldMatrix, parseMaterials, animationUpdater, resManifest, renderData, rangedMeshCollection);
+                AddAllMeshes(actor, model, worldMatrix, parseMaterials, animationUpdater, resManifest, renderData);
         }
     }
 
@@ -234,10 +249,8 @@ namespace JonsEngine
 
 	template <typename ACTOR_TYPE>
 	void AddAllMeshes(const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix, const bool parseMaterials, const AnimationUpdater& animationUpdater, const ResourceManifest& resManifest,
-		RenderQueue::RenderData& renderData, RenderableCollection& rangedMeshCollection)
+		RenderQueue::RenderData& renderData)
 	{
-		const RenderableMesh::Index startIndex = renderData.mMeshes.size();
-
 		for (const ModelNode& node : model.GetNodes())
 		{
 			if (node.GetNumMeshes() == 0)
@@ -252,25 +265,27 @@ namespace JonsEngine
 				AddMesh(actor, worldMatrix, materialID, materialTilingFactor, meshID, animationUpdater, renderData);
 			}
 		}
-
-		const RenderableMesh::Index endIndex = renderData.mMeshes.size() - 1;
-		AddMeshRange<ACTOR_TYPE>(startIndex, endIndex, rangedMeshCollection);
 	}
 	
 
 	template <>
 	void AddMesh(const StaticActor& actor, const Mat4& worldTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData)
 	{
-		renderData.mMeshes.emplace_back(worldTransform, materialIndex, materialTilingFactor, mesh);
+		renderData.mStaticMeshes.emplace_back(worldTransform, materialIndex, materialTilingFactor, mesh);
 	}
 
 	template <>
 	void AddMesh(const AnimatedActor& actor, const Mat4& worldTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData)
 	{
-		const auto animInstanceID = actor.GetAnimationInstance();
-		const auto& animBoneRange = animationUpdater.GetBoneRange(animInstanceID);
+		if (actor.IsPlaying())
+		{
+			const auto animInstanceID = actor.GetAnimationInstance();
+			const auto& animBoneRange = animationUpdater.GetBoneRange(animInstanceID);
 
-		renderData.mMeshes.emplace_back(worldTransform, animBoneRange, materialIndex, materialTilingFactor, mesh);
+			renderData.mAnimatedMeshes.emplace_back(worldTransform, animBoneRange, materialIndex, materialTilingFactor, mesh);
+		}
+		else
+			renderData.mStaticMeshes.emplace_back(worldTransform, materialIndex, materialTilingFactor, mesh);
 	}
 
 
@@ -299,20 +314,5 @@ namespace JonsEngine
 		const RenderableMaterial::Index index = materialContainer.size() - 1;
 
 		return index;
-	}
-
-
-	template <>
-	void AddMeshRange<StaticActor>(const RenderableMesh::Index startIndex, const RenderableMesh::Index endIndex, RenderableCollection& rangedMeshCollection)
-	{
-		rangedMeshCollection.mStaticMeshesBegin = startIndex;
-		rangedMeshCollection.mStaticMeshesEnd = endIndex;
-	}
-
-	template <>
-	void AddMeshRange<AnimatedActor>(const RenderableMesh::Index startIndex, const RenderableMesh::Index endIndex, RenderableCollection& rangedMeshCollection)
-	{
-		rangedMeshCollection.mAnimatedMeshesBegin = startIndex;
-		rangedMeshCollection.mAnimatedMeshesEnd = endIndex;
 	}
 }

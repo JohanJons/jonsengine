@@ -10,18 +10,20 @@
 
 namespace JonsEngine
 {
-    struct RenderableMesh : RenderableContainer<RenderableMesh>
+	struct RenderableMesh : RenderableContainer<RenderableMesh>
     {
 		typedef RenderableMaterial::Index MaterialIndex;
 
-        RenderableMesh(const Mat4& worldTransform, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID);
+		RenderableMesh(const Mat4& worldTransform, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID);
 		RenderableMesh(const Mat4& worldTransform, const BoneIndexRange& boneRange, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID);
 
 
         Mat4 mWorldTransform;
-        RenderableSkeleton mSkeleton;
+		RenderableSkeleton mSkeleton;
 		MaterialIndex mMaterial;
         float mMaterialTilingFactor;
         DX11MeshID mMeshID;
     };
+
+	typedef RenderableMesh::ContainerType RenderableMeshContainer;
 }

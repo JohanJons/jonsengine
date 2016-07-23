@@ -11,9 +11,9 @@ namespace JonsEngine
         RenderableCollection();
 
 
-        MeshIndex mStaticMeshesBegin;
-        MeshIndex mStaticMeshesEnd;
-        MeshIndex mAnimatedMeshesBegin;
-        MeshIndex mAnimatedMeshesEnd;
+		MeshIndex mStaticMeshesBegin;
+		MeshIndex mStaticMeshesEnd;
+		MeshIndex mAnimatedMeshesBegin;
+		MeshIndex mAnimatedMeshesEnd;
     };
 }

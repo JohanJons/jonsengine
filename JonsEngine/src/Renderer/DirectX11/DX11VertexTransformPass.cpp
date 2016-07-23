@@ -55,7 +55,7 @@ namespace JonsEngine
 	{
 		for (uint32_t meshIndex = beginIndex; meshIndex < endIndex; ++meshIndex)
 		{
-			const RenderableMesh& mesh = renderData.mMeshes.at(meshIndex);
+			const RenderableMesh& mesh = renderData.mStaticMeshes.at(meshIndex);
 			mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mWorldTransform));
 			mMeshMap.GetItem(mesh.mMeshID).DrawPositions();
 		}
@@ -65,7 +65,7 @@ namespace JonsEngine
 	{
 		for (uint32_t meshIndex = beginIndex; meshIndex < endIndex; ++meshIndex)
 		{
-			const RenderableMesh& mesh = renderData.mMeshes.at(meshIndex);
+			const RenderableMesh& mesh = renderData.mStaticMeshes.at(meshIndex);
 			mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mWorldTransform));
 			mMeshMap.GetItem(mesh.mMeshID).DrawAABB();
 		}
