@@ -155,7 +155,7 @@ namespace JonsGame
     void Scene::PlayAnimationWuson()
     {
         AnimatedActor& animWuson = mScene.GetAnimatedActor(mActorAnimWuson);
-        animWuson.PlayAnimation(mActorAnimWuson, mAnimDurationWuson, false);
+        animWuson.PlayAnimation(mAnimWuson, mAnimDurationWuson, false);
     }
 
 

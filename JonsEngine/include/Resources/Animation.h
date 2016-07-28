@@ -20,11 +20,10 @@ namespace JonsEngine
     class Animation
     {
     public:
-        static const uint32_t MAX_NUM_BONES = 64;
+		typedef std::vector<BoneIndex> ParentMap;
         static const uint32_t MAX_BONES_PER_VERTEX = NUM_BONES_PER_VERTEX;
-        typedef std::array<BoneIndex, MAX_NUM_BONES> ParentMap;
 
-        Animation(const std::string& name, const Milliseconds duration, const uint32_t numBones, const Mat4& inverseRootMatrix);
+        Animation(const std::string& name, const Milliseconds duration, const BoneTransforms& boneTransforms, const Mat4& inverseRootMatrix, const ParentMap& parentMap);
         ~Animation();
 
         const std::string& GetName() const;
@@ -41,7 +40,7 @@ namespace JonsEngine
         Milliseconds mAnimationDuration;
 		uint32_t mNumBones;
         Mat4 mInverseRootMatrix;
-        ParentMap mParentMap;
+		ParentMap mParentMap;
 		BoneTransforms mBindPoseTransforms;
     };
 }

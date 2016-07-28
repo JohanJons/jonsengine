@@ -2,11 +2,12 @@
 
 namespace JonsEngine
 {
-    Animation::Animation(const std::string& name, const Milliseconds duration, const uint32_t numBones, const Mat4& inverseRootMatrix) :
+    Animation::Animation(const std::string& name, const Milliseconds duration, const BoneTransforms& boneTransforms, const Mat4& inverseRootMatrix, const ParentMap& parentMap) :
         mName(name),
         mAnimationDuration(duration),
-		mNumBones(numBones),
-        mInverseRootMatrix(inverseRootMatrix)
+		mNumBones(boneTransforms.size()),
+        mInverseRootMatrix(inverseRootMatrix),
+		mParentMap(parentMap)
     {
     }
     

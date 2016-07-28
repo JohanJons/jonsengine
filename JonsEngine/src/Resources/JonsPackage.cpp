@@ -90,27 +90,6 @@ namespace JonsEngine
     {
     }
 
-    PackageBoneKeyframe::PackageBoneKeyframe()
-    {
-    }
-
-    PackageBoneKeyframe::PackageBoneKeyframe(const uint32_t timestampMilliseconds, const Vec3& translation, const Quaternion& rotation) : 
-        mTimestampMilliseconds(timestampMilliseconds),
-        mTranslation(translation),
-        mRotation(rotation)
-    {
-    }
-
-    PackageBoneAnimation::PackageBoneAnimation() :
-        PackageBoneAnimation(PackageBone::INVALID_BONE_INDEX)
-    {
-    }
-
-    PackageBoneAnimation::PackageBoneAnimation(const PackageBone::BoneIndex boneIndex) :
-        mBoneIndex(boneIndex)
-    {
-    }
-
     PackageAnimation::PackageAnimation()
     {
     }
