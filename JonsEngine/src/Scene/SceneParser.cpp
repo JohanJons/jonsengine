@@ -160,7 +160,7 @@ namespace JonsEngine
 	{
 		const AnimationUpdater& animUpdater = scene.GetAnimationUpdater();
 		const BoneTransforms& bones = animUpdater.GetBonedata();
-		std::copy(bones.begin(), bones.end(), mRenderQueue.mRenderData.mBones.begin());
+		mRenderQueue.mRenderData.mBones.insert(mRenderQueue.mRenderData.mBones.begin(), bones.begin(), bones.end());
 	}
 
 	void SceneParser::GetSkybox(const Scene& scene)

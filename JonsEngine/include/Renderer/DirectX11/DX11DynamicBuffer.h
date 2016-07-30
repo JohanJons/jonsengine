@@ -66,10 +66,12 @@ namespace JonsEngine
 
         D3D11_BUFFER_DESC bufferDescription;
         ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
-        bufferDescription.Usage = D3D11_USAGE_DEFAULT;
+        bufferDescription.Usage = D3D11_USAGE_DYNAMIC;
         bufferDescription.ByteWidth = newSizeInBytes;
-        bufferDescription.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+		bufferDescription.StructureByteStride = sizeof(T);
+        bufferDescription.BindFlags = D3D11_BIND_SHADER_RESOURCE;
         bufferDescription.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		bufferDescription.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
         DXCALL(mDevice->CreateBuffer(&bufferDescription, &initialData, &mBuffer));
 
         DXCALL(mDevice->CreateShaderResourceView(mBuffer, nullptr, &mBufferSRV));

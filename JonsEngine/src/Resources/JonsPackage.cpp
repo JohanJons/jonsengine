@@ -83,10 +83,10 @@ namespace JonsEngine
     {
     }
 
-    PackageNode::PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex) :
-        mName(name),
-        mNodeIndex(nodeIndex),
-        mParentNodeIndex(parentNodeIndex)
+	PackageNode::PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex) :
+		mName(name),
+		mNodeIndex(nodeIndex),
+		mParentNodeIndex(parentNodeIndex)
     {
     }
 
@@ -97,7 +97,9 @@ namespace JonsEngine
     PackageAnimation::PackageAnimation(const std::string& name, const Mat4& invRootMatrix, const uint32_t durationInMilliseconds) :
         mName(name),
         mInverseRootMatrix(mInverseRootMatrix),
-        mDurationInMilliseconds(durationInMilliseconds)
+        mDurationInMilliseconds(durationInMilliseconds),
+		mBoneParentMap(),
+		mBoneAnimations()
     {
     }
 

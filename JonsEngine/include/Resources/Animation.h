@@ -4,6 +4,7 @@
 #include "include/Core/Types.h"
 #include "include/Core/Math/Math.h"
 #include "include/Resources/Bone.h"
+#include "include/Resources/BoneAnimation.h"
 #include "include/Renderer/DirectX11/Shaders/Constants.h"
 
 #include <string>
@@ -20,27 +21,25 @@ namespace JonsEngine
     class Animation
     {
     public:
-		typedef std::vector<BoneIndex> ParentMap;
         static const uint32_t MAX_BONES_PER_VERTEX = NUM_BONES_PER_VERTEX;
 
-        Animation(const std::string& name, const Milliseconds duration, const BoneTransforms& boneTransforms, const Mat4& inverseRootMatrix, const ParentMap& parentMap);
+        Animation(const std::string& name, const Milliseconds duration, const BoneAnimationContainer& boneAnimations, const BoneParentMap& parentMap, const Mat4& inverseRootMatrix);
         ~Animation();
 
         const std::string& GetName() const;
         Milliseconds GetAnimationDuration() const;
 		uint32_t GetNumberOfBones() const;
 
+		const BoneIndex GetParentIndex(const BoneIndex bone) const;
         const Mat4& GetInverseRootMatrix() const;
-        const BoneIndex GetParentIndex(const BoneIndex bone) const;
-		const BoneTransforms& GetBindPoseTransforms() const;
+		Mat4 InterpolateBoneTransform(const Mat4& currentTransform, const BoneIndex bone, const Milliseconds elapsedTime) const;
 
 
     private:
         std::string mName;
         Milliseconds mAnimationDuration;
-		uint32_t mNumBones;
         Mat4 mInverseRootMatrix;
-		ParentMap mParentMap;
-		BoneTransforms mBindPoseTransforms;
+		BoneParentMap mParentMap;
+		BoneAnimationContainer mBoneAnimations;
     };
 }

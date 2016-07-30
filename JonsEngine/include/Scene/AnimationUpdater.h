@@ -34,8 +34,6 @@ namespace JonsEngine
         typedef std::vector<AnimationInstance> AnimationInstances;
         typedef std::unordered_map<AnimationInstanceID, AnimationInstance&> AnimationInstanceMap;
 
-        Mat4 InterpolateTransform(const BoneIndex index, const Milliseconds elapsedTime);
-
 
         const ResourceManifest& mResourceManifest;
 		IDGenerator32 mAnimInstanceIDGen;

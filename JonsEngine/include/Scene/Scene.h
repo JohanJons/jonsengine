@@ -91,6 +91,7 @@ namespace JonsEngine
         void UpdateDirtyObjects();
         void UpdateDirLightSplitRanges(const float cameraFov, const float windowAspectRatio);
         void UpdateAnimatedActors(const Milliseconds elapsedTime);
+		void UpdateBoneTransforms(const Milliseconds elapsedTime);
 
 
         DX11Renderer& mRenderer;

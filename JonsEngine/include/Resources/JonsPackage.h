@@ -142,7 +142,8 @@ namespace JonsEngine
         std::string mName;
         Mat4 mInverseRootMatrix;
         uint32_t mDurationInMilliseconds;
-        std::vector<BoneAnimation> mBoneAnimations;
+		BoneParentMap mBoneParentMap;
+		BoneAnimationContainer mBoneAnimations;
 
 
         PackageAnimation();

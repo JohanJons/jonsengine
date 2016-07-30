@@ -32,6 +32,7 @@ namespace JonsEngine
         UpdateDirtyObjects();
         UpdateDirLightSplitRanges(cameraFov, windowAspectRatio);
         UpdateAnimatedActors(elapsedTime);
+		UpdateBoneTransforms(elapsedTime);
     }
 
 
@@ -292,4 +293,9 @@ namespace JonsEngine
             actor.UpdateTimestamp(elapsedTime);
         }
     }
+
+	void Scene::UpdateBoneTransforms(const Milliseconds elapsedTime)
+	{
+		mAnimationUpdater.Update(elapsedTime);
+	}
 }

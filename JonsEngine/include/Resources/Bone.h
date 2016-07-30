@@ -12,6 +12,7 @@ namespace JonsEngine
 	typedef std::vector<Bone> BoneTransforms;
 	typedef BoneTransforms::size_type BoneIndex;
 	static constexpr BoneIndex INVALID_BONE_INDEX = std::numeric_limits<BoneIndex>::max();
+	typedef std::vector<BoneIndex> BoneParentMap;
 	// the range is [begin, end)
 	typedef std::pair<BoneIndex, BoneIndex> BoneIndexRange;
 }

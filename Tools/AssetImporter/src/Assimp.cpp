@@ -397,7 +397,7 @@ namespace JonsAssetImporter
 
                 const auto boneIndex = GetBoneIndex(model, nodeAnimation->mNodeName.C_Str());
                 pkgAnimation.mBoneAnimations.emplace_back(boneIndex);
-                PackageBoneAnimation& boneAnimation = pkgAnimation.mBoneAnimations.back();
+                BoneAnimation& boneAnimation = pkgAnimation.mBoneAnimations.back();
 
                 const uint32_t numPosKeys = nodeAnimation->mNumPositionKeys;
                 const uint32_t numRotkeys = nodeAnimation->mNumRotationKeys;
