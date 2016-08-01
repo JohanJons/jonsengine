@@ -23,7 +23,7 @@ namespace JonsAssetImporter
     bool UsedLessThanMaxNumBones(const std::vector<float>& boneWeights, const uint32_t offset);
     PackageNode::NodeIndex FindSkeletonRootNode(const aiMesh* assimpMesh, const std::vector<PackageNode>& nodes);
     const aiMesh* FindAssimpMesh(const std::string& meshName, const aiScene* scene);
-    void GetNodeDistanceFromRoot(const std::string& name, const std::vector<PackageNode>& nodes, uint32_t& distFromRoot, PackageNode::NodeIndex& nodeIndex);
+    void GetNodeDistanceFromRoot(const std::string& name, const std::vector<PackageNode>& nodes, uint32_t& distFromRoot, PackageNode::NodeIndex& rootIndex);
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
     Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
@@ -163,7 +163,7 @@ namespace JonsAssetImporter
         if (!ProcessNode(model.mNodes, model.mMeshes, scene, scene->mRootNode, rootParentIndex))
             return false;
             
-        if (!ProcessBones(model.mSkeleton, model.mNodes, model.mMeshes, scene))
+        if (!ProcessBones(model.mSkeleton, model.mMeshes, model.mNodes, scene))
             return false;
 
         return true;
@@ -313,9 +313,9 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool ProcessBones(std::vector<PackageBone>& bones, const std::vector<PackageNode>& nodes, const std::vector<PackageMesh>& meshes, const aiScene* scene)
+    bool Assimp::ProcessBones(std::vector<PackageBone>& bones, std::vector<PackageMesh>& meshes, const std::vector<PackageNode>& nodes, const aiScene* scene)
     {
-        for (const auto& pkgMesh : meshes)
+        for (auto& pkgMesh : meshes)
         {
             const aiMesh* assimpMesh = FindAssimpMesh(pkgMesh.mName, scene);
             assert(assimpMesh);
@@ -326,8 +326,16 @@ namespace JonsAssetImporter
             
             const PackageNode::NodeIndex rootNodeIndex = FindSkeletonRootNode(assimpMesh, nodes);
             assert(rootNodeIndex != PackageNode::INVALID_NODE_INDEX);
-            
-            
+			const PackageNode& rootNode = nodes.at(rootNodeIndex);
+
+			pkgMesh.mStartBoneIndex = bones.size();
+			bones.emplace_back(rootNode.mName, gIdentityMatrix);
+			for (uint32_t boneNum = 0; boneNum < assimpMesh->mNumBones; ++boneNum)
+			{
+				const auto bone = assimpMesh->mBones[boneNum];
+				bones.emplace_back(bone->mName.C_Str(), aiMat4ToJonsMat4(bone->mOffsetMatrix));
+			}
+			pkgMesh.mEndBoneIndex = bones.size();
         }
     
         return true;
@@ -618,7 +626,7 @@ namespace JonsAssetImporter
         uint32_t minDistance = largestNodeDistance;
         for (uint32_t boneNum = 0; boneNum < assimpMesh->mNumBones; ++boneNum)
         {
-            const aiBone* bone = *assimpMesh->mBones + boneNum;
+            const aiBone* bone = assimpMesh->mBones[boneNum];
             uint32_t distFromRoot = largestNodeDistance;
             PackageNode::NodeIndex nodeIndex = PackageNode::INVALID_NODE_INDEX;
             GetNodeDistanceFromRoot(bone->mName.C_Str(), nodes, distFromRoot, nodeIndex);
@@ -644,29 +652,29 @@ namespace JonsAssetImporter
         return nullptr;
     }
     
-    void GetNodeDistanceFromRoot(const std::string& name, const std::vector<PackageNode>& nodes, uint32_t& distFromRoot, PackageNode::NodeIndex& nodeIndex)
+    void GetNodeDistanceFromRoot(const std::string& name, const std::vector<PackageNode>& nodes, uint32_t& distFromRoot, PackageNode::NodeIndex& rootIndex)
     {
         // finds the PackageNode with the right name
-        PackageNode::NodeIndex node = PackageNode::INVALID_NODE_INDEX;
+        PackageNode::NodeIndex nodeIndex = PackageNode::INVALID_NODE_INDEX;
         for (const auto& pkgNode : nodes)
         {
             if (pkgNode.mName == name)
-                node = pkgNode.mNodeIndex;
+				nodeIndex = pkgNode.mNodeIndex;
         }
-        assert(node != PackageNode::INVALID_NODE_INDEX);
+        assert(nodeIndex != PackageNode::INVALID_NODE_INDEX);
         
         // backtracks to the root node and count steps
         uint32_t steps = 0;
-        while (node != PackageNode::INVALID_NODE_INDEX)
+        while (nodeIndex != PackageNode::INVALID_NODE_INDEX)
         {
-            const auto& parent = nodes.at(node);
-            node = parent.mNodeIndex;
+            const auto& node = nodes.at(nodeIndex);
+			nodeIndex = node.mParentNodeIndex;
             
             ++steps;
         };
         
         distFromRoot = steps;
-        nodeIndex = node;
+		rootIndex = nodeIndex;
     }
 
 
