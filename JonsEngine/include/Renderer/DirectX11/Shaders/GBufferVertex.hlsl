@@ -45,11 +45,16 @@ GBufferVSOut vs_main(GBufferVSIn input)
 {
     GBufferVSOut output = (GBufferVSOut)0;
 
+	output.mPosition = input.mPosition;
+	output.mNormal = input.mNormal;
+	output.mTangent = input.mTangent;
+	output.mBitangent = input.mBitangent;
+
     // temporary solution
     if (gIsAnimating)
     {
         for (uint boneNum = 0; boneNum < NUM_BONES_PER_VERTEX; ++boneNum)
-        {
+		{ 
             output.mPosition += ApplyBone(input.mPosition, input.mBoneIndices, input.mBoneWeights, boneNum);
             output.mNormal += ApplyBone(input.mNormal, input.mBoneIndices, input.mBoneWeights, boneNum);
 
@@ -59,13 +64,6 @@ GBufferVSOut vs_main(GBufferVSIn input)
                 output.mBitangent += ApplyBone(input.mBitangent, input.mBoneIndices, input.mBoneWeights, boneNum);
             }
         }
-    }
-    else
-    {
-        output.mPosition = input.mPosition;
-        output.mNormal = input.mNormal;
-        output.mTangent = input.mTangent;
-        output.mBitangent = input.mBitangent;
     }
         
     output.mPosition = mul(gWVPMatrix, output.mPosition);

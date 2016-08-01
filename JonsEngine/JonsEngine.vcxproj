@@ -136,6 +136,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Context.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11DepthReductionPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11DirectionalLightPass.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11DynamicBuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11FullscreenTrianglePass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Gbuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11IndexBuffer.cpp" />
@@ -166,6 +167,8 @@
     <ClCompile Include="src\RenderQueue\RenderQueue.cpp" />
     <ClCompile Include="src\Resources\Animation.cpp" />
     <ClCompile Include="src\Resources\AnimationInstance.cpp" />
+    <ClCompile Include="src\Resources\BoneAnimation.cpp" />
+    <ClCompile Include="src\Resources\BoneKeyframe.cpp" />
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
     <ClCompile Include="src\Resources\Material.cpp" />
     <ClCompile Include="src\Resources\Mesh.cpp" />
@@ -227,7 +230,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Context.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11DepthReductionPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11DirectionalLightPass.h" />
-    <ClInclude Include="include\Renderer\DirectX11\DX11DynamicBuffer.hpp" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11DynamicBuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11FullscreenTrianglePass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11GBuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11IndexBuffer.h" />
@@ -264,6 +267,8 @@
     <ClInclude Include="include\Resources\Animation.h" />
     <ClInclude Include="include\Resources\AnimationInstance.h" />
     <ClInclude Include="include\Resources\Bone.h" />
+    <ClInclude Include="include\Resources\BoneAnimation.h" />
+    <ClInclude Include="include\Resources\BoneKeyframe.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />
     <ClInclude Include="include\Resources\Material.h" />
     <ClInclude Include="include\Resources\Mesh.h" />

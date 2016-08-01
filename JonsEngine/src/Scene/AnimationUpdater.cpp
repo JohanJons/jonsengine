@@ -27,17 +27,20 @@ namespace JonsEngine
             // root has no parent
             // note: root is always front
             Mat4& rootTransform = mBoneTransforms.at(bonesBegin);
-            rootTransform = InterpolateTransform(bonesBegin, elapsedTime);
+			animation.InterpolateBoneTransform(rootTransform, bonesBegin, elapsedTime);
 
             const uint32_t numTransforms = bonesEnd - bonesBegin;
-            for (uint32_t boneOffset = 0; boneOffset < numTransforms; ++boneOffset)
+            for (uint32_t boneOffset = 1; boneOffset < numTransforms; ++boneOffset)
             {
-                Mat4& transform = mBoneTransforms.at(bonesBegin + boneOffset);
-				
+				const BoneIndex bone = bonesBegin + boneOffset;
+
+                Mat4& transform = mBoneTransforms.at(bone);
+				animation.InterpolateBoneTransform(transform, bone, elapsedTime);
+
                 const BoneIndex parentIndex = animation.GetParentIndex(boneOffset);
                 const Mat4& parentTransform = mBoneTransforms.at(parentIndex);
 
-                transform = InterpolateTransform(boneOffset, elapsedTime) * parentTransform;
+				transform *= parentTransform;
             }
         }
     }
@@ -53,8 +56,10 @@ namespace JonsEngine
 		const BoneIndex firstIndex = mBoneTransforms.size();
 
 		// initialize instance transforms to bind pose transforms
-		const auto& bindPoseTransforms = animation.GetBindPoseTransforms();
-		mBoneTransforms.insert(mBoneTransforms.end(), bindPoseTransforms.begin(), bindPoseTransforms.end());
+		//const auto& bindPoseTransforms = animation.GetBindPoseTransforms();
+		//mBoneTransforms.insert(mBoneTransforms.end(), bindPoseTransforms.begin(), bindPoseTransforms.end());
+		// initialize instance transforms to identity transform
+		mBoneTransforms.insert(mBoneTransforms.end(), numBonesForAnimation, gIdentityMatrix);
 
 		const BoneIndex lastIndex = firstIndex + numBonesForAnimation;
 		mActiveAnimations.emplace_back(animationID, firstIndex, lastIndex);
@@ -102,11 +107,4 @@ namespace JonsEngine
 
 		return mAnimationInstanceMap.at(animationInstance).mBoneRange;
 	}
-
-
-    Mat4 AnimationUpdater::InterpolateTransform(const BoneIndex index, const Milliseconds elapsedTime)
-    {
-        // TODO
-        return Mat4(1.0f);
-    }
 }

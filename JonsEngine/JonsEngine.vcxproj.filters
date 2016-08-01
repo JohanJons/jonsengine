@@ -245,9 +245,6 @@
     <ClCompile Include="src\Resources\ModelNode.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Resources\Skybox.cpp">
-      <Filter>Source Files\Resources</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scene\BaseActor.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
@@ -304,6 +301,18 @@
     </ClCompile>
     <ClCompile Include="src\Renderer\RenderDefs.cpp">
       <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11DynamicBuffer.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\BoneAnimation.cpp">
+      <Filter>Source Files\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\BoneKeyframe.cpp">
+      <Filter>Source Files\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\Skybox.cpp">
+      <Filter>Source Files\Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -595,8 +604,14 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11StaticBuffer.hpp">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DX11DynamicBuffer.hpp">
+    <ClInclude Include="include\Renderer\DirectX11\DX11DynamicBuffer.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resources\BoneAnimation.h">
+      <Filter>Header Files\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resources\BoneKeyframe.h">
+      <Filter>Header Files\Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -338,12 +338,11 @@ namespace JonsAssetImporter
         // make sure containers are large enough as we will access indices directly when iterating the bones
         const uint32_t numVertices = assimpMesh->mNumVertices;
         const uint32_t maxContainerSize = numVertices * Animation::MAX_BONES_PER_VERTEX;
+		// TODO: this maybe overallocates memory?
         boneIndices.resize(maxContainerSize);
         boneWeights.resize(maxContainerSize);
 
         const uint32_t numBones = assimpMesh->mNumBones;
-        assert(numBones <= Animation::MAX_NUM_BONES);
-
         for (uint8_t boneIndex = 0; boneIndex < numBones; ++boneIndex)
         {
             const auto assimpBone = assimpMesh->mBones[boneIndex];
@@ -409,7 +408,7 @@ namespace JonsAssetImporter
 
                 const auto boneIndex = GetBoneIndex(model, nodeAnimation->mNodeName.C_Str());
                 pkgAnimation.mBoneAnimations.emplace_back(boneIndex);
-                PackageBoneAnimation& boneAnimation = pkgAnimation.mBoneAnimations.back();
+                BoneAnimation& boneAnimation = pkgAnimation.mBoneAnimations.back();
 
                 const uint32_t numPosKeys = nodeAnimation->mNumPositionKeys;
                 const uint32_t numRotkeys = nodeAnimation->mNumRotationKeys;

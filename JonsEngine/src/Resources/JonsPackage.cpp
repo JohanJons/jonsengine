@@ -83,31 +83,10 @@ namespace JonsEngine
     {
     }
 
-    PackageNode::PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex) :
-        mName(name),
-        mNodeIndex(nodeIndex),
-        mParentNodeIndex(parentNodeIndex)
-    {
-    }
-
-    PackageBoneKeyframe::PackageBoneKeyframe()
-    {
-    }
-
-    PackageBoneKeyframe::PackageBoneKeyframe(const uint32_t timestampMilliseconds, const Vec3& translation, const Quaternion& rotation) : 
-        mTimestampMilliseconds(timestampMilliseconds),
-        mTranslation(translation),
-        mRotation(rotation)
-    {
-    }
-
-    PackageBoneAnimation::PackageBoneAnimation() :
-        PackageBoneAnimation(PackageBone::INVALID_BONE_INDEX)
-    {
-    }
-
-    PackageBoneAnimation::PackageBoneAnimation(const PackageBone::BoneIndex boneIndex) :
-        mBoneIndex(boneIndex)
+	PackageNode::PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex) :
+		mName(name),
+		mNodeIndex(nodeIndex),
+		mParentNodeIndex(parentNodeIndex)
     {
     }
 
@@ -118,7 +97,9 @@ namespace JonsEngine
     PackageAnimation::PackageAnimation(const std::string& name, const Mat4& invRootMatrix, const uint32_t durationInMilliseconds) :
         mName(name),
         mInverseRootMatrix(mInverseRootMatrix),
-        mDurationInMilliseconds(durationInMilliseconds)
+        mDurationInMilliseconds(durationInMilliseconds),
+		mBoneParentMap(),
+		mBoneAnimations()
     {
     }
 

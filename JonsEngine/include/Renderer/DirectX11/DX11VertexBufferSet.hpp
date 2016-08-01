@@ -40,6 +40,7 @@ namespace JonsEngine
         AddVertexBuffers(device, args...);
     }
 
+
     template <typename... T_ARGS>
     void DX11VertexBufferSet::AddVertexBuffers(ID3D11DevicePtr device, T_ARGS&&... args)
     {

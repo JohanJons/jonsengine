@@ -3,6 +3,8 @@
 #include "include/Core/Types.h"
 #include "include/Core/Utils/Time.h"
 #include "include/Resources/Animation.h"
+#include "include/Resources/BoneAnimation.h"
+#include "include/Resources/BoneKeyframe.h"
 
 #include <array>
 #include <vector>
@@ -135,33 +137,13 @@ namespace JonsEngine
         PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex);
     };
 
-    struct PackageBoneKeyframe
-    {
-        uint32_t mTimestampMilliseconds;
-        Vec3 mTranslation;
-        Quaternion mRotation;
-
-
-        PackageBoneKeyframe();
-        PackageBoneKeyframe(const uint32_t timestampMilliseconds, const Vec3& translation, const Quaternion& rotation);
-    };
-
-    struct PackageBoneAnimation
-    {
-        PackageBone::BoneIndex mBoneIndex;
-        std::vector<PackageBoneKeyframe> mKeyframes;
-
-
-        PackageBoneAnimation();
-        PackageBoneAnimation(const PackageBone::BoneIndex boneIndex);
-    };
-
     struct PackageAnimation
     {
         std::string mName;
         Mat4 mInverseRootMatrix;
         uint32_t mDurationInMilliseconds;
-        std::vector<PackageBoneAnimation> mBoneAnimations;
+		BoneParentMap mBoneParentMap;
+		BoneAnimationContainer mBoneAnimations;
 
 
         PackageAnimation();
@@ -286,7 +268,7 @@ namespace boost
         }
 
         template<class Archive>
-        void serialize(Archive & ar, JonsEngine::PackageBoneKeyframe& keyframe, const unsigned int version)
+        void serialize(Archive & ar, JonsEngine::BoneKeyframe& keyframe, const unsigned int version)
         {
             ar & keyframe.mTimestampMilliseconds;
             ar & keyframe.mTranslation;
@@ -294,7 +276,7 @@ namespace boost
         }
 
         template<class Archive>
-        void serialize(Archive & ar, JonsEngine::PackageBoneAnimation& boneAnimation, const unsigned int version)
+        void serialize(Archive & ar, JonsEngine::BoneAnimation& boneAnimation, const unsigned int version)
         {
             ar & boneAnimation.mBoneIndex;
             ar & boneAnimation.mKeyframes;

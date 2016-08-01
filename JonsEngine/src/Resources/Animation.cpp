@@ -2,11 +2,12 @@
 
 namespace JonsEngine
 {
-    Animation::Animation(const std::string& name, const Milliseconds duration, const uint32_t numBones, const Mat4& inverseRootMatrix) :
+    Animation::Animation(const std::string& name, const Milliseconds duration, const BoneAnimationContainer& boneAnimations, const BoneParentMap& parentMap, const Mat4& inverseRootMatrix) :
         mName(name),
         mAnimationDuration(duration),
-		mNumBones(numBones),
-        mInverseRootMatrix(inverseRootMatrix)
+        mInverseRootMatrix(inverseRootMatrix),
+		mParentMap(parentMap),
+		mBoneAnimations(boneAnimations)
     {
     }
     
@@ -27,7 +28,13 @@ namespace JonsEngine
 
 	uint32_t Animation::GetNumberOfBones() const
 	{
-		return mNumBones;
+		return mBoneAnimations.size();
+	}
+
+
+	const BoneIndex Animation::GetParentIndex(const BoneIndex bone) const
+	{
+		return mParentMap.at(bone);
 	}
 
     const Mat4& Animation::GetInverseRootMatrix() const
@@ -35,13 +42,10 @@ namespace JonsEngine
         return mInverseRootMatrix;
     }
 
-	const BoneIndex Animation::GetParentIndex(const BoneIndex bone) const
-    {
-        return mParentMap.at(bone);
-    }
-
-	const BoneTransforms& Animation::GetBindPoseTransforms() const
+	Mat4 Animation::InterpolateBoneTransform(const Mat4& currentTransform, const BoneIndex bone, const Milliseconds elapsedTime) const
 	{
-		return mBindPoseTransforms;
+		const BoneAnimation& boneAnimation = mBoneAnimations.at(bone);
+
+		return gIdentityMatrix;
 	}
 }
