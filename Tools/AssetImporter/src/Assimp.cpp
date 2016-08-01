@@ -21,6 +21,9 @@ namespace JonsAssetImporter
     PackageBone::BoneIndex GetBoneIndex(const PackageModel& model, const std::string& boneName);
     uint32_t CountChildren(const aiNode* node);
     bool UsedLessThanMaxNumBones(const std::vector<float>& boneWeights, const uint32_t offset);
+    PackageNode::NodeIndex FindSkeletonRootNode(const aiMesh* assimpMesh, const std::vector<PackageNode>& nodes);
+    const aiMesh* FindAssimpMesh(const std::string& meshName, const aiScene* scene);
+    void GetNodeDistanceFromRoot(const std::string& name, const std::vector<PackageNode>& nodes, uint32_t& distFromRoot, PackageNode::NodeIndex& nodeIndex);
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
     Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
@@ -159,6 +162,9 @@ namespace JonsAssetImporter
         const auto rootParentIndex = PackageNode::INVALID_NODE_INDEX;
         if (!ProcessNode(model.mNodes, model.mMeshes, scene, scene->mRootNode, rootParentIndex))
             return false;
+            
+        if (!ProcessBones(model.mSkeleton, model.mNodes, model.mMeshes, scene))
+            return false;
 
         return true;
     }
@@ -215,9 +221,6 @@ namespace JonsAssetImporter
             PackageMesh& jonsMesh = meshContainer.back();
 
             if (!ProcessMeshGeometricData(jonsMesh, assimpMesh, scene, meshIndex))
-                return false;
-
-            if (!ProcessBones(skeleton, assimpMesh))
                 return false;
 
             // bone weights
@@ -310,15 +313,23 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessBones(std::vector<JonsEngine::PackageBone>& skeleton, const aiMesh* assimpMesh)
+    bool ProcessBones(std::vector<PackageBone>& bones, const std::vector<PackageNode>& nodes, const std::vector<PackageMesh>& meshes, const aiScene* scene)
     {
-        const uint32_t numBones = assimpMesh->mNumBones;
-        for (uint32_t index = 0; index < numBones; ++index)
+        for (const auto& pkgMesh : meshes)
         {
-            const auto bone = assimpMesh->mBones[index];
-            skeleton.emplace_back(bone->mName.C_Str(), aiMat4ToJonsMat4(bone->mOffsetMatrix));
+            const aiMesh* assimpMesh = FindAssimpMesh(pkgMesh.mName, scene);
+            assert(assimpMesh);
+        
+            const bool hasSkeleton = assimpMesh->mNumBones > 0;
+            if (!hasSkeleton)
+                continue;
+            
+            const PackageNode::NodeIndex rootNodeIndex = FindSkeletonRootNode(assimpMesh, nodes);
+            assert(rootNodeIndex != PackageNode::INVALID_NODE_INDEX);
+            
+            
         }
-
+    
         return true;
     }
 
@@ -426,47 +437,6 @@ namespace JonsAssetImporter
 
                     boneAnimation.mKeyframes.emplace_back(timestampMillisec, translateVector, rotationQuat);
                 }
-                /*aiNodeAnim* nodeAnimation = *(animation->mChannels + nodeKey);
-
-                // cant do scaling animations
-                assert(nodeAnimation->mNumScalingKeys == noAnimationKeysNum);
-
-                // if no rotation/translation, continue
-                if (nodeAnimation->mNumPositionKeys == nodeAnimation->mNumRotationKeys == noAnimationKeysNum)
-                continue;
-
-                const uint32_t nodeIndex = GetNodeIndex(model, nodeAnimation->mNodeName.C_Str());
-                assert(nodeIndex < model.mNodes.size());
-                // index outside range means we didnt find node --> crash
-
-                pkgAnimation.mBoneAnimations.at(nodeKey) = nodeIndex;
-                PackageBoneAnimation& pkgBoneAnimation = pkgAnimation.mBoneAnimations.back();
-
-                const uint32_t numPosKeys = nodeAnimation->mNumPositionKeys;
-                const uint32_t numRotkeys = nodeAnimation->mNumRotationKeys;
-                const uint32_t maxNumKeys = glm::max(nodeAnimation->mNumPositionKeys, nodeAnimation->mNumRotationKeys);
-                for (uint32_t key = 0; key < maxNumKeys; ++key)
-                {
-                // same pos/rot might be used for several pos/rot transforms
-
-                // position
-                const uint32_t posKey = key < numPosKeys ? key : numPosKeys - 1;
-                aiVectorKey* aiPos = nodeAnimation->mPositionKeys + posKey;
-                const Vec3 posVec = aiVec3ToJonsVec3(aiPos->mValue);
-                Mat4 transform = glm::translate(posVec);
-
-                // rotation
-                const uint32_t rotKey = key < numRotkeys ? key : numRotkeys - 1;
-                aiQuatKey* aiRot = nodeAnimation->mRotationKeys + rotKey;
-                const Quaternion rotQuat = aiQuatToJonsQuat(aiRot->mValue);
-                transform *= glm::toMat4(rotQuat);
-
-                const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime) / animation->mTicksPerSecond;
-                const uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
-
-                pkgBoneAnimation.mKeyframes.emplace_back(timestampMillisec, transform);
-                }
-                }*/
             }
         }
 
@@ -637,6 +607,67 @@ namespace JonsAssetImporter
 
         // all indices used
         return false;
+    }
+    
+    PackageNode::NodeIndex FindSkeletonRootNode(const aiMesh* assimpMesh, const std::vector<PackageNode>& nodes)
+    {
+        assert(assimpMesh);
+        
+        const uint32_t largestNodeDistance = std::numeric_limits<uint32_t>::max();
+        
+        PackageNode::NodeIndex ret = PackageNode::INVALID_NODE_INDEX;
+        uint32_t minDistance = largestNodeDistance;
+        for (uint32_t boneNum = 0; boneNum < assimpMesh->mNumBones; ++boneNum)
+        {
+            const aiBone* bone = *assimpMesh->mBones + boneNum;
+            uint32_t distFromRoot = largestNodeDistance;
+            PackageNode::NodeIndex nodeIndex = PackageNode::INVALID_NODE_INDEX;
+            GetNodeDistanceFromRoot(bone->mName.C_Str(), nodes, distFromRoot, nodeIndex);
+            if (distFromRoot < minDistance)
+            {
+                minDistance = distFromRoot;
+                ret = nodeIndex;
+            }
+        }
+        
+        return ret;
+    }
+    
+    const aiMesh* FindAssimpMesh(const std::string& meshName, const aiScene* scene)
+    {
+        for (uint32_t meshNum = 0; meshNum < scene->mNumMeshes; ++meshNum)
+        {
+            const aiMesh* mesh = *scene->mMeshes + meshNum;
+            if (mesh->mName.C_Str() == meshName)
+                return mesh;
+        }
+        
+        return nullptr;
+    }
+    
+    void GetNodeDistanceFromRoot(const std::string& name, const std::vector<PackageNode>& nodes, uint32_t& distFromRoot, PackageNode::NodeIndex& nodeIndex)
+    {
+        // finds the PackageNode with the right name
+        PackageNode::NodeIndex node = PackageNode::INVALID_NODE_INDEX;
+        for (const auto& pkgNode : nodes)
+        {
+            if (pkgNode.mName == name)
+                node = pkgNode.mNodeIndex;
+        }
+        assert(node != PackageNode::INVALID_NODE_INDEX);
+        
+        // backtracks to the root node and count steps
+        uint32_t steps = 0;
+        while (node != PackageNode::INVALID_NODE_INDEX)
+        {
+            const auto& parent = nodes.at(node);
+            node = parent.mNodeIndex;
+            
+            ++steps;
+        };
+        
+        distFromRoot = steps;
+        nodeIndex = node;
     }
 
 
