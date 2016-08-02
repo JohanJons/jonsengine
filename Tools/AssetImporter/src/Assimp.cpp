@@ -17,7 +17,6 @@ namespace JonsAssetImporter
     bool OnlyOneNodePerMesh(const aiScene* scene);
     Mat4 GetMeshNodeTransform(const aiScene* scene, const aiNode* node, const uint32_t meshIndex, const Mat4& parentTransform);
     uint32_t CountMeshOccurances(const aiNode* node, const uint32_t aiMeshIndex, const bool recursive);
-    PackageNode::NodeIndex GetNodeIndex(const PackageModel& model, const std::string& nodeName);
     PackageBone::BoneIndex GetBoneIndex(const PackageModel& model, const std::string& boneName);
     uint32_t CountChildren(const aiNode* node);
     bool UsedLessThanMaxNumBones(const std::vector<float>& boneWeights, const uint32_t offset);
@@ -550,17 +549,6 @@ namespace JonsAssetImporter
         }
 
         return occurances;
-    }
-
-    PackageNode::NodeIndex GetNodeIndex(const std::vector<PackageNode>& nodes, const std::string& nodeName)
-    {
-        for (const PackageNode& node : nodes)
-        {
-            if (node.mName == nodeName)
-                return node.mNodeIndex;
-        }
-
-        return PackageNode::INVALID_NODE_INDEX;
     }
     
     PackageBone::BoneIndex GetBoneIndex(const PackageModel& model, const std::string& boneName)
