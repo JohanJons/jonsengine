@@ -623,7 +623,11 @@ namespace JonsAssetImporter
             }
         }
         
-        return scene->mRootNode->FindNode(rootNodeName);
+		// the parent of (one of) the top bones is the root of the skeleton
+		const aiNode* node = scene->mRootNode->FindNode(rootNodeName);
+		assert(node);
+
+        return node->mParent;
     }
     
     uint32_t GetNodeDistanceFromRoot(const aiString& name, const aiScene* scene)
