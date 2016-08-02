@@ -31,6 +31,8 @@ namespace JonsEngine
         Model(const Model& other);
         ~Model();
 
+		bool HasAnimations() const;
+
         MeshIterator GetMeshes() const;
         NodeIterator GetNodes() const;
         AnimationIterator GetAnimations() const;

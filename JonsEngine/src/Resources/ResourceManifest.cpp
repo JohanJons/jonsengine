@@ -141,15 +141,12 @@ namespace JonsEngine
         auto iter = FindInContainer<PackageMaterial>(assetName, jonsPkg->mMaterials);
         if (iter == jonsPkg->mMaterials.end())
             return INVALID_MATERIAL_ID;
-
         const PackageMaterial& pkgMaterial = *iter;
 
         DX11MaterialID diffuseTexture = INVALID_DX11_MATERIAL_ID;
         DX11MaterialID normalTexture  = INVALID_DX11_MATERIAL_ID;
-
         if (pkgMaterial.mHasDiffuseTexture)
         	diffuseTexture = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_DIFFUSE, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth, pkgMaterial.mDiffuseTexture.mTextureHeight);
-
         if (pkgMaterial.mHasNormalTexture)
             normalTexture = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_NORMAL, pkgMaterial.mNormalTexture.mTextureData, pkgMaterial.mNormalTexture.mTextureWidth, pkgMaterial.mNormalTexture.mTextureHeight);
 

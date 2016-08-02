@@ -40,7 +40,7 @@ namespace JonsEngine
                 const BoneIndex parentIndex = animation.GetParentIndex(boneOffset);
                 const Mat4& parentTransform = mBoneTransforms.at(parentIndex);
 
-				transform *= parentTransform;
+				transform = parentTransform * transform;
             }
         }
     }

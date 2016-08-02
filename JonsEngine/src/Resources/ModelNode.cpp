@@ -29,14 +29,31 @@ namespace JonsEngine
     //
 
     ModelNode::ModelNode(const PackageNode& pkgNode, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& childIter, const MeshIterator& meshIter, const NodeIterator& next) :
-        mName(pkgNode.mName), mNodeIndex(pkgNode.mNodeIndex), mLocalAABB(pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds), mNumMeshes(CountNumMeshes(meshIter)), mImmediateChildNodes(immChildIter), mAllChildNodes(childIter),
-        mMeshes(meshIter), mNext(next)
+        mName(pkgNode.mName),
+		mNodeIndex(pkgNode.mNodeIndex),
+		mLocalAABB(pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds),
+		mLocalTransform(pkgNode.mTransform),
+		mNumMeshes(CountNumMeshes(meshIter)),
+
+		mImmediateChildNodes(immChildIter),
+		mAllChildNodes(childIter),
+        mMeshes(meshIter),
+		mNext(next)
     {
     }
 
-    ModelNode::ModelNode(const std::string& name, const ModelNodeIndex nodeIndex, const Vec3& minBounds, const Vec3& maxBounds, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& allChildIter,
+    ModelNode::ModelNode(const std::string& name, const ModelNodeIndex nodeIndex, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& localTransform, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& allChildIter,
         const MeshIterator& meshIter, const NodeIterator& next) :
-        mName(name), mNodeIndex(nodeIndex), mLocalAABB(minBounds, maxBounds), mNumMeshes(CountNumMeshes(meshIter)), mImmediateChildNodes(immChildIter), mAllChildNodes(allChildIter), mMeshes(meshIter), mNext(next)
+        mName(name),
+		mNodeIndex(nodeIndex),
+		mLocalAABB(minBounds, maxBounds),
+		mLocalTransform(localTransform),
+		mNumMeshes(CountNumMeshes(meshIter)),
+		
+		mImmediateChildNodes(immChildIter),
+		mAllChildNodes(allChildIter),
+		mMeshes(meshIter),
+		mNext(next)
     {
     }
 
@@ -63,6 +80,11 @@ namespace JonsEngine
     {
         return mLocalAABB;
     }
+
+	const Mat4& ModelNode::GetLocalTransform() const
+	{
+		return mLocalTransform;
+	}
 
 
     ModelNode::MeshIterator ModelNode::GetMeshes() const

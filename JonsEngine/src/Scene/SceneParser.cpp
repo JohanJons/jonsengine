@@ -28,7 +28,7 @@ namespace JonsEngine
 		RenderQueue::RenderData& renderData);
 
 	template <typename ACTOR_TYPE>
-    void AddMesh(const ACTOR_TYPE& actor, const Mat4& worldTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData);
+    void AddMesh(const ACTOR_TYPE& actor, const Mat4& worldTransform, const Mat4& localTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData);
 
 	template <typename ACTOR_TYPE>
 	RenderableMaterial::Index ParseMaterial(const ACTOR_TYPE& actor, const Mesh& mesh, const bool parseMaterial, const ResourceManifest& resManifest, RenderableMaterial::ContainerType& materialContainer);
@@ -261,31 +261,39 @@ namespace JonsEngine
 				const RenderableMaterial::Index materialID = ParseMaterial(actor, mesh, parseMaterials, resManifest, renderData.mMaterials);
 				const float materialTilingFactor = actor.GetMaterialTilingFactor();
 				const DX11MeshID meshID = mesh.GetMesh();
+				const Mat4& localTransform = node.GetLocalTransform();
 
-				AddMesh(actor, worldMatrix, materialID, materialTilingFactor, meshID, animationUpdater, renderData);
+				AddMesh(actor, worldMatrix, localTransform, materialID, materialTilingFactor, meshID, animationUpdater, renderData);
 			}
 		}
 	}
 	
 
 	template <>
-	void AddMesh(const StaticActor& actor, const Mat4& worldTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData)
+	void AddMesh(const StaticActor& actor, const Mat4& worldTransform, const Mat4& localTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData)
 	{
-		renderData.mStaticMeshes.emplace_back(worldTransform, materialIndex, materialTilingFactor, mesh);
+		const Mat4 localWorldTransform = worldTransform * localTransform;
+
+		renderData.mStaticMeshes.emplace_back(localWorldTransform, materialIndex, materialTilingFactor, mesh);
 	}
 
 	template <>
-	void AddMesh(const AnimatedActor& actor, const Mat4& worldTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData)
+	void AddMesh(const AnimatedActor& actor, const Mat4& worldTransform, const Mat4& localTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData)
 	{
 		if (actor.IsPlaying())
 		{
 			const auto animInstanceID = actor.GetAnimationInstance();
 			const auto& animBoneRange = animationUpdater.GetBoneRange(animInstanceID);
 
+			// NOTE: might be a problem that all the node transforms up to the root bone is NOT added here!!
 			renderData.mAnimatedMeshes.emplace_back(worldTransform, animBoneRange, materialIndex, materialTilingFactor, mesh);
 		}
 		else
-			renderData.mStaticMeshes.emplace_back(worldTransform, materialIndex, materialTilingFactor, mesh);
+		{
+			const Mat4 localWorldTransform = worldTransform * localTransform;
+
+			renderData.mStaticMeshes.emplace_back(localWorldTransform, materialIndex, materialTilingFactor, mesh);
+		}
 	}
 
 

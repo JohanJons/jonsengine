@@ -51,14 +51,15 @@ namespace JonsEngine
         typedef ConstRangedIterator<NodeContainer, ImmediateChildrenIter> ImmediateChildrenIterator;
 
         ModelNode(const PackageNode& pkgNode, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& childIter, const MeshIterator& meshIter, const NodeIterator& next);
-        ModelNode(const std::string& name, const ModelNodeIndex nodeID, const Vec3& minBounds, const Vec3& maxBounds, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& allChildIter,
-            const MeshIterator& meshIter, const NodeIterator& next);
+        ModelNode(const std::string& name, const ModelNodeIndex nodeID, const Vec3& minBounds, const Vec3& maxBounds, const Mat4& localTransform, const ImmediateChildrenIterator& immChildIter,
+			const AllChildrenIterator& allChildIter, const MeshIterator& meshIter, const NodeIterator& next);
         ~ModelNode();
 
         uint32_t GetNumMeshes() const;
         const std::string& GetName() const;
         ModelNodeIndex GetModelNodeIndex() const;
         const AABB& GetLocalAABB() const;
+		const Mat4& GetLocalTransform() const;
 
         MeshIterator GetMeshes() const;
         AllChildrenIterator GetAllChildren() const;
@@ -69,6 +70,7 @@ namespace JonsEngine
         std::string mName;
         ModelNodeIndex mNodeIndex;
         AABB mLocalAABB;
+		Mat4 mLocalTransform;
         uint32_t mNumMeshes;
 
         ImmediateChildrenIterator mImmediateChildNodes;

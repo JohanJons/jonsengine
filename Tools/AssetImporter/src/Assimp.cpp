@@ -17,13 +17,13 @@ namespace JonsAssetImporter
     bool OnlyOneNodePerMesh(const aiScene* scene);
     Mat4 GetMeshNodeTransform(const aiScene* scene, const aiNode* node, const uint32_t meshIndex, const Mat4& parentTransform);
     uint32_t CountMeshOccurances(const aiNode* node, const uint32_t aiMeshIndex, const bool recursive);
-    uint32_t GetNodeIndex(const PackageModel& model, const std::string& nodeName);
+    PackageNode::NodeIndex GetNodeIndex(const PackageModel& model, const std::string& nodeName);
     PackageBone::BoneIndex GetBoneIndex(const PackageModel& model, const std::string& boneName);
     uint32_t CountChildren(const aiNode* node);
     bool UsedLessThanMaxNumBones(const std::vector<float>& boneWeights, const uint32_t offset);
-    PackageNode::NodeIndex FindSkeletonRootNode(const aiMesh* assimpMesh, const std::vector<PackageNode>& nodes);
-    const aiMesh* FindAssimpMesh(const std::string& meshName, const aiScene* scene);
-    void GetNodeDistanceFromRoot(const std::string& name, const std::vector<PackageNode>& nodes, uint32_t& distFromRoot, PackageNode::NodeIndex& rootIndex);
+    const aiNode* FindSkeletonRootNode(const aiMesh* assimpMesh, const aiScene* scene);
+    uint32_t GetNodeDistanceFromRoot(const aiString& name, const aiScene* scene);
+    Vec3 GetVertices(const bool isStatic, const Mat4& nodeTransform, const aiVector3D& assimpVertices);
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
     Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
@@ -142,7 +142,6 @@ namespace JonsAssetImporter
         pkg->mModels.emplace_back(modelName);
         PackageModel& model = pkg->mModels.back();
 
-        // reserve storage
         const uint32_t numNodes = CountChildren(scene->mRootNode) + 1;
         model.mNodes.reserve(numNodes);
         model.mMeshes.reserve(scene->mNumMeshes);
@@ -160,19 +159,17 @@ namespace JonsAssetImporter
 
         // recursively go through assimp node tree
         const auto rootParentIndex = PackageNode::INVALID_NODE_INDEX;
-        if (!ProcessNode(model.mNodes, model.mMeshes, scene, scene->mRootNode, rootParentIndex))
+        if (!ProcessNode(model.mNodes, model.mMeshes, scene, scene->mRootNode, rootParentIndex, gIdentityMatrix))
             return false;
             
-        if (!ProcessBones(model.mSkeleton, model.mMeshes, model.mNodes, scene))
-            return false;
-
         return true;
     }
 
-    bool Assimp::ProcessNode(std::vector<JonsEngine::PackageNode>& nodeContainer, const std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode, const JonsEngine::PackageNode::NodeIndex parentNodeIndex)
+    bool Assimp::ProcessNode(std::vector<PackageNode>& nodeContainer, const std::vector<PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode, const PackageNode::NodeIndex parentNodeIndex, const Mat4& parentTransform)
     {
         const uint32_t nodeIndex = nodeContainer.size();
-        nodeContainer.emplace_back(assimpNode->mName.C_Str(), nodeIndex, parentNodeIndex);
+        const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(assimpNode->mTransformation);
+        nodeContainer.emplace_back(assimpNode->mName.C_Str(), nodeTransform, nodeIndex, parentNodeIndex);
         PackageNode& jonsNode = nodeContainer.back();
 
         // jonsPkg uses same mesh indices as aiScene
@@ -190,7 +187,7 @@ namespace JonsAssetImporter
         {
             const aiNode* child = assimpNode->mChildren[childIndex];
 
-            if (!ProcessNode(nodeContainer, meshContainer, scene, child, nodeIndex))
+            if (!ProcessNode(nodeContainer, meshContainer, scene, child, nodeIndex, nodeTransform))
                 return false;
         }
         const uint32_t lastChildIndex = nodeContainer.size() - 1;
@@ -210,17 +207,18 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, std::vector<JonsEngine::PackageBone>& skeleton, const aiScene* scene, const MaterialMap& materialMap)
+    bool Assimp::ProcessMeshes(std::vector<PackageMesh>& meshContainer, std::vector<PackageBone>& skeleton, const aiScene* scene, const MaterialMap& materialMap)
     {
-        uint32_t boneStartIndex = 0, boneEndIndex = 0;
         for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
         {
             aiMesh* assimpMesh = scene->mMeshes[meshIndex];
-            boneEndIndex = boneStartIndex + assimpMesh->mNumBones;
-            meshContainer.emplace_back(assimpMesh->mName.C_Str(), boneStartIndex, boneEndIndex);
+            meshContainer.emplace_back(assimpMesh->mName.C_Str());
             PackageMesh& jonsMesh = meshContainer.back();
+            
+            if (!ProcessBones(skeleton, jonsMesh, assimpMesh, scene))
+                return false;
 
-            if (!ProcessMeshGeometricData(jonsMesh, assimpMesh, scene, meshIndex))
+            if (!ProcessMeshGeometricData(jonsMesh, skeleton, assimpMesh, scene, meshIndex))
                 return false;
 
             // bone weights
@@ -234,14 +232,13 @@ namespace JonsAssetImporter
             }
 
             jonsMesh.mMaterialIndex = materialMap.at(assimpMesh->mMaterialIndex);
-
-            boneStartIndex = boneEndIndex;
         }
 
         return true;
     }
 
-    bool Assimp::ProcessMeshGeometricData(PackageMesh& jonsMesh, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex)
+    // the bones of jonsMesh must've been parsed already
+    bool Assimp::ProcessMeshGeometricData(PackageMesh& jonsMesh, const std::vector<PackageBone>& bones, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex)
     {
         const uint32_t numFloatsPerTriangle = 3;
         const uint32_t numFloatsPerTexcoord = 2;
@@ -254,23 +251,27 @@ namespace JonsAssetImporter
         jonsMesh.mTangentData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle * 2);
         jonsMesh.mIndiceData.reserve(assimpMesh->mNumFaces * numFloatsPerTriangle);
 
-        // get the transform of the node associated with this mesh to pre-multiply all the vertices
-        const Mat4 nodeTransform = GetMeshNodeTransform(scene, scene->mRootNode, meshIndex, gIdentityMatrix);
+		// NOTE: commented pre-transform code out, might need some additional thinking to get it right (inverse transforms for animated meshes?)
+        // if the mesh is static, pre-multiply all the vertices with the transformation hierarchy
+        //const bool isStatic = !jonsMesh.IsAnimated();
+        //const Mat4 nodeTransform = isStatic ? GetMeshNodeTransform(scene, scene->mRootNode, meshIndex, gIdentityMatrix) : gIdentityMatrix;
 
         // vertice, normal, texcoord, tangents and bitangents data
         for (uint32_t j = 0; j < assimpMesh->mNumVertices; ++j)
         {
-            const Vec3 transformedVertices = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mVertices[j]), 1.0f));
-            jonsMesh.mVertexData.push_back(transformedVertices.x);
-            jonsMesh.mVertexData.push_back(transformedVertices.y);
-            jonsMesh.mVertexData.push_back(transformedVertices.z);
+            //const Vec3 vertices = GetVertices(isStatic, nodeTransform, assimpMesh->mVertices[j]);
+			const Vec3 vertices = aiVec3ToJonsVec3(assimpMesh->mVertices[j]);
+            jonsMesh.mVertexData.push_back(vertices.x);
+            jonsMesh.mVertexData.push_back(vertices.y);
+            jonsMesh.mVertexData.push_back(vertices.z);
 
             if (assimpMesh->HasNormals())
             {
-                const Vec3 transformedNormals = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mNormals[j]), 0.0f));
-                jonsMesh.mNormalData.push_back(transformedNormals.x);
-                jonsMesh.mNormalData.push_back(transformedNormals.y);
-                jonsMesh.mNormalData.push_back(transformedNormals.z);
+                //const Vec3 normals = GetVertices(isStatic, nodeTransform, assimpMesh->mNormals[j]);
+				const Vec3 normals = aiVec3ToJonsVec3(assimpMesh->mNormals[j]);
+                jonsMesh.mNormalData.push_back(normals.x);
+                jonsMesh.mNormalData.push_back(normals.y);
+                jonsMesh.mNormalData.push_back(normals.z);
             }
 
             // multiple texture coordinates only used in special scenarios so only use first row by default
@@ -282,20 +283,22 @@ namespace JonsAssetImporter
 
             if (assimpMesh->HasTangentsAndBitangents())
             {
-                const Vec3 transformedTangents = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mTangents[j]), 0.0f));
-                jonsMesh.mTangentData.push_back(transformedTangents.x);
-                jonsMesh.mTangentData.push_back(transformedTangents.y);
-                jonsMesh.mTangentData.push_back(transformedTangents.z);
+                //const Vec3 tangents = GetVertices(isStatic, nodeTransform, assimpMesh->mTangents[j]);
+				const Vec3 tangents = aiVec3ToJonsVec3(assimpMesh->mTangents[j]);
+                jonsMesh.mTangentData.push_back(tangents.x);
+                jonsMesh.mTangentData.push_back(tangents.y);
+                jonsMesh.mTangentData.push_back(tangents.z);
 
-                const Vec3 transformedBitangents = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(assimpMesh->mBitangents[j]), 0.0f));
-                jonsMesh.mTangentData.push_back(transformedBitangents.x);
-                jonsMesh.mTangentData.push_back(transformedBitangents.y);
-                jonsMesh.mTangentData.push_back(transformedBitangents.z);
+                //const Vec3 bitangents = GetVertices(isStatic, nodeTransform, assimpMesh->mBitangents[j]);
+				const Vec3 bitangents = aiVec3ToJonsVec3(assimpMesh->mBitangents[j]);
+                jonsMesh.mTangentData.push_back(bitangents.x);
+                jonsMesh.mTangentData.push_back(bitangents.y);
+                jonsMesh.mTangentData.push_back(bitangents.z);
             }
 
             // mesh AABB
-            jonsMesh.mAABB.mMinBounds = MinVal(jonsMesh.mAABB.mMinBounds, transformedVertices);
-            jonsMesh.mAABB.mMaxBounds = MaxVal(jonsMesh.mAABB.mMaxBounds, transformedVertices);
+            jonsMesh.mAABB.mMinBounds = MinVal(jonsMesh.mAABB.mMinBounds, vertices);
+            jonsMesh.mAABB.mMaxBounds = MaxVal(jonsMesh.mAABB.mMaxBounds, vertices);
         }
 
         // index data
@@ -313,30 +316,23 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessBones(std::vector<PackageBone>& bones, std::vector<PackageMesh>& meshes, const std::vector<PackageNode>& nodes, const aiScene* scene)
+    bool Assimp::ProcessBones(std::vector<PackageBone>& bones, PackageMesh& pkgMesh, const aiMesh* assimpMesh, const aiScene* scene)
     {
-        for (auto& pkgMesh : meshes)
-        {
-            const aiMesh* assimpMesh = FindAssimpMesh(pkgMesh.mName, scene);
-            assert(assimpMesh);
+        const bool hasSkeleton = assimpMesh->HasBones();
+        if (!hasSkeleton)
+            return true;
         
-            const bool hasSkeleton = assimpMesh->mNumBones > 0;
-            if (!hasSkeleton)
-                continue;
-            
-            const PackageNode::NodeIndex rootNodeIndex = FindSkeletonRootNode(assimpMesh, nodes);
-            assert(rootNodeIndex != PackageNode::INVALID_NODE_INDEX);
-			const PackageNode& rootNode = nodes.at(rootNodeIndex);
+        const aiNode* rootNode = FindSkeletonRootNode(assimpMesh, scene);
+        assert(rootNode);
 
-			pkgMesh.mStartBoneIndex = bones.size();
-			bones.emplace_back(rootNode.mName, gIdentityMatrix);
-			for (uint32_t boneNum = 0; boneNum < assimpMesh->mNumBones; ++boneNum)
-			{
-				const auto bone = assimpMesh->mBones[boneNum];
-				bones.emplace_back(bone->mName.C_Str(), aiMat4ToJonsMat4(bone->mOffsetMatrix));
-			}
-			pkgMesh.mEndBoneIndex = bones.size();
+        pkgMesh.mStartBoneIndex = bones.size();
+        bones.emplace_back(rootNode->mName.C_Str(), aiMat4ToJonsMat4(rootNode->mTransformation));
+        for (uint32_t boneNum = 0; boneNum < assimpMesh->mNumBones; ++boneNum)
+        {
+            const auto bone = assimpMesh->mBones[boneNum];
+            bones.emplace_back(bone->mName.C_Str(), aiMat4ToJonsMat4(bone->mOffsetMatrix));
         }
+        pkgMesh.mEndBoneIndex = bones.size();
     
         return true;
     }
@@ -346,7 +342,7 @@ namespace JonsAssetImporter
         // make sure containers are large enough as we will access indices directly when iterating the bones
         const uint32_t numVertices = assimpMesh->mNumVertices;
         const uint32_t maxContainerSize = numVertices * Animation::MAX_BONES_PER_VERTEX;
-		// TODO: this maybe overallocates memory?
+        // TODO: this maybe overallocates memory?
         boneIndices.resize(maxContainerSize);
         boneWeights.resize(maxContainerSize);
 
@@ -556,21 +552,15 @@ namespace JonsAssetImporter
         return occurances;
     }
 
-    uint32_t GetNodeIndex(const PackageModel& model, const std::string& nodeName)
+    PackageNode::NodeIndex GetNodeIndex(const std::vector<PackageNode>& nodes, const std::string& nodeName)
     {
-        uint32_t ret = model.mNodes.size();
-        for (const PackageNode& node : model.mNodes)
+        for (const PackageNode& node : nodes)
         {
             if (node.mName == nodeName)
-            {
-                ret = node.mNodeIndex;
-                break;
-            }
+                return node.mNodeIndex;
         }
 
-        assert(ret != model.mNodes.size());
-
-        return ret;
+        return PackageNode::INVALID_NODE_INDEX;
     }
     
     PackageBone::BoneIndex GetBoneIndex(const PackageModel& model, const std::string& boneName)
@@ -616,65 +606,52 @@ namespace JonsAssetImporter
         return false;
     }
     
-    PackageNode::NodeIndex FindSkeletonRootNode(const aiMesh* assimpMesh, const std::vector<PackageNode>& nodes)
+    const aiNode* FindSkeletonRootNode(const aiMesh* assimpMesh, const aiScene* scene)
     {
         assert(assimpMesh);
         
-        const uint32_t largestNodeDistance = std::numeric_limits<uint32_t>::max();
-        
-        PackageNode::NodeIndex ret = PackageNode::INVALID_NODE_INDEX;
-        uint32_t minDistance = largestNodeDistance;
+        aiString rootNodeName;
+        uint32_t minDistance = std::numeric_limits<uint32_t>::max();
         for (uint32_t boneNum = 0; boneNum < assimpMesh->mNumBones; ++boneNum)
         {
             const aiBone* bone = assimpMesh->mBones[boneNum];
-            uint32_t distFromRoot = largestNodeDistance;
-            PackageNode::NodeIndex nodeIndex = PackageNode::INVALID_NODE_INDEX;
-            GetNodeDistanceFromRoot(bone->mName.C_Str(), nodes, distFromRoot, nodeIndex);
+            uint32_t distFromRoot = GetNodeDistanceFromRoot(bone->mName, scene);
             if (distFromRoot < minDistance)
             {
                 minDistance = distFromRoot;
-                ret = nodeIndex;
+                rootNodeName = bone->mName;
             }
         }
         
-        return ret;
+        return scene->mRootNode->FindNode(rootNodeName);
     }
     
-    const aiMesh* FindAssimpMesh(const std::string& meshName, const aiScene* scene)
+    uint32_t GetNodeDistanceFromRoot(const aiString& name, const aiScene* scene)
     {
-        for (uint32_t meshNum = 0; meshNum < scene->mNumMeshes; ++meshNum)
-        {
-            const aiMesh* mesh = *scene->mMeshes + meshNum;
-            if (mesh->mName.C_Str() == meshName)
-                return mesh;
-        }
-        
-        return nullptr;
-    }
-    
-    void GetNodeDistanceFromRoot(const std::string& name, const std::vector<PackageNode>& nodes, uint32_t& distFromRoot, PackageNode::NodeIndex& rootIndex)
-    {
-        // finds the PackageNode with the right name
-        PackageNode::NodeIndex nodeIndex = PackageNode::INVALID_NODE_INDEX;
-        for (const auto& pkgNode : nodes)
-        {
-            if (pkgNode.mName == name)
-				nodeIndex = pkgNode.mNodeIndex;
-        }
-        assert(nodeIndex != PackageNode::INVALID_NODE_INDEX);
+        const aiNode* rootNode = scene->mRootNode;
+        assert(rootNode);
+        const aiNode* node = rootNode->FindNode(name);
+        assert(node);
         
         // backtracks to the root node and count steps
-        uint32_t steps = 0;
-        while (nodeIndex != PackageNode::INVALID_NODE_INDEX)
+        uint32_t dist = 0;
+        while (node != rootNode)
         {
-            const auto& node = nodes.at(nodeIndex);
-			nodeIndex = node.mParentNodeIndex;
+            node = node->mParent;
             
-            ++steps;
+            ++dist;
         };
         
-        distFromRoot = steps;
-		rootIndex = nodeIndex;
+        return dist;
+    }
+
+    Vec3 GetVertices(const bool isStaticMesh, const Mat4& nodeTransform, const aiVector3D& assimpVertices)
+    {
+        Vec3 ret = aiVec3ToJonsVec3(assimpVertices);
+        if (isStaticMesh)
+            ret = Vec3(nodeTransform * Vec4(ret, 1.0f));
+
+        return ret;
     }
 
 

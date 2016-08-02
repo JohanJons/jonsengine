@@ -28,41 +28,41 @@ namespace JonsEngine
 
     struct PackageHeader
     {
+        PackageHeader();
+    
+    
         std::string mSignature;
         uint8_t mMajorVersion;
         uint8_t mMinorVersion;
-
-
-        PackageHeader();
     };
 
     struct PackageAABB
     {
+        PackageAABB();
+        
+    
         Vec3 mMinBounds;
         Vec3 mMaxBounds;
-
-
-        PackageAABB();
     };
 
     struct PackageTexture
     {
+        PackageTexture();
+    
+    
         std::vector<uint8_t> mTextureData;
         uint32_t mTextureWidth;         // width/height in pixels
         uint32_t mTextureHeight;
-
-
-        PackageTexture();
     };
 
     struct PackageSkybox
     {
-        std::string mName;
-        PackageTexture mSkyboxTexture;
-
-
         PackageSkybox();
         PackageSkybox(const std::string& name);
+        
+    
+        std::string mName;
+        PackageTexture mSkyboxTexture;
     };
 
     struct PackageMaterial
@@ -70,6 +70,10 @@ namespace JonsEngine
         typedef uint32_t MaterialIndex;
         static const MaterialIndex INVALID_MATERIAL_INDEX = UINT32_MAX;
 
+        PackageMaterial();
+        PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture);
+        
+        
         std::string mName;
         bool mHasDiffuseTexture;
         bool mHasNormalTexture;
@@ -79,29 +83,31 @@ namespace JonsEngine
         Vec3 mAmbientColor;
         Vec3 mSpecularColor;
         Vec3 mEmissiveColor;
-
-
-        PackageMaterial();
-        PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture);
     };
 
     struct PackageBone
     {
         typedef uint32_t BoneIndex;
         static const BoneIndex INVALID_BONE_INDEX = UINT32_MAX;
+        
+        PackageBone();
+        PackageBone(const std::string& name, const Mat4& offsetMatrix);
+        
 
         std::string mName;
         Mat4 mOffsetMatrix;
-
-
-        PackageBone();
-        PackageBone(const std::string& name, const Mat4& offsetMatrix);
     };
 
     struct PackageMesh
     {
         typedef uint32_t MeshIndex;
         static const MeshIndex INVALID_MESH_INDEX = UINT32_MAX;
+        
+        PackageMesh();
+        PackageMesh(const std::string& name);
+        
+        bool IsAnimated() const;
+        
 
         std::string mName;
         PackageAABB mAABB;
@@ -115,53 +121,50 @@ namespace JonsEngine
         std::vector<uint8_t> mBoneIndices;
         std::vector<uint16_t> mIndiceData;
         PackageMaterial::MaterialIndex mMaterialIndex;
-
-
-        PackageMesh();
-        PackageMesh(const std::string& name, PackageBone::BoneIndex boneStartIndex, PackageBone::BoneIndex boneEndIndex);
     };
 
     struct PackageNode
     {
         typedef uint32_t NodeIndex;
         static const NodeIndex INVALID_NODE_INDEX = UINT32_MAX;
+        
+        PackageNode();
+        PackageNode(const std::string& name, const Mat4& transform, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex);
+        
 
         std::string mName;
+		Mat4 mTransform;
         NodeIndex mNodeIndex;
         NodeIndex mParentNodeIndex;
         PackageAABB mAABB;
         std::vector<PackageMesh::MeshIndex> mMeshes;
-
-
-        PackageNode();
-        PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex);
     };
 
     struct PackageAnimation
     {
+        PackageAnimation();
+        PackageAnimation(const std::string& name, const Mat4& invRootMatrix, const uint32_t durationMilliseconds);
+    
+    
         std::string mName;
         Mat4 mInverseRootMatrix;
         uint32_t mDurationInMilliseconds;
 		BoneParentMap mBoneParentMap;
 		BoneAnimationContainer mBoneAnimations;
-
-
-        PackageAnimation();
-        PackageAnimation(const std::string& name, const Mat4& invRootMatrix, const uint32_t durationMilliseconds);
     };
 
     struct PackageModel
     {
+        PackageModel();
+        PackageModel(const std::string& modelName);
+        
+    
         std::string mName;
         PackageAABB mStaticAABB;
         std::vector<PackageMesh> mMeshes;
         std::vector<PackageNode> mNodes;
         std::vector<PackageBone> mSkeleton;
         std::vector<PackageAnimation> mAnimations;
-
-
-        PackageModel();
-        PackageModel(const std::string& modelName);
     };
 
     struct JonsPackage
@@ -232,6 +235,7 @@ namespace boost
         void serialize(Archive & ar, JonsEngine::PackageNode& node, const unsigned int version)
         {
             ar & node.mName;
+			ar & node.mTransform;
             ar & node.mNodeIndex;
             ar & node.mParentNodeIndex;
             ar & node.mAABB;

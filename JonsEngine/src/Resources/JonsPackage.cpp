@@ -66,25 +66,30 @@ namespace JonsEngine
     {
     }
 
-    PackageMesh::PackageMesh() : PackageMesh("", PackageBone::INVALID_BONE_INDEX, PackageBone::INVALID_BONE_INDEX)
+    PackageMesh::PackageMesh() : PackageMesh("")
     {
     }
 
-    PackageMesh::PackageMesh(const std::string& name, PackageBone::BoneIndex boneStartIndex, PackageBone::BoneIndex boneEndIndex) :
+    PackageMesh::PackageMesh(const std::string& name) :
         mName(name),
-        mStartBoneIndex(boneStartIndex),
-        mEndBoneIndex(boneEndIndex),
         mMaterialIndex(PackageMaterial::INVALID_MATERIAL_INDEX)
     {
     }
 
+	bool PackageMesh::IsAnimated() const
+	{
+		return mStartBoneIndex != PackageBone::INVALID_BONE_INDEX && mEndBoneIndex != PackageBone::INVALID_BONE_INDEX;
+	}
+
+
     PackageNode::PackageNode() :
-        PackageNode("", INVALID_NODE_INDEX, INVALID_NODE_INDEX)
+        PackageNode("", gIdentityMatrix, INVALID_NODE_INDEX, INVALID_NODE_INDEX)
     {
     }
 
-	PackageNode::PackageNode(const std::string& name, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex) :
+	PackageNode::PackageNode(const std::string& name, const Mat4& transform, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex) :
 		mName(name),
+		mTransform(transform),
 		mNodeIndex(nodeIndex),
 		mParentNodeIndex(parentNodeIndex)
     {
