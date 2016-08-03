@@ -39,7 +39,7 @@ namespace JonsEngine
         std::string mName;
         Milliseconds mAnimationDuration;
         Mat4 mInverseRootMatrix;
-		BoneParentMap mParentMap;
+		const BoneParentMap& mParentMap;
 		BoneAnimationContainer mBoneAnimations;
     };
 }

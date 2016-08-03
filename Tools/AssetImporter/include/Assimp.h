@@ -25,12 +25,13 @@ namespace JonsAssetImporter
 
     private:
         void ProcessMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsEngine::JonsPackagePtr pkg);
-        bool ProcessModel(const aiScene* scene, const std::string& modelName, const MaterialMap& materialMap, JonsEngine::JonsPackagePtr pkg);
-        bool ProcessNode(std::vector<JonsEngine::PackageNode>& nodeContainer, const std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode,
+        bool ParseModel(const aiScene* scene, const std::string& modelName, const MaterialMap& materialMap, JonsEngine::JonsPackagePtr pkg);
+        bool ParseNodeHeirarchy(std::vector<JonsEngine::PackageNode>& nodeContainer, const std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode,
             const JonsEngine::PackageNode::NodeIndex parentNodeIndex, const JonsEngine::Mat4& parentTransform);
         bool ProcessMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, std::vector<JonsEngine::PackageBone>& skeleton, const aiScene* scene, const MaterialMap& materialMap);
-        bool ProcessMeshGeometricData(JonsEngine::PackageMesh& jonsMesh, const std::vector<JonsEngine::PackageBone>& skeleton, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex);
+        bool AddMeshGeometricData(JonsEngine::PackageMesh& jonsMesh, const std::vector<JonsEngine::PackageBone>& skeleton, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex);
         bool ProcessBones(std::vector<JonsEngine::PackageBone>& bones, JonsEngine::PackageMesh& pkgMesh, const aiMesh* assimpMesh, const aiScene* scene);
+		bool ProcessBoneParentMapping(JonsEngine::BoneParentMap& parentMap, const std::vector<JonsEngine::PackageBone>& bones, const aiScene* scene);
         bool ProcessVertexBoneWeights(std::vector<uint8_t>& boneIndices, std::vector<float>& boneWeights, const aiMesh* assimpMesh);
         bool ProcessAnimations(JonsEngine::PackageModel& model, const aiScene* scene);
 

@@ -55,7 +55,7 @@ namespace JonsAssetImporter
         ProcessMaterials(scene, modelPath, materialMap, freeimageImporter, pkg);
 
         // process model hierarchy
-        if (!ProcessModel(scene, modelName, materialMap, pkg))
+        if (!ParseModel(scene, modelName, materialMap, pkg))
             return false;
 
         PackageModel& model = pkg->mModels.back();
@@ -136,7 +136,7 @@ namespace JonsAssetImporter
         }
     }
 
-    bool Assimp::ProcessModel(const aiScene* scene, const std::string& modelName, const MaterialMap& materialMap, JonsPackagePtr pkg)
+    bool Assimp::ParseModel(const aiScene* scene, const std::string& modelName, const MaterialMap& materialMap, JonsPackagePtr pkg)
     {
         pkg->mModels.emplace_back(modelName);
         PackageModel& model = pkg->mModels.back();
@@ -158,13 +158,13 @@ namespace JonsAssetImporter
 
         // recursively go through assimp node tree
         const auto rootParentIndex = PackageNode::INVALID_NODE_INDEX;
-        if (!ProcessNode(model.mNodes, model.mMeshes, scene, scene->mRootNode, rootParentIndex, gIdentityMatrix))
+        if (!ParseNodeHeirarchy(model.mNodes, model.mMeshes, scene, scene->mRootNode, rootParentIndex, gIdentityMatrix))
             return false;
             
         return true;
     }
 
-    bool Assimp::ProcessNode(std::vector<PackageNode>& nodeContainer, const std::vector<PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode, const PackageNode::NodeIndex parentNodeIndex, const Mat4& parentTransform)
+    bool Assimp::ParseNodeHeirarchy(std::vector<PackageNode>& nodeContainer, const std::vector<PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode, const PackageNode::NodeIndex parentNodeIndex, const Mat4& parentTransform)
     {
         const uint32_t nodeIndex = nodeContainer.size();
         const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(assimpNode->mTransformation);
@@ -186,7 +186,7 @@ namespace JonsAssetImporter
         {
             const aiNode* child = assimpNode->mChildren[childIndex];
 
-            if (!ProcessNode(nodeContainer, meshContainer, scene, child, nodeIndex, nodeTransform))
+            if (!ParseNodeHeirarchy(nodeContainer, meshContainer, scene, child, nodeIndex, nodeTransform))
                 return false;
         }
         const uint32_t lastChildIndex = nodeContainer.size() - 1;
@@ -217,7 +217,7 @@ namespace JonsAssetImporter
             if (!ProcessBones(skeleton, jonsMesh, assimpMesh, scene))
                 return false;
 
-            if (!ProcessMeshGeometricData(jonsMesh, skeleton, assimpMesh, scene, meshIndex))
+            if (!AddMeshGeometricData(jonsMesh, skeleton, assimpMesh, scene, meshIndex))
                 return false;
 
             // bone weights
@@ -237,7 +237,7 @@ namespace JonsAssetImporter
     }
 
     // the bones of jonsMesh must've been parsed already
-    bool Assimp::ProcessMeshGeometricData(PackageMesh& jonsMesh, const std::vector<PackageBone>& bones, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex)
+    bool Assimp::AddMeshGeometricData(PackageMesh& jonsMesh, const std::vector<PackageBone>& bones, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex)
     {
         const uint32_t numFloatsPerTriangle = 3;
         const uint32_t numFloatsPerTexcoord = 2;
@@ -335,6 +335,18 @@ namespace JonsAssetImporter
     
         return true;
     }
+
+	bool Assimp::ProcessBoneParentMapping(BoneParentMap& parentMap, const std::vector<PackageBone>& bones, const aiScene* scene)
+	{
+		// all bones have a corresponding node
+		// find the node to get its parents name, then find that name in the bone list
+		for (const auto& pkgBone : bones)
+		{
+			const aiNode* node = scene->
+		}
+
+		return true;
+	}
 
     bool Assimp::ProcessVertexBoneWeights(std::vector<uint8_t>& boneIndices, std::vector<float>& boneWeights, const aiMesh* assimpMesh)
     {

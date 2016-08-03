@@ -3,6 +3,7 @@
 #include "include/Core/Types.h"
 #include "include/Core/Utils/Time.h"
 #include "include/Resources/Animation.h"
+#include "include/Resources/Bone.h"
 #include "include/Resources/BoneAnimation.h"
 #include "include/Resources/BoneKeyframe.h"
 
@@ -149,7 +150,6 @@ namespace JonsEngine
         std::string mName;
         Mat4 mInverseRootMatrix;
         uint32_t mDurationInMilliseconds;
-		BoneParentMap mBoneParentMap;
 		BoneAnimationContainer mBoneAnimations;
     };
 
@@ -165,6 +165,7 @@ namespace JonsEngine
         std::vector<PackageNode> mNodes;
         std::vector<PackageBone> mSkeleton;
         std::vector<PackageAnimation> mAnimations;
+		BoneParentMap mBoneParentMap;
     };
 
     struct JonsPackage
@@ -304,6 +305,7 @@ namespace boost
             ar & model.mNodes;
             ar & model.mSkeleton;
             ar & model.mAnimations;
+			ar & model.mBoneParentMap;
         }
 
         template<class Archive>

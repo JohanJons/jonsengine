@@ -87,7 +87,7 @@ namespace JonsEngine
         Model::AnimationList modelAnimations;
         for (const PackageAnimation& animation : pkgModel.mAnimations)
         {
-            const AnimationID animationID = LoadAnimation(animation);
+            const AnimationID animationID = LoadAnimation(animation, pkgModel.mBoneParentMap);
             modelAnimations.emplace(animation.mName, animationID);
         }
 
@@ -205,12 +205,11 @@ namespace JonsEngine
     }
 
 
-    AnimationID ResourceManifest::LoadAnimation(const PackageAnimation& animation)
+    AnimationID ResourceManifest::LoadAnimation(const PackageAnimation& animation, const BoneParentMap& parentMap)
     {
         mNextAnimationID = IncrementID(mNextAnimationID);
         const Milliseconds animationDuration(animation.mDurationInMilliseconds);
 		const auto& boneAnimations = animation.mBoneAnimations;
-		const auto& parentMap = animation.mBoneParentMap;
 
         mAnimations.emplace(std::piecewise_construct, std::forward_as_tuple(mNextAnimationID), std::forward_as_tuple(animation.mName, animationDuration, boneAnimations, parentMap, animation.mInverseRootMatrix));
 
