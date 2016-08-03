@@ -103,7 +103,6 @@ namespace JonsEngine
         mName(name),
         mInverseRootMatrix(mInverseRootMatrix),
         mDurationInMilliseconds(durationInMilliseconds),
-		mBoneParentMap(),
 		mBoneAnimations()
     {
     }

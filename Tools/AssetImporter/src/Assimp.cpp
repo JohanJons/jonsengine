@@ -160,6 +160,9 @@ namespace JonsAssetImporter
         const auto rootParentIndex = PackageNode::INVALID_NODE_INDEX;
         if (!ParseNodeHeirarchy(model.mNodes, model.mMeshes, scene, scene->mRootNode, rootParentIndex, gIdentityMatrix))
             return false;
+
+		if (!ProcessBoneParentMapping(model.mBoneParentMap, model.mSkeleton, scene))
+			return false;
             
         return true;
     }
@@ -338,13 +341,35 @@ namespace JonsAssetImporter
 
 	bool Assimp::ProcessBoneParentMapping(BoneParentMap& parentMap, const std::vector<PackageBone>& bones, const aiScene* scene)
 	{
+		if (bones.empty())
+			return true;
+
+		// root bone has no parent
+		parentMap.emplace_back(INVALID_BONE_INDEX);
+
 		// all bones have a corresponding node
 		// find the node to get its parents name, then find that name in the bone list
-		for (const auto& pkgBone : bones)
+		for (auto boneIter = bones.begin() + 1; boneIter != bones.end(); ++boneIter)
 		{
-			const aiNode* node = scene->
+			const aiNode* node = scene->mRootNode->FindNode(boneIter->mName.c_str());
+			assert(node);
+			const aiNode* parentNode = node->mParent;
+			assert(parentNode);
+
+			for (auto parentIter = bones.begin(); parentIter != bones.end(); ++parentIter)
+			{
+				if (parentIter->mName == parentNode->mName.C_Str())
+					parentMap.emplace_back(parentIter - bones.begin());
+
+				if (parentIter + 1 == bones.end()) {
+					auto a = parentIter + 1;
+					auto i = 1;
+				}
+			}
 		}
 
+		assert(parentMap.size() == bones.size());
+		
 		return true;
 	}
 
