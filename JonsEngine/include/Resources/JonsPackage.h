@@ -2,7 +2,6 @@
 
 #include "include/Core/Types.h"
 #include "include/Core/Utils/Time.h"
-#include "include/Resources/Animation.h"
 #include "include/Resources/Bone.h"
 #include "include/Resources/BoneAnimation.h"
 #include "include/Resources/BoneKeyframe.h"
@@ -144,12 +143,14 @@ namespace JonsEngine
     struct PackageAnimation
     {
         PackageAnimation();
-        PackageAnimation(const std::string& name, const Mat4& invRootMatrix, const uint32_t durationMilliseconds);
+        PackageAnimation(const std::string& name, const uint32_t durationMilliseconds, const Mat4& invRootMatrix, const BoneIndex firstBone, const BoneIndex endBone);
     
     
         std::string mName;
+		uint32_t mDurationInMilliseconds;
         Mat4 mInverseRootMatrix;
-        uint32_t mDurationInMilliseconds;
+		BoneIndex mFirstBone;
+		BoneIndex mEndBone;
 		BoneAnimationContainer mBoneAnimations;
     };
 
@@ -291,8 +292,10 @@ namespace boost
         void serialize(Archive & ar, JonsEngine::PackageAnimation& animation, const unsigned int version)
         {
             ar & animation.mName;
+			ar & animation.mDurationInMilliseconds;
             ar & animation.mInverseRootMatrix;
-            ar & animation.mDurationInMilliseconds;
+			ar & animation.mFirstBone;
+			ar & animation.mEndBone;
             ar & animation.mBoneAnimations;
         }
 

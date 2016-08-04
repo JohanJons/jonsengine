@@ -87,7 +87,7 @@ namespace JonsEngine
         Model::AnimationList modelAnimations;
         for (const PackageAnimation& animation : pkgModel.mAnimations)
         {
-            const AnimationID animationID = LoadAnimation(animation, pkgModel.mBoneParentMap);
+            const AnimationID animationID = LoadAnimation(animation, pkgModel.mBoneParentMap, pkgModel.mSkeleton);
             modelAnimations.emplace(animation.mName, animationID);
         }
 
@@ -205,13 +205,16 @@ namespace JonsEngine
     }
 
 
-    AnimationID ResourceManifest::LoadAnimation(const PackageAnimation& animation, const BoneParentMap& parentMap)
+    AnimationID ResourceManifest::LoadAnimation(const PackageAnimation& animation, const BoneParentMap& parentMap, const std::vector<PackageBone>& bones)
     {
         mNextAnimationID = IncrementID(mNextAnimationID);
         const Milliseconds animationDuration(animation.mDurationInMilliseconds);
 		const auto& boneAnimations = animation.mBoneAnimations;
 
-        mAnimations.emplace(std::piecewise_construct, std::forward_as_tuple(mNextAnimationID), std::forward_as_tuple(animation.mName, animationDuration, boneAnimations, parentMap, animation.mInverseRootMatrix));
+		ConstRangedIterator<BoneParentMap> parentIter(parentMap, animation.mFirstBone, animation.mEndBone);
+		ConstRangedIterator<std::vector<PackageBone>> boneIter(bones, animation.mFirstBone, animation.mEndBone);
+
+        mAnimations.emplace(std::piecewise_construct, std::forward_as_tuple(mNextAnimationID), std::forward_as_tuple(animation.mName, animationDuration, animation.mInverseRootMatrix, boneAnimations, parentIter, boneIter));
 
         return mNextAnimationID;
     }

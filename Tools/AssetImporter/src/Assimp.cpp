@@ -163,7 +163,7 @@ namespace JonsAssetImporter
 
 		if (!ProcessBoneParentMapping(model.mBoneParentMap, model.mSkeleton, scene))
 			return false;
-            
+
         return true;
     }
 
@@ -320,8 +320,11 @@ namespace JonsAssetImporter
 
     bool Assimp::ProcessBones(std::vector<PackageBone>& bones, PackageMesh& pkgMesh, const aiMesh* assimpMesh, const aiScene* scene)
     {
-        const bool hasSkeleton = assimpMesh->HasBones();
-        if (!hasSkeleton)
+		// NOTE: process bones anyway?
+		if (!scene->HasAnimations())
+			return true;
+
+        if (!assimpMesh->HasBones())
             return true;
         
         const aiNode* rootNode = FindSkeletonRootNode(assimpMesh, scene);
@@ -341,6 +344,11 @@ namespace JonsAssetImporter
 
 	bool Assimp::ProcessBoneParentMapping(BoneParentMap& parentMap, const std::vector<PackageBone>& bones, const aiScene* scene)
 	{
+		// NOTE: Process bones mapping anyway?
+		// might be problem with not including node transforms etc
+		if (!scene->HasAnimations())
+			return true;
+
 		if (bones.empty())
 			return true;
 
@@ -349,27 +357,31 @@ namespace JonsAssetImporter
 
 		// all bones have a corresponding node
 		// find the node to get its parents name, then find that name in the bone list
-		for (auto boneIter = bones.begin() + 1; boneIter != bones.end(); ++boneIter)
+		const auto boneBegin = bones.begin();
+		const auto boneEnd = bones.end();
+		for (auto boneIter = boneBegin + 1; boneIter != boneEnd; ++boneIter)
 		{
 			const aiNode* node = scene->mRootNode->FindNode(boneIter->mName.c_str());
 			assert(node);
 			const aiNode* parentNode = node->mParent;
 			assert(parentNode);
 
-			for (auto parentIter = bones.begin(); parentIter != bones.end(); ++parentIter)
+			for (auto parentIter = boneBegin; parentIter != boneEnd; ++parentIter)
 			{
 				if (parentIter->mName == parentNode->mName.C_Str())
-					parentMap.emplace_back(parentIter - bones.begin());
+				{
+					const auto boneIndex = boneIter - boneBegin;
+					const auto parentBoneIndex = parentIter - boneBegin;
+					// make sure parent appears before child
+					assert(parentBoneIndex < boneIndex);
 
-				if (parentIter + 1 == bones.end()) {
-					auto a = parentIter + 1;
-					auto i = 1;
+					parentMap.emplace_back(parentBoneIndex);
 				}
 			}
 		}
 
 		assert(parentMap.size() == bones.size());
-		
+
 		return true;
 	}
 

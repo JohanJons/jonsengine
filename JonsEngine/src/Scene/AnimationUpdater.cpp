@@ -24,24 +24,32 @@ namespace JonsEngine
             const BoneIndex bonesBegin = animationInstance.mBoneRange.first;
             const BoneIndex bonesEnd = animationInstance.mBoneRange.second;
 
-            // root has no parent
-            // note: root is always front
-            Mat4& rootTransform = mBoneTransforms.at(bonesBegin);
-			animation.InterpolateBoneTransform(rootTransform, bonesBegin, elapsedTime);
+			// root has no parent
+			// note: root is always front
+			Mat4& rootTransform = mBoneTransforms.at(bonesBegin);
+			rootTransform = animation.InterpolateBoneTransform(bonesBegin, elapsedTime);
 
+			// interpolate bone animations
             const uint32_t numTransforms = bonesEnd - bonesBegin;
             for (uint32_t boneOffset = 1; boneOffset < numTransforms; ++boneOffset)
             {
 				const BoneIndex bone = bonesBegin + boneOffset;
+				const BoneIndex parentBone = animation.GetParentIndex(bone);
+				const Mat4& parentTransform = mBoneTransforms.at(parentBone);
 
-                Mat4& transform = mBoneTransforms.at(bone);
-				animation.InterpolateBoneTransform(transform, bone, elapsedTime);
-
-                const BoneIndex parentIndex = animation.GetParentIndex(boneOffset);
-                const Mat4& parentTransform = mBoneTransforms.at(parentIndex);
-
-				transform = parentTransform * transform;
+				Mat4& transform = mBoneTransforms.at(bone);
+				transform = parentTransform * animation.InterpolateBoneTransform(bone, elapsedTime);
             }
+
+			// add misc transforms to get into bone space etc
+			// must be done after prior step because of transform multiplication order
+			const Mat4& rootInverseTransform = animation.GetInverseRootMatrix();
+			for (BoneIndex bone = bonesBegin; bone != bonesEnd; ++bone)
+			{
+				const Mat4& boneOffsetTransform = animation.GetBoneOffsetTransform(bone);
+				Mat4& transform = mBoneTransforms.at(bone);
+				transform = rootInverseTransform * transform * boneOffsetTransform;
+			}
         }
     }
 

@@ -44,7 +44,7 @@ namespace JonsEngine
 
 
     private:
-        AnimationID LoadAnimation(const PackageAnimation& animation, const BoneParentMap& parentMap);
+        AnimationID LoadAnimation(const PackageAnimation& animation, const BoneParentMap& parentMap, const std::vector<PackageBone>& bones);
         void DeleteAnimation(const AnimationID animationID);
 
         void ParseModelInitData(ModelNode::InitDataList& initData, const JonsPackagePtr jongPkg, const PackageModel& model);
