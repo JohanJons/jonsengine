@@ -23,13 +23,13 @@ namespace JonsEngine
     public:
         typedef ConstRangedIterator<MeshContainer, MeshContainer::const_iterator> MeshIterator;
         typedef ConstRangedIterator<NodeContainer, NodeContainer::const_iterator> NodeIterator;
-        typedef std::unordered_map<std::string, AnimationID> AnimationList;
-        typedef ConstRangedIterator<AnimationList, AnimationList::const_iterator> AnimationIterator;
+        typedef std::unordered_map<AnimationID, Animation> AnimationMap;
+		typedef std::unordered_map<std::string, AnimationID> AnimationNameMap;
+        typedef ConstRangedIterator<AnimationMap, AnimationMap::const_iterator> AnimationIterator;
 
         Model(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
-        Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData, const AnimationList& animations);
+        Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData);
         Model(const Model& other);
-        ~Model();
 
 		bool HasAnimations() const;
 
@@ -38,6 +38,7 @@ namespace JonsEngine
         AnimationIterator GetAnimations() const;
 
         AnimationID GetAnimationID(const std::string& name) const;
+		const Animation& GetAnimation(const AnimationID id) const;
 
         const ModelNode& GetRootNode() const;
         const std::string& GetName() const;
@@ -46,15 +47,22 @@ namespace JonsEngine
 
     private:
         void ParseNodes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode, const ModelNode::NodeIterator& next);
-        void ParseNodes(const Model& other);
         ModelNode::MeshIterator ParseMeshes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode);
+		void ParseAnimations(const PackageModel& pkgModel);
+
+		void CopyNodeHierarchy(const Model& otherModel);
+		void CopyAnimationHierarchy(const Model& otherModel);
 
 
         std::string mName;
         AABB mStaticAABB;
-        AnimationList mAnimations;
         NodeContainer mNodes;
         MeshContainer mMeshes;
+		AnimationMap mAnimations;
+		AnimationNameMap mAnimationNameMap;
+		BoneParentMap mParentMap;
+		BoneTransforms mBoneOffsetTransforms;
+		AnimationIDGenerator mAnimationIDGen;
     };
 
     typedef IDMap<Model>::ItemID ModelID;

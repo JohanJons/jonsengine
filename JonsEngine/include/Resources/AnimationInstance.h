@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Resources/Model.h"
 #include "include/Resources/Animation.h"
 #include "include/Resources/Bone.h"
 #include "include/Core/Utils/Time.h"
@@ -10,13 +11,14 @@ namespace JonsEngine
 {
     struct AnimationInstance
     {
+		ModelID mModelID;
         AnimationID mAnimationID;
         Milliseconds mTimestamp;
         BoneIndexRange mBoneRange;
 
 
-        AnimationInstance(const AnimationID animationID, const BoneIndex begin, const BoneIndex end);
-        AnimationInstance(const AnimationID animationID, const Milliseconds timestamp, const BoneIndex begin, const BoneIndex end);
+        AnimationInstance(const ModelID modelID, const AnimationID animationID, const BoneIndex begin, const BoneIndex end);
+        AnimationInstance(const ModelID modelID, const AnimationID animationID, const Milliseconds timestamp, const BoneIndex begin, const BoneIndex end);
     };
 
 	typedef IDGenerator32::ID AnimationInstanceID;

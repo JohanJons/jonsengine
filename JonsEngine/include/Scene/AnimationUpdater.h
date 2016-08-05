@@ -23,7 +23,7 @@ namespace JonsEngine
 
         void Update(const Milliseconds elapsedTime);
 
-        AnimationInstanceID PlayAnimation(const AnimationID animationID);
+        AnimationInstanceID PlayAnimation(const ModelID modelID, const AnimationID animationID);
         void StopAnimation(AnimationInstanceID& animationInstance);
 
 		const BoneTransforms& GetBonedata() const;

@@ -15,18 +15,10 @@ namespace JonsEngine
     template <typename PackageStruct>
     typename std::vector<PackageStruct>::const_iterator FindInContainer(const std::string& assetName, const std::vector<PackageStruct>& container);
 
-    template <typename IDType>
-    IDType IncrementID(const IDType prevID);
-
 
     ResourceManifest::ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator) :
         mMemoryAllocator(memoryAllocator),
-        mRenderer(renderer),
-        mNextAnimationID(0)
-    {
-    }
-       
-    ResourceManifest::~ResourceManifest()
+        mRenderer(renderer)
     {
     }
 
@@ -83,29 +75,16 @@ namespace JonsEngine
 
         const PackageModel& pkgModel = *iter;
 
-        // load animations, if any
-        Model::AnimationList modelAnimations;
-        for (const PackageAnimation& animation : pkgModel.mAnimations)
-        {
-            const AnimationID animationID = LoadAnimation(animation, pkgModel.mBoneParentMap, pkgModel.mSkeleton);
-            modelAnimations.emplace(animation.mName, animationID);
-        }
-
         ModelNode::InitDataList initDataList;
         ParseModelInitData(initDataList, jonsPkg, pkgModel);
 
-        return mModels.Insert(pkgModel, initDataList, modelAnimations);
+        return mModels.Insert(pkgModel, initDataList);
     }
 
     void ResourceManifest::DeleteModel(ModelID& modelID)
     {
         assert(modelID != INVALID_MODEL_ID);
         const Model& model = GetModel(modelID);
-
-        // delete any animations associated with the model
-        auto animations = model.GetAnimations();
-        for (auto& animation : animations)
-            DeleteAnimation(animation.second);
 
         mModels.Erase(modelID);
         modelID = INVALID_MODEL_ID;
@@ -114,25 +93,6 @@ namespace JonsEngine
     const Model& ResourceManifest::GetModel(const ModelID modelID) const
     {
         return mModels.GetItem(modelID);
-    }
-
-
-    const Animation& ResourceManifest::GetAnimation(const AnimationID animationID) const
-    {
-        assert(animationID != INVALID_ANIMATION_ID);
-
-        return mAnimations.at(animationID);
-    }
-
-    const Animation& ResourceManifest::GetAnimation(const ModelID modelID, const std::string& animationName) const
-    {
-        assert(modelID != INVALID_MODEL_ID);
-        const Model& model = mModels.GetItem(modelID);
-        
-        const AnimationID animationID = model.GetAnimationID(animationName);
-        assert(animationID != INVALID_ANIMATION_ID);
-
-        return GetAnimation(animationID);
     }
 
 
@@ -205,26 +165,6 @@ namespace JonsEngine
     }
 
 
-    AnimationID ResourceManifest::LoadAnimation(const PackageAnimation& animation, const BoneParentMap& parentMap, const std::vector<PackageBone>& bones)
-    {
-        mNextAnimationID = IncrementID(mNextAnimationID);
-        const Milliseconds animationDuration(animation.mDurationInMilliseconds);
-		const auto& boneAnimations = animation.mBoneAnimations;
-
-		ConstRangedIterator<BoneParentMap> parentIter(parentMap, animation.mFirstBone, animation.mEndBone);
-		ConstRangedIterator<std::vector<PackageBone>> boneIter(bones, animation.mFirstBone, animation.mEndBone);
-
-        mAnimations.emplace(std::piecewise_construct, std::forward_as_tuple(mNextAnimationID), std::forward_as_tuple(animation.mName, animationDuration, animation.mInverseRootMatrix, boneAnimations, parentIter, boneIter));
-
-        return mNextAnimationID;
-    }
-
-    void ResourceManifest::DeleteAnimation(const AnimationID animationID)
-    {
-        mAnimations.erase(animationID);
-    }
-
-
     void ResourceManifest::ParseModelInitData(ModelNode::InitDataList& initDataList, const JonsPackagePtr jongPkg, const PackageModel& model)
     {
         for (const PackageNode& node : model.mNodes)
@@ -256,11 +196,5 @@ namespace JonsEngine
         const size_t hashedName = boost::hash_value(assetName);
 
         return std::find_if(container.begin(), container.end(), [hashedName](const PackageStruct& asset) { return boost::hash_value(asset.mName) == hashedName; });
-    }
-
-    template <typename IDType>
-    IDType IncrementID(const IDType prevID)
-    {
-        return (prevID + 1) % INVALID_ANIMATION_ID;
     }
 }

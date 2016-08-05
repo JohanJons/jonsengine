@@ -100,12 +100,10 @@ namespace JonsEngine
     {
     }
 
-    PackageAnimation::PackageAnimation(const std::string& name, const uint32_t durationInMilliseconds, const Mat4& invRootMatrix, const BoneIndex firstBone, const BoneIndex endBone) :
+    PackageAnimation::PackageAnimation(const std::string& name, const uint32_t durationInMilliseconds, const Mat4& invRootMatrix) :
         mName(name),
 		mDurationInMilliseconds(durationInMilliseconds),
         mInverseRootMatrix(mInverseRootMatrix),
-		mFirstBone(firstBone),
-		mEndBone(endBone),
 		mBoneAnimations()
     {
     }

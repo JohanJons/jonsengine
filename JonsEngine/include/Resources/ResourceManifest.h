@@ -21,7 +21,6 @@ namespace JonsEngine
     {
     public:
         ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator);
-        ~ResourceManifest();
 
         ModelID CreateRectangle(const std::string& modelName, const float sizeX, const float sizeY, const float sizeZ);
         ModelID CreateCube(const std::string& modelName, const float size);
@@ -29,9 +28,6 @@ namespace JonsEngine
         ModelID LoadModel(const std::string& assetName, const JonsPackagePtr jonsPkg);
         void DeleteModel(ModelID& modelID);
         const Model& GetModel(const ModelID modelID) const;
-
-        const Animation& GetAnimation(const AnimationID animationID) const;
-        const Animation& GetAnimation(const ModelID modelID, const std::string& animationName) const;
 
         MaterialID LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg);
         void DeleteMaterial(MaterialID& materialID);
@@ -44,9 +40,6 @@ namespace JonsEngine
 
 
     private:
-        AnimationID LoadAnimation(const PackageAnimation& animation, const BoneParentMap& parentMap, const std::vector<PackageBone>& bones);
-        void DeleteAnimation(const AnimationID animationID);
-
         void ParseModelInitData(ModelNode::InitDataList& initData, const JonsPackagePtr jongPkg, const PackageModel& model);
 
 
@@ -54,10 +47,7 @@ namespace JonsEngine
         DX11Renderer& mRenderer;
 
         IDMap<Model> mModels;
-        std::unordered_map<AnimationID, Animation> mAnimations;
         IDMap<Material> mMaterials;
         IDMap<Skybox> mSkyboxes;
-
-        AnimationID mNextAnimationID;
     };
 }

@@ -7,7 +7,7 @@ namespace JonsEngine
     uint32_t CountNumMeshes(const PackageModel& model);
     uint32_t CountNumImmediateChildren(const PackageModel& model, const PackageNode& node);
     uint32_t CountNumChildren(const PackageModel& model, const PackageNode& node);
-    void ReserveStorage(const PackageModel& model, ModelNode::NodeContainer& nodeContainer, ModelNode::MeshContainer& meshContainer);
+    void ReserveStorage(const PackageModel& model, ModelNode::NodeContainer& nodeContainer, ModelNode::MeshContainer& meshContainer, Model::AnimationMap& animationMap, Model::AnimationNameMap& animationNameMap);
 
 
     Model::Model(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID) :
@@ -21,62 +21,29 @@ namespace JonsEngine
 			ModelNode::AllChildrenIterator(mNodes.end(), mNodes.end()), ModelNode::MeshIterator(mMeshes.begin(), mMeshes.end()), mNodes.end());
     }
 
-    Model::Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData, const AnimationList& animations) :
+    Model::Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData) :
         mName(pkgModel.mName),
-        mStaticAABB(pkgModel.mStaticAABB.mMinBounds, pkgModel.mStaticAABB.mMaxBounds),
-        mAnimations(animations)
+        mStaticAABB(pkgModel.mStaticAABB.mMinBounds, pkgModel.mStaticAABB.mMaxBounds)
     {
-        ReserveStorage(pkgModel, mNodes, mMeshes);
+        ReserveStorage(pkgModel, mNodes, mMeshes, mAnimations, mAnimationNameMap);
 
         ParseNodes(pkgModel, initData, pkgModel.mNodes.front(), mNodes.end());
+		ParseAnimations(pkgModel);
     }
 
     // node container needs special care due to reconstructing valid iterators
+	// same for animation container due to new references
     Model::Model(const Model& otherModel) :
         mName(otherModel.mName),
         mStaticAABB(otherModel.mStaticAABB),
-        mAnimations(otherModel.mAnimations),
-        mMeshes(otherModel.mMeshes)
+        mAnimationNameMap(otherModel.mAnimationNameMap),
+        mMeshes(otherModel.mMeshes),
+		mParentMap(otherModel.mParentMap),
+		mBoneOffsetTransforms(otherModel.mBoneOffsetTransforms),
+		mAnimationIDGen(otherModel.mAnimationIDGen)
     {
-        const uint32_t numNodes = otherModel.mNodes.size();
-        mNodes.reserve(numNodes);
-
-        for (const ModelNode& otherNode : otherModel.mNodes)
-        {
-            // rebuild mesh iter
-            const auto meshBeginIter = otherNode.GetMeshes().begin();
-            const auto meshEndIter = otherNode.GetMeshes().end();
-            const uint32_t meshBeginIndex = meshBeginIter - otherModel.mMeshes.begin();
-            const uint32_t numMeshes = meshEndIter - meshBeginIter;
-            const auto meshIter = ModelNode::MeshIterator(mMeshes.begin() + meshBeginIndex, mMeshes.begin() + meshBeginIndex + numMeshes);
-
-            // /all/immediate node iters
-            // both iters use same begin/last, only advances differently
-            const auto iterNodesBegin = otherModel.mNodes.begin();
-            const uint32_t firstChildIndex = otherNode.GetAllChildren().begin() - iterNodesBegin;
-            const uint32_t pastLastChildIndex = otherNode.GetAllChildren().end() - iterNodesBegin;
-            const auto immChildrenIter = ModelNode::ImmediateChildrenIterator(mNodes.begin() + firstChildIndex, mNodes.begin() + pastLastChildIndex);
-            const auto allChildrenIter = ModelNode::AllChildrenIterator(mNodes.begin() + firstChildIndex, mNodes.begin() + pastLastChildIndex);
-
-            // nodes next iter
-            auto immChildNext = otherNode.GetImmediateChildren().begin();
-            auto immChildEnd = otherNode.GetImmediateChildren().end();
-            uint32_t numChildren = std::distance(immChildNext, immChildEnd);
-            uint32_t nextChildIndex = immChildEnd - iterNodesBegin;
-            if (numChildren > 0)
-            {
-                ++immChildNext;
-                const uint32_t nextChildIndex = immChildNext - iterNodesBegin;
-            }
-
-            const auto childNextIter = mNodes.begin() + nextChildIndex;
-
-            mNodes.emplace_back(otherNode.GetName(), otherNode.GetModelNodeIndex(), otherNode.GetLocalAABB().Min(), otherNode.GetLocalAABB().Max(), otherNode.GetLocalTransform(), immChildrenIter, allChildrenIter, meshIter, childNextIter);
-        }
-    }
-
-    Model::~Model()
-    {
+		CopyNodeHierarchy(otherModel);
+		CopyAnimationHierarchy(otherModel);
     }
 
 
@@ -104,8 +71,18 @@ namespace JonsEngine
 
     AnimationID Model::GetAnimationID(const std::string& name) const
     {
-        return mAnimations.at(name);
+		const AnimationID id = mAnimationNameMap.at(name);
+		assert(id != INVALID_ANIMATION_ID);
+
+        return id;
     }
+
+	const Animation& Model::GetAnimation(const AnimationID id) const
+	{
+		assert(id != INVALID_ANIMATION_ID);
+
+		return mAnimations.at(id);
+	}
 
     
     const ModelNode& Model::GetRootNode() const
@@ -182,6 +159,69 @@ namespace JonsEngine
         return ModelNode::MeshIterator(mMeshes.begin() + meshesSizeBegin, mMeshes.begin() + meshesSizeEnd);
     }
 
+	void Model::ParseAnimations(const PackageModel& pkgModel)
+	{
+		for (const PackageAnimation pkgAnim : pkgModel.mAnimations)
+		{
+			const AnimationID nextAnimID = mAnimationIDGen.GenerateID();
+			const auto animationDuration = Milliseconds(pkgAnim.mDurationInMilliseconds);
+
+			mAnimations.emplace(std::piecewise_construct, std::forward_as_tuple(nextAnimID), std::forward_as_tuple(pkgAnim.mName, animationDuration, pkgAnim.mInverseRootMatrix, pkgAnim.mBoneAnimations,
+				mParentMap, mBoneOffsetTransforms));
+		}
+	}
+
+
+	void Model::CopyNodeHierarchy(const Model& otherModel)
+	{
+		const uint32_t numNodes = otherModel.mNodes.size();
+		mNodes.reserve(numNodes);
+
+		for (const ModelNode& otherNode : otherModel.mNodes)
+		{
+			// rebuild mesh iter
+			const auto meshBeginIter = otherNode.GetMeshes().begin();
+			const auto meshEndIter = otherNode.GetMeshes().end();
+			const uint32_t meshBeginIndex = meshBeginIter - otherModel.mMeshes.begin();
+			const uint32_t numMeshes = meshEndIter - meshBeginIter;
+			const auto meshIter = ModelNode::MeshIterator(mMeshes.begin() + meshBeginIndex, mMeshes.begin() + meshBeginIndex + numMeshes);
+
+			// /all/immediate node iters
+			// both iters use same begin/last, only advances differently
+			const auto iterNodesBegin = otherModel.mNodes.begin();
+			const uint32_t firstChildIndex = otherNode.GetAllChildren().begin() - iterNodesBegin;
+			const uint32_t pastLastChildIndex = otherNode.GetAllChildren().end() - iterNodesBegin;
+			const auto immChildrenIter = ModelNode::ImmediateChildrenIterator(mNodes.begin() + firstChildIndex, mNodes.begin() + pastLastChildIndex);
+			const auto allChildrenIter = ModelNode::AllChildrenIterator(mNodes.begin() + firstChildIndex, mNodes.begin() + pastLastChildIndex);
+
+			// nodes next iter
+			auto immChildNext = otherNode.GetImmediateChildren().begin();
+			auto immChildEnd = otherNode.GetImmediateChildren().end();
+			uint32_t numChildren = std::distance(immChildNext, immChildEnd);
+			uint32_t nextChildIndex = immChildEnd - iterNodesBegin;
+			if (numChildren > 0)
+			{
+				++immChildNext;
+				const uint32_t nextChildIndex = immChildNext - iterNodesBegin;
+			}
+
+			const auto childNextIter = mNodes.begin() + nextChildIndex;
+
+			mNodes.emplace_back(otherNode.GetName(), otherNode.GetModelNodeIndex(), otherNode.GetLocalAABB().Min(), otherNode.GetLocalAABB().Max(), otherNode.GetLocalTransform(), immChildrenIter, allChildrenIter, meshIter, childNextIter);
+		}
+	}
+
+	void Model::CopyAnimationHierarchy(const Model& otherModel)
+	{
+		for (const auto otherAnimPair : otherModel.mAnimations)
+		{
+			const AnimationID id = otherAnimPair.first;
+			const Animation& otherAnimation = otherAnimPair.second;
+			
+			mAnimations.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(otherAnimation, mParentMap, mBoneOffsetTransforms));
+		}
+	}
+
 
     uint32_t CountNumMeshes(const PackageModel& model)
     {
@@ -206,7 +246,7 @@ namespace JonsEngine
         return numNodes;
     }
 
-    // inefficient, but not a big concern
+    // inefficient, but not a big concern, since its only used during initalization
     uint32_t CountNumChildren(const PackageModel& model, const PackageNode& node)
     {
         uint32_t numNodes = 0;
@@ -223,14 +263,17 @@ namespace JonsEngine
         return numNodes;
     }
 
-    void ReserveStorage(const PackageModel& model, ModelNode::NodeContainer& nodeContainer, ModelNode::MeshContainer& meshContainer)
+    void ReserveStorage(const PackageModel& model, ModelNode::NodeContainer& nodeContainer, ModelNode::MeshContainer& meshContainer, Model::AnimationMap& animationMap, Model::AnimationNameMap& animationNameMap)
     {
         // count meshes/nodes and reserve() space in containers before parsing them
         // otherwise iterators gets invalidated as parsing goes on and containers grow
         const uint32_t numMeshes = CountNumMeshes(model);
         const uint32_t numNodes = model.mNodes.size();
+		const uint32_t numAnimations = model.mAnimations.size();
 
         meshContainer.reserve(numMeshes);
         nodeContainer.reserve(numNodes);
+		animationMap.reserve(numAnimations);
+		animationNameMap.reserve(numAnimations);
     }
 }

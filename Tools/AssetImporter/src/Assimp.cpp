@@ -443,7 +443,7 @@ namespace JonsAssetImporter
             assert(animation->mNumMeshChannels == 0);
 
             const uint32_t durationMillisec = static_cast<uint32_t>((animation->mDuration / animation->mTicksPerSecond) * 1000);
-            model.mAnimations.emplace_back(animation->mName.C_Str(), invRootNodeTransform, durationMillisec);
+            model.mAnimations.emplace_back(animation->mName.C_Str(), durationMillisec, invRootNodeTransform);
             PackageAnimation& pkgAnimation = model.mAnimations.back();
 
             const uint32_t noAnimationKeysNum = 1;

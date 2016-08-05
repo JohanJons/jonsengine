@@ -143,14 +143,12 @@ namespace JonsEngine
     struct PackageAnimation
     {
         PackageAnimation();
-        PackageAnimation(const std::string& name, const uint32_t durationMilliseconds, const Mat4& invRootMatrix, const BoneIndex firstBone, const BoneIndex endBone);
+        PackageAnimation(const std::string& name, const uint32_t durationMilliseconds, const Mat4& invRootMatrix);
     
     
         std::string mName;
 		uint32_t mDurationInMilliseconds;
         Mat4 mInverseRootMatrix;
-		BoneIndex mFirstBone;
-		BoneIndex mEndBone;
 		BoneAnimationContainer mBoneAnimations;
     };
 
@@ -294,8 +292,6 @@ namespace boost
             ar & animation.mName;
 			ar & animation.mDurationInMilliseconds;
             ar & animation.mInverseRootMatrix;
-			ar & animation.mFirstBone;
-			ar & animation.mEndBone;
             ar & animation.mBoneAnimations;
         }
 

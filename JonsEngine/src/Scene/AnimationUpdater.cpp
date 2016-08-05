@@ -19,7 +19,8 @@ namespace JonsEngine
     {
         for (AnimationInstance& animationInstance : mActiveAnimations)
         {
-            const Animation& animation = mResourceManifest.GetAnimation(animationInstance.mAnimationID);
+			const Model& model = mResourceManifest.GetModel(animationInstance.mModelID);
+            const Animation& animation = model.GetAnimation(animationInstance.mAnimationID);
 
             const BoneIndex bonesBegin = animationInstance.mBoneRange.first;
             const BoneIndex bonesEnd = animationInstance.mBoneRange.second;
@@ -54,11 +55,12 @@ namespace JonsEngine
     }
 
 
-    AnimationInstanceID AnimationUpdater::PlayAnimation(const AnimationID animationID)
+    AnimationInstanceID AnimationUpdater::PlayAnimation(const ModelID modelID, const AnimationID animationID)
     {
         assert(animationID != INVALID_ANIMATION_ID);
 
-		const Animation& animation = mResourceManifest.GetAnimation(animationID);
+		const Model& model = mResourceManifest.GetModel(modelID);
+		const Animation& animation = model.GetAnimation(animationID);
 		const uint32_t numBonesForAnimation = animation.GetNumberOfBones();
 		
 		const BoneIndex firstIndex = mBoneTransforms.size();
@@ -70,7 +72,7 @@ namespace JonsEngine
 		mBoneTransforms.insert(mBoneTransforms.end(), numBonesForAnimation, gIdentityMatrix);
 
 		const BoneIndex lastIndex = firstIndex + numBonesForAnimation;
-		mActiveAnimations.emplace_back(animationID, firstIndex, lastIndex);
+		mActiveAnimations.emplace_back(modelID, animationID, firstIndex, lastIndex);
 
 		// map instance ID
 		const AnimationInstanceID animInstanceID = mAnimInstanceIDGen.GenerateID();
