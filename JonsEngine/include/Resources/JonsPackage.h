@@ -106,13 +106,9 @@ namespace JonsEngine
         PackageMesh();
         PackageMesh(const std::string& name);
         
-        bool IsAnimated() const;
-        
 
         std::string mName;
         PackageAABB mAABB;
-        PackageBone::BoneIndex mStartBoneIndex;
-        PackageBone::BoneIndex mEndBoneIndex;
         std::vector<float> mVertexData;
         std::vector<float> mNormalData;
         std::vector<float> mTexCoordsData;
@@ -219,8 +215,6 @@ namespace boost
         {
             ar & mesh.mName;
             ar & mesh.mAABB;
-            ar & mesh.mStartBoneIndex;
-            ar & mesh.mEndBoneIndex;
             ar & mesh.mVertexData;
             ar & mesh.mNormalData;
             ar & mesh.mTexCoordsData;

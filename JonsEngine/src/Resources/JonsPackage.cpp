@@ -76,11 +76,6 @@ namespace JonsEngine
     {
     }
 
-	bool PackageMesh::IsAnimated() const
-	{
-		return mStartBoneIndex != PackageBone::INVALID_BONE_INDEX && mEndBoneIndex != PackageBone::INVALID_BONE_INDEX;
-	}
-
 
     PackageNode::PackageNode() :
         PackageNode("", gIdentityMatrix, INVALID_NODE_INDEX, INVALID_NODE_INDEX)

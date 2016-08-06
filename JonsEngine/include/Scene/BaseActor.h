@@ -25,7 +25,7 @@ namespace JonsEngine
         float GetMaterialTilingFactor() const;
 
 
-    private:
+    protected:
         std::string mName;
         ModelID mModelID;
         SceneNodeID mSceneNodeID;

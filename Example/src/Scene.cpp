@@ -85,7 +85,7 @@ namespace JonsGame
         // animated wuson
         const Model& modelWuson = resManifest.GetModel(mModelWuson);
 		mAnimWuson = modelWuson.GetAnimationID("Wuson_Run");
-		const Animation& animWuson = resManifest.GetAnimation(mAnimWuson);
+		const Animation& animWuson = modelWuson.GetAnimation(mAnimWuson);
 		mAnimDurationWuson = animWuson.GetAnimationDuration();
 
         //mAnimIndexWuson = modelWuson.GetAnimationIndex("Wuson_Run");

@@ -30,7 +30,7 @@ namespace JonsEngine
         mTimestamp = Milliseconds(0);
         mAnimationDuration = animationTime;
 
-        mAnimationData = mOnPlayAnimationFunc(animationID);
+        mAnimationData = mOnPlayAnimationFunc(mModelID, animationID);
     }
 
     void AnimatedActor::StopAnimation()

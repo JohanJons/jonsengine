@@ -6,6 +6,7 @@
 #include "include/FreeImage.h"
 
 #include <limits>
+#include <set>
 
 using namespace JonsEngine;
 
@@ -217,9 +218,6 @@ namespace JonsAssetImporter
             meshContainer.emplace_back(assimpMesh->mName.C_Str());
             PackageMesh& jonsMesh = meshContainer.back();
             
-            if (!ProcessBones(skeleton, jonsMesh, assimpMesh, scene))
-                return false;
-
             if (!AddMeshGeometricData(jonsMesh, skeleton, assimpMesh, scene, meshIndex))
                 return false;
 
@@ -235,6 +233,9 @@ namespace JonsAssetImporter
 
             jonsMesh.mMaterialIndex = materialMap.at(assimpMesh->mMaterialIndex);
         }
+
+		if (!ProcessBones(skeleton, scene))
+			return false;
 
         return true;
     }
@@ -318,7 +319,7 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessBones(std::vector<PackageBone>& bones, PackageMesh& pkgMesh, const aiMesh* assimpMesh, const aiScene* scene)
+    /*bool Assimp::ProcessBones(std::vector<PackageBone>& bones, PackageMesh& pkgMesh, const aiMesh* assimpMesh, const aiScene* scene)
     {
 		// NOTE: process bones anyway?
 		if (!scene->HasAnimations())
@@ -340,7 +341,68 @@ namespace JonsAssetImporter
         pkgMesh.mEndBoneIndex = bones.size();
     
         return true;
-    }
+    }*/
+
+	void BuildSkeleton(const aiNode* node,
+		const std::set<std::string>& boneNames,
+		const Mat4& parentTransform,
+		const int parentBoneIndex,
+		std::vector<PackageBone>& skeleton,
+		BoneParentMap& parentMap)
+	{
+		// accumulated parents => node transform
+		const Mat4 globalTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);	// P * B
+
+		//int newBoneIndex = parentBoneIndex;
+
+		auto boneIt = boneNames.find(node->mName.C_Str());
+		if (boneIt != boneNames.end())
+		{
+			skeleton.emplace_back(boneIt);
+			/*newBoneIndex = skeleton.Num();
+
+			BoneDesc* newBone = new BoneDesc();
+			skeleton.Add(newBone);
+
+			newBone->node = node;
+			newBone->name = node->mName.C_Str();
+			newBone->globalTransform = globalTransform;
+			newBone->parentIndex = parentBoneIndex;*/
+		}
+
+		for (int childIndex = 0; childIndex < node->mNumChildren; childIndex++)
+		{
+			const aiNode* childNode = node->mChildren[childIndex];
+			BuildSkeleton(childNode, boneNames, globalTransform, newBoneIndex, skeleton);
+		}
+	}
+
+	bool Assimp::ProcessBones(std::vector<PackageBone>& bones, const aiScene* scene)
+	{
+		std::set<std::string> bones2;
+
+		for (int meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
+		{
+			const aiMesh* mesh = scene->mMeshes[meshIndex];
+			for (int boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++)
+			{
+				const aiBone* bone = mesh->mBones[boneIndex];
+				const aiNode* node = scene->mRootNode->FindNode(bone->mName.C_Str());
+				while (node)
+				{
+					bones2.insert(node->mName.C_Str());
+					node = node->mParent;
+					if (node && node->mNumChildren == 1) {
+						break;	// don't chase up until the scene root, if possible
+					}
+				}
+			}
+		}
+
+		//scene->mRootNode->
+
+		return true;
+	}
 
 	bool Assimp::ProcessBoneParentMapping(BoneParentMap& parentMap, const std::vector<PackageBone>& bones, const aiScene* scene)
 	{
