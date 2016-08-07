@@ -23,11 +23,13 @@ namespace JonsEngine
 
     Model::Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData) :
         mName(pkgModel.mName),
-        mStaticAABB(pkgModel.mStaticAABB.mMinBounds, pkgModel.mStaticAABB.mMaxBounds)
+        mStaticAABB(pkgModel.mStaticAABB.mMinBounds, pkgModel.mStaticAABB.mMaxBounds),
+		mParentMap(pkgModel.mBoneParentMap)
     {
         ReserveStorage(pkgModel, mNodes, mMeshes, mAnimations, mAnimationNameMap);
 
         ParseNodes(pkgModel, initData, pkgModel.mNodes.front(), mNodes.end());
+		ParseSkeleton(pkgModel);
 		ParseAnimations(pkgModel);
     }
 
@@ -134,6 +136,12 @@ namespace JonsEngine
         }
     }
 
+	void Model::ParseSkeleton(const PackageModel& model)
+	{
+		for (const auto& pkgBone : model.mSkeleton)
+			mBoneOffsetTransforms.emplace_back(pkgBone.mOffsetMatrix);
+	}
+
     ModelNode::MeshIterator Model::ParseMeshes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode)
     {
         const uint32_t numMeshes = pkgNode.mMeshes.size();
@@ -168,6 +176,7 @@ namespace JonsEngine
 
 			mAnimations.emplace(std::piecewise_construct, std::forward_as_tuple(nextAnimID), std::forward_as_tuple(pkgAnim.mName, animationDuration, pkgAnim.mInverseRootMatrix, pkgAnim.mBoneAnimations,
 				mParentMap, mBoneOffsetTransforms));
+			mAnimationNameMap.emplace(std::piecewise_construct, std::forward_as_tuple(pkgAnim.mName), std::forward_as_tuple(nextAnimID));
 		}
 	}
 

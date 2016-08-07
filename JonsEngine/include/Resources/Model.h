@@ -48,6 +48,7 @@ namespace JonsEngine
     private:
         void ParseNodes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode, const ModelNode::NodeIterator& next);
         ModelNode::MeshIterator ParseMeshes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode);
+		void ParseSkeleton(const PackageModel& model);
 		void ParseAnimations(const PackageModel& pkgModel);
 
 		void CopyNodeHierarchy(const Model& otherModel);

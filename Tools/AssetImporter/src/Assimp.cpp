@@ -162,7 +162,9 @@ namespace JonsAssetImporter
         if (!ParseNodeHeirarchy(model.mNodes, model.mMeshes, scene, scene->mRootNode, rootParentIndex, gIdentityMatrix))
             return false;
 
-		if (!ProcessBoneParentMapping(model.mBoneParentMap, model.mSkeleton, scene))
+		//if (!ProcessBoneParentMapping(model.mBoneParentMap, model.mSkeleton, scene))
+		//	return false;
+		if (!ProcessBones(model.mBoneParentMap, model.mSkeleton, scene))
 			return false;
 
         return true;
@@ -233,9 +235,6 @@ namespace JonsAssetImporter
 
             jonsMesh.mMaterialIndex = materialMap.at(assimpMesh->mMaterialIndex);
         }
-
-		if (!ProcessBones(skeleton, scene))
-			return false;
 
         return true;
     }
@@ -343,19 +342,12 @@ namespace JonsAssetImporter
         return true;
     }*/
 
-	void BuildSkeleton(const aiNode* node,
-		const std::set<std::string>& boneNames,
-		const Mat4& parentTransform,
-		const int parentBoneIndex,
-		std::vector<PackageBone>& skeleton,
-		BoneParentMap& parentMap)
+	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const std::set<std::string>& boneNames, const aiNode* node, const Mat4& parentTransform, const BoneIndex parentBone)
 	{
 		// accumulated parents => node transform
-		const Mat4 globalTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);	// P * B
-
 		//int newBoneIndex = parentBoneIndex;
 
-		auto boneIt = boneNames.find(node->mName.C_Str());
+		/*auto boneIt = boneNames.find(node->mName.C_Str());
 		if (boneIt != boneNames.end())
 		{
 			skeleton.emplace_back(boneIt);
@@ -367,24 +359,35 @@ namespace JonsAssetImporter
 			newBone->node = node;
 			newBone->name = node->mName.C_Str();
 			newBone->globalTransform = globalTransform;
-			newBone->parentIndex = parentBoneIndex;*/
-		}
+			newBone->parentIndex = parentBoneIndex;
+		}*/
 
-		for (int childIndex = 0; childIndex < node->mNumChildren; childIndex++)
+		//skeleton.emplace_back(node->mName)
+		const auto boneIt = boneNames.find(node->mName.C_Str());
+		if (boneIt == boneNames.end())
+			return;
+
+		const Mat4 boneTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);	// P * B
+		skeleton.emplace_back(node->mName.C_Str(), boneTransform);
+		
+		const BoneIndex thisBone = skeleton.size() - 1;
+		parentMap.at(thisBone) = parentBone;
+
+		for (uint32_t childIndex = 0; childIndex < node->mNumChildren; childIndex++)
 		{
 			const aiNode* childNode = node->mChildren[childIndex];
-			BuildSkeleton(childNode, boneNames, globalTransform, newBoneIndex, skeleton);
+			BuildSkeleton(parentMap, skeleton, boneNames, childNode, boneTransform, thisBone);
 		}
 	}
 
-	bool Assimp::ProcessBones(std::vector<PackageBone>& bones, const aiScene* scene)
+	bool Assimp::ProcessBones(JonsEngine::BoneParentMap& parentMap, std::vector<PackageBone>& bones, const aiScene* scene)
 	{
 		std::set<std::string> bones2;
 
-		for (int meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
+		for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
 		{
 			const aiMesh* mesh = scene->mMeshes[meshIndex];
-			for (int boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++)
+			for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++)
 			{
 				const aiBone* bone = mesh->mBones[boneIndex];
 				const aiNode* node = scene->mRootNode->FindNode(bone->mName.C_Str());
@@ -399,7 +402,11 @@ namespace JonsAssetImporter
 			}
 		}
 
-		//scene->mRootNode->
+		const std::size_t numBones = bones2.size();
+		parentMap.resize(numBones, INVALID_BONE_INDEX);
+		bones.reserve(numBones);
+
+		BuildSkeleton(parentMap, bones, bones2, scene->mRootNode, gIdentityMatrix, INVALID_BONE_INDEX);
 
 		return true;
 	}
