@@ -268,7 +268,7 @@ namespace boost
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::BoneKeyframe& keyframe, const unsigned int version)
         {
-            ar & keyframe.mTimestampMilliseconds;
+            ar & keyframe.mTimestamp;
             ar & keyframe.mTranslation;
             ar & keyframe.mRotation;
         }
@@ -351,5 +351,11 @@ namespace boost
             ar & quat.z;
             ar & quat.w;
         }
+
+		template<class Archive>
+		void serialize(Archive & ar, JonsEngine::Milliseconds time, const unsigned int version)
+		{
+			ar & 
+		}
     } // namespace serialization
 } // namespace boost

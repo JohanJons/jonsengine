@@ -61,7 +61,7 @@ namespace JonsGame
                 case Key::W: mSun.SetIsMoving(false); break;
 
                 // animated actors
-                case Key::E: mGameScene.PlayAnimationWuson();
+                case Key::E: mGameScene.ToggleAnimationWuson();
                 //case Key::R: mSunSpeed -= 0.005f; break;
                 
                 default:

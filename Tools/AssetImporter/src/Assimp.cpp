@@ -332,38 +332,20 @@ namespace JonsAssetImporter
     
 	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const std::set<std::string>& boneNames, const std::set<const aiBone*> aiBones, const aiNode* node, const Mat4& parentTransform, const BoneIndex parentBone)
 	{
-		// accumulated parents => node transform
-		//int newBoneIndex = parentBoneIndex;
-
-		/*auto boneIt = boneNames.find(node->mName.C_Str());
-		if (boneIt != boneNames.end())
-		{
-			skeleton.emplace_back(boneIt);
-			/*newBoneIndex = skeleton.Num();
-
-			BoneDesc* newBone = new BoneDesc();
-			skeleton.Add(newBone);
-
-			newBone->node = node;
-			newBone->name = node->mName.C_Str();
-			newBone->globalTransform = globalTransform;
-			newBone->parentIndex = parentBoneIndex;
-		}*/
-
-		//skeleton.emplace_back(node->mName)
-		const auto boneNameIt = boneNames.find(node->mName.C_Str());
-		if (boneNameIt == boneNames.end())
-			return;
-
-        const aiBone* bone = FindAiBoneByName(aiBones, *boneNameIt);
+		BoneIndex thisBone = INVALID_BONE_INDEX;
 		const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
-        if (bone)
-            skeleton.emplace_back(*boneNameIt, aiMat4ToJonsMat4(bone->mOffsetMatrix));
-        else
-            skeleton.emplace_back(*boneNameIt, nodeTransform);
-		
-		const BoneIndex thisBone = skeleton.size() - 1;
-		parentMap.at(thisBone) = parentBone;
+		const auto boneNameIt = boneNames.find(node->mName.C_Str());
+		if (boneNameIt != boneNames.end())
+		{
+			const aiBone* bone = FindAiBoneByName(aiBones, *boneNameIt);
+			if (bone)
+				skeleton.emplace_back(*boneNameIt, aiMat4ToJonsMat4(bone->mOffsetMatrix));
+			else
+				skeleton.emplace_back(*boneNameIt, nodeTransform);
+
+			thisBone = skeleton.size() - 1;
+			parentMap.at(thisBone) = parentBone;
+		}
 
 		for (uint32_t childIndex = 0; childIndex < node->mNumChildren; childIndex++)
 		{
@@ -571,7 +553,7 @@ namespace JonsAssetImporter
                     const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime) / animation->mTicksPerSecond;
                     const uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
 
-                    boneAnimation.mKeyframes.emplace_back(timestampMillisec, translateVector, rotationQuat);
+                    boneAnimation.mKeyframes.emplace_back(Milliseconds(timestampMillisec), translateVector, rotationQuat);
                 }
             }
         }
@@ -771,7 +753,6 @@ namespace JonsAssetImporter
 			const aiNode* childNode = node->mChildren[childIndex];
 			assert(childNode);
 			const aiNode* childRes = FindMeshNode(mesh, scene, childNode);
-			assert(childRes);
             if (childRes != nullptr)
                 return childRes;
 		}

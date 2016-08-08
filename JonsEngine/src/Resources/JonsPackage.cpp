@@ -98,8 +98,7 @@ namespace JonsEngine
     PackageAnimation::PackageAnimation(const std::string& name, const uint32_t durationInMilliseconds, const Mat4& invRootMatrix) :
         mName(name),
 		mDurationInMilliseconds(durationInMilliseconds),
-        mInverseRootMatrix(mInverseRootMatrix),
-		mBoneAnimations()
+        mInverseRootMatrix(mInverseRootMatrix)
     {
     }
 
