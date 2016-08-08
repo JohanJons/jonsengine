@@ -65,18 +65,16 @@ namespace JonsEngine
 		
 		const BoneIndex firstIndex = mBoneTransforms.size();
 
-		// initialize instance transforms to bind pose transforms
-		//const auto& bindPoseTransforms = animation.GetBindPoseTransforms();
-		//mBoneTransforms.insert(mBoneTransforms.end(), bindPoseTransforms.begin(), bindPoseTransforms.end());
 		// initialize instance transforms to identity transform
 		mBoneTransforms.insert(mBoneTransforms.end(), numBonesForAnimation, gIdentityMatrix);
 
 		const BoneIndex lastIndex = firstIndex + numBonesForAnimation;
 		mActiveAnimations.emplace_back(modelID, animationID, firstIndex, lastIndex);
 
-		// map instance ID
+		// map instance ID to instance index
 		const AnimationInstanceID animInstanceID = mAnimInstanceIDGen.GenerateID();
-		mAnimationInstanceMap.emplace(animInstanceID, mActiveAnimations.back());
+		const AnimationInstanceIndex animInstanceIndex = mActiveAnimations.size() - 1;
+		mAnimationInstanceMap.emplace(animInstanceID, animInstanceIndex);
 
 		return animInstanceID;
     }
@@ -86,15 +84,14 @@ namespace JonsEngine
         assert(instanceID != INVALID_ANIMATION_INSTANCE_ID);
 
 		// copy bone range before deleting instance
-		const BoneIndexRange boneRange = mAnimationInstanceMap.at(instanceID).mBoneRange;
-
-		mAnimationInstanceMap.erase(instanceID);
-		mAnimInstanceIDGen.FreeID(instanceID);
+		const auto animInstanceIndex = mAnimationInstanceMap.at(instanceID);
+		const BoneIndexRange boneRange = mActiveAnimations.at(animInstanceIndex).mBoneRange;
 
 		// remove transforms, update indices, etc
+		mActiveAnimations.erase(mActiveAnimations.begin() + animInstanceIndex);
+		mAnimationInstanceMap.erase(instanceID);
+		mAnimInstanceIDGen.FreeID(instanceID);
 		mBoneTransforms.erase(mBoneTransforms.begin() + boneRange.first, mBoneTransforms.begin() + boneRange.second);
-		//mActiveAnimations.erase().....
-		mActiveAnimations.pop_back();
 
 		const std::size_t numBonesRemoved = boneRange.second - boneRange.first;
 		for (AnimationInstance& animInstance : mActiveAnimations)
@@ -105,6 +102,10 @@ namespace JonsEngine
 				animInstance.mBoneRange.second -= numBonesRemoved;
 			}
 		}
+
+		// decrement index-mapping of other animationInstances as we are removing one member
+		for (auto& animInstIDIndexPair : mAnimationInstanceMap)
+			--animInstIDIndexPair.second;
     }
 
 
@@ -116,7 +117,8 @@ namespace JonsEngine
 	const BoneIndexRange& AnimationUpdater::GetBoneRange(const AnimationInstanceID animationInstance) const
 	{
 		assert(animationInstance != INVALID_ANIMATION_INSTANCE_ID);
+		const auto animInstanceIndex = mAnimationInstanceMap.at(animationInstance);
 
-		return mAnimationInstanceMap.at(animationInstance).mBoneRange;
+		return mActiveAnimations.at(animInstanceIndex).mBoneRange;
 	}
 }

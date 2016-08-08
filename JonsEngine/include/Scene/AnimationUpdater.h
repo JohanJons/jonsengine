@@ -32,7 +32,8 @@ namespace JonsEngine
 
     private:
         typedef std::vector<AnimationInstance> AnimationInstances;
-        typedef std::unordered_map<AnimationInstanceID, AnimationInstance&> AnimationInstanceMap;
+		typedef AnimationInstances::size_type AnimationInstanceIndex;
+        typedef std::unordered_map<AnimationInstanceID, AnimationInstanceIndex> AnimationInstanceMap;
 
 
         const ResourceManifest& mResourceManifest;

@@ -59,7 +59,8 @@ namespace JonsGame
 
         // misc animation
 		mAnimWuson(INVALID_ANIMATION_ID),
-        mAnimDurationWuson(0)
+        mAnimDurationWuson(0),
+		mIsAnimatingWuson(false)
     {
         // ambient light
         mScene.SetAmbientLight(Vec4(0.01f));
@@ -152,10 +153,15 @@ namespace JonsGame
     }
 
 
-    void Scene::PlayAnimationWuson()
+    void Scene::ToggleAnimationWuson()
     {
         AnimatedActor& animWuson = mScene.GetAnimatedActor(mActorAnimWuson);
-        animWuson.PlayAnimation(mAnimWuson, mAnimDurationWuson, false);
+		if (mIsAnimatingWuson)
+			animWuson.PlayAnimation(mAnimWuson, mAnimDurationWuson, true);
+		else
+			animWuson.StopAnimation();
+
+		mIsAnimatingWuson = !mIsAnimatingWuson;
     }
 
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/Types.h"
+#include "include/Core/Utils/Time.h"
 
 #include <vector>
 
@@ -8,13 +9,13 @@ namespace JonsEngine
 {
 	struct BoneKeyframe
 	{
-		uint32_t mTimestampMilliseconds;
+		BoneKeyframe();
+		BoneKeyframe(const Milliseconds timestamp, const Vec3& translation, const Quaternion& rotation);
+
+
+		Milliseconds mTimestamp;
 		Vec3 mTranslation;
 		Quaternion mRotation;
-
-
-		BoneKeyframe();
-		BoneKeyframe(const uint32_t timestampMilliseconds, const Vec3& translation, const Quaternion& rotation);
 	};
 
 	typedef std::vector<BoneKeyframe> BoneKeyframeContainer;

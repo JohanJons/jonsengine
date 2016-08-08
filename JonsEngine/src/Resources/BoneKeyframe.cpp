@@ -8,8 +8,8 @@ namespace JonsEngine
 	{
 	}
 
-	BoneKeyframe::BoneKeyframe(const uint32_t timestampMilliseconds, const Vec3& translation, const Quaternion& rotation) :
-		mTimestampMilliseconds(timestampMilliseconds),
+	BoneKeyframe::BoneKeyframe(const Milliseconds timestamp, const Vec3& translation, const Quaternion& rotation) :
+		mTimestamp(timestamp),
 		mTranslation(translation),
 		mRotation(rotation)
 	{

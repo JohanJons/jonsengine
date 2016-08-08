@@ -14,7 +14,7 @@ namespace JonsGame
         Scene(JonsEngine::Scene& jonsScene, JonsEngine::ResourceManifest& resManifest, const std::string& jonsPkgName);
         ~Scene();
 
-        void PlayAnimationWuson();
+        void ToggleAnimationWuson();
 
         JonsEngine::Scene& GetJonsScene();
         JonsEngine::SceneNode& GetMovingLightNode();
@@ -67,5 +67,6 @@ namespace JonsGame
 
         JonsEngine::AnimationID mAnimWuson;
         JonsEngine::Milliseconds mAnimDurationWuson;
+		bool mIsAnimatingWuson;
     };
 }

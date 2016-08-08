@@ -21,7 +21,8 @@ namespace JonsAssetImporter
     PackageBone::BoneIndex GetBoneIndex(const PackageModel& model, const std::string& boneName);
     uint32_t CountChildren(const aiNode* node);
     bool UsedLessThanMaxNumBones(const std::vector<float>& boneWeights, const uint32_t offset);
-    const aiNode* FindSkeletonRootNode(const aiMesh* assimpMesh, const aiScene* scene);
+    const aiNode* FindSkeletonRootNode(const aiMesh* mesh, const aiScene* scene);
+	const aiNode* FindMeshNode(const aiMesh* mesh, const aiScene* scene, const aiNode* node);
     uint32_t GetNodeDistanceFromRoot(const aiString& name, const aiScene* scene);
     Vec3 GetVertices(const bool isStatic, const Mat4& nodeTransform, const aiVector3D& assimpVertices);
 
@@ -318,31 +319,18 @@ namespace JonsAssetImporter
         return true;
     }
 
-    /*bool Assimp::ProcessBones(std::vector<PackageBone>& bones, PackageMesh& pkgMesh, const aiMesh* assimpMesh, const aiScene* scene)
+    const aiBone* FindAiBoneByName(const std::set<const aiBone*> aiBones, const std::string& string)
     {
-		// NOTE: process bones anyway?
-		if (!scene->HasAnimations())
-			return true;
-
-        if (!assimpMesh->HasBones())
-            return true;
-        
-        const aiNode* rootNode = FindSkeletonRootNode(assimpMesh, scene);
-        assert(rootNode);
-
-        pkgMesh.mStartBoneIndex = bones.size();
-        bones.emplace_back(rootNode->mName.C_Str(), aiMat4ToJonsMat4(rootNode->mTransformation));
-        for (uint32_t boneNum = 0; boneNum < assimpMesh->mNumBones; ++boneNum)
+        for (const aiBone* bone : aiBones)
         {
-            const auto bone = assimpMesh->mBones[boneNum];
-            bones.emplace_back(bone->mName.C_Str(), aiMat4ToJonsMat4(bone->mOffsetMatrix));
+            if (bone->mName.C_Str() == string)
+                return bone;
         }
-        pkgMesh.mEndBoneIndex = bones.size();
     
-        return true;
-    }*/
-
-	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const std::set<std::string>& boneNames, const aiNode* node, const Mat4& parentTransform, const BoneIndex parentBone)
+        return nullptr;
+    }
+    
+	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const std::set<std::string>& boneNames, const std::set<const aiBone*> aiBones, const aiNode* node, const Mat4& parentTransform, const BoneIndex parentBone)
 	{
 		// accumulated parents => node transform
 		//int newBoneIndex = parentBoneIndex;
@@ -363,12 +351,16 @@ namespace JonsAssetImporter
 		}*/
 
 		//skeleton.emplace_back(node->mName)
-		const auto boneIt = boneNames.find(node->mName.C_Str());
-		if (boneIt == boneNames.end())
+		const auto boneNameIt = boneNames.find(node->mName.C_Str());
+		if (boneNameIt == boneNames.end())
 			return;
 
-		const Mat4 boneTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);	// P * B
-		skeleton.emplace_back(node->mName.C_Str(), boneTransform);
+        const aiBone* bone = FindAiBoneByName(aiBones, *boneNameIt);
+		const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
+        if (bone)
+            skeleton.emplace_back(*boneNameIt, aiMat4ToJonsMat4(bone->mOffsetMatrix));
+        else
+            skeleton.emplace_back(*boneNameIt, nodeTransform);
 		
 		const BoneIndex thisBone = skeleton.size() - 1;
 		parentMap.at(thisBone) = parentBone;
@@ -376,37 +368,61 @@ namespace JonsAssetImporter
 		for (uint32_t childIndex = 0; childIndex < node->mNumChildren; childIndex++)
 		{
 			const aiNode* childNode = node->mChildren[childIndex];
-			BuildSkeleton(parentMap, skeleton, boneNames, childNode, boneTransform, thisBone);
+			BuildSkeleton(parentMap, skeleton, boneNames, aiBones, childNode, nodeTransform, thisBone);
 		}
 	}
 
 	bool Assimp::ProcessBones(JonsEngine::BoneParentMap& parentMap, std::vector<PackageBone>& bones, const aiScene* scene)
 	{
-		std::set<std::string> bones2;
+        /*
+        Using the bones name you can find the corresponding node in the node hierarchy. This node in relation to the other bones' nodes defines the skeleton of the mesh. Unfortunately there might also be nodes which are not used by a bone in the mesh, but still affect the pose of the skeleton because they have child nodes which are bones. So when creating the skeleton hierarchy for a mesh I suggest the following method:
 
-		for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
+        a) Create a map or a similar container to store which nodes are necessary for the skeleton. Pre-initialise it for all nodes with a "no". 
+        b) For each bone in the mesh: 
+        b1) Find the corresponding node in the scene's hierarchy by comparing their names. 
+        b2) Mark this node as "yes" in the necessityMap. 
+        b3) Mark all of its parents the same way until you 1) find the mesh's node or 2) the parent of the mesh's node. 
+        c) Recursively iterate over the node hierarchy 
+        c1) If the node is marked as necessary, copy it into the skeleton and check its children 
+        c2) If the node is marked as not necessary, skip it and do not iterate over its children. 
+        Reasons: you need all the parent nodes to keep the transformation chain intact. For most file formats and modelling packages the node hierarchy of the skeleton is either a child of the mesh node or a sibling of the mesh node but this is by no means a requirement so you shouldn't rely on it. The node closest to the root node is your skeleton root, from there you start copying the hierarchy. You can skip every branch without a node being a bone in the mesh - that's why the algorithm skips the whole branch if the node is marked as "not necessary".
+        */
+    
+		std::set<std::string> boneNames;
+        std::set<const aiBone*> aiBones;
+
+		for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
 		{
 			const aiMesh* mesh = scene->mMeshes[meshIndex];
-			for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++)
+            assert(mesh);
+			const aiNode* meshNode = FindMeshNode(mesh, scene, scene->mRootNode);
+            assert(meshNode);
+            const aiNode* parentMeshNode = meshNode->mParent;
+            
+			for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
 			{
 				const aiBone* bone = mesh->mBones[boneIndex];
+                assert(bone);
 				const aiNode* node = scene->mRootNode->FindNode(bone->mName.C_Str());
-				while (node)
-				{
-					bones2.insert(node->mName.C_Str());
-					node = node->mParent;
-					if (node && node->mNumChildren == 1) {
-						break;	// don't chase up until the scene root, if possible
-					}
-				}
+                assert(node);
+                
+                aiBones.insert(bone);
+                do
+                {
+                    boneNames.insert(node->mName.C_Str());
+                    node = node->mParent;
+                }
+				while (node && node != meshNode && node != parentMeshNode);
 			}
 		}
 
-		const std::size_t numBones = bones2.size();
+		const std::size_t numBones = boneNames.size();
 		parentMap.resize(numBones, INVALID_BONE_INDEX);
 		bones.reserve(numBones);
 
-		BuildSkeleton(parentMap, bones, bones2, scene->mRootNode, gIdentityMatrix, INVALID_BONE_INDEX);
+		BuildSkeleton(parentMap, bones, boneNames, aiBones, scene->mRootNode, gIdentityMatrix, INVALID_BONE_INDEX);
+
+		assert(bones.size() == numBones);
 
 		return true;
 	}
@@ -712,15 +728,16 @@ namespace JonsAssetImporter
         return false;
     }
     
-    const aiNode* FindSkeletonRootNode(const aiMesh* assimpMesh, const aiScene* scene)
+    const aiNode* FindSkeletonRootNode(const aiMesh* mesh, const aiScene* scene)
     {
-        assert(assimpMesh);
+        assert(mesh);
+		assert(scene);
         
         aiString rootNodeName;
         uint32_t minDistance = std::numeric_limits<uint32_t>::max();
-        for (uint32_t boneNum = 0; boneNum < assimpMesh->mNumBones; ++boneNum)
+        for (uint32_t boneNum = 0; boneNum < mesh->mNumBones; ++boneNum)
         {
-            const aiBone* bone = assimpMesh->mBones[boneNum];
+            const aiBone* bone = mesh->mBones[boneNum];
             uint32_t distFromRoot = GetNodeDistanceFromRoot(bone->mName, scene);
             if (distFromRoot < minDistance)
             {
@@ -735,6 +752,32 @@ namespace JonsAssetImporter
 
         return node->mParent;
     }
+
+	const aiNode* FindMeshNode(const aiMesh* mesh, const aiScene* scene, const aiNode* node)
+	{
+		assert(mesh);
+		assert(scene);
+		assert(node);
+
+		for (uint32_t meshIndex = 0; meshIndex < node->mNumMeshes; ++meshIndex)
+		{
+			const aiMesh* nodeMesh = scene->mMeshes[meshIndex];
+			if (nodeMesh == mesh)
+				return node;
+		}
+
+		for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex)
+		{
+			const aiNode* childNode = node->mChildren[childIndex];
+			assert(childNode);
+			const aiNode* childRes = FindMeshNode(mesh, scene, childNode);
+			assert(childRes);
+            if (childRes != nullptr)
+                return childRes;
+		}
+        
+        return nullptr;
+	}
     
     uint32_t GetNodeDistanceFromRoot(const aiString& name, const aiScene* scene)
     {
