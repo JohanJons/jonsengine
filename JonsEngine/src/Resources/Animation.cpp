@@ -94,22 +94,21 @@ namespace JonsEngine
 			return gIdentityMatrix;
 
 		const KeyframeIterator currframeIter = GetBoneKeyframe(elapsedTime);
-		const KeyframeIterator nextFrameIter = GetNextFrameIter(currframeIter);
+		/*const KeyframeIterator nextFrameIter = GetNextFrameIter(currframeIter);
         const auto endIter = mKeyframes.end();
 		if (currframeIter == endIter || nextFrameIter == endIter)
 		{
             // only last keyframe is used - no interpolation
-            const BoneKeyframe& lastKeyframe = mKeyframe.back();
-            Mat4 boneMatrix = glm::toMat4(keyframe.mRotation);
-            boneMatrix = glm::translate(boneMatrix, keyframe.mTranslation);
+            const BoneKeyframe& lastKeyframe = mKeyframes.back();
+            Mat4 boneMatrix = glm::toMat4(lastKeyframe.mRotation);
+            boneMatrix = glm::translate(boneMatrix, lastKeyframe.mTranslation);
             
             return boneMatrix;
         }
         else
         {
-            const Milliseconds deltaTime = nextFrameIter->mTimestamp - currframeIter->mTimestamp;
-            const Milliseconds factor = (elapsedTime - currframeIter->mTimestamp) / deltaTime;
-            const float interpolationFactor = factor.count();
+            const float deltaTime = (nextFrameIter->mTimestamp - currframeIter->mTimestamp).count();
+            const float interpolationFactor = (elapsedTime - currframeIter->mTimestamp).count() / deltaTime;
         
             // interpolate rotation
             const Quaternion& currRot = currframeIter->mRotation;
@@ -120,7 +119,7 @@ namespace JonsEngine
             const Vec3& currTranslation = currframeIter->mTranslation;
             const Vec3& nextTranslation = nextFrameIter->mTranslation;
             const Vec3 finalTranslation = interpolationFactor * currTranslation + (1.0f - interpolationFactor) * nextTranslation;
-        }
+        }*/
 
         // TODO: interpolation between frames
         Mat4 boneMatrix = glm::toMat4(currframeIter->mRotation);
@@ -148,6 +147,6 @@ namespace JonsEngine
 		if (currFrameIter == endIter)
 			return endIter;
 
-
+		return endIter;
 	}
 }

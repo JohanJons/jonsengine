@@ -50,19 +50,21 @@ GBufferVSOut vs_main(GBufferVSIn input)
 	output.mBitangent = input.mBitangent;
 
 	float4x4 wvpMatrix = gWVPMatrix;
+	float4x4 worldViewMatrix = gWorldViewMatrix;
     // temporary solution
     if (gIsAnimating)
     {
 		float4x4 boneTransform = BuildBoneTransform(input.mBoneIndices, input.mBoneWeights);
 		wvpMatrix = mul(wvpMatrix, boneTransform);
+		worldViewMatrix = mul(worldViewMatrix, boneTransform);
     }
         
     output.mPosition = mul(wvpMatrix, output.mPosition);
 
     // rotating/translation/uniform scaling is fine, we dont need to normalize in VS
-    output.mNormal = mul((float3x3)wvpMatrix, output.mNormal);
-    output.mTangent = mul((float3x3)wvpMatrix, output.mTangent);
-    output.mBitangent = mul((float3x3)wvpMatrix, output.mBitangent);
+    output.mNormal = mul((float3x3)worldViewMatrix, output.mNormal);
+    output.mTangent = mul((float3x3)worldViewMatrix, output.mTangent);
+    output.mBitangent = mul((float3x3)worldViewMatrix, output.mBitangent);
 
     output.mTexcoord = gTextureTilingFactor * input.mTexcoord;
 

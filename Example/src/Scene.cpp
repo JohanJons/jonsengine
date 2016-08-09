@@ -157,9 +157,9 @@ namespace JonsGame
     {
         AnimatedActor& animWuson = mScene.GetAnimatedActor(mActorAnimWuson);
 		if (mIsAnimatingWuson)
-			animWuson.PlayAnimation(mAnimWuson, mAnimDurationWuson, true);
-		else
 			animWuson.StopAnimation();
+		else
+			animWuson.PlayAnimation(mAnimWuson, mAnimDurationWuson, true);
 
 		mIsAnimatingWuson = !mIsAnimatingWuson;
     }
