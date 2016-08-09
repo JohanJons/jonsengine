@@ -37,8 +37,7 @@ cbuffer GBufferConstants : register(CBUFFER_REGISTER_VERTEX)
 
 StructuredBuffer<float4x4> gBones : register (SBUFFER_REGISTER_VERTEX);
 
-float3 ApplyBone(float3 normal, uint4 boneIndices, float4 boneWeights, uint boneNum);
-float4 ApplyBone(float4 position, uint4 boneIndices, float4 boneWeights, uint boneNum);
+float4x4 BuildBoneTransform(const uint4 boneIndices, const float4 boneWeights);
 
 
 GBufferVSOut vs_main(GBufferVSIn input)
@@ -50,28 +49,20 @@ GBufferVSOut vs_main(GBufferVSIn input)
 	output.mTangent = input.mTangent;
 	output.mBitangent = input.mBitangent;
 
+	float4x4 wvpMatrix = gWVPMatrix;
     // temporary solution
     if (gIsAnimating)
     {
-        for (uint boneNum = 0; boneNum < NUM_BONES_PER_VERTEX; ++boneNum)
-		{ 
-            output.mPosition += ApplyBone(input.mPosition, input.mBoneIndices, input.mBoneWeights, boneNum);
-            output.mNormal += ApplyBone(input.mNormal, input.mBoneIndices, input.mBoneWeights, boneNum);
-
-            if (gHasNormalTexture)
-            {
-                output.mTangent += ApplyBone(input.mTangent, input.mBoneIndices, input.mBoneWeights, boneNum);
-                output.mBitangent += ApplyBone(input.mBitangent, input.mBoneIndices, input.mBoneWeights, boneNum);
-            }
-        }
+		float4x4 boneTransform = BuildBoneTransform(input.mBoneIndices, input.mBoneWeights);
+		wvpMatrix = mul(wvpMatrix, boneTransform);
     }
         
-    output.mPosition = mul(gWVPMatrix, output.mPosition);
+    output.mPosition = mul(wvpMatrix, output.mPosition);
 
     // rotating/translation/uniform scaling is fine, we dont need to normalize in VS
-    output.mNormal = mul((float3x3)gWorldViewMatrix, output.mNormal);
-    output.mTangent = mul((float3x3)gWorldViewMatrix, output.mTangent);
-    output.mBitangent = mul((float3x3)gWorldViewMatrix, output.mBitangent);
+    output.mNormal = mul((float3x3)wvpMatrix, output.mNormal);
+    output.mTangent = mul((float3x3)wvpMatrix, output.mTangent);
+    output.mBitangent = mul((float3x3)wvpMatrix, output.mBitangent);
 
     output.mTexcoord = gTextureTilingFactor * input.mTexcoord;
 
@@ -79,17 +70,19 @@ GBufferVSOut vs_main(GBufferVSIn input)
 }
 
 
-float3 ApplyBone(float3 normal, uint4 boneIndices, float4 boneWeights, uint boneNum)
+float4x4 BuildBoneTransform(const uint4 boneIndices, const float4 boneWeights)
 {
-    return ApplyBone(float4(normal, 0.0), boneIndices, boneWeights, boneNum).xyz;
-}
+	float4x4 boneTransform = (float4x4)0;
 
-float4 ApplyBone(float4 position, uint4 boneIndices, float4 boneWeights, uint boneNum)
-{
-    const uint boneIndex = boneIndices[boneNum];
-    const uint boneWeight = boneWeights[boneNum];
+	for (uint boneNum = 0; boneNum < NUM_BONES_PER_VERTEX; ++boneNum)
+	{
+		const uint boneIndex = boneIndices[boneNum];
+		const uint boneWeight = boneWeights[boneNum];
 
-    return mul(position, gBones[boneIndex]) * boneWeight;
+		boneTransform += gBones[boneIndex] * boneWeight;
+	}
+
+	return boneTransform;
 }
 
 #endif

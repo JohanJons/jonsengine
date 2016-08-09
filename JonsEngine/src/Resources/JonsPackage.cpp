@@ -66,6 +66,20 @@ namespace JonsEngine
     {
     }
 
+	PackageBoneKeyframe::PackageBoneKeyframe() :
+		mTimestampMillisec(0),
+		mTranslation(0.0f),
+		mRotation(0.0f, 0.0f, 0.0f, 1.0f)
+	{
+	}
+
+	PackageBoneKeyframe::PackageBoneKeyframe(const uint32_t timestampMillisec, const Vec3& translation, const Quaternion& rotation) :
+		mTimestampMillisec(timestampMillisec),
+		mTranslation(translation),
+		mRotation(rotation)
+	{
+	}
+
     PackageMesh::PackageMesh() : PackageMesh("")
     {
     }

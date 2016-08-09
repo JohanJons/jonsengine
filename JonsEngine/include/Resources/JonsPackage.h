@@ -3,7 +3,6 @@
 #include "include/Core/Types.h"
 #include "include/Core/Utils/Time.h"
 #include "include/Resources/Bone.h"
-#include "include/Resources/BoneAnimation.h"
 #include "include/Resources/BoneKeyframe.h"
 
 #include <array>
@@ -98,6 +97,17 @@ namespace JonsEngine
         Mat4 mOffsetMatrix;
     };
 
+	struct PackageBoneKeyframe
+	{
+		PackageBoneKeyframe();
+		PackageBoneKeyframe(const uint32_t timestampMillisec, const Vec3& translation, const Quaternion& rotation);
+
+
+		uint32_t mTimestampMillisec;
+		Vec3 mTranslation;
+		Quaternion mRotation;
+	};
+
     struct PackageMesh
     {
         typedef uint32_t MeshIndex;
@@ -138,6 +148,8 @@ namespace JonsEngine
 
     struct PackageAnimation
     {
+		typedef std::vector<PackageBoneKeyframe> BoneKeyframeContainer;
+
         PackageAnimation();
         PackageAnimation(const std::string& name, const uint32_t durationMilliseconds, const Mat4& invRootMatrix);
     
@@ -145,7 +157,7 @@ namespace JonsEngine
         std::string mName;
 		uint32_t mDurationInMilliseconds;
         Mat4 mInverseRootMatrix;
-		BoneAnimationContainer mBoneAnimations;
+		BoneKeyframeContainer mKeyframes;
     };
 
     struct PackageModel
@@ -266,18 +278,11 @@ namespace boost
         }
 
         template<class Archive>
-        void serialize(Archive & ar, JonsEngine::BoneKeyframe& keyframe, const unsigned int version)
+        void serialize(Archive & ar, JonsEngine::PackageBoneKeyframe& keyframe, const unsigned int version)
         {
-            ar & keyframe.mTimestamp;
+            ar & keyframe.mTimestampMillisec;
             ar & keyframe.mTranslation;
             ar & keyframe.mRotation;
-        }
-
-        template<class Archive>
-        void serialize(Archive & ar, JonsEngine::BoneAnimation& boneAnimation, const unsigned int version)
-        {
-            ar & boneAnimation.mBoneIndex;
-            ar & boneAnimation.mKeyframes;
         }
         
         template<class Archive>
@@ -286,7 +291,7 @@ namespace boost
             ar & animation.mName;
 			ar & animation.mDurationInMilliseconds;
             ar & animation.mInverseRootMatrix;
-            ar & animation.mBoneAnimations;
+            ar & animation.mKeyframes;
         }
 
         template<class Archive>
@@ -351,11 +356,5 @@ namespace boost
             ar & quat.z;
             ar & quat.w;
         }
-
-		template<class Archive>
-		void serialize(Archive & ar, JonsEngine::Milliseconds time, const unsigned int version)
-		{
-			ar & 
-		}
     } // namespace serialization
 } // namespace boost

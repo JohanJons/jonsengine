@@ -167,7 +167,6 @@
     <ClCompile Include="src\RenderQueue\RenderQueue.cpp" />
     <ClCompile Include="src\Resources\Animation.cpp" />
     <ClCompile Include="src\Resources\AnimationInstance.cpp" />
-    <ClCompile Include="src\Resources\BoneAnimation.cpp" />
     <ClCompile Include="src\Resources\BoneKeyframe.cpp" />
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
     <ClCompile Include="src\Resources\Material.cpp" />
@@ -267,7 +266,6 @@
     <ClInclude Include="include\Resources\Animation.h" />
     <ClInclude Include="include\Resources\AnimationInstance.h" />
     <ClInclude Include="include\Resources\Bone.h" />
-    <ClInclude Include="include\Resources\BoneAnimation.h" />
     <ClInclude Include="include\Resources\BoneKeyframe.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />
     <ClInclude Include="include\Resources\Material.h" />

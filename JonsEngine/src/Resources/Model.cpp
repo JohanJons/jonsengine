@@ -169,13 +169,12 @@ namespace JonsEngine
 
 	void Model::ParseAnimations(const PackageModel& pkgModel)
 	{
-		for (const PackageAnimation pkgAnim : pkgModel.mAnimations)
+		for (const PackageAnimation& pkgAnim : pkgModel.mAnimations)
 		{
 			const AnimationID nextAnimID = mAnimationIDGen.GenerateID();
 			const auto animationDuration = Milliseconds(pkgAnim.mDurationInMilliseconds);
 
-			mAnimations.emplace(std::piecewise_construct, std::forward_as_tuple(nextAnimID), std::forward_as_tuple(pkgAnim.mName, animationDuration, pkgAnim.mInverseRootMatrix, pkgAnim.mBoneAnimations,
-				mParentMap, mBoneOffsetTransforms));
+			mAnimations.emplace(std::piecewise_construct, std::forward_as_tuple(nextAnimID), std::forward_as_tuple(pkgAnim, mParentMap, mBoneOffsetTransforms));
 			mAnimationNameMap.emplace(std::piecewise_construct, std::forward_as_tuple(pkgAnim.mName), std::forward_as_tuple(nextAnimID));
 		}
 	}

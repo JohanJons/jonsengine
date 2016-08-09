@@ -18,7 +18,6 @@ namespace JonsEngine
 
 
         AnimationInstance(const ModelID modelID, const AnimationID animationID, const BoneIndex begin, const BoneIndex end);
-        AnimationInstance(const ModelID modelID, const AnimationID animationID, const Milliseconds timestamp, const BoneIndex begin, const BoneIndex end);
     };
 
 	typedef IDGenerator32::ID AnimationInstanceID;

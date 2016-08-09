@@ -19,6 +19,8 @@ namespace JonsEngine
     {
         for (AnimationInstance& animationInstance : mActiveAnimations)
         {
+			animationInstance.mTimestamp += elapsedTime;
+
 			const Model& model = mResourceManifest.GetModel(animationInstance.mModelID);
             const Animation& animation = model.GetAnimation(animationInstance.mAnimationID);
 
@@ -28,7 +30,7 @@ namespace JonsEngine
 			// root has no parent
 			// note: root is always front
 			Mat4& rootTransform = mBoneTransforms.at(bonesBegin);
-			rootTransform = animation.InterpolateBoneTransform(bonesBegin, elapsedTime);
+			rootTransform = animation.InterpolateBoneTransform(bonesBegin, animationInstance.mTimestamp);
 
 			// interpolate bone animations
             const uint32_t numTransforms = bonesEnd - bonesBegin;
@@ -39,7 +41,7 @@ namespace JonsEngine
 				const Mat4& parentTransform = mBoneTransforms.at(parentBone);
 
 				Mat4& transform = mBoneTransforms.at(bone);
-				transform = parentTransform * animation.InterpolateBoneTransform(bone, elapsedTime);
+				transform = parentTransform * animation.InterpolateBoneTransform(bone, animationInstance.mTimestamp);
             }
 
 			// add misc transforms to get into bone space etc

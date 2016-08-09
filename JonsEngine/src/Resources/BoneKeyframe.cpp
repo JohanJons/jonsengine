@@ -1,10 +1,18 @@
 #pragma once
 
 #include "include/Resources/BoneKeyframe.h"
+#include "include/Resources/JonsPackage.h"
 
 namespace JonsEngine
 {
 	BoneKeyframe::BoneKeyframe()
+	{
+	}
+
+	BoneKeyframe::BoneKeyframe(const PackageBoneKeyframe& pkgKeyframe) :
+		mTimestamp(pkgKeyframe.mTimestampMillisec),
+		mTranslation(pkgKeyframe.mTranslation),
+		mRotation(pkgKeyframe.mRotation)
 	{
 	}
 
