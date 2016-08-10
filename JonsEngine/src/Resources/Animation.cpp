@@ -125,7 +125,8 @@ namespace JonsEngine
         Mat4 boneMatrix = glm::toMat4(currframeIter->mRotation);
         boneMatrix = glm::translate(boneMatrix, currframeIter->mTranslation);
 
-        return boneMatrix;
+        //return boneMatrix;
+		return gIdentityMatrix;
     }
 
 
