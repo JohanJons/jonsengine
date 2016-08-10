@@ -142,7 +142,6 @@ namespace JonsEngine
 		Mat4 mTransform;
         NodeIndex mNodeIndex;
         NodeIndex mParentNodeIndex;
-        PackageAABB mAABB;
         std::vector<PackageMesh::MeshIndex> mMeshes;
     };
 
@@ -244,7 +243,6 @@ namespace boost
 			ar & node.mTransform;
             ar & node.mNodeIndex;
             ar & node.mParentNodeIndex;
-            ar & node.mAABB;
             ar & node.mMeshes;
         }
 

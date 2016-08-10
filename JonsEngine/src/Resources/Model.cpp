@@ -17,7 +17,7 @@ namespace JonsEngine
         const ModelNodeIndex rootNodeIndex = INVALID_MODEL_NODE_INDEX;
 
         mMeshes.emplace_back(name, meshID, INVALID_MATERIAL_ID, minBounds, maxBounds);
-        mNodes.emplace_back(name, rootNodeIndex, minBounds, maxBounds, gIdentityMatrix, ModelNode::ImmediateChildrenIterator(mNodes.end(), mNodes.end()),
+        mNodes.emplace_back(name, rootNodeIndex, gIdentityMatrix, ModelNode::ImmediateChildrenIterator(mNodes.end(), mNodes.end()),
 			ModelNode::AllChildrenIterator(mNodes.end(), mNodes.end()), ModelNode::MeshIterator(mMeshes.begin(), mMeshes.end()), mNodes.end());
     }
 
@@ -215,7 +215,7 @@ namespace JonsEngine
 
 			const auto childNextIter = mNodes.begin() + nextChildIndex;
 
-			mNodes.emplace_back(otherNode.GetName(), otherNode.GetModelNodeIndex(), otherNode.GetLocalAABB().Min(), otherNode.GetLocalAABB().Max(), otherNode.GetLocalTransform(), immChildrenIter, allChildrenIter, meshIter, childNextIter);
+			mNodes.emplace_back(otherNode.GetName(), otherNode.GetModelNodeIndex(), otherNode.GetLocalTransform(), immChildrenIter, allChildrenIter, meshIter, childNextIter);
 		}
 	}
 

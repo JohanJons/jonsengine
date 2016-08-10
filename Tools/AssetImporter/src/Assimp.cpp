@@ -63,7 +63,7 @@ namespace JonsAssetImporter
         if (!ProcessAnimations(model, scene))
             return false;
 
-        AddStaticAABB(model);
+        //AddStaticAABB(model);
 
         return true;
     }
@@ -154,7 +154,7 @@ namespace JonsAssetImporter
             return false;
         }
 
-        if (!ProcessMeshes(model.mMeshes, model.mSkeleton, scene, materialMap))
+        if (!ProcessMeshes(model.mMeshes, scene, materialMap, model.mStaticAABB.mMinBounds, model.mStaticAABB.mMaxBounds))
             return false;
 
         // recursively go through assimp node tree
@@ -162,8 +162,6 @@ namespace JonsAssetImporter
         if (!ParseNodeHeirarchy(model.mNodes, model.mMeshes, scene, scene->mRootNode, rootParentIndex, gIdentityMatrix))
             return false;
 
-        //if (!ProcessBoneParentMapping(model.mBoneParentMap, model.mSkeleton, scene))
-        //    return false;
         if (!ProcessBones(model.mBoneParentMap, model.mSkeleton, scene))
             return false;
 
@@ -173,21 +171,14 @@ namespace JonsAssetImporter
     bool Assimp::ParseNodeHeirarchy(std::vector<PackageNode>& nodeContainer, const std::vector<PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode, const PackageNode::NodeIndex parentNodeIndex, const Mat4& parentTransform)
     {
         const uint32_t nodeIndex = nodeContainer.size();
-        const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(assimpNode->mTransformation);
+		const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(assimpNode->mTransformation);
         nodeContainer.emplace_back(assimpNode->mName.C_Str(), nodeTransform, nodeIndex, parentNodeIndex);
         PackageNode& jonsNode = nodeContainer.back();
 
         // jonsPkg uses same mesh indices as aiScene
         for (uint32_t meshIndex = 0; meshIndex < assimpNode->mNumMeshes; ++meshIndex)
-        {
             jonsNode.mMeshes.emplace_back(assimpNode->mMeshes[meshIndex]);
 
-            const PackageMesh& mesh = meshContainer.at(meshIndex);
-            jonsNode.mAABB.mMinBounds = MinVal(jonsNode.mAABB.mMinBounds, mesh.mAABB.mMinBounds);
-            jonsNode.mAABB.mMaxBounds = MaxVal(jonsNode.mAABB.mMaxBounds, mesh.mAABB.mMaxBounds);
-        }
-
-        const uint32_t firstChildIndex = nodeContainer.size();
         for (uint32_t childIndex = 0; childIndex < assimpNode->mNumChildren; ++childIndex)
         {
             const aiNode* child = assimpNode->mChildren[childIndex];
@@ -195,24 +186,11 @@ namespace JonsAssetImporter
             if (!ParseNodeHeirarchy(nodeContainer, meshContainer, scene, child, nodeIndex, nodeTransform))
                 return false;
         }
-        const uint32_t lastChildIndex = nodeContainer.size() - 1;
-
-        // update node AABB
-        for (uint32_t childIndex = firstChildIndex; childIndex <= lastChildIndex; ++childIndex)
-        {
-            const PackageNode& child = nodeContainer.at(childIndex);
-            jonsNode.mAABB.mMinBounds = MinVal(jonsNode.mAABB.mMinBounds, child.mAABB.mMinBounds);
-            jonsNode.mAABB.mMaxBounds = MaxVal(jonsNode.mAABB.mMaxBounds, child.mAABB.mMaxBounds);
-        }
-
-        // if node has no legit AABB from either its own mesh or a childrens mesh, zero length it
-        // is done after updating parent aabb bounds since the result might otherwise invalidate the parents aabb when comparing it against its other childrens
-        CheckForInvalidAABB(jonsNode.mAABB);
 
         return true;
     }
 
-    bool Assimp::ProcessMeshes(std::vector<PackageMesh>& meshContainer, std::vector<PackageBone>& skeleton, const aiScene* scene, const MaterialMap& materialMap)
+    bool Assimp::ProcessMeshes(std::vector<PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap, Vec3& modelMinBounds, Vec3& modelMaxBounds)
     {
         for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
         {
@@ -220,7 +198,7 @@ namespace JonsAssetImporter
             meshContainer.emplace_back(assimpMesh->mName.C_Str());
             PackageMesh& jonsMesh = meshContainer.back();
             
-            if (!AddMeshGeometricData(jonsMesh, skeleton, assimpMesh, scene, meshIndex))
+            if (!AddMeshGeometricData(jonsMesh, assimpMesh, scene, meshIndex, modelMinBounds, modelMaxBounds))
                 return false;
 
             // bone weights
@@ -240,7 +218,7 @@ namespace JonsAssetImporter
     }
 
     // the bones of jonsMesh must've been parsed already
-    bool Assimp::AddMeshGeometricData(PackageMesh& jonsMesh, const std::vector<PackageBone>& bones, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex)
+    bool Assimp::AddMeshGeometricData(PackageMesh& jonsMesh, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex, Vec3& modelMinBounds, Vec3& modelMaxBounds)
     {
         const uint32_t numFloatsPerTriangle = 3;
         const uint32_t numFloatsPerTexcoord = 2;
@@ -257,6 +235,7 @@ namespace JonsAssetImporter
         // if the mesh is static, pre-multiply all the vertices with the transformation hierarchy
         //const bool isStatic = !jonsMesh.IsAnimated();
         //const Mat4 nodeTransform = isStatic ? GetMeshNodeTransform(scene, scene->mRootNode, meshIndex, gIdentityMatrix) : gIdentityMatrix;
+		const Mat4 nodeTransform = GetMeshNodeTransform(scene, scene->mRootNode, meshIndex, gIdentityMatrix);
 
         // vertice, normal, texcoord, tangents and bitangents data
         for (uint32_t j = 0; j < assimpMesh->mNumVertices; ++j)
@@ -299,8 +278,10 @@ namespace JonsAssetImporter
             }
 
             // mesh AABB
-            jonsMesh.mAABB.mMinBounds = MinVal(jonsMesh.mAABB.mMinBounds, vertices);
-            jonsMesh.mAABB.mMaxBounds = MaxVal(jonsMesh.mAABB.mMaxBounds, vertices);
+			// pre-multiply transforms for static aabb
+			const Vec3 transformedVertices = Vec3(nodeTransform * Vec4(vertices, 1.0f));
+			modelMinBounds = MinVal(modelMinBounds, transformedVertices);
+			modelMaxBounds = MaxVal(modelMaxBounds, transformedVertices);
         }
 
         // index data
@@ -557,8 +538,8 @@ namespace JonsAssetImporter
     void AddStaticAABB(PackageModel& model)
     {
         // two cases: animated vs static model
-        const PackageAABB& rootNodeAABB = model.mNodes.front().mAABB;
-        model.mStaticAABB = rootNodeAABB;
+        //const PackageAABB& rootNodeAABB = model.mNodes.front().mAABB;
+        //model.mStaticAABB = rootNodeAABB;
 
         // TODO
         // static model: use root node AABB as its overall AABB
