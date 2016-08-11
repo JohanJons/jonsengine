@@ -62,6 +62,8 @@ namespace JonsEngine
         assert(bone != INVALID_BONE_INDEX);
 		assert(!mKeyframes.empty());
 
+		// TODO: if repeating, smoothe between frames..
+
 		const KeyframeIterator currframeIter = GetBoneKeyframe(elapsedTime);
 		const KeyframeIterator nextFrameIter = GetNextFrameIter(currframeIter);
         const KeyframeIterator endIter = mKeyframes.end();
@@ -83,14 +85,15 @@ namespace JonsEngine
             // interpolate rotation
             const Quaternion& currRot = currframeIter->mRotation;
             const Quaternion& nextRot = nextFrameIter->mRotation;
-            const Quaternion finalRot = glm::slerp(currRot, nextRot, interpolationFactor);
+            Quaternion finalRot = glm::slerp(currRot, nextRot, interpolationFactor);
+			finalRot = glm::normalize(finalRot);
             
             // interpolate translation
             const Vec3& currTranslation = currframeIter->mTranslation;
             const Vec3& nextTranslation = nextFrameIter->mTranslation;
             const Vec3 finalTranslation = interpolationFactor * currTranslation + (1.0f - interpolationFactor) * nextTranslation;
             
-            Mat4 boneMatrix = glm::normalize(glm::toMat4(finalRot));
+            Mat4 boneMatrix = glm::toMat4(finalRot);
             boneMatrix = glm::translate(boneMatrix, finalTranslation);
             
             return boneMatrix;

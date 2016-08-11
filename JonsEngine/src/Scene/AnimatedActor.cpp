@@ -35,6 +35,14 @@ namespace JonsEngine
         mAnimationData = mOnPlayAnimationFunc(mModelID, animationID);
     }
 
+	void AnimatedActor::RestartAnimation()
+	{
+		assert(mIsAnimating);
+
+		mTimestamp = Milliseconds(0);
+		mOnRestartAnimationFunc(mAnimationData);
+	}
+
     void AnimatedActor::StopAnimation()
     {
         mIsAnimating = false;
@@ -75,8 +83,8 @@ namespace JonsEngine
         if (mTimestamp < mAnimationDuration)
             return;
 
-        if (IsRepeatingAnimation())
-            mTimestamp = Milliseconds(0);
+		if (IsRepeatingAnimation())
+			RestartAnimation();
         else
             StopAnimation();
     }

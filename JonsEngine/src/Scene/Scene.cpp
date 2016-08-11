@@ -108,9 +108,10 @@ namespace JonsEngine
     AnimatedActorID Scene::CreateAnimatedActor(const std::string& actorName, const ModelID modelID, const SceneNodeID sceneNodeID)
     {
         auto onPlayAnim = std::bind(&AnimationUpdater::PlayAnimation, &mAnimationUpdater, std::placeholders::_1, std::placeholders::_2);
+		auto onRestartAnim = std::bind(&AnimationUpdater::RestartAnimation, &mAnimationUpdater, std::placeholders::_1);
         auto onStopAnim = std::bind(&AnimationUpdater::StopAnimation, &mAnimationUpdater, std::placeholders::_1);
 
-        return mAnimatedActors.Insert(onPlayAnim, onStopAnim, actorName, modelID, sceneNodeID);
+        return mAnimatedActors.Insert(onPlayAnim, onRestartAnim, onStopAnim, actorName, modelID, sceneNodeID);
     }
 
     void Scene::DeleteAnimatedActor(AnimatedActorID& actorID)

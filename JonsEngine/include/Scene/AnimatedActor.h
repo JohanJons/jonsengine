@@ -22,6 +22,7 @@ namespace JonsEngine
         ~AnimatedActor();
 
         void PlayAnimation(const AnimationID animationID, const Milliseconds animationTime, const bool repeat);
+		void RestartAnimation();
         void StopAnimation();
 
         AnimationID GetActiveAnimation() const;
