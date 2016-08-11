@@ -14,9 +14,11 @@ namespace JonsEngine
     {
     public:
         typedef std::function<AnimationInstanceID(const ModelID, const AnimationID)> OnPlayAnimationFunc;
+		typedef std::function<void(const AnimationInstanceID)> OnRestartAnimationFunc;
         typedef std::function<void(AnimationInstanceID&)> OnStopAnimationFunc;
 
-        AnimatedActor(const OnPlayAnimationFunc& onPlayAnimation, const OnStopAnimationFunc& onStopAnimation, const std::string& name, const ModelID modelId, const SceneNodeID sceneNodeID);
+        AnimatedActor(const OnPlayAnimationFunc& onPlayAnimation, const OnRestartAnimationFunc& onRestartAnimation, const OnStopAnimationFunc& onStopAnimation,
+			const std::string& name, const ModelID modelId, const SceneNodeID sceneNodeID);
         ~AnimatedActor();
 
         void PlayAnimation(const AnimationID animationID, const Milliseconds animationTime, const bool repeat);
@@ -33,6 +35,7 @@ namespace JonsEngine
 
     private:
         OnPlayAnimationFunc mOnPlayAnimationFunc;
+		OnRestartAnimationFunc mOnRestartAnimationFunc;
         OnStopAnimationFunc mOnStopAnimationFunc;
         AnimationInstanceID mAnimationData;
 

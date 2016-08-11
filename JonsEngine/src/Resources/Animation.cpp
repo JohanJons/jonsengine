@@ -59,47 +59,17 @@ namespace JonsEngine
 
     Mat4 Animation::InterpolateBoneTransform(const BoneIndex bone, const Milliseconds elapsedTime) const
     {
-        /*
-         // we need at least two values to interpolate...
-        if (pNodeAnim->mNumRotationKeys == 1) {
-            Out = pNodeAnim->mRotationKeys[0].mValue;
-            return;
-        }
-
-        uint RotationIndex = FindRotation(AnimationTime, pNodeAnim);
-        uint NextRotationIndex = (RotationIndex + 1);
-        assert(NextRotationIndex < pNodeAnim->mNumRotationKeys);
-        float DeltaTime = pNodeAnim->mRotationKeys[NextRotationIndex].mTime - pNodeAnim->mRotationKeys[RotationIndex].mTime;
-        float Factor = (AnimationTime - (float)pNodeAnim->mRotationKeys[RotationIndex].mTime) / DeltaTime;
-        assert(Factor >= 0.0f && Factor <= 1.0f);
-        const aiQuaternion& StartRotationQ = pNodeAnim->mRotationKeys[RotationIndex].mValue;
-        const aiQuaternion& EndRotationQ = pNodeAnim->mRotationKeys[NextRotationIndex].mValue;
-        aiQuaternion::Interpolate(Out, StartRotationQ, EndRotationQ, Factor);
-        Out = Out.Normalize();
-        
-        uint Mesh::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
-        {
-            assert(pNodeAnim->mNumRotationKeys > 0);
-
-            for (uint i = 0 ; i < pNodeAnim->mNumRotationKeys - 1 ; i++) {
-                if (AnimationTime < (float)pNodeAnim->mRotationKeys[i + 1].mTime) {
-                    return i;
-                }
-            }
-
-            assert(0);
-        }
-        */
-		if (mKeyframes.empty())
-			return gIdentityMatrix;
+        assert(bone != INVALID_BONE_INDEX);
+		assert(!mKeyframes.empty());
 
 		const KeyframeIterator currframeIter = GetBoneKeyframe(elapsedTime);
-		/*const KeyframeIterator nextFrameIter = GetNextFrameIter(currframeIter);
-        const auto endIter = mKeyframes.end();
+		const KeyframeIterator nextFrameIter = GetNextFrameIter(currframeIter);
+        const KeyframeIterator endIter = mKeyframes.end();
 		if (currframeIter == endIter || nextFrameIter == endIter)
 		{
             // only last keyframe is used - no interpolation
             const BoneKeyframe& lastKeyframe = mKeyframes.back();
+            
             Mat4 boneMatrix = glm::toMat4(lastKeyframe.mRotation);
             boneMatrix = glm::translate(boneMatrix, lastKeyframe.mTranslation);
             
@@ -119,14 +89,12 @@ namespace JonsEngine
             const Vec3& currTranslation = currframeIter->mTranslation;
             const Vec3& nextTranslation = nextFrameIter->mTranslation;
             const Vec3 finalTranslation = interpolationFactor * currTranslation + (1.0f - interpolationFactor) * nextTranslation;
-        }*/
-
-        // TODO: interpolation between frames
-        Mat4 boneMatrix = glm::toMat4(currframeIter->mRotation);
-        boneMatrix = glm::translate(boneMatrix, currframeIter->mTranslation);
-
-        //return boneMatrix;
-		return gIdentityMatrix;
+            
+            Mat4 boneMatrix = glm::normalize(glm::toMat4(finalRot));
+            boneMatrix = glm::translate(boneMatrix, finalTranslation);
+            
+            return boneMatrix;
+        }
     }
 
 
@@ -142,12 +110,12 @@ namespace JonsEngine
         return endIter;
     }
 
-	Animation::KeyframeIterator Animation::GetNextFrameIter(const KeyframeIterator& currFrameIter) const
+	Animation::KeyframeIterator Animation::GetNextFrameIter(const KeyframeIterator currFrameIter) const
 	{
 		const auto endIter = mKeyframes.end();
 		if (currFrameIter == endIter)
 			return endIter;
 
-		return endIter;
+		return currFrameIter + 1;
 	}
 }

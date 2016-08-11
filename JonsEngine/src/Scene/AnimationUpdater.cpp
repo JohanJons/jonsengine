@@ -36,21 +36,25 @@ namespace JonsEngine
             const uint32_t numTransforms = bonesEnd - bonesBegin;
             for (uint32_t boneOffset = 1; boneOffset < numTransforms; ++boneOffset)
             {
-				const BoneIndex bone = bonesBegin + boneOffset;
-				const BoneIndex parentBone = animation.GetParentIndex(bone);
-				const Mat4& parentTransform = mBoneTransforms.at(parentBone);
+				const BoneIndex bone = boneOffset;
+				const BoneIndex parentInstance = bonesBegin + animation.GetParentIndex(bone);
+				const Mat4& parentTransform = mBoneTransforms.at(parentInstance);
 
-				Mat4& transform = mBoneTransforms.at(bone);
+				const BoneIndex boneInstance = bonesBegin + boneOffset;
+				Mat4& transform = mBoneTransforms.at(boneInstance);
 				transform = parentTransform * animation.InterpolateBoneTransform(bone, animationInstance.mTimestamp);
             }
 
 			// add misc transforms to get into bone space etc
 			// must be done after prior step because of transform multiplication order
 			const Mat4& rootInverseTransform = animation.GetInverseRootMatrix();
-			for (BoneIndex bone = bonesBegin; bone != bonesEnd; ++bone)
+			for (uint32_t boneOffset = 1; boneOffset < numTransforms; ++boneOffset)
 			{
+				const BoneIndex bone = boneOffset;
 				const Mat4& boneOffsetTransform = animation.GetBoneOffsetTransform(bone);
-				Mat4& transform = mBoneTransforms.at(bone);
+
+				const BoneIndex boneInstance = bonesBegin + boneOffset;
+				Mat4& transform = mBoneTransforms.at(boneInstance);
 				transform = rootInverseTransform * transform * boneOffsetTransform;
 			}
         }
@@ -80,6 +84,16 @@ namespace JonsEngine
 
 		return animInstanceID;
     }
+
+	void AnimationUpdater::RestartAnimation(const AnimationInstanceID instanceID)
+	{
+		assert(instanceID != INVALID_ANIMATION_INSTANCE_ID);
+
+		const auto animInstanceIndex = mAnimationInstanceMap.at(instanceID);
+		auto& animationInstance = mActiveAnimations.at(animInstanceIndex);
+
+		animationInstance.mTimestamp = Milliseconds(0);
+	}
 
     void AnimationUpdater::StopAnimation(AnimationInstanceID& instanceID)
     {

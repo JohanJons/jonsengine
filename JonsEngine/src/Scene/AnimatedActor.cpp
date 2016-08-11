@@ -2,9 +2,11 @@
 
 namespace JonsEngine
 {
-    AnimatedActor::AnimatedActor(const OnPlayAnimationFunc& onPlayAnimation, const OnStopAnimationFunc& onStopAnimation, const std::string& name, const ModelID modelId, const SceneNodeID sceneNodeID) :
+    AnimatedActor::AnimatedActor(const OnPlayAnimationFunc& onPlayAnimation, const OnRestartAnimationFunc& onRestartAnimation, const OnStopAnimationFunc& onStopAnimation, const std::string& name,
+		const ModelID modelId, const SceneNodeID sceneNodeID) :
         BaseActor(name, modelId, sceneNodeID),
         mOnPlayAnimationFunc(onPlayAnimation),
+		mOnRestartAnimationFunc(onRestartAnimation),
         mOnStopAnimationFunc(onStopAnimation),
         mAnimationData(INVALID_ANIMATION_INSTANCE_ID),
         mIsAnimating(false),

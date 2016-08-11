@@ -3,7 +3,6 @@
 #include "include/Resources/Animation.h"
 #include "include/Resources/ModelNode.h"
 #include "include/Resources/Mesh.h"
-#include "include/Resources/JonsPackage.h"
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/Containers/RangedIterator.hpp"
@@ -14,6 +13,9 @@
 
 namespace JonsEngine
 {
+	struct PackageModel;
+	struct PackageNode;
+
     class Model
     {
     private:

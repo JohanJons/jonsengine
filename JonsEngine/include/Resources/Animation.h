@@ -43,7 +43,7 @@ namespace JonsEngine
 		typedef BoneKeyframeContainer::const_iterator KeyframeIterator;
 
 		KeyframeIterator GetBoneKeyframe(const Milliseconds time) const;
-		KeyframeIterator GetNextFrameIter(const KeyframeIterator& currFrameIter) const;
+		KeyframeIterator GetNextFrameIter(const KeyframeIterator currFrameIter) const;
 
 
         std::string mName;
