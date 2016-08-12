@@ -13,7 +13,7 @@ namespace JonsEngine
     class AnimatedActor : public BaseActor
     {
     public:
-        typedef std::function<AnimationInstanceID(const ModelID, const AnimationID)> OnPlayAnimationFunc;
+        typedef std::function<AnimationInstanceID(const ModelID, const AnimationID, const bool)> OnPlayAnimationFunc;
 		typedef std::function<void(const AnimationInstanceID)> OnRestartAnimationFunc;
         typedef std::function<void(AnimationInstanceID&)> OnStopAnimationFunc;
 

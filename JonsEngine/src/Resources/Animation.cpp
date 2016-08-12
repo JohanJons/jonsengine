@@ -57,17 +57,16 @@ namespace JonsEngine
         return mParentMap.at(bone);
     }
 
-    Mat4 Animation::InterpolateBoneTransform(const BoneIndex bone, const Milliseconds elapsedTime) const
+    Mat4 Animation::InterpolateBoneTransform(const BoneIndex bone, const Milliseconds elapsedTime, const bool repeatingAnimation) const
     {
         assert(bone != INVALID_BONE_INDEX);
-		assert(!mKeyframes.empty());
-
-		// TODO: if repeating, smoothe between frames..
+		if (mKeyframes.empty())
+			return gIdentityMatrix;
 
 		const KeyframeIterator currframeIter = GetBoneKeyframe(elapsedTime);
-		const KeyframeIterator nextFrameIter = GetNextFrameIter(currframeIter);
-        const KeyframeIterator endIter = mKeyframes.end();
-		if (currframeIter == endIter || nextFrameIter == endIter)
+		const KeyframeIterator endIter = mKeyframes.end();
+		const bool isEndFrameAndNoRepeat = (currframeIter == endIter || currframeIter + 1 == endIter) && !repeatingAnimation;
+		if (mKeyframes.size() == 1 || isEndFrameAndNoRepeat)
 		{
             // only last keyframe is used - no interpolation
             const BoneKeyframe& lastKeyframe = mKeyframes.back();
@@ -76,28 +75,27 @@ namespace JonsEngine
             boneMatrix = glm::translate(boneMatrix, lastKeyframe.mTranslation);
             
             return boneMatrix;
-        }
-        else
-        {
-            const float deltaTime = (nextFrameIter->mTimestamp - currframeIter->mTimestamp).count();
-            const float interpolationFactor = (elapsedTime - currframeIter->mTimestamp).count() / deltaTime;
+		}
+
+        const KeyframeIterator nextFrameIter = GetNextFrameIter(currframeIter);
+        const float interpolationFactor = GetInterpolationFactor(currframeIter, nextFrameIter, elapsedTime);
+        assert(interpolationFactor >= 0.0f && interpolationFactor <= 1.0f);
         
-            // interpolate rotation
-            const Quaternion& currRot = currframeIter->mRotation;
-            const Quaternion& nextRot = nextFrameIter->mRotation;
-            Quaternion finalRot = glm::slerp(currRot, nextRot, interpolationFactor);
-			finalRot = glm::normalize(finalRot);
-            
-            // interpolate translation
-            const Vec3& currTranslation = currframeIter->mTranslation;
-            const Vec3& nextTranslation = nextFrameIter->mTranslation;
-            const Vec3 finalTranslation = interpolationFactor * currTranslation + (1.0f - interpolationFactor) * nextTranslation;
-            
-            Mat4 boneMatrix = glm::toMat4(finalRot);
-            boneMatrix = glm::translate(boneMatrix, finalTranslation);
-            
-            return boneMatrix;
-        }
+        // interpolate rotation
+        const Quaternion& currRot = currframeIter->mRotation;
+        const Quaternion& nextRot = nextFrameIter->mRotation;
+        Quaternion finalRot = glm::slerp(currRot, nextRot, interpolationFactor);
+        finalRot = glm::normalize(finalRot);
+        
+        // interpolate translation
+        const Vec3& currTranslation = currframeIter->mTranslation;
+        const Vec3& nextTranslation = nextFrameIter->mTranslation;
+        const Vec3 finalTranslation = interpolationFactor * currTranslation + (1.0f - interpolationFactor) * nextTranslation;
+        
+        Mat4 boneMatrix = glm::toMat4(finalRot);
+        boneMatrix = glm::translate(boneMatrix, finalTranslation);
+        
+        return boneMatrix;
     }
 
 
@@ -116,9 +114,27 @@ namespace JonsEngine
 	Animation::KeyframeIterator Animation::GetNextFrameIter(const KeyframeIterator currFrameIter) const
 	{
 		const auto endIter = mKeyframes.end();
-		if (currFrameIter == endIter)
-			return endIter;
+        assert(currFrameIter != endIter);
+        
+        // if we are at the end, interpolate at the beginning again
+		if (currFrameIter + 1 == endIter)
+			return mKeyframes.begin();
 
 		return currFrameIter + 1;
 	}
+    
+    float Animation::GetInterpolationFactor(const KeyframeIterator currIter, const KeyframeIterator nextIter, const Milliseconds elapsedTime) const
+    {
+        const auto endIter = mKeyframes.end();
+        assert(currIter != endIter && nextIter != endIter);
+        
+        const auto currTimestamp = currIter->mTimestamp;
+        // if we need to loop animation, fake timestamp of nextIter to make interpolation calculations make sense
+        const auto nextTimestamp = currIter + 1 == endIter? currTimestamp + nextIter->mTimestamp : nextIter->mTimestamp;
+    
+        const float deltaTime = (nextTimestamp - currTimestamp).count();
+        const float interpolationFactor = (elapsedTime - currTimestamp).count() / deltaTime;
+        
+        return interpolationFactor;
+    }
 }

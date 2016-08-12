@@ -23,7 +23,7 @@ namespace JonsEngine
 
         void Update(const Milliseconds elapsedTime);
 
-        AnimationInstanceID PlayAnimation(const ModelID modelID, const AnimationID animationID);
+        AnimationInstanceID PlayAnimation(const ModelID modelID, const AnimationID animationID, const bool repeating);
 		void RestartAnimation(const AnimationInstanceID instanceID);
         void StopAnimation(AnimationInstanceID& animationInstance);
 

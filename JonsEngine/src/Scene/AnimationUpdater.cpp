@@ -30,7 +30,7 @@ namespace JonsEngine
 			// root has no parent
 			// note: root is always front
 			Mat4& rootTransform = mBoneTransforms.at(bonesBegin);
-			rootTransform = animation.InterpolateBoneTransform(bonesBegin, animationInstance.mTimestamp);
+			rootTransform = animation.InterpolateBoneTransform(bonesBegin, animationInstance.mTimestamp, animationInstance.mRepeating);
 
 			// interpolate bone animations
             const uint32_t numTransforms = bonesEnd - bonesBegin;
@@ -42,7 +42,7 @@ namespace JonsEngine
 
 				const BoneIndex boneInstance = bonesBegin + boneOffset;
 				Mat4& transform = mBoneTransforms.at(boneInstance);
-				transform = parentTransform * animation.InterpolateBoneTransform(bone, animationInstance.mTimestamp);
+				transform = parentTransform * animation.InterpolateBoneTransform(bone, animationInstance.mTimestamp, animationInstance.mRepeating);
             }
 
 			// add misc transforms to get into bone space etc
@@ -61,7 +61,7 @@ namespace JonsEngine
     }
 
 
-    AnimationInstanceID AnimationUpdater::PlayAnimation(const ModelID modelID, const AnimationID animationID)
+    AnimationInstanceID AnimationUpdater::PlayAnimation(const ModelID modelID, const AnimationID animationID, const bool repeating)
     {
         assert(animationID != INVALID_ANIMATION_ID);
 
@@ -75,7 +75,7 @@ namespace JonsEngine
 		mBoneTransforms.insert(mBoneTransforms.end(), numBonesForAnimation, gIdentityMatrix);
 
 		const BoneIndex lastIndex = firstIndex + numBonesForAnimation;
-		mActiveAnimations.emplace_back(modelID, animationID, firstIndex, lastIndex);
+		mActiveAnimations.emplace_back(modelID, animationID, firstIndex, lastIndex, repeating);
 
 		// map instance ID to instance index
 		const AnimationInstanceID animInstanceID = mAnimInstanceIDGen.GenerateID();

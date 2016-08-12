@@ -325,6 +325,9 @@ namespace JonsAssetImporter
 
             thisBone = skeleton.size() - 1;
             parentMap.at(thisBone) = parentBone;
+
+			// parents must always appear infront of children to speed up updating transforms
+			assert(parentBone < thisBone);
         }
 
         for (uint32_t childIndex = 0; childIndex < node->mNumChildren; childIndex++)
@@ -385,49 +388,6 @@ namespace JonsAssetImporter
         BuildSkeleton(parentMap, bones, boneNames, aiBones, scene->mRootNode, gIdentityMatrix, INVALID_BONE_INDEX);
 
         assert(bones.size() == numBones);
-
-        return true;
-    }
-
-    bool Assimp::ProcessBoneParentMapping(BoneParentMap& parentMap, const std::vector<PackageBone>& bones, const aiScene* scene)
-    {
-        // NOTE: Process bones mapping anyway?
-        // might be problem with not including node transforms etc
-        if (!scene->HasAnimations())
-            return true;
-
-        if (bones.empty())
-            return true;
-
-        // root bone has no parent
-        parentMap.emplace_back(INVALID_BONE_INDEX);
-
-        // all bones have a corresponding node
-        // find the node to get its parents name, then find that name in the bone list
-        const auto boneBegin = bones.begin();
-        const auto boneEnd = bones.end();
-        for (auto boneIter = boneBegin + 1; boneIter != boneEnd; ++boneIter)
-        {
-            const aiNode* node = scene->mRootNode->FindNode(boneIter->mName.c_str());
-            assert(node);
-            const aiNode* parentNode = node->mParent;
-            assert(parentNode);
-
-            for (auto parentIter = boneBegin; parentIter != boneEnd; ++parentIter)
-            {
-                if (parentIter->mName == parentNode->mName.C_Str())
-                {
-                    const auto boneIndex = boneIter - boneBegin;
-                    const auto parentBoneIndex = parentIter - boneBegin;
-                    // make sure parent appears before child
-                    assert(parentBoneIndex < boneIndex);
-
-                    parentMap.emplace_back(parentBoneIndex);
-                }
-            }
-        }
-
-        assert(parentMap.size() == bones.size());
 
         return true;
     }

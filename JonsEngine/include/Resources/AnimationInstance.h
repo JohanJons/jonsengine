@@ -15,9 +15,10 @@ namespace JonsEngine
         AnimationID mAnimationID;
         Milliseconds mTimestamp;
         BoneIndexRange mBoneRange;
+		bool mRepeating;
 
 
-        AnimationInstance(const ModelID modelID, const AnimationID animationID, const BoneIndex begin, const BoneIndex end);
+        AnimationInstance(const ModelID modelID, const AnimationID animationID, const BoneIndex begin, const BoneIndex end, const bool repeating);
     };
 
 	typedef IDGenerator32::ID AnimationInstanceID;
