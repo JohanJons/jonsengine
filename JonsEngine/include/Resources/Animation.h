@@ -40,11 +40,11 @@ namespace JonsEngine
 
 
     private:
-		typedef BoneKeyframeContainer::const_iterator KeyframeIterator;
+		typedef KeyframeContainer::const_iterator KeyframeIterator;
 
-		KeyframeIterator GetBoneKeyframe(const Milliseconds time) const;
-		KeyframeIterator GetNextFrameIter(const KeyframeIterator currFrameIter) const;
-        float GetInterpolationFactor(const KeyframeIterator currIter, const KeyframeIterator nextIter, const Milliseconds elapsedTime) const;
+		KeyframeIterator GetBoneKeyframe(const BoneIndex bone, const Milliseconds time) const;
+		KeyframeIterator GetNextFrameIter(const BoneIndex bone, const KeyframeIterator currFrameIter) const;
+        float GetInterpolationFactor(const BoneIndex bone, const KeyframeIterator currIter, const KeyframeIterator nextIter, const Milliseconds elapsedTime) const;
 
 
         std::string mName;

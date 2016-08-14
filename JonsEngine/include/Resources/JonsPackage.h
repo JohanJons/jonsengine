@@ -147,7 +147,8 @@ namespace JonsEngine
 
     struct PackageAnimation
     {
-		typedef std::vector<PackageBoneKeyframe> BoneKeyframeContainer;
+		typedef std::vector<PackageBoneKeyframe> KeyFrameContainer;
+		typedef std::vector<KeyFrameContainer> BoneKeyframeContainer;
 
         PackageAnimation();
         PackageAnimation(const std::string& name, const uint32_t durationMilliseconds, const Mat4& invRootMatrix);

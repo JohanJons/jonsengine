@@ -11,8 +11,14 @@ namespace JonsEngine
         mParentMap(parentMap),
         mBoneOffsetTransforms(boneOffsets)
     {
-        for (const auto& keyframe : pkgAnimation.mKeyframes)
-            mKeyframes.emplace_back(keyframe);
+		for (const auto& pkgKeyFrameContainer : pkgAnimation.mKeyframes)
+		{
+			mKeyframes.emplace_back();
+			auto& keyframeContainer = mKeyframes.back();
+
+			for (const auto& pkgKeyframe : pkgKeyFrameContainer)
+				keyframeContainer.emplace_back(pkgKeyframe);
+		}
     }
 
     Animation::Animation(const Animation& other, const BoneParentMap& parentMap, const BoneTransforms& boneOffsets) :
@@ -60,16 +66,21 @@ namespace JonsEngine
     Mat4 Animation::InterpolateBoneTransform(const BoneIndex bone, const Milliseconds elapsedTime, const bool repeatingAnimation) const
     {
         assert(bone != INVALID_BONE_INDEX);
+
+		auto& keyframeContainer = mKeyframes.at(bone);
 		if (mKeyframes.empty())
 			return gIdentityMatrix;
 
-		const KeyframeIterator currframeIter = GetBoneKeyframe(elapsedTime);
-		const KeyframeIterator endIter = mKeyframes.end();
+		const KeyframeIterator endIter = keyframeContainer.end();
+		const KeyframeIterator currframeIter = GetBoneKeyframe(bone, elapsedTime);
+		if (currframeIter == endIter)
+			return gIdentityMatrix;
+
 		const bool isEndFrameAndNoRepeat = (currframeIter == endIter || currframeIter + 1 == endIter) && !repeatingAnimation;
 		if (mKeyframes.size() == 1 || isEndFrameAndNoRepeat)
 		{
             // only last keyframe is used - no interpolation
-            const BoneKeyframe& lastKeyframe = mKeyframes.back();
+            const BoneKeyframe& lastKeyframe = keyframeContainer.back();
             
             Mat4 boneMatrix = glm::toMat4(lastKeyframe.mRotation);
             boneMatrix = glm::translate(boneMatrix, lastKeyframe.mTranslation);
@@ -77,9 +88,12 @@ namespace JonsEngine
             return boneMatrix;
 		}
 
-        const KeyframeIterator nextFrameIter = GetNextFrameIter(currframeIter);
-        const float interpolationFactor = GetInterpolationFactor(currframeIter, nextFrameIter, elapsedTime);
-        assert(interpolationFactor >= 0.0f && interpolationFactor <= 1.0f);
+        const KeyframeIterator nextFrameIter = GetNextFrameIter(bone, currframeIter);
+        const float interpolationFactor = GetInterpolationFactor(bone, currframeIter, nextFrameIter, elapsedTime);
+		
+		if (interpolationFactor < 0.0f || interpolationFactor > 1.0f)
+			int i = 2;
+		//assert(interpolationFactor >= 0.0f && interpolationFactor <= 1.0f);
         
         // interpolate rotation
         const Quaternion& currRot = currframeIter->mRotation;
@@ -99,10 +113,11 @@ namespace JonsEngine
     }
 
 
-	Animation::KeyframeIterator Animation::GetBoneKeyframe(const Milliseconds time) const
+	Animation::KeyframeIterator Animation::GetBoneKeyframe(const BoneIndex bone, const Milliseconds time) const
     {
-		const auto endIter = mKeyframes.end();
-		for (auto iter = mKeyframes.begin(); iter != endIter; ++iter)
+		const auto& keyframeContainer = mKeyframes.at(bone);
+		const auto endIter = keyframeContainer.end();
+		for (auto iter = keyframeContainer.begin(); iter != endIter; ++iter)
 		{
 			if (iter->mTimestamp > time)
 				return iter;
@@ -111,21 +126,23 @@ namespace JonsEngine
         return endIter;
     }
 
-	Animation::KeyframeIterator Animation::GetNextFrameIter(const KeyframeIterator currFrameIter) const
+	Animation::KeyframeIterator Animation::GetNextFrameIter(const BoneIndex bone, const KeyframeIterator currFrameIter) const
 	{
-		const auto endIter = mKeyframes.end();
+		const auto& keyframeContainer = mKeyframes.at(bone);
+		const auto endIter = keyframeContainer.end();
         assert(currFrameIter != endIter);
         
         // if we are at the end, interpolate at the beginning again
 		if (currFrameIter + 1 == endIter)
-			return mKeyframes.begin();
+			return keyframeContainer.begin();
 
 		return currFrameIter + 1;
 	}
     
-    float Animation::GetInterpolationFactor(const KeyframeIterator currIter, const KeyframeIterator nextIter, const Milliseconds elapsedTime) const
+    float Animation::GetInterpolationFactor(const BoneIndex bone, const KeyframeIterator currIter, const KeyframeIterator nextIter, const Milliseconds elapsedTime) const
     {
-        const auto endIter = mKeyframes.end();
+		const auto& keyframeContainer = mKeyframes.at(bone);
+        const auto endIter = keyframeContainer.end();
         assert(currIter != endIter && nextIter != endIter);
         
         const auto currTimestamp = currIter->mTimestamp;
@@ -133,7 +150,7 @@ namespace JonsEngine
         const auto nextTimestamp = currIter + 1 == endIter? currTimestamp + nextIter->mTimestamp : nextIter->mTimestamp;
     
         const float deltaTime = (nextTimestamp - currTimestamp).count();
-        const float interpolationFactor = (elapsedTime - currTimestamp).count() / deltaTime;
+        const float interpolationFactor = (currTimestamp - elapsedTime).count() / deltaTime;
         
         return interpolationFactor;
     }

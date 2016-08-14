@@ -21,5 +21,6 @@ namespace JonsEngine
 		Quaternion mRotation;
 	};
 
-	typedef std::vector<BoneKeyframe> BoneKeyframeContainer;
+	typedef std::vector<BoneKeyframe> KeyframeContainer;
+	typedef std::vector<KeyframeContainer> BoneKeyframeContainer;
 }

@@ -7,6 +7,7 @@
 
 #include <limits>
 #include <set>
+#include <algorithm>
 
 using namespace JonsEngine;
 
@@ -327,7 +328,7 @@ namespace JonsAssetImporter
             parentMap.at(thisBone) = parentBone;
 
 			// parents must always appear infront of children to speed up updating transforms
-			assert(parentBone < thisBone);
+			assert(parentBone == INVALID_BONE_INDEX || parentBone < thisBone);
         }
 
         for (uint32_t childIndex = 0; childIndex < node->mNumChildren; childIndex++)
@@ -453,6 +454,11 @@ namespace JonsAssetImporter
             model.mAnimations.emplace_back(animation->mName.C_Str(), durationMillisec, invRootNodeTransform);
             PackageAnimation& pkgAnimation = model.mAnimations.back();
 
+			// number of nodeanim channels should be same as num bones
+			// TODO: rearrange boneanims for better cache utilization?
+			const uint32_t numBones = model.mSkeleton.size();
+			pkgAnimation.mKeyframes.resize(numBones);
+
             const uint32_t noAnimationKeysNum = 1;
             for (uint32_t nodeAnimIndex = 0; nodeAnimIndex < animation->mNumChannels; ++nodeAnimIndex)
             {
@@ -464,6 +470,13 @@ namespace JonsAssetImporter
                 // if no rotation and translation, continue
                 if (nodeAnimation->mNumPositionKeys == nodeAnimation->mNumRotationKeys == noAnimationKeysNum)
                     continue;
+				
+				const std::string nodeAnimName = nodeAnimation->mNodeName.C_Str();
+				const auto boneEndIter = model.mSkeleton.end();
+				const auto boneIter = std::find_if(model.mSkeleton.begin(), boneEndIter, [&nodeAnimName](const PackageBone& pkgBone) { return pkgBone.mName == nodeAnimName; });
+				assert(boneIter != boneEndIter);
+				const BoneIndex bone = model.mSkeleton.end() - boneIter - 1;
+				auto& nodeKeyframes = pkgAnimation.mKeyframes.at(bone);
 
                 const uint32_t numPosKeys = nodeAnimation->mNumPositionKeys;
                 const uint32_t numRotkeys = nodeAnimation->mNumRotationKeys;
@@ -487,7 +500,7 @@ namespace JonsAssetImporter
                     const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime) / animation->mTicksPerSecond;
                     const uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
 
-                    pkgAnimation.mKeyframes.emplace_back(timestampMillisec, translateVector, rotationQuat);
+					nodeKeyframes.emplace_back(timestampMillisec, translateVector, rotationQuat);
                 }
             }
         }
