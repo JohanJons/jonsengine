@@ -11,12 +11,12 @@ namespace JonsEngine
         mParentMap(parentMap),
         mBoneOffsetTransforms(boneOffsets)
     {
-		for (const auto& pkgKeyFrameContainer : pkgAnimation.mKeyframes)
+		for (const auto& pkgBoneAnims : pkgAnimation.mBoneAnimations)
 		{
 			mKeyframes.emplace_back();
 			auto& keyframeContainer = mKeyframes.back();
 
-			for (const auto& pkgKeyframe : pkgKeyFrameContainer)
+			for (const auto& pkgKeyframe : pkgBoneAnims)
 				keyframeContainer.emplace_back(pkgKeyframe);
 		}
     }
@@ -90,10 +90,7 @@ namespace JonsEngine
 
         const KeyframeIterator nextFrameIter = GetNextFrameIter(bone, currframeIter);
         const float interpolationFactor = GetInterpolationFactor(bone, currframeIter, nextFrameIter, elapsedTime);
-		
-		if (interpolationFactor < 0.0f || interpolationFactor > 1.0f)
-			int i = 2;
-		//assert(interpolationFactor >= 0.0f && interpolationFactor <= 1.0f);
+		assert(interpolationFactor >= 0.0f && interpolationFactor <= 1.0f);
         
         // interpolate rotation
         const Quaternion& currRot = currframeIter->mRotation;

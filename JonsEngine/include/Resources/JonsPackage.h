@@ -148,7 +148,7 @@ namespace JonsEngine
     struct PackageAnimation
     {
 		typedef std::vector<PackageBoneKeyframe> KeyFrameContainer;
-		typedef std::vector<KeyFrameContainer> BoneKeyframeContainer;
+		typedef std::vector<KeyFrameContainer> BoneAnimationContainer;
 
         PackageAnimation();
         PackageAnimation(const std::string& name, const uint32_t durationMilliseconds, const Mat4& invRootMatrix);
@@ -157,7 +157,7 @@ namespace JonsEngine
         std::string mName;
 		uint32_t mDurationInMilliseconds;
         Mat4 mInverseRootMatrix;
-		BoneKeyframeContainer mKeyframes;
+		BoneAnimationContainer mBoneAnimations;
     };
 
     struct PackageModel
@@ -290,7 +290,7 @@ namespace boost
             ar & animation.mName;
 			ar & animation.mDurationInMilliseconds;
             ar & animation.mInverseRootMatrix;
-            ar & animation.mKeyframes;
+            ar & animation.mBoneAnimations;
         }
 
         template<class Archive>

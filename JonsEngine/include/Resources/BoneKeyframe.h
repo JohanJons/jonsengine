@@ -22,5 +22,5 @@ namespace JonsEngine
 	};
 
 	typedef std::vector<BoneKeyframe> KeyframeContainer;
-	typedef std::vector<KeyframeContainer> BoneKeyframeContainer;
+	typedef std::vector<KeyframeContainer> BoneAnimationContainer;
 }

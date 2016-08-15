@@ -21,6 +21,8 @@ namespace JonsEngine
 		AnimationUpdater(const ResourceManifest& resourceManifest);
         ~AnimationUpdater();
 
+		// Updates animation bone transforms
+		// @elapstedTime - time since last Update()
         void Update(const Milliseconds elapsedTime);
 
         AnimationInstanceID PlayAnimation(const ModelID modelID, const AnimationID animationID, const bool repeating);

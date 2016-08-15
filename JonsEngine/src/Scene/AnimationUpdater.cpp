@@ -19,10 +19,18 @@ namespace JonsEngine
     {
         for (AnimationInstance& animationInstance : mActiveAnimations)
         {
-			animationInstance.mTimestamp += elapsedTime;
-
 			const Model& model = mResourceManifest.GetModel(animationInstance.mModelID);
             const Animation& animation = model.GetAnimation(animationInstance.mAnimationID);
+
+			const auto animDuration = animation.GetAnimationDuration();
+			animationInstance.mTimestamp += elapsedTime;
+			// pause animation if we reach end duration and is not repeating
+			if (animationInstance.mTimestamp > animDuration && !animationInstance.mRepeating)
+				continue;
+
+			// if repeating start over timestamp
+			if (animationInstance.mTimestamp > animDuration && animationInstance.mRepeating)
+				animationInstance.mTimestamp = animationInstance.mTimestamp % animDuration;
 
             const BoneIndex bonesBegin = animationInstance.mBoneRange.first;
             const BoneIndex bonesEnd = animationInstance.mBoneRange.second;

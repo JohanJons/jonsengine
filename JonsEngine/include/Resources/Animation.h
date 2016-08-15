@@ -52,6 +52,6 @@ namespace JonsEngine
         Mat4 mInverseRootMatrix;
 		const BoneParentMap& mParentMap;
 		const BoneTransforms& mBoneOffsetTransforms;
-		BoneKeyframeContainer mKeyframes;
+		BoneAnimationContainer mKeyframes;
     };
 }

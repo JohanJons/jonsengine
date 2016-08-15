@@ -13,8 +13,10 @@ using namespace JonsEngine;
 
 namespace JonsAssetImporter
 {
+	typedef std::set<std::string> BoneNameSet;
+	typedef std::set<const aiBone*> AssimpBoneSet;
+
     void AddStaticAABB(PackageModel& model);
-    void CheckForInvalidAABB(PackageAABB& aabb);
 
     bool OnlyOneNodePerMesh(const aiScene* scene);
     Mat4 GetMeshNodeTransform(const aiScene* scene, const aiNode* node, const uint32_t meshIndex, const Mat4& parentTransform);
@@ -23,8 +25,10 @@ namespace JonsAssetImporter
     uint32_t CountChildren(const aiNode* node);
     bool UsedLessThanMaxNumBones(const std::vector<float>& boneWeights, const uint32_t offset);
     const aiNode* FindMeshNode(const aiMesh* mesh, const aiScene* scene, const aiNode* node);
-    uint32_t GetNodeDistanceFromRoot(const aiString& name, const aiScene* scene);
     Vec3 GetVertices(const bool isStatic, const Mat4& nodeTransform, const aiVector3D& assimpVertices);
+	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiAnimation* animation);
+	PackageAnimation::KeyFrameContainer& GetBoneKeyframeContainer(PackageAnimation& pkgAnimation, const std::vector<PackageBone>& bones, const aiNodeAnim* nodeAnimation);
+	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const BoneNameSet& boneNames, const AssimpBoneSet& aiBones, const aiNode* node, const Mat4& parentTransform, const BoneIndex parentBone);
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
     Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
@@ -310,50 +314,9 @@ namespace JonsAssetImporter
     
         return nullptr;
     }
-    
-    void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const std::set<std::string>& boneNames, const std::set<const aiBone*> aiBones, const aiNode* node, const Mat4& parentTransform, const BoneIndex parentBone)
-    {
-        BoneIndex thisBone = INVALID_BONE_INDEX;
-        const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
-        const auto boneNameIt = boneNames.find(node->mName.C_Str());
-        if (boneNameIt != boneNames.end())
-        {
-            const aiBone* bone = FindAiBoneByName(aiBones, *boneNameIt);
-            if (bone)
-                skeleton.emplace_back(*boneNameIt, aiMat4ToJonsMat4(bone->mOffsetMatrix));
-            else
-                skeleton.emplace_back(*boneNameIt, nodeTransform);
-
-            thisBone = skeleton.size() - 1;
-            parentMap.at(thisBone) = parentBone;
-
-			// parents must always appear infront of children to speed up updating transforms
-			assert(parentBone == INVALID_BONE_INDEX || parentBone < thisBone);
-        }
-
-        for (uint32_t childIndex = 0; childIndex < node->mNumChildren; childIndex++)
-        {
-            const aiNode* childNode = node->mChildren[childIndex];
-            BuildSkeleton(parentMap, skeleton, boneNames, aiBones, childNode, nodeTransform, thisBone);
-        }
-    }
 
     bool Assimp::ProcessBones(JonsEngine::BoneParentMap& parentMap, std::vector<PackageBone>& bones, const aiScene* scene)
     {
-        /*
-        Using the bones name you can find the corresponding node in the node hierarchy. This node in relation to the other bones' nodes defines the skeleton of the mesh. Unfortunately there might also be nodes which are not used by a bone in the mesh, but still affect the pose of the skeleton because they have child nodes which are bones. So when creating the skeleton hierarchy for a mesh I suggest the following method:
-
-        a) Create a map or a similar container to store which nodes are necessary for the skeleton. Pre-initialise it for all nodes with a "no". 
-        b) For each bone in the mesh: 
-        b1) Find the corresponding node in the scene's hierarchy by comparing their names. 
-        b2) Mark this node as "yes" in the necessityMap. 
-        b3) Mark all of its parents the same way until you 1) find the mesh's node or 2) the parent of the mesh's node. 
-        c) Recursively iterate over the node hierarchy 
-        c1) If the node is marked as necessary, copy it into the skeleton and check its children 
-        c2) If the node is marked as not necessary, skip it and do not iterate over its children. 
-        Reasons: you need all the parent nodes to keep the transformation chain intact. For most file formats and modelling packages the node hierarchy of the skeleton is either a child of the mesh node or a sibling of the mesh node but this is by no means a requirement so you shouldn't rely on it. The node closest to the root node is your skeleton root, from there you start copying the hierarchy. You can skip every branch without a node being a bone in the mesh - that's why the algorithm skips the whole branch if the node is marked as "not necessary".
-        */
-    
         std::set<std::string> boneNames;
         std::set<const aiBone*> aiBones;
 
@@ -364,6 +327,7 @@ namespace JonsAssetImporter
             const aiNode* meshNode = FindMeshNode(mesh, scene, scene->mRootNode);
             assert(meshNode);
             const aiNode* parentMeshNode = meshNode->mParent;
+			assert(parentMeshNode);
             
             for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
             {
@@ -387,7 +351,6 @@ namespace JonsAssetImporter
         bones.reserve(numBones);
 
         BuildSkeleton(parentMap, bones, boneNames, aiBones, scene->mRootNode, gIdentityMatrix, INVALID_BONE_INDEX);
-
         assert(bones.size() == numBones);
 
         return true;
@@ -415,11 +378,7 @@ namespace JonsAssetImporter
 
                 // make sure we havn't reached bone weight cap per bone
                 const bool notExceededNumBones = UsedLessThanMaxNumBones(boneWeights, vertexStartIndex);
-                if (!notExceededNumBones)
-                {
-                    Log("ERROR: More bone weights used than capacity for");
-                    return false;
-                }
+				assert(notExceededNumBones);
                 
                 // get the first unused bone index
                 uint32_t firstFreeIndex = vertexStartIndex;
@@ -439,30 +398,21 @@ namespace JonsAssetImporter
         if (!scene->HasAnimations())
             return true;
 
-        const Mat4 rootNodeTransform = aiMat4ToJonsMat4(scene->mRootNode->mTransformation);
-        const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);
-
         for (uint32_t animationIndex = 0; animationIndex < scene->mNumAnimations; ++animationIndex)
         {
             aiAnimation* animation = *(scene->mAnimations + animationIndex);
+			assert(animation);
 
-            // what is this anyway...
-            // shouldn't be present
+            // what is this anyway... shouldn't be present
             assert(animation->mNumMeshChannels == 0);
 
-            const uint32_t durationMillisec = static_cast<uint32_t>((animation->mDuration / animation->mTicksPerSecond) * 1000);
-            model.mAnimations.emplace_back(animation->mName.C_Str(), durationMillisec, invRootNodeTransform);
-            PackageAnimation& pkgAnimation = model.mAnimations.back();
-
-			// number of nodeanim channels should be same as num bones
-			// TODO: rearrange boneanims for better cache utilization?
-			const uint32_t numBones = model.mSkeleton.size();
-			pkgAnimation.mKeyframes.resize(numBones);
+			PackageAnimation& pkgAnimation = AddPkgAnimation(model, animation);
 
             const uint32_t noAnimationKeysNum = 1;
             for (uint32_t nodeAnimIndex = 0; nodeAnimIndex < animation->mNumChannels; ++nodeAnimIndex)
             {
                 aiNodeAnim* nodeAnimation = *(animation->mChannels + nodeAnimIndex);
+				assert(nodeAnimation);
 
                 // cant do scaling animations
                 assert(nodeAnimation->mNumScalingKeys == noAnimationKeysNum);
@@ -471,12 +421,7 @@ namespace JonsAssetImporter
                 if (nodeAnimation->mNumPositionKeys == nodeAnimation->mNumRotationKeys == noAnimationKeysNum)
                     continue;
 				
-				const std::string nodeAnimName = nodeAnimation->mNodeName.C_Str();
-				const auto boneEndIter = model.mSkeleton.end();
-				const auto boneIter = std::find_if(model.mSkeleton.begin(), boneEndIter, [&nodeAnimName](const PackageBone& pkgBone) { return pkgBone.mName == nodeAnimName; });
-				assert(boneIter != boneEndIter);
-				const BoneIndex bone = model.mSkeleton.end() - boneIter - 1;
-				auto& nodeKeyframes = pkgAnimation.mKeyframes.at(bone);
+				PackageAnimation::KeyFrameContainer& keyFrames = GetBoneKeyframeContainer(pkgAnimation, model.mSkeleton, nodeAnimation);
 
                 const uint32_t numPosKeys = nodeAnimation->mNumPositionKeys;
                 const uint32_t numRotkeys = nodeAnimation->mNumRotationKeys;
@@ -484,23 +429,24 @@ namespace JonsAssetImporter
                 for (uint32_t key = 0; key < maxNumKeys; ++key)
                 {
                     // same pos/rot might be used for several pos/rot transforms
-
                     // NOTE: use mTransformation after last key encountered????
 
                     // position
                     const uint32_t posKey = key < numPosKeys ? key : numPosKeys - 1;
                     aiVectorKey* aiPos = nodeAnimation->mPositionKeys + posKey;
+					assert(aiPos);
                     const Vec3 translateVector = aiVec3ToJonsVec3(aiPos->mValue);
 
                     // rotation
                     const uint32_t rotKey = key < numRotkeys ? key : numRotkeys - 1;
                     aiQuatKey* aiRot = nodeAnimation->mRotationKeys + rotKey;
+					assert(aiRot);
                     const Quaternion rotationQuat = aiQuatToJonsQuat(aiRot->mValue);
 
                     const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime) / animation->mTicksPerSecond;
                     const uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
 
-					nodeKeyframes.emplace_back(timestampMillisec, translateVector, rotationQuat);
+					keyFrames.emplace_back(timestampMillisec, translateVector, rotationQuat);
                 }
             }
         }
@@ -550,16 +496,6 @@ namespace JonsAssetImporter
         model.mStaticAABB.mMaxBounds = maxExtent;*/
     }
 
-
-    void CheckForInvalidAABB(PackageAABB& aabb)
-    {
-        // resets AABB to zero length
-        if (aabb.mMinBounds == Vec3(std::numeric_limits<float>::max()) && aabb.mMaxBounds == Vec3(std::numeric_limits<float>::lowest()))
-        {
-            aabb.mMinBounds = Vec3(0.0f);
-            aabb.mMaxBounds = Vec3(0.0f);
-        }
-    }
 
     bool OnlyOneNodePerMesh(const aiScene* scene)
     {
@@ -682,25 +618,6 @@ namespace JonsAssetImporter
         return nullptr;
     }
     
-    uint32_t GetNodeDistanceFromRoot(const aiString& name, const aiScene* scene)
-    {
-        const aiNode* rootNode = scene->mRootNode;
-        assert(rootNode);
-        const aiNode* node = rootNode->FindNode(name);
-        assert(node);
-        
-        // backtracks to the root node and count steps
-        uint32_t dist = 0;
-        while (node != rootNode)
-        {
-            node = node->mParent;
-            
-            ++dist;
-        };
-        
-        return dist;
-    }
-
     Vec3 GetVertices(const bool isStaticMesh, const Mat4& nodeTransform, const aiVector3D& assimpVertices)
     {
         Vec3 ret = aiVec3ToJonsVec3(assimpVertices);
@@ -709,6 +626,62 @@ namespace JonsAssetImporter
 
         return ret;
     }
+
+	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiAnimation* animation)
+	{
+		const Mat4& rootNodeTransform = model.mNodes.front().mTransform;
+		const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);
+
+		const uint32_t durationMillisec = static_cast<uint32_t>((animation->mDuration / animation->mTicksPerSecond) * 1000);
+		model.mAnimations.emplace_back(animation->mName.C_Str(), durationMillisec, invRootNodeTransform);
+		PackageAnimation& pkgAnimation = model.mAnimations.back();
+
+		// number of nodeanim channels should be same as num bones
+		// TODO: vector of vectors - rearrange boneanims for better cache utilization?
+		const uint32_t numBones = model.mSkeleton.size();
+		pkgAnimation.mBoneAnimations.resize(numBones);
+
+		return pkgAnimation;
+	}
+
+	PackageAnimation::KeyFrameContainer& GetBoneKeyframeContainer(PackageAnimation& pkgAnimation, const std::vector<PackageBone>& bones, const aiNodeAnim* nodeAnimation)
+	{
+		const std::string nodeAnimName = nodeAnimation->mNodeName.C_Str();
+		const auto boneEndIter = bones.end();
+		const auto boneIter = std::find_if(bones.begin(), boneEndIter, [&nodeAnimName](const PackageBone& pkgBone) { return pkgBone.mName == nodeAnimName; });
+		assert(boneIter != boneEndIter);
+		const BoneIndex bone = bones.end() - boneIter - 1;
+		
+		return pkgAnimation.mBoneAnimations.at(bone);
+	}
+
+	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const BoneNameSet& boneNames, const AssimpBoneSet& aiBones, const aiNode* node, const Mat4& parentTransform, const BoneIndex parentBone)
+	{
+		BoneIndex thisBone = INVALID_BONE_INDEX;
+		const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
+		const auto boneNameIter = boneNames.find(node->mName.C_Str());
+		if (boneNameIter != boneNames.end())
+		{
+			const std::string& boneName = *boneNameIter;
+			const aiBone* bone = FindAiBoneByName(aiBones, boneName);
+			if (bone)
+				skeleton.emplace_back(boneName, aiMat4ToJonsMat4(bone->mOffsetMatrix));
+			else
+				skeleton.emplace_back(boneName, nodeTransform);
+
+			thisBone = skeleton.size() - 1;
+			parentMap.at(thisBone) = parentBone;
+
+			// parents must always appear infront of children to speed up updating transforms
+			assert(parentBone == INVALID_BONE_INDEX || parentBone < thisBone);
+		}
+
+		for (uint32_t childIndex = 0; childIndex < node->mNumChildren; childIndex++)
+		{
+			const aiNode* childNode = node->mChildren[childIndex];
+			BuildSkeleton(parentMap, skeleton, boneNames, aiBones, childNode, nodeTransform, thisBone);
+		}
+	}
 
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat)
