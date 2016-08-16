@@ -94,17 +94,19 @@ namespace JonsEngine
         
         // interpolate rotation
         const Quaternion& currRot = currframeIter->mRotation;
-        const Quaternion& nextRot = nextFrameIter->mRotation;
-        Quaternion finalRot = glm::slerp(currRot, nextRot, interpolationFactor);
-        finalRot = glm::normalize(finalRot);
+       // const Quaternion& nextRot = nextFrameIter->mRotation;
+        //Quaternion finalRot = glm::slerp(currRot, nextRot, interpolationFactor);
+		Quaternion finalRot = currRot;
         
         // interpolate translation
         const Vec3& currTranslation = currframeIter->mTranslation;
-        const Vec3& nextTranslation = nextFrameIter->mTranslation;
-        const Vec3 finalTranslation = interpolationFactor * currTranslation + (1.0f - interpolationFactor) * nextTranslation;
-        
-        Mat4 boneMatrix = glm::toMat4(finalRot);
-        boneMatrix = glm::translate(boneMatrix, finalTranslation);
+        //const Vec3& nextTranslation = nextFrameIter->mTranslation;
+      //  const Vec3 finalTranslation = interpolationFactor * currTranslation + (1.0f - interpolationFactor) * nextTranslation;
+		Vec3 finalTranslation = currTranslation;
+
+        //Mat4 boneMatrix = glm::toMat4(finalRot);
+        //boneMatrix = glm::translate(boneMatrix, finalTranslation);
+		Mat4 boneMatrix = glm::translate(gIdentityMatrix, finalTranslation);
         
         return boneMatrix;
     }

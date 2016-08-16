@@ -63,7 +63,7 @@ namespace JonsEngine
 
 				const BoneIndex boneInstance = bonesBegin + boneOffset;
 				Mat4& transform = mBoneTransforms.at(boneInstance);
-				transform = rootInverseTransform * transform * boneOffsetTransform;
+				transform = /*rootInverseTransform */ transform * boneOffsetTransform;
 			}
         }
     }

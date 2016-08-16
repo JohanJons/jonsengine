@@ -365,6 +365,7 @@ namespace JonsAssetImporter
         boneIndices.resize(maxContainerSize);
         boneWeights.resize(maxContainerSize);
 
+		// TODO: this could be made faster
         const uint32_t numBones = assimpMesh->mNumBones;
         for (uint8_t boneIndex = 0; boneIndex < numBones; ++boneIndex)
         {
@@ -665,9 +666,10 @@ namespace JonsAssetImporter
 			const std::string& boneName = *boneNameIter;
 			const aiBone* bone = FindAiBoneByName(aiBones, boneName);
 			if (bone)
-				skeleton.emplace_back(boneName, aiMat4ToJonsMat4(bone->mOffsetMatrix));
-			else
-				skeleton.emplace_back(boneName, nodeTransform);
+                skeleton.emplace_back(boneName, aiMat4ToJonsMat4(bone->mOffsetMatrix));
+            else
+                skeleton.emplace_back(boneName, gIdentityMatrix);
+                //skeleton.emplace_back(boneName, nodeTransform);
 
 			thisBone = skeleton.size() - 1;
 			parentMap.at(thisBone) = parentBone;
@@ -698,7 +700,7 @@ namespace JonsAssetImporter
 
     Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat)
     {
-        return Quaternion(aiQuat.x, aiQuat.y, aiQuat.z, aiQuat.w);
+        return Quaternion(aiQuat.w, aiQuat.x, aiQuat.y, aiQuat.z);
     }
 
     Vec3 aiColor3DToJonsVec3(const aiColor3D& color)
