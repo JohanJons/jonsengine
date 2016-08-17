@@ -90,7 +90,7 @@ namespace JonsEngine
 
         const KeyframeIterator nextFrameIter = GetNextFrameIter(bone, currframeIter);
         const float interpolationFactor = GetInterpolationFactor(bone, currframeIter, nextFrameIter, elapsedTime);
-		assert(interpolationFactor >= 0.0f && interpolationFactor <= 1.0f);
+		//assert(interpolationFactor >= 0.0f && interpolationFactor <= 1.0f);
         
         // interpolate rotation
         const Quaternion& currRot = currframeIter->mRotation;
@@ -106,9 +106,10 @@ namespace JonsEngine
 
         //Mat4 boneMatrix = glm::toMat4(finalRot);
         //boneMatrix = glm::translate(boneMatrix, finalTranslation);
-		Mat4 boneMatrix = glm::translate(gIdentityMatrix, finalTranslation);
+		Mat4 rotMatrix = glm::toMat4(finalRot);
+		Mat4 transMatrix = glm::translate(gIdentityMatrix, finalTranslation);
         
-        return boneMatrix;
+        return transMatrix * rotMatrix;
     }
 
 

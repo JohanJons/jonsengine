@@ -4,6 +4,7 @@
 #include "include/Renderer/DirectX11/DX11VertexBufferSet.hpp"
 #include "include/Core/Types.h"
 #include "include/Core/Platform/Directx11.h"
+#include "include/Resources/Bone.h"
 
 #include <vector>
 #include <memory>

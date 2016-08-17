@@ -580,7 +580,7 @@ namespace JonsAssetImporter
 
     bool UsedLessThanMaxNumBones(const BoneWeight& pkgBoneWeight)
     {
-        for (uint32_t bone = 0; bone < MAX_NUM_BONES; ++bone)
+        for (uint32_t bone = 0; bone < MAX_BONES_PER_VERTEX; ++bone)
         {
             // invalid index means unused
             if (pkgBoneWeight.mBoneIndices.at(bone) == INVALID_BONE_INDEX)

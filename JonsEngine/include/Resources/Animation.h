@@ -2,7 +2,6 @@
 
 #include "include/Resources/Bone.h"
 #include "include/Resources/BoneKeyframe.h"
-#include "include/Renderer/DirectX11/Shaders/Constants.h"
 #include "include/Core/Utils/Time.h"
 #include "include/Core/Utils/IDGenerator.hpp"
 #include "include/Core/Types.h"
@@ -24,8 +23,6 @@ namespace JonsEngine
     class Animation
     {
     public:
-        static const uint32_t MAX_BONES_PER_VERTEX = NUM_BONES_PER_VERTEX;
-
         Animation(const PackageAnimation& pkgAnimation, const BoneParentMap& parentMap, const BoneTransforms& boneOffsets);
 		Animation(const Animation& other, const BoneParentMap& parentMap, const BoneTransforms& boneOffsets);
 
