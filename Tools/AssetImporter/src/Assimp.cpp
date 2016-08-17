@@ -21,9 +21,9 @@ namespace JonsAssetImporter
     bool OnlyOneNodePerMesh(const aiScene* scene);
     Mat4 GetMeshNodeTransform(const aiScene* scene, const aiNode* node, const uint32_t meshIndex, const Mat4& parentTransform);
     uint32_t CountMeshOccurances(const aiNode* node, const uint32_t aiMeshIndex, const bool recursive);
-    PackageBone::BoneIndex GetBoneIndex(const PackageModel& model, const std::string& boneName);
+    BoneIndex GetBoneIndex(const PackageModel& model, const std::string& boneName);
     uint32_t CountChildren(const aiNode* node);
-    bool UsedLessThanMaxNumBones(const std::vector<float>& boneWeights, const uint32_t offset);
+    bool UsedLessThanMaxNumBones(const BoneWeight& pkgBoneWeight);
     const aiNode* FindMeshNode(const aiMesh* mesh, const aiScene* scene, const aiNode* node);
     Vec3 GetVertices(const bool isStatic, const Mat4& nodeTransform, const aiVector3D& assimpVertices);
 	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiAnimation* animation);
@@ -207,7 +207,7 @@ namespace JonsAssetImporter
                 return false;
 
             // bone weights
-            if (!ProcessVertexBoneWeights(jonsMesh.mBoneIndices, jonsMesh.mBoneWeights, assimpMesh))
+            if (!ProcessVertexBoneWeights(jonsMesh.mBoneWeights, assimpMesh))
                 return false;
 
             if (materialMap.find(assimpMesh->mMaterialIndex) == materialMap.end())
@@ -317,8 +317,8 @@ namespace JonsAssetImporter
 
     bool Assimp::ProcessBones(JonsEngine::BoneParentMap& parentMap, std::vector<PackageBone>& bones, const aiScene* scene)
     {
-        std::set<std::string> boneNames;
-        std::set<const aiBone*> aiBones;
+        BoneNameSet boneNames;
+        AssimpBoneSet aiBones;
 
         for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
         {
@@ -356,41 +356,38 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessVertexBoneWeights(std::vector<uint8_t>& boneIndices, std::vector<float>& boneWeights, const aiMesh* assimpMesh)
+    bool Assimp::ProcessVertexBoneWeights(std::vector<BoneWeight>& boneWeights, const aiMesh* assimpMesh)
     {
         // make sure containers are large enough as we will access indices directly when iterating the bones
         const uint32_t numVertices = assimpMesh->mNumVertices;
-        const uint32_t maxContainerSize = numVertices * Animation::MAX_BONES_PER_VERTEX;
-        // TODO: this maybe overallocates memory?
-        boneIndices.resize(maxContainerSize);
-        boneWeights.resize(maxContainerSize);
+		boneWeights.resize(numVertices);
 
-		// TODO: this could be made faster
-        const uint32_t numBones = assimpMesh->mNumBones;
-        for (uint8_t boneIndex = 0; boneIndex < numBones; ++boneIndex)
-        {
-            const auto assimpBone = assimpMesh->mBones[boneIndex];
-            
+		const uint32_t numBones = assimpMesh->mNumBones;
+		assert(numBones <= MAX_NUM_BONES);
+		for (BoneIndex bone = 0; bone < numBones; ++bone)
+		{
+			const auto assimpBone = assimpMesh->mBones[bone];
             const uint32_t numWeights = assimpBone->mNumWeights;
+
             for (uint32_t weightIndex = 0; weightIndex < numWeights; ++weightIndex)
             {
                 const auto assimpWeight = assimpBone->mWeights[weightIndex];
-                const uint32_t vertexStartIndex = assimpWeight.mVertexId * Animation::MAX_BONES_PER_VERTEX;
-
-                // make sure we havn't reached bone weight cap per bone
-                const bool notExceededNumBones = UsedLessThanMaxNumBones(boneWeights, vertexStartIndex);
+                const uint32_t vertexID = assimpWeight.mVertexId;
+				const float weightFactor = assimpWeight.mWeight;
+                
+                auto& pkgWeight = boneWeights.at(vertexID);
+                const bool notExceededNumBones = UsedLessThanMaxNumBones(pkgWeight);
 				assert(notExceededNumBones);
                 
-                // get the first unused bone index
-                uint32_t firstFreeIndex = vertexStartIndex;
-                while (!IsEqual(boneWeights.at(firstFreeIndex), 0.0f))
-                    ++firstFreeIndex;
+				uint32_t firstFreeIndex = 0;
+				while (pkgWeight.mBoneIndices.at(firstFreeIndex) != INVALID_BONE_INDEX)
+					++firstFreeIndex;
 
-                boneWeights.at(firstFreeIndex) = assimpWeight.mWeight;
-                boneIndices.at(firstFreeIndex) = boneIndex;
+				pkgWeight.mBoneIndices.at(firstFreeIndex) = bone;
+				pkgWeight.mBoneWeights.at(firstFreeIndex) = weightFactor;
             }
-        }
-
+		}
+        
         return true;
     }
 
@@ -551,12 +548,12 @@ namespace JonsAssetImporter
         return occurances;
     }
     
-    PackageBone::BoneIndex GetBoneIndex(const PackageModel& model, const std::string& boneName)
+    BoneIndex GetBoneIndex(const PackageModel& model, const std::string& boneName)
     {
         for (const PackageMesh& mesh : model.mMeshes)
         {
             const uint32_t numBones = model.mSkeleton.size();
-            for (PackageBone::BoneIndex boneIndex = 0; boneIndex < numBones; ++boneIndex)
+            for (BoneIndex boneIndex = 0; boneIndex < numBones; ++boneIndex)
             {
                 const PackageBone& bone = model.mSkeleton.at(boneIndex);
                 if (bone.mName == boneName)
@@ -564,7 +561,7 @@ namespace JonsAssetImporter
             }
         }
         
-        return PackageBone::INVALID_BONE_INDEX;
+        return INVALID_BONE_INDEX;
     }
 
     uint32_t CountChildren(const aiNode* node)
@@ -581,16 +578,15 @@ namespace JonsAssetImporter
         return ret;
     }
 
-    bool UsedLessThanMaxNumBones(const std::vector<float>& boneWeights, const uint32_t offset)
+    bool UsedLessThanMaxNumBones(const BoneWeight& pkgBoneWeight)
     {
-        for (uint32_t index = offset; index < offset + Animation::MAX_BONES_PER_VERTEX; ++index)
+        for (uint32_t bone = 0; bone < MAX_NUM_BONES; ++bone)
         {
-            // weight zero means unused index
-            if (IsEqual(boneWeights.at(index), 0.0f))
+            // invalid index means unused
+            if (pkgBoneWeight.mBoneIndices.at(bone) == INVALID_BONE_INDEX)
                 return true;
         }
-
-        // all indices used
+        
         return false;
     }
 
@@ -671,7 +667,7 @@ namespace JonsAssetImporter
                 skeleton.emplace_back(boneName, gIdentityMatrix);
                 //skeleton.emplace_back(boneName, nodeTransform);
 
-			thisBone = skeleton.size() - 1;
+			thisBone = static_cast<BoneIndex>(skeleton.size() - 1);
 			parentMap.at(thisBone) = parentBone;
 
 			// parents must always appear infront of children to speed up updating transforms

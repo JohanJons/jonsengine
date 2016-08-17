@@ -86,9 +86,6 @@ namespace JonsEngine
 
     struct PackageBone
     {
-        typedef uint32_t BoneIndex;
-        static const BoneIndex INVALID_BONE_INDEX = UINT32_MAX;
-        
         PackageBone();
         PackageBone(const std::string& name, const Mat4& offsetMatrix);
         
@@ -123,8 +120,7 @@ namespace JonsEngine
         std::vector<float> mNormalData;
         std::vector<float> mTexCoordsData;
         std::vector<float> mTangentData;
-        std::vector<float> mBoneWeights;
-        std::vector<uint8_t> mBoneIndices;
+        std::vector<BoneWeight> mBoneWeights;
         std::vector<uint16_t> mIndiceData;
         PackageMaterial::MaterialIndex mMaterialIndex;
     };
@@ -231,7 +227,6 @@ namespace boost
             ar & mesh.mNormalData;
             ar & mesh.mTexCoordsData;
             ar & mesh.mTangentData;
-            ar & mesh.mBoneIndices;
             ar & mesh.mBoneWeights;
             ar & mesh.mIndiceData;
             ar & mesh.mMaterialIndex;
@@ -283,6 +278,13 @@ namespace boost
             ar & keyframe.mTranslation;
             ar & keyframe.mRotation;
         }
+
+		template<class Archive>
+		void serialize(Archive & ar, JonsEngine::BoneWeight& boneWeight, const unsigned int version)
+		{
+			ar & boneWeight.mBoneIndices;
+			ar & boneWeight.mBoneWeights;
+		}
         
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageAnimation& animation, const unsigned int version)

@@ -167,6 +167,7 @@
     <ClCompile Include="src\RenderQueue\RenderQueue.cpp" />
     <ClCompile Include="src\Resources\Animation.cpp" />
     <ClCompile Include="src\Resources\AnimationInstance.cpp" />
+    <ClCompile Include="src\Resources\Bone.cpp" />
     <ClCompile Include="src\Resources\BoneKeyframe.cpp" />
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
     <ClCompile Include="src\Resources\Material.cpp" />
