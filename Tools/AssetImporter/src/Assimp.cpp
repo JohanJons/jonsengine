@@ -651,7 +651,7 @@ namespace JonsAssetImporter
 		const auto boneEndIter = bones.end();
 		const auto boneIter = std::find_if(bones.begin(), boneEndIter, [&nodeAnimName](const PackageBone& pkgBone) { return pkgBone.mName == nodeAnimName; });
 		assert(boneIter != boneEndIter);
-		const BoneIndex bone = bones.end() - boneIter - 1;
+		const BoneIndex bone = boneIter - bones.begin();
 		
 		return pkgAnimation.mBoneAnimations.at(bone);
 	}
