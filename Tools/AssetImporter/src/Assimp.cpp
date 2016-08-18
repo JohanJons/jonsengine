@@ -317,8 +317,8 @@ namespace JonsAssetImporter
 
     bool Assimp::ProcessBones(JonsEngine::BoneParentMap& parentMap, std::vector<PackageBone>& bones, const aiScene* scene)
     {
-        BoneNameSet boneNames;
-        AssimpBoneSet aiBones;
+        std::set<std::string> boneNames;
+        std::set<const aiBone*> aiBones;
 
         for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
         {
@@ -344,6 +344,9 @@ namespace JonsAssetImporter
                 }
                 while (node && node != meshNode && node != parentMeshNode);
             }
+
+			// temp!!
+			assert(mesh->mNumBones == boneNames.size());
         }
 
         const std::size_t numBones = boneNames.size();
@@ -580,7 +583,7 @@ namespace JonsAssetImporter
 
     bool UsedLessThanMaxNumBones(const BoneWeight& pkgBoneWeight)
     {
-        for (uint32_t bone = 0; bone < MAX_BONES_PER_VERTEX; ++bone)
+        for (uint32_t bone = 0; bone < MAX_NUM_BONES; ++bone)
         {
             // invalid index means unused
             if (pkgBoneWeight.mBoneIndices.at(bone) == INVALID_BONE_INDEX)
@@ -661,6 +664,10 @@ namespace JonsAssetImporter
 		{
 			const std::string& boneName = *boneNameIter;
 			const aiBone* bone = FindAiBoneByName(aiBones, boneName);
+
+			// makes no sense if not a bone
+			//assert(bone);
+
 			if (bone)
                 skeleton.emplace_back(boneName, aiMat4ToJonsMat4(bone->mOffsetMatrix));
             else
