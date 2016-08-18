@@ -89,9 +89,6 @@ namespace JonsGame
 		const Animation& animWuson = modelWuson.GetAnimation(mAnimWuson);
 		mAnimDurationWuson = animWuson.GetAnimationDuration();
 
-        //mAnimIndexWuson = modelWuson.GetAnimationIndex("Wuson_Run");
-        //const ModelAnimation& modelAnimation = modelWuson.GetAnimation(mAnimIndexWuson);
-        //mAnimDurationWuson = modelAnimation.GetAnimationDuration();
         SceneNode& nodeWuson = mScene.GetSceneNode(mNodeAnimWuson);
         nodeWuson.TranslateNode(Vec3(-10.0f, 4.5f, -11.0f));
         nodeWuson.RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
