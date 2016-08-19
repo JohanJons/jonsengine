@@ -64,7 +64,7 @@ namespace JonsEngine
 
 				const BoneIndex boneInstance = bonesBegin + boneOffset;
 				Mat4& transform = mBoneTransforms.at(boneInstance);
-				transform = rootInverseTransform * transform * boneOffsetTransform;
+				transform = /*rootInverseTransform */ transform * boneOffsetTransform;
 			}
         }
     }
@@ -78,7 +78,7 @@ namespace JonsEngine
 		const Animation& animation = model.GetAnimation(animationID);
 		const uint32_t numBonesForAnimation = animation.GetNumberOfBones();
 		
-		const BoneIndex firstIndex = static_cast<BoneIndex>(mBoneTransforms.size());
+		const BoneIndex firstIndex = mBoneTransforms.size();
 
 		// initialize instance transforms to identity transform
 		mBoneTransforms.insert(mBoneTransforms.end(), numBonesForAnimation, gIdentityMatrix);
@@ -118,7 +118,7 @@ namespace JonsEngine
 		mAnimInstanceIDGen.FreeID(instanceID);
 		mBoneTransforms.erase(mBoneTransforms.begin() + boneRange.first, mBoneTransforms.begin() + boneRange.second);
 
-		const BoneIndex numBonesRemoved = boneRange.second - boneRange.first;
+		const std::size_t numBonesRemoved = boneRange.second - boneRange.first;
 		for (AnimationInstance& animInstance : mActiveAnimations)
 		{
 			if (animInstance.mBoneRange.first > boneRange.first)

@@ -32,7 +32,7 @@ namespace JonsEngine
             const EngineSettings::ShadowReadbackLatency shadowmapReadbackLatency, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap);
         ~DX11Pipeline();
 
-        void BeginFrame();
+        void BeginFrame(const RenderQueue& renderQueue);
         void EndFrame();
 
         void GeometryStage(const RenderQueue& renderQueue);

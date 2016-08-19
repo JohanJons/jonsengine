@@ -22,6 +22,7 @@ namespace JonsEngine
         ~AnimationUpdater();
 
 		// Updates animation bone transforms
+		// Note: dosn't remove expired animation instances, must be explicitly removed with StopAnimation()
 		// @elapstedTime - time since last Update()
         void Update(const Milliseconds elapsedTime);
 

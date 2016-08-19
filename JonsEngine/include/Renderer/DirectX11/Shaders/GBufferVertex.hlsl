@@ -36,7 +36,7 @@ cbuffer GBufferConstants : register(CBUFFER_REGISTER_VERTEX)
     bool gIsAnimating;
 };
 
-StructuredBuffer<float4x4> gBones : register (SBUFFER_REGISTER_VERTEX);
+StructuredBuffer<float4x4> gBones : register (SBUFFER_REGISTER_BONE_TRANSFORMS);
 
 float4x4 BuildBoneTransform(const uint4 boneIndices, const float4 boneWeights);
 
@@ -73,32 +73,26 @@ GBufferVSOut vs_main(GBufferVSIn input)
 }
 
 
-// assumes there will at most be four bones
 float4x4 BuildBoneTransform(const uint4 boneIndices, const float4 boneWeights)
 {
+	//float4x4 boneTransform = (float4x4)0;
 	uint boneIndex = boneIndices[0];
 	float boneWeight = boneWeights[0];
 	float4x4 boneTransform = gBones[boneIndex] * boneWeight;
 
-	boneWeight = boneWeights[1];
-	if (boneWeight > 0.0)
+	for (uint boneNum = 1; boneNum < NUM_BONES_PER_VERTEX; ++boneNum)
 	{
-		uint boneIndex = boneIndices[1];
+		boneIndex = boneIndices[boneNum];
+		boneWeight = boneWeights[boneNum];
+
 		boneTransform += gBones[boneIndex] * boneWeight;
+		/*float4x4 tmp = gBones[boneIndex] * boneWeight;
+		 boneTransform += gBones[boneIndex] * boneWeight;
 
-		boneWeight = boneWeights[2];
-		if (boneWeight > 0.0)
-		{
-			uint boneIndex = boneIndices[2];
-			boneTransform += gBones[boneIndex] * boneWeight;
-
-			boneWeight = boneWeights[3];
-			if (boneWeight > 0.0)
-			{
-				uint boneIndex = boneIndices[3];
-				boneTransform += gBones[boneIndex] * boneWeight;
-			}
-		}
+		boneTransform += CreateMatrixFromCols(float4(tmp[0].x, tmp[1].x, tmp[2].x, tmp[3].x),
+			float4(tmp[0].y, tmp[1].y, tmp[2].y, tmp[3].y),
+			float4(tmp[0].z, tmp[1].z, tmp[2].z, tmp[3].z),
+			float4(tmp[0].w, tmp[1].w, tmp[2].w, tmp[3].w));*/
 	}
 
 	return boneTransform;

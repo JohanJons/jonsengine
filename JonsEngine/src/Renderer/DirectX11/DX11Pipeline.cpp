@@ -96,9 +96,17 @@ namespace JonsEngine
     }
 
 
-    void DX11Pipeline::BeginFrame()
+    void DX11Pipeline::BeginFrame(const RenderQueue& renderQueue)
     {
         mBackbuffer.ClearBackbuffer(gClearColor);
+
+		// Send all bone transforms to GPU
+		const bool hasBoneData = !renderQueue.mRenderData.mBones.empty();
+		if (hasBoneData)
+		{
+			mBoneTransformsBuffer.SetData(renderQueue.mRenderData.mBones);
+			mBoneTransformsBuffer.Bind(DX11DynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_BONE_TRANSFORMS);
+		}
     }
 
     void DX11Pipeline::EndFrame()
@@ -109,14 +117,6 @@ namespace JonsEngine
 
     void DX11Pipeline::GeometryStage(const RenderQueue& renderQueue)
     {
-        // Send all bone transforms to GPU
-		const bool hasBoneData = !renderQueue.mRenderData.mBones.empty();
-		if (hasBoneData)
-		{
-			mBoneTransformsBuffer.SetData(renderQueue.mRenderData.mBones);
-			mBoneTransformsBuffer.Bind(DX11DynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_VERTEX);
-		}
-
         mGBuffer.BindForGeometryStage(mDSV);
 
 		// TEMP SOLUTION !!!

@@ -2,6 +2,7 @@
 
 #include "include/Resources/Bone.h"
 #include "include/Resources/BoneKeyframe.h"
+#include "include/Renderer/DirectX11/Shaders/Constants.h"
 #include "include/Core/Utils/Time.h"
 #include "include/Core/Utils/IDGenerator.hpp"
 #include "include/Core/Types.h"
@@ -23,6 +24,8 @@ namespace JonsEngine
     class Animation
     {
     public:
+        static const uint32_t MAX_BONES_PER_VERTEX = NUM_BONES_PER_VERTEX;
+
         Animation(const PackageAnimation& pkgAnimation, const BoneParentMap& parentMap, const BoneTransforms& boneOffsets);
 		Animation(const Animation& other, const BoneParentMap& parentMap, const BoneTransforms& boneOffsets);
 
@@ -39,9 +42,9 @@ namespace JonsEngine
     private:
 		typedef KeyframeContainer::const_iterator KeyframeIterator;
 
-		KeyframeIterator GetBoneKeyframe(const BoneIndex bone, const Milliseconds time) const;
-		KeyframeIterator GetNextFrameIter(const BoneIndex bone, const KeyframeIterator currFrameIter) const;
-        float GetInterpolationFactor(const BoneIndex bone, const KeyframeIterator currIter, const KeyframeIterator nextIter, const Milliseconds elapsedTime) const;
+		KeyframeIterator GetBoneKeyframe(const KeyframeContainer& keyframeContainer, const Milliseconds time) const;
+		KeyframeIterator GetNextFrameIter(const KeyframeContainer& keyframeContainer, const KeyframeIterator currFrameIter) const;
+        float GetInterpolationFactor(const KeyframeContainer& keyframeContainer, const KeyframeIterator currIter, const KeyframeIterator nextIter, const Milliseconds elapsedTime) const;
 
 
         std::string mName;

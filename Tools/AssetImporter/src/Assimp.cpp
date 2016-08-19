@@ -26,6 +26,7 @@ namespace JonsAssetImporter
     bool UsedLessThanMaxNumBones(const BoneWeight& pkgBoneWeight);
     const aiNode* FindMeshNode(const aiMesh* mesh, const aiScene* scene, const aiNode* node);
 	const aiMesh* FindMesh(const aiScene* scene, const std::string& name);
+	const aiBone* FindAiBoneByName(const std::set<const aiBone*> aiBones, const std::string& string);
     Vec3 GetVertices(const bool isStatic, const Mat4& nodeTransform, const aiVector3D& assimpVertices);
 	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiAnimation* animation);
 	BoneIndex GetBoneKeyframeContainer(PackageAnimation& pkgAnimation, const std::vector<PackageBone>& bones, const aiNodeAnim* nodeAnimation);
@@ -204,13 +205,13 @@ namespace JonsAssetImporter
             meshContainer.emplace_back(assimpMesh->mName.C_Str());
             PackageMesh& jonsMesh = meshContainer.back();
             
-            if (!AddMeshGeometricData(jonsMesh, assimpMesh, scene, meshIndex, modelMinBounds, modelMaxBounds))
+            if (!AddMeshGeometricData(jonsMesh, assimpMesh, scene, meshIndex, jonsMesh.mAABB.mMinBounds, jonsMesh.mAABB.mMaxBounds))
                 return false;
 
-            // bone weights
-            //if (!ProcessVertexBoneWeights(jonsMesh.mBoneWeights, assimpMesh))
-            //    return false;
-
+			// update overall model AABB
+			modelMinBounds = MinVal(modelMinBounds, jonsMesh.mAABB.mMinBounds);
+			modelMaxBounds = MaxVal(modelMaxBounds, jonsMesh.mAABB.mMaxBounds);
+           
             if (materialMap.find(assimpMesh->mMaterialIndex) == materialMap.end())
             {
                 Log("ERROR: Unable to find mesh material in materialMap");
@@ -305,17 +306,6 @@ namespace JonsAssetImporter
         return true;
     }
 
-    const aiBone* FindAiBoneByName(const std::set<const aiBone*> aiBones, const std::string& string)
-    {
-        for (const aiBone* bone : aiBones)
-        {
-            if (bone->mName.C_Str() == string)
-                return bone;
-        }
-    
-        return nullptr;
-    }
-
     bool Assimp::ProcessBones(JonsEngine::BoneParentMap& parentMap, std::vector<PackageBone>& bones, std::vector<PackageMesh>& meshes, const aiScene* scene)
     {
         std::set<std::string> boneNames;
@@ -345,18 +335,18 @@ namespace JonsAssetImporter
                 }
                 while (node && node != meshNode && node != parentMeshNode);
             }
-
-			// temp!!
-			//assert(mesh->mNumBones == boneNames.size());
         }
 
-        const std::size_t numBones = boneNames.size();
-        parentMap.resize(numBones, INVALID_BONE_INDEX);
-        bones.reserve(numBones);
-
         BuildSkeleton(parentMap, bones, boneNames, aiBones, scene->mRootNode, gIdentityMatrix, INVALID_BONE_INDEX);
-        assert(bones.size() == numBones);
+        assert(bones.size() == boneNames.size());
 
+		const bool processedOK = ProcessVertexBoneWeights(bones, meshes, scene);
+
+        return processedOK;
+    }
+
+    bool Assimp::ProcessVertexBoneWeights(std::vector<PackageBone>& bones, std::vector<PackageMesh>& meshes, const aiScene* scene)
+    {
 		for (PackageMesh& pkgMesh : meshes)
 		{
 			const aiMesh* assimpMesh = FindMesh(scene, pkgMesh.mName);
@@ -393,45 +383,9 @@ namespace JonsAssetImporter
 					pkgWeight.mBoneWeights.at(firstFreeIndex) = weightFactor;
 				}
 			}
-
 		}
 
-        return true;
-    }
-
-    bool Assimp::ProcessVertexBoneWeights(std::vector<BoneWeight>& boneWeights, const aiMesh* assimpMesh)
-    {
-        // make sure containers are large enough as we will access indices directly when iterating the bones
-        const uint32_t numVertices = assimpMesh->mNumVertices;
-		boneWeights.resize(numVertices);
-
-		const uint32_t numBones = assimpMesh->mNumBones;
-		assert(numBones <= MAX_NUM_BONES);
-		for (BoneIndex bone = 0; bone < numBones; ++bone)
-		{
-			const auto assimpBone = assimpMesh->mBones[bone];
-            const uint32_t numWeights = assimpBone->mNumWeights;
-
-            for (uint32_t weightIndex = 0; weightIndex < numWeights; ++weightIndex)
-            {
-                const auto assimpWeight = assimpBone->mWeights[weightIndex];
-                const uint32_t vertexID = assimpWeight.mVertexId;
-				const float weightFactor = assimpWeight.mWeight;
-                
-                auto& pkgWeight = boneWeights.at(vertexID);
-                const bool notExceededNumBones = UsedLessThanMaxNumBones(pkgWeight);
-				assert(notExceededNumBones);
-                
-				uint32_t firstFreeIndex = 0;
-				while (pkgWeight.mBoneIndices.at(firstFreeIndex) != INVALID_BONE_INDEX)
-					++firstFreeIndex;
-
-				pkgWeight.mBoneIndices.at(firstFreeIndex) = bone;
-				pkgWeight.mBoneWeights.at(firstFreeIndex) = weightFactor;
-            }
-		}
-        
-        return true;
+		return true;
     }
 
     bool Assimp::ProcessAnimations(PackageModel& model, const aiScene* scene)
@@ -539,6 +493,8 @@ namespace JonsAssetImporter
 
     bool OnlyOneNodePerMesh(const aiScene* scene)
     {
+		assert(scene);
+
         for (uint32_t meshNum = 0; meshNum < scene->mNumMeshes; ++meshNum)
         {
             const bool recursive = true;
@@ -553,6 +509,9 @@ namespace JonsAssetImporter
     // assumes aiMeshIndex actually exists in node hierarchy
     Mat4 GetMeshNodeTransform(const aiScene* scene, const aiNode* node, const uint32_t aiMeshIndex, const Mat4& parentTransform)
     {
+		assert(scene);
+		assert(node);
+
         const bool recursive = false;
         const uint32_t occurances = CountMeshOccurances(node, aiMeshIndex, recursive);
         const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
@@ -571,6 +530,8 @@ namespace JonsAssetImporter
 
     uint32_t CountMeshOccurances(const aiNode* node, const uint32_t aiMeshIndex, const bool recursive)
     {
+		assert(node);
+
         uint32_t occurances = 0;
         for (uint32_t meshNum = 0; meshNum < node->mNumMeshes; ++meshNum)
         {
@@ -608,8 +569,9 @@ namespace JonsAssetImporter
 
     uint32_t CountChildren(const aiNode* node)
     {
-        uint32_t ret = 0;
+		assert(node);
 
+        uint32_t ret = 0;
         for (uint32_t index = 0; index < node->mNumChildren; ++index)
         {
             ++ret;
@@ -670,6 +632,17 @@ namespace JonsAssetImporter
 
 		return nullptr;
 	}
+
+	const aiBone* FindAiBoneByName(const std::set<const aiBone*> aiBones, const std::string& string)
+	{
+		for (const aiBone* bone : aiBones)
+		{
+			if (bone->mName.C_Str() == string)
+				return bone;
+		}
+
+		return nullptr;
+	}
     
     Vec3 GetVertices(const bool isStaticMesh, const Mat4& nodeTransform, const aiVector3D& assimpVertices)
     {
@@ -682,6 +655,8 @@ namespace JonsAssetImporter
 
 	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiAnimation* animation)
 	{
+		assert(animation);
+
 		const Mat4& rootNodeTransform = model.mNodes.front().mTransform;
 		const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);
 
@@ -700,16 +675,21 @@ namespace JonsAssetImporter
 	BoneIndex GetBoneKeyframeContainer(PackageAnimation& pkgAnimation, const std::vector<PackageBone>& bones, const aiNodeAnim* nodeAnimation)
 	{
 		const std::string nodeAnimName = nodeAnimation->mNodeName.C_Str();
+		const auto boneBeginIter = bones.begin();
 		const auto boneEndIter = bones.end();
-		const auto boneIter = std::find_if(bones.begin(), boneEndIter, [&nodeAnimName](const PackageBone& pkgBone) { return pkgBone.mName == nodeAnimName; });
+		const auto boneIter = std::find_if(boneBeginIter, boneEndIter, [&nodeAnimName](const PackageBone& pkgBone) { return pkgBone.mName == nodeAnimName; });
 		if (boneIter == boneEndIter)
 			return INVALID_BONE_INDEX;
 
-		return boneIter - bones.begin();
+		return boneIter - boneBeginIter;
 	}
 
 	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const BoneNameSet& boneNames, const AssimpBoneSet& aiBones, const aiNode* node, const Mat4& parentTransform, const BoneIndex parentBone)
 	{
+		const std::size_t numBones = boneNames.size();
+		parentMap.resize(numBones, INVALID_BONE_INDEX);
+		skeleton.reserve(numBones);
+
 		BoneIndex thisBone = INVALID_BONE_INDEX;
 		const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
 		const auto boneNameIter = boneNames.find(node->mName.C_Str());
