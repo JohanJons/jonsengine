@@ -36,7 +36,7 @@ namespace JonsEngine
 		const Mat4& GetInverseRootMatrix() const;
 		const Mat4& GetBoneOffsetTransform(const BoneIndex bone) const;
 		const BoneIndex GetParentIndex(const BoneIndex bone) const;
-		Mat4 InterpolateBoneTransform(const BoneIndex bone, const Milliseconds elapsedTime, const bool repeatingAnimation) const;
+		Mat4 InterpolateBoneTransform(const BoneIndex bone, const Milliseconds currTime, const bool repeatingAnimation) const;
 
 
     private:
@@ -44,7 +44,7 @@ namespace JonsEngine
 
 		KeyframeIterator GetBoneKeyframe(const KeyframeContainer& keyframeContainer, const Milliseconds time) const;
 		KeyframeIterator GetNextFrameIter(const KeyframeContainer& keyframeContainer, const KeyframeIterator currFrameIter) const;
-        float GetInterpolationFactor(const KeyframeContainer& keyframeContainer, const KeyframeIterator currIter, const KeyframeIterator nextIter, const Milliseconds elapsedTime) const;
+        float GetInterpolationFactor(const KeyframeContainer& keyframeContainer, const KeyframeIterator currIter, const KeyframeIterator nextIter, const Milliseconds currElapsedTime) const;
 
 
         std::string mName;

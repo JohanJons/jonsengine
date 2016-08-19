@@ -38,6 +38,7 @@ namespace JonsGame
         JonsEngine::ModelID mModelSphere;
         JonsEngine::ModelID mModelCube2;
         JonsEngine::ModelID mModelCube3;
+		JonsEngine::ModelID mModelBob;
 
         JonsEngine::SceneNodeID mNodeSectoid;
         JonsEngine::SceneNodeID mNodeCube;
@@ -50,6 +51,7 @@ namespace JonsGame
         JonsEngine::SceneNodeID mNodeSphere;
         JonsEngine::SceneNodeID mNodeCube2;
         JonsEngine::SceneNodeID mNodeCube3;
+		JonsEngine::SceneNodeID mNodeBob;
 
         JonsEngine::PointLightID mMovingPointLightID;
         JonsEngine::DirectionalLightID mSunDirLightID;
@@ -64,8 +66,10 @@ namespace JonsGame
         JonsEngine::StaticActorID mActorSphere;
         JonsEngine::StaticActorID mActorCube2;
         JonsEngine::StaticActorID mActorCube3;
+		JonsEngine::AnimatedActorID mActorAnimBob;
 
         JonsEngine::AnimationID mAnimWuson;
+		JonsEngine::AnimationID mAnimBob;
         JonsEngine::Milliseconds mAnimDurationWuson;
 		bool mIsAnimatingWuson;
     };

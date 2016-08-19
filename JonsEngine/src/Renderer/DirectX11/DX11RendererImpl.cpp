@@ -169,7 +169,7 @@ namespace JonsEngine
 
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags)
     {
-        mPipeline.BeginFrame();
+        mPipeline.BeginFrame(renderQueue);
 
         mPipeline.GeometryStage(renderQueue);
         mPipeline.LightingStage(renderQueue, debugFlags, mShadowFiltering, mSSAOEnabled);

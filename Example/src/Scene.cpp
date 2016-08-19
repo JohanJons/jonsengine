@@ -27,6 +27,7 @@ namespace JonsGame
         mModelSphere(resManifest.CreateSphere("Sphere", 1.0f, 12, 24)),
         mModelCube2(resManifest.CreateCube("Cube2", 3)),
         mModelCube3(resManifest.CreateCube("Cube3", 3)),
+		mModelBob(resManifest.LoadModel("bob", mJonsPackage)),
 
         // scene nodes
         mNodeSectoid(mScene.CreateSceneNode("nodeSectoid", mScene.GetRootNodeID())),
@@ -40,6 +41,7 @@ namespace JonsGame
         mNodeSphere(mScene.CreateSceneNode("nodeSphere", mScene.GetRootNodeID())),
         mNodeCube2(mScene.CreateSceneNode("nodeCube2", mScene.GetRootNodeID())),
         mNodeCube3(mScene.CreateSceneNode("nodeCube3", mScene.GetRootNodeID())),
+		mNodeBob(mScene.CreateSceneNode("nodeBob", mScene.GetRootNodeID())),
         
         // lights
         mMovingPointLightID(mScene.CreatePointLight("MovingPointLight", mNodePointLight)),
@@ -56,11 +58,15 @@ namespace JonsGame
         mActorSphere(mScene.CreateStaticActor("actorSphere", mModelSphere, mNodeSphere)),
         mActorCube2(mScene.CreateStaticActor("actorCube2", mModelCube2, mNodeCube2)),
         mActorCube3(mScene.CreateStaticActor("actorCube3", mModelCube3, mNodeCube3)),
+		mActorAnimBob(mScene.CreateAnimatedActor("animBob", mModelBob, mNodeBob)),
 
-        // misc animation
+        // misc animation - wuson
 		mAnimWuson(INVALID_ANIMATION_ID),
         mAnimDurationWuson(0),
-		mIsAnimatingWuson(false)
+		mIsAnimatingWuson(false),
+
+		// misc animaition - bob
+		mAnimBob(INVALID_ANIMATION_ID)
     {
         // ambient light
         mScene.SetAmbientLight(Vec4(0.01f));
@@ -136,6 +142,16 @@ namespace JonsGame
         actorCube3.SetMaterial(mMaterialCheckers);
         SceneNode& nodeCube3 = mScene.GetSceneNode(mNodeCube3);
         nodeCube3.TranslateNode(-sun.GetLightDirection() * 40.0f);
+
+		// actor bob
+		const Model& modelBob = resManifest.GetModel(mModelBob);
+		//mAnimBob = modelBob.GetAnimationID("Wuson_Run");
+		//const Animation& animWuson = modelWuson.GetAnimation(mAnimWuson);
+		//mAnimDurationWuson = animWuson.GetAnimationDuration();
+
+		SceneNode& nodeBob = mScene.GetSceneNode(mNodeBob);
+		nodeBob.TranslateNode(Vec3(-2.0f, 0.5f, -6.0f));
+		nodeBob.ScaleNode(0.06f);
 
         // load skybox
         mScene.SetSkybox(mSkybox);
