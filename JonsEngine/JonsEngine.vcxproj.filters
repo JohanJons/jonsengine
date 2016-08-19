@@ -12,18 +12,6 @@
     <Filter Include="Source Files\Core">
       <UniqueIdentifier>{68d50880-3b36-46e7-b2ce-670c81b0d80d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Core">
-      <UniqueIdentifier>{5a494202-1728-4048-a253-a0de5440ecd2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Core\Logging">
-      <UniqueIdentifier>{a68ce750-d5ef-433a-a7b9-c6b7b87f1cd4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Core\Memory">
-      <UniqueIdentifier>{f9fdbb70-9e32-4b69-b412-2b72faf7d6b6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Core\Utils">
-      <UniqueIdentifier>{ab910717-264a-445e-8545-85e3e20a505b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Core\Logging">
       <UniqueIdentifier>{43bdffa5-ecf2-4b77-99bc-723680333003}</UniqueIdentifier>
     </Filter>
@@ -32,9 +20,6 @@
     </Filter>
     <Filter Include="Source Files\Core\Utils">
       <UniqueIdentifier>{05c56eae-62a1-484f-822e-7a6d9071a4ca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Core\Containers">
-      <UniqueIdentifier>{8f7619c7-3070-47dd-9384-05d95b47af54}</UniqueIdentifier>
     </Filter>
     <Filter Include="Thirdparty">
       <UniqueIdentifier>{7b2a64d1-5223-4406-82fa-d4f188db9cc9}</UniqueIdentifier>
@@ -78,14 +63,35 @@
     <Filter Include="Header Files\Renderer\DirectX11\Shaders">
       <UniqueIdentifier>{c2480e19-3446-43fa-8891-a1bd483bb955}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Core\Math">
-      <UniqueIdentifier>{715a4116-fd7a-4d30-b42d-f6be5508ceaa}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Core\Math">
       <UniqueIdentifier>{b074f7aa-71f8-4a51-b4e6-83de54bfc707}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{5a494202-1728-4048-a253-a0de5440ecd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Logging">
+      <UniqueIdentifier>{a68ce750-d5ef-433a-a7b9-c6b7b87f1cd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Memory">
+      <UniqueIdentifier>{f9fdbb70-9e32-4b69-b412-2b72faf7d6b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Utils">
+      <UniqueIdentifier>{ab910717-264a-445e-8545-85e3e20a505b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Containers">
+      <UniqueIdentifier>{8f7619c7-3070-47dd-9384-05d95b47af54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Core\Math">
+      <UniqueIdentifier>{715a4116-fd7a-4d30-b42d-f6be5508ceaa}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Header Files\Core\Platform">
       <UniqueIdentifier>{a433238b-126a-45f5-bfa8-a8106e7b41ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\RenderQueue">
+      <UniqueIdentifier>{b819a765-d574-4b0d-81ab-1995cd9f9959}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\RenderQueue">
+      <UniqueIdentifier>{d2394e95-5003-4689-aba2-740258517682}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -130,9 +136,6 @@
     </ClCompile>
     <ClCompile Include="src\Core\Logging\StreamBuf.cpp">
       <Filter>Source Files\Core\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Utils\Time.cpp">
-      <Filter>Source Files\Core\Utils</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\DirectionalLight.cpp">
       <Filter>Source Files\Scene</Filter>
@@ -200,12 +203,6 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Pipeline.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\RenderQueue.cpp">
-      <Filter>Source Files\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Scene\Actor.cpp">
-      <Filter>Source Files\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\DirectX11\DX11RenderTarget2D.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
@@ -236,9 +233,6 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Material.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
-    <ClCompile Include="src\Resources\Animation.cpp">
-      <Filter>Source Files\Resources</Filter>
-    </ClCompile>
     <ClCompile Include="src\Resources\Material.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
@@ -251,7 +245,73 @@
     <ClCompile Include="src\Resources\ModelNode.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
+    <ClCompile Include="src\Scene\BaseActor.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\AnimatedActor.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\StaticActor.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Utils\Timer.cpp">
+      <Filter>Source Files\Core\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\SceneParser.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11VertexBufferSet.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11IndexBuffer.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\Animation.cpp">
+      <Filter>Source Files\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\AnimationInstance.cpp">
+      <Filter>Source Files\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\AnimationUpdater.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderableCamera.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderableCollection.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderableDirectionalLight.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderableMaterial.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderableMesh.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderablePointLight.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderableSkeleton.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderQueue.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\RenderDefs.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11DynamicBuffer.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\BoneKeyframe.cpp">
+      <Filter>Source Files\Resources</Filter>
+    </ClCompile>
     <ClCompile Include="src\Resources\Skybox.cpp">
+      <Filter>Source Files\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\Bone.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -267,9 +327,6 @@
     </ClInclude>
     <ClInclude Include="include\Core\Memory\HeapAllocator.h">
       <Filter>Header Files\Core\Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Containers\Vector.h">
-      <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Logging\LogManager.h">
       <Filter>Header Files\Core\Logging</Filter>
@@ -298,12 +355,6 @@
     <ClInclude Include="include\Resources\JonsPackage.h">
       <Filter>Header Files\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\EngineDefs.h">
-      <Filter>Header Files\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Memory\IMemoryAllocator.h">
-      <Filter>Header Files\Core\Memory</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\Shapes.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
@@ -321,9 +372,6 @@
     </ClInclude>
     <ClInclude Include="include\Core\Logging\OutputStream.h">
       <Filter>Header Files\Core\Logging</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\Utils\Time.h">
-      <Filter>Header Files\Core\Utils</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\DebugOptions.h">
       <Filter>Header Files\Core</Filter>
@@ -403,12 +451,6 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Pipeline.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\RenderQueue.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Scene\Actor.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11RenderTarget2D.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
@@ -460,9 +502,6 @@
     <ClInclude Include="include\Core\Platform\Directx11.h">
       <Filter>Header Files\Core\Platform</Filter>
     </ClInclude>
-    <ClInclude Include="include\Resources\Animation.h">
-      <Filter>Header Files\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="include\Resources\Material.h">
       <Filter>Header Files\Resources</Filter>
     </ClInclude>
@@ -483,6 +522,93 @@
     </ClInclude>
     <ClInclude Include="include\Core\Containers\IDMapBase.hpp">
       <Filter>Header Files\Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\AnimatedActor.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\StaticActor.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\BaseActor.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\Clock.hpp">
+      <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\Time.h">
+      <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\Timer.h">
+      <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\SceneParser.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Memory\HeapAligned.h">
+      <Filter>Header Files\Core\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11Buffer.hpp">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11VertexBufferSet.hpp">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11IndexBuffer.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resources\Animation.h">
+      <Filter>Header Files\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resources\AnimationInstance.h">
+      <Filter>Header Files\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\AnimationUpdater.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableCamera.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableMaterial.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableMesh.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderablePointLight.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableSkeleton.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderQueue.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableCollection.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableContainer.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableDirectionalLight.h">
+      <Filter>Header Files\RenderQueue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\RenderDefs.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resources\Bone.h">
+      <Filter>Header Files\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Utils\IDGenerator.hpp">
+      <Filter>Header Files\Core\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11StaticBuffer.hpp">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11DynamicBuffer.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resources\BoneKeyframe.h">
+      <Filter>Header Files\Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

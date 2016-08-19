@@ -1,6 +1,5 @@
 #pragma once
 
-#include "include/Renderer/RenderQueue.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Material.h"
 #include "include/Renderer/DirectX11/DX11Context.h"
@@ -10,10 +9,10 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
-#include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/DebugOptions.h"
 #include "include/Core/Platform/Directx11.h"
+#include "include/Resources/Bone.h"
 
 #include <string>
 #include <vector>
@@ -24,19 +23,23 @@
 namespace JonsEngine
 {
     class Logger;
+    class HeapAllocator;
+    struct RenderQueue;
 
     class DX11RendererImpl : protected DX11Context
     {
     public:
-        DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator);
+        DX11RendererImpl(const EngineSettings& settings, Logger& logger, HeapAllocator& memoryAllocator);
         ~DX11RendererImpl();
 
         DX11MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,
             const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds);
+        DX11MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,
+            const std::vector<BoneWeight>& boneWeights, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds);
         DX11MaterialID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight);
 
         void Render(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags);
-        void ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth);
+        void ReduceDepth(float& minDepth, float& maxDepth);
 
         EngineSettings::Anisotropic GetAnisotropicFiltering() const;
         void SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic);
@@ -61,7 +64,7 @@ namespace JonsEngine
         void SetupContext(const uint32_t viewportWidth, const uint32_t viewportHeight);
 
         Logger& mLogger;
-        IMemoryAllocatorPtr mMemoryAllocator;
+        HeapAllocator& mMemoryAllocator;
         IDMap<DX11Mesh> mMeshes;
         IDMap<DX11Material> mMaterials;
 

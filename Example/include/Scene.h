@@ -14,10 +14,11 @@ namespace JonsGame
         Scene(JonsEngine::Scene& jonsScene, JonsEngine::ResourceManifest& resManifest, const std::string& jonsPkgName);
         ~Scene();
 
+        void ToggleAnimationWuson();
+
         JonsEngine::Scene& GetJonsScene();
         JonsEngine::SceneNode& GetMovingLightNode();
         JonsEngine::DirectionalLight& GetSun();
-        JonsEngine::Actor& GetAnimatedWuson();
 
 
     private:
@@ -37,31 +38,39 @@ namespace JonsGame
         JonsEngine::ModelID mModelSphere;
         JonsEngine::ModelID mModelCube2;
         JonsEngine::ModelID mModelCube3;
+		JonsEngine::ModelID mModelBob;
 
         JonsEngine::SceneNodeID mNodeSectoid;
         JonsEngine::SceneNodeID mNodeCube;
         JonsEngine::SceneNodeID mNodeChair;
         JonsEngine::SceneNodeID mNodeHouse;
-        JonsEngine::SceneNodeID mNodeWuson;
+        JonsEngine::SceneNodeID mNodeAnimWuson;
         JonsEngine::SceneNodeID mNodeWuson2;
         JonsEngine::SceneNodeID mNodePointLight;
         JonsEngine::SceneNodeID mNodePlane;
         JonsEngine::SceneNodeID mNodeSphere;
         JonsEngine::SceneNodeID mNodeCube2;
         JonsEngine::SceneNodeID mNodeCube3;
+		JonsEngine::SceneNodeID mNodeBob;
 
         JonsEngine::PointLightID mMovingPointLightID;
         JonsEngine::DirectionalLightID mSunDirLightID;
 
-        JonsEngine::ActorID mActorSectoid;
-        JonsEngine::ActorID mActorCube;
-        JonsEngine::ActorID mActorChair;
-        JonsEngine::ActorID mActorHouse;
-        JonsEngine::ActorID mActorWuson;
-        JonsEngine::ActorID mActorWuson2;
-        JonsEngine::ActorID mActorPlane;
-        JonsEngine::ActorID mActorSphere;
-        JonsEngine::ActorID mActorCube2;
-        JonsEngine::ActorID mActorCube3;
+        JonsEngine::StaticActorID mActorSectoid;
+        JonsEngine::StaticActorID mActorCube;
+        JonsEngine::StaticActorID mActorChair;
+        JonsEngine::StaticActorID mActorHouse;
+        JonsEngine::AnimatedActorID mActorAnimWuson;
+        JonsEngine::StaticActorID mActorWuson2;
+        JonsEngine::StaticActorID mActorPlane;
+        JonsEngine::StaticActorID mActorSphere;
+        JonsEngine::StaticActorID mActorCube2;
+        JonsEngine::StaticActorID mActorCube3;
+		JonsEngine::AnimatedActorID mActorAnimBob;
+
+        JonsEngine::AnimationID mAnimWuson;
+		JonsEngine::AnimationID mAnimBob;
+        JonsEngine::Milliseconds mAnimDurationWuson;
+		bool mIsAnimatingWuson;
     };
 }

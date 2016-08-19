@@ -1,11 +1,13 @@
 #pragma once
 
 #include "include/Core/Types.h"
-#include "include/Core/Memory/IMemoryAllocator.h"
+#include "include/Core/Memory/HeapAllocator.h"
+#include "include/Core/Utils/Clock.hpp"
 #include "include/Window/WindowManager.h"
 #include "include/Renderer/DirectX11/DX11Renderer.h"
 #include "include/Resources/ResourceManifest.h"
 #include "include/Scene/SceneManager.h"
+#include "include/Scene/SceneParser.h"
 
 namespace JonsEngine
 {
@@ -32,15 +34,16 @@ namespace JonsEngine
 
     private:
         Logger& mLog;
-        IMemoryAllocatorPtr mMemoryAllocator;
+        HeapAllocator mMemoryAllocator;
 
         WindowManager mWindow;
         DX11Renderer mRenderer;
         ResourceManifest mResourceManifest;
         SceneManager mSceneManager;
+        SceneParser mSceneParser;
 
-        float mPrevMinDepth;
-        float mPrevMaxDepth;
+        HiResClock mClock;
+        HiResClock::TimePoint mLastFrameTime;
     };
 
 

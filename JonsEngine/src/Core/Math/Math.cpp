@@ -7,11 +7,13 @@ namespace JonsEngine
         const float fovRadians = glm::radians(fovDegrees);
         const float yScale = 1 / tan(fovRadians / 2.0f);
         const float xScale = yScale / aspectRatio;
+        const float nearPlane = PerspectiveNearPlane(zNear, zFar);
+        const float farPlane = PerspectiveFarPlane(zNear, zFar);
 
         return Mat4(xScale, 0.0f, 0.0f, 0.0f,
                     0.0f, yScale, 0.0f, 0.0f,
-                    0.0f, 0.0f, zFar / (zNear - zFar), -1.0f,
-                    0.0f, 0.0f, zNear * zFar / (zNear - zFar), 0.0f);
+                    0.0f, 0.0f, nearPlane, -1.0f,
+                    0.0f, 0.0f, farPlane, 0.0f);
     }
 
     Mat4 OrthographicMatrix(const float left, const float right, const float top, const float bottom, const float zNear, const float zFar)
@@ -47,5 +49,31 @@ namespace JonsEngine
     Vec4 MaxVal(const Vec4& v1, const Vec4& v2)
     {
         return Vec4(std::max(v1.x, v2.x), std::max(v1.y, v2.y), std::max(v1.z, v2.z), std::max(v1.w, v2.w));
+    }
+
+
+    float PerspectiveNearPlane(const float zNear, const float zFar)
+    {
+        return zFar / (zNear - zFar);
+    }
+
+    float PerspectiveFarPlane(const float zNear, const float zFar)
+    {
+        return zNear * PerspectiveNearPlane(zNear, zFar);
+    }
+
+
+    bool IsEqual(const float val1, const float val2)
+    {
+        const double epsilon = 0.0000000001;
+
+        return std::abs(val1 - val2) <= epsilon * std::abs(val1);
+    }
+
+    bool IsEqual(const double val1, const double val2)
+    {
+        const float epsilon = 0.0000000001f;
+
+        return std::abs(val1 - val2) <= epsilon * std::abs(val1);
     }
 }

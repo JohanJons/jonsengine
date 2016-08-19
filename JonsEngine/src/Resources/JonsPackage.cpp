@@ -1,5 +1,7 @@
 #include "include/Resources/JonsPackage.h"
+
 #include "include/Core/Memory/HeapAllocator.h"
+#include "include/Core/Math/Math.h"
 
 #include <string>
 #include <iostream>
@@ -10,71 +12,117 @@
 
 namespace JonsEngine
 {
-    PackageHeader::PackageHeader() : mSignature("jons"), mMajorVersion(LatestMajorVersion), mMinorVersion(LatestMinorVersion)
+    PackageHeader::PackageHeader() :
+        mSignature("jons"),
+        mMajorVersion(LatestMajorVersion),
+        mMinorVersion(LatestMinorVersion)
     {
     }
 
-    PackageAABB::PackageAABB() : mMinBounds(std::numeric_limits<float>::max()), mMaxBounds(std::numeric_limits<float>::lowest())
+    PackageAABB::PackageAABB() :
+        mMinBounds(std::numeric_limits<float>::max()),
+        mMaxBounds(std::numeric_limits<float>::lowest())
     {
     }
 
-    PackageMesh::PackageMesh() : mMaterialIndex(0), mHasMaterial(false)
+    PackageTexture::PackageTexture() :
+        mTextureWidth(0),
+        mTextureHeight(0)
     {
     }
 
-    PackageNode::PackageNode()
+    PackageSkybox::PackageSkybox() :
+        PackageSkybox("")
     {
     }
 
-    PackageTexture::PackageTexture() : mTextureWidth(0), mTextureHeight(0)
+    PackageSkybox::PackageSkybox(const std::string& name) :
+        mName(name)
     {
     }
 
-    PackageSkybox::PackageSkybox()
+    PackageMaterial::PackageMaterial() :
+        PackageMaterial("", false, false)
     {
     }
 
-    PackageSkybox::PackageSkybox(const std::string& name) : mName(name)
+    PackageMaterial::PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture) : mName(name), mHasDiffuseTexture(hasDiffTexture), mHasNormalTexture(hasNormalTexture),
+        mDiffuseColor(1.0f),
+        mAmbientColor(1.0f),
+        mSpecularColor(1.0f),
+        mEmissiveColor(0.0f)
     {
     }
 
-    PackageMaterial::PackageMaterial() : mHasDiffuseTexture(false), mHasNormalTexture(false), mDiffuseColor(1.0f), mAmbientColor(1.0f), mSpecularColor(1.0f), mEmissiveColor(0.0f)
+    PackageBone::PackageBone() :
+        mName(""),
+        mOffsetMatrix(gIdentityMatrix)
     {
     }
 
-    PackageMaterial::PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture) : mName(name), mHasDiffuseTexture(hasDiffTexture), mHasNormalTexture(hasNormalTexture)
+    PackageBone::PackageBone(const std::string& name, const Mat4& transform) :
+        mName(name),
+        mOffsetMatrix(transform)
     {
     }
 
-    PackageAnimatedNodeTransform::PackageAnimatedNodeTransform()
+	PackageBoneKeyframe::PackageBoneKeyframe() :
+		mTimestampMillisec(0),
+		mTranslation(0.0f),
+		mRotation(0.0f, 0.0f, 0.0f, 1.0f)
+	{
+	}
+
+	PackageBoneKeyframe::PackageBoneKeyframe(const uint32_t timestampMillisec, const Vec3& translation, const Quaternion& rotation) :
+		mTimestampMillisec(timestampMillisec),
+		mTranslation(translation),
+		mRotation(rotation)
+	{
+	}
+
+    PackageMesh::PackageMesh() : PackageMesh("")
     {
     }
 
-    PackageAnimatedNodeTransform::PackageAnimatedNodeTransform(const double timestamp, const Mat4& transform) : mTimestamp(timestamp), mTransform(transform)
+    PackageMesh::PackageMesh(const std::string& name) :
+        mName(name),
+        mMaterialIndex(PackageMaterial::INVALID_MATERIAL_INDEX)
     {
     }
 
-    PackageAnimatedNode::PackageAnimatedNode()
+
+    PackageNode::PackageNode() :
+        PackageNode("", gIdentityMatrix, INVALID_NODE_INDEX, INVALID_NODE_INDEX)
     {
     }
 
-    PackageAnimatedNode::PackageAnimatedNode(const std::string& nodeName) : mNodeName(nodeName)
+	PackageNode::PackageNode(const std::string& name, const Mat4& transform, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex) :
+		mName(name),
+		mTransform(transform),
+		mNodeIndex(nodeIndex),
+		mParentNodeIndex(parentNodeIndex)
     {
     }
+
 
     PackageAnimation::PackageAnimation()
     {
     }
 
-    PackageAnimation::PackageAnimation(const std::string& name, const double durationSeconds) : mName(name), mDurationInSeconds(durationSeconds)
+    PackageAnimation::PackageAnimation(const std::string& name, const uint32_t durationInMilliseconds, const Mat4& invRootMatrix) :
+        mName(name),
+		mDurationInMilliseconds(durationInMilliseconds),
+        mInverseRootMatrix(invRootMatrix)
     {
     }
+
 
     PackageModel::PackageModel()
     {
     }
 
-    PackageModel::PackageModel(const std::string& name) : mName(name)
+    PackageModel::PackageModel(const std::string& modelName) :
+        mName(modelName)
     {
     }
 

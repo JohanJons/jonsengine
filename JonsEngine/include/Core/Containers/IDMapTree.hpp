@@ -10,10 +10,6 @@
 
 namespace JonsEngine
 {
-    //
-    // TODO: extend with all/immediate child iterators when needed
-    //
-
     // Internal storage item
     template <typename T>
     struct IDMapTreeItem
@@ -22,12 +18,15 @@ namespace JonsEngine
         ItemID mNext;
         T mItem;
 
+
+		IDMapTreeItem(const IDMapTreeItem&);
         template <typename... Arguments>
         IDMapTreeItem(const ItemID id, const ItemID next, Arguments&&... args);
     };
 
     // Contigous-memory ID-based tree container
     // Elements must be MoveAssignable
+    // TODO: Extend with all/immediate child iterators
     template <typename T>
     class IDMapTree : public IDMapBase<T, IDMapTreeItem<T>>
     {
@@ -49,9 +48,6 @@ namespace JonsEngine
         size_t Size() const;
         size_t Capacity() const;
 
-        iterator begin();
-        iterator end();
-
 
     private:
         ItemID mRootNodeID;
@@ -67,6 +63,13 @@ namespace JonsEngine
     IDMapTreeItem<T>::IDMapTreeItem(const ItemID id, const ItemID next, Arguments&&... args) : mID(id), mNext(next), mItem{ std::forward<Arguments>(args)... }
     {
     }
+
+
+	template <typename T>
+	IDMapTreeItem<T>::IDMapTreeItem(const IDMapTreeItem& other) : mID(other.mID), mNext(other.mNext), mItem(std::move(other.mItem))
+	{
+	}
+
 
 
     //
@@ -203,18 +206,5 @@ namespace JonsEngine
     size_t IDMapTree<T>::Capacity() const
     {
         return mItems.capacity();
-    }
-
-
-    template <typename T>
-    typename IDMapTree<T>::iterator IDMapTree<T>::begin()
-    {
-        return iterator(mItems.begin());
-    }
-
-    template <typename T>
-    typename IDMapTree<T>::iterator IDMapTree<T>::end()
-    {
-        return iterator(mItems.end());
     }
 }

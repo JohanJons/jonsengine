@@ -1,6 +1,7 @@
 #include "include/Scene/DirectionalLight.h"
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/RenderDefs.h"
 #include "include/Core/Math/Math.h"
 
 namespace JonsEngine
@@ -8,7 +9,7 @@ namespace JonsEngine
     DirectionalLight::DirectionalLight(const std::string& name, const uint32_t numShadowmapCascades) :
         mName(name), mNumShadowmapCascades(numShadowmapCascades), mLightColor(1.0f), mLightDirection(0.0f, -1.0f, -1.0f), mCascadeSplitLambda(0.8f)
     {
-        assert(numShadowmapCascades >= 1 && numShadowmapCascades <= 4);
+        assert(numShadowmapCascades >= 1 && numShadowmapCascades <= gMaxNumShadowmapCascades);
 
         mCascadeKDOPRange.reserve(numShadowmapCascades);
         mSplitDistances.reserve(numShadowmapCascades);
@@ -56,14 +57,14 @@ namespace JonsEngine
     }
 
 
-    ConstRangedIterator<KDOP> DirectionalLight::GetBoundingVolume(const uint32_t cascadeIndex) const
+    DirectionalLight::BoundingVolume DirectionalLight::GetBoundingVolume(const uint32_t cascadeIndex) const
     {
         assert(cascadeIndex < mNumShadowmapCascades);
 
         const size_t startIndex = cascadeIndex == 0 ? 0 : mCascadeKDOPRange.at(cascadeIndex - 1);
         const size_t endIndex = mCascadeKDOPRange.at(cascadeIndex);
 
-        return ConstRangedIterator<KDOP>(mKDOP, startIndex, endIndex);
+        return BoundingVolume(mKDOP, startIndex, endIndex);
     }
 
     void DirectionalLight::GetSplitDistance(const uint32_t cascadeIndex, float& nearZ, float& farZ) const
@@ -139,13 +140,13 @@ namespace JonsEngine
         for (uint32_t index = 0; index < frustumPlanes.size(); index++) {
             const Plane& plane = frustumPlanes.at(index);
             // If this plane is facing away from us, move on.
-            float fDir = glm::dot(plane.GetNormal(), lightDirNormalized);
+            const float fDir = glm::dot(plane.GetNormal(), lightDirNormalized);
             if (fDir > 0.0f) { continue; }
 
             // For each neighbor of this plane.
             const auto& neightbourPlanes = GetNeighbouringPlanes(static_cast<FrustumPlane>(index));
             for (const FrustumPlane plane : neightbourPlanes) {
-                float fNeighborDir = glm::dot(frustumPlanes[plane].GetNormal(), lightDirNormalized);
+                const float fNeighborDir = glm::dot(frustumPlanes[plane].GetNormal(), lightDirNormalized);
                 // If this plane is facing away from us, the edge between plane I and plane J
                 //	marks the edge of a plane we need to add.
                 if (fNeighborDir > 0.0f) {

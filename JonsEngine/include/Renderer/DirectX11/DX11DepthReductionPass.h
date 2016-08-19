@@ -20,7 +20,7 @@ namespace JonsEngine
         ~DX11DepthReductionPass();
 
 
-        void ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth);
+        void ReduceDepth(float& minDepth, float& maxDepth);
 
 
     private:

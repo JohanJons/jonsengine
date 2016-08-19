@@ -19,7 +19,8 @@ namespace JonsEngine
     {
     public:
         SceneNode(const std::string& nodeName, const SceneNodeID parent, const OnSceneNodeDirtyFunc& onDirty);
-        SceneNode& operator=(SceneNode&& otherSceneNode);
+		SceneNode(const SceneNode& otherSceneNode);
+        //SceneNode& operator=(SceneNode&& otherSceneNode);
         ~SceneNode();
 	
         // TODO: for non-uniform scaling, need change in gbuffer shader

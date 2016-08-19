@@ -8,6 +8,9 @@
 
 namespace JonsEngine
 {
+    // Stable map-like container with contigous memory using IDs for keys
+    // Useful for when both instant lookup of keys and fast container iteration is needed
+
     // Internal storage item
     template <typename T>
     struct IDMapItem
@@ -19,7 +22,6 @@ namespace JonsEngine
         IDMapItem(const ItemID id, Arguments&&... args);
     };
 
-    // Contigous-memory ID-based container.
     template<typename T>
     class IDMap : public IDMapBase<T, IDMapItem<T>>
     {
@@ -32,9 +34,6 @@ namespace JonsEngine
         const T& GetItem(const ItemID id) const;
 
         void Clear();
-
-        iterator begin();
-        iterator end();
     };
 
 
@@ -120,17 +119,5 @@ namespace JonsEngine
 		mItems.clear();
 		mIndirectionLayer.clear();
         mFreeIndirectionIndices.clear();
-	}
-
-	template <typename T>
-    typename IDMap<T>::iterator IDMap<T>::begin()
-	{
-		return iterator(mItems.begin());
-	}
-
-	template <typename T>
-    typename IDMap<T>::iterator IDMap<T>::end()
-	{
-		return iterator(mItems.end());
 	}
 }

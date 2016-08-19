@@ -6,7 +6,6 @@
 
 namespace JonsEngine
 {
-    class IMemoryAllocator;
     class ResourceManifest;
 
     typedef uint32_t SceneID;
@@ -14,7 +13,7 @@ namespace JonsEngine
     class SceneManager
     {
     public:
-        SceneManager(const ResourceManifest& resourceManifest);
+        SceneManager(DX11Renderer& renderer, const ResourceManifest& resourceManifest);
         ~SceneManager();
 
         SceneID CreateScene(const std::string& sceneName);
@@ -28,6 +27,7 @@ namespace JonsEngine
 
 
     private:
+        DX11Renderer& mRenderer;
         const ResourceManifest& mResourceManifest;
 
         IDMap<Scene> mScenes;

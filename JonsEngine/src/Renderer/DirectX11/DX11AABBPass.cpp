@@ -17,11 +17,11 @@ namespace JonsEngine
     }
 
 
-    void DX11AABBPass::Render(const RenderQueue& renderQueue)
+    void DX11AABBPass::Render(const RenderQueue::RenderData& renderData, const RenderableCamera& camera)
     {
         mContext->PSSetShader(mPixelShader, nullptr, 0);
         mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
-        mVertexTransformPass.RenderAABBs(renderQueue.mCamera.mModels, renderQueue.mCamera.mCameraViewProjectionMatrix);
+        mVertexTransformPass.RenderAABBs(renderData, camera.mStaticMeshesBegin, camera.mStaticMeshesEnd, camera.mCameraViewProjectionMatrix);
     }
 }

@@ -4,10 +4,10 @@
 #include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/DebugOptions.h"
+#include "include/Core/Utils/Time.h"
 #include "include/Scene/Scene.h"
 #include "include/Window/WindowManager.h"
 #include "include/Resources/ResourceManifest.h"
-#include "include/Renderer/RenderQueue.h"
 
 #include <exception>
 #include <functional>
@@ -16,16 +16,13 @@
 namespace JonsEngine
 {
     Engine::Engine(const EngineSettings& settings) : mLog(Logger::GetCoreLogger()), 
-                                                     mMemoryAllocator(HeapAllocator::GetDefaultHeapAllocator().AllocateObject<HeapAllocator>("DefaultHeapAllocator"), 
-                                                                      [](HeapAllocator* allocator) { HeapAllocator::GetDefaultHeapAllocator().DeallocateObject(allocator); }),
+                                                     mMemoryAllocator("EngineHeapAllocator"),
 
                                                      mWindow(settings, mMemoryAllocator, mLog), 
                                                      mRenderer(settings, mMemoryAllocator, mLog),
                                                      mResourceManifest(mRenderer, mMemoryAllocator), 
-                                                     mSceneManager(mResourceManifest),
-
-                                                     mPrevMinDepth(0.0f),
-                                                     mPrevMaxDepth(1.0f)
+                                                     mSceneManager(mRenderer, mResourceManifest),
+                                                     mSceneParser(settings, mResourceManifest)
     {
         JONS_LOG_INFO(mLog, "-------- ENGINE INITIALIZED --------")
     }
@@ -37,25 +34,24 @@ namespace JonsEngine
 
     void Engine::Tick(const DebugOptions& debugOptions)
     {
+        const HiResClock::TimePoint currentFrameTime = mClock.Now();
+        const Milliseconds elapstedFrameTime = mClock.ElapsedTime<Milliseconds>(mLastFrameTime, currentFrameTime);
+
         // process input and window events
         mWindow.Poll();
+        const float windowAspectRatio = mWindow.GetScreenWidth() / static_cast<float>(mWindow.GetScreenHeight());
 
+        // update scene actors
 		Scene& activeScene = mSceneManager.GetActiveScene();
+        activeScene.Tick(elapstedFrameTime, windowAspectRatio);
 
-        const uint32_t windowWidth = mWindow.GetScreenWidth();
-        const uint32_t windowHeight = mWindow.GetScreenHeight();
-        const float cameraFov = activeScene.GetSceneCamera().GetFOV();
-        const float windowAspectRatio = windowWidth / static_cast<float>(windowHeight);
-        const Mat4 cameraProjectionMatrix = PerspectiveMatrixFov(cameraFov, windowAspectRatio, mRenderer.GetZNear(), mRenderer.GetZFar());
-        
-        // get renderqueue from scene
-        const RenderQueue& renderQueue = activeScene.GetRenderQueue(cameraProjectionMatrix, cameraFov, windowAspectRatio, mPrevMinDepth, mPrevMaxDepth);
+        // parse scene into renderqueue for renderer
+        const float zNear = mRenderer.GetZNear(), zFar = mRenderer.GetZFar();
+        const RenderQueue& renderQueue = mSceneParser.ParseScene(activeScene, windowAspectRatio, zNear, zFar);
 
         // render the scene
         mRenderer.Render(renderQueue, debugOptions.mRenderingFlags);
 
-        // get min/max depth from frame, used in culling and rendering
-        // TODO: move elsewhere?
-        mRenderer.ReduceDepth(cameraProjectionMatrix, mPrevMinDepth, mPrevMaxDepth);
+        mLastFrameTime = currentFrameTime;
     }
 }

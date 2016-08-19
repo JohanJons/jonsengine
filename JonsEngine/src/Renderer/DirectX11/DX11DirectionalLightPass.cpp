@@ -1,6 +1,5 @@
 #include "include/Renderer/DirectX11/DX11DirectionalLightPass.h"
 
-#include "include/Renderer/RenderQueue.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Pipeline.h"
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
@@ -98,7 +97,7 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::Render(const RenderableDirLight& directionalLight, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix)
+    void DX11DirectionalLightPass::Render(const RenderableDirectionalLight& directionalLight, const RenderQueue::RenderData& renderData, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix)
     {
         // preserve current state
         D3D11_VIEWPORT prevViewport;
@@ -129,30 +128,30 @@ namespace JonsEngine
         const float maxFloatVal = std::numeric_limits<float>::max();
         std::array<float, NUM_SHADOWMAP_CASCADES> splitDistances = { maxFloatVal, maxFloatVal, maxFloatVal, maxFloatVal };
         std::array<Mat4, NUM_SHADOWMAP_CASCADES> lightVPMatrices;
-        for (uint32_t cascadeIndex = 0; cascadeIndex < directionalLight.mNumCascades; ++cascadeIndex)
+        for (uint32_t cascadeIndex = 0; cascadeIndex < directionalLight.mNumCascadesUsed; ++cascadeIndex)
         {
             mShadowmap.BindDepthView(cascadeIndex);
 
-            const auto& cascadeSplit = directionalLight.mCascadeSplits.at(cascadeIndex);
+            const auto& cascadeSplit = directionalLight.mCascades.at(cascadeIndex);
             
             // create view-projection matrix for cascade
             const Mat4 perspectiveMatrix = PerspectiveMatrixFov(degreesFOV, mAspectRatio, cascadeSplit.mNearZ, cascadeSplit.mFarZ);
             const auto frustumCorners = GetFrustumCorners(perspectiveMatrix * cameraViewMatrix);
-            lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(frustumCorners, directionalLight.mLightDirection);
+            lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(frustumCorners, directionalLight.mDirection);
 
             // render meshes from lights POV
-            const size_t meshStartIndex = cascadeIndex == 0 ? 0 : directionalLight.mCascadeSplits.at(cascadeIndex - 1).mMeshEndIndex;
-            const size_t meshEndIndex = cascadeSplit.mMeshEndIndex;
-            ConstRangedIterator<RenderableMeshes> meshIterator(directionalLight.mMeshes, meshStartIndex, meshEndIndex);
-            mVertexTransformPass.RenderMeshes(meshIterator, lightVPMatrices[cascadeIndex]);
+            //const size_t meshStartIndex = cascadeIndex == 0 ? 0 : directionalLight.mCascadeSplits.at(cascadeIndex - 1).mMeshEndIndex;
+            //const size_t meshEndIndex = cascadeSplit.mMeshEndIndex;
+            //ConstRangedIterator<RenderableMeshes> meshIterator(directionalLight.mMeshes, meshStartIndex, meshEndIndex);
+            mVertexTransformPass.RenderMeshes(renderData, cascadeSplit.mStaticMeshesBegin, cascadeSplit.mStaticMeshesEnd, lightVPMatrices[cascadeIndex]);
 
             // store view-projection for shading pass
             lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex] * glm::inverse(cameraViewMatrix);
         }
 
         // negate the split distances for comparison against view space position in the shader
-        for (uint32_t cascadeIndex = 0; cascadeIndex < directionalLight.mNumCascades; ++cascadeIndex)
-            splitDistances[cascadeIndex] = -directionalLight.mCascadeSplits.at(cascadeIndex).mFarZ;
+        for (uint32_t cascadeIndex = 0; cascadeIndex < directionalLight.mNumCascadesUsed; ++cascadeIndex)
+            splitDistances[cascadeIndex] = -directionalLight.mCascades.at(cascadeIndex).mFarZ;
 
 
         //
@@ -168,10 +167,10 @@ namespace JonsEngine
         // bind shadowmap SRV for reading
         mShadowmap.BindForReading();
 
-        const Vec4 camLightDir = glm::normalize(cameraViewMatrix * Vec4(-directionalLight.mLightDirection, 0));
+        const Vec4 camLightDir = glm::normalize(cameraViewMatrix * Vec4(-directionalLight.mDirection, 0));
 
         // set dir light cbuffer data
-        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, invCameraProjMatrix, splitDistances, directionalLight.mLightColor, camLightDir, mWindowSize, static_cast<float>(mShadowmap.GetTextureSize())));
+        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, invCameraProjMatrix, splitDistances, directionalLight.mColor, camLightDir, mWindowSize, static_cast<float>(mShadowmap.GetTextureSize())));
         
         // bind appropiate shading pixel shader for shadow filtering argument
         BindShadingPixelShader(shadowFiltering);

@@ -1,6 +1,7 @@
 #include "include/Renderer/DirectX11/DX11RendererImpl.h"
 
 #include "include/Core/Logging/Logger.h"
+#include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/Math/Math.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 
@@ -93,7 +94,7 @@ namespace JonsEngine
     }
 
 
-    DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, IMemoryAllocatorPtr memoryAllocator) : 
+    DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, HeapAllocator& memoryAllocator) : 
         DX11Context(GetActiveWindow()), 
         mLogger(logger),
         mMemoryAllocator(memoryAllocator),
@@ -106,7 +107,7 @@ namespace JonsEngine
         mDepthReductionPass(mDevice, mContext, settings.mShadowReadbackLatency, settings.mWindowWidth, settings.mWindowHeight),
 
         // samplers
-        mModelSampler(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, mContext, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator->DeallocateObject(sampler); }),
+        mModelSampler(mMemoryAllocator.AllocateObject<DX11Sampler>(mDevice, mContext, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator.DeallocateObject(sampler); }),
         mShadowmapSampler(mDevice, mContext, EngineSettings::Anisotropic::X1, D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
         mShadowmapNoCompareSampler(mDevice, mContext, EngineSettings::Anisotropic::X1, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT),
 
@@ -141,6 +142,7 @@ namespace JonsEngine
     {
         RemoveWindowSubclass(mWindowHandle, WndProc, gSubClassID);
     
+		// TODO: might throw exception!
         DXCALL(mSwapchain->SetFullscreenState(false, nullptr));
     }
 
@@ -148,15 +150,17 @@ namespace JonsEngine
     DX11MeshID DX11RendererImpl::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,
         const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
     {
-        auto allocator = mMemoryAllocator;
-
         return mMeshes.Insert(mDevice, mContext, vertexData, normalData, texCoords, tangentData, indexData, minBounds, maxBounds);
+    }
+
+    DX11MeshID DX11RendererImpl::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,
+		const std::vector<BoneWeight>& boneWeights, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
+    {
+        return mMeshes.Insert(mDevice, mContext, vertexData, normalData, texCoords, tangentData, boneWeights, indexData, minBounds, maxBounds);
     }
 
     DX11MaterialID DX11RendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
     {
-        auto allocator = mMemoryAllocator;
-
         const bool isCubemap = textureType == TextureType::TEXTURE_TYPE_SKYBOX;
 
         return mMaterials.Insert(mDevice, mContext, textureData, GetTextureFormat(textureType), textureWidth, textureHeight, isCubemap);
@@ -165,7 +169,7 @@ namespace JonsEngine
 
     void DX11RendererImpl::Render(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags)
     {
-        mPipeline.BeginFrame();
+        mPipeline.BeginFrame(renderQueue);
 
         mPipeline.GeometryStage(renderQueue);
         mPipeline.LightingStage(renderQueue, debugFlags, mShadowFiltering, mSSAOEnabled);
@@ -174,9 +178,9 @@ namespace JonsEngine
         mPipeline.EndFrame();
     }
 
-    void DX11RendererImpl::ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth)
+    void DX11RendererImpl::ReduceDepth(float& minDepth, float& maxDepth)
     {
-        mDepthReductionPass.ReduceDepth(cameraProjMatrix, minDepth, maxDepth);
+        mDepthReductionPass.ReduceDepth(minDepth, maxDepth);
     }
 
 
@@ -187,7 +191,7 @@ namespace JonsEngine
 
     void DX11RendererImpl::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
     {
-        mModelSampler.reset(mMemoryAllocator->AllocateObject<DX11Sampler>(mDevice, mContext, anisotropic, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC));
+        mModelSampler.reset(mMemoryAllocator.AllocateObject<DX11Sampler>(mDevice, mContext, anisotropic, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC));
     }
 
 

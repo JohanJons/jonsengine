@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <sstream>
 #include <functional>
+#include <tuple>
+#include <utility>
 
 namespace JonsEngine
 {
@@ -14,11 +16,9 @@ namespace JonsEngine
     typename std::vector<PackageStruct>::const_iterator FindInContainer(const std::string& assetName, const std::vector<PackageStruct>& container);
 
 
-    ResourceManifest::ResourceManifest(DX11Renderer& renderer, IMemoryAllocatorPtr memoryAllocator) : mMemoryAllocator(memoryAllocator), mRenderer(renderer)
-    {
-    }
-       
-    ResourceManifest::~ResourceManifest()
+    ResourceManifest::ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator) :
+        mMemoryAllocator(memoryAllocator),
+        mRenderer(renderer)
     {
     }
 
@@ -41,7 +41,7 @@ namespace JonsEngine
         const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, indiceData, minBounds, maxBounds);
         assert(meshID != INVALID_DX11_MESH_ID);
 
-        return mModels.Insert(modelName, Mat4(1.0f), minBounds, maxBounds, meshID);
+        return mModels.Insert(modelName, minBounds, maxBounds, meshID);
     }
 
     ModelID ResourceManifest::CreateCube(const std::string& modelName, const float size)
@@ -64,7 +64,7 @@ namespace JonsEngine
         const DX11MeshID meshID = mRenderer.CreateMesh(vertexData, normalData, texcoordData, tangentData, indiceData, minBounds, maxBounds);
         assert(meshID != INVALID_DX11_MESH_ID);
         
-        return mModels.Insert(modelName, Mat4(1.0f), minBounds, maxBounds, meshID);
+        return mModels.Insert(modelName, minBounds, maxBounds, meshID);
     }
 
     ModelID ResourceManifest::LoadModel(const std::string& assetName, const JonsPackagePtr jonsPkg)
@@ -76,7 +76,7 @@ namespace JonsEngine
         const PackageModel& pkgModel = *iter;
 
         ModelNode::InitDataList initDataList;
-        ParseModelInitData(initDataList, jonsPkg, pkgModel.mRootNode);
+        ParseModelInitData(initDataList, jonsPkg, pkgModel);
 
         return mModels.Insert(pkgModel, initDataList);
     }
@@ -84,14 +84,10 @@ namespace JonsEngine
     void ResourceManifest::DeleteModel(ModelID& modelID)
     {
         assert(modelID != INVALID_MODEL_ID);
+        const Model& model = GetModel(modelID);
 
         mModels.Erase(modelID);
         modelID = INVALID_MODEL_ID;
-    }
-
-    Model& ResourceManifest::GetModel(const ModelID modelID)
-    {
-        return mModels.GetItem(modelID);
     }
 
     const Model& ResourceManifest::GetModel(const ModelID modelID) const
@@ -105,15 +101,12 @@ namespace JonsEngine
         auto iter = FindInContainer<PackageMaterial>(assetName, jonsPkg->mMaterials);
         if (iter == jonsPkg->mMaterials.end())
             return INVALID_MATERIAL_ID;
-
         const PackageMaterial& pkgMaterial = *iter;
 
         DX11MaterialID diffuseTexture = INVALID_DX11_MATERIAL_ID;
         DX11MaterialID normalTexture  = INVALID_DX11_MATERIAL_ID;
-
         if (pkgMaterial.mHasDiffuseTexture)
         	diffuseTexture = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_DIFFUSE, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth, pkgMaterial.mDiffuseTexture.mTextureHeight);
-
         if (pkgMaterial.mHasNormalTexture)
             normalTexture = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_NORMAL, pkgMaterial.mNormalTexture.mTextureData, pkgMaterial.mNormalTexture.mTextureWidth, pkgMaterial.mNormalTexture.mTextureHeight);
 
@@ -130,11 +123,6 @@ namespace JonsEngine
 
         mMaterials.Erase(materialID);
         materialID = INVALID_MATERIAL_ID;
-    }
-
-    Material& ResourceManifest::GetMaterial(const MaterialID materialID)
-    {
-        return mMaterials.GetItem(materialID);
     }
 
     const Material& ResourceManifest::GetMaterial(const MaterialID materialID) const
@@ -177,25 +165,28 @@ namespace JonsEngine
     }
 
 
-    void ResourceManifest::ParseModelInitData(ModelNode::InitDataList& initDataList, const JonsPackagePtr jongPkg, const PackageNode& node)
+    void ResourceManifest::ParseModelInitData(ModelNode::InitDataList& initDataList, const JonsPackagePtr jongPkg, const PackageModel& model)
     {
-        for (const PackageMesh& mesh : node.mMeshes)
+        for (const PackageNode& node : model.mNodes)
         {
-            const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
-            DX11MaterialID materialID = INVALID_DX11_MATERIAL_ID;
-            if (mesh.mHasMaterial)
+            for (const PackageMesh::MeshIndex meshIndex : node.mMeshes)
             {
-                const PackageMaterial& material = jongPkg->mMaterials.at(mesh.mMaterialIndex);
-                materialID = LoadMaterial(material.mName, jongPkg);
+                const PackageMesh& mesh = model.mMeshes.at(meshIndex);
 
-                assert(materialID != INVALID_DX11_MATERIAL_ID);
+                const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mBoneWeights, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
+                DX11MaterialID materialID = INVALID_DX11_MATERIAL_ID;
+                const bool meshHasMaterial = mesh.mMaterialIndex != PackageMaterial::INVALID_MATERIAL_INDEX;
+                if (meshHasMaterial)
+                {
+                    const PackageMaterial& material = jongPkg->mMaterials.at(mesh.mMaterialIndex);
+                    materialID = LoadMaterial(material.mName, jongPkg);
+
+                    assert(materialID != INVALID_DX11_MATERIAL_ID);
+                }
+
+                initDataList.emplace_back(mesh, meshID, materialID);
             }
-
-            initDataList.emplace_back(mesh, meshID, materialID);
         }
-
-        for (const PackageNode& child : node.mChildNodes)
-            ParseModelInitData(initDataList, jongPkg, child);
     }
 
 

@@ -1,7 +1,11 @@
 #pragma once
 
 #include "include/Core/Types.h"
+#include "include/Core/Utils/Time.h"
+#include "include/Resources/Bone.h"
+#include "include/Resources/BoneKeyframe.h"
 
+#include <array>
 #include <vector>
 #include <memory>
 
@@ -16,80 +20,59 @@
 
 namespace JonsEngine
 {
-    // TODO: heavily optimize the asset file loading by flattening the container hierarchy
-    // containers of containers is slow especially in debug mode with debug information attached...
-    
+    // TODO: currently a mix of SoA and AoS - refactor into AoS for better performance?
+
     const uint8_t LatestMajorVersion = 0;
     const uint8_t LatestMinorVersion = 1;
 
     struct PackageHeader
     {
+        PackageHeader();
+    
+    
         std::string mSignature;
         uint8_t mMajorVersion;
         uint8_t mMinorVersion;
-
-
-        PackageHeader();
     };
 
     struct PackageAABB
     {
+        PackageAABB();
+        
+    
         Vec3 mMinBounds;
         Vec3 mMaxBounds;
-
-
-        PackageAABB();
-    };
-
-    struct PackageMesh
-    {
-        std::string mName;
-        PackageAABB mAABB;
-        std::vector<float> mVertexData;
-        std::vector<float> mNormalData;
-        std::vector<float> mTexCoordsData;
-        std::vector<float> mTangentData;
-        std::vector<uint16_t> mIndiceData;
-        uint16_t mMaterialIndex;
-        bool mHasMaterial;
-
-
-        PackageMesh();
-    };
-
-    struct PackageNode
-    {
-        std::string mName;
-        PackageAABB mAABB;
-        std::vector<PackageMesh> mMeshes;
-        std::vector<PackageNode> mChildNodes;
-
-
-        PackageNode();
     };
 
     struct PackageTexture
     {
+        PackageTexture();
+    
+    
         std::vector<uint8_t> mTextureData;
         uint32_t mTextureWidth;         // width/height in pixels
         uint32_t mTextureHeight;
-
-
-        PackageTexture();
     };
 
     struct PackageSkybox
     {
-        std::string mName;
-        PackageTexture mSkyboxTexture;
-
-
         PackageSkybox();
         PackageSkybox(const std::string& name);
+        
+    
+        std::string mName;
+        PackageTexture mSkyboxTexture;
     };
 
     struct PackageMaterial
     {
+        typedef uint32_t MaterialIndex;
+        static const MaterialIndex INVALID_MATERIAL_INDEX = UINT32_MAX;
+
+        PackageMaterial();
+        PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture);
+        
+        
         std::string mName;
         bool mHasDiffuseTexture;
         bool mHasNormalTexture;
@@ -99,52 +82,93 @@ namespace JonsEngine
         Vec3 mAmbientColor;
         Vec3 mSpecularColor;
         Vec3 mEmissiveColor;
-
-
-        PackageMaterial();
-        PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture);
     };
 
-    struct PackageAnimatedNodeTransform
+    struct PackageBone
     {
-        double mTimestamp;
-        Mat4 mTransform;
+        PackageBone();
+        PackageBone(const std::string& name, const Mat4& offsetMatrix);
+        
 
-
-        PackageAnimatedNodeTransform();
-        PackageAnimatedNodeTransform(const double timestamp, const Mat4& transform);
+        std::string mName;
+        Mat4 mOffsetMatrix;
     };
 
-    struct PackageAnimatedNode
+	struct PackageBoneKeyframe
+	{
+		PackageBoneKeyframe();
+		PackageBoneKeyframe(const uint32_t timestampMillisec, const Vec3& translation, const Quaternion& rotation);
+
+
+		uint32_t mTimestampMillisec;
+		Vec3 mTranslation;
+		Quaternion mRotation;
+	};
+
+    struct PackageMesh
     {
-        std::string mNodeName;
-        std::vector<PackageAnimatedNodeTransform> mAnimationTransforms;
+        typedef uint32_t MeshIndex;
+        static const MeshIndex INVALID_MESH_INDEX = UINT32_MAX;
+        
+        PackageMesh();
+        PackageMesh(const std::string& name);
+        
 
+        std::string mName;
+        PackageAABB mAABB;
+        std::vector<float> mVertexData;
+        std::vector<float> mNormalData;
+        std::vector<float> mTexCoordsData;
+        std::vector<float> mTangentData;
+        std::vector<BoneWeight> mBoneWeights;
+        std::vector<uint16_t> mIndiceData;
+        PackageMaterial::MaterialIndex mMaterialIndex;
+    };
 
-        PackageAnimatedNode();
-        PackageAnimatedNode(const std::string& nodeName);
+    struct PackageNode
+    {
+        typedef uint32_t NodeIndex;
+        static const NodeIndex INVALID_NODE_INDEX = UINT32_MAX;
+        
+        PackageNode();
+        PackageNode(const std::string& name, const Mat4& transform, const NodeIndex nodeIndex, const NodeIndex parentNodeIndex);
+        
+
+        std::string mName;
+		Mat4 mTransform;
+        NodeIndex mNodeIndex;
+        NodeIndex mParentNodeIndex;
+        std::vector<PackageMesh::MeshIndex> mMeshes;
     };
 
     struct PackageAnimation
     {
-        std::string mName;
-        double mDurationInSeconds;
-        std::vector<PackageAnimatedNode> mAnimatedNodes;
-
+		typedef std::vector<PackageBoneKeyframe> KeyFrameContainer;
+		typedef std::vector<KeyFrameContainer> BoneAnimationContainer;
 
         PackageAnimation();
-        PackageAnimation(const std::string& name, const double durationSeconds);
+        PackageAnimation(const std::string& name, const uint32_t durationMilliseconds, const Mat4& invRootMatrix);
+    
+    
+        std::string mName;
+		uint32_t mDurationInMilliseconds;
+        Mat4 mInverseRootMatrix;
+		BoneAnimationContainer mBoneAnimations;
     };
 
     struct PackageModel
     {
-        std::string mName;
-        PackageNode mRootNode;
-        std::vector<PackageAnimation> mAnimations;
-
-
         PackageModel();
-        PackageModel(const std::string& name);
+        PackageModel(const std::string& modelName);
+        
+    
+        std::string mName;
+        PackageAABB mStaticAABB;
+        std::vector<PackageMesh> mMeshes;
+        std::vector<PackageNode> mNodes;
+        std::vector<PackageBone> mSkeleton;
+        std::vector<PackageAnimation> mAnimations;
+		BoneParentMap mBoneParentMap;
     };
 
     struct JonsPackage
@@ -188,27 +212,34 @@ namespace boost
         }
 
         template<class Archive>
+        void serialize(Archive & ar, JonsEngine::PackageBone& bone, const unsigned int version)
+        {
+            ar & bone.mName;
+            ar & bone.mOffsetMatrix;
+        }
+
+        template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageMesh& mesh, const unsigned int version)
         {
             ar & mesh.mName;
             ar & mesh.mAABB;
-
             ar & mesh.mVertexData;
             ar & mesh.mNormalData;
             ar & mesh.mTexCoordsData;
             ar & mesh.mTangentData;
+            ar & mesh.mBoneWeights;
             ar & mesh.mIndiceData;
             ar & mesh.mMaterialIndex;
-            ar & mesh.mHasMaterial;
         }
 
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageNode& node, const unsigned int version)
         {
             ar & node.mName;
-            ar & node.mAABB;
+			ar & node.mTransform;
+            ar & node.mNodeIndex;
+            ar & node.mParentNodeIndex;
             ar & node.mMeshes;
-            ar & node.mChildNodes;
         }
 
         template<class Archive>
@@ -241,33 +272,39 @@ namespace boost
         }
 
         template<class Archive>
-        void serialize(Archive & ar, JonsEngine::PackageAnimatedNodeTransform& animationNodeTransform, const unsigned int version)
+        void serialize(Archive & ar, JonsEngine::PackageBoneKeyframe& keyframe, const unsigned int version)
         {
-            ar & animationNodeTransform.mTimestamp;
-            ar & animationNodeTransform.mTransform;
+            ar & keyframe.mTimestampMillisec;
+            ar & keyframe.mTranslation;
+            ar & keyframe.mRotation;
         }
 
-        template<class Archive>
-        void serialize(Archive & ar, JonsEngine::PackageAnimatedNode& animationNode, const unsigned int version)
-        {
-            ar & animationNode.mNodeName;
-            ar & animationNode.mAnimationTransforms;
-        }
+		template<class Archive>
+		void serialize(Archive & ar, JonsEngine::BoneWeight& boneWeight, const unsigned int version)
+		{
+			ar & boneWeight.mBoneIndices;
+			ar & boneWeight.mBoneWeights;
+		}
         
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageAnimation& animation, const unsigned int version)
         {
             ar & animation.mName;
-            ar & animation.mDurationInSeconds;
-            ar & animation.mAnimatedNodes;
+			ar & animation.mDurationInMilliseconds;
+            ar & animation.mInverseRootMatrix;
+            ar & animation.mBoneAnimations;
         }
 
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageModel& model, const unsigned int version)
         {
             ar & model.mName;
-            ar & model.mRootNode;
+            ar & model.mStaticAABB;
+            ar & model.mMeshes;
+            ar & model.mNodes;
+            ar & model.mSkeleton;
             ar & model.mAnimations;
+			ar & model.mBoneParentMap;
         }
 
         template<class Archive>
@@ -310,6 +347,15 @@ namespace boost
         {
             ar & vec.x;
             ar & vec.y;
+        }
+
+        template<class Archive>
+        void serialize(Archive & ar, JonsEngine::Quaternion& quat, const unsigned int version)
+        {
+            ar & quat.x;
+            ar & quat.y;
+            ar & quat.z;
+            ar & quat.w;
         }
     } // namespace serialization
 } // namespace boost

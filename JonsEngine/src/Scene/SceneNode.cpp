@@ -9,7 +9,12 @@ namespace JonsEngine
     {
     }
 
-    SceneNode& SceneNode::operator=(SceneNode&& otherSceneNode)
+	SceneNode::SceneNode(const SceneNode& other) :
+		mName(other.mName), mWorldTransform(other.mWorldTransform), mOrientation(other.mOrientation), mScale(other.mScale), mTranslation(other.mTranslation), mParent(other.mParent), mOnDirtyFunc(other.mOnDirtyFunc)
+	{
+	}
+
+    /*SceneNode& SceneNode::operator=(SceneNode&& otherSceneNode)
     {
         if (this != &otherSceneNode)
         {
@@ -26,7 +31,7 @@ namespace JonsEngine
         }
 
         return *this;
-    }
+    }*/
         
     SceneNode::~SceneNode()
     {

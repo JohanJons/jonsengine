@@ -1,17 +1,16 @@
 #pragma once
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/DirectX11/DX11VertexBufferSet.hpp"
 #include "include/Core/Types.h"
 #include "include/Core/Platform/Directx11.h"
+#include "include/Resources/Bone.h"
 
 #include <vector>
 #include <memory>
 
 namespace JonsEngine
 {
-    class DX11Mesh;
-    typedef std::shared_ptr<DX11Mesh> DX11MeshPtr;
-
     class DX11Mesh
     {
     public:
@@ -21,12 +20,15 @@ namespace JonsEngine
             VERTEX_BUFFER_SLOT_NORMALS,
             VERTEX_BUFFER_SLOT_TEXCOORDS,
             VERTEX_BUFFER_SLOT_TANGENTS,
+			VERTEX_BUFFER_SLOT_BONE_WEIGHTS,
             NUM_VERTEX_BUFFER_SLOTS
         };
 
 
         DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
             const std::vector<float>& tangentData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds);
+        DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
+            const std::vector<float>& tangentData, const std::vector<BoneWeight>& boneWeights, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds);
         ~DX11Mesh();
 
         void Draw();
@@ -43,9 +45,11 @@ namespace JonsEngine
         ID3D11BufferPtr mNormalBuffer;
         ID3D11BufferPtr mTangentBuffer;
         ID3D11BufferPtr mTexcoordBuffer;
+        ID3D11BufferPtr mBoneWeightBuffer;
         ID3D11BufferPtr mIndexBuffer;
 
-        uint32_t mNumVertices;
-        uint16_t mNumIndices;
+        const uint32_t mNumVertices;
+        const uint32_t mNumIndices;
+        const bool mHasBones;
     };
 }

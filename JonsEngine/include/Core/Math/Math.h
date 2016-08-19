@@ -27,4 +27,10 @@ namespace JonsEngine
     Vec4 MinVal(const Vec4& v1, const Vec4& v2);
     Vec3 MaxVal(const Vec3& v1, const Vec3& v2);
     Vec4 MaxVal(const Vec4& v1, const Vec4& v2);
+
+    float PerspectiveNearPlane(const float zNear, const float zFar);
+    float PerspectiveFarPlane(const float zNear, const float zFar);
+
+    bool IsEqual(const float val1, const float val2);
+    bool IsEqual(const double val1, const double val2);
 }

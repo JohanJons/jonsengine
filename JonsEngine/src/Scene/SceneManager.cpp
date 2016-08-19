@@ -2,7 +2,7 @@
 
 namespace JonsEngine
 {
-    SceneManager::SceneManager(const ResourceManifest& resourceManifest) : mResourceManifest(resourceManifest), mActiveScene(CreateScene("DefaultScene"))
+    SceneManager::SceneManager(DX11Renderer& renderer, const ResourceManifest& resourceManifest) : mRenderer(renderer), mResourceManifest(resourceManifest), mActiveScene(CreateScene("DefaultScene"))
     {
     }
 
@@ -13,7 +13,7 @@ namespace JonsEngine
 
     SceneID SceneManager::CreateScene(const std::string& sceneName)
     {
-        return mScenes.Insert(sceneName, mResourceManifest);
+        return mScenes.Insert(sceneName, mRenderer, mResourceManifest);
     }
 
     Scene& SceneManager::GetScene(const SceneID sceneID)

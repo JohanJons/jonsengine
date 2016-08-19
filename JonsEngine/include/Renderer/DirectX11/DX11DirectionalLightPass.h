@@ -4,6 +4,7 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11Shadowmap.h"
+#include "include/RenderQueue/RenderQueue.h"
 #include "include/Core/Types.h"
 #include "include/Core/Math/Frustum.h"
 #include "include/Core/EngineSettings.h"
@@ -16,7 +17,7 @@ namespace JonsEngine
 {
     class DX11FullscreenTrianglePass;
     class DX11VertexTransformPass;
-	struct RenderableDirLight;
+	struct RenderableDirectionalLight;
 
     class DX11DirectionalLightPass
     {
@@ -27,7 +28,7 @@ namespace JonsEngine
             const EngineSettings::ShadowReadbackLatency readbackLatency, const uint32_t windowWidth, const uint32_t windowHeight);
         ~DX11DirectionalLightPass();
 
-        void Render(const RenderableDirLight& directionalLight, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix);
+        void Render(const RenderableDirectionalLight& directionalLight, const RenderQueue::RenderData& renderData, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix);
 
 
     private:

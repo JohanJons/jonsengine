@@ -1,7 +1,7 @@
 #include "include/Renderer/DirectX11/DX11Pipeline.h"
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
-
+#include "include/RenderQueue/RenderQueue.h"
 
 namespace JonsEngine
 {
@@ -24,6 +24,7 @@ namespace JonsEngine
         mDepthStencilState(nullptr),
         mAdditiveBlending(nullptr),
 
+        mBoneTransformsBuffer(device, context),
         mVertexTransformPass(device, context, meshMap),
         mAABBPass(device, context, mVertexTransformPass),
         mFullscreenTrianglePass(device, context),
@@ -95,9 +96,17 @@ namespace JonsEngine
     }
 
 
-    void DX11Pipeline::BeginFrame()
+    void DX11Pipeline::BeginFrame(const RenderQueue& renderQueue)
     {
         mBackbuffer.ClearBackbuffer(gClearColor);
+
+		// Send all bone transforms to GPU
+		const bool hasBoneData = !renderQueue.mRenderData.mBones.empty();
+		if (hasBoneData)
+		{
+			mBoneTransformsBuffer.SetData(renderQueue.mRenderData.mBones);
+			mBoneTransformsBuffer.Bind(DX11DynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_BONE_TRANSFORMS);
+		}
     }
 
     void DX11Pipeline::EndFrame()
@@ -110,24 +119,69 @@ namespace JonsEngine
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-		for (const RenderableModel& model : renderQueue.mCamera.mModels)
-        {
-            assert(model.mMesh.mMeshID != INVALID_DX11_MESH_ID);
+		// TEMP SOLUTION !!!
+		// STATICS
+		const auto staticBeginIndex = renderQueue.mCamera.mStaticMeshesBegin;
+		const auto staticEndIndex = renderQueue.mCamera.mStaticMeshesEnd;
+		for (auto meshIndex = staticBeginIndex; meshIndex < staticEndIndex; ++meshIndex)
+		{
+			const RenderableMesh& mesh = renderQueue.mRenderData.mStaticMeshes.at(meshIndex);
+			assert(mesh.mMeshID != INVALID_DX11_MESH_ID);
 
-            const bool hasDiffuseTexture = model.mMaterial.mDiffuseTextureID != INVALID_DX11_MATERIAL_ID;
-            const bool hasNormalTexture = model.mMaterial.mNormalTextureID != INVALID_DX11_MATERIAL_ID;
+			bool hasDiffuseTexture = false, hasNormalTexture = false;
+			if (mesh.mMaterial != RenderableMaterial::INVALID_INDEX)
+			{
+				const RenderableMaterial& material = renderQueue.mRenderData.mMaterials.at(mesh.mMaterial);
+				hasDiffuseTexture = material.mDiffuseTextureID != INVALID_DX11_MATERIAL_ID;
+				hasNormalTexture = material.mNormalTextureID != INVALID_DX11_MATERIAL_ID;
 
-            if (hasDiffuseTexture)
-                mMaterialMap.GetItem(model.mMaterial.mDiffuseTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_DIFFUSE);
+				if (hasDiffuseTexture)
+					mMaterialMap.GetItem(material.mDiffuseTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_DIFFUSE);
 
-            if (hasNormalTexture)
-                mMaterialMap.GetItem(model.mMaterial.mNormalTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_NORMAL);
+				if (hasNormalTexture)
+					mMaterialMap.GetItem(material.mNormalTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_NORMAL);
+			}
 
-            const Mat4& localWorldMatrix = model.mMesh.mWorldTransform;
+			const bool isAnimating = false;
 
-            mGBuffer.SetConstantData(renderQueue.mCamera.mCameraViewProjectionMatrix * localWorldMatrix, renderQueue.mCamera.mCameraViewMatrix * localWorldMatrix, model.mTextureTilingFactor, hasDiffuseTexture, hasNormalTexture);
-            mMeshMap.GetItem(model.mMesh.mMeshID).Draw();
-        }
+			const Mat4 wvpMatrix = renderQueue.mCamera.mCameraViewProjectionMatrix * mesh.mWorldTransform;
+			const Mat4 worldViewMatrix = renderQueue.mCamera.mCameraViewMatrix * mesh.mWorldTransform;
+
+			mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, mesh.mMaterialTilingFactor, hasDiffuseTexture, hasNormalTexture, isAnimating);
+			mMeshMap.GetItem(mesh.mMeshID).Draw();
+		}
+
+
+		// ANIMATED
+		const auto animatedBeginIndex = renderQueue.mCamera.mAnimatedMeshesBegin;
+		const auto animatedEndIndex = renderQueue.mCamera.mAnimatedMeshesEnd;
+		for (auto meshIndex = animatedBeginIndex; meshIndex < animatedEndIndex; ++meshIndex)
+		{
+			const RenderableMesh& mesh = renderQueue.mRenderData.mAnimatedMeshes.at(meshIndex);
+			assert(mesh.mMeshID != INVALID_DX11_MESH_ID);
+
+			bool hasDiffuseTexture = false, hasNormalTexture = false;
+			if (mesh.mMaterial != RenderableMaterial::INVALID_INDEX)
+			{
+				const RenderableMaterial& material = renderQueue.mRenderData.mMaterials.at(mesh.mMaterial);
+				hasDiffuseTexture = material.mDiffuseTextureID != INVALID_DX11_MATERIAL_ID;
+				hasNormalTexture = material.mNormalTextureID != INVALID_DX11_MATERIAL_ID;
+
+				if (hasDiffuseTexture)
+					mMaterialMap.GetItem(material.mDiffuseTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_DIFFUSE);
+
+				if (hasNormalTexture)
+					mMaterialMap.GetItem(material.mNormalTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_NORMAL);
+			}
+
+			const bool isAnimating = true;
+
+			const Mat4 wvpMatrix = renderQueue.mCamera.mCameraViewProjectionMatrix * mesh.mWorldTransform;
+			const Mat4 worldViewMatrix = renderQueue.mCamera.mCameraViewMatrix * mesh.mWorldTransform;
+
+			mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, mesh.mMaterialTilingFactor, hasDiffuseTexture, hasNormalTexture, isAnimating);
+			mMeshMap.GetItem(mesh.mMeshID).Draw();
+		}
     }
 
     void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugExtra, const EngineSettings::ShadowFiltering shadowFiltering, const bool SSAOEnabled)
@@ -153,15 +207,15 @@ namespace JonsEngine
         mContext->OMSetBlendState(mAdditiveBlending, nullptr, 0xffffffff);
 
         // do all directional lights
-        for (const RenderableDirLight& directionalLight : renderQueue.mDirectionalLights)
-            mDirectionalLightPass.Render(directionalLight, shadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix);
+        for (const RenderableDirectionalLight& directionalLight : renderQueue.mDirectionalLights)
+            mDirectionalLightPass.Render(directionalLight, renderQueue.mRenderData, shadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix);
 
         // do all point lights
         mPointLightPass.BindForShading();
         for (const RenderablePointLight& pointLight : renderQueue.mPointLights)
         {
             mContext->ClearDepthStencilView(mDSV, D3D11_CLEAR_STENCIL, 1.0f, 0);
-            mPointLightPass.Render(pointLight, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix);
+            mPointLightPass.Render(pointLight, renderQueue.mRenderData, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix);
         }
 
         // turn off blending
@@ -186,6 +240,6 @@ namespace JonsEngine
             mSkyboxPass.Render(renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraProjectionMatrix, mMaterialMap.GetItem(renderQueue.mSkyboxTextureID));
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
-            mAABBPass.Render(renderQueue);
+            mAABBPass.Render(renderQueue.mRenderData, renderQueue.mCamera);
     }
 }

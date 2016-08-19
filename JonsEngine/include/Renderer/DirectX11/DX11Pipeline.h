@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/DirectX11/DX11DynamicBuffer.h"
 #include "include/Renderer/DirectX11/DX11Material.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11GBuffer.h"
@@ -22,6 +23,8 @@
 
 namespace JonsEngine
 {
+    struct RenderQueue;
+
     class DX11Pipeline
     {
     public:
@@ -29,7 +32,7 @@ namespace JonsEngine
             const EngineSettings::ShadowReadbackLatency shadowmapReadbackLatency, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap);
         ~DX11Pipeline();
 
-        void BeginFrame();
+        void BeginFrame(const RenderQueue& renderQueue);
         void EndFrame();
 
         void GeometryStage(const RenderQueue& renderQueue);
@@ -52,6 +55,7 @@ namespace JonsEngine
         ID3D11DepthStencilStatePtr mDepthStencilState;
         ID3D11BlendStatePtr mAdditiveBlending;
     
+        DX11DynamicBuffer mBoneTransformsBuffer;
         DX11VertexTransformPass mVertexTransformPass;
         DX11AABBPass mAABBPass;
         DX11FullscreenTrianglePass mFullscreenTrianglePass;

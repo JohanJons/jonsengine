@@ -2,6 +2,8 @@
 
 namespace JonsEngine
 {
+    // TODO: this duplication of code must be redundant
+
     template <class Container, class InternalIterator = typename Container::iterator>
     class RangedIterator
     {
@@ -16,6 +18,7 @@ namespace JonsEngine
         RangedIterator(const Iterator& begin, const Iterator& end) : mIterBegin(begin), mIterEnd(end)
         {
         }
+
 
         Iterator begin()
         {
@@ -49,12 +52,13 @@ namespace JonsEngine
         {
         }
 
-        const Iterator begin() const
+
+        Iterator begin() const
         {
             return mIterBegin;
         }
 
-        const Iterator end() const
+        Iterator end() const
         {
             return mIterEnd;
         }

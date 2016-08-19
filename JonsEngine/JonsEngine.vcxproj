@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -20,7 +20,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <UseOfAtl>false</UseOfAtl>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -28,7 +28,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -71,9 +71,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>winmm.lib;libboost_serialization-vc120-mt-sgd-1_56.lib;d3d11.lib;Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;libboost_serialization-vc140-mt-sgd-1_56.lib;d3d11.lib;Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)/Thirdparty/boost_1_56_0/bin.v2/libs/serialization/build/msvc-12.0/debug/link-static/runtime-link-static/threading-multi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)/Thirdparty/boost_1_56_0/bin.v2/libs/serialization/build/msvc-14.0/debug/link-static/runtime-link-static/threading-multi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -104,8 +104,8 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>winmm.lib;libboost_serialization-vc120-mt-s-1_56.lib;d3d11.lib;Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)/Thirdparty/boost_1_56_0/bin.v2\libs\serialization\build\msvc-12.0\release\link-static\runtime-link-static\threading-multi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>winmm.lib;libboost_serialization-vc140-mt-s-1_56.lib;d3d11.lib;Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)/Thirdparty/boost_1_56_0/bin.v2\libs\serialization\build\msvc-14.0\release\link-static\runtime-link-static\threading-multi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>
@@ -128,7 +128,7 @@
     <ClCompile Include="src\Core\Math\Plane.cpp" />
     <ClCompile Include="src\Core\Memory\HeapAllocator.cpp" />
     <ClCompile Include="src\Core\Logging\LogManager.cpp" />
-    <ClCompile Include="src\Core\Utils\Time.cpp" />
+    <ClCompile Include="src\Core\Utils\Timer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11AABBPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11AmbientPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Backbuffer.cpp" />
@@ -136,8 +136,10 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Context.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11DepthReductionPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11DirectionalLightPass.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11DynamicBuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11FullscreenTrianglePass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Gbuffer.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11IndexBuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11LightAccumulationbuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Material.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Mesh.cpp" />
@@ -151,10 +153,22 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Shadowmap.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11SkyboxPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Utils.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11VertexBufferSet.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp" />
-    <ClCompile Include="src\Renderer\RenderQueue.cpp" />
+    <ClCompile Include="src\Renderer\RenderDefs.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderableCamera.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderableCollection.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderableDirectionalLight.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderableMaterial.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderableMesh.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderablePointLight.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderableSkeleton.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderQueue.cpp" />
     <ClCompile Include="src\Resources\Animation.cpp" />
+    <ClCompile Include="src\Resources\AnimationInstance.cpp" />
+    <ClCompile Include="src\Resources\Bone.cpp" />
+    <ClCompile Include="src\Resources\BoneKeyframe.cpp" />
     <ClCompile Include="src\Resources\JonsPackage.cpp" />
     <ClCompile Include="src\Resources\Material.cpp" />
     <ClCompile Include="src\Resources\Mesh.cpp" />
@@ -162,13 +176,17 @@
     <ClCompile Include="src\Resources\ModelNode.cpp" />
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
     <ClCompile Include="src\Resources\Skybox.cpp" />
-    <ClCompile Include="src\Scene\Actor.cpp" />
+    <ClCompile Include="src\Scene\AnimatedActor.cpp" />
+    <ClCompile Include="src\Scene\AnimationUpdater.cpp" />
+    <ClCompile Include="src\Scene\BaseActor.cpp" />
     <ClCompile Include="src\Scene\Camera.cpp" />
     <ClCompile Include="src\Scene\DirectionalLight.cpp" />
     <ClCompile Include="src\Scene\PointLight.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Scene\SceneManager.cpp" />
     <ClCompile Include="src\Scene\SceneNode.cpp" />
+    <ClCompile Include="src\Scene\SceneParser.cpp" />
+    <ClCompile Include="src\Scene\StaticActor.cpp" />
     <ClCompile Include="src\Window\WindowManager.cpp" />
     <ClCompile Include="src\Window\WindowManagerImpl.cpp" />
   </ItemGroup>
@@ -180,10 +198,8 @@
     <ClInclude Include="include\Core\Containers\IDMapPointer.hpp" />
     <ClInclude Include="include\Core\Containers\IDMapTree.hpp" />
     <ClInclude Include="include\Core\Containers\RangedIterator.hpp" />
-    <ClInclude Include="include\Core\Containers\Vector.h" />
     <ClInclude Include="include\Core\DebugOptions.h" />
     <ClInclude Include="include\Core\Engine.h" />
-    <ClInclude Include="include\Core\EngineDefs.h" />
     <ClInclude Include="include\Core\EngineSettings.h" />
     <ClInclude Include="include\Core\Logging\OutputStream.h" />
     <ClInclude Include="include\Core\Logging\StreamBuf.h" />
@@ -194,24 +210,30 @@
     <ClInclude Include="include\Core\Math\Intersection.h" />
     <ClInclude Include="include\Core\Math\Math.h" />
     <ClInclude Include="include\Core\Math\Plane.h" />
+    <ClInclude Include="include\Core\Memory\HeapAligned.h" />
     <ClInclude Include="include\Core\Memory\HeapAllocator.h" />
-    <ClInclude Include="include\Core\Memory\IMemoryAllocator.h" />
     <ClInclude Include="include\Core\Platform\Directx11.h" />
     <ClInclude Include="include\Core\Platform\Windows.h" />
     <ClInclude Include="include\Core\Types.h" />
+    <ClInclude Include="include\Core\Utils\Clock.hpp" />
     <ClInclude Include="include\Core\Utils\Error.h" />
+    <ClInclude Include="include\Core\Utils\IDGenerator.hpp" />
     <ClInclude Include="include\Core\Utils\NonCopyable.h" />
     <ClInclude Include="include\Core\Utils\Time.h" />
+    <ClInclude Include="include\Core\Utils\Timer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11AABBPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11AmbientPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Backbuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11BoxBlurPass.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11Buffer.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11ConstantBuffer.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Context.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11DepthReductionPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11DirectionalLightPass.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11DynamicBuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11FullscreenTrianglePass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11GBuffer.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11IndexBuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11LightAccumulationbuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Material.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Mesh.h" />
@@ -224,14 +246,28 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Sampler.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Shadowmap.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11SkyboxPass.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11StaticBuffer.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11VertexBufferSet.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11VertexTransformPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\Shaders\Constants.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="include\Renderer\RenderQueue.h" />
+    <ClInclude Include="include\Renderer\RenderDefs.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
+    <ClInclude Include="include\RenderQueue\RenderableCamera.h" />
+    <ClInclude Include="include\RenderQueue\RenderableCollection.h" />
+    <ClInclude Include="include\RenderQueue\RenderableContainer.h" />
+    <ClInclude Include="include\RenderQueue\RenderableDirectionalLight.h" />
+    <ClInclude Include="include\RenderQueue\RenderableMaterial.h" />
+    <ClInclude Include="include\RenderQueue\RenderableMesh.h" />
+    <ClInclude Include="include\RenderQueue\RenderablePointLight.h" />
+    <ClInclude Include="include\RenderQueue\RenderableSkeleton.h" />
+    <ClInclude Include="include\RenderQueue\RenderQueue.h" />
     <ClInclude Include="include\Resources\Animation.h" />
+    <ClInclude Include="include\Resources\AnimationInstance.h" />
+    <ClInclude Include="include\Resources\Bone.h" />
+    <ClInclude Include="include\Resources\BoneKeyframe.h" />
     <ClInclude Include="include\Resources\JonsPackage.h" />
     <ClInclude Include="include\Resources\Material.h" />
     <ClInclude Include="include\Resources\Mesh.h" />
@@ -239,13 +275,17 @@
     <ClInclude Include="include\Resources\ModelNode.h" />
     <ClInclude Include="include\Resources\ResourceManifest.h" />
     <ClInclude Include="include\Resources\Skybox.h" />
-    <ClInclude Include="include\Scene\Actor.h" />
+    <ClInclude Include="include\Scene\AnimatedActor.h" />
+    <ClInclude Include="include\Scene\AnimationUpdater.h" />
+    <ClInclude Include="include\Scene\BaseActor.h" />
     <ClInclude Include="include\Scene\Camera.h" />
     <ClInclude Include="include\Scene\DirectionalLight.h" />
     <ClInclude Include="include\Scene\PointLight.h" />
     <ClInclude Include="include\Scene\Scene.h" />
     <ClInclude Include="include\Scene\SceneManager.h" />
     <ClInclude Include="include\Scene\SceneNode.h" />
+    <ClInclude Include="include\Scene\SceneParser.h" />
+    <ClInclude Include="include\Scene\StaticActor.h" />
     <ClInclude Include="include\Window\KeyCallback.h" />
     <ClInclude Include="include\Window\KeyDefinition.h" />
     <ClInclude Include="include\Window\MouseCallback.h" />

@@ -1,12 +1,13 @@
 #include "include/Renderer/DirectX11/DX11Renderer.h"
 
 #include "include/Renderer/DirectX11/DX11RendererImpl.h"
+#include "include/Core/Memory/HeapAllocator.h"
 
 
 namespace JonsEngine
 {
-    DX11Renderer::DX11Renderer(const EngineSettings& settings, IMemoryAllocatorPtr memoryAllocator, Logger& logger) :
-        mMemoryAllocator(memoryAllocator), mImplementation(mMemoryAllocator->AllocateObject<DX11RendererImpl>(settings, logger, memoryAllocator), [this](DX11RendererImpl* directxImpl) { mMemoryAllocator->DeallocateObject(directxImpl); })
+    DX11Renderer::DX11Renderer(const EngineSettings& settings, HeapAllocator& memoryAllocator, Logger& logger) :
+        mMemoryAllocator(memoryAllocator), mImplementation(mMemoryAllocator.AllocateObject<DX11RendererImpl>(settings, logger, memoryAllocator), [this](DX11RendererImpl* directxImpl) { mMemoryAllocator.DeallocateObject(directxImpl); })
     {
     }
 
@@ -21,6 +22,12 @@ namespace JonsEngine
         return mImplementation->CreateMesh(vertexData, normalData, texCoords, tangentData, indexData, minBounds, maxBounds);
     }
 
+    DX11MeshID DX11Renderer::CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,
+		const std::vector<BoneWeight>& boneWeights, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds)
+    {
+        return mImplementation->CreateMesh(vertexData, normalData, texCoords, tangentData, boneWeights, indexData, minBounds, maxBounds);
+    }
+
     DX11MaterialID DX11Renderer::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
     {
         return mImplementation->CreateTexture(textureType, textureData, textureWidth, textureHeight);
@@ -32,9 +39,9 @@ namespace JonsEngine
         mImplementation->Render(renderQueue, debugFlags);
     }
 
-    void DX11Renderer::ReduceDepth(const Mat4& cameraProjMatrix, float& minDepth, float& maxDepth)
+    void DX11Renderer::ReduceDepth(float& minDepth, float& maxDepth)
     {
-        mImplementation->ReduceDepth(cameraProjMatrix, minDepth, maxDepth);
+        mImplementation->ReduceDepth(minDepth, maxDepth);
     }
 
 

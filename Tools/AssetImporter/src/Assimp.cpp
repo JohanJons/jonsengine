@@ -1,20 +1,41 @@
 #include "include/Assimp.h"
 
 #include "include/Core/Math/Math.h"
+#include "include/Core/Math/AABB.h"
+#include "include/Resources/Animation.h"
 #include "include/FreeImage.h"
 
 #include <limits>
+#include <set>
+#include <algorithm>
 
 using namespace JonsEngine;
 
 namespace JonsAssetImporter
 {
-    void CheckForInvalidAABB(JonsEngine::PackageAABB& aabb);
+	typedef std::set<std::string> BoneNameSet;
+	typedef std::set<const aiBone*> AssimpBoneSet;
 
-    JonsEngine::Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
-    JonsEngine::Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
-    JonsEngine::Vec3 aiColor3DToJonsVec3(const aiColor3D& color);
-    JonsEngine::Vec3 aiVec3ToJonsVec3(const aiVector3D& vec);
+    void AddStaticAABB(PackageModel& model);
+
+    bool OnlyOneNodePerMesh(const aiScene* scene);
+    Mat4 GetMeshNodeTransform(const aiScene* scene, const aiNode* node, const uint32_t meshIndex, const Mat4& parentTransform);
+    uint32_t CountMeshOccurances(const aiNode* node, const uint32_t aiMeshIndex, const bool recursive);
+    BoneIndex GetBoneIndex(const std::vector<PackageMesh>& meshes, const std::vector<PackageBone>& bones, const std::string& boneName);
+    uint32_t CountChildren(const aiNode* node);
+    bool UsedLessThanMaxNumBones(const BoneWeight& pkgBoneWeight);
+    const aiNode* FindMeshNode(const aiMesh* mesh, const aiScene* scene, const aiNode* node);
+	const aiMesh* FindMesh(const aiScene* scene, const std::string& name);
+	const aiBone* FindAiBoneByName(const std::set<const aiBone*> aiBones, const std::string& string);
+    Vec3 GetVertices(const bool isStatic, const Mat4& nodeTransform, const aiVector3D& assimpVertices);
+	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiScene* scene, const aiAnimation* animation);
+	BoneIndex GetBoneKeyframeContainer(PackageAnimation& pkgAnimation, const std::vector<PackageBone>& bones, const aiNodeAnim* nodeAnimation);
+	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const BoneNameSet& boneNames, const AssimpBoneSet& aiBones, const aiNode* node, const Mat4& parentTransform, const BoneIndex parentBone);
+
+    Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
+    Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
+    Vec3 aiColor3DToJonsVec3(const aiColor3D& color);
+    Vec3 aiVec3ToJonsVec3(const aiVector3D& vec);
 
 
     Assimp::Assimp()
@@ -26,7 +47,7 @@ namespace JonsAssetImporter
     }
 
 
-    bool Assimp::ProcessScene(const boost::filesystem::path& modelPath, const std::string& modelName, FreeImage& freeimageImporter, JonsEngine::JonsPackagePtr pkg)
+    bool Assimp::ProcessScene(const boost::filesystem::path& modelPath, const std::string& modelName, FreeImage& freeimageImporter, JonsPackagePtr pkg)
     {
         const aiScene* scene = mImporter.ReadFile(modelPath.string(), aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_MaxQuality);
         if (!scene)
@@ -39,21 +60,22 @@ namespace JonsAssetImporter
         // process materials
         // map scene material indexes to actual package material indexes
         MaterialMap materialMap;
-        ProcessAssimpMaterials(scene, modelPath, materialMap, freeimageImporter, pkg);
+        ProcessMaterials(scene, modelPath, materialMap, freeimageImporter, pkg);
 
         // process model hierarchy
-        pkg->mModels.emplace_back(modelName);
-        auto& model = pkg->mModels.back();
-        if (!ProcessAssimpNode(model.mRootNode, scene, scene->mRootNode, materialMap, gIdentityMatrix, model.mRootNode.mAABB.mMinBounds, model.mRootNode.mAABB.mMaxBounds))
+        if (!ParseModel(scene, modelName, materialMap, pkg))
             return false;
 
-        if (!ProcessAssimpAnimations(model, scene))
+        PackageModel& model = pkg->mModels.back();
+        if (!ProcessAnimations(model, scene))
             return false;
+
+        //AddStaticAABB(model);
 
         return true;
     }
 
-    void Assimp::ProcessAssimpMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsEngine::JonsPackagePtr pkg)
+    void Assimp::ProcessMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsPackagePtr pkg)
     {
         if (!scene->HasMaterials())
             return;
@@ -122,120 +144,251 @@ namespace JonsAssetImporter
         }
     }
 
-    bool Assimp::ProcessAssimpNode(JonsEngine::PackageNode& pkgNode, const aiScene* scene, const aiNode* node, const MaterialMap& materialMap, const Mat4& parentTransform, JonsEngine::Vec3& parentMinBounds, JonsEngine::Vec3& parentMaxBounds)
+    bool Assimp::ParseModel(const aiScene* scene, const std::string& modelName, const MaterialMap& materialMap, JonsPackagePtr pkg)
     {
-        pkgNode.mName = node->mName.C_Str();
+        pkg->mModels.emplace_back(modelName);
+        PackageModel& model = pkg->mModels.back();
 
-        const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
-        const uint32_t numMeshes = node->mNumMeshes;
-        for (uint32_t i = 0; i < numMeshes; ++i)
+        const uint32_t numNodes = CountChildren(scene->mRootNode) + 1;
+        model.mNodes.reserve(numNodes);
+        model.mMeshes.reserve(scene->mNumMeshes);
+        model.mAnimations.reserve(scene->mNumAnimations);
+
+        // we assume only one node per mesh - means we can pre-transform vertices for bind pose, makes rendering static actors faster
+        if (!OnlyOneNodePerMesh(scene))
         {
-            pkgNode.mMeshes.emplace_back();
-            if (!ProcessAssimpMesh(pkgNode.mMeshes.back(), scene->mMeshes[node->mMeshes[i]], materialMap, nodeTransform, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds))
-                return false;
-        }
-
-        const uint32_t numChildren = node->mNumChildren;
-        for (uint32_t i = 0; i < numChildren; ++i)
-        {
-            pkgNode.mChildNodes.emplace_back();
-            if (!ProcessAssimpNode(pkgNode.mChildNodes.back(), scene, node->mChildren[i], materialMap, nodeTransform, pkgNode.mAABB.mMinBounds, pkgNode.mAABB.mMaxBounds))
-                return false;
-        }
-
-        parentMinBounds = MinVal(parentMinBounds, pkgNode.mAABB.mMinBounds);
-        parentMaxBounds = MaxVal(parentMaxBounds, pkgNode.mAABB.mMaxBounds);
-
-        // if node has no legit AABB from either its own mesh or a childrens mesh, zero length it
-        // is done after updating parent aabb bounds since the result might otherwise invalidate the parents aabb when comparing it against its other childrens
-        CheckForInvalidAABB(pkgNode.mAABB);
-
-        return true;
-    }
-
-    bool Assimp::ProcessAssimpMesh(JonsEngine::PackageMesh& pkgMesh, const aiMesh* mesh, const MaterialMap& materialMap, const Mat4& nodeTransform, JonsEngine::Vec3& nodeMinBounds, JonsEngine::Vec3& nodeMaxBounds)
-    {
-        pkgMesh.mName = mesh->mName.C_Str();
-
-        const uint32_t numFloatsPerTriangle = 3;
-        const uint32_t numFloatsPerTexcoord = 2;
-        pkgMesh.mVertexData.reserve(mesh->mNumVertices * numFloatsPerTriangle);
-        pkgMesh.mNormalData.reserve(mesh->mNumVertices * numFloatsPerTriangle);
-        pkgMesh.mTexCoordsData.reserve(mesh->mNumVertices * numFloatsPerTexcoord);
-        // store both tangents and bitangents in same buffer
-        pkgMesh.mTangentData.reserve(mesh->mNumVertices * numFloatsPerTriangle * 2);;
-
-        // vertice, normal, texcoord, tangents and bitangents data
-        for (unsigned int j = 0; j < mesh->mNumVertices; ++j)
-        {
-            const Vec3 transformedVertices = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(mesh->mVertices[j]), 1.0f));
-            pkgMesh.mVertexData.push_back(transformedVertices.x);
-            pkgMesh.mVertexData.push_back(transformedVertices.y);
-            pkgMesh.mVertexData.push_back(transformedVertices.z);
-
-            if (mesh->HasNormals())
-            {
-                const Vec3 transformedNormals = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(mesh->mNormals[j]), 0.0f));
-                pkgMesh.mNormalData.push_back(transformedNormals.x);
-                pkgMesh.mNormalData.push_back(transformedNormals.y);
-                pkgMesh.mNormalData.push_back(transformedNormals.z);
-            }
-
-            if (mesh->HasTextureCoords(0))
-            {
-                pkgMesh.mTexCoordsData.push_back(mesh->mTextureCoords[0][j].x);
-                pkgMesh.mTexCoordsData.push_back(mesh->mTextureCoords[0][j].y);
-            }
-
-            if (mesh->HasTangentsAndBitangents())
-            {
-                const Vec3 transformedTangents = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(mesh->mTangents[j]), 0.0f));
-                pkgMesh.mTangentData.push_back(transformedTangents.x);
-                pkgMesh.mTangentData.push_back(transformedTangents.y);
-                pkgMesh.mTangentData.push_back(transformedTangents.z);
-
-                const Vec3 transformedBitangents = Vec3(nodeTransform * Vec4(aiVec3ToJonsVec3(mesh->mBitangents[j]), 0.0f));
-                pkgMesh.mTangentData.push_back(transformedBitangents.x);
-                pkgMesh.mTangentData.push_back(transformedBitangents.y);
-                pkgMesh.mTangentData.push_back(transformedBitangents.z);
-            }
-
-            // mesh AABB
-            pkgMesh.mAABB.mMinBounds = MinVal(pkgMesh.mAABB.mMinBounds, transformedVertices);
-            pkgMesh.mAABB.mMaxBounds = MaxVal(pkgMesh.mAABB.mMaxBounds, transformedVertices);
-        }
-
-        pkgMesh.mIndiceData.reserve(mesh->mNumFaces * numFloatsPerTriangle);
-
-        // index data
-        for (uint32_t j = 0; j < mesh->mNumFaces; ++j)
-        {
-            // only dem triangles
-            assert(mesh->mFaces[j].mNumIndices == numFloatsPerTriangle);
-            for (uint32_t index = 0; index < numFloatsPerTriangle; index++)
-            {
-                assert(mesh->mFaces[j].mIndices[index] <= UINT16_MAX);
-                pkgMesh.mIndiceData.push_back(mesh->mFaces[j].mIndices[index]);
-            }
-        }
-
-        if (materialMap.find(mesh->mMaterialIndex) == materialMap.end())
-        {
-            Log("ERROR: Unable to find mesh material in materialMap");
+            Log("ERROR: Assimp parser assumes only one node per mesh");
             return false;
         }
 
-        pkgMesh.mMaterialIndex = materialMap.at(mesh->mMaterialIndex);
-        pkgMesh.mHasMaterial = true;
+        if (!ProcessMeshes(model.mMeshes, scene, materialMap, model.mStaticAABB.mMinBounds, model.mStaticAABB.mMaxBounds))
+            return false;
 
-        // node AABB
-        nodeMinBounds = MinVal(nodeMinBounds, pkgMesh.mAABB.mMinBounds);
-        nodeMaxBounds = MaxVal(nodeMaxBounds, pkgMesh.mAABB.mMaxBounds);
+        // recursively go through assimp node tree
+        const auto rootParentIndex = PackageNode::INVALID_NODE_INDEX;
+        if (!ParseNodeHeirarchy(model.mNodes, model.mMeshes, scene, scene->mRootNode, rootParentIndex, gIdentityMatrix))
+            return false;
+
+        if (!ProcessBones(model.mBoneParentMap, model.mSkeleton, model.mMeshes, scene))
+            return false;
 
         return true;
     }
 
-    bool Assimp::ProcessAssimpAnimations(JonsEngine::PackageModel& model, const aiScene* scene)
+    bool Assimp::ParseNodeHeirarchy(std::vector<PackageNode>& nodeContainer, const std::vector<PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode, const PackageNode::NodeIndex parentNodeIndex, const Mat4& parentTransform)
+    {
+        const uint32_t nodeIndex = nodeContainer.size();
+		const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(assimpNode->mTransformation);
+        nodeContainer.emplace_back(assimpNode->mName.C_Str(), nodeTransform, nodeIndex, parentNodeIndex);
+        PackageNode& jonsNode = nodeContainer.back();
+
+        // jonsPkg uses same mesh indices as aiScene
+        for (uint32_t meshIndex = 0; meshIndex < assimpNode->mNumMeshes; ++meshIndex)
+            jonsNode.mMeshes.emplace_back(assimpNode->mMeshes[meshIndex]);
+
+        for (uint32_t childIndex = 0; childIndex < assimpNode->mNumChildren; ++childIndex)
+        {
+            const aiNode* child = assimpNode->mChildren[childIndex];
+
+            if (!ParseNodeHeirarchy(nodeContainer, meshContainer, scene, child, nodeIndex, nodeTransform))
+                return false;
+        }
+
+        return true;
+    }
+
+    bool Assimp::ProcessMeshes(std::vector<PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap, Vec3& modelMinBounds, Vec3& modelMaxBounds)
+    {
+        for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
+        {
+            aiMesh* assimpMesh = scene->mMeshes[meshIndex];
+            meshContainer.emplace_back(assimpMesh->mName.C_Str());
+            PackageMesh& jonsMesh = meshContainer.back();
+            
+            if (!AddMeshGeometricData(jonsMesh, assimpMesh, scene, meshIndex, jonsMesh.mAABB.mMinBounds, jonsMesh.mAABB.mMaxBounds))
+                return false;
+
+			// update overall model AABB
+			modelMinBounds = MinVal(modelMinBounds, jonsMesh.mAABB.mMinBounds);
+			modelMaxBounds = MaxVal(modelMaxBounds, jonsMesh.mAABB.mMaxBounds);
+           
+            if (materialMap.find(assimpMesh->mMaterialIndex) == materialMap.end())
+            {
+                Log("ERROR: Unable to find mesh material in materialMap");
+                return false;
+            }
+
+            jonsMesh.mMaterialIndex = materialMap.at(assimpMesh->mMaterialIndex);
+        }
+
+        return true;
+    }
+
+    // the bones of jonsMesh must've been parsed already
+    bool Assimp::AddMeshGeometricData(PackageMesh& jonsMesh, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex, Vec3& modelMinBounds, Vec3& modelMaxBounds)
+    {
+        const uint32_t numFloatsPerTriangle = 3;
+        const uint32_t numFloatsPerTexcoord = 2;
+
+        // reserve storage
+        jonsMesh.mVertexData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle);
+        jonsMesh.mNormalData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle);
+        jonsMesh.mTexCoordsData.reserve(assimpMesh->mNumVertices * numFloatsPerTexcoord);
+        // store both tangents and bitangents in same buffer
+        jonsMesh.mTangentData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle * 2);
+        jonsMesh.mIndiceData.reserve(assimpMesh->mNumFaces * numFloatsPerTriangle);
+
+        // NOTE: commented pre-transform code out, might need some additional thinking to get it right (inverse transforms for animated meshes?)
+        // if the mesh is static, pre-multiply all the vertices with the transformation hierarchy
+        //const bool isStatic = !jonsMesh.IsAnimated();
+        //const Mat4 nodeTransform = isStatic ? GetMeshNodeTransform(scene, scene->mRootNode, meshIndex, gIdentityMatrix) : gIdentityMatrix;
+		const Mat4 nodeTransform = GetMeshNodeTransform(scene, scene->mRootNode, meshIndex, gIdentityMatrix);
+
+        // vertice, normal, texcoord, tangents and bitangents data
+        for (uint32_t j = 0; j < assimpMesh->mNumVertices; ++j)
+        {
+            //const Vec3 vertices = GetVertices(isStatic, nodeTransform, assimpMesh->mVertices[j]);
+            const Vec3 vertices = aiVec3ToJonsVec3(assimpMesh->mVertices[j]);
+            jonsMesh.mVertexData.push_back(vertices.x);
+            jonsMesh.mVertexData.push_back(vertices.y);
+            jonsMesh.mVertexData.push_back(vertices.z);
+
+            if (assimpMesh->HasNormals())
+            {
+                //const Vec3 normals = GetVertices(isStatic, nodeTransform, assimpMesh->mNormals[j]);
+                const Vec3 normals = aiVec3ToJonsVec3(assimpMesh->mNormals[j]);
+                jonsMesh.mNormalData.push_back(normals.x);
+                jonsMesh.mNormalData.push_back(normals.y);
+                jonsMesh.mNormalData.push_back(normals.z);
+            }
+
+            // multiple texture coordinates only used in special scenarios so only use first row by default
+            if (assimpMesh->HasTextureCoords(0))
+            {
+                jonsMesh.mTexCoordsData.push_back(assimpMesh->mTextureCoords[0][j].x);
+                jonsMesh.mTexCoordsData.push_back(assimpMesh->mTextureCoords[0][j].y);
+            }
+
+            if (assimpMesh->HasTangentsAndBitangents())
+            {
+                //const Vec3 tangents = GetVertices(isStatic, nodeTransform, assimpMesh->mTangents[j]);
+                const Vec3 tangents = aiVec3ToJonsVec3(assimpMesh->mTangents[j]);
+                jonsMesh.mTangentData.push_back(tangents.x);
+                jonsMesh.mTangentData.push_back(tangents.y);
+                jonsMesh.mTangentData.push_back(tangents.z);
+
+                //const Vec3 bitangents = GetVertices(isStatic, nodeTransform, assimpMesh->mBitangents[j]);
+                const Vec3 bitangents = aiVec3ToJonsVec3(assimpMesh->mBitangents[j]);
+                jonsMesh.mTangentData.push_back(bitangents.x);
+                jonsMesh.mTangentData.push_back(bitangents.y);
+                jonsMesh.mTangentData.push_back(bitangents.z);
+            }
+
+            // mesh AABB
+			// pre-multiply transforms for static aabb
+			const Vec3 transformedVertices = Vec3(nodeTransform * Vec4(vertices, 1.0f));
+			modelMinBounds = MinVal(modelMinBounds, transformedVertices);
+			modelMaxBounds = MaxVal(modelMaxBounds, transformedVertices);
+        }
+
+        // index data
+        for (uint32_t j = 0; j < assimpMesh->mNumFaces; ++j)
+        {
+            // only dem triangles
+            assert(assimpMesh->mFaces[j].mNumIndices == numFloatsPerTriangle);
+            for (uint32_t index = 0; index < numFloatsPerTriangle; index++)
+            {
+                assert(assimpMesh->mFaces[j].mIndices[index] <= UINT16_MAX);
+                jonsMesh.mIndiceData.push_back(assimpMesh->mFaces[j].mIndices[index]);
+            }
+        }
+
+        return true;
+    }
+
+    bool Assimp::ProcessBones(JonsEngine::BoneParentMap& parentMap, std::vector<PackageBone>& bones, std::vector<PackageMesh>& meshes, const aiScene* scene)
+    {
+        std::set<std::string> boneNames;
+        std::set<const aiBone*> aiBones;
+
+        for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
+        {
+            const aiMesh* mesh = scene->mMeshes[meshIndex];
+            assert(mesh);
+            const aiNode* meshNode = FindMeshNode(mesh, scene, scene->mRootNode);
+            assert(meshNode);
+            const aiNode* parentMeshNode = meshNode->mParent;
+			assert(parentMeshNode);
+            
+            for (uint32_t boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
+            {
+                const aiBone* bone = mesh->mBones[boneIndex];
+                assert(bone);
+                const aiNode* node = scene->mRootNode->FindNode(bone->mName.C_Str());
+                assert(node);
+                
+                aiBones.insert(bone);
+                do
+                {
+                    boneNames.insert(node->mName.C_Str());
+                    node = node->mParent;
+                }
+                while (node && node != meshNode && node != parentMeshNode);
+            }
+        }
+
+        BuildSkeleton(parentMap, bones, boneNames, aiBones, scene->mRootNode, gIdentityMatrix, INVALID_BONE_INDEX);
+        assert(bones.size() == boneNames.size());
+
+		const bool processedOK = ProcessVertexBoneWeights(bones, meshes, scene);
+
+        return processedOK;
+    }
+
+    bool Assimp::ProcessVertexBoneWeights(std::vector<PackageBone>& bones, std::vector<PackageMesh>& meshes, const aiScene* scene)
+    {
+		for (PackageMesh& pkgMesh : meshes)
+		{
+			const aiMesh* assimpMesh = FindMesh(scene, pkgMesh.mName);
+			assert(assimpMesh);
+
+			const uint32_t numVertices = assimpMesh->mNumVertices;
+			pkgMesh.mBoneWeights.resize(numVertices);
+
+			const uint32_t numBones = assimpMesh->mNumBones;
+			assert(numBones <= MAX_NUM_BONES);
+
+			for (uint32_t boneIndex = 0; boneIndex < assimpMesh->mNumBones; ++boneIndex)
+			{
+				const aiBone* assimpBone = assimpMesh->mBones[boneIndex];
+				const BoneIndex bone = GetBoneIndex(meshes, bones, assimpBone->mName.C_Str());
+				assert(bone != INVALID_BONE_INDEX);
+
+				const uint32_t numWeights = assimpBone->mNumWeights;
+				for (uint32_t weightIndex = 0; weightIndex < numWeights; ++weightIndex)
+				{
+					const auto assimpWeight = assimpBone->mWeights[weightIndex];
+					const uint32_t vertexID = assimpWeight.mVertexId;
+					const float weightFactor = assimpWeight.mWeight;
+
+					auto& pkgWeight = pkgMesh.mBoneWeights.at(vertexID);
+					const bool notExceededNumBones = UsedLessThanMaxNumBones(pkgWeight);
+					assert(notExceededNumBones);
+
+					uint32_t firstFreeIndex = 0;
+					while (pkgWeight.mBoneIndices.at(firstFreeIndex) != INVALID_BONE_INDEX)
+						++firstFreeIndex;
+
+					pkgWeight.mBoneIndices.at(firstFreeIndex) = bone;
+					pkgWeight.mBoneWeights.at(firstFreeIndex) = weightFactor;
+				}
+			}
+		}
+
+		return true;
+    }
+
+    bool Assimp::ProcessAnimations(PackageModel& model, const aiScene* scene)
     {
         if (!scene->HasAnimations())
             return true;
@@ -243,53 +396,51 @@ namespace JonsAssetImporter
         for (uint32_t animationIndex = 0; animationIndex < scene->mNumAnimations; ++animationIndex)
         {
             aiAnimation* animation = *(scene->mAnimations + animationIndex);
+			assert(animation);
 
-            // what is this anyway...
-            // shouldn't be present
+            // what is this anyway... shouldn't be present
             assert(animation->mNumMeshChannels == 0);
 
-            const double duration = animation->mDuration / animation->mTicksPerSecond;
-            model.mAnimations.emplace_back(animation->mName.C_Str(), duration);
-            PackageAnimation& pkgAnimation = model.mAnimations.back();
+			PackageAnimation& pkgAnimation = AddPkgAnimation(model, scene, animation);
 
-            aiNode* rootNode = scene->mRootNode;
-            const uint32_t noAnimationKeysNum = 1;
-            for (uint32_t nodeKey = 0; nodeKey < animation->mNumChannels; ++nodeKey)
+            for (uint32_t nodeAnimIndex = 0; nodeAnimIndex < animation->mNumChannels; ++nodeAnimIndex)
             {
-                aiNodeAnim* nodeAnimation = *(animation->mChannels + nodeKey);
-                aiNode* node = rootNode->FindNode(nodeAnimation->mNodeName);
-                assert(node != NULL);
+                aiNodeAnim* nodeAnimation = *(animation->mChannels + nodeAnimIndex);
+				assert(nodeAnimation);
 
                 // cant do scaling animations
-                assert(nodeAnimation->mNumScalingKeys == noAnimationKeysNum);
+                assert(nodeAnimation->mNumScalingKeys <= 1);
 
-                // if no rotation/translation, continue
-                if (nodeAnimation->mNumPositionKeys == nodeAnimation->mNumRotationKeys == noAnimationKeysNum)
-                    continue;
+				const BoneIndex bone = GetBoneKeyframeContainer(pkgAnimation, model.mSkeleton, nodeAnimation);
+				if (bone == INVALID_BONE_INDEX)
+					continue;
 
-                pkgAnimation.mAnimatedNodes.emplace_back(nodeAnimation->mNodeName.C_Str());
-                PackageAnimatedNode& pkgAnimatedNode = pkgAnimation.mAnimatedNodes.back();
+				auto& keyFrames = pkgAnimation.mBoneAnimations.at(bone);
 
                 const uint32_t numPosKeys = nodeAnimation->mNumPositionKeys;
                 const uint32_t numRotkeys = nodeAnimation->mNumRotationKeys;
                 const uint32_t maxNumKeys = glm::max(nodeAnimation->mNumPositionKeys, nodeAnimation->mNumRotationKeys);
                 for (uint32_t key = 0; key < maxNumKeys; ++key)
                 {
+                    // same pos/rot might be used for several pos/rot transforms
+                    // NOTE: use mTransformation after last key encountered????
+
                     // position
                     const uint32_t posKey = key < numPosKeys ? key : numPosKeys - 1;
                     aiVectorKey* aiPos = nodeAnimation->mPositionKeys + posKey;
-                    const Vec3 posVec = aiVec3ToJonsVec3(aiPos->mValue);
-                    Mat4 transform = glm::translate(posVec);
-                    float keyTime = aiPos->mTime;
+					assert(aiPos);
+                    const Vec3 translateVector = aiVec3ToJonsVec3(aiPos->mValue);
 
                     // rotation
                     const uint32_t rotKey = key < numRotkeys ? key : numRotkeys - 1;
                     aiQuatKey* aiRot = nodeAnimation->mRotationKeys + rotKey;
-                    const Quaternion rotQuat = aiQuatToJonsQuat(aiRot->mValue);
-                    transform *= glm::toMat4(rotQuat);
-                    keyTime = aiRot->mTime;
+					assert(aiRot);
+                    const Quaternion rotationQuat = aiQuatToJonsQuat(aiRot->mValue);
 
-                    pkgAnimatedNode.mAnimationTransforms.emplace_back(keyTime, transform);
+                    const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime) / animation->mTicksPerSecond;
+                    const uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
+
+					keyFrames.emplace_back(timestampMillisec, translateVector, rotationQuat);
                 }
             }
         }
@@ -297,19 +448,292 @@ namespace JonsAssetImporter
         return true;
     }
 
-
-    void CheckForInvalidAABB(JonsEngine::PackageAABB& aabb)
+    void AddStaticAABB(PackageModel& model)
     {
-        // resets AABB to zero length
-        if (aabb.mMinBounds == Vec3(std::numeric_limits<float>::max()) && aabb.mMaxBounds == Vec3(std::numeric_limits<float>::lowest()))
+        // two cases: animated vs static model
+        //const PackageAABB& rootNodeAABB = model.mNodes.front().mAABB;
+        //model.mStaticAABB = rootNodeAABB;
+
+        // TODO
+        // static model: use root node AABB as its overall AABB
+       /* if (model.mAnimations.empty())
         {
-            aabb.mMinBounds = Vec3(0.0f);
-            aabb.mMaxBounds = Vec3(0.0f);
+            model.mStaticAABB = rootNodeAABB;
+            return;
         }
+
+        // animated model: needs to transform all nodes using all the animations to find the maximum extents
+        // results in a loose, static aabb
+        Vec3 minExtent(rootNodeAABB.mMinBounds), maxExtent(rootNodeAABB.mMaxBounds);
+        for (const PackageAnimation& animation : model.mAnimations)
+        {
+            for (const PackageBoneAnimation& animNode : animation.mBoneAnimations)
+            {
+                for (const PackageBoneKeyframe& keyframe : animNode.mKeyframes)
+                {
+                    AABB aabb(node.mAABB.mMinBounds, node.mAABB.mMaxBounds);
+                    aabb = aabb * keyframe.mTransform;
+
+                    const Vec3 tempMin = aabb.Min(), tempMax = aabb.Max();
+                    if (tempMin.x < minExtent.x) minExtent.x = tempMin.x;
+                    if (tempMin.y < minExtent.y) minExtent.y = tempMin.y;
+                    if (tempMin.z < minExtent.z) minExtent.z = tempMin.z;
+
+                    if (tempMax.x > maxExtent.x) maxExtent.x = tempMax.x;
+                    if (tempMax.y > maxExtent.y) maxExtent.y = tempMax.y;
+                    if (tempMax.z > maxExtent.z) maxExtent.z = tempMax.z;
+                }
+            }
+        }
+
+        model.mStaticAABB.mMinBounds = minExtent;
+        model.mStaticAABB.mMaxBounds = maxExtent;*/
     }
 
 
-    JonsEngine::Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat)
+    bool OnlyOneNodePerMesh(const aiScene* scene)
+    {
+		assert(scene);
+
+        for (uint32_t meshNum = 0; meshNum < scene->mNumMeshes; ++meshNum)
+        {
+            const bool recursive = true;
+            const uint32_t occurances = CountMeshOccurances(scene->mRootNode, meshNum, recursive);
+            if (occurances > 1)
+                return false;
+        }
+
+        return true;
+    }
+
+    // assumes aiMeshIndex actually exists in node hierarchy
+    Mat4 GetMeshNodeTransform(const aiScene* scene, const aiNode* node, const uint32_t aiMeshIndex, const Mat4& parentTransform)
+    {
+		assert(scene);
+		assert(node);
+
+        const bool recursive = false;
+        const uint32_t occurances = CountMeshOccurances(node, aiMeshIndex, recursive);
+        const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
+        if (occurances != 1)
+        {
+            for (uint32_t childNum = 0; childNum < node->mNumChildren; ++childNum)
+            {
+                const aiNode* child = node->mChildren[childNum];
+                if (CountMeshOccurances(child, aiMeshIndex, recursive) == 1)
+                    return GetMeshNodeTransform(scene, child, aiMeshIndex, nodeTransform);
+            }
+        }
+
+        return nodeTransform;
+    }
+
+    uint32_t CountMeshOccurances(const aiNode* node, const uint32_t aiMeshIndex, const bool recursive)
+    {
+		assert(node);
+
+        uint32_t occurances = 0;
+        for (uint32_t meshNum = 0; meshNum < node->mNumMeshes; ++meshNum)
+        {
+            if (*(node->mMeshes + meshNum) == aiMeshIndex)
+                ++occurances;
+        }
+
+        if (recursive)
+        {
+            for (uint32_t childNum = 0; childNum < node->mNumChildren; ++childNum)
+            {
+                const aiNode* child = node->mChildren[childNum];
+                occurances += CountMeshOccurances(child, aiMeshIndex, recursive);
+            }
+        }
+
+        return occurances;
+    }
+    
+    BoneIndex GetBoneIndex(const std::vector<PackageMesh>& meshes, const std::vector<PackageBone>& bones, const std::string& boneName)
+    {
+        for (const PackageMesh& mesh : meshes)
+        {
+            const uint32_t numBones = bones.size();
+            for (BoneIndex boneIndex = 0; boneIndex < numBones; ++boneIndex)
+            {
+                const PackageBone& bone = bones.at(boneIndex);
+                if (bone.mName == boneName)
+                    return boneIndex;
+            }
+        }
+        
+        return INVALID_BONE_INDEX;
+    }
+
+    uint32_t CountChildren(const aiNode* node)
+    {
+		assert(node);
+
+        uint32_t ret = 0;
+        for (uint32_t index = 0; index < node->mNumChildren; ++index)
+        {
+            ++ret;
+
+            ret += CountChildren(node->mChildren[index]);
+        }
+
+        return ret;
+    }
+
+    bool UsedLessThanMaxNumBones(const BoneWeight& pkgBoneWeight)
+    {
+        for (uint32_t bone = 0; bone < MAX_NUM_BONES; ++bone)
+        {
+            // invalid index means unused
+            if (pkgBoneWeight.mBoneIndices.at(bone) == INVALID_BONE_INDEX)
+                return true;
+        }
+        
+        return false;
+    }
+
+    const aiNode* FindMeshNode(const aiMesh* mesh, const aiScene* scene, const aiNode* node)
+    {
+        assert(mesh);
+        assert(scene);
+        assert(node);
+
+        for (uint32_t meshIndex = 0; meshIndex < node->mNumMeshes; ++meshIndex)
+        {
+            const aiMesh* nodeMesh = scene->mMeshes[meshIndex];
+            if (nodeMesh == mesh)
+                return node;
+        }
+
+        for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex)
+        {
+            const aiNode* childNode = node->mChildren[childIndex];
+            assert(childNode);
+            const aiNode* childRes = FindMeshNode(mesh, scene, childNode);
+            if (childRes != nullptr)
+                return childRes;
+        }
+        
+        return nullptr;
+    }
+
+	const aiMesh* FindMesh(const aiScene* scene, const std::string& name)
+	{
+		assert(scene);
+
+		for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
+		{
+			const aiMesh* nodeMesh = scene->mMeshes[meshIndex];
+			if (nodeMesh->mName.C_Str() == name)
+				return nodeMesh;
+		}
+
+		return nullptr;
+	}
+
+	const aiBone* FindAiBoneByName(const std::set<const aiBone*> aiBones, const std::string& string)
+	{
+		for (const aiBone* bone : aiBones)
+		{
+			if (bone->mName.C_Str() == string)
+				return bone;
+		}
+
+		return nullptr;
+	}
+
+    Vec3 GetVertices(const bool isStaticMesh, const Mat4& nodeTransform, const aiVector3D& assimpVertices)
+    {
+        Vec3 ret = aiVec3ToJonsVec3(assimpVertices);
+        if (isStaticMesh)
+            ret = Vec3(nodeTransform * Vec4(ret, 1.0f));
+
+        return ret;
+    }
+
+	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiScene* scene, const aiAnimation* animation)
+	{
+		assert(animation);
+
+		/*auto nod = scene->mRootNode->FindNode(model.mSkeleton.front().mName.c_str());
+		auto rootMat = aiMatrix4x4();
+		while (nod != nullptr)
+		{
+			rootMat = nod->mTransformation * rootMat;
+			nod = nod->mParent;
+		}
+
+		const Mat4& rootNodeTransform = aiMat4ToJonsMat4(rootMat);
+		const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);
+		//const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);*/
+		const Mat4& rootNodeTransform = model.mNodes.front().mTransform;
+		const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);
+
+		const uint32_t durationMillisec = static_cast<uint32_t>((animation->mDuration / animation->mTicksPerSecond) * 1000);
+		model.mAnimations.emplace_back(animation->mName.C_Str(), durationMillisec, invRootNodeTransform);
+		PackageAnimation& pkgAnimation = model.mAnimations.back();
+
+		// number of nodeanim channels should be same as num bones
+		// TODO: vector of vectors - rearrange boneanims for better cache utilization?
+		const uint32_t numBones = model.mSkeleton.size();
+		pkgAnimation.mBoneAnimations.resize(numBones);
+
+		return pkgAnimation;
+	}
+
+	BoneIndex GetBoneKeyframeContainer(PackageAnimation& pkgAnimation, const std::vector<PackageBone>& bones, const aiNodeAnim* nodeAnimation)
+	{
+		const std::string nodeAnimName = nodeAnimation->mNodeName.C_Str();
+		const auto boneBeginIter = bones.begin();
+		const auto boneEndIter = bones.end();
+		const auto boneIter = std::find_if(boneBeginIter, boneEndIter, [&nodeAnimName](const PackageBone& pkgBone) { return pkgBone.mName == nodeAnimName; });
+		if (boneIter == boneEndIter)
+			return INVALID_BONE_INDEX;
+
+		return boneIter - boneBeginIter;
+	}
+
+	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const BoneNameSet& boneNames, const AssimpBoneSet& aiBones, const aiNode* node, const Mat4& parentTransform, const BoneIndex parentBone)
+	{
+		const std::size_t numBones = boneNames.size();
+		parentMap.resize(numBones, INVALID_BONE_INDEX);
+		skeleton.reserve(numBones);
+
+		BoneIndex thisBone = INVALID_BONE_INDEX;
+		const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
+		const auto boneNameIter = boneNames.find(node->mName.C_Str());
+		if (boneNameIter != boneNames.end())
+		{
+			const std::string& boneName = *boneNameIter;
+			const aiBone* bone = FindAiBoneByName(aiBones, boneName);
+
+			// makes no sense if not a bone
+			//assert(bone);
+
+			if (bone)
+                skeleton.emplace_back(boneName, aiMat4ToJonsMat4(bone->mOffsetMatrix));
+            else
+                //skeleton.emplace_back(boneName, glm::inverse(nodeTransform));
+                skeleton.emplace_back(boneName, gIdentityMatrix);
+
+			thisBone = static_cast<BoneIndex>(skeleton.size() - 1);
+			parentMap.at(thisBone) = parentBone;
+
+			// parents must always appear infront of children to speed up updating transforms
+			assert(parentBone == INVALID_BONE_INDEX || parentBone < thisBone);
+		}
+
+		for (uint32_t childIndex = 0; childIndex < node->mNumChildren; childIndex++)
+		{
+			const aiNode* childNode = node->mChildren[childIndex];
+			BuildSkeleton(parentMap, skeleton, boneNames, aiBones, childNode, nodeTransform, thisBone);
+		}
+	}
+
+
+    Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat)
     {
         Mat4 jMat;
 
@@ -321,17 +745,17 @@ namespace JonsAssetImporter
         return jMat;
     }
 
-    JonsEngine::Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat)
+    Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat)
     {
-        return Quaternion(aiQuat.x, aiQuat.y, aiQuat.z, aiQuat.w);
+        return Quaternion(aiQuat.w, aiQuat.x, aiQuat.y, aiQuat.z);
     }
 
-    JonsEngine::Vec3 aiColor3DToJonsVec3(const aiColor3D& color)
+    Vec3 aiColor3DToJonsVec3(const aiColor3D& color)
     {
         return Vec3(color.r, color.g, color.b);
     }
 
-    JonsEngine::Vec3 aiVec3ToJonsVec3(const aiVector3D& vec)
+    Vec3 aiVec3ToJonsVec3(const aiVector3D& vec)
     {
         return Vec3(vec.x, vec.y, vec.z);
     }
