@@ -31,7 +31,7 @@ namespace JonsAssetImporter
 	const aiMesh* FindMesh(const aiScene* scene, const MeshNameMap& meshNameMap, const std::string& pkgName);
 	const aiBone* FindAiBoneByName(const std::set<const aiBone*> aiBones, const std::string& string);
     Vec3 GetVertices(const bool isStatic, const Mat4& nodeTransform, const aiVector3D& assimpVertices);
-	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiScene* scene, const aiAnimation* animation);
+	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiScene* scene, const aiAnimation* animation, uint32_t& unnamedAnimationCounter);
 	BoneIndex GetBoneKeyframeContainer(PackageAnimation& pkgAnimation, const std::vector<PackageBone>& bones, const aiNodeAnim* nodeAnimation);
 	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const BoneNameSet& boneNames, const AssimpBoneSet& aiBones, const aiNode* node, const Mat4& parentTransform, const BoneIndex parentBone);
 
@@ -425,7 +425,7 @@ namespace JonsAssetImporter
             // what is this anyway... shouldn't be present
             assert(animation->mNumMeshChannels == 0);
 
-			PackageAnimation& pkgAnimation = AddPkgAnimation(model, scene, animation);
+			PackageAnimation& pkgAnimation = AddPkgAnimation(model, scene, animation, unnamedAnimationCounter);
 
             for (uint32_t nodeAnimIndex = 0; nodeAnimIndex < animation->mNumChannels; ++nodeAnimIndex)
             {
@@ -704,7 +704,7 @@ namespace JonsAssetImporter
         return ret;
     }
 
-	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiScene* scene, const aiAnimation* animation)
+	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiScene* scene, const aiAnimation* animation, uint32_t& unnamedAnimationCounter)
 	{
 		assert(animation);
 
@@ -719,15 +719,23 @@ namespace JonsAssetImporter
 		const Mat4& rootNodeTransform = aiMat4ToJonsMat4(rootMat);
 		const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);
 		//const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);*/
-		std::string assimpAnimName = animation->mName.C_Str();....
-		const bool animNameFound = DoesPkgNameExist<PackageAnimation>(model.mAnimations, assimpAnimName);
+		std::string animName = animation->mName.C_Str();
+	    bool animNameFound = DoesPkgNameExist<PackageAnimation>(model.mAnimations, animName);
+		if (animNameFound)
+			Log("WARNING: Name collision for animation " + animName);
 
+		// name collision - need to rename material
+		while (animName.empty() || animNameFound)
+		{
+			animName = "Material_" + std::to_string(unnamedAnimationCounter++);
+			animNameFound = DoesPkgNameExist<PackageAnimation>(model.mAnimations, animName);
+		}
 
 		const Mat4& rootNodeTransform = model.mNodes.front().mTransform;
 		const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);
 
 		const uint32_t durationMillisec = static_cast<uint32_t>((animation->mDuration / animation->mTicksPerSecond) * 1000);
-		model.mAnimations.emplace_back(animation->mName.C_Str(), durationMillisec, invRootNodeTransform);
+		model.mAnimations.emplace_back(animName, durationMillisec, invRootNodeTransform);
 		PackageAnimation& pkgAnimation = model.mAnimations.back();
 
 		// number of nodeanim channels should be same as num bones

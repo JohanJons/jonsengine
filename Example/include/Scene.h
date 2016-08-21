@@ -15,6 +15,7 @@ namespace JonsGame
         ~Scene();
 
         void ToggleAnimationWuson();
+		void ToggleAnimationBob();
 
         JonsEngine::Scene& GetJonsScene();
         JonsEngine::SceneNode& GetMovingLightNode();
@@ -71,6 +72,8 @@ namespace JonsGame
         JonsEngine::AnimationID mAnimWuson;
 		JonsEngine::AnimationID mAnimBob;
         JonsEngine::Milliseconds mAnimDurationWuson;
+		JonsEngine::Milliseconds mAnimDurationBob;
 		bool mIsAnimatingWuson;
+		bool mIsAnimatingBob;
     };
 }

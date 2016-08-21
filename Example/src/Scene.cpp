@@ -66,7 +66,9 @@ namespace JonsGame
 		mIsAnimatingWuson(false),
 
 		// misc animaition - bob
-		mAnimBob(INVALID_ANIMATION_ID)
+		mAnimBob(INVALID_ANIMATION_ID),
+		mAnimDurationBob(0),
+		mIsAnimatingBob(false)
     {
         // ambient light
         mScene.SetAmbientLight(Vec4(0.01f));
@@ -145,9 +147,9 @@ namespace JonsGame
 
 		// actor bob
 		const Model& modelBob = resManifest.GetModel(mModelBob);
-		//mAnimBob = modelBob.GetAnimationID("Wuson_Run");
-		//const Animation& animWuson = modelWuson.GetAnimation(mAnimWuson);
-		//mAnimDurationWuson = animWuson.GetAnimationDuration();
+		mAnimBob = modelBob.GetAnimationID("Material_0");
+		const Animation& animBob = modelBob.GetAnimation(mAnimBob);
+		mAnimDurationBob = animBob.GetAnimationDuration();
 
 		SceneNode& nodeBob = mScene.GetSceneNode(mNodeBob);
 		nodeBob.TranslateNode(Vec3(-2.0f, 0.5f, -6.0f));
@@ -176,6 +178,17 @@ namespace JonsGame
 
 		mIsAnimatingWuson = !mIsAnimatingWuson;
     }
+
+	void Scene::ToggleAnimationBob()
+	{
+		AnimatedActor& animBob = mScene.GetAnimatedActor(mActorAnimBob);
+		if (mIsAnimatingBob)
+			animBob.StopAnimation();
+		else
+			animBob.PlayAnimation(mAnimBob, mAnimDurationBob, true);
+
+		mIsAnimatingBob = !mIsAnimatingBob;
+	}
 
 
     JonsEngine::Scene& Scene::GetJonsScene()
