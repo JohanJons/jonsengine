@@ -286,7 +286,7 @@ namespace JonsEngine
 			const auto& animBoneRange = animationUpdater.GetBoneRange(animInstanceID);
 
 			// NOTE: might be a problem that all the node transforms up to the root bone is NOT added here!!
-			renderData.mAnimatedMeshes.emplace_back(worldTransform, animBoneRange, materialIndex, materialTilingFactor, mesh);
+			renderData.mAnimatedMeshes.emplace_back(worldTransform * localTransform, animBoneRange, materialIndex, materialTilingFactor, mesh);
 		}
 		else
 		{

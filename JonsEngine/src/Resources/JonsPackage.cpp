@@ -46,7 +46,11 @@ namespace JonsEngine
     {
     }
 
-    PackageMaterial::PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture) : mName(name), mHasDiffuseTexture(hasDiffTexture), mHasNormalTexture(hasNormalTexture),
+    PackageMaterial::PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture) :
+		mName(name),
+		mHasDiffuseTexture(hasDiffTexture),
+		mHasNormalTexture(hasNormalTexture),
+
         mDiffuseColor(1.0f),
         mAmbientColor(1.0f),
         mSpecularColor(1.0f),

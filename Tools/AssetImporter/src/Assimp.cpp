@@ -17,6 +17,7 @@ namespace JonsAssetImporter
 	typedef std::set<const aiBone*> AssimpBoneSet;
 
     void AddStaticAABB(PackageModel& model);
+	bool ImportTexture(PackageTexture& texture, const boost::filesystem::path& modelPath, const std::string& texturePathStr, FreeImage& freeimageImporter);
 
     bool OnlyOneNodePerMesh(const aiScene* scene);
     Mat4 GetMeshNodeTransform(const aiScene* scene, const aiNode* node, const uint32_t meshIndex, const Mat4& parentTransform);
@@ -24,8 +25,10 @@ namespace JonsAssetImporter
     BoneIndex GetBoneIndex(const std::vector<PackageMesh>& meshes, const std::vector<PackageBone>& bones, const std::string& boneName);
     uint32_t CountChildren(const aiNode* node);
     bool UsedLessThanMaxNumBones(const BoneWeight& pkgBoneWeight);
+	template <typename T>
+	bool DoesPkgNameExist(const std::vector<T>& pkgContainer, const std::string& name);
     const aiNode* FindMeshNode(const aiMesh* mesh, const aiScene* scene, const aiNode* node);
-	const aiMesh* FindMesh(const aiScene* scene, const std::string& name);
+	const aiMesh* FindMesh(const aiScene* scene, const MeshNameMap& meshNameMap, const std::string& pkgName);
 	const aiBone* FindAiBoneByName(const std::set<const aiBone*> aiBones, const std::string& string);
     Vec3 GetVertices(const bool isStatic, const Mat4& nodeTransform, const aiVector3D& assimpVertices);
 	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiScene* scene, const aiAnimation* animation);
@@ -60,7 +63,8 @@ namespace JonsAssetImporter
         // process materials
         // map scene material indexes to actual package material indexes
         MaterialMap materialMap;
-        ProcessMaterials(scene, modelPath, materialMap, freeimageImporter, pkg);
+		if (!ProcessMaterials(pkg->mMaterials, scene, modelPath, materialMap, freeimageImporter))
+			return false;
 
         // process model hierarchy
         if (!ParseModel(scene, modelName, materialMap, pkg))
@@ -75,73 +79,76 @@ namespace JonsAssetImporter
         return true;
     }
 
-    void Assimp::ProcessMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsPackagePtr pkg)
+    bool Assimp::ProcessMaterials(std::vector<PackageMaterial>& materials, const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter)
     {
         if (!scene->HasMaterials())
-            return;
+            return true;
 
+		uint32_t unnamedMaterialCounter = 0;
         for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
         {
             const aiMaterial* material = scene->mMaterials[i];
-            PackageMaterial pkgMaterial;
-            aiString assimpTexturePath;
 
-            if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0 && material->GetTexture(aiTextureType_DIFFUSE, 0, &assimpTexturePath) == aiReturn_SUCCESS)
-            {
-                const boost::filesystem::path texturePath = std::string(assimpTexturePath.C_Str());
+			aiString diffuseTexturePath("");
+			aiString normalTexturePath("");
+			const bool hasDiffuseTexture = material->GetTextureCount(aiTextureType_DIFFUSE) > 0 && material->GetTexture(aiTextureType_DIFFUSE, 0, &diffuseTexturePath) == aiReturn_SUCCESS;
+			const bool hasNormalTexture = (material->GetTextureCount(aiTextureType_NORMALS) > 0 && material->GetTexture(aiTextureType_NORMALS, 0, &normalTexturePath) == aiReturn_SUCCESS) ||
+										  (material->GetTextureCount(aiTextureType_HEIGHT) > 0 && material->GetTexture(aiTextureType_HEIGHT, 0, &normalTexturePath) == aiReturn_SUCCESS);
 
-                std::string fullTexturePath = "";
-                if (modelPath.has_parent_path())
-                {
-                    fullTexturePath.append(modelPath.parent_path().string());
-                    fullTexturePath.append("/");
-                }
-                fullTexturePath.append(texturePath.string());
+			aiString assimpMaterialName("");
+			material->Get(AI_MATKEY_NAME, assimpMaterialName);
 
-                freeimageImporter.ProcessTexture(pkgMaterial.mDiffuseTexture, fullTexturePath);
-                pkgMaterial.mHasDiffuseTexture = true;
-            }
+			std::string materialName(assimpMaterialName.C_Str());
+			bool materialAlreadyImported = DoesPkgNameExist<PackageMaterial>(materials, materialName);
+			if (materialAlreadyImported)
+				Log("WARNING: Name collision for material " + materialName);
 
-            if ((material->GetTextureCount(aiTextureType_NORMALS) > 0 && material->GetTexture(aiTextureType_NORMALS, 0, &assimpTexturePath) == aiReturn_SUCCESS) ||
-                (material->GetTextureCount(aiTextureType_HEIGHT) > 0 && material->GetTexture(aiTextureType_HEIGHT, 0, &assimpTexturePath) == aiReturn_SUCCESS))
-            {
-                const boost::filesystem::path texturePath = std::string(assimpTexturePath.C_Str());
+			// name collision - need to rename material
+			while (materialName.empty() || materialAlreadyImported)
+			{
+				materialName = "Material_" + std::to_string(unnamedMaterialCounter++);
+				materialAlreadyImported = DoesPkgNameExist<PackageMaterial>(materials, materialName);
+			}
 
-                std::string fullTexturePath = "";
-                if (modelPath.has_parent_path())
-                {
-                    fullTexturePath.append(modelPath.parent_path().string());
-                    fullTexturePath.append("/");
-                }
-                fullTexturePath.append(texturePath.string());
+			materials.emplace_back(materialName, hasDiffuseTexture, hasNormalTexture);
+			PackageMaterial& pkgMaterial = materials.back();
 
-                freeimageImporter.ProcessTexture(pkgMaterial.mNormalTexture, fullTexturePath);
-                pkgMaterial.mHasNormalTexture = true;
-            }
+			if (hasDiffuseTexture)
+			{
+				if (!ImportTexture(pkgMaterial.mDiffuseTexture, modelPath, diffuseTexturePath.C_Str(), freeimageImporter))
+				{
+					Log("ERROR: Unable to import diffuse texture " + pkgMaterial.mName);
+					return false;
+				}
+			}
+			if (hasNormalTexture)
+			{
+				if (!ImportTexture(pkgMaterial.mNormalTexture, modelPath, normalTexturePath.C_Str(), freeimageImporter))
+				{
+					Log("ERROR: Unable to import normal texture " + pkgMaterial.mName);
+					return false;
+				}
+			}
 
-            aiString materialName;
             aiColor3D diffuseColor;
             aiColor3D ambientColor(0.1f);
             aiColor3D specularColor;
             aiColor3D emissiveColor;
-
-            material->Get(AI_MATKEY_NAME, materialName);
             material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
             //if (material->Get(AI_MATKEY_COLOR_AMBIENT, ambientColor) == aiReturn_SUCCESS)     TODO
             //    ambientColor = aiColor3D(1.0f);
             material->Get(AI_MATKEY_COLOR_SPECULAR, specularColor);
             material->Get(AI_MATKEY_COLOR_EMISSIVE, emissiveColor);
-
-            pkgMaterial.mName = materialName.C_Str();
             pkgMaterial.mDiffuseColor = aiColor3DToJonsVec3(diffuseColor);
             pkgMaterial.mAmbientColor = aiColor3DToJonsVec3(ambientColor);
             pkgMaterial.mSpecularColor = aiColor3DToJonsVec3(specularColor);
             pkgMaterial.mEmissiveColor = aiColor3DToJonsVec3(emissiveColor);
 
-            std::vector<PackageMaterial>::iterator iter = pkg->mMaterials.insert(pkg->mMaterials.end(), pkgMaterial);
-
-            materialMap.insert(MaterialPair(i, std::distance(pkg->mMaterials.begin(), iter)));
+			const uint32_t pkgMaterialIndex = materials.size() - 1;
+            materialMap.insert(MaterialPair(i, pkgMaterialIndex));
         }
+
+		return true;
     }
 
     bool Assimp::ParseModel(const aiScene* scene, const std::string& modelName, const MaterialMap& materialMap, JonsPackagePtr pkg)
@@ -161,7 +168,9 @@ namespace JonsAssetImporter
             return false;
         }
 
-        if (!ProcessMeshes(model.mMeshes, scene, materialMap, model.mStaticAABB.mMinBounds, model.mStaticAABB.mMaxBounds))
+		// need to map assimp name to pkgName since we need to name them in case of name collisions
+		MeshNameMap meshNameMap;
+        if (!ProcessMeshes(model.mMeshes, scene, materialMap, meshNameMap, model.mStaticAABB.mMinBounds, model.mStaticAABB.mMaxBounds))
             return false;
 
         // recursively go through assimp node tree
@@ -169,7 +178,7 @@ namespace JonsAssetImporter
         if (!ParseNodeHeirarchy(model.mNodes, model.mMeshes, scene, scene->mRootNode, rootParentIndex, gIdentityMatrix))
             return false;
 
-        if (!ProcessBones(model.mBoneParentMap, model.mSkeleton, model.mMeshes, scene))
+        if (!ProcessBones(model.mBoneParentMap, model.mSkeleton, model.mMeshes, meshNameMap, scene))
             return false;
 
         return true;
@@ -197,12 +206,25 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessMeshes(std::vector<PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap, Vec3& modelMinBounds, Vec3& modelMaxBounds)
+    bool Assimp::ProcessMeshes(std::vector<PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap, MeshNameMap& meshNameMap, Vec3& modelMinBounds, Vec3& modelMaxBounds)
     {
+		uint32_t unnamedMeshCounter = 0;
         for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
         {
             aiMesh* assimpMesh = scene->mMeshes[meshIndex];
-            meshContainer.emplace_back(assimpMesh->mName.C_Str());
+			std::string assimpName = assimpMesh->mName.C_Str();
+			std::string meshName = assimpName;
+			bool meshAlreadyImported = DoesPkgNameExist<PackageMesh>(meshContainer, meshName);
+			
+			// name collision - need to rename mesh
+			while (meshName.empty() || meshAlreadyImported)
+			{
+				meshName = "Mesh_" + std::to_string(unnamedMeshCounter++);
+				meshAlreadyImported = DoesPkgNameExist<PackageMesh>(meshContainer, meshName);
+			}
+
+			meshNameMap.emplace(meshName, assimpName);
+            meshContainer.emplace_back(meshName);
             PackageMesh& jonsMesh = meshContainer.back();
             
             if (!AddMeshGeometricData(jonsMesh, assimpMesh, scene, meshIndex, jonsMesh.mAABB.mMinBounds, jonsMesh.mAABB.mMaxBounds))
@@ -306,7 +328,7 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessBones(JonsEngine::BoneParentMap& parentMap, std::vector<PackageBone>& bones, std::vector<PackageMesh>& meshes, const aiScene* scene)
+    bool Assimp::ProcessBones(JonsEngine::BoneParentMap& parentMap, std::vector<PackageBone>& bones, std::vector<PackageMesh>& meshes, const MeshNameMap& meshNameMap, const aiScene* scene)
     {
         std::set<std::string> boneNames;
         std::set<const aiBone*> aiBones;
@@ -340,16 +362,17 @@ namespace JonsAssetImporter
         BuildSkeleton(parentMap, bones, boneNames, aiBones, scene->mRootNode, gIdentityMatrix, INVALID_BONE_INDEX);
         assert(bones.size() == boneNames.size());
 
-		const bool processedOK = ProcessVertexBoneWeights(bones, meshes, scene);
+		const bool processedOK = ProcessVertexBoneWeights(bones, meshes, meshNameMap, scene);
 
         return processedOK;
     }
 
-    bool Assimp::ProcessVertexBoneWeights(std::vector<PackageBone>& bones, std::vector<PackageMesh>& meshes, const aiScene* scene)
+    bool Assimp::ProcessVertexBoneWeights(std::vector<PackageBone>& bones, std::vector<PackageMesh>& meshes, const MeshNameMap& meshNameMap, const aiScene* scene)
     {
 		for (PackageMesh& pkgMesh : meshes)
 		{
-			const aiMesh* assimpMesh = FindMesh(scene, pkgMesh.mName);
+			const std::string pkgMeshName = pkgMesh.mName;
+			const aiMesh* assimpMesh = FindMesh(scene, meshNameMap, pkgMeshName);
 			assert(assimpMesh);
 
 			const uint32_t numVertices = assimpMesh->mNumVertices;
@@ -393,6 +416,7 @@ namespace JonsAssetImporter
         if (!scene->HasAnimations())
             return true;
 
+		uint32_t unnamedAnimationCounter = 0;
         for (uint32_t animationIndex = 0; animationIndex < scene->mNumAnimations; ++animationIndex)
         {
             aiAnimation* animation = *(scene->mAnimations + animationIndex);
@@ -489,6 +513,21 @@ namespace JonsAssetImporter
         model.mStaticAABB.mMinBounds = minExtent;
         model.mStaticAABB.mMaxBounds = maxExtent;*/
     }
+
+	bool ImportTexture(PackageTexture& texture, const boost::filesystem::path& modelPath, const std::string& texturePathStr, FreeImage& freeimageImporter)
+	{
+		const boost::filesystem::path texturePath = texturePathStr;
+
+		std::string fullTexturePath = "";
+		if (modelPath.has_parent_path())
+		{
+			fullTexturePath.append(modelPath.parent_path().string());
+			fullTexturePath.append("/");
+		}
+		fullTexturePath.append(texturePath.string());
+
+		return freeimageImporter.ProcessTexture(texture, fullTexturePath);
+	}
 
 
     bool OnlyOneNodePerMesh(const aiScene* scene)
@@ -594,6 +633,14 @@ namespace JonsAssetImporter
         return false;
     }
 
+	template <typename T>
+	bool DoesPkgNameExist(const std::vector<T>& pkgContainer, const std::string& name)
+	{
+		auto iter = std::find_if(pkgContainer.begin(), pkgContainer.end(), [&name](const T& item) { return item.mName == name; });
+
+		return iter != pkgContainer.end();
+	}
+
     const aiNode* FindMeshNode(const aiMesh* mesh, const aiScene* scene, const aiNode* node)
     {
         assert(mesh);
@@ -619,14 +666,18 @@ namespace JonsAssetImporter
         return nullptr;
     }
 
-	const aiMesh* FindMesh(const aiScene* scene, const std::string& name)
+	const aiMesh* FindMesh(const aiScene* scene, const MeshNameMap& meshNameMap, const std::string& pkgName)
 	{
 		assert(scene);
+
+		auto iter = meshNameMap.find(pkgName);
+		assert(iter != meshNameMap.end());
+		const std::string& assimpName = iter->second;
 
 		for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
 		{
 			const aiMesh* nodeMesh = scene->mMeshes[meshIndex];
-			if (nodeMesh->mName.C_Str() == name)
+			if (nodeMesh->mName.C_Str() == assimpName)
 				return nodeMesh;
 		}
 
@@ -668,6 +719,10 @@ namespace JonsAssetImporter
 		const Mat4& rootNodeTransform = aiMat4ToJonsMat4(rootMat);
 		const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);
 		//const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);*/
+		std::string assimpAnimName = animation->mName.C_Str();....
+		const bool animNameFound = DoesPkgNameExist<PackageAnimation>(model.mAnimations, assimpAnimName);
+
+
 		const Mat4& rootNodeTransform = model.mNodes.front().mTransform;
 		const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);
 

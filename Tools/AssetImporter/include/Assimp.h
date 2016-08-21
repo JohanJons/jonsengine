@@ -14,6 +14,9 @@ namespace JonsAssetImporter
 {
     class FreeImage;
 
+	// <pkgName, assimpName>
+	typedef std::map<std::string, std::string> MeshNameMap;
+
     class Assimp
     {
     public:
@@ -24,14 +27,14 @@ namespace JonsAssetImporter
 
 
     private:
-        void ProcessMaterials(const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsEngine::JonsPackagePtr pkg);
+        bool ProcessMaterials(std::vector<JonsEngine::PackageMaterial>& materials, const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter);
         bool ParseModel(const aiScene* scene, const std::string& modelName, const MaterialMap& materialMap, JonsEngine::JonsPackagePtr pkg);
         bool ParseNodeHeirarchy(std::vector<JonsEngine::PackageNode>& nodeContainer, const std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode,
             const JonsEngine::PackageNode::NodeIndex parentNodeIndex, const JonsEngine::Mat4& parentTransform);
-        bool ProcessMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap, JonsEngine::Vec3& modelMinBounds, JonsEngine::Vec3& modelMaxBounds);
+        bool ProcessMeshes(std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const MaterialMap& materialMap, MeshNameMap& meshNameMap, JonsEngine::Vec3& modelMinBounds, JonsEngine::Vec3& modelMaxBounds);
         bool AddMeshGeometricData(JonsEngine::PackageMesh& jonsMesh, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex, JonsEngine::Vec3& modelMinBounds, JonsEngine::Vec3& modelMaxBounds);
-		bool ProcessBones(JonsEngine::BoneParentMap& parentMap, std::vector<JonsEngine::PackageBone>& bones, std::vector<JonsEngine::PackageMesh>& meshes, const aiScene* scene);
-        bool ProcessVertexBoneWeights(std::vector<JonsEngine::PackageBone>& bones, std::vector<JonsEngine::PackageMesh>& meshes, const aiScene* scene);
+		bool ProcessBones(JonsEngine::BoneParentMap& parentMap, std::vector<JonsEngine::PackageBone>& bones, std::vector<JonsEngine::PackageMesh>& meshes, const MeshNameMap& meshNameMap, const aiScene* scene);
+        bool ProcessVertexBoneWeights(std::vector<JonsEngine::PackageBone>& bones, std::vector<JonsEngine::PackageMesh>& meshes, const MeshNameMap& meshNameMap, const aiScene* scene);
         bool ProcessAnimations(JonsEngine::PackageModel& model, const aiScene* scene);
 
 
