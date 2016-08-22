@@ -7,9 +7,12 @@
 
 namespace JonsEngine
 {
+	struct PackageAABB;
+
     class AABB
     {
     public:
+		AABB(const PackageAABB& pkgAABB);
         AABB(const Vec3& minBounds, const Vec3& maxBounds);
 
         Vec3 Min() const;

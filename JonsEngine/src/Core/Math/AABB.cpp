@@ -1,11 +1,19 @@
 #include "include/Core/Math/AABB.h"
 #include "include/Core/Math/Math.h"
+#include "include/Resources/JonsPackage.h"
 
 #include <cmath>
 
 namespace JonsEngine
 {
-    AABB::AABB(const Vec3& minBounds, const Vec3& maxBounds) : mAABBCenter(0.5f * (minBounds + maxBounds)), mAABBExtent(0.5f * (maxBounds - minBounds))
+	AABB::AABB(const PackageAABB& pkgAABB) :
+		AABB(pkgAABB.mMinBounds, pkgAABB.mMaxBounds)
+	{
+	}
+
+    AABB::AABB(const Vec3& minBounds, const Vec3& maxBounds) :
+		mAABBCenter(0.5f * (minBounds + maxBounds)),
+		mAABBExtent(0.5f * (maxBounds - minBounds))
     {
     }
 

@@ -20,6 +20,7 @@
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/Platform/Directx11.h"
+#include "include/RenderQueue/RenderableMesh.h"
 
 namespace JonsEngine
 {
@@ -41,6 +42,9 @@ namespace JonsEngine
 
 
     private:
+		void RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end);
+
+
         Logger& mLogger;
         const Vec2 mWindowSize;
         IDMap<DX11Mesh>& mMeshMap;

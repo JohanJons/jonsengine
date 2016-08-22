@@ -134,6 +134,8 @@ namespace JonsEngine
     }
 
 
+	// NOTE: this adds some wasted transforms - nodes that are animated, but not actually bones, are still present here
+	// but it should be very few, if problematic for performance it should be fixed
 	const BoneTransforms& AnimationUpdater::GetBonedata() const
 	{
 		return mBoneTransforms;

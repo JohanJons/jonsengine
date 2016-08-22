@@ -16,7 +16,6 @@ namespace JonsAssetImporter
 	typedef std::set<std::string> BoneNameSet;
 	typedef std::set<const aiBone*> AssimpBoneSet;
 
-    void AddStaticAABB(PackageModel& model);
 	bool ImportTexture(PackageTexture& texture, const boost::filesystem::path& modelPath, const std::string& texturePathStr, FreeImage& freeimageImporter);
 
     bool OnlyOneNodePerMesh(const aiScene* scene);
@@ -31,9 +30,11 @@ namespace JonsAssetImporter
 	const aiMesh* FindMesh(const aiScene* scene, const MeshNameMap& meshNameMap, const std::string& pkgName);
 	const aiBone* FindAiBoneByName(const std::set<const aiBone*> aiBones, const std::string& string);
     Vec3 GetVertices(const bool isStatic, const Mat4& nodeTransform, const aiVector3D& assimpVertices);
+    
 	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiScene* scene, const aiAnimation* animation, uint32_t& unnamedAnimationCounter);
 	BoneIndex GetBoneKeyframeContainer(PackageAnimation& pkgAnimation, const std::vector<PackageBone>& bones, const aiNodeAnim* nodeAnimation);
 	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const BoneNameSet& boneNames, const AssimpBoneSet& aiBones, const aiNode* node, const Mat4& parentTransform, const BoneIndex parentBone);
+    void ParseStaticAABBForAnimatedModel(PackageModel& model);
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
     Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
@@ -74,7 +75,7 @@ namespace JonsAssetImporter
         if (!ProcessAnimations(model, scene))
             return false;
 
-        //AddStaticAABB(model);
+        ParseStaticAABBForAnimatedModel(model);
 
         return true;
     }
@@ -227,7 +228,7 @@ namespace JonsAssetImporter
             meshContainer.emplace_back(meshName);
             PackageMesh& jonsMesh = meshContainer.back();
             
-            if (!AddMeshGeometricData(jonsMesh, assimpMesh, scene, meshIndex, jonsMesh.mAABB.mMinBounds, jonsMesh.mAABB.mMaxBounds))
+            if (!AddMeshGeometricData(jonsMesh, assimpMesh, scene, meshIndex))
                 return false;
 
 			// update overall model AABB
@@ -247,7 +248,7 @@ namespace JonsAssetImporter
     }
 
     // the bones of jonsMesh must've been parsed already
-    bool Assimp::AddMeshGeometricData(PackageMesh& jonsMesh, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex, Vec3& modelMinBounds, Vec3& modelMaxBounds)
+    bool Assimp::AddMeshGeometricData(PackageMesh& jonsMesh, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex)
     {
         const uint32_t numFloatsPerTriangle = 3;
         const uint32_t numFloatsPerTexcoord = 2;
@@ -309,8 +310,8 @@ namespace JonsAssetImporter
             // mesh AABB
 			// pre-multiply transforms for static aabb
 			const Vec3 transformedVertices = Vec3(nodeTransform * Vec4(vertices, 1.0f));
-			modelMinBounds = MinVal(modelMinBounds, transformedVertices);
-			modelMaxBounds = MaxVal(modelMaxBounds, transformedVertices);
+			jonsMesh.mAABB.mMinBounds = MinVal(jonsMesh.mAABB.mMinBounds, transformedVertices);
+			jonsMesh.mAABB.mMaxBounds = MaxVal(jonsMesh.mAABB.mMaxBounds, transformedVertices);
         }
 
         // index data
@@ -443,7 +444,7 @@ namespace JonsAssetImporter
 
                 const uint32_t numPosKeys = nodeAnimation->mNumPositionKeys;
                 const uint32_t numRotkeys = nodeAnimation->mNumRotationKeys;
-                const uint32_t maxNumKeys = glm::max(nodeAnimation->mNumPositionKeys, nodeAnimation->mNumRotationKeys);
+                const uint32_t maxNumKeys = glm::max(numPosKeys, numRotkeys);
                 for (uint32_t key = 0; key < maxNumKeys; ++key)
                 {
                     // same pos/rot might be used for several pos/rot transforms
@@ -472,47 +473,6 @@ namespace JonsAssetImporter
         return true;
     }
 
-    void AddStaticAABB(PackageModel& model)
-    {
-        // two cases: animated vs static model
-        //const PackageAABB& rootNodeAABB = model.mNodes.front().mAABB;
-        //model.mStaticAABB = rootNodeAABB;
-
-        // TODO
-        // static model: use root node AABB as its overall AABB
-       /* if (model.mAnimations.empty())
-        {
-            model.mStaticAABB = rootNodeAABB;
-            return;
-        }
-
-        // animated model: needs to transform all nodes using all the animations to find the maximum extents
-        // results in a loose, static aabb
-        Vec3 minExtent(rootNodeAABB.mMinBounds), maxExtent(rootNodeAABB.mMaxBounds);
-        for (const PackageAnimation& animation : model.mAnimations)
-        {
-            for (const PackageBoneAnimation& animNode : animation.mBoneAnimations)
-            {
-                for (const PackageBoneKeyframe& keyframe : animNode.mKeyframes)
-                {
-                    AABB aabb(node.mAABB.mMinBounds, node.mAABB.mMaxBounds);
-                    aabb = aabb * keyframe.mTransform;
-
-                    const Vec3 tempMin = aabb.Min(), tempMax = aabb.Max();
-                    if (tempMin.x < minExtent.x) minExtent.x = tempMin.x;
-                    if (tempMin.y < minExtent.y) minExtent.y = tempMin.y;
-                    if (tempMin.z < minExtent.z) minExtent.z = tempMin.z;
-
-                    if (tempMax.x > maxExtent.x) maxExtent.x = tempMax.x;
-                    if (tempMax.y > maxExtent.y) maxExtent.y = tempMax.y;
-                    if (tempMax.z > maxExtent.z) maxExtent.z = tempMax.z;
-                }
-            }
-        }
-
-        model.mStaticAABB.mMinBounds = minExtent;
-        model.mStaticAABB.mMaxBounds = maxExtent;*/
-    }
 
 	bool ImportTexture(PackageTexture& texture, const boost::filesystem::path& modelPath, const std::string& texturePathStr, FreeImage& freeimageImporter)
 	{
@@ -703,22 +663,12 @@ namespace JonsAssetImporter
 
         return ret;
     }
+    
 
 	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiScene* scene, const aiAnimation* animation, uint32_t& unnamedAnimationCounter)
 	{
 		assert(animation);
 
-		/*auto nod = scene->mRootNode->FindNode(model.mSkeleton.front().mName.c_str());
-		auto rootMat = aiMatrix4x4();
-		while (nod != nullptr)
-		{
-			rootMat = nod->mTransformation * rootMat;
-			nod = nod->mParent;
-		}
-
-		const Mat4& rootNodeTransform = aiMat4ToJonsMat4(rootMat);
-		const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);
-		//const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);*/
 		std::string animName = animation->mName.C_Str();
 	    bool animNameFound = DoesPkgNameExist<PackageAnimation>(model.mAnimations, animName);
 		if (animNameFound)
@@ -731,6 +681,7 @@ namespace JonsAssetImporter
 			animNameFound = DoesPkgNameExist<PackageAnimation>(model.mAnimations, animName);
 		}
 
+        // scene root node is always first
 		const Mat4& rootNodeTransform = model.mNodes.front().mTransform;
 		const Mat4 invRootNodeTransform = glm::inverse(rootNodeTransform);
 
@@ -772,9 +723,6 @@ namespace JonsAssetImporter
 			const std::string& boneName = *boneNameIter;
 			const aiBone* bone = FindAiBoneByName(aiBones, boneName);
 
-			// makes no sense if not a bone
-			//assert(bone);
-
 			if (bone)
                 skeleton.emplace_back(boneName, aiMat4ToJonsMat4(bone->mOffsetMatrix));
             else
@@ -794,6 +742,41 @@ namespace JonsAssetImporter
 			BuildSkeleton(parentMap, skeleton, boneNames, aiBones, childNode, nodeTransform, thisBone);
 		}
 	}
+    
+    void ParseStaticAABBForAnimatedModel(PackageModel& model)
+    {
+        if (model.mAnimations.empty())
+            return;
+    
+        const AABB& rootNodeAABB = AABB(model.mStaticAABB);
+    
+        // animated model: needs to transform all nodes using all the animations to find the maximum extents
+        // results in a looser, static aabb atleast the size of the aabb in bind pose
+        Vec3 minExtent(rootNodeAABB.Min()), maxExtent(rootNodeAABB.Max());
+        /*for (const PackageAnimation& animation : model.mAnimations)
+        {
+            for (const PackageBoneAnimation& animNode : animation.mBoneAnimations)
+            {
+                for (const PackageBoneKeyframe& keyframe : animNode.mKeyframes)
+                {
+                    //AABB aabb(node.mAABB.mMinBounds, node.mAABB.mMaxBounds);
+                    //aabb = aabb * keyframe.mTransform;
+
+                    const Vec3 tempMin = aabb.Min(), tempMax = aabb.Max();
+                    if (tempMin.x < minExtent.x) minExtent.x = tempMin.x;
+                    if (tempMin.y < minExtent.y) minExtent.y = tempMin.y;
+                    if (tempMin.z < minExtent.z) minExtent.z = tempMin.z;
+
+                    if (tempMax.x > maxExtent.x) maxExtent.x = tempMax.x;
+                    if (tempMax.y > maxExtent.y) maxExtent.y = tempMax.y;
+                    if (tempMax.z > maxExtent.z) maxExtent.z = tempMax.z;
+                }
+            }
+        }*/
+
+        model.mStaticAABB.mMinBounds = minExtent;
+        model.mStaticAABB.mMaxBounds = maxExtent;
+    }
 
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat)

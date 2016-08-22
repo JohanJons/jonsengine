@@ -119,9 +119,14 @@ namespace JonsEngine
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
+		const auto staticBeginIndex = renderQueue.mCamera.mStaticMeshesBegin;
+		const auto staticEndIndex = renderQueue.mCamera.mStaticMeshesEnd;
+		const auto& staticMeshesContainer = renderQueue.mRenderData.mStaticMeshes;
+		RenderMeshes(renderQueue, staticMeshesContainer, staticBeginIndex, staticEndIndex);
+
 		// TEMP SOLUTION !!!
 		// STATICS
-		const auto staticBeginIndex = renderQueue.mCamera.mStaticMeshesBegin;
+		/*const auto staticBeginIndex = renderQueue.mCamera.mStaticMeshesBegin;
 		const auto staticEndIndex = renderQueue.mCamera.mStaticMeshesEnd;
 		for (auto meshIndex = staticBeginIndex; meshIndex < staticEndIndex; ++meshIndex)
 		{
@@ -181,7 +186,7 @@ namespace JonsEngine
 
 			mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, mesh.mMaterialTilingFactor, hasDiffuseTexture, hasNormalTexture, isAnimating);
 			mMeshMap.GetItem(mesh.mMeshID).Draw();
-		}
+		}*/
     }
 
     void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugExtra, const EngineSettings::ShadowFiltering shadowFiltering, const bool SSAOEnabled)
@@ -242,4 +247,10 @@ namespace JonsEngine
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
             mAABBPass.Render(renderQueue.mRenderData, renderQueue.mCamera);
     }
+
+
+	void DX11Pipeline::RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end)
+	{
+
+	}
 }
