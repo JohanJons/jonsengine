@@ -33,7 +33,8 @@ namespace JonsAssetImporter
     
 	PackageAnimation& AddPkgAnimation(PackageModel& model, const aiScene* scene, const aiAnimation* animation, uint32_t& unnamedAnimationCounter);
 	BoneIndex GetBoneKeyframeContainer(PackageAnimation& pkgAnimation, const std::vector<PackageBone>& bones, const aiNodeAnim* nodeAnimation);
-	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const BoneNameSet& boneNames, const AssimpBoneSet& aiBones, const aiNode* node, const Mat4& parentTransform, const BoneIndex parentBone);
+	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const BoneNameSet& boneNames, const AssimpBoneSet& aiBones, const aiNode* node, const BoneIndex parentBone);
+	std::set<std::string> GetListOfAnimatedNodes(const aiScene* scene);
     void ParseStaticAABBForAnimatedModel(PackageModel& model);
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
@@ -334,6 +335,10 @@ namespace JonsAssetImporter
         std::set<std::string> boneNames;
         std::set<const aiBone*> aiBones;
 
+		auto animatedNodesSet = GetListOfAnimatedNodes(scene);
+		if (animatedNodesSet.empty())
+			return true;
+
         for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
         {
             const aiMesh* mesh = scene->mMeshes[meshIndex];
@@ -353,14 +358,21 @@ namespace JonsAssetImporter
                 aiBones.insert(bone);
                 do
                 {
-                    boneNames.insert(node->mName.C_Str());
+					const std::string nodeName = node->mName.C_Str();
+					const bool isAnimatedNode = animatedNodesSet.find(nodeName) != animatedNodesSet.end();
+					if (isAnimatedNode)
+						boneNames.insert(nodeName);
+
                     node = node->mParent;
                 }
                 while (node && node != meshNode && node != parentMeshNode);
             }
         }
 
-        BuildSkeleton(parentMap, bones, boneNames, aiBones, scene->mRootNode, gIdentityMatrix, INVALID_BONE_INDEX);
+		if (bones.empty())
+			return true;
+
+        BuildSkeleton(parentMap, bones, boneNames, aiBones, scene->mRootNode, INVALID_BONE_INDEX);
         assert(bones.size() == boneNames.size());
 
 		const bool processedOK = ProcessVertexBoneWeights(bones, meshes, meshNameMap, scene);
@@ -709,14 +721,13 @@ namespace JonsAssetImporter
 		return boneIter - boneBeginIter;
 	}
 
-	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const BoneNameSet& boneNames, const AssimpBoneSet& aiBones, const aiNode* node, const Mat4& parentTransform, const BoneIndex parentBone)
+	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const BoneNameSet& boneNames, const AssimpBoneSet& aiBones, const aiNode* node, const BoneIndex parentBone)
 	{
 		const std::size_t numBones = boneNames.size();
 		parentMap.resize(numBones, INVALID_BONE_INDEX);
 		skeleton.reserve(numBones);
 
 		BoneIndex thisBone = INVALID_BONE_INDEX;
-		const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(node->mTransformation);
 		const auto boneNameIter = boneNames.find(node->mName.C_Str());
 		if (boneNameIter != boneNames.end())
 		{
@@ -739,8 +750,28 @@ namespace JonsAssetImporter
 		for (uint32_t childIndex = 0; childIndex < node->mNumChildren; childIndex++)
 		{
 			const aiNode* childNode = node->mChildren[childIndex];
-			BuildSkeleton(parentMap, skeleton, boneNames, aiBones, childNode, nodeTransform, thisBone);
+			BuildSkeleton(parentMap, skeleton, boneNames, aiBones, childNode, thisBone);
 		}
+	}
+
+	std::set<std::string> GetListOfAnimatedNodes(const aiScene* scene)
+	{
+		std::set<std::string> ret;
+
+		for (uint32_t animationIndex = 0; animationIndex < scene->mNumAnimations; ++animationIndex)
+		{
+			const aiAnimation* animation = scene->mAnimations[animationIndex];
+			assert(animation);
+			for (uint32_t nodeAnimIndex = 0; nodeAnimIndex < animation->mNumChannels; ++nodeAnimIndex)
+			{
+				const aiNodeAnim* nodeAnim = animation->mChannels[nodeAnimIndex];
+				assert(nodeAnim);
+
+				ret.insert(nodeAnim->mNodeName.C_Str());
+			}
+		}
+
+		return ret;
 	}
     
     void ParseStaticAABBForAnimatedModel(PackageModel& model)

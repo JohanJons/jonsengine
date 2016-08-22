@@ -56,7 +56,6 @@ namespace JonsEngine
 
 			// add misc transforms to get into bone space etc
 			// must be done after prior step because of transform multiplication order
-			const Mat4& rootInverseTransform = animation.GetInverseRootMatrix();
 			for (BoneIndex boneOffset = 1; boneOffset < numBones; ++boneOffset)
 			{
 				const BoneIndex bone = boneOffset;
@@ -64,7 +63,7 @@ namespace JonsEngine
 
 				const BoneIndex boneInstance = bonesBegin + boneOffset;
 				Mat4& transform = mBoneTransforms.at(boneInstance);
-				transform = rootInverseTransform * transform * boneOffsetTransform;
+				transform = transform * boneOffsetTransform;
 			}
         }
     }
