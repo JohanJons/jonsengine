@@ -42,7 +42,7 @@ namespace JonsEngine
 
 
     private:
-		void RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end);
+		void RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end, const bool isAnimated);
 
 
         Logger& mLogger;

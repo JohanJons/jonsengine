@@ -40,18 +40,7 @@ namespace JonsEngine
         mesh.DrawPositions();
     }
 
-    template <typename T>
-    void DX11VertexTransformPass::RenderMeshesAux(const T& meshContainer, const Mat4& viewProjectionMatrix)
-    {
-        for (const RenderableMesh& mesh : meshContainer)
-        {
-            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mWorldTransform));
-            mMeshMap.GetItem(mesh.mMeshID).DrawPositions();
-        }
-    }
-
-
-	void DX11VertexTransformPass::RenderMeshes(const  RenderQueue::RenderData& renderData, const RenderableMesh::Index beginIndex, const RenderableMesh::Index endIndex, const Mat4& viewProjectionMatrix)
+	void DX11VertexTransformPass::RenderMeshes(const RenderQueue::RenderData& renderData, const RenderableMesh::Index beginIndex, const RenderableMesh::Index endIndex, const Mat4& viewProjectionMatrix)
 	{
 		for (uint32_t meshIndex = beginIndex; meshIndex < endIndex; ++meshIndex)
 		{
@@ -61,7 +50,7 @@ namespace JonsEngine
 		}
 	}
 
-	void DX11VertexTransformPass::RenderAABBs(const  RenderQueue::RenderData& renderData, const RenderableMesh::Index beginIndex, const RenderableMesh::Index endIndex, const Mat4& viewProjectionMatrix)
+	void DX11VertexTransformPass::RenderAABBs(const RenderQueue::RenderData& renderData, const RenderableMesh::Index beginIndex, const RenderableMesh::Index endIndex, const Mat4& viewProjectionMatrix)
 	{
 		for (uint32_t meshIndex = beginIndex; meshIndex < endIndex; ++meshIndex)
 		{
@@ -70,23 +59,15 @@ namespace JonsEngine
 			mMeshMap.GetItem(mesh.mMeshID).DrawAABB();
 		}
 	}
-	/*
-    void DX11VertexTransformPass::RenderMeshes(const RenderableMeshes& meshes, const Mat4& viewProjectionMatrix)
-    {
-        RenderMeshesAux(meshes, viewProjectionMatrix);
-    }
 
-    void DX11VertexTransformPass::RenderMeshes(ConstRangedIterator<RenderableMeshes>& meshIterator, const Mat4& viewProjectionMatrix)
-    {
-        RenderMeshesAux(meshIterator, viewProjectionMatrix);
-    }
 
-    void DX11VertexTransformPass::RenderAABBs(const RenderableModels& models, const Mat4& viewProjectionMatrix)
-    {
-        for (const RenderableModel& model : models)
-        {
-            mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * model.mMesh.mWorldTransform));
-            mMeshMap.GetItem(model.mMesh.mMeshID).DrawAABB();
-        }
-    }*/
+	void DX11VertexTransformPass::RenderMeshesAux(const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index beginIndex, const RenderableMesh::Index endIndex, const Mat4& viewProjectionMatrix)
+	{
+
+	}
+
+	void DX11VertexTransformPass::RenderAABBsAux(const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index beginIndex, const RenderableMesh::Index endIndex, const Mat4& viewProjectionMatrix)
+	{
+
+	}
 }

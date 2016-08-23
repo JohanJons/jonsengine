@@ -336,9 +336,6 @@ namespace JonsAssetImporter
         std::set<const aiBone*> aiBones;
 
 		auto animatedNodesSet = GetListOfAnimatedNodes(scene);
-		if (animatedNodesSet.empty())
-			return true;
-
         for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
         {
             const aiMesh* mesh = scene->mMeshes[meshIndex];
@@ -358,6 +355,7 @@ namespace JonsAssetImporter
                 aiBones.insert(bone);
                 do
                 {
+					// only nodes that are animated can be considered bones
 					const std::string nodeName = node->mName.C_Str();
 					const bool isAnimatedNode = animatedNodesSet.find(nodeName) != animatedNodesSet.end();
 					if (isAnimatedNode)
@@ -368,9 +366,6 @@ namespace JonsAssetImporter
                 while (node && node != meshNode && node != parentMeshNode);
             }
         }
-
-		if (bones.empty())
-			return true;
 
         BuildSkeleton(parentMap, bones, boneNames, aiBones, scene->mRootNode, INVALID_BONE_INDEX);
         assert(bones.size() == boneNames.size());
@@ -398,7 +393,12 @@ namespace JonsAssetImporter
 			{
 				const aiBone* assimpBone = assimpMesh->mBones[boneIndex];
 				const BoneIndex bone = GetBoneIndex(meshes, bones, assimpBone->mName.C_Str());
-				assert(bone != INVALID_BONE_INDEX);
+				if (bone == INVALID_BONE_INDEX)
+				{
+					// to make sure our bone parsing is sane - "false" bones should also not have any weights
+					assert(assimpBone->mNumWeights == 0);
+					continue;
+				}
 
 				const uint32_t numWeights = assimpBone->mNumWeights;
 				for (uint32_t weightIndex = 0; weightIndex < numWeights; ++weightIndex)
@@ -747,7 +747,7 @@ namespace JonsAssetImporter
 			assert(parentBone == INVALID_BONE_INDEX || parentBone < thisBone);
 		}
 
-		for (uint32_t childIndex = 0; childIndex < node->mNumChildren; childIndex++)
+		for (uint32_t childIndex = 0; childIndex < node->mNumChildren; ++childIndex)
 		{
 			const aiNode* childNode = node->mChildren[childIndex];
 			BuildSkeleton(parentMap, skeleton, boneNames, aiBones, childNode, thisBone);

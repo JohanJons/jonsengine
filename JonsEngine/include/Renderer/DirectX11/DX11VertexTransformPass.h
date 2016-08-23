@@ -37,8 +37,8 @@ namespace JonsEngine
             }
         };
 
-        template <typename T>
-        void RenderMeshesAux(const T& meshes, const Mat4& viewProjectionMatrix);
+        void RenderMeshesAux(const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index beginIndex, const RenderableMesh::Index endIndex, const Mat4& viewProjectionMatrix);
+		void RenderAABBsAux(const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index beginIndex, const RenderableMesh::Index endIndex, const Mat4& viewProjectionMatrix);
 
 
         ID3D11DeviceContextPtr mContext;

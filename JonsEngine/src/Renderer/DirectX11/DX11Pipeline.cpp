@@ -119,74 +119,19 @@ namespace JonsEngine
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-		/*const auto staticBeginIndex = renderQueue.mCamera.mStaticMeshesBegin;
-		const auto staticEndIndex = renderQueue.mCamera.mStaticMeshesEnd;
-		const auto& staticMeshesContainer = renderQueue.mRenderData.mStaticMeshes;
-		RenderMeshes(renderQueue, staticMeshesContainer, staticBeginIndex, staticEndIndex);*/
-
-		// TEMP SOLUTION !!!
-		// STATICS
+        // static meshes
 		const auto staticBeginIndex = renderQueue.mCamera.mStaticMeshesBegin;
 		const auto staticEndIndex = renderQueue.mCamera.mStaticMeshesEnd;
-		for (auto meshIndex = staticBeginIndex; meshIndex < staticEndIndex; ++meshIndex)
-		{
-			const RenderableMesh& mesh = renderQueue.mRenderData.mStaticMeshes.at(meshIndex);
-			assert(mesh.mMeshID != INVALID_DX11_MESH_ID);
-
-			bool hasDiffuseTexture = false, hasNormalTexture = false;
-			if (mesh.mMaterial != RenderableMaterial::INVALID_INDEX)
-			{
-				const RenderableMaterial& material = renderQueue.mRenderData.mMaterials.at(mesh.mMaterial);
-				hasDiffuseTexture = material.mDiffuseTextureID != INVALID_DX11_MATERIAL_ID;
-				hasNormalTexture = material.mNormalTextureID != INVALID_DX11_MATERIAL_ID;
-
-				if (hasDiffuseTexture)
-					mMaterialMap.GetItem(material.mDiffuseTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_DIFFUSE);
-
-				if (hasNormalTexture)
-					mMaterialMap.GetItem(material.mNormalTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_NORMAL);
-			}
-
-			const bool isAnimating = false;
-
-			const Mat4 wvpMatrix = renderQueue.mCamera.mCameraViewProjectionMatrix * mesh.mWorldTransform;
-			const Mat4 worldViewMatrix = renderQueue.mCamera.mCameraViewMatrix * mesh.mWorldTransform;
-
-			mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, mesh.mMaterialTilingFactor, hasDiffuseTexture, hasNormalTexture, isAnimating);
-			mMeshMap.GetItem(mesh.mMeshID).Draw();
-		}
-
-
-		// ANIMATED
-		const auto animatedBeginIndex = renderQueue.mCamera.mAnimatedMeshesBegin;
+		const auto& staticMeshesContainer = renderQueue.mRenderData.mStaticMeshes;
+        bool isAnimated = false;
+		RenderMeshes(renderQueue, staticMeshesContainer, staticBeginIndex, staticEndIndex, isAnimated);
+        
+        // animated meshes
+        const auto animatedBeginIndex = renderQueue.mCamera.mAnimatedMeshesBegin;
 		const auto animatedEndIndex = renderQueue.mCamera.mAnimatedMeshesEnd;
-		for (auto meshIndex = animatedBeginIndex; meshIndex < animatedEndIndex; ++meshIndex)
-		{
-			const RenderableMesh& mesh = renderQueue.mRenderData.mAnimatedMeshes.at(meshIndex);
-			assert(mesh.mMeshID != INVALID_DX11_MESH_ID);
-
-			bool hasDiffuseTexture = false, hasNormalTexture = false;
-			if (mesh.mMaterial != RenderableMaterial::INVALID_INDEX)
-			{
-				const RenderableMaterial& material = renderQueue.mRenderData.mMaterials.at(mesh.mMaterial);
-				hasDiffuseTexture = material.mDiffuseTextureID != INVALID_DX11_MATERIAL_ID;
-				hasNormalTexture = material.mNormalTextureID != INVALID_DX11_MATERIAL_ID;
-
-				if (hasDiffuseTexture)
-					mMaterialMap.GetItem(material.mDiffuseTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_DIFFUSE);
-
-				if (hasNormalTexture)
-					mMaterialMap.GetItem(material.mNormalTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_NORMAL);
-			}
-
-			const bool isAnimating = true;
-
-			const Mat4 wvpMatrix = renderQueue.mCamera.mCameraViewProjectionMatrix * mesh.mWorldTransform;
-			const Mat4 worldViewMatrix = renderQueue.mCamera.mCameraViewMatrix * mesh.mWorldTransform;
-
-			mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, mesh.mMaterialTilingFactor, hasDiffuseTexture, hasNormalTexture, isAnimating);
-			mMeshMap.GetItem(mesh.mMeshID).Draw();
-		}
+		const auto& animatedMeshesContainer = renderQueue.mRenderData.mAnimatedMeshes;
+        isAnimated = true;
+		RenderMeshes(renderQueue, animatedMeshesContainer, animatedBeginIndex, animatedEndIndex, isAnimated);
     }
 
     void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugExtra, const EngineSettings::ShadowFiltering shadowFiltering, const bool SSAOEnabled)
@@ -249,8 +194,32 @@ namespace JonsEngine
     }
 
 
-	void DX11Pipeline::RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end)
+	void DX11Pipeline::RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end, const bool isAnimated)
 	{
+		for (auto meshIndex = begin; meshIndex < end; ++meshIndex)
+		{
+			const RenderableMesh& mesh = meshContainer.at(meshIndex);
+			assert(mesh.mMeshID != INVALID_DX11_MESH_ID);
 
+			bool hasDiffuseTexture = false, hasNormalTexture = false;
+			if (mesh.mMaterial != RenderableMaterial::INVALID_INDEX)
+			{
+				const RenderableMaterial& material = renderQueue.mRenderData.mMaterials.at(mesh.mMaterial);
+				hasDiffuseTexture = material.mDiffuseTextureID != INVALID_DX11_MATERIAL_ID;
+				hasNormalTexture = material.mNormalTextureID != INVALID_DX11_MATERIAL_ID;
+
+				if (hasDiffuseTexture)
+					mMaterialMap.GetItem(material.mDiffuseTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_DIFFUSE);
+
+				if (hasNormalTexture)
+					mMaterialMap.GetItem(material.mNormalTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_NORMAL);
+			}
+
+			const Mat4 wvpMatrix = renderQueue.mCamera.mCameraViewProjectionMatrix * mesh.mWorldTransform;
+			const Mat4 worldViewMatrix = renderQueue.mCamera.mCameraViewMatrix * mesh.mWorldTransform;
+
+			mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, mesh.mMaterialTilingFactor, hasDiffuseTexture, hasNormalTexture, isAnimated);
+			mMeshMap.GetItem(mesh.mMeshID).Draw();
+		}
 	}
 }
