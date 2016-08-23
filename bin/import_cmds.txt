@@ -1,2 +1,2 @@
 // Copy-paste to import assets
-Debug\Win32\AssetImporter.exe import -package Debug\Win32\assets.jons -model Assets/Testwuson.X Assets/cube_with_color.obj Assets/chair/chair.obj Assets/sectoid/sectoid.dae Assets/house/house.obj Assets/boblampclean.md5mesh -material Assets/checker.dds -skybox Assets/skybox_v.jpg -name wuson cube chair sectoid house bob checkers skybox
+Debug\Win32\AssetImporter.exe import -package Debug\Win32\assets.jons -model Assets/Testwuson.X Assets/cube_with_color.obj Assets/chair/chair.obj Assets/sectoid/sectoid.dae Assets/house/house.obj Assets/boblampclean.md5mesh Assets/SAS/sas.dae -material Assets/checker.dds -skybox Assets/skybox_v.jpg -name wuson cube chair sectoid house bob sas checkers skybox

@@ -152,7 +152,7 @@ namespace JonsEngine
             const Mat4 faceViewMatrix = glm::lookAt(viewLightPositonV3, viewLightPositonV3 + gCubemapDirVectors[face], gCubemapUpVectors[face]);
 
 			mShadowmap.BindDepthView(face);
-            mVertexTransformPass.RenderMeshes(renderData, pointLight.mStaticMeshesBegin, pointLight.mStaticMeshesEnd, faceProjmatrix * faceViewMatrix * camViewMatrix);
+            mVertexTransformPass.RenderMeshes(renderData, pointLight, faceProjmatrix * faceViewMatrix * camViewMatrix);
         }
 
 
@@ -171,7 +171,7 @@ namespace JonsEngine
         // restore screen viewport
         mContext->RSSetViewports(numViewports, &prevViewport);
 
-        mVertexTransformPass.RenderMesh(mSphereMesh, lightMeshWVP);
+        mVertexTransformPass.RenderMesh(mSphereMesh, lightMeshWVP, false);
 
 
         //
@@ -187,7 +187,7 @@ namespace JonsEngine
         mPointLightCBuffer.SetData(PointLightCBuffer(invCameraProjMatrix, pointLight.mColor, viewLightPositonV4, mWindowSize, pointLight.mIntensity, Z_NEAR, pointLight.mRadius));
 
         // run transform pass on sphere + point light shading pass
-        mVertexTransformPass.RenderMesh(mSphereMesh, lightMeshWVP);
+        mVertexTransformPass.RenderMesh(mSphereMesh, lightMeshWVP, false);
 
         // restore state
         mContext->RSSetState(prevRasterizerState);

@@ -28,6 +28,7 @@ namespace JonsGame
         mModelCube2(resManifest.CreateCube("Cube2", 3)),
         mModelCube3(resManifest.CreateCube("Cube3", 3)),
 		mModelBob(resManifest.LoadModel("bob", mJonsPackage)),
+		mModelSAS(resManifest.LoadModel("sas", mJonsPackage)),
 
         // scene nodes
         mNodeSectoid(mScene.CreateSceneNode("nodeSectoid", mScene.GetRootNodeID())),
@@ -42,6 +43,7 @@ namespace JonsGame
         mNodeCube2(mScene.CreateSceneNode("nodeCube2", mScene.GetRootNodeID())),
         mNodeCube3(mScene.CreateSceneNode("nodeCube3", mScene.GetRootNodeID())),
 		mNodeBob(mScene.CreateSceneNode("nodeBob", mScene.GetRootNodeID())),
+		mNodeSAS(mScene.CreateSceneNode("nodeSas", mScene.GetRootNodeID())),
         
         // lights
         mMovingPointLightID(mScene.CreatePointLight("MovingPointLight", mNodePointLight)),
@@ -59,6 +61,7 @@ namespace JonsGame
         mActorCube2(mScene.CreateStaticActor("actorCube2", mModelCube2, mNodeCube2)),
         mActorCube3(mScene.CreateStaticActor("actorCube3", mModelCube3, mNodeCube3)),
 		mActorAnimBob(mScene.CreateAnimatedActor("animBob", mModelBob, mNodeBob)),
+		mActorSAS(mScene.CreateStaticActor("actorSAS", mModelSAS, mNodeSAS)),
 
         // misc animation - wuson
 		mAnimWuson(INVALID_ANIMATION_ID),
@@ -152,8 +155,14 @@ namespace JonsGame
 		mAnimDurationBob = animBob.GetAnimationDuration();
 
 		SceneNode& nodeBob = mScene.GetSceneNode(mNodeBob);
-		nodeBob.TranslateNode(Vec3(-2.0f, 0.5f, -6.0f));
+		nodeBob.TranslateNode(Vec3(6.0f, 0.5f, -6.0f));
 		nodeBob.ScaleNode(0.06f);
+
+		// actor SAS
+		SceneNode& nodeSAS = mScene.GetSceneNode(mNodeSAS);
+		nodeSAS.TranslateNode(Vec3(-3.0f, 0.7f, -5.5f));
+		nodeSAS.RotateNode(90.0f, Vec3(-1.0f, 0.0f, 0.0f));
+		nodeSAS.ScaleNode(2.0f);
 
         // load skybox
         mScene.SetSkybox(mSkybox);

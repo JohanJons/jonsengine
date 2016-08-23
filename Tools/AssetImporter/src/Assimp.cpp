@@ -318,12 +318,17 @@ namespace JonsAssetImporter
         // index data
         for (uint32_t j = 0; j < assimpMesh->mNumFaces; ++j)
         {
-            // only dem triangles
-            assert(assimpMesh->mFaces[j].mNumIndices == numFloatsPerTriangle);
-            for (uint32_t index = 0; index < numFloatsPerTriangle; index++)
+			const aiFace face = assimpMesh->mFaces[j];
+
+			// only dem triangles
+			// should mNumIndices != 3, we can just ignore it, if we have provided #aiProcess_Triangulate and #aiProcess_SortByPType, according to assimp docs
+			if (face.mNumIndices != numFloatsPerTriangle)
+				continue;
+
+            for (uint32_t index = 0; index < numFloatsPerTriangle; ++index)
             {
-                assert(assimpMesh->mFaces[j].mIndices[index] <= UINT16_MAX);
-                jonsMesh.mIndiceData.push_back(assimpMesh->mFaces[j].mIndices[index]);
+                assert(face.mIndices[index] <= UINT16_MAX);
+                jonsMesh.mIndiceData.push_back(face.mIndices[index]);
             }
         }
 
@@ -370,6 +375,10 @@ namespace JonsAssetImporter
         BuildSkeleton(parentMap, bones, boneNames, aiBones, scene->mRootNode, INVALID_BONE_INDEX);
         assert(bones.size() == boneNames.size());
 
+		// if we dont have any animated bones, dont bother with bone weights etc
+		if (animatedNodesSet.empty())
+			return true;
+
 		const bool processedOK = ProcessVertexBoneWeights(bones, meshes, meshNameMap, scene);
 
         return processedOK;
@@ -393,12 +402,7 @@ namespace JonsAssetImporter
 			{
 				const aiBone* assimpBone = assimpMesh->mBones[boneIndex];
 				const BoneIndex bone = GetBoneIndex(meshes, bones, assimpBone->mName.C_Str());
-				if (bone == INVALID_BONE_INDEX)
-				{
-					// to make sure our bone parsing is sane - "false" bones should also not have any weights
-					assert(assimpBone->mNumWeights == 0);
-					continue;
-				}
+				assert(bone != INVALID_BONE_INDEX);
 
 				const uint32_t numWeights = assimpBone->mNumWeights;
 				for (uint32_t weightIndex = 0; weightIndex < numWeights; ++weightIndex)

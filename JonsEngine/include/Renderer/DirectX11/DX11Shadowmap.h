@@ -25,7 +25,6 @@ namespace JonsEngine
     private:
         ID3D11DeviceContextPtr mContext;
         ID3D11Texture2DPtr mShadowmapTexture;
-        ID3D11InputLayoutPtr mInputLayout;
         ID3D11ShaderResourceViewPtr mShadowmapSRV;
 
         std::vector<ID3D11DepthStencilViewPtr> mShadowmapViews;

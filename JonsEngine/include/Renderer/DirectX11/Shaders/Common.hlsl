@@ -1,6 +1,11 @@
 #ifndef COMMON_HLSL
 #define COMMON_HLSL
 
+#include "Constants.h"
+
+StructuredBuffer<float4x4> gBones : register (SBUFFER_REGISTER_BONE_TRANSFORMS);
+
+
 float3 SampleNormalTexture(in Texture2D normalTexture, uint2 samplePosition)
 {
     float3 normal = normalTexture[samplePosition].xyz;
@@ -36,5 +41,23 @@ float4x4 CreateMatrixFromCols(const float4 c0, const float4 c1, const float4 c2,
                     c0.z, c1.z, c2.z, c3.z,
                     c0.w, c1.w, c2.w, c3.w);
 }
+
+float4x4 BuildBoneTransform(const uint4 boneIndices, const float4 boneWeights)
+{
+	uint boneIndex = boneIndices[0];
+	float boneWeight = boneWeights[0];
+	float4x4 boneTransform = gBones[boneIndex] * boneWeight;
+
+	for (uint boneNum = 1; boneNum < NUM_BONES_PER_VERTEX; ++boneNum)
+	{
+		boneIndex = boneIndices[boneNum];
+		boneWeight = boneWeights[boneNum];
+
+		boneTransform += gBones[boneIndex] * boneWeight;
+	}
+
+	return boneTransform;
+}
+
 
 #endif
