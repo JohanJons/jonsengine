@@ -445,6 +445,7 @@ namespace JonsAssetImporter
             assert(animation->mNumMeshChannels == 0);
 
 			PackageAnimation& pkgAnimation = AddPkgAnimation(model, scene, animation, unnamedAnimationCounter);
+			const auto animDuration = pkgAnimation.mDurationInMilliseconds;
 
             for (uint32_t nodeAnimIndex = 0; nodeAnimIndex < animation->mNumChannels; ++nodeAnimIndex)
             {
@@ -481,7 +482,10 @@ namespace JonsAssetImporter
                     const Quaternion rotationQuat = aiQuatToJonsQuat(aiRot->mValue);
 
                     const double maxKeyTimeSeconds = glm::max(aiPos->mTime, aiRot->mTime) / animation->mTicksPerSecond;
-                    const uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
+                    uint32_t timestampMillisec = static_cast<uint32_t>(maxKeyTimeSeconds * 1000);
+					// if this is the last frame and we are behind the total duration, drag this one out
+					if (key == maxNumKeys - 1 && timestampMillisec < animDuration)
+						timestampMillisec = animDuration;
 
 					keyFrames.emplace_back(timestampMillisec, translateVector, rotationQuat);
                 }
@@ -695,7 +699,7 @@ namespace JonsAssetImporter
 		// name collision - need to rename material
 		while (animName.empty() || animNameFound)
 		{
-			animName = "Material_" + std::to_string(unnamedAnimationCounter++);
+			animName = "Animation_" + std::to_string(unnamedAnimationCounter++);
 			animNameFound = DoesPkgNameExist<PackageAnimation>(model.mAnimations, animName);
 		}
 
@@ -851,17 +855,18 @@ namespace JonsAssetImporter
 				const BoneWeight& weights = mesh.mBoneWeights.at(vertexNum);
 
 				uint32_t weightNum = 0;
-				BoneIndex bone = weights.mBoneIndices.at(weightNum);
 				Mat4 boneTransform(gIdentityMatrix);
-				while (bone != INVALID_BONE_INDEX)
+				while (weightNum < MAX_BONES_PER_VERTEX)
                 {
-					const Mat4& transform = boneTransforms.at(bone);
+					const BoneIndex bone = weights.mBoneIndices.at(weightNum);
 					const float weight = weights.mBoneWeights.at(weightNum);
+					if (bone == INVALID_BONE_INDEX)
+						break;
 
+					const Mat4& transform = boneTransforms.at(bone);
 					boneTransform = boneTransform * (transform * weight);
                     
 					++weightNum;
-					bone = weights.mBoneIndices.at(weightNum);
                 }
 
 				const Vec3 transformedVertex = Vec3(boneTransform * vertex);

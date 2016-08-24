@@ -150,7 +150,7 @@ namespace JonsGame
 
 		// actor bob
 		const Model& modelBob = resManifest.GetModel(mModelBob);
-		mAnimBob = modelBob.GetAnimationID("Material_0");
+		mAnimBob = modelBob.GetAnimationID("Animation_0");
 		const Animation& animBob = modelBob.GetAnimation(mAnimBob);
 		mAnimDurationBob = animBob.GetAnimationDuration();
 

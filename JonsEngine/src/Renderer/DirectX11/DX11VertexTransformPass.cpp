@@ -8,16 +8,16 @@ namespace JonsEngine
 {
 	enum StaticLayout
 	{
-		POSITION = 0,
-		NUM_INPUT_LAYOUTS
+		STATIC_POSITION = 0,
+		STATIC_NUM_INPUT_LAYOUTS
 	};
 
 	enum AnimatedLayout
 	{
-		POSITION = 0,
-		BONE_INDEX,
-		BONE_WEIGHT,
-		NUM_INPUT_LAYOUTS
+		ANIMATED_POSITION = 0,
+		ANIMATED_BONE_INDEX,
+		ANIMATED_BONE_WEIGHT,
+		ANIMATED_NUM_INPUT_LAYOUTS
 	};
 
 
@@ -31,45 +31,45 @@ namespace JonsEngine
 		mMeshMap(meshMap)
     {
 		// static layout
-        D3D11_INPUT_ELEMENT_DESC inputDescStatic[StaticLayout::NUM_INPUT_LAYOUTS];
+        D3D11_INPUT_ELEMENT_DESC inputDescStatic[StaticLayout::STATIC_NUM_INPUT_LAYOUTS];
         ZeroMemory(&inputDescStatic, sizeof(D3D11_INPUT_ELEMENT_DESC));
-		inputDescStatic[StaticLayout::POSITION].SemanticName = "POSITION";
-		inputDescStatic[StaticLayout::POSITION].SemanticIndex = 0;
-		inputDescStatic[StaticLayout::POSITION].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		inputDescStatic[StaticLayout::POSITION].InputSlot = 0;
-		inputDescStatic[StaticLayout::POSITION].AlignedByteOffset = 0;
-		inputDescStatic[StaticLayout::POSITION].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputDescStatic[StaticLayout::POSITION].InstanceDataStepRate = 0;
-		DXCALL(device->CreateInputLayout(inputDescStatic, StaticLayout::NUM_INPUT_LAYOUTS, gTransformStaticVertexShader, sizeof(gTransformStaticVertexShader), &mLayoutStatic));
+		inputDescStatic[StaticLayout::STATIC_POSITION].SemanticName = "POSITION";
+		inputDescStatic[StaticLayout::STATIC_POSITION].SemanticIndex = 0;
+		inputDescStatic[StaticLayout::STATIC_POSITION].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		inputDescStatic[StaticLayout::STATIC_POSITION].InputSlot = 0;
+		inputDescStatic[StaticLayout::STATIC_POSITION].AlignedByteOffset = 0;
+		inputDescStatic[StaticLayout::STATIC_POSITION].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputDescStatic[StaticLayout::STATIC_POSITION].InstanceDataStepRate = 0;
+		DXCALL(device->CreateInputLayout(inputDescStatic, StaticLayout::STATIC_NUM_INPUT_LAYOUTS, gTransformStaticVertexShader, sizeof(gTransformStaticVertexShader), &mLayoutStatic));
 		DXCALL(device->CreateVertexShader(gTransformStaticVertexShader, sizeof(gTransformStaticVertexShader), nullptr, &mStaticShader));
 
 		// animated layout
-		D3D11_INPUT_ELEMENT_DESC inputDescAnimated[AnimatedLayout::NUM_INPUT_LAYOUTS];
+		D3D11_INPUT_ELEMENT_DESC inputDescAnimated[AnimatedLayout::ANIMATED_NUM_INPUT_LAYOUTS];
 		ZeroMemory(&inputDescAnimated, sizeof(D3D11_INPUT_ELEMENT_DESC));
-		inputDescAnimated[AnimatedLayout::POSITION].SemanticName = "POSITION";
-		inputDescAnimated[AnimatedLayout::POSITION].SemanticIndex = 0;
-		inputDescAnimated[AnimatedLayout::POSITION].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		inputDescAnimated[AnimatedLayout::POSITION].InputSlot = 0;
-		inputDescAnimated[AnimatedLayout::POSITION].AlignedByteOffset = 0;
-		inputDescAnimated[AnimatedLayout::POSITION].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputDescAnimated[AnimatedLayout::POSITION].InstanceDataStepRate = 0;
+		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].SemanticName = "POSITION";
+		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].SemanticIndex = 0;
+		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].InputSlot = 0;
+		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].AlignedByteOffset = 0;
+		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].InstanceDataStepRate = 0;
 
-		inputDescAnimated[AnimatedLayout::BONE_INDEX].SemanticName = "BONE_INDICES";
-		inputDescAnimated[AnimatedLayout::BONE_INDEX].SemanticIndex = 0;
-		inputDescAnimated[AnimatedLayout::BONE_INDEX].Format = DXGI_FORMAT_R8G8B8A8_UINT;
-		inputDescAnimated[AnimatedLayout::BONE_INDEX].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_BONE_WEIGHTS;
-		inputDescAnimated[AnimatedLayout::BONE_INDEX].AlignedByteOffset = 0;
-		inputDescAnimated[AnimatedLayout::BONE_INDEX].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputDescAnimated[AnimatedLayout::BONE_INDEX].InstanceDataStepRate = 0;
+		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_INDEX].SemanticName = "BONE_INDICES";
+		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_INDEX].SemanticIndex = 0;
+		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_INDEX].Format = DXGI_FORMAT_R8G8B8A8_UINT;
+		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_INDEX].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_BONE_WEIGHTS;
+		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_INDEX].AlignedByteOffset = 0;
+		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_INDEX].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_INDEX].InstanceDataStepRate = 0;
 
-		inputDescAnimated[AnimatedLayout::BONE_WEIGHT].SemanticName = "BONE_WEIGHTS";
-		inputDescAnimated[AnimatedLayout::BONE_WEIGHT].SemanticIndex = 0;
-		inputDescAnimated[AnimatedLayout::BONE_WEIGHT].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		inputDescAnimated[AnimatedLayout::BONE_WEIGHT].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_BONE_WEIGHTS;
-		inputDescAnimated[AnimatedLayout::BONE_WEIGHT].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-		inputDescAnimated[AnimatedLayout::BONE_WEIGHT].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputDescAnimated[AnimatedLayout::BONE_WEIGHT].InstanceDataStepRate = 0;
-        DXCALL(device->CreateInputLayout(inputDescAnimated, AnimatedLayout::NUM_INPUT_LAYOUTS, gTransformAnimatedVertexShader, sizeof(gTransformAnimatedVertexShader), &mLayoutAnimated));
+		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_WEIGHT].SemanticName = "BONE_WEIGHTS";
+		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_WEIGHT].SemanticIndex = 0;
+		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_WEIGHT].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_WEIGHT].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_BONE_WEIGHTS;
+		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_WEIGHT].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_WEIGHT].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_WEIGHT].InstanceDataStepRate = 0;
+        DXCALL(device->CreateInputLayout(inputDescAnimated, AnimatedLayout::ANIMATED_NUM_INPUT_LAYOUTS, gTransformAnimatedVertexShader, sizeof(gTransformAnimatedVertexShader), &mLayoutAnimated));
         DXCALL(device->CreateVertexShader(gTransformAnimatedVertexShader, sizeof(gTransformAnimatedVertexShader), nullptr, &mAnimatedShader));
     }
 

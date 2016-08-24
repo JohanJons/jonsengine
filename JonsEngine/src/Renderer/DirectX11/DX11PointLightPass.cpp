@@ -165,7 +165,7 @@ namespace JonsEngine
         // restore screen viewport
         mContext->RSSetViewports(numViewports, &prevViewport);
 
-        mVertexTransformPass.RenderMesh(mSphereMesh, lightMeshWVP, false);
+        mVertexTransformPass.RenderStaticMesh(mSphereMesh, lightMeshWVP);
 
 
         //
@@ -181,7 +181,7 @@ namespace JonsEngine
         mPointLightCBuffer.SetData(PointLightCBuffer(invCameraProjMatrix, pointLight.mColor, viewLightPositonV4, mWindowSize, pointLight.mIntensity, Z_NEAR, pointLight.mRadius));
 
         // run transform pass on sphere + point light shading pass
-        mVertexTransformPass.RenderMesh(mSphereMesh, lightMeshWVP, false);
+        mVertexTransformPass.RenderStaticMesh(mSphereMesh, lightMeshWVP);
 
         // restore state
         mContext->RSSetState(prevRasterizerState);

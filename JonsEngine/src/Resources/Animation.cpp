@@ -146,7 +146,8 @@ namespace JonsEngine
         const auto currTimestamp = currIter->mTimestamp;
         // if we need to loop animation, fake timestamp of nextIter to make interpolation calculations make sense
         const auto nextTimestamp = currIter + 1 == endIter? currTimestamp + nextIter->mTimestamp : nextIter->mTimestamp;
-    
+		assert(currTimestamp != nextTimestamp);
+
         const float deltaTime = (nextTimestamp - currTimestamp).count();
         const float interpolationFactor = (nextTimestamp - currElapsedTime).count() / deltaTime;
         
