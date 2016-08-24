@@ -20,7 +20,6 @@ namespace JonsEngine
     void DX11AABBPass::Render(const RenderQueue::RenderData& renderData, const RenderableCamera& camera)
     {
         mContext->PSSetShader(mPixelShader, nullptr, 0);
-        mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
         mVertexTransformPass.RenderAABBs(renderData, camera, camera.mCameraViewProjectionMatrix);
     }

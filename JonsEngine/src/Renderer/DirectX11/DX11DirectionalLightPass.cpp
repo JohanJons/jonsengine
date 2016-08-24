@@ -122,7 +122,6 @@ namespace JonsEngine
         // depth clamp to avoid issues with meshes between splits
         mContext->RSSetState(mRSDepthClamp);
 
-        mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         mShadowmap.BindForDrawing();
 
         const float maxFloatVal = std::numeric_limits<float>::max();

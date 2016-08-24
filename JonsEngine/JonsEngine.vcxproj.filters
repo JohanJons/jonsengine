@@ -630,9 +630,6 @@
     <FxCompile Include="include\Renderer\DirectX11\Shaders\PointLightPixel.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="include\Renderer\DirectX11\Shaders\TransformVertex.hlsl">
-      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\FXAAPixel.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
@@ -682,6 +679,12 @@
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\SkyboxVertex.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\TransformAnimatedVertex.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\TransformStaticVertex.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

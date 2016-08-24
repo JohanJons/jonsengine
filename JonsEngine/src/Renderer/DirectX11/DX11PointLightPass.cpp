@@ -113,12 +113,6 @@ namespace JonsEngine
     }
 
 
-    void DX11PointLightPass::BindForShading()
-    {
-        // geometry transform vertex pass for stencil/shadow pass
-        mVertexTransformPass.BindForTransformPass(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    }
-
     void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const RenderQueue::RenderData& renderData, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix)
     {
         // preserve current state

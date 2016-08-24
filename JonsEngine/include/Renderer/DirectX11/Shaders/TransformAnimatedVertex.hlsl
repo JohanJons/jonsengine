@@ -1,5 +1,5 @@
-#ifndef TRANSFORM_VERTEX_HLSL
-#define TRANSFORM_VERTEX_HLSL
+#ifndef TRANSFORM_ANIMATED_VERTEX_HLSL
+#define TRANSFORM_ANIMATED_VERTEX_HLSL
 
 #include "Constants.h"
 #include "Common.hlsl"
@@ -13,21 +13,15 @@ struct TransformVSInput
 
 cbuffer TransformConstants : register(CBUFFER_REGISTER_VERTEX)
 {
-    float4x4 gWVPMatrix;
-	bool gIsAnimating;
+	float4x4 gWVPMatrix;
 };
 
 
 float4 vs_main(TransformVSInput input) : SV_Position
 {
-	float4x4 wvpMatrix = gWVPMatrix;
+	float4x4 boneTransform = BuildBoneTransform(input.mBoneIndices, input.mBoneWeights);
+	float4x4 wvpMatrix = mul(gWVPMatrix, boneTransform);
 
-	if (gIsAnimating)
-	{
-		float4x4 boneTransform = BuildBoneTransform(input.mBoneIndices, input.mBoneWeights);
-		wvpMatrix = mul(gWVPMatrix, boneTransform);
-	}
-	
 	return mul(wvpMatrix, input.mPosition);
 }
 

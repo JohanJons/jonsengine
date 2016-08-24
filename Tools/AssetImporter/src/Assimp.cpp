@@ -36,6 +36,8 @@ namespace JonsAssetImporter
 	void BuildSkeleton(BoneParentMap& parentMap, std::vector<PackageBone>& skeleton, const BoneNameSet& boneNames, const AssimpBoneSet& aiBones, const aiNode* node, const BoneIndex parentBone);
 	std::set<std::string> GetListOfAnimatedNodes(const aiScene* scene);
     void ParseStaticAABBForAnimatedModel(PackageModel& model);
+	void UpdateBoneTransforms(const Milliseconds currTimestamp, const Animation& jonsAnimation, BoneTransforms& boneTransforms, const std::size_t numBones);
+	void TransformsVerticesAndCheckAABB(const PackageModel& model, const BoneTransforms& boneTransforms, Vec3& minExtent, Vec3& maxExtent);
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
     Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
@@ -778,40 +780,96 @@ namespace JonsAssetImporter
 		return ret;
 	}
     
+	// animated model: needs to transform all nodes using all the animations to find the maximum extents
+	// results in a looser, static aabb atleast the size of the aabb in bind pose
+	// basically implements CPU skinning to evaluate max aabb...
     void ParseStaticAABBForAnimatedModel(PackageModel& model)
     {
         if (model.mAnimations.empty())
             return;
     
-        const AABB& rootNodeAABB = AABB(model.mStaticAABB);
-    
-        // animated model: needs to transform all nodes using all the animations to find the maximum extents
-        // results in a looser, static aabb atleast the size of the aabb in bind pose
-        Vec3 minExtent(rootNodeAABB.Min()), maxExtent(rootNodeAABB.Max());
-        /*for (const PackageAnimation& animation : model.mAnimations)
-        {
-            for (const PackageBoneAnimation& animNode : animation.mBoneAnimations)
-            {
-                for (const PackageBoneKeyframe& keyframe : animNode.mKeyframes)
-                {
-                    //AABB aabb(node.mAABB.mMinBounds, node.mAABB.mMaxBounds);
-                    //aabb = aabb * keyframe.mTransform;
+		const Milliseconds keyTickrate = Milliseconds(16);
+		auto& parentMap = model.mBoneParentMap;
+		BoneTransforms boneOffsets;
+		for (const auto& pkgBone : model.mSkeleton)
+			boneOffsets.emplace_back(pkgBone.mOffsetMatrix);
 
-                    const Vec3 tempMin = aabb.Min(), tempMax = aabb.Max();
-                    if (tempMin.x < minExtent.x) minExtent.x = tempMin.x;
-                    if (tempMin.y < minExtent.y) minExtent.y = tempMin.y;
-                    if (tempMin.z < minExtent.z) minExtent.z = tempMin.z;
+		const std::size_t numBones = model.mSkeleton.size();
+		BoneTransforms boneTransforms(numBones, gIdentityMatrix);
+		for (const PackageAnimation& pkgAnimation : model.mAnimations)
+		{
+			// use/feed the engine animation class to help interpolating etc
+			Animation jonsAnimation(pkgAnimation, parentMap, boneOffsets);
 
-                    if (tempMax.x > maxExtent.x) maxExtent.x = tempMax.x;
-                    if (tempMax.y > maxExtent.y) maxExtent.y = tempMax.y;
-                    if (tempMax.z > maxExtent.z) maxExtent.z = tempMax.z;
-                }
-            }
-        }*/
+			const Milliseconds animDuration(pkgAnimation.mDurationInMilliseconds);
+			Milliseconds currTime(0);
+			while (currTime < animDuration)
+			{
+				UpdateBoneTransforms(currTime, jonsAnimation, boneTransforms, numBones);
+				TransformsVerticesAndCheckAABB(model, boneTransforms, model.mStaticAABB.mMinBounds, model.mStaticAABB.mMaxBounds);
 
-        model.mStaticAABB.mMinBounds = minExtent;
-        model.mStaticAABB.mMaxBounds = maxExtent;
+				currTime += keyTickrate;
+			}
+		}
     }
+
+	void UpdateBoneTransforms(const Milliseconds currTimestamp, const Animation& jonsAnimation, BoneTransforms& boneTransforms, const std::size_t numBones)
+	{
+		const bool calcUsingRepeatAnimation = true;
+
+		Mat4& rootTransform = boneTransforms.front();
+		rootTransform = jonsAnimation.InterpolateBoneTransform(0, currTimestamp, calcUsingRepeatAnimation);
+		for (BoneIndex bone = 1; bone < numBones; ++bone)
+		{
+			const BoneIndex parentInstance = jonsAnimation.GetParentIndex(bone);
+			const Mat4& parentTransform = boneTransforms.at(parentInstance);
+
+			Mat4& transform = boneTransforms.at(bone);
+			transform = parentTransform * jonsAnimation.InterpolateBoneTransform(bone, currTimestamp, calcUsingRepeatAnimation);
+		}
+
+		for (BoneIndex bone = 1; bone < numBones; ++bone)
+		{
+			const Mat4& boneOffsetTransform = jonsAnimation.GetBoneOffsetTransform(bone);
+			Mat4& transform = boneTransforms.at(bone);
+			transform = transform * boneOffsetTransform;
+		}
+	}
+
+	void TransformsVerticesAndCheckAABB(const PackageModel& model, const BoneTransforms& boneTransforms, Vec3& minExtent, Vec3& maxExtent)
+	{
+		const std::size_t vertexStepSize = 3;
+
+		for (const PackageMesh& mesh : model.mMeshes)
+		{
+			const std::size_t numVertices = mesh.mVertexData.size() / vertexStepSize;
+			for (std::size_t vertexNum = 0; vertexNum < numVertices; ++vertexNum)
+			{
+				std::size_t vertexPos = vertexNum * vertexStepSize;
+				// x = 0, y = +1, z = +2
+				Vec4 vertex(mesh.mVertexData.at(vertexPos), mesh.mVertexData.at(vertexPos + 1), mesh.mVertexData.at(vertexPos + 2), 1.0f);
+				const BoneWeight& weights = mesh.mBoneWeights.at(vertexNum);
+
+				uint32_t weightNum = 0;
+				BoneIndex bone = weights.mBoneIndices.at(weightNum);
+				Mat4 boneTransform(gIdentityMatrix);
+				while (bone != INVALID_BONE_INDEX)
+                {
+					const Mat4& transform = boneTransforms.at(bone);
+					const float weight = weights.mBoneWeights.at(weightNum);
+
+					boneTransform = boneTransform * (transform * weight);
+                    
+					++weightNum;
+					bone = weights.mBoneIndices.at(weightNum);
+                }
+
+				const Vec3 transformedVertex = Vec3(boneTransform * vertex);
+				minExtent = MinVal(minExtent, transformedVertex);
+                maxExtent = MaxVal(maxExtent, transformedVertex);
+			}
+		}
+	}
 
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat)

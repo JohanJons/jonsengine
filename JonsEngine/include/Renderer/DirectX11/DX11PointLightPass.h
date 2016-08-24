@@ -35,8 +35,6 @@ namespace JonsEngine
 
         void Render(const RenderablePointLight& pointLight, const RenderQueue::RenderData& renderData, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix);
 
-        void BindForShading();
-
 
     private:
         struct PointLightCBuffer
