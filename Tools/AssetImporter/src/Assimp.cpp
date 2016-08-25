@@ -37,7 +37,7 @@ namespace JonsAssetImporter
 	std::set<std::string> GetListOfAnimatedNodes(const aiScene* scene);
     void ParseStaticAABBForAnimatedModel(PackageModel& model);
 	void UpdateBoneTransforms(const Milliseconds currTimestamp, const Animation& jonsAnimation, BoneTransforms& boneTransforms, const std::size_t numBones);
-	void TransformsVerticesAndCheckAABB(const PackageModel& model, const BoneTransforms& boneTransforms, Vec3& minExtent, Vec3& maxExtent);
+	void TransformsVerticesAndCheckAABB(PackageModel& model, const BoneTransforms& boneTransforms, Vec3& minExtent, Vec3& maxExtent);
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
     Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
@@ -840,39 +840,50 @@ namespace JonsAssetImporter
 		}
 	}
 
-	void TransformsVerticesAndCheckAABB(const PackageModel& model, const BoneTransforms& boneTransforms, Vec3& minExtent, Vec3& maxExtent)
+	void TransformsVerticesAndCheckAABB(PackageModel& model, const BoneTransforms& boneTransforms, Vec3& minExtent, Vec3& maxExtent)
 	{
 		const std::size_t vertexStepSize = 3;
 
+		for (PackageNode& node : model.mNodes)
+		{
+			const std::size_t numMeshes = node.mMeshes.size();
+			for (PackageMesh::MeshIndex meshIndex = 0; meshIndex < numMeshes; ++meshIndex)
+			{
+				PackageMesh& mesh = model.mMeshes.at(meshIndex);
+				const std::size_t numVertices = mesh.mVertexData.size() / vertexStepSize;
+				for (std::size_t vertexNum = 0; vertexNum < numVertices; ++vertexNum)
+				{
+					std::size_t vertexPos = vertexNum * vertexStepSize;
+					// x = 0, y = +1, z = +2
+					Vec4 vertex(mesh.mVertexData.at(vertexPos), mesh.mVertexData.at(vertexPos + 1), mesh.mVertexData.at(vertexPos + 2), 1.0f);
+					const BoneWeight& weights = mesh.mBoneWeights.at(vertexNum);
+
+					uint32_t weightNum = 0;
+					Mat4 boneTransform(node.mTransform);
+					while (weightNum < MAX_BONES_PER_VERTEX)
+					{
+						const BoneIndex bone = weights.mBoneIndices.at(weightNum);
+						const float weight = weights.mBoneWeights.at(weightNum);
+						if (bone == INVALID_BONE_INDEX)
+							break;
+
+						const Mat4& transform = boneTransforms.at(bone);
+						boneTransform = boneTransform * (transform * weight);
+
+						++weightNum;
+					}
+
+					const Vec3 transformedVertex = Vec3(boneTransform * vertex);
+					mesh.mAABB.mMinBounds = MinVal(mesh.mAABB.mMinBounds, transformedVertex);
+					mesh.mAABB.mMaxBounds = MaxVal(mesh.mAABB.mMaxBounds, transformedVertex);
+				}
+			}
+		}
+		
 		for (const PackageMesh& mesh : model.mMeshes)
 		{
-			const std::size_t numVertices = mesh.mVertexData.size() / vertexStepSize;
-			for (std::size_t vertexNum = 0; vertexNum < numVertices; ++vertexNum)
-			{
-				std::size_t vertexPos = vertexNum * vertexStepSize;
-				// x = 0, y = +1, z = +2
-				Vec4 vertex(mesh.mVertexData.at(vertexPos), mesh.mVertexData.at(vertexPos + 1), mesh.mVertexData.at(vertexPos + 2), 1.0f);
-				const BoneWeight& weights = mesh.mBoneWeights.at(vertexNum);
-
-				uint32_t weightNum = 0;
-				Mat4 boneTransform(gIdentityMatrix);
-				while (weightNum < MAX_BONES_PER_VERTEX)
-                {
-					const BoneIndex bone = weights.mBoneIndices.at(weightNum);
-					const float weight = weights.mBoneWeights.at(weightNum);
-					if (bone == INVALID_BONE_INDEX)
-						break;
-
-					const Mat4& transform = boneTransforms.at(bone);
-					boneTransform = boneTransform * (transform * weight);
-                    
-					++weightNum;
-                }
-
-				const Vec3 transformedVertex = Vec3(boneTransform * vertex);
-				minExtent = MinVal(minExtent, transformedVertex);
-                maxExtent = MaxVal(maxExtent, transformedVertex);
-			}
+			minExtent = MinVal(minExtent, mesh.mAABB.mMinBounds);
+			maxExtent = MaxVal(maxExtent, mesh.mAABB.mMaxBounds);
 		}
 	}
 

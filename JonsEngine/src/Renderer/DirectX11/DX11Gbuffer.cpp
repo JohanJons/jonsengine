@@ -2,7 +2,8 @@
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
-#include "include/Renderer/DirectX11/Shaders/Compiled/GBufferVertex.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/GBufferVertexStatic.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/GBufferVertexAnimated.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/GBufferPixel.h"
 
 namespace JonsEngine
@@ -23,7 +24,15 @@ namespace JonsEngine
 
 
     DX11GBuffer::DX11GBuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc) :
-        mContext(context), mInputLayout(nullptr), mVertexShader(nullptr), mPixelShader(nullptr), mConstantBuffer(device, context, mConstantBuffer.CONSTANT_BUFFER_SLOT_VERTEX)
+        mContext(context),
+
+		mStaticLayout(nullptr),
+		mAnimatedLayout(nullptr),
+		mStaticVertexShader(nullptr),
+		mAnimatedVertexShader(nullptr),
+
+		mPixelShader(nullptr),
+		mConstantBuffer(device, context, mConstantBuffer.CONSTANT_BUFFER_SLOT_VERTEX)
     {
         backbufferTextureDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
         
@@ -101,10 +110,14 @@ namespace JonsEngine
         inputDescription[VSInputLayout::BONE_WEIGHT].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
         inputDescription[VSInputLayout::BONE_WEIGHT].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
         inputDescription[VSInputLayout::BONE_WEIGHT].InstanceDataStepRate = 0;
-        DXCALL(device->CreateInputLayout(inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gGBufferVertexShader, sizeof(gGBufferVertexShader), &mInputLayout));
+
+		const uint32_t animatedNumExtraInputs = 2;
+        DXCALL(device->CreateInputLayout(inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS - animatedNumExtraInputs, gGBufferVertexStaticShader, sizeof(gGBufferVertexStaticShader), &mStaticLayout));
+		DXCALL(device->CreateInputLayout(inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gGBufferVertexAnimatedShader, sizeof(gGBufferVertexAnimatedShader), &mAnimatedLayout));
 
         // create shader objects
-        DXCALL(device->CreateVertexShader(gGBufferVertexShader, sizeof(gGBufferVertexShader), nullptr, &mVertexShader));
+        DXCALL(device->CreateVertexShader(gGBufferVertexStaticShader, sizeof(gGBufferVertexStaticShader), nullptr, &mStaticVertexShader));
+		DXCALL(device->CreateVertexShader(gGBufferVertexAnimatedShader, sizeof(gGBufferVertexAnimatedShader), nullptr, &mAnimatedVertexShader));
         DXCALL(device->CreatePixelShader(gGBufferPixelShader, sizeof(gGBufferPixelShader), nullptr, &mPixelShader));
     }
 
@@ -113,9 +126,9 @@ namespace JonsEngine
     }
 
 
-    void DX11GBuffer::SetConstantData(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture, const bool hasBones)
+    void DX11GBuffer::SetConstantData(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture)
     {
-        mConstantBuffer.SetData({ wvpMatrix, worldViewMatrix, textureTilingFactor, hasDiffuseTexture, hasNormalTexture, hasBones });
+        mConstantBuffer.SetData({ wvpMatrix, worldViewMatrix, textureTilingFactor, hasDiffuseTexture, hasNormalTexture });
     }
 
     void DX11GBuffer::BindForGeometryStage(ID3D11DepthStencilViewPtr dsv)
@@ -136,11 +149,20 @@ namespace JonsEngine
         mContext->OMSetRenderTargets(DX11GBuffer::GBUFFER_NUM_RENDERTARGETS, &(mRenderTargets.begin()->p), dsv);
         mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        mContext->IASetInputLayout(mInputLayout);
-
-        mContext->VSSetShader(mVertexShader, nullptr, 0);
         mContext->PSSetShader(mPixelShader, nullptr, 0);
     }
+
+	void DX11GBuffer::BindForStaticPass()
+	{
+		mContext->IASetInputLayout(mStaticLayout);
+		mContext->VSSetShader(mStaticVertexShader, nullptr, 0);
+	}
+
+	void DX11GBuffer::BindForAnimatedPass()
+	{
+		mContext->IASetInputLayout(mAnimatedLayout);
+		mContext->VSSetShader(mAnimatedVertexShader, nullptr, 0);
+	}
 
     void DX11GBuffer::BindGeometryTextures()
     {

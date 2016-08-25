@@ -4,17 +4,6 @@
 #include "Constants.h"
 #include "Common.hlsl"
 
-struct GBufferVSIn
-{
-    float4 mPosition : POSITION;
-    float3 mNormal : NORMAL;
-    float2 mTexcoord : TEXCOORD;
-    float3 mTangent : TANGENT;
-    float3 mBitangent : BITANGENT;
-    uint4 mBoneIndices : BONE_INDICES;
-    float4 mBoneWeights : BONE_WEIGHTS;
-};
-
 struct GBufferVSOut
 {
     float4 mPosition : SV_POSITION;
@@ -33,7 +22,6 @@ cbuffer GBufferConstants : register(CBUFFER_REGISTER_VERTEX)
     float gTextureTilingFactor;
     bool gHasDiffuseTexture;
     bool gHasNormalTexture;
-    bool gIsAnimating;
 };
 
 
@@ -48,13 +36,12 @@ GBufferVSOut vs_main(GBufferVSIn input)
 
 	float4x4 wvpMatrix = gWVPMatrix;
 	float4x4 worldViewMatrix = gWorldViewMatrix;
-    // temporary solution
-    if (gIsAnimating)
-    {
+    
+    #if GBUFFER_IS_ANIMATED_MESHES
 		float4x4 boneTransform = BuildBoneTransform(input.mBoneIndices, input.mBoneWeights);
 		wvpMatrix = mul(wvpMatrix, boneTransform);
 		worldViewMatrix = mul(worldViewMatrix, boneTransform);
-    }
+    #endif
         
     output.mPosition = mul(wvpMatrix, output.mPosition);
 

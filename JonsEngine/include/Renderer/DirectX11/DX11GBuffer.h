@@ -23,8 +23,10 @@ namespace JonsEngine
         DX11GBuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc);
         ~DX11GBuffer();
 
-        void SetConstantData(const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture, const bool isAnimating);
+        void SetConstantData(const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture);
         void BindForGeometryStage(ID3D11DepthStencilViewPtr dsv);
+		void BindForStaticPass();
+		void BindForAnimatedPass();
         void BindGeometryTextures();
 
 
@@ -36,15 +38,13 @@ namespace JonsEngine
             float mTextureTilingFactor;
             uint32_t mHasDiffuseTexture;
             uint32_t mHasNormalTexture;
-            uint32_t mIsAnimating;
 
-            GBufferCBuffer(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuse, const bool hasNormal, const bool isAnimating) :
+            GBufferCBuffer(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuse, const bool hasNormal) :
                 mWVPMatrix(wvpMatrix),
                 mWorldViewMatrix(worldViewMatrix),
                 mTextureTilingFactor(textureTilingFactor),
                 mHasDiffuseTexture(hasDiffuse),
-                mHasNormalTexture(hasNormal),
-                mIsAnimating(isAnimating)
+                mHasNormalTexture(hasNormal)
             {
             }
         };
@@ -53,8 +53,12 @@ namespace JonsEngine
         std::array<ID3D11RenderTargetViewPtr, DX11GBuffer::GBUFFER_NUM_RENDERTARGETS> mRenderTargets;
         std::array<ID3D11ShaderResourceViewPtr, DX11GBuffer::GBUFFER_NUM_RENDERTARGETS> mShaderResourceViews;
         ID3D11DeviceContextPtr mContext;
-        ID3D11InputLayoutPtr mInputLayout;
-        ID3D11VertexShaderPtr mVertexShader;
+
+        ID3D11InputLayoutPtr mStaticLayout;
+		ID3D11InputLayoutPtr mAnimatedLayout;
+        ID3D11VertexShaderPtr mStaticVertexShader;
+		ID3D11VertexShaderPtr mAnimatedVertexShader;
+
         ID3D11PixelShaderPtr mPixelShader;
         DX11ConstantBuffer<GBufferCBuffer> mConstantBuffer;
     };

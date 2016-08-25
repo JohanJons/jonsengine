@@ -123,15 +123,15 @@ namespace JonsEngine
 		const auto staticBeginIndex = renderQueue.mCamera.mStaticMeshesBegin;
 		const auto staticEndIndex = renderQueue.mCamera.mStaticMeshesEnd;
 		const auto& staticMeshesContainer = renderQueue.mRenderData.mStaticMeshes;
-        bool isAnimated = false;
-		RenderMeshes(renderQueue, staticMeshesContainer, staticBeginIndex, staticEndIndex, isAnimated);
+		mGBuffer.BindForStaticPass();
+		RenderMeshes(renderQueue, staticMeshesContainer, staticBeginIndex, staticEndIndex);
         
         // animated meshes
         const auto animatedBeginIndex = renderQueue.mCamera.mAnimatedMeshesBegin;
 		const auto animatedEndIndex = renderQueue.mCamera.mAnimatedMeshesEnd;
 		const auto& animatedMeshesContainer = renderQueue.mRenderData.mAnimatedMeshes;
-        isAnimated = true;
-		RenderMeshes(renderQueue, animatedMeshesContainer, animatedBeginIndex, animatedEndIndex, isAnimated);
+		mGBuffer.BindForAnimatedPass();
+		RenderMeshes(renderQueue, animatedMeshesContainer, animatedBeginIndex, animatedEndIndex);
     }
 
     void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugExtra, const EngineSettings::ShadowFiltering shadowFiltering, const bool SSAOEnabled)
@@ -193,7 +193,7 @@ namespace JonsEngine
     }
 
 
-	void DX11Pipeline::RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end, const bool isAnimated)
+	void DX11Pipeline::RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end)
 	{
 		for (auto meshIndex = begin; meshIndex < end; ++meshIndex)
 		{
@@ -217,7 +217,7 @@ namespace JonsEngine
 			const Mat4 wvpMatrix = renderQueue.mCamera.mCameraViewProjectionMatrix * mesh.mWorldTransform;
 			const Mat4 worldViewMatrix = renderQueue.mCamera.mCameraViewMatrix * mesh.mWorldTransform;
 
-			mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, mesh.mMaterialTilingFactor, hasDiffuseTexture, hasNormalTexture, isAnimated);
+			mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, mesh.mMaterialTilingFactor, hasDiffuseTexture, hasNormalTexture);
 			mMeshMap.GetItem(mesh.mMeshID).Draw();
 		}
 	}

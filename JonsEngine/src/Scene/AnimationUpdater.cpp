@@ -37,8 +37,9 @@ namespace JonsEngine
 
 			// root has no parent
 			// note: root is always front
+            const BoneIndex rootBoneIndex = 0;
 			Mat4& rootTransform = mBoneTransforms.at(bonesBegin);
-			rootTransform = animation.InterpolateBoneTransform(bonesBegin, animationInstance.mTimestamp, animationInstance.mRepeating);
+			rootTransform = animation.InterpolateBoneTransform(rootBoneIndex, animationInstance.mTimestamp, animationInstance.mRepeating);
 
 			// interpolate bone animations
             const BoneIndex numBones = bonesEnd - bonesBegin;
@@ -56,7 +57,7 @@ namespace JonsEngine
 
 			// add misc transforms to get into bone space etc
 			// must be done after prior step because of transform multiplication order
-			for (BoneIndex boneOffset = 1; boneOffset < numBones; ++boneOffset)
+			for (BoneIndex boneOffset = 0; boneOffset < numBones; ++boneOffset)
 			{
 				const BoneIndex bone = boneOffset;
 				const Mat4& boneOffsetTransform = animation.GetBoneOffsetTransform(bone);
