@@ -4,6 +4,28 @@
 #include "Constants.h"
 #include "Common.hlsl"
 
+#if GBUFFER_IS_ANIMATED_MESHES
+struct GBufferVSIn
+{
+	float4 mPosition : POSITION;
+	float3 mNormal : NORMAL;
+	float2 mTexcoord : TEXCOORD;
+	float3 mTangent : TANGENT;
+	float3 mBitangent : BITANGENT;
+	uint4 mBoneIndices : BONE_INDICES;
+	float4 mBoneWeights : BONE_WEIGHTS;
+};
+#else
+struct GBufferVSIn
+{
+	float4 mPosition : POSITION;
+	float3 mNormal : NORMAL;
+	float2 mTexcoord : TEXCOORD;
+	float3 mTangent : TANGENT;
+	float3 mBitangent : BITANGENT;
+};
+#endif
+
 struct GBufferVSOut
 {
     float4 mPosition : SV_POSITION;

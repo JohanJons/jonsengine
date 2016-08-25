@@ -312,7 +312,7 @@ namespace JonsAssetImporter
 
             // mesh AABB
 			// pre-multiply transforms for static aabb
-			const Vec3 transformedVertices = Vec3(nodeTransform * Vec4(vertices, 1.0f));
+			const Vec3 transformedVertices = vertices;// Vec3(nodeTransform * Vec4(vertices, 1.0f));
 			jonsMesh.mAABB.mMinBounds = MinVal(jonsMesh.mAABB.mMinBounds, transformedVertices);
 			jonsMesh.mAABB.mMaxBounds = MaxVal(jonsMesh.mAABB.mMaxBounds, transformedVertices);
         }
@@ -859,7 +859,8 @@ namespace JonsAssetImporter
 					const BoneWeight& weights = mesh.mBoneWeights.at(vertexNum);
 
 					uint32_t weightNum = 0;
-					Mat4 boneTransform(node.mTransform);
+					//Mat4 boneTransform(node.mTransform);
+					Mat4 boneTransform(gIdentityMatrix);
 					while (weightNum < MAX_BONES_PER_VERTEX)
 					{
 						const BoneIndex bone = weights.mBoneIndices.at(weightNum);
