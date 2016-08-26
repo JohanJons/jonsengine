@@ -52,7 +52,8 @@ namespace JonsEngine
             NONE,
             FXAA
         } mAntiAliasing;
-
+        
+        bool mBloomEnabled;
         bool mSSAOEnabled;
 
         // window settings
@@ -82,6 +83,7 @@ namespace JonsEngine
         mShadowFiltering(ShadowFiltering::PCF_2X2),
         mAnisotropicFiltering(Anisotropic::X16),
         mAntiAliasing(AntiAliasing::FXAA),
+        mBloomEnabled(true),
         mSSAOEnabled(true),
 
         // window settings

@@ -139,6 +139,7 @@ namespace JonsEngine
             mContext->PSSetShaderResources(index, 1, &gNullSRV.p);
             mContext->ClearRenderTargetView(mRenderTargets.at(index), gClearColor);
         }
+        
         // backbuffers depth texture might still be bound as SRV
         mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSRV.p);
 		mContext->CSSetShaderResources(SHADER_TEXTURE_SLOT_DEPTH, 1, &gNullSRV.p);

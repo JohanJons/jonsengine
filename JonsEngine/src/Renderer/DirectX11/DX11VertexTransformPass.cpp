@@ -110,15 +110,16 @@ namespace JonsEngine
 	{
 		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
-		// static meshes
+		// only use static rendering, since AABBs are enlarged enough to cover all poses anyway
 		BindForStaticRendering();
+
+		// static meshes
 		const auto staticBegin = renderables.mStaticMeshesBegin;
 		const auto staticEnd = renderables.mStaticMeshesEnd;
 		const auto& staticMeshesContainer = renderData.mStaticMeshes;
 		RenderAABBsAux(staticMeshesContainer, staticBegin, staticEnd, viewProjectionMatrix);
 
 		// animated meshes
-		BindForAnimatedRendering();
 		const auto animatedBegin = renderables.mAnimatedMeshesBegin;
 		const auto animatedEnd = renderables.mAnimatedMeshesEnd;
 		const auto& animatedMeshesContainer = renderData.mAnimatedMeshes;

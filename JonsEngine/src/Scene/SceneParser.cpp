@@ -280,20 +280,18 @@ namespace JonsEngine
 	template <>
 	void AddMesh(const AnimatedActor& actor, const Mat4& worldTransform, const Mat4& localTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData)
 	{
+		const Mat4 localWorldTransform = worldTransform * localTransform;
+
 		if (actor.IsPlaying())
 		{
 			const auto animInstanceID = actor.GetAnimationInstance();
 			const auto& animBoneRange = animationUpdater.GetBoneRange(animInstanceID);
 
 			// NOTE: might be a problem that all the node transforms up to the root bone is NOT added here!!
-			renderData.mAnimatedMeshes.emplace_back(worldTransform * localTransform, animBoneRange, materialIndex, materialTilingFactor, mesh);
+			renderData.mAnimatedMeshes.emplace_back(localWorldTransform, animBoneRange, materialIndex, materialTilingFactor, mesh);
 		}
 		else
-		{
-			const Mat4 localWorldTransform = worldTransform * localTransform;
-
 			renderData.mStaticMeshes.emplace_back(localWorldTransform, materialIndex, materialTilingFactor, mesh);
-		}
 	}
 
 
