@@ -79,7 +79,6 @@ namespace JonsGame
         // sectoid
         SceneNode& nodeSectoid = mScene.GetSceneNode(mNodeSectoid);
         nodeSectoid.TranslateNode(Vec3(0.0f, 0.5f, -4.0f));
-        nodeSectoid.RotateNode(90.0f, Vec3(1.0f, 0.0f, 0.0f));
 
         // cube
         SceneNode& nodeCube = mScene.GetSceneNode(mNodeCube);

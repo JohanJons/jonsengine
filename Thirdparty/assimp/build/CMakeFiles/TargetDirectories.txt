@@ -1,5 +1,0 @@
-C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/build/contrib/zlib/CMakeFiles/ALL_BUILD.dir
-C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/build/CMakeFiles/ZERO_CHECK.dir
-C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/build/code/CMakeFiles/assimp.dir
-C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/build/CMakeFiles/uninstall.dir
-C:/Users/Johan/Desktop/SVN/jonsengine/Thirdparty/assimp/build/contrib/zlib/CMakeFiles/zlibstatic.dir
