@@ -5,6 +5,7 @@
 
 namespace JonsEngine
 {
+	struct DebugOptions;
     class ResourceManifest;
     class Scene;
 
@@ -14,16 +15,19 @@ namespace JonsEngine
         SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest);
         ~SceneParser();
 
-        const RenderQueue& ParseScene(const Scene& scene, const float windowAspectRatio, const float zNear, const float zFar);
+        const RenderQueue& ParseScene(const Scene& scene, const DebugOptions& debugOpts, const float windowAspectRatio, const float zNear, const float zFar);
 
 
     private:
+		// TODO: support multiple cameras
         void ViewFrustumCulling(const Scene& scene, const float windowAspectRatio, const float zNear, const float zFar);
         void PointLightCulling(const Scene& scene);
         void DirectionalLightCulling(const Scene& scene);
 		void CopyBoneTransforms(const Scene& scene);
 		void GetSkybox(const Scene& scene);
 		void GetAmbientLight(const Scene& scene);
+		// needs to run after ViewFrustumCulling
+		void AddAABBDebugData(const Scene& scene);
 
 
         const ResourceManifest& mResourceManifest;

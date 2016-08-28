@@ -24,7 +24,7 @@ namespace JonsEngine
         Engine(const EngineSettings& settings);
         ~Engine();
 
-        void Tick(const DebugOptions& debugOtions);
+        void Tick(const DebugOptions& debugOptions);
 
         WindowManager& GetWindow();
         DX11Renderer& GetRenderer();

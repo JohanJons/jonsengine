@@ -106,24 +106,22 @@ namespace JonsEngine
 		RenderMeshesAux(animatedMeshesContainer, animatedBegin, animatedEnd, viewProjectionMatrix);
 	}
 
-	void DX11VertexTransformPass::RenderAABBs(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix)
+	void DX11VertexTransformPass::RenderAABBs(const AABBRenderData& aabbRenderData)
 	{
 		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
 		// only use static rendering, since AABBs are enlarged enough to cover all poses anyway
 		BindForStaticRendering();
 
-		// static meshes
-		const auto staticBegin = renderables.mStaticMeshesBegin;
-		const auto staticEnd = renderables.mStaticMeshesEnd;
-		const auto& staticMeshesContainer = renderData.mStaticMeshes;
-		RenderAABBsAux(staticMeshesContainer, staticBegin, staticEnd, viewProjectionMatrix);
+		const Mat4& viewProjMatrix = aabbRenderData.mCameraViewProjectionMatrix;
+		for (const auto& aabbData : aabbRenderData.mRenderableAABBs)
+		{
+			const Mat4& worldTransform = aabbData.first;
+			const DX11MeshID meshID = aabbData.second;
 
-		// animated meshes
-		const auto animatedBegin = renderables.mAnimatedMeshesBegin;
-		const auto animatedEnd = renderables.mAnimatedMeshesEnd;
-		const auto& animatedMeshesContainer = renderData.mAnimatedMeshes;
-		RenderAABBsAux(animatedMeshesContainer, animatedBegin, animatedEnd, viewProjectionMatrix);
+			mTransformCBuffer.SetData(TransformCBuffer(viewProjMatrix * worldTransform));
+			mMeshMap.GetItem(meshID).DrawAABB();
+		}
 	}
 
 
@@ -144,18 +142,8 @@ namespace JonsEngine
 		for (auto meshIndex = beginIndex; meshIndex < endIndex; ++meshIndex)
 		{
 			const RenderableMesh& mesh = meshContainer.at(meshIndex);
-			mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mWorldTransform));
+			mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mLocalWorldTransform));
 			mMeshMap.GetItem(mesh.mMeshID).DrawPositions();
-		}
-	}
-
-	void DX11VertexTransformPass::RenderAABBsAux(const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index beginIndex, const RenderableMesh::Index endIndex, const Mat4& viewProjectionMatrix)
-	{
-		for (auto meshIndex = beginIndex; meshIndex < endIndex; ++meshIndex)
-		{
-			const RenderableMesh& mesh = meshContainer.at(meshIndex);
-			mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mWorldTransform));
-			mMeshMap.GetItem(mesh.mMeshID).DrawAABB();
 		}
 	}
 }

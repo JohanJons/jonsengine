@@ -157,6 +157,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp" />
     <ClCompile Include="src\Renderer\RenderDefs.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />
+    <ClCompile Include="src\RenderQueue\AABBRenderData.cpp" />
     <ClCompile Include="src\RenderQueue\RenderableCamera.cpp" />
     <ClCompile Include="src\RenderQueue\RenderableCollection.cpp" />
     <ClCompile Include="src\RenderQueue\RenderableDirectionalLight.cpp" />
@@ -255,6 +256,7 @@
     </ClInclude>
     <ClInclude Include="include\Renderer\RenderDefs.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
+    <ClInclude Include="include\RenderQueue\AABBRenderData.h" />
     <ClInclude Include="include\RenderQueue\RenderableCamera.h" />
     <ClInclude Include="include\RenderQueue\RenderableCollection.h" />
     <ClInclude Include="include\RenderQueue\RenderableContainer.h" />

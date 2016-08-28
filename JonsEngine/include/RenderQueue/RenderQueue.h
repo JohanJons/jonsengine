@@ -5,6 +5,7 @@
 #include "include/RenderQueue/RenderablePointLight.h"
 #include "include/RenderQueue/RenderableMaterial.h"
 #include "include/RenderQueue/RenderableMesh.h"
+#include "include/RenderQueue/AABBRenderData.h"
 #include "include/Resources/Bone.h"
 
 #include <vector>
@@ -35,7 +36,9 @@ namespace JonsEngine
         RenderableCamera mCamera;
         RenderablePointLights mPointLights;
         RenderableDirectionalLights mDirectionalLights;
-
 		RenderData mRenderData;
+
+		// debug-related stuff
+		AABBRenderData mAABBRenderData;
     };
 }

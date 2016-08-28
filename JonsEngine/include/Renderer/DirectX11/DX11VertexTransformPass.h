@@ -3,7 +3,6 @@
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/RenderQueue/RenderableMesh.h"
 #include "include/RenderQueue/RenderQueue.h"
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
@@ -14,7 +13,7 @@
 
 namespace JonsEngine
 {
-	struct RenderData;
+	struct AABBRenderData;
 	struct RenderableCollection;
 
     class DX11VertexTransformPass
@@ -25,7 +24,7 @@ namespace JonsEngine
 
         void RenderStaticMesh(DX11Mesh& mesh, const Mat4& wvpMatrix);
 		void RenderMeshes(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix);
-		void RenderAABBs(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix);
+		void RenderAABBs(const AABBRenderData& aabbRenderData);
 
 
     private:

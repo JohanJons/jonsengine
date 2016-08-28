@@ -3,6 +3,7 @@
 #include "include/Scene/Scene.h"
 #include "include/Resources/ResourceManifest.h"
 #include "include/Core/Types.h"
+#include "include/Core/DebugOptions.h"
 #include "include/Core/Math/Math.h"
 #include "include/Core/Math/Intersection.h"
 
@@ -33,8 +34,14 @@ namespace JonsEngine
 	template <typename ACTOR_TYPE>
 	RenderableMaterial::Index ParseMaterial(const ACTOR_TYPE& actor, const Mesh& mesh, const bool parseMaterial, const ResourceManifest& resManifest, RenderableMaterial::ContainerType& materialContainer);
 
+	template <typename ACTOR_ITER_TYPE>
+	void CullAABB(const Scene& scene, const ResourceManifest& resManifest, const ACTOR_ITER_TYPE& actorIterator, const EngineSettings::CullingStrategy cullingStrat, AABBRenderData::RenderableAABBsContainer& aabbDataContainer,
+		const Mat4& viewProjTransform);
 
-    SceneParser::SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest) : mResourceManifest(resManifest), mCullingStrategy(engineSettings.mSceneCullingStrategy)
+
+    SceneParser::SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest) :
+		mResourceManifest(resManifest),
+		mCullingStrategy(engineSettings.mSceneCullingStrategy)
     {
     }
 
@@ -43,7 +50,7 @@ namespace JonsEngine
     }
 
 
-    const RenderQueue& SceneParser::ParseScene(const Scene& scene, const float windowAspectRatio, const float zNear, const float zFar)
+    const RenderQueue& SceneParser::ParseScene(const Scene& scene, const DebugOptions& debugOpts, const float windowAspectRatio, const float zNear, const float zFar)
     {
         mRenderQueue.Clear();
 
@@ -54,6 +61,9 @@ namespace JonsEngine
         ViewFrustumCulling(scene, windowAspectRatio, zNear, zFar);
         PointLightCulling(scene);
         DirectionalLightCulling(scene);
+
+		if (debugOpts.mRenderingFlags.test(debugOpts.RENDER_FLAG_DRAW_AABB))
+			AddAABBDebugData(scene);
 
         return mRenderQueue;
     }
@@ -179,6 +189,19 @@ namespace JonsEngine
 	void SceneParser::GetAmbientLight(const Scene& scene)
 	{
 		mRenderQueue.mAmbientLight = scene.GetAmbientLight();
+	}
+
+	void SceneParser::AddAABBDebugData(const Scene& scene)
+	{
+		mRenderQueue.mAABBRenderData.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix;
+
+		const auto staticActors = scene.GetStaticActors();
+		const auto animatedActors = scene.GetAnimatedActors();
+		auto& aabbDataContainer = mRenderQueue.mAABBRenderData.mRenderableAABBs;
+		const Mat4& viewProjTransform = mRenderQueue.mAABBRenderData.mCameraViewProjectionMatrix;
+
+		CullAABB<decltype(staticActors)>(scene, mResourceManifest, staticActors, mCullingStrategy, aabbDataContainer, viewProjTransform);
+		CullAABB<decltype(animatedActors)>(scene, mResourceManifest, animatedActors, mCullingStrategy, aabbDataContainer, viewProjTransform);
 	}
 
 
@@ -320,5 +343,41 @@ namespace JonsEngine
 		const RenderableMaterial::Index index = materialContainer.size() - 1;
 
 		return index;
+	}
+
+	template <typename ACTOR_ITER_TYPE>
+	void CullAABB(const Scene& scene, const ResourceManifest& resManifest, const ACTOR_ITER_TYPE& actorIterator, const EngineSettings::CullingStrategy cullingStrat, AABBRenderData::RenderableAABBsContainer& aabbDataContainer,
+		const Mat4& viewProjTransform)
+	{
+		for (const auto& actor : actorIterator)
+		{
+			const SceneNodeID sceneNodeID = actor.GetSceneNode();
+			const ModelID modelID = actor.GetModel();
+			if (sceneNodeID == INVALID_SCENE_NODE_ID || modelID == INVALID_MODEL_ID)
+				continue;
+
+			const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
+			const Model& model = resManifest.GetModel(modelID);
+			const Mat4& worldMatrix = sceneNode.GetWorldTransform();
+
+			const auto visibilityResult = FrustumCull(model, worldMatrix, viewProjTransform);
+
+			// TODO: extend with fine-grained culling, such as adding meshes per-node rather than per-model for AGGRESSIVE culling strategy,
+			const bool addAllMeshes = DetermineIfAddAllMeshes(cullingStrat, visibilityResult);
+			if (addAllMeshes)
+			{
+				for (const ModelNode& node : model.GetNodes())
+				{
+					if (node.GetNumMeshes() == 0)
+						continue;
+
+					for (const Mesh& mesh : node.GetMeshes())
+					{
+						const DX11MeshID meshID = mesh.GetMesh();
+						aabbDataContainer.emplace_back(worldMatrix, meshID);
+					}
+				}
+			}
+		}
 	}
 }

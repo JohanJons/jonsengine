@@ -189,7 +189,7 @@ namespace JonsEngine
             mSkyboxPass.Render(renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraProjectionMatrix, mMaterialMap.GetItem(renderQueue.mSkyboxTextureID));
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
-            mAABBPass.Render(renderQueue.mRenderData, renderQueue.mCamera);
+            mAABBPass.Render(renderQueue.mAABBRenderData);
     }
 
 
@@ -214,8 +214,8 @@ namespace JonsEngine
 					mMaterialMap.GetItem(material.mNormalTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_NORMAL);
 			}
 
-			const Mat4 wvpMatrix = renderQueue.mCamera.mCameraViewProjectionMatrix * mesh.mWorldTransform;
-			const Mat4 worldViewMatrix = renderQueue.mCamera.mCameraViewMatrix * mesh.mWorldTransform;
+			const Mat4 wvpMatrix = renderQueue.mCamera.mCameraViewProjectionMatrix * mesh.mLocalWorldTransform;
+			const Mat4 worldViewMatrix = renderQueue.mCamera.mCameraViewMatrix * mesh.mLocalWorldTransform;
 
 			mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, mesh.mMaterialTilingFactor, hasDiffuseTexture, hasNormalTexture);
 			mMeshMap.GetItem(mesh.mMeshID).Draw();

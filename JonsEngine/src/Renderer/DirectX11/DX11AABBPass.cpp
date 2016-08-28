@@ -17,10 +17,10 @@ namespace JonsEngine
     }
 
 
-    void DX11AABBPass::Render(const RenderQueue::RenderData& renderData, const RenderableCamera& camera)
+    void DX11AABBPass::Render(const AABBRenderData& renderData)
     {
         mContext->PSSetShader(mPixelShader, nullptr, 0);
 
-        mVertexTransformPass.RenderAABBs(renderData, camera, camera.mCameraViewProjectionMatrix);
+        mVertexTransformPass.RenderAABBs(renderData);
     }
 }

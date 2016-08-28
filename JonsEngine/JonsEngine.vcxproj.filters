@@ -314,6 +314,9 @@
     <ClCompile Include="src\Resources\Bone.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
+    <ClCompile Include="src\RenderQueue\AABBRenderData.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -609,6 +612,9 @@
     </ClInclude>
     <ClInclude Include="include\Resources\BoneKeyframe.h">
       <Filter>Header Files\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\AABBRenderData.h">
+      <Filter>Header Files\RenderQueue</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

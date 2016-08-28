@@ -47,7 +47,7 @@ namespace JonsEngine
 
         // parse scene into renderqueue for renderer
         const float zNear = mRenderer.GetZNear(), zFar = mRenderer.GetZFar();
-        const RenderQueue& renderQueue = mSceneParser.ParseScene(activeScene, windowAspectRatio, zNear, zFar);
+        const RenderQueue& renderQueue = mSceneParser.ParseScene(activeScene, debugOptions, windowAspectRatio, zNear, zFar);
 
         // render the scene
         mRenderer.Render(renderQueue, debugOptions.mRenderingFlags);

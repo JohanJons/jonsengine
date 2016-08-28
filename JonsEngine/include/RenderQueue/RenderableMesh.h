@@ -14,11 +14,11 @@ namespace JonsEngine
     {
 		typedef RenderableMaterial::Index MaterialIndex;
 
-		RenderableMesh(const Mat4& worldTransform, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID);
-		RenderableMesh(const Mat4& worldTransform, const BoneIndexRange& boneRange, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID);
+		RenderableMesh(const Mat4& localWorldTransform, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID);
+		RenderableMesh(const Mat4& localWorldTransform, const BoneIndexRange& boneRange, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID);
 
 
-        Mat4 mWorldTransform;
+        Mat4 mLocalWorldTransform;
 		RenderableSkeleton mSkeleton;
 		MaterialIndex mMaterial;
         float mMaterialTilingFactor;
