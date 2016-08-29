@@ -8,7 +8,13 @@
 namespace JonsEngine
 {
     DX11PostProcessor::DX11PostProcessor(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, D3D11_TEXTURE2D_DESC backbufferTextureDesc) :
-        mContext(context), mFullscreenPass(fullscreenPass), mFXAACBuffer(device, context, mFXAACBuffer.CONSTANT_BUFFER_SLOT_PIXEL), mFXAABackbufferTexture(nullptr), mFXAARTV(nullptr), mFXAASRV(nullptr), mFXAAPixelShader(nullptr)
+        mContext(context),
+        mFullscreenPass(fullscreenPass),
+        mFXAACBuffer(device, context, mFXAACBuffer.CONSTANT_BUFFER_SLOT_PIXEL),
+        mFXAABackbufferTexture(nullptr),
+        mFXAARTV(nullptr),
+        mFXAASRV(nullptr),
+        mFXAAPixelShader(nullptr)
     {
         backbufferTextureDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
