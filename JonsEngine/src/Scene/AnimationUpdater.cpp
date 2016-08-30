@@ -130,7 +130,12 @@ namespace JonsEngine
 
 		// decrement index-mapping of other animationInstances as we are removing one member
 		for (auto& animInstIDIndexPair : mAnimationInstanceMap)
-			--animInstIDIndexPair.second;
+		{
+			AnimationInstanceIndex& index = animInstIDIndexPair.second;
+
+			if (index > animInstanceIndex)
+				--animInstIDIndexPair.second;
+		}
     }
 
 

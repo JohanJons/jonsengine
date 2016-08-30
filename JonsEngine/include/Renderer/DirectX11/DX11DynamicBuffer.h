@@ -59,6 +59,9 @@ namespace JonsEngine
         assert(data);
         assert(newSizeInBytes > 0);
 
+		mBuffer.Release();
+		mBufferSRV.Release();
+
         D3D11_SUBRESOURCE_DATA initialData;
         ZeroMemory(&initialData, sizeof(D3D11_SUBRESOURCE_DATA));
         initialData.pSysMem = data;
