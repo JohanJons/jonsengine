@@ -31,9 +31,12 @@ namespace JonsEngine
         struct TransformCBuffer
         {
             Mat4 mWVPMatrix;
+			uint32_t mBoneIndexOffset;
 
 
-            TransformCBuffer(const Mat4& wvpMatrix) : mWVPMatrix(wvpMatrix)
+            TransformCBuffer(const Mat4& wvpMatrix, const uint32_t boneIndexOffset) :
+				mWVPMatrix(wvpMatrix),
+				mBoneIndexOffset(boneIndexOffset)
             {
             }
         };
@@ -41,7 +44,6 @@ namespace JonsEngine
 		void BindForStaticRendering();
 		void BindForAnimatedRendering();
         void RenderMeshesAux(const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index beginIndex, const RenderableMesh::Index endIndex, const Mat4& viewProjectionMatrix);
-		void RenderAABBsAux(const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index beginIndex, const RenderableMesh::Index endIndex, const Mat4& viewProjectionMatrix);
 
 
         ID3D11DeviceContextPtr mContext;

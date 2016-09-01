@@ -214,10 +214,15 @@ namespace JonsEngine
 					mMaterialMap.GetItem(material.mNormalTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_NORMAL);
 			}
 
+			uint32_t boneOffset = 0;
+			const bool hasBones = mesh.mSkeleton.mBoneRange.first != INVALID_BONE_INDEX;
+			if (hasBones)
+				boneOffset = mesh.mSkeleton.mBoneRange.first;
+
 			const Mat4 wvpMatrix = renderQueue.mCamera.mCameraViewProjectionMatrix * mesh.mLocalWorldTransform;
 			const Mat4 worldViewMatrix = renderQueue.mCamera.mCameraViewMatrix * mesh.mLocalWorldTransform;
 
-			mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, mesh.mMaterialTilingFactor, hasDiffuseTexture, hasNormalTexture);
+			mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, mesh.mMaterialTilingFactor, hasDiffuseTexture, hasNormalTexture, boneOffset);
 			mMeshMap.GetItem(mesh.mMeshID).Draw();
 		}
 	}

@@ -126,9 +126,9 @@ namespace JonsEngine
     }
 
 
-    void DX11GBuffer::SetConstantData(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture)
+    void DX11GBuffer::SetConstantData(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture, const uint32_t boneIndexOffset)
     {
-        mConstantBuffer.SetData({ wvpMatrix, worldViewMatrix, textureTilingFactor, hasDiffuseTexture, hasNormalTexture });
+        mConstantBuffer.SetData({ wvpMatrix, worldViewMatrix, textureTilingFactor, hasDiffuseTexture, hasNormalTexture, boneIndexOffset });
     }
 
     void DX11GBuffer::BindForGeometryStage(ID3D11DepthStencilViewPtr dsv)

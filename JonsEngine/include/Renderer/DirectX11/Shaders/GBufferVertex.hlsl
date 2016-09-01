@@ -44,6 +44,7 @@ cbuffer GBufferConstants : register(CBUFFER_REGISTER_VERTEX)
     float gTextureTilingFactor;
     bool gHasDiffuseTexture;
     bool gHasNormalTexture;
+	uint gBoneIndexOffset;
 };
 
 
@@ -60,7 +61,7 @@ GBufferVSOut vs_main(GBufferVSIn input)
 	float4x4 worldViewMatrix = gWorldViewMatrix;
     
     #if GBUFFER_IS_ANIMATED_MESHES
-		float4x4 boneTransform = BuildBoneTransform(input.mBoneIndices, input.mBoneWeights);
+		float4x4 boneTransform = BuildBoneTransform(input.mBoneIndices + gBoneIndexOffset, input.mBoneWeights);
 		wvpMatrix = mul(wvpMatrix, boneTransform);
 		worldViewMatrix = mul(worldViewMatrix, boneTransform);
     #endif

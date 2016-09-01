@@ -23,7 +23,7 @@ namespace JonsEngine
         DX11GBuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc);
         ~DX11GBuffer();
 
-        void SetConstantData(const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture);
+        void SetConstantData(const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture, const uint32_t boneIndexOffset);
         void BindForGeometryStage(ID3D11DepthStencilViewPtr dsv);
 		void BindForStaticPass();
 		void BindForAnimatedPass();
@@ -38,13 +38,15 @@ namespace JonsEngine
             float mTextureTilingFactor;
             uint32_t mHasDiffuseTexture;
             uint32_t mHasNormalTexture;
+			uint32_t mBoneIndexOffset;
 
-            GBufferCBuffer(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuse, const bool hasNormal) :
+            GBufferCBuffer(const Mat4& wvpMatrix, const Mat4& worldViewMatrix, const float textureTilingFactor, const bool hasDiffuse, const bool hasNormal, const uint32_t boneIndexOffset) :
                 mWVPMatrix(wvpMatrix),
                 mWorldViewMatrix(worldViewMatrix),
                 mTextureTilingFactor(textureTilingFactor),
                 mHasDiffuseTexture(hasDiffuse),
-                mHasNormalTexture(hasNormal)
+                mHasNormalTexture(hasNormal),
+				mBoneIndexOffset(boneIndexOffset)
             {
             }
         };

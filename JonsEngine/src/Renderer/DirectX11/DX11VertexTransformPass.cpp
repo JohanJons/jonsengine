@@ -83,7 +83,8 @@ namespace JonsEngine
 		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		BindForStaticRendering();
 
-        mTransformCBuffer.SetData(TransformCBuffer(wvpMatrix));
+		const uint32_t noBoneIndexOffset = 0;
+        mTransformCBuffer.SetData(TransformCBuffer(wvpMatrix, noBoneIndexOffset));
         mesh.DrawPositions();
     }
 
@@ -113,13 +114,15 @@ namespace JonsEngine
 		// only use static rendering, since AABBs are enlarged enough to cover all poses anyway
 		BindForStaticRendering();
 
+		// TODO: separate cbuffer for boneindex
+		const uint32_t noBoneIndexOffset = 0;
 		const Mat4& viewProjMatrix = aabbRenderData.mCameraViewProjectionMatrix;
 		for (const auto& aabbData : aabbRenderData.mRenderableAABBs)
 		{
 			const Mat4& worldTransform = aabbData.first;
 			const DX11MeshID meshID = aabbData.second;
 
-			mTransformCBuffer.SetData(TransformCBuffer(viewProjMatrix * worldTransform));
+			mTransformCBuffer.SetData(TransformCBuffer(viewProjMatrix * worldTransform, noBoneIndexOffset));
 			mMeshMap.GetItem(meshID).DrawAABB();
 		}
 	}
@@ -142,7 +145,13 @@ namespace JonsEngine
 		for (auto meshIndex = beginIndex; meshIndex < endIndex; ++meshIndex)
 		{
 			const RenderableMesh& mesh = meshContainer.at(meshIndex);
-			mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mLocalWorldTransform));
+
+			uint32_t boneOffset = 0;
+			const bool hasBones = mesh.mSkeleton.mBoneRange.first != INVALID_BONE_INDEX;
+			if (hasBones)
+				boneOffset = mesh.mSkeleton.mBoneRange.first;
+
+			mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mLocalWorldTransform, boneOffset));
 			mMeshMap.GetItem(mesh.mMeshID).DrawPositions();
 		}
 	}

@@ -14,12 +14,13 @@ struct TransformVSInput
 cbuffer TransformConstants : register(CBUFFER_REGISTER_VERTEX)
 {
 	float4x4 gWVPMatrix;
+	uint gBoneIndexOffset;
 };
 
 
 float4 vs_main(TransformVSInput input) : SV_Position
 {
-	float4x4 boneTransform = BuildBoneTransform(input.mBoneIndices, input.mBoneWeights);
+	float4x4 boneTransform = BuildBoneTransform(input.mBoneIndices + gBoneIndexOffset, input.mBoneWeights);
 	float4x4 wvpMatrix = mul(gWVPMatrix, boneTransform);
 
 	return mul(wvpMatrix, input.mPosition);
