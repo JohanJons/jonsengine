@@ -14,8 +14,8 @@ namespace JonsAssetImporter
 {
     class FreeImage;
 
-	// <pkgName, assimpName>
-	typedef std::map<std::string, std::string> MeshNameMap;
+	// <pkgName, assimpMeshIndex>
+	typedef std::map<std::string, uint32_t> MeshNameMap;
 
     class Assimp
     {

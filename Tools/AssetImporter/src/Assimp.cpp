@@ -216,8 +216,7 @@ namespace JonsAssetImporter
         for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
         {
             aiMesh* assimpMesh = scene->mMeshes[meshIndex];
-			std::string assimpName = assimpMesh->mName.C_Str();
-			std::string meshName = assimpName;
+			std::string meshName = assimpMesh->mName.C_Str();
 			bool meshAlreadyImported = DoesPkgNameExist<PackageMesh>(meshContainer, meshName);
 			
 			// name collision - need to rename mesh
@@ -227,7 +226,7 @@ namespace JonsAssetImporter
 				meshAlreadyImported = DoesPkgNameExist<PackageMesh>(meshContainer, meshName);
 			}
 
-			meshNameMap.emplace(meshName, assimpName);
+			meshNameMap.emplace(meshName, meshIndex);
             meshContainer.emplace_back(meshName);
             PackageMesh& jonsMesh = meshContainer.back();
             
@@ -654,16 +653,11 @@ namespace JonsAssetImporter
 
 		auto iter = meshNameMap.find(pkgName);
 		assert(iter != meshNameMap.end());
-		const std::string& assimpName = iter->second;
 
-		for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
-		{
-			const aiMesh* nodeMesh = scene->mMeshes[meshIndex];
-			if (nodeMesh->mName.C_Str() == assimpName)
-				return nodeMesh;
-		}
+		const uint32_t assimpMeshIndex = iter->second;
+		assert(assimpMeshIndex < scene->mNumMeshes);
 
-		return nullptr;
+		return scene->mMeshes[assimpMeshIndex];
 	}
 
 	const aiBone* FindAiBoneByName(const std::set<const aiBone*> aiBones, const std::string& string)
