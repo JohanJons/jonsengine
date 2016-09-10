@@ -152,6 +152,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Sampler.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Shadowmap.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11SkyboxPass.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11ToneMapper.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Utils.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexBufferSet.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp" />
@@ -248,6 +249,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Shadowmap.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11SkyboxPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11StaticBuffer.hpp" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11ToneMapper.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11VertexBufferSet.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11VertexTransformPass.h" />

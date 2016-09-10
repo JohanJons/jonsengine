@@ -13,6 +13,7 @@
 #include "include/Renderer/DirectX11/DX11AmbientPass.h"
 #include "include/Renderer/DirectX11/DX11DirectionalLightPass.h"
 #include "include/Renderer/DirectX11/DX11PointLightPass.h"
+#include "include/Renderer/DirectX11/DX11ToneMapper.h"
 #include "include/Renderer/DirectX11/DX11SkyboxPass.h"
 #include "include/Renderer/DirectX11/DX11PostProcessor.h"
 #include "include/Core/DebugOptions.h"
@@ -71,6 +72,7 @@ namespace JonsEngine
         DX11AmbientPass mAmbientPass;
         DX11DirectionalLightPass mDirectionalLightPass;
         DX11PointLightPass mPointLightPass;
+		DX11ToneMapper mToneMapper;
         DX11PostProcessor mPostProcessor;
         DX11SkyboxPass mSkyboxPass;
     };
