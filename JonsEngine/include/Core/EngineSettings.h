@@ -14,28 +14,32 @@ namespace JonsEngine
     /* EngineSettings definition */
     struct EngineSettings
     {
+		typedef float ToneMappingAdaptationRate;
+		constexpr ToneMappingAdaptationRate DefaultTMAdaptationRate() const { return 1.0f; }
+
+
         // render settings
         enum class ShadowResolution
         {
-            RESOLUTION_1024,
-            RESOLUTION_2048,
-            RESOLUTION_4092
+            Resolution_1024,
+			Resolution_2048,
+			Resolution_4092
         } mShadowResolution;
 
         enum class ShadowReadbackLatency
         {
-           LATENCY_0,
-           LATENCY_1,
-           LATENCY_2,
-           LATENCY_3
+           Latency_0,
+		   Latency_1,
+		   Latency_2,
+		   Latency_3
         } mShadowReadbackLatency;
 
         enum class ShadowFiltering
         {
-            PCF_2X2,
-            PCF_3X3,
-            PCF_5X5,
-            PCF_7X7
+            PCF_2x2,
+            PCF_3x3,
+            PCF_5x5,
+            PCF_7x7
         } mShadowFiltering;
 
         enum class Anisotropic
@@ -49,10 +53,17 @@ namespace JonsEngine
 
         enum class AntiAliasing
         {
-            NONE,
-            FXAA
+            None,
+            Fxaa
         } mAntiAliasing;
+
+		enum class ToneMappingAlghorithm
+		{
+			None,
+			FilmicU2
+		} mToneMapping;
         
+		ToneMappingAdaptationRate mTMAdaptationRate;
         bool mBloomEnabled;
         bool mSSAOEnabled;
 
@@ -78,11 +89,12 @@ namespace JonsEngine
     /* EngineSettings inlines */
     inline EngineSettings::EngineSettings() :
         // render settings
-        mShadowResolution(ShadowResolution::RESOLUTION_2048),
-        mShadowReadbackLatency(ShadowReadbackLatency::LATENCY_2),
-        mShadowFiltering(ShadowFiltering::PCF_2X2),
+        mShadowResolution(ShadowResolution::Resolution_2048),
+        mShadowReadbackLatency(ShadowReadbackLatency::Latency_2),
+        mShadowFiltering(ShadowFiltering::PCF_2x2),
         mAnisotropicFiltering(Anisotropic::X16),
-        mAntiAliasing(AntiAliasing::FXAA),
+        mAntiAliasing(AntiAliasing::Fxaa),
+		mTMAdaptationRate(DefaultTMAdaptationRate()),
         mBloomEnabled(true),
         mSSAOEnabled(true),
 

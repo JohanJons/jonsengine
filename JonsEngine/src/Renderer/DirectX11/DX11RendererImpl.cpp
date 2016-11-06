@@ -103,7 +103,7 @@ namespace JonsEngine
         mShadowFiltering(settings.mShadowFiltering),
         mAntiAliasing(settings.mAntiAliasing),
 
-        mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), mShadowResolution, mShadowReadbackLatency, mMeshes, mMaterials),
+        mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), settings, mMeshes, mMaterials),
         mDepthReductionPass(mDevice, mContext, settings.mShadowReadbackLatency, settings.mWindowWidth, settings.mWindowHeight),
 
         // samplers

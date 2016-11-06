@@ -114,14 +114,14 @@ namespace JonsGame
         // point light
         PointLight& movingLight = mScene.GetPointLight(mMovingPointLightID);
         movingLight.SetRadius(10.0f);
-        movingLight.SetIntensity(2.0f);
-        movingLight.SetLightColor(Vec4(1.0f, 1.0f, 0.0f, 0.0f));
+        movingLight.SetIntensity(10.0f);
+        movingLight.SetLightColor(Vec4(1.0f, 1.0f, 0.2f, 0.0f));
         SceneNode& nodePointLight = mScene.GetSceneNode(mNodePointLight);
         nodePointLight.TranslateNode(Vec3(5.0f, 3.5f, -15.0f));
 
         // directional light
         DirectionalLight& sun = mScene.GetDirectionalLight(mMovingPointLightID);
-        sun.SetLightColor(Vec4(0.55f));
+        sun.SetLightColor(Vec4(1.0f));
 
         // ground plane
         StaticActor& actorPlane = mScene.GetStaticActor(mActorPlane);

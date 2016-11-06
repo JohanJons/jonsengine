@@ -630,9 +630,6 @@
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferVertex.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="include\Renderer\DirectX11\Shaders\FullscreenTriangleVertex.hlsl">
-      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\AmbientPixel.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
@@ -703,6 +700,18 @@
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferVertexStatic.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\Tonemapping.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\AvgLuminance.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\FullscreenTriangle.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\FullscreenTriangleTexcoord.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
   </ItemGroup>

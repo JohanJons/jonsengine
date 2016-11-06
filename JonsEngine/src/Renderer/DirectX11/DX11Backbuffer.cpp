@@ -7,9 +7,6 @@
 
 namespace JonsEngine
 {
-    static const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-
-
     DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDXGISwapChainPtr swapchain, DX11FullscreenTrianglePass& fullscreenPass) :
         mContext(context),
         mBackbufferTexture(nullptr),
@@ -51,17 +48,20 @@ namespace JonsEngine
         mContext->CopyResource(dest, mBackbufferTexture);
     }
 
-    void DX11Backbuffer::BindForDrawing(ID3D11DepthStencilViewPtr dsv, const bool renderToSRGB)
-    {
-        if (renderToSRGB)
-            mContext->OMSetRenderTargets(1, &mRTV_SRGB.p, dsv);
-        else
-            mContext->OMSetRenderTargets(1, &mRTV.p, dsv);
-    }
+
+	void DX11Backbuffer::BindForTonemapping()
+	{
+		mContext->OMSetRenderTargets(1, &mRTV_SRGB.p, nullptr);
+	}
+
+	void DX11Backbuffer::BindForPostProcessing()
+	{
+		mContext->OMSetRenderTargets(1, &mRTV.p, nullptr);
+	}
 
 
     void DX11Backbuffer::ClearBackbuffer(const DX11Color& clearColor)
     {
-        mContext->ClearRenderTargetView(mRTV, &clearColor[0]);
+        mContext->ClearRenderTargetView(mRTV, GetClearColor());
     }
 }

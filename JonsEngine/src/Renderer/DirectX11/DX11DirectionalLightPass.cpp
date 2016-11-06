@@ -184,22 +184,22 @@ namespace JonsEngine
         switch (shadowFiltering)
         {
             default:
-            case EngineSettings::ShadowFiltering::PCF_2X2:
+            case EngineSettings::ShadowFiltering::PCF_2x2:
             {
                 mContext->PSSetShader(mPCF2x2Shader, nullptr, 0);
                 break;
             }
-            case EngineSettings::ShadowFiltering::PCF_3X3:
+            case EngineSettings::ShadowFiltering::PCF_3x3:
             {
                 mContext->PSSetShader(mPCF3x3Shader, nullptr, 0);
                 break;
             }
-            case EngineSettings::ShadowFiltering::PCF_5X5:
+            case EngineSettings::ShadowFiltering::PCF_5x5:
             {
                 mContext->PSSetShader(mPCF5x5Shader, nullptr, 0);
                 break;
             }
-            case EngineSettings::ShadowFiltering::PCF_7X7:
+            case EngineSettings::ShadowFiltering::PCF_7x7:
             {
                 mContext->PSSetShader(mPCF7x7Shader, nullptr, 0);
                 break;
