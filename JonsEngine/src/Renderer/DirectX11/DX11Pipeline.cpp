@@ -32,7 +32,7 @@ namespace JonsEngine
         mAmbientPass(device, context, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, settings.mShadowResolution, settings.mShadowReadbackLatency, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mPointLightPass(device, mContext, mVertexTransformPass, settings.mShadowResolution, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-		mToneMapper(device, context, mFullscreenTrianglePass, settings.mToneMapping),
+		mToneMapper(device, context, mFullscreenTrianglePass, settings.mToneMapping, settings.mAutoExposureRate),
         mPostProcessor(device, context, mFullscreenTrianglePass, backbufferTextureDesc),
         mSkyboxPass(device, context)
     {

@@ -77,6 +77,7 @@ namespace JonsEngine
         DX11DepthReductionPass mDepthReductionPass;
         ID3D11RasterizerStatePtr mDefaultRasterizerState;
         std::unique_ptr<DX11Sampler, std::function<void(DX11Sampler*)>> mModelSampler;
+        DX11Sampler mLinearSampler;
         DX11Sampler mShadowmapSampler;
         DX11Sampler mShadowmapNoCompareSampler;
         bool mSSAOEnabled;

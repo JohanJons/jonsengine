@@ -7,11 +7,10 @@
 
 namespace JonsEngine
 {
-	DX11ToneMapper::DX11ToneMapper(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const EngineSettings::ToneMappingAlghorithm alghorithm, const EngineSettings::ToneMappingAdaptationRate rate) :
+	DX11ToneMapper::DX11ToneMapper(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const EngineSettings::ToneMappingAlghorithm alghorithm, const EngineSettings::AutoExposureRate rate) :
 		mContext(context),
 
 		mAvgLuminanceCBuffer(device, context, DX11ConstantBuffer<AvgLuminanceCBuffer>::CONSTANT_BUFFER_SLOT_PIXEL),
-		mLinearSampler(nullptr),
 		mLuminanceTexture(nullptr),
 		mLuminanceRTV(nullptr),
 		mLuminanceSRV(nullptr),
@@ -19,27 +18,9 @@ namespace JonsEngine
 		mTonemapPixelShader(nullptr),
 
 		mFullscreenPass(fullscreenPass),
-
 		mAlghorithm(alghorithm),
-		mAdaptationRate(rate)
+		mAutoExposureRate(rate)
 	{
-		// Create sampler states
-		D3D11_SAMPLER_DESC sampDesc;
-		sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-		sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-		sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-		sampDesc.BorderColor[0] = 0;
-		sampDesc.BorderColor[1] = 0;
-		sampDesc.BorderColor[2] = 0;
-		sampDesc.BorderColor[3] = 0;
-		sampDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-		sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		sampDesc.MaxAnisotropy = 1;
-		sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
-		sampDesc.MinLOD = 0;
-		sampDesc.MipLODBias = 0;
-		DXCALL(device->CreateSamplerState(&sampDesc, &mLinearSampler));
-
 		D3D11_TEXTURE2D_DESC lumTextureDesc;
 		ZeroMemory(&lumTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
 		lumTextureDesc.Width = LUM_MAP_WIDTH;
@@ -82,9 +63,6 @@ namespace JonsEngine
 
 		mContext->RSSetViewports(1, &mAvgLumViewport);
 		mContext->ClearRenderTargetView(mLuminanceRTV, GetClearColor());
-
-		ID3D11SamplerState* samplerStates[1] = { mLinearSampler };
-		mContext->PSSetSamplers(3, 1, samplerStates);
 
 		mContext->PSSetShader(mAvgLuminancePixelShader, nullptr, 0);
 		mAvgLuminanceCBuffer.SetData(AvgLuminanceCBuffer());

@@ -5,20 +5,27 @@ namespace JonsEngine
     DX11Sampler::DX11Sampler(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const EngineSettings::Anisotropic maxAnisotropy, const D3D11_FILTER filter, const D3D11_TEXTURE_ADDRESS_MODE addressMode,
         const D3D11_COMPARISON_FUNC comparison, const SHADER_SAMPLER_SLOT samplerSlot) 
         :
+        DX11Sampler(device, context, maxAnisotropy, filter, addressMode, addressMode, addressMode, comparison, samplerSlot)
+    {
+    }
+    
+    DX11Sampler::DX11Sampler(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const EngineSettings::Anisotropic maxAnisotropy, const D3D11_FILTER filter, const D3D11_TEXTURE_ADDRESS_MODE addressModeU,
+        const D3D11_TEXTURE_ADDRESS_MODE addressModeV, const D3D11_TEXTURE_ADDRESS_MODE addressModeW, const D3D11_COMPARISON_FUNC comparison, const SHADER_SAMPLER_SLOT samplerSlot)
+        :
         mContext(context), mTextureSampler(nullptr), mAnisotropicFiltering(maxAnisotropy), mSamplerSlot(samplerSlot)
     {
         D3D11_SAMPLER_DESC samplerDesc;
         ZeroMemory(&samplerDesc, sizeof(D3D11_SAMPLER_DESC));
         samplerDesc.Filter = filter;
-        samplerDesc.AddressU = addressMode;
-        samplerDesc.AddressV = addressMode;
-        samplerDesc.AddressW = addressMode;
+        samplerDesc.AddressU = addressModeU;
+        samplerDesc.AddressV = addressModeV;
+        samplerDesc.AddressW = addressModeW;
         samplerDesc.MaxAnisotropy = EngineSettingsToVal(mAnisotropicFiltering);
         samplerDesc.ComparisonFunc = comparison;
         samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
         DXCALL(device->CreateSamplerState(&samplerDesc, &mTextureSampler));
     }
-    
+
     DX11Sampler::~DX11Sampler()
     {
     }

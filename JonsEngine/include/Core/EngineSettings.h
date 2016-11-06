@@ -14,8 +14,8 @@ namespace JonsEngine
     /* EngineSettings definition */
     struct EngineSettings
     {
-		typedef float ToneMappingAdaptationRate;
-		constexpr ToneMappingAdaptationRate DefaultTMAdaptationRate() const { return 1.0f; }
+		typedef float AutoExposureRate;
+		constexpr AutoExposureRate static DefaultAutoExposureRate() { return 1.0f; }
 
 
         // render settings
@@ -63,7 +63,7 @@ namespace JonsEngine
 			FilmicU2
 		} mToneMapping;
         
-		ToneMappingAdaptationRate mTMAdaptationRate;
+        AutoExposureRate mAutoExposureRate;
         bool mBloomEnabled;
         bool mSSAOEnabled;
 
@@ -94,7 +94,7 @@ namespace JonsEngine
         mShadowFiltering(ShadowFiltering::PCF_2x2),
         mAnisotropicFiltering(Anisotropic::X16),
         mAntiAliasing(AntiAliasing::Fxaa),
-		mTMAdaptationRate(DefaultTMAdaptationRate()),
+		mAutoExposureRate(DefaultAutoExposureRate()),
         mBloomEnabled(true),
         mSSAOEnabled(true),
 

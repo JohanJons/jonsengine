@@ -12,7 +12,7 @@ namespace JonsEngine
 	class DX11ToneMapper
 	{
 	public:
-		DX11ToneMapper(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const EngineSettings::ToneMappingAlghorithm alghorithm, const EngineSettings::ToneMappingAdaptationRate rate);
+		DX11ToneMapper(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const EngineSettings::ToneMappingAlghorithm alghorithm, const EngineSettings::AutoExposureRate rate);
 
 		void BindAsRenderTarget();
 		void RenderLuminance();
@@ -40,6 +40,6 @@ namespace JonsEngine
 		DX11FullscreenTrianglePass& mFullscreenPass;
 
 		EngineSettings::ToneMappingAlghorithm mAlghorithm;
-		EngineSettings::ToneMappingAdaptationRate mAdaptationRate;
+		EngineSettings::AutoExposureRate mAutoExposureRate;
 	};
 }
