@@ -13,7 +13,7 @@ namespace JonsEngine
         ~DX11LightAccumulationbuffer();
 
         void BindAsRenderTarget(ID3D11DepthStencilViewPtr dsv);
-        void BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot);
+        void BindAsShaderResource();
         void Clear();
 
 

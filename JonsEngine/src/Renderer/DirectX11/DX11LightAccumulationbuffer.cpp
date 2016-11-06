@@ -5,9 +5,6 @@
 
 namespace JonsEngine
 {
-    static const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-
     DX11LightAccumulationbuffer::DX11LightAccumulationbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc) :
         mContext(context),
         mAccumulationTexture(nullptr),
@@ -33,13 +30,13 @@ namespace JonsEngine
         mContext->OMSetRenderTargets(1, &mRTV.p, dsv);
     }
 
-    void DX11LightAccumulationbuffer::BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot)
+    void DX11LightAccumulationbuffer::BindAsShaderResource()
     {
-        mContext->PSSetShaderResources(shaderTextureSlot, 1, &mSRV.p);
+        mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_DIFFUSE, 1, &mSRV.p);
     }
 
     void DX11LightAccumulationbuffer::Clear()
     {
-        mContext->ClearRenderTargetView(mRTV, gClearColor);
+        mContext->ClearRenderTargetView(mRTV, GetClearColor());
     }
 }

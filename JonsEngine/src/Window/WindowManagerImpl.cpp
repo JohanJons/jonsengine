@@ -231,7 +231,7 @@ namespace JonsEngine
 
     void WindowManagerImpl::SetMousePosition(const uint32_t x, const uint32_t y)
     {
-        POINT cursorPos = { x, y };
+        POINT cursorPos = { static_cast<LONG>(x), static_cast<LONG>(y) };
 
         ClientToScreen(mWindowHandle, &cursorPos);
         SetCursorPos(cursorPos.x, cursorPos.y);

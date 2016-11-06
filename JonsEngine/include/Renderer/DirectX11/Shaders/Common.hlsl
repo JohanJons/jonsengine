@@ -59,5 +59,10 @@ float4x4 BuildBoneTransform(const uint4 boneIndices, const float4 boneWeights)
 	return boneTransform;
 }
 
+float CalcLuminance(const float3 color)
+{
+	return max(dot(color, float3(0.299f, 0.587f, 0.114f)), 0.0001f);
+}
+
 
 #endif

@@ -30,8 +30,7 @@ namespace JonsEngine
     class DX11Pipeline
     {
     public:
-        DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const EngineSettings::ShadowResolution shadowmapResolution,
-            const EngineSettings::ShadowReadbackLatency shadowmapReadbackLatency, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap);
+        DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const EngineSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap);
         ~DX11Pipeline();
 
         void BeginFrame(const RenderQueue& renderQueue);

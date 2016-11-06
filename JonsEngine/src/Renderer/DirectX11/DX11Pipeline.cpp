@@ -5,11 +5,7 @@
 
 namespace JonsEngine
 {
-    const DX11Color gClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-
-
-    DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const EngineSettings::ShadowResolution shadowmapResolution,
-        const EngineSettings::ShadowReadbackLatency shadowmapReadbackLatency, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap)
+    DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const EngineSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap)
         :
         mLogger(logger),
         mWindowSize(backbufferTextureDesc.Width, backbufferTextureDesc.Height),
@@ -34,8 +30,9 @@ namespace JonsEngine
         mGBuffer(device, mContext, backbufferTextureDesc),
 
         mAmbientPass(device, context, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-        mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, shadowmapResolution, shadowmapReadbackLatency, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-        mPointLightPass(device, mContext, mVertexTransformPass, shadowmapResolution, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
+        mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, settings.mShadowResolution, settings.mShadowReadbackLatency, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
+        mPointLightPass(device, mContext, mVertexTransformPass, settings.mShadowResolution, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
+		mToneMapper(device, context, mFullscreenTrianglePass, settings.mToneMapping),
         mPostProcessor(device, context, mFullscreenTrianglePass, backbufferTextureDesc),
         mSkyboxPass(device, context)
     {
@@ -169,24 +166,29 @@ namespace JonsEngine
 
         // turn off blending
         mContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);
+
+		// skybox pass
+		if (renderQueue.mSkyboxTextureID != INVALID_DX11_MATERIAL_ID)
+			mSkyboxPass.Render(renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraProjectionMatrix, mMaterialMap.GetItem(renderQueue.mSkyboxTextureID));
     }
 
     void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA)
     {
-        // flip from lightAccumulatorBuffer --> backbuffer
-        mBackbuffer.BindForDrawing(mDSVReadOnly, true);
-        mLightAccbuffer.BindAsShaderResource(SHADER_TEXTURE_SLOT_EXTRA);
-        mBackbuffer.FillBackbuffer();
+		// render luminance to texture
+		mToneMapper.BindAsRenderTarget();
+		mLightAccbuffer.BindAsShaderResource();
+		mToneMapper.RenderLuminance();
 
-        // post-processing done in sRGB space
-        mBackbuffer.BindForDrawing(mDSVReadOnly, false);
+        // flip from lightAccumulatorBuffer --> backbuffer using tonemapping
+        mBackbuffer.BindForTonemapping();
+		mToneMapper.ApplyToneMapping();
+
+        // rest of post-processing done in sRGB space directly to the backbuffer
+        mBackbuffer.BindForPostProcessing();
 
         // FXAA done in sRGB space
-        if (AA == EngineSettings::AntiAliasing::FXAA)
+        if (AA == EngineSettings::AntiAliasing::Fxaa)
             mPostProcessor.FXAAPass(mBackbuffer, mWindowSize);
-
-        if (renderQueue.mSkyboxTextureID != INVALID_DX11_MATERIAL_ID)
-            mSkyboxPass.Render(renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraProjectionMatrix, mMaterialMap.GetItem(renderQueue.mSkyboxTextureID));
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
             mAABBPass.Render(renderQueue.mAABBRenderData);

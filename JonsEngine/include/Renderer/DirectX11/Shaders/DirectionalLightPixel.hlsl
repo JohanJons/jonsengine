@@ -3,7 +3,6 @@
 
 #include "Constants.h"
 #include "Common.hlsl"
-#include "FullscreenTriangleVertex.hlsl"
 #include "Shadowmapping.hlsl"
 #include "OptimizedPCF.hlsl"
 

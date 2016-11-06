@@ -1,5 +1,5 @@
-#ifndef FULLSCREEN_TRIANGLE_VERTEX_HLSL
-#define FULLSCREEN_TRIANGLE_VERTEX_HLSL
+#ifndef FULLSCREEN_TRIANGLE_HLSL
+#define FULLSCREEN_TRIANGLE_HLSL
 
 // Variation on Timothy Lottes FXAA vertex shader
 float4 vs_main(uint VertexID: SV_VertexID) : SV_Position

@@ -29,13 +29,13 @@ namespace JonsEngine
         {
             default:
                 JONS_ERROR(Logger::GetRendererLogger(), "DX11Utils::EngineSettingsToVal(EngineSettings::ShadowReadbackLatency): Invalid enum");
-            case EngineSettings::ShadowReadbackLatency::LATENCY_0:
+            case EngineSettings::ShadowReadbackLatency::Latency_0:
                 return 0;
-            case EngineSettings::ShadowReadbackLatency::LATENCY_1:
+            case EngineSettings::ShadowReadbackLatency::Latency_1:
                 return 1;
-            case EngineSettings::ShadowReadbackLatency::LATENCY_2:
+            case EngineSettings::ShadowReadbackLatency::Latency_2:
                 return 2;
-            case EngineSettings::ShadowReadbackLatency::LATENCY_3:
+            case EngineSettings::ShadowReadbackLatency::Latency_3:
                 return 3;
         }
     }
@@ -46,11 +46,11 @@ namespace JonsEngine
         {
             default:
                 JONS_ERROR(Logger::GetRendererLogger(), "DX11Utils::EngineSettingsToVal(EngineSettings::ShadowResolution): Invalid enum");
-            case EngineSettings::ShadowResolution::RESOLUTION_1024:
+            case EngineSettings::ShadowResolution::Resolution_1024:
                 return 1024;
-            case EngineSettings::ShadowResolution::RESOLUTION_2048:
+            case EngineSettings::ShadowResolution::Resolution_2048:
                 return 2048;
-            case EngineSettings::ShadowResolution::RESOLUTION_4092:
+            case EngineSettings::ShadowResolution::Resolution_4092:
                 return 4092;
         }
     }

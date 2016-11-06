@@ -2,7 +2,6 @@
 #define CONSTANTS_HLSL
 
 // TODO: refactor this into a more efficient system
-
 #define CBUFFER_SLOT_VERTEX 0
 #define CBUFFER_SLOT_PIXEL 1
 #define CBUFFER_SLOT_COMPUTE 2
@@ -36,5 +35,8 @@
 #define SDSM_NUM_THREADS (SDSM_THREAD_GROUP_SIZE * SDSM_THREAD_GROUP_SIZE)
 
 #define NUM_BONES_PER_VERTEX 4
+
+#define LUM_MAP_WIDTH 1024
+#define LUM_MAP_HEIGHT 1024
 
 #endif

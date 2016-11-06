@@ -20,9 +20,6 @@ namespace JonsEngine
         NUM_INPUT_LAYOUTS
     };
 
-    const float gClearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-
-
     DX11GBuffer::DX11GBuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc) :
         mContext(context),
 
@@ -137,7 +134,7 @@ namespace JonsEngine
         {
             // unbind gbuffer textures as input, it is now rendertarget
             mContext->PSSetShaderResources(index, 1, &gNullSRV.p);
-            mContext->ClearRenderTargetView(mRenderTargets.at(index), gClearColor);
+            mContext->ClearRenderTargetView(mRenderTargets.at(index), &gClearColor.front());
         }
         
         // backbuffers depth texture might still be bound as SRV

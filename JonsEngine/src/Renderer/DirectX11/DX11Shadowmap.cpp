@@ -4,6 +4,7 @@ namespace JonsEngine
 {
     DX11Shadowmap::DX11Shadowmap(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const EngineSettings::ShadowResolution shadowmapRes, const uint32_t numTextures, const bool isCubeTexture) :
         mContext(context),
+
 		mShadowmapTexture(nullptr),
 		mShadowmapSRV(nullptr)
     {

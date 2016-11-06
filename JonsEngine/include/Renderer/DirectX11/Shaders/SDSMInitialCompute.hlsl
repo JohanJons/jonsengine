@@ -2,7 +2,6 @@
 #define SDSM_INITIAL_COMPUTE_HLSL
 
 #include "Constants.h"
-#include "FullscreenTriangleVertex.hlsl"
 #include "Common.hlsl"
 
 // shared memory

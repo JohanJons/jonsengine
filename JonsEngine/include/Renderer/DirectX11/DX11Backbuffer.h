@@ -16,7 +16,9 @@ namespace JonsEngine
 
         void FillBackbuffer();
         void CopyBackbuffer(ID3D11Texture2DPtr dest);
-        void BindForDrawing(ID3D11DepthStencilViewPtr dsv, const bool renderToSRGB);
+
+		void BindForTonemapping();
+        void BindForPostProcessing();
         
         void ClearBackbuffer(const DX11Color& clearColor);
 
