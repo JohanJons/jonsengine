@@ -26,6 +26,10 @@ namespace JonsEngine
 			float mAdaptationRate;
 		};
 
+		void AverageLumPass();
+		void TonemappingPass();
+
+
 		ID3D11DeviceContextPtr mContext;
 
 		D3D11_VIEWPORT mAvgLumViewport;
