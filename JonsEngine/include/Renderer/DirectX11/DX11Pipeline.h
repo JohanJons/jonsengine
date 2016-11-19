@@ -20,6 +20,7 @@
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
+#include "include/Core/Utils/Time.h"
 #include "include/Core/Platform/Directx11.h"
 #include "include/RenderQueue/RenderableMesh.h"
 
@@ -38,7 +39,7 @@ namespace JonsEngine
 
         void GeometryStage(const RenderQueue& renderQueue);
         void LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::ShadowFiltering shadowFiltering, const bool SSAOEnabled);
-        void PostProcessingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA);
+        void PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA);
 
 
     private:

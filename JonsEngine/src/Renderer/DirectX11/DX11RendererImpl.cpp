@@ -168,13 +168,13 @@ namespace JonsEngine
     }
 
 
-    void DX11RendererImpl::Render(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags)
+    void DX11RendererImpl::Render(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags)
     {
         mPipeline.BeginFrame(renderQueue);
 
         mPipeline.GeometryStage(renderQueue);
         mPipeline.LightingStage(renderQueue, debugFlags, mShadowFiltering, mSSAOEnabled);
-        mPipeline.PostProcessingStage(renderQueue, debugFlags, mAntiAliasing);
+        mPipeline.PostProcessingStage(renderQueue, elapstedFrameTime, debugFlags, mAntiAliasing);
 
         mPipeline.EndFrame();
     }

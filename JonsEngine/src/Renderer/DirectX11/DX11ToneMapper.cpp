@@ -55,21 +55,23 @@ namespace JonsEngine
 		mContext->OMSetRenderTargets(1, &mLuminanceRTV.p, nullptr);
 	}
 
-	void DX11ToneMapper::RenderLuminance()
+	void DX11ToneMapper::RenderLuminance(const Milliseconds elapstedFrameTime)
 	{
-		AverageLumPass();
+		AverageLumPass(elapstedFrameTime);
 		TonemappingPass();
 	}
 
 	void DX11ToneMapper::ApplyToneMapping()
 	{
+		assert(mAlghorithm == EngineSettings::ToneMappingAlghorithm::FilmicU2);
+
 		mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mLuminanceSRV.p);
 		mContext->PSSetShader(mTonemapPixelShader, nullptr, 0);
 		mFullscreenPass.Render();
 	}
 
 
-	void DX11ToneMapper::AverageLumPass()
+	void DX11ToneMapper::AverageLumPass(const Milliseconds elapstedFrameTime)
 	{
 		D3D11_VIEWPORT prevViewport;
 		uint32_t num = 1;
@@ -79,7 +81,8 @@ namespace JonsEngine
 		mContext->ClearRenderTargetView(mLuminanceRTV, GetClearColor());
 
 		mContext->PSSetShader(mAvgLuminancePixelShader, nullptr, 0);
-		mAvgLuminanceCBuffer.SetData(AvgLuminanceCBuffer());
+		const float elapsedSeconds = TimeInSeconds(elapstedFrameTime).count();
+		mAvgLuminanceCBuffer.SetData({ elapsedSeconds, mAutoExposureRate });
 
 		mFullscreenPass.Render(true);
 
@@ -89,5 +92,9 @@ namespace JonsEngine
 	void DX11ToneMapper::TonemappingPass()
 	{
 		mContext->GenerateMips(mLuminanceSRV);
+
+		mContext->PSSetShader(mAvgLuminancePixelShader, nullptr, 0);
+
+		mFullscreenPass.Render(true);
 	}
 }

@@ -11,6 +11,7 @@
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/DebugOptions.h"
+#include "include/Core/Utils/Time.h"
 #include "include/Core/Platform/Directx11.h"
 #include "include/Resources/Bone.h"
 
@@ -38,7 +39,7 @@ namespace JonsEngine
             const std::vector<BoneWeight>& boneWeights, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds);
         DX11MaterialID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight);
 
-        void Render(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags);
+        void Render(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags);
         void ReduceDepth(float& minDepth, float& maxDepth);
 
         EngineSettings::Anisotropic GetAnisotropicFiltering() const;
