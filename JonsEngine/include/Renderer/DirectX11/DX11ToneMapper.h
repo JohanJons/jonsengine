@@ -2,6 +2,7 @@
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
+#include "include/Core/Utils/Time.h"
 
 #include "include/Core/EngineSettings.h"
 
@@ -15,7 +16,7 @@ namespace JonsEngine
 		DX11ToneMapper(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const EngineSettings::ToneMappingAlghorithm alghorithm, const EngineSettings::AutoExposureRate rate);
 
 		void BindAsRenderTarget();
-		void RenderLuminance();
+		void RenderLuminance(const Milliseconds elapstedFrameTime);
 		void ApplyToneMapping();
 
 
@@ -26,7 +27,7 @@ namespace JonsEngine
 			float mAdaptationRate;
 		};
 
-		void AverageLumPass();
+		void AverageLumPass(const Milliseconds elapstedFrameTime);
 		void TonemappingPass();
 
 

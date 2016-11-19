@@ -172,12 +172,12 @@ namespace JonsEngine
 			mSkyboxPass.Render(renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraProjectionMatrix, mMaterialMap.GetItem(renderQueue.mSkyboxTextureID));
     }
 
-    void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA)
+    void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA)
     {
 		// render luminance to texture
 		mToneMapper.BindAsRenderTarget();
 		mLightAccbuffer.BindAsShaderResource();
-		mToneMapper.RenderLuminance();
+		mToneMapper.RenderLuminance(elapstedFrameTime);
 
         // flip from lightAccumulatorBuffer --> backbuffer using tonemapping
         mBackbuffer.BindForTonemapping();

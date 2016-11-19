@@ -30,6 +30,7 @@ namespace JonsEngine
         void Clear();
 
 
+
         Vec4 mAmbientLight;
         DX11MaterialID mSkyboxTextureID;
 

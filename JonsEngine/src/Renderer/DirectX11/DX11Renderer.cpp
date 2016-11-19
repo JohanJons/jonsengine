@@ -34,9 +34,9 @@ namespace JonsEngine
     }
 
 
-    void DX11Renderer::Render(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags)
+    void DX11Renderer::Render(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags)
     {
-        mImplementation->Render(renderQueue, debugFlags);
+        mImplementation->Render(renderQueue, elapstedFrameTime, debugFlags);
     }
 
     void DX11Renderer::ReduceDepth(float& minDepth, float& maxDepth)
