@@ -7,7 +7,7 @@
 
 cbuffer AvgLuminanceConstants : register(CBUFFER_REGISTER_PIXEL)
 {
-	float gTimeDelta;
+	float gTimeDeltaSeconds;
 	float gAdaptationRate;
 };
 
@@ -23,7 +23,7 @@ float4 ps_main(FullScreenTexcoordOutput input) : SV_Target0
 	const float currLum = CalcLuminance(rgb);
 
 	const float lastLum = exp(gPreviousLumTexture.Sample(gPointSampler, input.mTexcoord).x);
-	const float adaptedLum = lastLum + (currLum - lastLum) * (1 - exp(-gTimeDelta * gAdaptationRate));
+	const float adaptedLum = lastLum + (currLum - lastLum) * (1 - exp(-gTimeDeltaSeconds * gAdaptationRate));
 
 	return float4(log(adaptedLum), 1.0f, 1.0f, 1.0f);
 }

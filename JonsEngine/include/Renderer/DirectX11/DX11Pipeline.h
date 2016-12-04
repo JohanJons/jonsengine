@@ -1,7 +1,7 @@
 #pragma once
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/Renderer/DirectX11/DX11DynamicBuffer.h"
+#include "include/Renderer/DirectX11/DX11CPUDynamicBuffer.h"
 #include "include/Renderer/DirectX11/DX11Material.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11GBuffer.h"
@@ -60,7 +60,7 @@ namespace JonsEngine
         ID3D11DepthStencilStatePtr mDepthStencilState;
         ID3D11BlendStatePtr mAdditiveBlending;
     
-        DX11DynamicBuffer mBoneTransformsBuffer;
+        DX11CPUDynamicBuffer mBoneTransformsBuffer;
         DX11VertexTransformPass mVertexTransformPass;
         DX11AABBPass mAABBPass;
         DX11FullscreenTrianglePass mFullscreenTrianglePass;

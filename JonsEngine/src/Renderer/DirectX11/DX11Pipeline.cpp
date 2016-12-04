@@ -102,7 +102,7 @@ namespace JonsEngine
 		if (hasBoneData)
 		{
 			mBoneTransformsBuffer.SetData(renderQueue.mRenderData.mBones);
-			mBoneTransformsBuffer.Bind(DX11DynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_BONE_TRANSFORMS);
+			mBoneTransformsBuffer.Bind(DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_BONE_TRANSFORMS);
 		}
     }
 

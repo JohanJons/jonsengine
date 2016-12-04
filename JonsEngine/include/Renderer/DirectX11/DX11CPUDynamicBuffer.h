@@ -8,7 +8,7 @@
 
 namespace JonsEngine
 {
-    class DX11DynamicBuffer //: protected DX11Buffer<T, D3D11_USAGE_DYNAMIC>
+    class DX11CPUDynamicBuffer //: protected DX11Buffer<T, D3D11_USAGE_DYNAMIC>
     {
     public:
         enum class Shaderslot
@@ -17,7 +17,7 @@ namespace JonsEngine
             Pixel
         };
 
-        DX11DynamicBuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context);
+        DX11CPUDynamicBuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context);
 
         void Bind(const Shaderslot shaderSlot, const uint32_t bindSlot);
         template <typename T> 
@@ -40,7 +40,7 @@ namespace JonsEngine
 
 
     template <typename T>
-    void DX11DynamicBuffer::SetData(const std::vector<T>& data)
+    void DX11CPUDynamicBuffer::SetData(const std::vector<T>& data)
     {
         const std::size_t dataSize = data.size() * sizeof(T);
         const T* dataBegin = &data.front();
@@ -54,7 +54,7 @@ namespace JonsEngine
 
 
     template <typename T>
-    void DX11DynamicBuffer::ResizeBuffer(const T* data, const std::size_t newSizeInBytes)
+    void DX11CPUDynamicBuffer::ResizeBuffer(const T* data, const std::size_t newSizeInBytes)
     {
         assert(data);
         assert(newSizeInBytes > 0);
@@ -81,7 +81,7 @@ namespace JonsEngine
     }
 
     template <typename T>
-    void DX11DynamicBuffer::BufferData(const T* data, const std::size_t newSizeInBytes)
+    void DX11CPUDynamicBuffer::BufferData(const T* data, const std::size_t newSizeInBytes)
     {
         assert(data);
         assert(newSizeInBytes > 0);

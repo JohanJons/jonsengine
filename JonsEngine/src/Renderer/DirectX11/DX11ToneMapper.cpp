@@ -7,13 +7,16 @@
 
 namespace JonsEngine
 {
+	
+
 	DX11ToneMapper::DX11ToneMapper(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const EngineSettings::ToneMappingAlghorithm alghorithm, const EngineSettings::AutoExposureRate rate) :
 		mContext(context),
 
 		mAvgLuminanceCBuffer(device, context, DX11ConstantBuffer<AvgLuminanceCBuffer>::CONSTANT_BUFFER_SLOT_PIXEL),
 		mLuminanceTexture(nullptr),
-		mLuminanceRTV(nullptr),
-		mLuminanceSRV(nullptr),
+		mAvgLuminanceBuffers({ nullptr, nullptr }),
+		mLuminanceRTVs({ nullptr, nullptr, nullptr }),
+		mLuminanceSRVs({ nullptr, nullptr, nullptr }),
 		mAvgLuminancePixelShader(nullptr),
 		mTonemapPixelShader(nullptr),
 
@@ -40,13 +43,13 @@ namespace JonsEngine
 		DXCALL(device->CreatePixelShader(gTonemappingShader, sizeof(gTonemappingShader), nullptr, &mTonemapPixelShader));
 
 		// viewport used during shadow pass
-		ZeroMemory(&mAvgLumViewport, sizeof(D3D11_VIEWPORT));
-		mAvgLumViewport.TopLeftX = 0;
-		mAvgLumViewport.TopLeftY = 0;
-		mAvgLumViewport.Width = static_cast<float>(LUM_MAP_WIDTH);
-		mAvgLumViewport.Height = static_cast<float>(LUM_MAP_HEIGHT);
-		mAvgLumViewport.MinDepth = 0.0f;
-		mAvgLumViewport.MaxDepth = 1.0f;
+		ZeroMemory(&mAvgLuminanceViewport, sizeof(D3D11_VIEWPORT));
+		mAvgLuminanceViewport.TopLeftX = 0;
+		mAvgLuminanceViewport.TopLeftY = 0;
+		mAvgLuminanceViewport.Width = static_cast<float>(LUM_MAP_WIDTH);
+		mAvgLuminanceViewport.Height = static_cast<float>(LUM_MAP_HEIGHT);
+		mAvgLuminanceViewport.MinDepth = 0.0f;
+		mAvgLuminanceViewport.MaxDepth = 1.0f;
 	}
 
 
@@ -58,7 +61,9 @@ namespace JonsEngine
 	void DX11ToneMapper::RenderLuminance(const Milliseconds elapstedFrameTime)
 	{
 		AverageLumPass(elapstedFrameTime);
-		TonemappingPass();
+
+		// avg. frame luminance will be in the lowest mip
+		mContext->GenerateMips(mLuminanceSRV);
 	}
 
 	void DX11ToneMapper::ApplyToneMapping()
@@ -77,23 +82,15 @@ namespace JonsEngine
 		uint32_t num = 1;
 		mContext->RSGetViewports(&num, &prevViewport);
 
-		mContext->RSSetViewports(1, &mAvgLumViewport);
+		mContext->RSSetViewports(1, &mAvgLuminanceViewport);
 		mContext->ClearRenderTargetView(mLuminanceRTV, GetClearColor());
 
 		mContext->PSSetShader(mAvgLuminancePixelShader, nullptr, 0);
-		mAvgLuminanceCBuffer.SetData({__IN_SECONDS__, mAutoExposureRate});
+		const float elapsedSeconds = TimeInSeconds(elapstedFrameTime).count();
+		mAvgLuminanceCBuffer.SetData({ elapsedSeconds, mAutoExposureRate });
 
 		mFullscreenPass.Render(true);
 
 		mContext->RSSetViewports(1, &prevViewport);
-	}
-
-	void DX11ToneMapper::TonemappingPass()
-	{
-		mContext->GenerateMips(mLuminanceSRV);
-
-		mContext->PSSetShader(mAvgLuminancePixelShader, nullptr, 0);
-
-		mFullscreenPass.Render(true);
 	}
 }

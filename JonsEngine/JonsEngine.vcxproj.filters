@@ -302,9 +302,6 @@
     <ClCompile Include="src\Renderer\RenderDefs.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX11\DX11DynamicBuffer.cpp">
-      <Filter>Source Files\Renderer\DirectX11</Filter>
-    </ClCompile>
     <ClCompile Include="src\Resources\BoneKeyframe.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
@@ -318,6 +315,9 @@
       <Filter>Source Files\RenderQueue</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\DirectX11\DX11ToneMapper.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11CPUDynamicBuffer.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
   </ItemGroup>
@@ -610,9 +610,6 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11StaticBuffer.hpp">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DX11DynamicBuffer.h">
-      <Filter>Header Files\Renderer\DirectX11</Filter>
-    </ClInclude>
     <ClInclude Include="include\Resources\BoneKeyframe.h">
       <Filter>Header Files\Resources</Filter>
     </ClInclude>
@@ -620,6 +617,9 @@
       <Filter>Header Files\RenderQueue</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11ToneMapper.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11CPUDynamicBuffer.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
   </ItemGroup>
