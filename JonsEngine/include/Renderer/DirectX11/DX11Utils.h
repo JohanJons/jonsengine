@@ -66,6 +66,7 @@ namespace JonsEngine
     typedef CComPtr<IDXGISwapChain> IDXGISwapChainPtr;
     typedef CComPtr<ID3D11Device> ID3D11DevicePtr;
     typedef CComPtr<ID3D11DeviceContext> ID3D11DeviceContextPtr;
+	typedef CComPtr<ID3D11Texture1D> ID3D11Texture1DPtr;
     typedef CComPtr<ID3D11Texture2D> ID3D11Texture2DPtr;
     typedef CComPtr<ID3D11ShaderResourceView> ID3D11ShaderResourceViewPtr;
     typedef CComPtr<ID3D11UnorderedAccessView> ID3D11UnorderedAccessViewPtr;

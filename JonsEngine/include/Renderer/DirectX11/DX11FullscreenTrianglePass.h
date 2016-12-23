@@ -13,10 +13,13 @@ namespace JonsEngine
         DX11FullscreenTrianglePass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context);
         ~DX11FullscreenTrianglePass();
 
-        void Render(const bool withTexcoords = false);
+        void Render();
+		void RenderWithTexcoords();
 
 
     private:
+		void InternalRender();
+
         ID3D11DeviceContextPtr mContext;
         ID3D11VertexShaderPtr mFSVertexShader;
 		ID3D11VertexShaderPtr mFSTexcoordVertexShader;

@@ -87,13 +87,14 @@ namespace JonsEngine
 
 
     /* EngineSettings inlines */
-    inline EngineSettings::EngineSettings() :
-        // render settings
-        mShadowResolution(ShadowResolution::Resolution_2048),
-        mShadowReadbackLatency(ShadowReadbackLatency::Latency_2),
-        mShadowFiltering(ShadowFiltering::PCF_2x2),
-        mAnisotropicFiltering(Anisotropic::X16),
-        mAntiAliasing(AntiAliasing::Fxaa),
+	inline EngineSettings::EngineSettings() :
+		// render settings
+		mShadowResolution(ShadowResolution::Resolution_2048),
+		mShadowReadbackLatency(ShadowReadbackLatency::Latency_2),
+		mShadowFiltering(ShadowFiltering::PCF_2x2),
+		mAnisotropicFiltering(Anisotropic::X16),
+		mAntiAliasing(AntiAliasing::Fxaa),
+		mToneMapping(ToneMappingAlghorithm::FilmicU2),
 		mAutoExposureRate(DefaultAutoExposureRate()),
         mBloomEnabled(true),
         mSSAOEnabled(true),

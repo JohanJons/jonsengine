@@ -13,10 +13,12 @@ namespace JonsEngine
 		mContext(context),
 
 		mAvgLuminanceCBuffer(device, context, DX11ConstantBuffer<AvgLuminanceCBuffer>::CONSTANT_BUFFER_SLOT_PIXEL),
-		mLuminanceTexture(nullptr),
-		mAvgLuminanceBuffers({ nullptr, nullptr }),
-		mLuminanceRTVs({ nullptr, nullptr, nullptr }),
-		mLuminanceSRVs({ nullptr, nullptr, nullptr }),
+
+		mLuminanceTextures({ nullptr, nullptr }),
+		mLuminanceRTVs({ nullptr, nullptr }),
+		mLuminanceSRVs({ nullptr, nullptr }),
+		mCurrentLumTexture(0),
+
 		mAvgLuminancePixelShader(nullptr),
 		mTonemapPixelShader(nullptr),
 
@@ -24,20 +26,30 @@ namespace JonsEngine
 		mAlghorithm(alghorithm),
 		mAutoExposureRate(rate)
 	{
-		D3D11_TEXTURE2D_DESC lumTextureDesc;
-		ZeroMemory(&lumTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
-		lumTextureDesc.Width = LUM_MAP_WIDTH;
-		lumTextureDesc.Height = LUM_MAP_HEIGHT;
-		lumTextureDesc.MipLevels = 1;
-		lumTextureDesc.ArraySize = 1;
-		lumTextureDesc.Format = DXGI_FORMAT_R16_FLOAT;
-		lumTextureDesc.SampleDesc.Count = 1;
-		lumTextureDesc.Usage = D3D11_USAGE_DEFAULT;
-		lumTextureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+		D3D11_TEXTURE2D_DESC lumDesc;
+		ZeroMemory(&lumDesc, sizeof(D3D11_TEXTURE2D_DESC));
+		lumDesc.Width = LUM_MAP_WIDTH;
+		lumDesc.Height = LUM_MAP_HEIGHT;
+		lumDesc.MipLevels = 1;
+		lumDesc.ArraySize = 1;
+		lumDesc.Format = DXGI_FORMAT_R16_FLOAT;
+		lumDesc.SampleDesc.Count = 1;
+		lumDesc.Usage = D3D11_USAGE_DEFAULT;
+		lumDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+		lumDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+		
+		for (uint32_t lumTextureIndex = 0; lumTextureIndex < NumLuminanceTextures; ++lumTextureIndex)
+		{
+			auto& lumTexture = mLuminanceTextures.at(lumTextureIndex);
+			auto& lumRTV = mLuminanceRTVs.at(lumTextureIndex);
+			auto& lumSRV = mLuminanceSRVs.at(lumTextureIndex);
 
-		DXCALL(device->CreateTexture2D(&lumTextureDesc, nullptr, &mLuminanceTexture));
-		DXCALL(device->CreateRenderTargetView(mLuminanceTexture, nullptr, &mLuminanceRTV));
-		DXCALL(device->CreateShaderResourceView(mLuminanceTexture, nullptr, &mLuminanceSRV));
+			DXCALL(device->CreateTexture2D(&lumDesc, nullptr, &lumTexture));
+			DXCALL(device->CreateRenderTargetView(lumTexture, nullptr, &lumRTV));
+			DXCALL(device->CreateShaderResourceView(lumTexture, nullptr, &lumSRV));
+
+			mContext->ClearRenderTargetView(lumRTV, GetClearColor());
+		}
 
 		DXCALL(device->CreatePixelShader(gAvgLuminanceShader, sizeof(gAvgLuminanceShader), nullptr, &mAvgLuminancePixelShader));
 		DXCALL(device->CreatePixelShader(gTonemappingShader, sizeof(gTonemappingShader), nullptr, &mTonemapPixelShader));
@@ -55,7 +67,7 @@ namespace JonsEngine
 
 	void DX11ToneMapper::BindAsRenderTarget()
 	{
-		mContext->OMSetRenderTargets(1, &mLuminanceRTV.p, nullptr);
+		mContext->OMSetRenderTargets(1, &mLuminanceRTVs.at(mCurrentLumTexture).p, nullptr);
 	}
 
 	void DX11ToneMapper::RenderLuminance(const Milliseconds elapstedFrameTime)
@@ -63,16 +75,19 @@ namespace JonsEngine
 		AverageLumPass(elapstedFrameTime);
 
 		// avg. frame luminance will be in the lowest mip
-		mContext->GenerateMips(mLuminanceSRV);
+		mContext->GenerateMips(mLuminanceSRVs.at(mCurrentLumTexture));
 	}
 
 	void DX11ToneMapper::ApplyToneMapping()
 	{
+		static_assert(NumLuminanceTextures == 2, "Code assumes only 2 luminance textures");
 		assert(mAlghorithm == EngineSettings::ToneMappingAlghorithm::FilmicU2);
 
-		mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mLuminanceSRV.p);
+		mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mLuminanceSRVs.at(mCurrentLumTexture).p);
 		mContext->PSSetShader(mTonemapPixelShader, nullptr, 0);
 		mFullscreenPass.Render();
+
+		mCurrentLumTexture = !mCurrentLumTexture;
 	}
 
 
@@ -83,13 +98,15 @@ namespace JonsEngine
 		mContext->RSGetViewports(&num, &prevViewport);
 
 		mContext->RSSetViewports(1, &mAvgLuminanceViewport);
-		mContext->ClearRenderTargetView(mLuminanceRTV, GetClearColor());
+		mContext->ClearRenderTargetView(mLuminanceRTVs.at(mCurrentLumTexture), GetClearColor());
 
 		mContext->PSSetShader(mAvgLuminancePixelShader, nullptr, 0);
-		const float elapsedSeconds = TimeInSeconds(elapstedFrameTime).count();
+		// note: first frame prev lum texture will be black. Problem?
+		mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mLuminanceSRVs.at(!mCurrentLumTexture).p);
+		const float elapsedSeconds = ConvertTimeUnitToFloat(TimeInSeconds(elapstedFrameTime));
 		mAvgLuminanceCBuffer.SetData({ elapsedSeconds, mAutoExposureRate });
 
-		mFullscreenPass.Render(true);
+		mFullscreenPass.RenderWithTexcoords();
 
 		mContext->RSSetViewports(1, &prevViewport);
 	}

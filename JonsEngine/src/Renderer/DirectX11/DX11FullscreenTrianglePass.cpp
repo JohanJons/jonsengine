@@ -19,13 +19,26 @@ namespace JonsEngine
     }
 
 
-    void DX11FullscreenTrianglePass::Render(const bool withTexcoords)
+    void DX11FullscreenTrianglePass::Render()
     {
-        mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-        mContext->IASetInputLayout(nullptr);
+        mContext->VSSetShader(mFSVertexShader, nullptr, 0);
 
-        mContext->VSSetShader(withTexcoords ? mFSTexcoordVertexShader : mFSVertexShader, nullptr, 0);
-
-        mContext->Draw(3, 0);
+		InternalRender();
     }
+
+	void DX11FullscreenTrianglePass::RenderWithTexcoords()
+	{
+		mContext->VSSetShader(mFSTexcoordVertexShader, nullptr, 0);
+
+		InternalRender();
+	}
+
+
+	void DX11FullscreenTrianglePass::InternalRender()
+	{
+		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		mContext->IASetInputLayout(nullptr);
+
+		mContext->Draw(3, 0);
+	}
 }

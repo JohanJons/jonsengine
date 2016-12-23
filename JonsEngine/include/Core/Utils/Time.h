@@ -45,4 +45,10 @@ namespace JonsEngine
 	{
 		return CastTimeUnit<TIME_FROM, Hours>(from);
 	}
+
+	template <typename TIME_UNIT>
+	float ConvertTimeUnitToFloat(const TIME_UNIT duration)
+	{
+		return std::chrono::duration<float, TIME_UNIT::period>(duration).count();
+	}
 }
