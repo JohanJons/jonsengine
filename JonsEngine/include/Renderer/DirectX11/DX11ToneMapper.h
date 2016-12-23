@@ -30,6 +30,12 @@ namespace JonsEngine
 			float __padding[2];
 		};
 
+		struct TonemappingCBuffer
+		{
+			uint32_t mMipMapLevel;
+			float __padding[3];
+		};
+
 		static constexpr uint32_t NumLuminanceTextures = 2;
 
 		void AverageLumPass(const Milliseconds elapstedFrameTime);
@@ -40,6 +46,7 @@ namespace JonsEngine
 
 		D3D11_VIEWPORT mAvgLuminanceViewport;
 		DX11ConstantBuffer<AvgLuminanceCBuffer> mAvgLuminanceCBuffer;
+		DX11ConstantBuffer<TonemappingCBuffer> mTonemappingCBuffer;
 		ID3D11SamplerStatePtr mLinearSampler;
 
 		std::array<ID3D11Texture2DPtr, NumLuminanceTextures> mLuminanceTextures;

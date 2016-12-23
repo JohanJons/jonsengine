@@ -13,6 +13,7 @@ namespace JonsEngine
 		mContext(context),
 
 		mAvgLuminanceCBuffer(device, context, DX11ConstantBuffer<AvgLuminanceCBuffer>::CONSTANT_BUFFER_SLOT_PIXEL),
+		mTonemappingCBuffer(device, context, DX11ConstantBuffer<TonemappingCBuffer>::CONSTANT_BUFFER_SLOT_PIXEL),
 
 		mLuminanceTextures({ nullptr, nullptr }),
 		mLuminanceRTVs({ nullptr, nullptr }),
@@ -81,10 +82,14 @@ namespace JonsEngine
 	void DX11ToneMapper::ApplyToneMapping()
 	{
 		static_assert(NumLuminanceTextures == 2, "Code assumes only 2 luminance textures");
+		static_assert(LUM_MAP_WIDTH == LUM_MAP_HEIGHT, "Code assumes 1:1 lum texture aspect ratio");
 		assert(mAlghorithm == EngineSettings::ToneMappingAlghorithm::FilmicU2);
 
 		mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mLuminanceSRVs.at(mCurrentLumTexture).p);
 		mContext->PSSetShader(mTonemapPixelShader, nullptr, 0);
+		const uint32_t mipMapLevel = std::log(LUM_MAP_WIDTH);
+		mTonemappingCBuffer.SetData({ mipMapLevel });
+
 		mFullscreenPass.Render();
 
 		mCurrentLumTexture = !mCurrentLumTexture;

@@ -7,6 +7,11 @@
 Texture2D gFrameTexture : register(TEXTURE_REGISTER_DIFFUSE);
 Texture2D gLuminanceTexture : register(TEXTURE_REGISTER_EXTRA);
 
+cbuffer TonemappingConstants : register(CBUFFER_REGISTER_PIXEL)
+{
+	unsigned int gMipMapLevel;
+};
+
 
 /*
 
