@@ -66,6 +66,17 @@ namespace JonsEngine
 	}
 
 
+	EngineSettings::AutoExposureRate DX11ToneMapper::GetExposureRate() const
+	{
+		return mAutoExposureRate;
+	}
+
+	EngineSettings::ToneMappingAlghorithm DX11ToneMapper::GetTonemappingAlghorithm() const
+	{
+		return mAlghorithm;
+	}
+
+
 	void DX11ToneMapper::BindAsRenderTarget()
 	{
 		mContext->OMSetRenderTargets(1, &mLuminanceRTVs.at(mCurrentLumTexture).p, nullptr);
@@ -87,10 +98,10 @@ namespace JonsEngine
 
 		mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mLuminanceSRVs.at(mCurrentLumTexture).p);
 		mContext->PSSetShader(mTonemapPixelShader, nullptr, 0);
-		const uint32_t mipMapLevel = std::log(LUM_MAP_WIDTH);
+		const uint32_t mipMapLevel = static_cast<uint32_t>(std::log2(LUM_MAP_WIDTH));
 		mTonemappingCBuffer.SetData({ mipMapLevel });
 
-		mFullscreenPass.Render();
+		mFullscreenPass.RenderWithTexcoords();
 
 		mCurrentLumTexture = !mCurrentLumTexture;
 	}

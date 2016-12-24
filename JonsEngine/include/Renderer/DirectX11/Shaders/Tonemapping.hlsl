@@ -3,9 +3,11 @@
 
 #include "Constants.h"
 #include "Common.hlsl"
+#include "FullscreenTriangleTexcoord.hlsl"
 
 Texture2D gFrameTexture : register(TEXTURE_REGISTER_DIFFUSE);
 Texture2D gLuminanceTexture : register(TEXTURE_REGISTER_EXTRA);
+SamplerState gLinearSampler : register(SAMPLER_REGISTER_LINEAR);
 
 cbuffer TonemappingConstants : register(CBUFFER_REGISTER_PIXEL)
 {
@@ -66,10 +68,11 @@ float3 TonemappingU2(const float3 rgb)
 	return ((rgb * (A * rgb + C * B) + D * E) / (rgb * (A * rgb + B) + D * F)) - E / F;
 }
 
-float4 ps_main(float4 position: SV_Position) : SV_Target0
+float4 ps_main(FullScreenTexcoordOutput input) : SV_Target0
 {
-	const float3 rgb = gFrameTexture[uint2(position.xy)].rgb;
-	const float3 tonemappedRGB = TonemappingU2(rgb);
+	const float luminance = gLuminanceTexture.SampleLevel(gLinearSampler, input.mTexcoord, gMipMapLevel).r;
+	const float3 rgb = gFrameTexture[uint2(input.mPosition.xy)].rgb;
+	const float3 tonemappedRGB = luminance * TonemappingU2(rgb);
 
 	return float4(tonemappedRGB, 1.0);
 }

@@ -17,6 +17,9 @@ namespace JonsEngine
 	public:
 		DX11ToneMapper(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const EngineSettings::ToneMappingAlghorithm alghorithm, const EngineSettings::AutoExposureRate rate);
 
+		EngineSettings::AutoExposureRate GetExposureRate() const;
+		EngineSettings::ToneMappingAlghorithm GetTonemappingAlghorithm() const;
+
 		void BindAsRenderTarget();
 		void RenderLuminance(const Milliseconds elapstedFrameTime);
 		void ApplyToneMapping();

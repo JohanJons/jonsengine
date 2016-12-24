@@ -78,6 +78,17 @@ namespace JonsEngine
 	}
 
 
+	EngineSettings::ToneMappingAlghorithm DX11Renderer::GetToneMappingAlghorithm() const
+	{
+		return mImplementation->GetToneMappingAlghorithm();
+	}
+
+	void DX11Renderer::SetToneMappingAlghorithm(const EngineSettings::ToneMappingAlghorithm alghorithm)
+	{
+		mImplementation->SetToneMappingAlghorithm(alghorithm);
+	}
+
+
     bool DX11Renderer::IsSSAOEnabled() const
     {
         return mImplementation->IsSSAOEnabled();

@@ -42,6 +42,9 @@ namespace JonsEngine
 
 		EngineSettings::ShadowFiltering GetShadowFiltering() const;
 		void SetShadowFiltering(const EngineSettings::ShadowFiltering shadowFiltering);
+		
+		EngineSettings::ToneMappingAlghorithm GetToneMappingAlghorithm() const;
+		void SetToneMappingAlghorithm(const EngineSettings::ToneMappingAlghorithm alghorithm);
 
         bool IsSSAOEnabled() const;
         void SetSSAO(const bool useSSAO);

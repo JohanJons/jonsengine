@@ -51,6 +51,9 @@ namespace JonsEngine
 		EngineSettings::ShadowFiltering GetShadowFiltering() const;
 		void SetShadowFiltering(const EngineSettings::ShadowFiltering shadowFiltering);
 
+		EngineSettings::ToneMappingAlghorithm GetToneMappingAlghorithm() const;
+		void SetToneMappingAlghorithm(const EngineSettings::ToneMappingAlghorithm alghorithm);
+
         bool IsSSAOEnabled() const;
         void SetSSAO(const bool useSSAO);
 
@@ -73,6 +76,7 @@ namespace JonsEngine
         const EngineSettings::ShadowReadbackLatency mShadowReadbackLatency;
         EngineSettings::ShadowFiltering mShadowFiltering;
         EngineSettings::AntiAliasing mAntiAliasing;
+		EngineSettings::ToneMappingAlghorithm mToneMappingAlghorithm;
 
         DX11Pipeline mPipeline;
         DX11DepthReductionPass mDepthReductionPass;

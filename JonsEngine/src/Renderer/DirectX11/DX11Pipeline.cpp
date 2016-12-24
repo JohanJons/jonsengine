@@ -174,14 +174,7 @@ namespace JonsEngine
 
     void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA)
     {
-		// render luminance to texture
-		mToneMapper.BindAsRenderTarget();
-		mLightAccbuffer.BindAsShaderResource();
-		mToneMapper.RenderLuminance(elapstedFrameTime);
-
-        // flip from lightAccumulatorBuffer --> backbuffer using tonemapping
-        mBackbuffer.BindForTonemapping();
-		mToneMapper.ApplyToneMapping();
+		PerformTonemapping(elapstedFrameTime);
 
         // rest of post-processing done in sRGB space directly to the backbuffer
         mBackbuffer.BindForPostProcessing();
@@ -226,6 +219,28 @@ namespace JonsEngine
 
 			mGBuffer.SetConstantData(wvpMatrix, worldViewMatrix, mesh.mMaterialTilingFactor, hasDiffuseTexture, hasNormalTexture, boneOffset);
 			mMeshMap.GetItem(mesh.mMeshID).Draw();
+		}
+	}
+
+	void DX11Pipeline::PerformTonemapping(const Milliseconds elapstedFrameTime)
+	{
+		if (mToneMapper.GetTonemappingAlghorithm() != EngineSettings::ToneMappingAlghorithm::None)
+		{
+			// render luminance to texture
+			mToneMapper.BindAsRenderTarget();
+			mLightAccbuffer.BindAsShaderResource();
+			mToneMapper.RenderLuminance(elapstedFrameTime);
+
+			// flip from lightAccumulatorBuffer --> backbuffer using tonemapping
+			mBackbuffer.BindForTonemapping();
+			mToneMapper.ApplyToneMapping();
+		}
+		else
+		{
+			// simply copy lightAccumulatorBuffer --> backbuffer with sRGB conversion
+			mBackbuffer.BindForTonemapping();
+			mLightAccbuffer.BindAsShaderResource();
+			mBackbuffer.FillBackbuffer();
 		}
 	}
 }
