@@ -15,14 +15,11 @@ namespace JonsEngine
 	class DX11ToneMapper
 	{
 	public:
-		DX11ToneMapper(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const EngineSettings::ToneMappingAlghorithm alghorithm, const EngineSettings::AutoExposureRate rate);
-
-		EngineSettings::AutoExposureRate GetExposureRate() const;
-		EngineSettings::ToneMappingAlghorithm GetTonemappingAlghorithm() const;
+		DX11ToneMapper(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass);
 
 		void BindAsRenderTarget();
-		void RenderLuminance(const Milliseconds elapstedFrameTime);
-		void ApplyToneMapping();
+		void RenderLuminance(const Milliseconds elapstedFrameTime, const RenderSettings::AutoExposureRate exposureRate);
+		void ApplyToneMapping(const RenderSettings::ToneMappingAlghorithm alghorithm);
 
 
 	private:
@@ -41,16 +38,12 @@ namespace JonsEngine
 
 		static constexpr uint32_t NumLuminanceTextures = 2;
 
-		void AverageLumPass(const Milliseconds elapstedFrameTime);
-		void TonemappingPass();
-
 
 		ID3D11DeviceContextPtr mContext;
 
 		D3D11_VIEWPORT mAvgLuminanceViewport;
 		DX11ConstantBuffer<AvgLuminanceCBuffer> mAvgLuminanceCBuffer;
 		DX11ConstantBuffer<TonemappingCBuffer> mTonemappingCBuffer;
-		ID3D11SamplerStatePtr mLinearSampler;
 
 		std::array<ID3D11Texture2DPtr, NumLuminanceTextures> mLuminanceTextures;
 		std::array<ID3D11RenderTargetViewPtr, NumLuminanceTextures> mLuminanceRTVs;
@@ -61,8 +54,5 @@ namespace JonsEngine
 		ID3D11PixelShaderPtr mTonemapPixelShader;
 
 		DX11FullscreenTrianglePass& mFullscreenPass;
-
-		EngineSettings::ToneMappingAlghorithm mAlghorithm;
-		EngineSettings::AutoExposureRate mAutoExposureRate;
 	};
 }

@@ -3,7 +3,7 @@
 
 #include "Constants.h"
 
-Texture2D gTexture : register(TEXTURE_REGISTER_EXTRA);
+Texture2D gTexture : register(TEXTURE_REGISTER_DIFFUSE);
 
 
 float4 ps_main(float4 position : SV_Position) : SV_Target0

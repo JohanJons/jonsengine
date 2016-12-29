@@ -19,21 +19,21 @@ namespace JonsEngine
             SHADER_SAMPLER_SLOT_LINEAR = SAMPLER_SLOT_LINEAR
         };
     
-        DX11Sampler(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const EngineSettings::Anisotropic maxAnisotropy, const D3D11_FILTER filter, const D3D11_TEXTURE_ADDRESS_MODE addressMode,
+        DX11Sampler(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const RenderSettings::Anisotropic maxAnisotropy, const D3D11_FILTER filter, const D3D11_TEXTURE_ADDRESS_MODE addressMode,
             const D3D11_COMPARISON_FUNC comparison, const SHADER_SAMPLER_SLOT samplerSlot);
-        DX11Sampler(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const EngineSettings::Anisotropic maxAnisotropy, const D3D11_FILTER filter, const D3D11_TEXTURE_ADDRESS_MODE addressModeU,
+        DX11Sampler(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const RenderSettings::Anisotropic maxAnisotropy, const D3D11_FILTER filter, const D3D11_TEXTURE_ADDRESS_MODE addressModeU,
             const D3D11_TEXTURE_ADDRESS_MODE addressModeV, const D3D11_TEXTURE_ADDRESS_MODE addressModeW, const D3D11_COMPARISON_FUNC comparison, const SHADER_SAMPLER_SLOT samplerSlot);
         ~DX11Sampler();
         
         void BindSampler();
-        EngineSettings::Anisotropic GetMaxAnisotropicFiltering() const;
+		RenderSettings::Anisotropic GetMaxAnisotropicFiltering() const;
         
     
     private:
         ID3D11DeviceContextPtr mContext;
         ID3D11SamplerStatePtr mTextureSampler;
 
-        const EngineSettings::Anisotropic mAnisotropicFiltering;
+        const RenderSettings::Anisotropic mAnisotropicFiltering;
         const SHADER_SAMPLER_SLOT mSamplerSlot;
     };
 }

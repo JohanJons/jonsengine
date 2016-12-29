@@ -34,25 +34,25 @@ namespace JonsEngine
         void Render(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags);
         void ReduceDepth(float& minDepth, float& maxDepth);
 
-        EngineSettings::Anisotropic GetAnisotropicFiltering() const;
-        void SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic);
+        RenderSettings::Anisotropic GetAnisotropicFiltering() const;
+        void SetAnisotropicFiltering(const RenderSettings::Anisotropic anisotropic);
 
-        EngineSettings::AntiAliasing GetAntiAliasing() const;
-        void SetAntiAliasing(const EngineSettings::AntiAliasing aa);
+		RenderSettings::AntiAliasing GetAntiAliasing() const;
+        void SetAntiAliasing(const RenderSettings::AntiAliasing aa);
 
-		EngineSettings::ShadowFiltering GetShadowFiltering() const;
-		void SetShadowFiltering(const EngineSettings::ShadowFiltering shadowFiltering);
+		RenderSettings::ShadowFiltering GetShadowFiltering() const;
+		void SetShadowFiltering(const RenderSettings::ShadowFiltering shadowFiltering);
 		
-		EngineSettings::ToneMappingAlghorithm GetToneMappingAlghorithm() const;
-		void SetToneMappingAlghorithm(const EngineSettings::ToneMappingAlghorithm alghorithm);
+		RenderSettings::ToneMappingAlghorithm GetToneMappingAlghorithm() const;
+		void SetToneMappingAlghorithm(const RenderSettings::ToneMappingAlghorithm alghorithm);
 
         bool IsSSAOEnabled() const;
         void SetSSAO(const bool useSSAO);
 
         float GetZNear() const;
         float GetZFar() const;
-        EngineSettings::ShadowResolution GetShadowResolution() const;
-        EngineSettings::ShadowReadbackLatency GetShadowReadbackLatency() const;
+		RenderSettings::ShadowResolution GetShadowResolution() const;
+		RenderSettings::ShadowReadbackLatency GetShadowReadbackLatency() const;
 
 
     private:

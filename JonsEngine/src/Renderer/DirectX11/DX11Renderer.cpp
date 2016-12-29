@@ -45,45 +45,45 @@ namespace JonsEngine
     }
 
 
-    EngineSettings::Anisotropic DX11Renderer::GetAnisotropicFiltering() const
+	RenderSettings::Anisotropic DX11Renderer::GetAnisotropicFiltering() const
     {
         return mImplementation->GetAnisotropicFiltering();
     }
 
-    void DX11Renderer::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
+    void DX11Renderer::SetAnisotropicFiltering(const RenderSettings::Anisotropic anisotropic)
     {
         mImplementation->SetAnisotropicFiltering(anisotropic);
     }
 
 
-    EngineSettings::AntiAliasing DX11Renderer::GetAntiAliasing() const
+	RenderSettings::AntiAliasing DX11Renderer::GetAntiAliasing() const
     {
         return mImplementation->GetAntiAliasing();
     }
 
-    void DX11Renderer::SetAntiAliasing(const EngineSettings::AntiAliasing aa)
+    void DX11Renderer::SetAntiAliasing(const RenderSettings::AntiAliasing aa)
     {
         mImplementation->SetAntiAliasing(aa);
     }
 
 
-	EngineSettings::ShadowFiltering DX11Renderer::GetShadowFiltering() const
+	RenderSettings::ShadowFiltering DX11Renderer::GetShadowFiltering() const
 	{
 		return mImplementation->GetShadowFiltering();
 	}
 
-	void DX11Renderer::SetShadowFiltering(const EngineSettings::ShadowFiltering shadowFiltering)
+	void DX11Renderer::SetShadowFiltering(const RenderSettings::ShadowFiltering shadowFiltering)
 	{
 		mImplementation->SetShadowFiltering(shadowFiltering);
 	}
 
 
-	EngineSettings::ToneMappingAlghorithm DX11Renderer::GetToneMappingAlghorithm() const
+	RenderSettings::ToneMappingAlghorithm DX11Renderer::GetToneMappingAlghorithm() const
 	{
 		return mImplementation->GetToneMappingAlghorithm();
 	}
 
-	void DX11Renderer::SetToneMappingAlghorithm(const EngineSettings::ToneMappingAlghorithm alghorithm)
+	void DX11Renderer::SetToneMappingAlghorithm(const RenderSettings::ToneMappingAlghorithm alghorithm)
 	{
 		mImplementation->SetToneMappingAlghorithm(alghorithm);
 	}
@@ -110,12 +110,12 @@ namespace JonsEngine
         return mImplementation->GetZFar();
     }
 
-    EngineSettings::ShadowResolution DX11Renderer::GetShadowResolution() const
+	RenderSettings::ShadowResolution DX11Renderer::GetShadowResolution() const
     {
         return mImplementation->GetShadowResolution();
     }
 
-    EngineSettings::ShadowReadbackLatency DX11Renderer::GetShadowReadbackLatency() const
+	RenderSettings::ShadowReadbackLatency DX11Renderer::GetShadowReadbackLatency() const
     {
         return mImplementation->GetShadowReadbackLatency();
     }

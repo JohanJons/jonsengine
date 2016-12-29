@@ -9,7 +9,7 @@ namespace JonsEngine
 {
 	
 
-	DX11ToneMapper::DX11ToneMapper(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, const EngineSettings::ToneMappingAlghorithm alghorithm, const EngineSettings::AutoExposureRate rate) :
+	DX11ToneMapper::DX11ToneMapper(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass) :
 		mContext(context),
 
 		mAvgLuminanceCBuffer(device, context, DX11ConstantBuffer<AvgLuminanceCBuffer>::CONSTANT_BUFFER_SLOT_PIXEL),
@@ -23,15 +23,12 @@ namespace JonsEngine
 		mAvgLuminancePixelShader(nullptr),
 		mTonemapPixelShader(nullptr),
 
-		mFullscreenPass(fullscreenPass),
-		mAlghorithm(alghorithm),
-		mAutoExposureRate(rate)
+		mFullscreenPass(fullscreenPass)
 	{
 		D3D11_TEXTURE2D_DESC lumDesc;
 		ZeroMemory(&lumDesc, sizeof(D3D11_TEXTURE2D_DESC));
 		lumDesc.Width = LUM_MAP_WIDTH;
 		lumDesc.Height = LUM_MAP_HEIGHT;
-		lumDesc.MipLevels = 1;
 		lumDesc.ArraySize = 1;
 		lumDesc.Format = DXGI_FORMAT_R16_FLOAT;
 		lumDesc.SampleDesc.Count = 1;
@@ -39,6 +36,7 @@ namespace JonsEngine
 		lumDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 		lumDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 		
+		const std::array<float, 4> avgLuminanceClearColor = { 0.0001f, 0.0f, 0.0f, 0.0f };
 		for (uint32_t lumTextureIndex = 0; lumTextureIndex < NumLuminanceTextures; ++lumTextureIndex)
 		{
 			auto& lumTexture = mLuminanceTextures.at(lumTextureIndex);
@@ -49,7 +47,7 @@ namespace JonsEngine
 			DXCALL(device->CreateRenderTargetView(lumTexture, nullptr, &lumRTV));
 			DXCALL(device->CreateShaderResourceView(lumTexture, nullptr, &lumSRV));
 
-			mContext->ClearRenderTargetView(lumRTV, GetClearColor());
+			mContext->ClearRenderTargetView(lumRTV, &avgLuminanceClearColor.front());
 		}
 
 		DXCALL(device->CreatePixelShader(gAvgLuminanceShader, sizeof(gAvgLuminanceShader), nullptr, &mAvgLuminancePixelShader));
@@ -66,48 +64,12 @@ namespace JonsEngine
 	}
 
 
-	EngineSettings::AutoExposureRate DX11ToneMapper::GetExposureRate() const
-	{
-		return mAutoExposureRate;
-	}
-
-	EngineSettings::ToneMappingAlghorithm DX11ToneMapper::GetTonemappingAlghorithm() const
-	{
-		return mAlghorithm;
-	}
-
-
 	void DX11ToneMapper::BindAsRenderTarget()
 	{
 		mContext->OMSetRenderTargets(1, &mLuminanceRTVs.at(mCurrentLumTexture).p, nullptr);
 	}
 
-	void DX11ToneMapper::RenderLuminance(const Milliseconds elapstedFrameTime)
-	{
-		AverageLumPass(elapstedFrameTime);
-
-		// avg. frame luminance will be in the lowest mip
-		mContext->GenerateMips(mLuminanceSRVs.at(mCurrentLumTexture));
-	}
-
-	void DX11ToneMapper::ApplyToneMapping()
-	{
-		static_assert(NumLuminanceTextures == 2, "Code assumes only 2 luminance textures");
-		static_assert(LUM_MAP_WIDTH == LUM_MAP_HEIGHT, "Code assumes 1:1 lum texture aspect ratio");
-		assert(mAlghorithm == EngineSettings::ToneMappingAlghorithm::FilmicU2);
-
-		mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mLuminanceSRVs.at(mCurrentLumTexture).p);
-		mContext->PSSetShader(mTonemapPixelShader, nullptr, 0);
-		const uint32_t mipMapLevel = static_cast<uint32_t>(std::log2(LUM_MAP_WIDTH));
-		mTonemappingCBuffer.SetData({ mipMapLevel });
-
-		mFullscreenPass.RenderWithTexcoords();
-
-		mCurrentLumTexture = !mCurrentLumTexture;
-	}
-
-
-	void DX11ToneMapper::AverageLumPass(const Milliseconds elapstedFrameTime)
+	void DX11ToneMapper::RenderLuminance(const Milliseconds elapstedFrameTime, const RenderSettings::AutoExposureRate exposureRate)
 	{
 		D3D11_VIEWPORT prevViewport;
 		uint32_t num = 1;
@@ -117,13 +79,31 @@ namespace JonsEngine
 		mContext->ClearRenderTargetView(mLuminanceRTVs.at(mCurrentLumTexture), GetClearColor());
 
 		mContext->PSSetShader(mAvgLuminancePixelShader, nullptr, 0);
-		// note: first frame prev lum texture will be black. Problem?
 		mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mLuminanceSRVs.at(!mCurrentLumTexture).p);
 		const float elapsedSeconds = ConvertTimeUnitToFloat(TimeInSeconds(elapstedFrameTime));
-		mAvgLuminanceCBuffer.SetData({ elapsedSeconds, mAutoExposureRate });
+		mAvgLuminanceCBuffer.SetData({ elapsedSeconds, exposureRate });
 
 		mFullscreenPass.RenderWithTexcoords();
 
 		mContext->RSSetViewports(1, &prevViewport);
+
+		// avg. frame luminance will be in the lowest mip
+		mContext->GenerateMips(mLuminanceSRVs.at(mCurrentLumTexture));
+	}
+
+	void DX11ToneMapper::ApplyToneMapping(const RenderSettings::ToneMappingAlghorithm alghorithm)
+	{
+		static_assert(NumLuminanceTextures == 2, "Code assumes only 2 luminance textures");
+		static_assert(LUM_MAP_WIDTH == LUM_MAP_HEIGHT, "Code assumes 1:1 luminance texture aspect ratio");
+		assert(alghorithm == RenderSettings::ToneMappingAlghorithm::FilmicU2);
+
+		mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mLuminanceSRVs.at(mCurrentLumTexture).p);
+		mContext->PSSetShader(mTonemapPixelShader, nullptr, 0);
+		const uint32_t mipMapLevel = static_cast<uint32_t>(std::log2(LUM_MAP_WIDTH));
+		mTonemappingCBuffer.SetData({ mipMapLevel });
+
+		mFullscreenPass.RenderWithTexcoords();
+
+		mCurrentLumTexture = !mCurrentLumTexture;
 	}
 }

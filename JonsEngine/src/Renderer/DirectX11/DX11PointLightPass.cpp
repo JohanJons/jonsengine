@@ -32,7 +32,7 @@ namespace JonsEngine
     }
 
 
-    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const EngineSettings::ShadowResolution shadowmapRes, const uint32_t windowWidth, const uint32_t windowHeight) :
+    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const RenderSettings::ShadowResolution shadowmapRes, const uint32_t windowWidth, const uint32_t windowHeight) :
         mWindowSize(windowWidth, windowHeight),
         
         mContext(context),

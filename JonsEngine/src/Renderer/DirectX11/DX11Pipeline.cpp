@@ -1,11 +1,12 @@
 #include "include/Renderer/DirectX11/DX11Pipeline.h"
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/RenderSettings.h"
 #include "include/RenderQueue/RenderQueue.h"
 
 namespace JonsEngine
 {
-    DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const EngineSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap)
+    DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const RenderSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap)
         :
         mLogger(logger),
         mWindowSize(backbufferTextureDesc.Width, backbufferTextureDesc.Height),
@@ -32,7 +33,7 @@ namespace JonsEngine
         mAmbientPass(device, context, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, settings.mShadowResolution, settings.mShadowReadbackLatency, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mPointLightPass(device, mContext, mVertexTransformPass, settings.mShadowResolution, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-		mToneMapper(device, context, mFullscreenTrianglePass, settings.mToneMapping, settings.mAutoExposureRate),
+		mToneMapper(device, context, mFullscreenTrianglePass),
         mPostProcessor(device, context, mFullscreenTrianglePass, backbufferTextureDesc),
         mSkyboxPass(device, context)
     {
@@ -131,7 +132,7 @@ namespace JonsEngine
 		RenderMeshes(renderQueue, animatedMeshesContainer, animatedBeginIndex, animatedEndIndex);
     }
 
-    void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugExtra, const EngineSettings::ShadowFiltering shadowFiltering, const bool SSAOEnabled)
+    void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugExtra, const RenderSettings& renderSettings)
     {
         mLightAccbuffer.Clear();
         mLightAccbuffer.BindAsRenderTarget(mDSVReadOnly);
@@ -148,14 +149,14 @@ namespace JonsEngine
         const Mat4 invCameraProjMatrix = glm::inverse(renderQueue.mCamera.mCameraProjectionMatrix);
 
         // ambient light
-        mAmbientPass.Render(invCameraProjMatrix, renderQueue.mAmbientLight, mWindowSize, SSAOEnabled);
+        mAmbientPass.Render(invCameraProjMatrix, renderQueue.mAmbientLight, mWindowSize, renderSettings.mSSAOEnabled);
 
         // additive blending for adding lighting
         mContext->OMSetBlendState(mAdditiveBlending, nullptr, 0xffffffff);
 
         // do all directional lights
         for (const RenderableDirectionalLight& directionalLight : renderQueue.mDirectionalLights)
-            mDirectionalLightPass.Render(directionalLight, renderQueue.mRenderData, shadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix);
+            mDirectionalLightPass.Render(directionalLight, renderQueue.mRenderData, renderSettings.mShadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix);
 
         // do all point lights
         for (const RenderablePointLight& pointLight : renderQueue.mPointLights)
@@ -172,15 +173,15 @@ namespace JonsEngine
 			mSkyboxPass.Render(renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraProjectionMatrix, mMaterialMap.GetItem(renderQueue.mSkyboxTextureID));
     }
 
-    void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA)
+    void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags, const RenderSettings& renderSettings)
     {
-		PerformTonemapping(elapstedFrameTime);
+		PerformTonemapping(elapstedFrameTime, renderSettings.mAutoExposureRate, renderSettings.mToneMapping);
 
         // rest of post-processing done in sRGB space directly to the backbuffer
         mBackbuffer.BindForPostProcessing();
 
         // FXAA done in sRGB space
-        if (AA == EngineSettings::AntiAliasing::Fxaa)
+        if (renderSettings.mAntiAliasing == RenderSettings::AntiAliasing::Fxaa)
             mPostProcessor.FXAAPass(mBackbuffer, mWindowSize);
 
         if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
@@ -222,18 +223,18 @@ namespace JonsEngine
 		}
 	}
 
-	void DX11Pipeline::PerformTonemapping(const Milliseconds elapstedFrameTime)
+	void DX11Pipeline::PerformTonemapping(const Milliseconds elapstedFrameTime, const RenderSettings::AutoExposureRate exposureRate, const RenderSettings::ToneMappingAlghorithm alghorithm)
 	{
-		if (mToneMapper.GetTonemappingAlghorithm() != EngineSettings::ToneMappingAlghorithm::None)
+		if (alghorithm != RenderSettings::ToneMappingAlghorithm::None)
 		{
 			// render luminance to texture
 			mToneMapper.BindAsRenderTarget();
 			mLightAccbuffer.BindAsShaderResource();
-			mToneMapper.RenderLuminance(elapstedFrameTime);
+			mToneMapper.RenderLuminance(elapstedFrameTime, exposureRate);
 
 			// flip from lightAccumulatorBuffer --> backbuffer using tonemapping
 			mBackbuffer.BindForTonemapping();
-			mToneMapper.ApplyToneMapping();
+			mToneMapper.ApplyToneMapping(alghorithm);
 		}
 		else
 		{

@@ -53,8 +53,8 @@ namespace JonsEngine
     }
 
 
-    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, const EngineSettings::ShadowResolution shadowmapRes,
-        const EngineSettings::ShadowReadbackLatency readbackLatency, const uint32_t windowWidth, const uint32_t windowHeight)
+    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, const RenderSettings::ShadowResolution shadowmapRes,
+        const RenderSettings::ShadowReadbackLatency readbackLatency, const uint32_t windowWidth, const uint32_t windowHeight)
         :
         mWindowSize(windowWidth, windowHeight),
         mAspectRatio(mWindowSize.x / mWindowSize.y),
@@ -97,7 +97,7 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::Render(const RenderableDirectionalLight& directionalLight, const RenderQueue::RenderData& renderData, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix)
+    void DX11DirectionalLightPass::Render(const RenderableDirectionalLight& directionalLight, const RenderQueue::RenderData& renderData, const RenderSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix)
     {
         // preserve current state
         D3D11_VIEWPORT prevViewport;
@@ -179,27 +179,27 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::BindShadingPixelShader(const EngineSettings::ShadowFiltering shadowFiltering)
+    void DX11DirectionalLightPass::BindShadingPixelShader(const RenderSettings::ShadowFiltering shadowFiltering)
     {
         switch (shadowFiltering)
         {
             default:
-            case EngineSettings::ShadowFiltering::PCF_2x2:
+            case RenderSettings::ShadowFiltering::PCF_2x2:
             {
                 mContext->PSSetShader(mPCF2x2Shader, nullptr, 0);
                 break;
             }
-            case EngineSettings::ShadowFiltering::PCF_3x3:
+            case RenderSettings::ShadowFiltering::PCF_3x3:
             {
                 mContext->PSSetShader(mPCF3x3Shader, nullptr, 0);
                 break;
             }
-            case EngineSettings::ShadowFiltering::PCF_5x5:
+            case RenderSettings::ShadowFiltering::PCF_5x5:
             {
                 mContext->PSSetShader(mPCF5x5Shader, nullptr, 0);
                 break;
             }
-            case EngineSettings::ShadowFiltering::PCF_7x7:
+            case RenderSettings::ShadowFiltering::PCF_7x7:
             {
                 mContext->PSSetShader(mPCF7x7Shader, nullptr, 0);
                 break;

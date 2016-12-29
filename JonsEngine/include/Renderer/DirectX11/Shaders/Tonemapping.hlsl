@@ -14,67 +14,29 @@ cbuffer TonemappingConstants : register(CBUFFER_REGISTER_PIXEL)
 	unsigned int gMipMapLevel;
 };
 
+static const float A = 0.15f;
+static const float B = 0.50f;
+static const float C = 0.10f;
+static const float D = 0.20f;
+static const float E = 0.02f;
+static const float F = 0.30f;
+static const float W = 11.2f;
+#define TonemappingU2(color) (((color * (A * color + C * B) + D * E) / (color * (A * color + B) + D * F)) - E / F)
+static const float gWhiteTonemapped = TonemappingU2(W);
 
-/*
-
-float3 ToneMap(float3 color, float avgLuminance, float threshold, out float exposure)
-{
-	float pixelLuminance = CalcLuminance(color);
-	color = CalcExposedColor(color, avgLuminance, threshold, exposure);
-
-	color = ToneMapFilmicU2(color);
-}
-
-return color;
-}
-
-// Applies exposure and tone mapping to the input, and combines it with the
-// results of the bloom pass
-void Composite(in PSInput input,
-	out float4 outputColor : SV_Target0,
-	out float4 outputExposure : SV_Target1)
-{
-	// Tone map the primary input
-	float avgLuminance = GetAvgLuminance(InputTexture1, input.TexCoord);
-	float3 color = InputTexture0.Sample(PointSampler, input.TexCoord).rgb;
-	float exposure = 0;
-	color = ToneMap(color, avgLuminance, 0, exposure);
-
-	// Sample the bloom
-	float3 bloom = InputTexture2.Sample(LinearSampler, input.TexCoord).rgb;
-	bloom = bloom * BloomMagnitude;
-
-	// Add in the bloom
-	color = color + bloom;
-
-	outputColor = float4(color, 1.0f);
-	// outputExposure = (exposure + 10.0f) / 20.0f;
-	outputExposure = avgLuminance;
-	outputExposure.a = 1.0f;
-}
-
-*/
-
-
-float3 TonemappingU2(const float3 rgb)
-{
-	const float A = 0.15;
-	const float B = 0.50;
-	const float C = 0.10;
-	const float D = 0.20;
-	const float E = 0.02;
-	const float F = 0.30;
-
-	return ((rgb * (A * rgb + C * B) + D * E) / (rgb * (A * rgb + B) + D * F)) - E / F;
-}
 
 float4 ps_main(FullScreenTexcoordOutput input) : SV_Target0
 {
-	const float luminance = gLuminanceTexture.SampleLevel(gLinearSampler, input.mTexcoord, gMipMapLevel).r;
-	const float3 rgb = gFrameTexture[uint2(input.mPosition.xy)].rgb;
-	const float3 tonemappedRGB = luminance * TonemappingU2(rgb);
+	float3 color = gFrameTexture.Sample(gLinearSampler, input.mTexcoord).rgb;
+	float avgLuminance = exp(gLuminanceTexture.SampleLevel(gLinearSampler, input.mTexcoord, gMipMapLevel).r);
 
-	return float4(tonemappedRGB, 1.0);
+	float linearExposure = 1.03f - (2.0f / (2 + log10(avgLuminance + 1)));
+	linearExposure = (linearExposure / avgLuminance);
+	color *= linearExposure;
+
+	color = TonemappingU2(color) / gWhiteTonemapped;
+
+	return float4(color, 1.0f);
 }
 
 #endif

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Renderer/DirectX11/Shaders/Constants.h"
+#include "include/Renderer/RenderSettings.h"
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Types.h"
@@ -32,9 +33,9 @@ namespace JonsEngine
         NUM_SHADER_TEXTURE_SLOTS
     };
 
-    uint32_t EngineSettingsToVal(const EngineSettings::Anisotropic anisotropicEnum);
-    uint32_t EngineSettingsToVal(const EngineSettings::ShadowReadbackLatency shadowReadbackLatencyEnum);
-    uint32_t EngineSettingsToVal(const EngineSettings::ShadowResolution shadowResolutionEnum);
+    uint32_t RenderSettingsToVal(const RenderSettings::Anisotropic anisotropicEnum);
+    uint32_t RenderSettingsToVal(const RenderSettings::ShadowReadbackLatency shadowReadbackLatencyEnum);
+    uint32_t RenderSettingsToVal(const RenderSettings::ShadowResolution shadowResolutionEnum);
 
     #ifdef _DEBUG
     #define DXCALL(function)                                                                                                                            \

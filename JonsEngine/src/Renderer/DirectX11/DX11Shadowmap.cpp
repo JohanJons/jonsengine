@@ -2,7 +2,7 @@
 
 namespace JonsEngine
 {
-    DX11Shadowmap::DX11Shadowmap(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const EngineSettings::ShadowResolution shadowmapRes, const uint32_t numTextures, const bool isCubeTexture) :
+    DX11Shadowmap::DX11Shadowmap(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const RenderSettings::ShadowResolution shadowmapRes, const uint32_t numTextures, const bool isCubeTexture) :
         mContext(context),
 
 		mShadowmapTexture(nullptr),
@@ -11,7 +11,7 @@ namespace JonsEngine
         mShadowmapViews.resize(numTextures);
 
         // create shadowmap texture/view/srv
-        const uint32_t shadowmapResVal = EngineSettingsToVal(shadowmapRes);
+        const uint32_t shadowmapResVal = RenderSettingsToVal(shadowmapRes);
 
         D3D11_TEXTURE2D_DESC depthBufferDesc;
         ZeroMemory(&depthBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));

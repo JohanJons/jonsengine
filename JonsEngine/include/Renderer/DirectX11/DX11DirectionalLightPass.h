@@ -24,11 +24,11 @@ namespace JonsEngine
     public:
         const static uint32_t NUM_SHADOWMAP_CASCADES = 4;
 
-        DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, const EngineSettings::ShadowResolution shadowmapRes,
-            const EngineSettings::ShadowReadbackLatency readbackLatency, const uint32_t windowWidth, const uint32_t windowHeight);
+        DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, const RenderSettings::ShadowResolution shadowmapRes,
+            const RenderSettings::ShadowReadbackLatency readbackLatency, const uint32_t windowWidth, const uint32_t windowHeight);
         ~DX11DirectionalLightPass();
 
-        void Render(const RenderableDirectionalLight& directionalLight, const RenderQueue::RenderData& renderData, const EngineSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix);
+        void Render(const RenderableDirectionalLight& directionalLight, const RenderQueue::RenderData& renderData, const RenderSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix, const Mat4& invCameraProjMatrix);
 
 
     private:
@@ -50,7 +50,7 @@ namespace JonsEngine
             }
         };
 
-        void BindShadingPixelShader(const EngineSettings::ShadowFiltering shadowFiltering);
+        void BindShadingPixelShader(const RenderSettings::ShadowFiltering shadowFiltering);
 
 
         const Vec2 mWindowSize;

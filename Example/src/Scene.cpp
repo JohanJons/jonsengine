@@ -74,7 +74,7 @@ namespace JonsGame
 		mIsAnimatingBob(false)
     {
         // ambient light
-        mScene.SetAmbientLight(Vec4(0.01f));
+        mScene.SetAmbientLight(Vec4(0.03f));
 
         // sectoid
         SceneNode& nodeSectoid = mScene.GetSceneNode(mNodeSectoid);
@@ -121,7 +121,7 @@ namespace JonsGame
 
         // directional light
         DirectionalLight& sun = mScene.GetDirectionalLight(mMovingPointLightID);
-        sun.SetLightColor(Vec4(1.0f));
+        sun.SetLightColor(Vec4(6.0f));
 
         // ground plane
         StaticActor& actorPlane = mScene.GetStaticActor(mActorPlane);

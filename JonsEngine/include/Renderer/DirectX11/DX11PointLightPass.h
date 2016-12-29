@@ -30,7 +30,7 @@ namespace JonsEngine
             POINT_LIGHT_DIR_COUNT
         };
 
-        DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const EngineSettings::ShadowResolution shadowmapRes, const uint32_t windowWidth, const uint32_t windowHeight);
+        DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const RenderSettings::ShadowResolution shadowmapRes, const uint32_t windowWidth, const uint32_t windowHeight);
         ~DX11PointLightPass();
 
         void Render(const RenderablePointLight& pointLight, const RenderQueue::RenderData& renderData, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix);

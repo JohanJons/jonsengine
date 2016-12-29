@@ -12,7 +12,7 @@ namespace JonsEngine
     class DX11Shadowmap
     {
     public:
-        DX11Shadowmap(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const EngineSettings::ShadowResolution shadowmapRes, const uint32_t numTextures, const bool isCubeTexture);
+        DX11Shadowmap(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const RenderSettings::ShadowResolution shadowmapRes, const uint32_t numTextures, const bool isCubeTexture);
         ~DX11Shadowmap();
 
         void BindForDrawing();

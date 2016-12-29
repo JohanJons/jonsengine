@@ -51,10 +51,13 @@ namespace JonsGame
             switch (evnt.mKey)
             {
                 //  renderering
-                case Key::ONE: mEngine.GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_2x2); break;
-                case Key::TWO: mEngine.GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_3x3); break;
-                case Key::THREE: mEngine.GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_5x5); break;
-                case Key::FOUR: mEngine.GetRenderer().SetShadowFiltering(EngineSettings::ShadowFiltering::PCF_7x7); break;
+                case Key::ONE: mEngine.GetRenderer().SetShadowFiltering(RenderSettings::ShadowFiltering::PCF_2x2); break;
+                case Key::TWO: mEngine.GetRenderer().SetShadowFiltering(RenderSettings::ShadowFiltering::PCF_3x3); break;
+                case Key::THREE: mEngine.GetRenderer().SetShadowFiltering(RenderSettings::ShadowFiltering::PCF_5x5); break;
+                case Key::FOUR: mEngine.GetRenderer().SetShadowFiltering(RenderSettings::ShadowFiltering::PCF_7x7); break;
+
+				case Key::FIVE: mEngine.GetRenderer().SetToneMappingAlghorithm(RenderSettings::ToneMappingAlghorithm::None); break;
+				case Key::SIX: mEngine.GetRenderer().SetToneMappingAlghorithm(RenderSettings::ToneMappingAlghorithm::FilmicU2); break;
 
                 // sun
                 case Key::Q: mSun.SetIsMoving(true); break;
@@ -93,10 +96,10 @@ namespace JonsGame
                 case Key::TWO: mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS); break;
                 case Key::U: mEngine.GetRenderer().SetSSAO(false); break;
                 case Key::I: mEngine.GetRenderer().SetSSAO(true); break;
-                case Key::H: mEngine.GetRenderer().SetAnisotropicFiltering(EngineSettings::Anisotropic::X1); break;
-                case Key::J: mEngine.GetRenderer().SetAnisotropicFiltering(EngineSettings::Anisotropic::X16); break;
-                case Key::K: mEngine.GetRenderer().SetAntiAliasing(EngineSettings::AntiAliasing::None); break;
-                case Key::L: mEngine.GetRenderer().SetAntiAliasing(EngineSettings::AntiAliasing::Fxaa); break;
+                case Key::H: mEngine.GetRenderer().SetAnisotropicFiltering(RenderSettings::Anisotropic::X1); break;
+                case Key::J: mEngine.GetRenderer().SetAnisotropicFiltering(RenderSettings::Anisotropic::X16); break;
+                case Key::K: mEngine.GetRenderer().SetAntiAliasing(RenderSettings::AntiAliasing::None); break;
+                case Key::L: mEngine.GetRenderer().SetAntiAliasing(RenderSettings::AntiAliasing::Fxaa); break;
 
                 //  misc
                 case Key::N: mEngine.GetWindow().SetFullscreen(true); break;

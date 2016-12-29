@@ -26,25 +26,26 @@
 
 namespace JonsEngine
 {
+	struct RenderSettings;
     struct RenderQueue;
 
     class DX11Pipeline
     {
     public:
-        DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const EngineSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap);
+        DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const RenderSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap);
         ~DX11Pipeline();
 
         void BeginFrame(const RenderQueue& renderQueue);
         void EndFrame();
 
         void GeometryStage(const RenderQueue& renderQueue);
-        void LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::ShadowFiltering shadowFiltering, const bool SSAOEnabled);
-        void PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags, const EngineSettings::AntiAliasing AA);
+        void LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const RenderSettings& renderSettings);
+        void PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags, const RenderSettings& renderSettings);
 
 
     private:
 		void RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end);
-		void PerformTonemapping(const Milliseconds elapstedFrameTime);
+		void PerformTonemapping(const Milliseconds elapstedFrameTime, const RenderSettings::AutoExposureRate exposureRate, const RenderSettings::ToneMappingAlghorithm alghorithm);
 
 
         Logger& mLogger;

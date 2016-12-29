@@ -16,7 +16,7 @@ namespace JonsEngine
     public:
         const static uint32_t MAX_READBACK_LATENCY = 3;
 
-        DX11DepthReductionPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const EngineSettings::ShadowReadbackLatency readbackLatency, const uint16_t windowWidth, const uint16_t windowHeight);
+        DX11DepthReductionPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const RenderSettings::ShadowReadbackLatency readbackLatency, const uint16_t windowWidth, const uint16_t windowHeight);
         ~DX11DepthReductionPass();
 
 

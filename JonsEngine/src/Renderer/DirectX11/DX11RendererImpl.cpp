@@ -98,22 +98,19 @@ namespace JonsEngine
         DX11Context(GetActiveWindow()), 
         mLogger(logger),
         mMemoryAllocator(memoryAllocator),
-        mShadowResolution(settings.mShadowResolution),
-        mShadowReadbackLatency(settings.mShadowReadbackLatency),
-        mShadowFiltering(settings.mShadowFiltering),
-        mAntiAliasing(settings.mAntiAliasing),
+		mRenderSettings(settings.mRenderSettings),
 
-        mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), settings, mMeshes, mMaterials),
-        mDepthReductionPass(mDevice, mContext, settings.mShadowReadbackLatency, settings.mWindowWidth, settings.mWindowHeight),
+        mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), mRenderSettings, mMeshes, mMaterials),
+        mDepthReductionPass(mDevice, mContext, mRenderSettings.mShadowReadbackLatency, settings.mWindowWidth, settings.mWindowHeight),
 
         // samplers
-        mModelSampler(mMemoryAllocator.AllocateObject<DX11Sampler>(mDevice, mContext, settings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator.DeallocateObject(sampler); }),
-        mLinearSampler(mDevice, mContext, EngineSettings::Anisotropic::X1, D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_LINEAR),
-        mShadowmapSampler(mDevice, mContext, EngineSettings::Anisotropic::X1, D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
-        mShadowmapNoCompareSampler(mDevice, mContext, EngineSettings::Anisotropic::X1, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT),
+        mModelSampler(mMemoryAllocator.AllocateObject<DX11Sampler>(mDevice, mContext, mRenderSettings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator.DeallocateObject(sampler); }),
+        mLinearSampler(mDevice, mContext, RenderSettings::Anisotropic::X1, D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_LINEAR),
+        mShadowmapSampler(mDevice, mContext, RenderSettings::Anisotropic::X1, D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
+        mShadowmapNoCompareSampler(mDevice, mContext, RenderSettings::Anisotropic::X1, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT),
 
         // misc
-        mSSAOEnabled(settings.mSSAOEnabled)
+        mSSAOEnabled(mRenderSettings.mSSAOEnabled)
     {
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -173,8 +170,8 @@ namespace JonsEngine
         mPipeline.BeginFrame(renderQueue);
 
         mPipeline.GeometryStage(renderQueue);
-        mPipeline.LightingStage(renderQueue, debugFlags, mShadowFiltering, mSSAOEnabled);
-        mPipeline.PostProcessingStage(renderQueue, elapstedFrameTime, debugFlags, mAntiAliasing);
+        mPipeline.LightingStage(renderQueue, debugFlags, mRenderSettings);
+        mPipeline.PostProcessingStage(renderQueue, elapstedFrameTime, debugFlags, mRenderSettings);
 
         mPipeline.EndFrame();
     }
@@ -185,47 +182,47 @@ namespace JonsEngine
     }
 
 
-    EngineSettings::Anisotropic DX11RendererImpl::GetAnisotropicFiltering() const
+	RenderSettings::Anisotropic DX11RendererImpl::GetAnisotropicFiltering() const
     {
         return mModelSampler->GetMaxAnisotropicFiltering();
     }
 
-    void DX11RendererImpl::SetAnisotropicFiltering(const EngineSettings::Anisotropic anisotropic)
+    void DX11RendererImpl::SetAnisotropicFiltering(const RenderSettings::Anisotropic anisotropic)
     {
         mModelSampler.reset(mMemoryAllocator.AllocateObject<DX11Sampler>(mDevice, mContext, anisotropic, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC));
     }
 
 
-    EngineSettings::AntiAliasing DX11RendererImpl::GetAntiAliasing() const
+    RenderSettings::AntiAliasing DX11RendererImpl::GetAntiAliasing() const
     {
-        return mAntiAliasing;
+        return mRenderSettings.mAntiAliasing;
     }
 
-    void DX11RendererImpl::SetAntiAliasing(const EngineSettings::AntiAliasing aa)
+    void DX11RendererImpl::SetAntiAliasing(const RenderSettings::AntiAliasing aa)
     {
-        mAntiAliasing = aa;
+		mRenderSettings.mAntiAliasing = aa;
     }
 
 
-	EngineSettings::ShadowFiltering DX11RendererImpl::GetShadowFiltering() const
+	RenderSettings::ShadowFiltering DX11RendererImpl::GetShadowFiltering() const
 	{
-		return mShadowFiltering;
+		return mRenderSettings.mShadowFiltering;
 	}
 
-	void DX11RendererImpl::SetShadowFiltering(const EngineSettings::ShadowFiltering shadowFiltering)
+	void DX11RendererImpl::SetShadowFiltering(const RenderSettings::ShadowFiltering shadowFiltering)
 	{
-		mShadowFiltering = shadowFiltering;
+		mRenderSettings.mShadowFiltering = shadowFiltering;
 	}
 
 
-	EngineSettings::ToneMappingAlghorithm DX11RendererImpl::GetToneMappingAlghorithm() const
+	RenderSettings::ToneMappingAlghorithm DX11RendererImpl::GetToneMappingAlghorithm() const
 	{
-		return mToneMappingAlghorithm;
+		return mRenderSettings.mToneMapping;
 	}
 
-	void DX11RendererImpl::SetToneMappingAlghorithm(const EngineSettings::ToneMappingAlghorithm alghorithm)
+	void DX11RendererImpl::SetToneMappingAlghorithm(const RenderSettings::ToneMappingAlghorithm alghorithm)
 	{
-		mToneMappingAlghorithm = alghorithm;
+		mRenderSettings.mToneMapping = alghorithm;
 	}
 
 
@@ -250,14 +247,14 @@ namespace JonsEngine
         return Z_FAR;
     }
 
-    EngineSettings::ShadowResolution DX11RendererImpl::GetShadowResolution() const
+    RenderSettings::ShadowResolution DX11RendererImpl::GetShadowResolution() const
     {
-        return mShadowResolution;
+        return mRenderSettings.mShadowResolution;
     }
 
-    EngineSettings::ShadowReadbackLatency DX11RendererImpl::GetShadowReadbackLatency() const
+    RenderSettings::ShadowReadbackLatency DX11RendererImpl::GetShadowReadbackLatency() const
     {
-        return mShadowReadbackLatency;
+        return mRenderSettings.mShadowReadbackLatency;
     }
 
 

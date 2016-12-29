@@ -622,6 +622,9 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11CPUDynamicBuffer.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderer\RenderSettings.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferPixel.hlsl">
