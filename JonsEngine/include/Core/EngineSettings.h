@@ -2,6 +2,7 @@
 
 #include "include/Renderer/RenderSettings.h"
 #include "include/Window/WindowSettings.h"
+#include "include/Scene/SceneSettings.h"
 
 namespace JonsEngine
 {
@@ -10,23 +11,7 @@ namespace JonsEngine
      * Parameters can be changed to alter the engine properties
      */
 
-    struct EngineSettings : RenderSettings, WindowSettings
+    struct EngineSettings : RenderSettings, WindowSettings, SceneSettings
     {
-        // scene settings
-        enum class CullingStrategy
-        {
-            STANDARD,
-            AGGRESSIVE
-        } mSceneCullingStrategy;
-
-
-        EngineSettings();
     };
-
-
-	inline EngineSettings::EngineSettings() :
-        // scene settings
-        mSceneCullingStrategy(CullingStrategy::STANDARD)
-    {
-    }
 }

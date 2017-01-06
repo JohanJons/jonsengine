@@ -628,6 +628,9 @@
     <ClInclude Include="include\Window\WindowSettings.h">
       <Filter>Header Files\Window</Filter>
     </ClInclude>
+    <ClInclude Include="include\Scene\SceneSettings.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferPixel.hlsl">

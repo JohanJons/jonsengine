@@ -290,6 +290,7 @@
     <ClInclude Include="include\Scene\SceneManager.h" />
     <ClInclude Include="include\Scene\SceneNode.h" />
     <ClInclude Include="include\Scene\SceneParser.h" />
+    <ClInclude Include="include\Scene\SceneSettings.h" />
     <ClInclude Include="include\Scene\StaticActor.h" />
     <ClInclude Include="include\Window\KeyCallback.h" />
     <ClInclude Include="include\Window\KeyDefinition.h" />
