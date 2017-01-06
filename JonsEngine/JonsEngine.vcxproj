@@ -296,6 +296,7 @@
     <ClInclude Include="include\Window\MouseCallback.h" />
     <ClInclude Include="include\Window\WindowManager.h" />
     <ClInclude Include="include\Window\WindowManagerImpl.h" />
+    <ClInclude Include="include\Window\WindowSettings.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\AmbientPixel.hlsl">

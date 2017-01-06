@@ -6,8 +6,8 @@
 
 namespace JonsEngine
 {
-    DX11Renderer::DX11Renderer(const EngineSettings& settings, HeapAllocator& memoryAllocator, Logger& logger) :
-        mMemoryAllocator(memoryAllocator), mImplementation(mMemoryAllocator.AllocateObject<DX11RendererImpl>(settings, logger, memoryAllocator), [this](DX11RendererImpl* directxImpl) { mMemoryAllocator.DeallocateObject(directxImpl); })
+    DX11Renderer::DX11Renderer(const RenderSettings& renderSettings, const WindowSettings& windowSettings, HeapAllocator& memoryAllocator, Logger& logger) :
+        mMemoryAllocator(memoryAllocator), mImplementation(mMemoryAllocator.AllocateObject<DX11RendererImpl>(renderSettings, windowSettings, logger, memoryAllocator), [this](DX11RendererImpl* directxImpl) { mMemoryAllocator.DeallocateObject(directxImpl); })
     {
     }
 

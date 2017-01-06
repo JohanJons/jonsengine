@@ -11,14 +11,13 @@
 
 namespace JonsEngine
 {
-    struct EngineSettings;
+    struct WindowSettings;
     class Logger;
 
-    /* WindowManagerImpl definition */
     class WindowManagerImpl
     {
     public:
-        WindowManagerImpl(const EngineSettings& engineSettings, Logger& logger);
+        WindowManagerImpl(const WindowSettings& settings, Logger& logger);
         ~WindowManagerImpl();
 
         /*

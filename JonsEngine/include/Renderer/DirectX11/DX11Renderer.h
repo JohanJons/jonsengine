@@ -16,13 +16,15 @@ namespace JonsEngine
 {
     class Logger;
     class HeapAllocator;
-    struct RenderQueue;
     class DX11RendererImpl;
+	struct RenderSettings;
+	struct WindowSettings;
+	struct RenderQueue;
 
     class DX11Renderer
     {
     public:
-        DX11Renderer(const EngineSettings& settings, HeapAllocator& memoryAllocator, Logger& logger);
+        DX11Renderer(const RenderSettings& renderSettings, const WindowSettings& windowSettings, HeapAllocator& memoryAllocator, Logger& logger);
         ~DX11Renderer();
 
         DX11MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,

@@ -7,7 +7,6 @@
 #include "include/Renderer/DirectX11/DX11DepthReductionPass.h"
 #include "include/Renderer/DirectX11/DX11Sampler.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
-#include "include/Renderer/RenderSettings.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Containers/IDMap.hpp"
@@ -27,11 +26,13 @@ namespace JonsEngine
     class Logger;
     class HeapAllocator;
     struct RenderQueue;
+	struct RenderSettings;
+	struct WindowSettings;
 
     class DX11RendererImpl : protected DX11Context
     {
     public:
-        DX11RendererImpl(const EngineSettings& settings, Logger& logger, HeapAllocator& memoryAllocator);
+        DX11RendererImpl(const RenderSettings& renderSettings, const WindowSettings& windowSettings, Logger& logger, HeapAllocator& memoryAllocator);
         ~DX11RendererImpl();
 
         DX11MeshID CreateMesh(const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords, const std::vector<float>& tangentData,

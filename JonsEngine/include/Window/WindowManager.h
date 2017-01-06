@@ -11,16 +11,15 @@
 
 namespace JonsEngine
 {
-    struct EngineSettings;
+    struct WindowSettings;
     class Logger;
     class HeapAllocator;
     class WindowManagerImpl;
 
-    /* WindowManager definition */
     class WindowManager
     {
     public:
-        WindowManager(const EngineSettings& engineSettings, HeapAllocator& memoryAllocator, Logger& logger);
+        WindowManager(const WindowSettings& settings, HeapAllocator& memoryAllocator, Logger& logger);
         ~WindowManager();
 
         /*

@@ -1,9 +1,10 @@
 #include "include/Renderer/DirectX11/DX11RendererImpl.h"
 
+#include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/RenderSettings.h"
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Memory/HeapAllocator.h"
 #include "include/Core/Math/Math.h"
-#include "include/Renderer/DirectX11/DX11Utils.h"
 
 #include <Commctrl.h>
 #include <array>
@@ -94,14 +95,14 @@ namespace JonsEngine
     }
 
 
-    DX11RendererImpl::DX11RendererImpl(const EngineSettings& settings, Logger& logger, HeapAllocator& memoryAllocator) : 
+    DX11RendererImpl::DX11RendererImpl(const RenderSettings& renderSettings, const WindowSettings& windowSettings, Logger& logger, HeapAllocator& memoryAllocator) : 
         DX11Context(GetActiveWindow()), 
         mLogger(logger),
         mMemoryAllocator(memoryAllocator),
-		mRenderSettings(settings.mRenderSettings),
+		mRenderSettings(renderSettings),
 
         mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), mRenderSettings, mMeshes, mMaterials),
-        mDepthReductionPass(mDevice, mContext, mRenderSettings.mShadowReadbackLatency, settings.mWindowWidth, settings.mWindowHeight),
+        mDepthReductionPass(mDevice, mContext, mRenderSettings.mShadowReadbackLatency, windowSettings.mWindowWidth, windowSettings.mWindowHeight),
 
         // samplers
         mModelSampler(mMemoryAllocator.AllocateObject<DX11Sampler>(mDevice, mContext, mRenderSettings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator.DeallocateObject(sampler); }),

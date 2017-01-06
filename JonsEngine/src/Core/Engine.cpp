@@ -19,7 +19,7 @@ namespace JonsEngine
                                                      mMemoryAllocator("EngineHeapAllocator"),
 
                                                      mWindow(settings, mMemoryAllocator, mLog), 
-                                                     mRenderer(settings, mMemoryAllocator, mLog),
+                                                     mRenderer(settings, settings, mMemoryAllocator, mLog),
                                                      mResourceManifest(mRenderer, mMemoryAllocator), 
                                                      mSceneManager(mRenderer, mResourceManifest),
                                                      mSceneParser(settings, mResourceManifest)

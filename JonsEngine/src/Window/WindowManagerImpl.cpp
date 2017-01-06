@@ -67,12 +67,12 @@ namespace JonsEngine
     }
 
 
-    WindowManagerImpl::WindowManagerImpl(const EngineSettings& engineSettings, Logger& logger) : 
+    WindowManagerImpl::WindowManagerImpl(const WindowSettings& settings, Logger& logger) :
         mLogger(logger), 
         
-        mWindowTitle(engineSettings.mWindowTitle),
-        mScreenWidth(engineSettings.mWindowWidth),
-        mScreenHeight(engineSettings.mWindowHeight),
+        mWindowTitle(settings.mWindowTitle),
+        mScreenWidth(settings.mWindowWidth),
+        mScreenHeight(settings.mWindowHeight),
         mShowMouseCursor(false),
         mFullscreen(false),
         
@@ -139,7 +139,7 @@ namespace JonsEngine
             throw std::runtime_error("WindowManagerImpl::WindowManagerImpl(): RegisterRawInputDevices failed: " + win32Error);
         }
 
-        if (engineSettings.mFullscreen)
+        if (settings.mFullscreen)
             SetFullscreen(true);
 
         gWindowManagerImpl = this;
