@@ -2,9 +2,16 @@
 
 namespace JonsEngine
 {
+	static const std::string gDefaultLoggerName = "DefaultLogger";
+
     static Logger gCoreLogger("CORE");
     static Logger gRendererLogger("RENDERER");
     static Logger gWindowLogger("WINDOW");
+
+
+	Logger::Logger() : Logger(gDefaultLoggerName)
+	{
+	}
 
     Logger::Logger(const std::string& loggerName) : mLoggerName(loggerName) 
     {

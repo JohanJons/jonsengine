@@ -13,6 +13,7 @@ namespace JonsEngine
     class HeapAllocator
     {
     public:
+		HeapAllocator();
         HeapAllocator(const std::string& allocatorName);
         ~HeapAllocator();
         static HeapAllocator& GetDefaultHeapAllocator();

@@ -16,14 +16,20 @@ namespace JonsEngine
 
 
 		WindowSettings();
+		WindowSettings(const std::string& windowTitle, uint16_t width, uint16_t height, bool fullscreen, uint16_t frameLimit);
 	};
 
 	inline WindowSettings::WindowSettings() :
-		mWindowTitle("JonsEngine Game"),
-		mWindowWidth(1920),
-		mWindowHeight(1080),
-		mFullscreen(false),
-		mFrameLimit(0)
+		WindowSettings("JonsEngine Game", 1920, 1080, false, 0)
+	{
+	}
+
+	inline WindowSettings::WindowSettings(const std::string& windowTitle, uint16_t width, uint16_t height, bool fullscreen, uint16_t frameLimit) :
+		mWindowTitle(windowTitle),
+		mWindowWidth(width),
+		mWindowHeight(height),
+		mFullscreen(fullscreen),
+		mFrameLimit(frameLimit)
 	{
 	}
 }

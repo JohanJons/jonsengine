@@ -15,11 +15,10 @@ namespace JonsEngine
     /*
      * Object used to log to the default logmanager 
      */
-
-    /* Logger class definition */
     class Logger
     {
     public:
+		Logger();
         Logger(const std::string& loggerName);
         ~Logger();
 

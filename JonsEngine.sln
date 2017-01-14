@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JonsEngine", "JonsEngine\JonsEngine.vcxproj", "{96000F2E-1268-46DB-AE59-2F0F4C3EBAC9}"
 EndProject
@@ -59,6 +59,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "Thirdparty\imgui-master\imgui.vcxproj", "{10CEEE29-A42C-43BE-AC0A-40694ECCE2C5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JonsEditor", "Tools\JonsEditor\JonsEditor.vcxproj", "{B604E1A7-28B0-4959-B88D-5D2F0A469E1A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{96000F2E-1268-46DB-AE59-2F0F4C3EBAC9} = {96000F2E-1268-46DB-AE59-2F0F4C3EBAC9}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
