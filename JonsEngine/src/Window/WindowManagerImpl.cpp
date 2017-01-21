@@ -78,6 +78,8 @@ namespace JonsEngine
         
         mRelativePosX(0),
         mRelativePosY(0),
+		mAbsolutePosX(0),
+		mAbsolutePosY(0),
         mCtrlPressed(false),
         mAltPressed(false),
         mShiftPressed(false),
@@ -142,6 +144,11 @@ namespace JonsEngine
         if (settings.mFullscreen)
             SetFullscreen(true);
 
+		POINT p;
+		GetCursorPos(&p);
+		mAbsolutePosX = p.x;
+		mAbsolutePosY = p.y;
+
         gWindowManagerImpl = this;
     }
 
@@ -167,6 +174,31 @@ namespace JonsEngine
 
             mRelativePosX = 0;
             mRelativePosY = 0;
+
+			auto right = GetSystemMetrics(SM_CXSCREEN);
+			auto bottom = GetSystemMetrics(SM_CYSCREEN);
+			auto top = 0;
+			auto left = 0;
+
+			// Ensure mouse coords are within the screens boundaries
+			if (mAbsolutePosX < left)
+			{
+				mAbsolutePosX = left;
+			}
+			if (mAbsolutePosX > right)
+			{
+				mAbsolutePosX = right;
+			}
+			if (mAbsolutePosY < top)
+			{
+				mAbsolutePosY = top;
+			}
+			if (mAbsolutePosY > bottom)
+			{
+				mAbsolutePosY = bottom;
+			}
+
+			_RPT1(0, "%dx%d\n", mAbsolutePosX, mAbsolutePosY);
         }
 
         if (mMouseButtonCallback)
@@ -436,11 +468,8 @@ namespace JonsEngine
 
         mRelativePosX += mouseInput.lLastX;
         mRelativePosY += mouseInput.lLastY;
-
-        if (mRelativePosX > 25.0f || mRelativePosY > 25.0f)
-        {
-            int i = 2;
-        }
+		mAbsolutePosX += mouseInput.lLastX;
+		mAbsolutePosY += mouseInput.lLastY;
 
         mMouseButtonEvents.emplace_back(MouseButtonEvent([&]()
         {

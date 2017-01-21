@@ -14,7 +14,7 @@ namespace JonsEditor
 		mIsRunning(false),
 		mCameraMovespeed(gDefaultCameraMovespeed)
 	{
-		mEngine.GetWindow().ShowMouseCursor(false);
+		mEngine.GetWindow().ShowMouseCursor(true);
 		SetupInputCallbacks();
 		SetupGeometry();
 	}
@@ -36,7 +36,7 @@ namespace JonsEditor
 		using namespace std::placeholders;
 
 		mEngine.GetWindow().SetKeyCallback(std::bind(&Editor::OnKeyEvent, this, _1));
-		mEngine.GetWindow().SetMousePositionCallback(std::bind(&Editor::OnMousePositionEvent, this, _1));
+		mEngine.GetWindow().SetMouseButtonCallback(std::bind(&Editor::OnMouseButtonEvent, this, _1));
 		mEngine.GetWindow().SetMousePositionCallback(std::bind(&Editor::OnMousePositionEvent, this, _1));
 	}
 
@@ -79,6 +79,16 @@ namespace JonsEditor
 
 	void Editor::OnMouseButtonEvent(const JonsEngine::MouseButtonEvent& evnt)
 	{
+		auto& window = mEngine.GetWindow();
+		auto windowWidth = window.GetScreenWidth(), windowHeight = window.GetScreenHeight();
+
+		/*float x = 2.0f * evnt. / windowWidth - 1;
+		float y = -2.0f * winY / windowHeight + 1;
+		Matrix4 viewProjectionInverse = inverse(projectionMatrix *
+			viewMatrix);
+
+		Point3D point3D = new Point3D(x, y, 0);
+		return viewProjectionInverse.multiply(point3D);*/
 	}
 
 	void Editor::OnMousePositionEvent(const MousePositionEvent& evnt)

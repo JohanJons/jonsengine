@@ -62,6 +62,8 @@ namespace JonsEngine
 
         int32_t mRelativePosX;
         int32_t mRelativePosY;
+		int32_t mAbsolutePosX;
+		int32_t mAbsolutePosY;
         bool mCtrlPressed;
         bool mAltPressed;
         bool mShiftPressed;
