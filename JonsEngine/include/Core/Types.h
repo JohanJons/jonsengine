@@ -26,6 +26,10 @@ namespace JonsEngine
     static const DX11MeshID INVALID_DX11_MESH_ID = 0;
     static const DX11MaterialID INVALID_DX11_MATERIAL_ID = 0;
 
+	typedef glm::uvec2 uVec2;
+	typedef glm::uvec3 uVec3;
+	typedef glm::ivec2 iVec2;
+	typedef glm::ivec3 iVec3;
     typedef glm::vec2 Vec2;
     typedef glm::vec3 Vec3;
     typedef glm::vec4 Vec4;

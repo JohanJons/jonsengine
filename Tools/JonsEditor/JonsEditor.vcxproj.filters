@@ -15,15 +15,9 @@
     <ClCompile Include="src\Editor.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="src\Window.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Editor.h">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Window.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

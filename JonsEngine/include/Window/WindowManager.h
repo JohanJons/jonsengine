@@ -9,17 +9,22 @@
 #include <memory>
 
 
+struct tagRAWKEYBOARD;
+struct tagRAWMOUSE;
+
 namespace JonsEngine
 {
     struct WindowSettings;
+	struct NativeResources;
     class Logger;
-    class HeapAllocator;
-    class WindowManagerImpl;
 
     class WindowManager
     {
     public:
-        WindowManager(const WindowSettings& settings, HeapAllocator& memoryAllocator, Logger& logger);
+		typedef iVec2 MousePosition;
+		typedef uVec2 WindowDimensions;
+
+        WindowManager(const WindowSettings& settings, Logger& logger);
         ~WindowManager();
 
         /*
@@ -40,17 +45,64 @@ namespace JonsEngine
 
         void SetFullscreen(bool fullscreen);
         void SetScreenResolution(const uint32_t width, const uint32_t height);
+		void SetScreenResolution(const WindowDimensions& dimensions);
         void SetWindowTitle(const std::string& windowTitle);
 
         bool GetFullscreen() const;
-        uint32_t GetScreenWidth() const;
-        uint32_t GetScreenHeight() const;
+		WindowDimensions GetWindowDimensions() const;
         const std::string& GetWindowTitle() const;
         bool GetShowMouseCursor() const;
 
 
+	private:
+		struct MouseData
+		{
+			MousePosition mRelativePos;
+			MousePosition mAbsolutePos;
+
+			inline MouseData() :
+				mRelativePos(0, 0),
+				mAbsolutePos(0, 0)
+			{
+			}
+		};
+
+		struct KeyboardData
+		{
+			bool mCtrlPressed;
+			bool mAltPressed;
+			bool mShiftPressed;
+
+			inline KeyboardData() :
+				mCtrlPressed(false),
+				mAltPressed(false),
+				mShiftPressed(false)
+			{
+			}
+		};
+
     private:
-        HeapAllocator& mMemoryAllocator;
-        std::unique_ptr<WindowManagerImpl, std::function<void(WindowManagerImpl*)>> mImplementation;
+		void ProcessKeyboardInput(const tagRAWKEYBOARD& keyInput);
+		void ProcessMouseInput(const tagRAWMOUSE& mouseInput);
+		void VerifyAbsoluteMousePosition();
+
+		Logger& mLogger;
+
+		std::string mWindowTitle;
+		WindowDimensions mWindowDimensions;
+		bool mShowMouseCursor;
+		bool mFullscreen;
+
+		MouseData mMouseData;
+		KeyboardData mKeyboardData;
+
+		MouseButtonCallback mMouseButtonCallback;
+		MousePositionCallback mMousePositionCallback;
+		KeyCallback mKeyCallback;
+
+		std::vector<MouseButtonEvent> mMouseButtonEvents;
+		std::vector<KeyEvent> mKeyEvents;
+
+		std::unique_ptr<NativeResources> mNativeHandles;
     };
 }

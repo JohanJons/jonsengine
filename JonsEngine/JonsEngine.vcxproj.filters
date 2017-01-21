@@ -146,9 +146,6 @@
     <ClCompile Include="src\Window\WindowManager.cpp">
       <Filter>Source Files\Window</Filter>
     </ClCompile>
-    <ClCompile Include="src\Window\WindowManagerImpl.cpp">
-      <Filter>Source Files\Window</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\DirectX11\DX11Mesh.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
@@ -389,9 +386,6 @@
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="include\Window\WindowManager.h">
-      <Filter>Header Files\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Window\WindowManagerImpl.h">
       <Filter>Header Files\Window</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11AmbientPass.h">

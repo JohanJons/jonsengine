@@ -21,11 +21,9 @@
   <ItemGroup>
     <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Editor.h" />
-    <ClInclude Include="include\Window.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B604E1A7-28B0-4959-B88D-5D2F0A469E1A}</ProjectGuid>

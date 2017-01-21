@@ -102,7 +102,7 @@ namespace JonsEngine
 		mRenderSettings(renderSettings),
 
         mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), mRenderSettings, mMeshes, mMaterials),
-        mDepthReductionPass(mDevice, mContext, mRenderSettings.mShadowReadbackLatency, windowSettings.mWindowWidth, windowSettings.mWindowHeight),
+        mDepthReductionPass(mDevice, mContext, mRenderSettings.mShadowReadbackLatency, windowSettings.mWindowDimensions.x, windowSettings.mWindowDimensions.y),
 
         // samplers
         mModelSampler(mMemoryAllocator.AllocateObject<DX11Sampler>(mDevice, mContext, mRenderSettings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator.DeallocateObject(sampler); }),

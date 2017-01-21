@@ -80,7 +80,7 @@ namespace JonsEditor
 	void Editor::OnMouseButtonEvent(const JonsEngine::MouseButtonEvent& evnt)
 	{
 		auto& window = mEngine.GetWindow();
-		auto windowWidth = window.GetScreenWidth(), windowHeight = window.GetScreenHeight();
+		auto windowDimensions = window.GetWindowDimensions();
 
 		/*float x = 2.0f * evnt. / windowWidth - 1;
 		float y = -2.0f * winY / windowHeight + 1;
@@ -94,8 +94,8 @@ namespace JonsEditor
 	void Editor::OnMousePositionEvent(const MousePositionEvent& evnt)
 	{
 		const float sens = 0.1f;
-		float newXPos = (float)evnt.mRelativePosX * sens;
-		float newYPos = (float)evnt.mRelativePosY * sens;
+		float newXPos = (float)evnt.x * sens;
+		float newYPos = (float)evnt.y * sens;
 
 		auto& camera = mEngine.GetSceneManager().GetActiveScene().GetSceneCamera();
 		camera.RotateCamera(newXPos, newYPos);

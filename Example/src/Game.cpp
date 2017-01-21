@@ -125,8 +125,8 @@ namespace JonsGame
         Camera& camera = mGameScene.GetJonsScene().GetSceneCamera();
 
         const float sens = 0.1f;
-        float newXPos = (float)evnt.mRelativePosX * sens;
-        float newYPos = (float)evnt.mRelativePosY * sens;
+        float newXPos = (float)evnt.x * sens;
+        float newYPos = (float)evnt.y * sens;
 
         camera.RotateCamera(newXPos, newYPos);
     }

@@ -18,7 +18,7 @@ namespace JonsEngine
     Engine::Engine(const EngineSettings& settings) : mLog(Logger::GetCoreLogger()), 
                                                      mMemoryAllocator("EngineHeapAllocator"),
 
-                                                     mWindow(settings, mMemoryAllocator, mLog), 
+                                                     mWindow(settings, mLog), 
                                                      mRenderer(settings, settings, mMemoryAllocator, mLog),
                                                      mResourceManifest(mRenderer, mMemoryAllocator), 
                                                      mSceneManager(mRenderer, mResourceManifest),
@@ -39,7 +39,8 @@ namespace JonsEngine
 
         // process input and window events
         mWindow.Poll();
-        const float windowAspectRatio = mWindow.GetScreenWidth() / static_cast<float>(mWindow.GetScreenHeight());
+		auto windowDimensions = mWindow.GetWindowDimensions();
+        const float windowAspectRatio = windowDimensions.x / static_cast<float>(windowDimensions.y);
 
         // update scene actors
 		Scene& activeScene = mSceneManager.GetActiveScene();

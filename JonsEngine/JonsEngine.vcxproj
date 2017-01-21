@@ -190,7 +190,6 @@
     <ClCompile Include="src\Scene\SceneParser.cpp" />
     <ClCompile Include="src\Scene\StaticActor.cpp" />
     <ClCompile Include="src\Window\WindowManager.cpp" />
-    <ClCompile Include="src\Window\WindowManagerImpl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
@@ -296,7 +295,6 @@
     <ClInclude Include="include\Window\KeyDefinition.h" />
     <ClInclude Include="include\Window\MouseCallback.h" />
     <ClInclude Include="include\Window\WindowManager.h" />
-    <ClInclude Include="include\Window\WindowManagerImpl.h" />
     <ClInclude Include="include\Window\WindowSettings.h" />
   </ItemGroup>
   <ItemGroup>

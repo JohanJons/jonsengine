@@ -9,14 +9,13 @@ namespace JonsEngine
 	struct WindowSettings
 	{
 		std::string mWindowTitle;
-		uint16_t mWindowWidth;
-		uint16_t mWindowHeight;
+		uVec2 mWindowDimensions;
 		bool mFullscreen;
 		uint16_t mFrameLimit;
 
 
 		WindowSettings();
-		WindowSettings(const std::string& windowTitle, uint16_t width, uint16_t height, bool fullscreen, uint16_t frameLimit);
+		WindowSettings(const std::string& windowTitle, uint32_t width, uint32_t height, bool fullscreen, uint16_t frameLimit);
 	};
 
 	inline WindowSettings::WindowSettings() :
@@ -24,10 +23,9 @@ namespace JonsEngine
 	{
 	}
 
-	inline WindowSettings::WindowSettings(const std::string& windowTitle, uint16_t width, uint16_t height, bool fullscreen, uint16_t frameLimit) :
+	inline WindowSettings::WindowSettings(const std::string& windowTitle, uint32_t width, uint32_t height, bool fullscreen, uint16_t frameLimit) :
 		mWindowTitle(windowTitle),
-		mWindowWidth(width),
-		mWindowHeight(height),
+		mWindowDimensions(width, height),
 		mFullscreen(fullscreen),
 		mFrameLimit(frameLimit)
 	{
