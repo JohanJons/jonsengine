@@ -91,6 +91,9 @@ namespace JonsEngine
         mInstanceHandle(GetModuleHandle(NULL)),
         mWindowHandle(nullptr)
     {
+		// not foolproof but should work
+		assert(SetProcessDPIAware());
+
         // Register class
         WNDCLASSEX wcex;
         ZeroMemory(&wcex, sizeof(wcex));
@@ -145,7 +148,8 @@ namespace JonsEngine
             SetFullscreen(true);
 
 		POINT p;
-		GetCursorPos(&p);
+		ZeroMemory(&p, sizeof(p));
+		assert(GetCursorPos(&p));
 		mAbsolutePosX = p.x;
 		mAbsolutePosY = p.y;
 
