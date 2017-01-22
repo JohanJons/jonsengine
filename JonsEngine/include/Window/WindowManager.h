@@ -8,7 +8,6 @@
 #include <vector>
 #include <memory>
 
-
 struct tagRAWKEYBOARD;
 struct tagRAWMOUSE;
 
@@ -50,6 +49,7 @@ namespace JonsEngine
 
         bool GetFullscreen() const;
 		WindowDimensions GetWindowDimensions() const;
+		MousePosition GetCurrentMousePosition() const;
         const std::string& GetWindowTitle() const;
         bool GetShowMouseCursor() const;
 

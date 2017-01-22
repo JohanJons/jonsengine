@@ -305,6 +305,11 @@ namespace JonsEngine
 		return mWindowDimensions;
 	}
 
+	WindowManager::MousePosition WindowManager::GetCurrentMousePosition() const
+	{
+		return mMouseData.mAbsolutePos;
+	}
+
 	const std::string& WindowManager::GetWindowTitle() const
 	{
 		return mWindowTitle;
@@ -457,12 +462,14 @@ namespace JonsEngine
 		if (!mMouseButtonCallback && !mMousePositionCallback)
 			return;
 
+		// make sure mouse movements are relative
+		assert(!(mouseInput.usFlags & (1 << 0)));
+
 		mMouseData.mRelativePos.x += mouseInput.lLastX;
 		mMouseData.mRelativePos.y += mouseInput.lLastY;
 		mMouseData.mAbsolutePos.x += mouseInput.lLastX;
 		mMouseData.mAbsolutePos.y += mouseInput.lLastY;
 		VerifyAbsoluteMousePosition();
-		_RPT1(0, "%dx%d\n", mMouseData.mAbsolutePos.x, mMouseData.mAbsolutePos.y);
 
 		mMouseButtonEvents.emplace_back(MouseButtonEvent([&]()
 		{

@@ -81,14 +81,15 @@ namespace JonsEditor
 	{
 		auto& window = mEngine.GetWindow();
 		auto windowDimensions = window.GetWindowDimensions();
+		auto mousePosition = window.GetCurrentMousePosition();
 
-		/*float x = 2.0f * evnt. / windowWidth - 1;
-		float y = -2.0f * winY / windowHeight + 1;
-		Matrix4 viewProjectionInverse = inverse(projectionMatrix *
-			viewMatrix);
+		float x = 2.0f * mousePosition.x / windowDimensions.x - 1;
+		float y = -2.0f * mousePosition.y / windowDimensions.y + 1;
+		Mat4 cameraTransform = mEngine.GetSceneManager().GetActiveScene().GetSceneCamera().GetCameraTransform();
+		Mat4 invCameraTransform = glm::inverse(cameraTransform);
 
 		Point3D point3D = new Point3D(x, y, 0);
-		return viewProjectionInverse.multiply(point3D);*/
+		return viewProjectionInverse.multiply(point3D);
 	}
 
 	void Editor::OnMousePositionEvent(const MousePositionEvent& evnt)
