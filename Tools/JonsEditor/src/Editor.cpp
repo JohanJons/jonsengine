@@ -88,8 +88,8 @@ namespace JonsEditor
 		Mat4 cameraTransform = mEngine.GetSceneManager().GetActiveScene().GetSceneCamera().GetCameraTransform();
 		Mat4 invCameraTransform = glm::inverse(cameraTransform);
 
-		Point3D point3D = new Point3D(x, y, 0);
-		return viewProjectionInverse.multiply(point3D);
+		//Point3D point3D = new Point3D(x, y, 0);
+		//return viewProjectionInverse.multiply(point3D);
 	}
 
 	void Editor::OnMousePositionEvent(const MousePositionEvent& evnt)

@@ -87,6 +87,7 @@ namespace JonsEngine
 		mShowMouseCursor(false),
 		mFullscreen(false),
 
+		mRelativePos({0, 0}),
 		mMouseButtonCallback(nullptr),
 		mMousePositionCallback(nullptr),
 		mKeyCallback(nullptr),
@@ -151,12 +152,6 @@ namespace JonsEngine
 		if (settings.mFullscreen)
 			SetFullscreen(true);
 
-		// get initial mouse position
-		POINT p;
-		ZeroMemory(&p, sizeof(p));
-		assert(GetCursorPos(&p));
-		mMouseData.mAbsolutePos = { p.x, p.y };
-
 		using namespace std::placeholders;
 		gKeyboardCallback = std::bind(&WindowManager::ProcessKeyboardInput, this, _1);
 		gMouseCallback = std::bind(&WindowManager::ProcessMouseInput, this, _1);
@@ -182,15 +177,8 @@ namespace JonsEngine
 		// Dispatch waiting events for each event type to registered callbacks
 		if (mMousePositionCallback)
 		{
-			mMousePositionCallback(mMouseData.mRelativePos);
-			mMouseData.mRelativePos = { 0, 0 };
-
-			//POINT p;
-			//ZeroMemory(&p, sizeof(p));
-			//assert(GetCursorPos(&p));
-			//mMouseData.mAbsolutePos = { p.x, p.y };
-			//VerifyAbsoluteMousePosition();
-			_RPT1(0, "%dx%d\n", mMouseData.mAbsolutePos.x, mMouseData.mAbsolutePos.y);
+			mMousePositionCallback(mRelativePos);
+			mRelativePos = { 0, 0 };
 		}
 
 		if (mMouseButtonCallback)
@@ -307,7 +295,11 @@ namespace JonsEngine
 
 	WindowManager::MousePosition WindowManager::GetCurrentMousePosition() const
 	{
-		return mMouseData.mAbsolutePos;
+		POINT p;
+		ZeroMemory(&p, sizeof(p));
+		assert(GetCursorPos(&p));
+
+		return{ p.x, p.y };
 	}
 
 	const std::string& WindowManager::GetWindowTitle() const
@@ -465,11 +457,8 @@ namespace JonsEngine
 		// make sure mouse movements are relative
 		assert(!(mouseInput.usFlags & (1 << 0)));
 
-		mMouseData.mRelativePos.x += mouseInput.lLastX;
-		mMouseData.mRelativePos.y += mouseInput.lLastY;
-		mMouseData.mAbsolutePos.x += mouseInput.lLastX;
-		mMouseData.mAbsolutePos.y += mouseInput.lLastY;
-		VerifyAbsoluteMousePosition();
+		mRelativePos.x += mouseInput.lLastX;
+		mRelativePos.y += mouseInput.lLastY;
 
 		mMouseButtonEvents.emplace_back(MouseButtonEvent([&]()
 		{
@@ -484,21 +473,5 @@ namespace JonsEngine
 			default:                            return MouseButtonEvent(MouseButtonEvent::BUTTON_NONE, MouseButtonEvent::STATE_UNKNOWN);
 			};
 		}()));
-	}
-
-	void WindowManager::VerifyAbsoluteMousePosition()
-	{
-		static int32_t right = static_cast<int32_t>(GetSystemMetrics(SM_CXSCREEN));
-		static int32_t bottom = static_cast<int32_t>(GetSystemMetrics(SM_CYSCREEN));
-		static int32_t top = 0;
-		static int32_t left = 0;
-
-		// Ensure mouse coords are within the screens boundaries
-		if (mMouseData.mAbsolutePos.x < left)	mMouseData.mAbsolutePos.x = left;
-		if (mMouseData.mAbsolutePos.x > right)	mMouseData.mAbsolutePos.x = right;
-		if (mMouseData.mAbsolutePos.y < top)	mMouseData.mAbsolutePos.y = top;
-		if (mMouseData.mAbsolutePos.y > bottom)	mMouseData.mAbsolutePos.y = bottom;
-
-		_RPT1(0, "%dx%d\n", mMouseData.mAbsolutePos.x, mMouseData.mAbsolutePos.y);
 	}
 }

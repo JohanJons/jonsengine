@@ -55,18 +55,6 @@ namespace JonsEngine
 
 
 	private:
-		struct MouseData
-		{
-			MousePosition mRelativePos;
-			MousePosition mAbsolutePos;
-
-			inline MouseData() :
-				mRelativePos(0, 0),
-				mAbsolutePos(0, 0)
-			{
-			}
-		};
-
 		struct KeyboardData
 		{
 			bool mCtrlPressed;
@@ -84,7 +72,6 @@ namespace JonsEngine
     private:
 		void ProcessKeyboardInput(const tagRAWKEYBOARD& keyInput);
 		void ProcessMouseInput(const tagRAWMOUSE& mouseInput);
-		void VerifyAbsoluteMousePosition();
 
 		Logger& mLogger;
 
@@ -93,9 +80,8 @@ namespace JonsEngine
 		bool mShowMouseCursor;
 		bool mFullscreen;
 
-		MouseData mMouseData;
+		MousePosition mRelativePos;
 		KeyboardData mKeyboardData;
-
 		MouseButtonCallback mMouseButtonCallback;
 		MousePositionCallback mMousePositionCallback;
 		KeyCallback mKeyCallback;
