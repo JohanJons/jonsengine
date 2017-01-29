@@ -87,9 +87,9 @@ namespace JonsEngine
 		mShowMouseCursor(false),
 		mFullscreen(false),
 
-		mRelativePos({0, 0}),
+		mMouseMovement({0, 0}),
 		mMouseButtonCallback(nullptr),
-		mMousePositionCallback(nullptr),
+		mMouseMovementCallback(nullptr),
 		mKeyCallback(nullptr),
 
 		mNativeHandles(new NativeResources({ GetModuleHandle(NULL), nullptr }))
@@ -175,10 +175,10 @@ namespace JonsEngine
 		}
 
 		// Dispatch waiting events for each event type to registered callbacks
-		if (mMousePositionCallback)
+		if (mMouseMovementCallback)
 		{
-			mMousePositionCallback(mRelativePos);
-			mRelativePos = { 0, 0 };
+			mMouseMovementCallback(mMouseMovement);
+			mMouseMovement = { 0, 0 };
 		}
 
 		if (mMouseButtonCallback)
@@ -207,14 +207,14 @@ namespace JonsEngine
 		mMouseButtonCallback = callback;
 	}
 
-	void WindowManager::SetMousePositionCallback()
+	void WindowManager::SetMouseMovementCallback()
 	{
-		mMousePositionCallback = nullptr;
+		mMouseMovementCallback = nullptr;
 	}
 
-	void WindowManager::SetMousePositionCallback(const MousePositionCallback& callback)
+	void WindowManager::SetMouseMovementCallback(const MouseMovementCallback& callback)
 	{
-		mMousePositionCallback = callback;
+		mMouseMovementCallback = callback;
 	}
 
 	void WindowManager::SetKeyCallback()
@@ -288,17 +288,18 @@ namespace JonsEngine
 		return mFullscreen;
 	}
 
-	WindowManager::WindowDimensions WindowManager::GetWindowDimensions() const
+	WindowDimensions WindowManager::GetWindowDimensions() const
 	{
 		return mWindowDimensions;
 	}
 
-	WindowManager::MousePosition WindowManager::GetCurrentMousePosition() const
+	WindowPosition WindowManager::GetCurrentMousePosition() const
 	{
 		POINT p;
 		ZeroMemory(&p, sizeof(p));
 		assert(GetCursorPos(&p));
 
+		// note: screen, not clientwindow coordinates!
 		return{ p.x, p.y };
 	}
 
@@ -451,14 +452,17 @@ namespace JonsEngine
 
 	void WindowManager::ProcessMouseInput(const tagRAWMOUSE& mouseInput)
 	{
-		if (!mMouseButtonCallback && !mMousePositionCallback)
+		if (!mMouseButtonCallback && !mMouseMovementCallback)
 			return;
 
 		// make sure mouse movements are relative
 		assert(!(mouseInput.usFlags & (1 << 0)));
 
-		mRelativePos.x += mouseInput.lLastX;
-		mRelativePos.y += mouseInput.lLastY;
+		mMouseMovement.x += mouseInput.lLastX;
+		mMouseMovement.y += mouseInput.lLastY;
+
+		if (!mouseInput.usButtonFlags)
+			return;
 
 		mMouseButtonEvents.emplace_back(MouseButtonEvent([&]()
 		{

@@ -135,6 +135,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11BoxBlurPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Context.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11CPUDynamicBuffer.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11DepthBufferReadback.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11DepthReductionPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11DirectionalLightPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11FullscreenTrianglePass.cpp" />
@@ -230,6 +231,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11ConstantBuffer.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Context.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11CPUDynamicBuffer.h" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11DepthBufferReadback.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11DepthReductionPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11DirectionalLightPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11FullscreenTrianglePass.h" />
@@ -294,6 +296,7 @@
     <ClInclude Include="include\Window\KeyCallback.h" />
     <ClInclude Include="include\Window\KeyDefinition.h" />
     <ClInclude Include="include\Window\MouseCallback.h" />
+    <ClInclude Include="include\Window\Types.h" />
     <ClInclude Include="include\Window\WindowManager.h" />
     <ClInclude Include="include\Window\WindowSettings.h" />
   </ItemGroup>

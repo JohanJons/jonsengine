@@ -120,7 +120,7 @@ namespace JonsGame
     {
     }
 
-    void Game::OnMousePositionEvent(const JonsEngine::MousePositionEvent& evnt)
+    void Game::OnMouseMovementEvent(const JonsEngine::MouseMovementEvent& evnt)
     {
         Camera& camera = mGameScene.GetJonsScene().GetSceneCamera();
 
@@ -134,7 +134,7 @@ namespace JonsGame
     void Game::SetupInputCallbacks()
     {
         mEngine.GetWindow().SetMouseButtonCallback(boost::bind(&Game::OnMouseButtonEvent, this, _1));
-        mEngine.GetWindow().SetMousePositionCallback(boost::bind(&Game::OnMousePositionEvent, this, _1));
+        mEngine.GetWindow().SetMouseMovementCallback(boost::bind(&Game::OnMouseMovementEvent, this, _1));
         mEngine.GetWindow().SetKeyCallback(boost::bind(&Game::OnKeyEvent, this, _1));
     }
 }

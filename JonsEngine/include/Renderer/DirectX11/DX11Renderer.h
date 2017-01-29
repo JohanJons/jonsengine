@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Window/Types.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/DebugOptions.h"
@@ -51,6 +52,7 @@ namespace JonsEngine
         bool IsSSAOEnabled() const;
         void SetSSAO(const bool useSSAO);
 
+		float GetDepthValue(const WindowPosition& position) const;
         float GetZNear() const;
         float GetZFar() const;
 		RenderSettings::ShadowResolution GetShadowResolution() const;

@@ -23,7 +23,7 @@ namespace JonsGame
         void Run();
 
         void OnMouseButtonEvent(const JonsEngine::MouseButtonEvent& evnt);
-        void OnMousePositionEvent(const JonsEngine::MousePositionEvent& evnt);
+        void OnMouseMovementEvent(const JonsEngine::MouseMovementEvent& evnt);
         void OnKeyEvent(const JonsEngine::KeyEvent& evnt);
 
 

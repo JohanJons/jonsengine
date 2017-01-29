@@ -3,6 +3,7 @@
 #include "include/Window/KeyCallback.h"
 #include "include/Window/KeyDefinition.h"
 #include "include/Window/MouseCallback.h"
+#include "include/Window/Types.h"
 
 #include <string>
 #include <vector>
@@ -20,9 +21,6 @@ namespace JonsEngine
     class WindowManager
     {
     public:
-		typedef iVec2 MousePosition;
-		typedef uVec2 WindowDimensions;
-
         WindowManager(const WindowSettings& settings, Logger& logger);
         ~WindowManager();
 
@@ -34,8 +32,8 @@ namespace JonsEngine
 
         void SetMouseButtonCallback();
         void SetMouseButtonCallback(const MouseButtonCallback& callback);
-        void SetMousePositionCallback();
-        void SetMousePositionCallback(const MousePositionCallback& callback);
+        void SetMouseMovementCallback();
+        void SetMouseMovementCallback(const MouseMovementCallback& callback);
         void SetKeyCallback();
         void SetKeyCallback(const KeyCallback& callback);
 
@@ -49,7 +47,8 @@ namespace JonsEngine
 
         bool GetFullscreen() const;
 		WindowDimensions GetWindowDimensions() const;
-		MousePosition GetCurrentMousePosition() const;
+		// note: is actually screen position
+		WindowPosition GetCurrentMousePosition() const;
         const std::string& GetWindowTitle() const;
         bool GetShowMouseCursor() const;
 
@@ -80,10 +79,10 @@ namespace JonsEngine
 		bool mShowMouseCursor;
 		bool mFullscreen;
 
-		MousePosition mRelativePos;
+		MouseMovement mMouseMovement;
 		KeyboardData mKeyboardData;
 		MouseButtonCallback mMouseButtonCallback;
-		MousePositionCallback mMousePositionCallback;
+		MouseMovementCallback mMouseMovementCallback;
 		KeyCallback mKeyCallback;
 
 		std::vector<MouseButtonEvent> mMouseButtonEvents;

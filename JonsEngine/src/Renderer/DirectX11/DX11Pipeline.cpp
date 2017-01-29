@@ -1,12 +1,13 @@
 #include "include/Renderer/DirectX11/DX11Pipeline.h"
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/SimpleTexturePixel.h"
 #include "include/Renderer/RenderSettings.h"
 #include "include/RenderQueue/RenderQueue.h"
 
 namespace JonsEngine
 {
-    DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const RenderSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap)
+    DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, DX11Backbuffer& backbuffer, const RenderSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap)
         :
         mLogger(logger),
         mWindowSize(backbufferTextureDesc.Width, backbufferTextureDesc.Height),
@@ -20,51 +21,42 @@ namespace JonsEngine
         mDepthSRV(nullptr),
         mDepthStencilState(nullptr),
         mAdditiveBlending(nullptr),
+		mSimpleTextureShader(nullptr),
 
         mBoneTransformsBuffer(device, context),
         mVertexTransformPass(device, context, meshMap),
         mAABBPass(device, context, mVertexTransformPass),
-        mFullscreenTrianglePass(device, context),
+        mFullscreenPass(device, context),
 
-        mBackbuffer(device, mContext, mSwapchain, mFullscreenTrianglePass),
+		mBackbuffer(backbuffer),
         mLightAccbuffer(device, mContext, backbufferTextureDesc),
         mGBuffer(device, mContext, backbufferTextureDesc),
 
-        mAmbientPass(device, context, mFullscreenTrianglePass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-        mDirectionalLightPass(device, mContext, mFullscreenTrianglePass, mVertexTransformPass, settings.mShadowResolution, settings.mShadowReadbackLatency, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
+        mAmbientPass(device, context, mFullscreenPass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
+        mDirectionalLightPass(device, mContext, mFullscreenPass, mVertexTransformPass, settings.mShadowResolution, settings.mShadowReadbackLatency, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mPointLightPass(device, mContext, mVertexTransformPass, settings.mShadowResolution, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-		mToneMapper(device, context, mFullscreenTrianglePass),
-        mPostProcessor(device, context, mFullscreenTrianglePass, backbufferTextureDesc),
+		mToneMapper(device, context, mFullscreenPass),
+        mPostProcessor(device, context, mFullscreenPass, backbufferTextureDesc),
         mSkyboxPass(device, context)
     {
-        // create depth buffer/view/srv
-        D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
-        ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
-        depthStencilBufferDesc.ArraySize = 1;
-        depthStencilBufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
-        depthStencilBufferDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
-        depthStencilBufferDesc.Width = backbufferTextureDesc.Width;
-        depthStencilBufferDesc.Height = backbufferTextureDesc.Height;
-        depthStencilBufferDesc.MipLevels = 1;
-        depthStencilBufferDesc.SampleDesc.Count = 1;
-        depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-        DXCALL(device->CreateTexture2D(&depthStencilBufferDesc, nullptr, &mDepthStencilBuffer));
+		auto depthStencilBuffer = backbuffer.GetDepthbuffer();
 
+        // create depth buffer view/srv
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         ZeroMemory(&srvDesc, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
         srvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
         srvDesc.Texture2D.MipLevels = 1;
-        DXCALL(device->CreateShaderResourceView(mDepthStencilBuffer, &srvDesc, &mDepthSRV));
+        DXCALL(device->CreateShaderResourceView(depthStencilBuffer, &srvDesc, &mDepthSRV));
 
         D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
         ZeroMemory(&dsvDesc, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC));
         dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
         dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-        DXCALL(device->CreateDepthStencilView(mDepthStencilBuffer, &dsvDesc, &mDSV));
+        DXCALL(device->CreateDepthStencilView(depthStencilBuffer, &dsvDesc, &mDSV));
 
         dsvDesc.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
-        DXCALL(device->CreateDepthStencilView(mDepthStencilBuffer, &dsvDesc, &mDSVReadOnly));
+        DXCALL(device->CreateDepthStencilView(depthStencilBuffer, &dsvDesc, &mDSVReadOnly));
 
         // depth stencil config used in shading stage
         D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
@@ -87,6 +79,9 @@ namespace JonsEngine
         blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
         blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
         DXCALL(device->CreateBlendState(&blendDesc, &mAdditiveBlending));
+
+		// pixelshader that will output lightAccumBuffer to backbuffer
+		DXCALL(device->CreatePixelShader(gSimpleTexturePixelShader, sizeof(gSimpleTexturePixelShader), nullptr, &mSimpleTextureShader))
     }
 
     DX11Pipeline::~DX11Pipeline()
@@ -241,7 +236,8 @@ namespace JonsEngine
 			// simply copy lightAccumulatorBuffer --> backbuffer with sRGB conversion
 			mBackbuffer.BindForTonemapping();
 			mLightAccbuffer.BindAsShaderResource();
-			mBackbuffer.FillBackbuffer();
+			mContext->PSSetShader(mSimpleTextureShader, nullptr, 0);
+			mFullscreenPass.Render();
 		}
 	}
 }

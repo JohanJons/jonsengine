@@ -37,7 +37,7 @@ namespace JonsEditor
 
 		mEngine.GetWindow().SetKeyCallback(std::bind(&Editor::OnKeyEvent, this, _1));
 		mEngine.GetWindow().SetMouseButtonCallback(std::bind(&Editor::OnMouseButtonEvent, this, _1));
-		mEngine.GetWindow().SetMousePositionCallback(std::bind(&Editor::OnMousePositionEvent, this, _1));
+		mEngine.GetWindow().SetMouseMovementCallback(std::bind(&Editor::OnMouseMovementEvent, this, _1));
 	}
 
 	void Editor::SetupGeometry()
@@ -80,19 +80,29 @@ namespace JonsEditor
 	void Editor::OnMouseButtonEvent(const JonsEngine::MouseButtonEvent& evnt)
 	{
 		auto& window = mEngine.GetWindow();
+		auto& renderer = mEngine.GetRenderer();
 		auto windowDimensions = window.GetWindowDimensions();
 		auto mousePosition = window.GetCurrentMousePosition();
 
+		auto& camera = mEngine.GetSceneManager().GetActiveScene().GetSceneCamera();
+		float cameraFOV = camera.GetFOV();
+		Mat4 viewTransform = camera.GetCameraTransform();
+		Mat4 projTransform = PerspectiveMatrixFov(cameraFOV, windowDimensions.x / static_cast<float>(windowDimensions.y), renderer.GetZNear(), renderer.GetZFar());
+		Mat4 invViewProj = glm::inverse(projTransform * viewTransform);
+
 		float x = 2.0f * mousePosition.x / windowDimensions.x - 1;
 		float y = -2.0f * mousePosition.y / windowDimensions.y + 1;
-		Mat4 cameraTransform = mEngine.GetSceneManager().GetActiveScene().GetSceneCamera().GetCameraTransform();
-		Mat4 invCameraTransform = glm::inverse(cameraTransform);
-
+		float z = renderer.GetDepthValue(mousePosition);
+		Vec4 point4{x, y, 0, 1};
+		point4 = invViewProj * point4;
+		Vec3 point3(point4);
 		//Point3D point3D = new Point3D(x, y, 0);
 		//return viewProjectionInverse.multiply(point3D);
+
+		_RPT1(0, "%f x %f x %f\n", point3.x, point3.y, point3.z);
 	}
 
-	void Editor::OnMousePositionEvent(const MousePositionEvent& evnt)
+	void Editor::OnMouseMovementEvent(const MouseMovementEvent& evnt)
 	{
 		const float sens = 0.1f;
 		float newXPos = (float)evnt.x * sens;

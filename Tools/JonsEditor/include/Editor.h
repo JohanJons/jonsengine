@@ -18,7 +18,7 @@ namespace JonsEditor
 		void SetupGeometry();
 
 		void OnKeyEvent(const JonsEngine::KeyEvent& evnt);
-		void OnMousePositionEvent(const JonsEngine::MousePositionEvent& evnt);
+		void OnMouseMovementEvent(const JonsEngine::MouseMovementEvent& evnt);
 		void OnMouseButtonEvent(const JonsEngine::MouseButtonEvent& evnt);
 
 

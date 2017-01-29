@@ -101,8 +101,10 @@ namespace JonsEngine
         mMemoryAllocator(memoryAllocator),
 		mRenderSettings(renderSettings),
 
-        mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), mRenderSettings, mMeshes, mMaterials),
-        mDepthReductionPass(mDevice, mContext, mRenderSettings.mShadowReadbackLatency, windowSettings.mWindowDimensions.x, windowSettings.mWindowDimensions.y),
+		mBackbuffer(mDevice, mContext, mSwapchain),
+
+		mDepthReadback(mDevice, mContext, mBackbuffer.GetDepthbuffer()),
+		mDepthReductionPass(mDevice, mContext, mRenderSettings.mShadowReadbackLatency, windowSettings.mWindowDimensions.x, windowSettings.mWindowDimensions.y),
 
         // samplers
         mModelSampler(mMemoryAllocator.AllocateObject<DX11Sampler>(mDevice, mContext, mRenderSettings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator.DeallocateObject(sampler); }),
@@ -111,7 +113,9 @@ namespace JonsEngine
         mShadowmapNoCompareSampler(mDevice, mContext, RenderSettings::Anisotropic::X1, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT),
 
         // misc
-        mSSAOEnabled(mRenderSettings.mSSAOEnabled)
+        mSSAOEnabled(mRenderSettings.mSSAOEnabled),
+
+		mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), mBackbuffer, mRenderSettings, mMeshes, mMaterials)
     {
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -237,6 +241,11 @@ namespace JonsEngine
         mSSAOEnabled = useSSAO;
     }
 
+
+	float DX11RendererImpl::GetDepthValue(const WindowPosition& position) const
+	{
+		return mDepthReadback.GetDepthValue(position);
+	}
 
     float DX11RendererImpl::GetZNear() const
     {

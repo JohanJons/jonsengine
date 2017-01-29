@@ -1,5 +1,6 @@
 #pragma once
 
+#include "include/Window/Types.h"
 #include"include/Core/Types.h"
 
 #include <functional>
@@ -11,9 +12,9 @@ namespace JonsEngine
     typedef void(*MouseButtonCallbackSignature)(const MouseButtonEvent&);
     typedef std::function<void(const MouseButtonEvent&)> MouseButtonCallback;
 
-	typedef iVec2 MousePositionEvent;
-    typedef void(*MousePositionCallbackSignature)(const MousePositionEvent&);
-    typedef std::function<void(const MousePositionEvent&)> MousePositionCallback;
+	typedef MouseMovement MouseMovementEvent;
+    typedef void(*MouseMovementCallbackSignature)(const MouseMovementEvent&);
+    typedef std::function<void(const MouseMovementEvent&)> MouseMovementCallback;
 
     struct MouseButtonEvent
     {

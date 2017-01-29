@@ -32,7 +32,7 @@ namespace JonsEngine
     class DX11Pipeline
     {
     public:
-        DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, const RenderSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap);
+        DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, DX11Backbuffer& backbuffer, const RenderSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap);
         ~DX11Pipeline();
 
         void BeginFrame(const RenderQueue& renderQueue);
@@ -55,19 +55,19 @@ namespace JonsEngine
 
         IDXGISwapChainPtr mSwapchain;
         ID3D11DeviceContextPtr mContext;
-        ID3D11Texture2DPtr mDepthStencilBuffer;
         ID3D11DepthStencilViewPtr mDSV;
         ID3D11DepthStencilViewPtr mDSVReadOnly;
         ID3D11ShaderResourceViewPtr mDepthSRV;
         ID3D11DepthStencilStatePtr mDepthStencilState;
         ID3D11BlendStatePtr mAdditiveBlending;
+		ID3D11PixelShaderPtr mSimpleTextureShader;
     
         DX11CPUDynamicBuffer mBoneTransformsBuffer;
         DX11VertexTransformPass mVertexTransformPass;
         DX11AABBPass mAABBPass;
-        DX11FullscreenTrianglePass mFullscreenTrianglePass;
+        DX11FullscreenTrianglePass mFullscreenPass;
 
-        DX11Backbuffer mBackbuffer;
+        DX11Backbuffer& mBackbuffer;
         DX11LightAccumulationbuffer mLightAccbuffer;
         DX11GBuffer mGBuffer;
 

@@ -2,22 +2,37 @@
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11FullscreenTrianglePass.h"
-#include "include/Renderer/DirectX11/Shaders/Compiled/SimpleTexturePixel.h"
 
 
 namespace JonsEngine
 {
-    DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDXGISwapChainPtr swapchain, DX11FullscreenTrianglePass& fullscreenPass) :
+    DX11Backbuffer::DX11Backbuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDXGISwapChainPtr swapchain) :
         mContext(context),
         mBackbufferTexture(nullptr),
+		mDepthStencilBuffer(nullptr),
         mRTV(nullptr),
-        mRTV_SRGB(nullptr),
-        mFullscreenPass(fullscreenPass)
+        mRTV_SRGB(nullptr)
     {
-        // backbuffer rendertarget setup
         DXCALL(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&mBackbufferTexture));
 
-        // create RTVs
+		D3D11_TEXTURE2D_DESC backbufferTextureDesc;
+		ZeroMemory(&backbufferTextureDesc, sizeof(backbufferTextureDesc));
+		mBackbufferTexture->GetDesc(&backbufferTextureDesc);
+
+		// create depth buffer
+		D3D11_TEXTURE2D_DESC depthStencilBufferDesc;
+		ZeroMemory(&depthStencilBufferDesc, sizeof(D3D11_TEXTURE2D_DESC));
+		depthStencilBufferDesc.ArraySize = 1;
+		depthStencilBufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
+		depthStencilBufferDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+		depthStencilBufferDesc.Width = backbufferTextureDesc.Width;
+		depthStencilBufferDesc.Height = backbufferTextureDesc.Height;
+		depthStencilBufferDesc.MipLevels = 1;
+		depthStencilBufferDesc.SampleDesc.Count = 1;
+		depthStencilBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		DXCALL(device->CreateTexture2D(&depthStencilBufferDesc, nullptr, &mDepthStencilBuffer));
+
+        // create backbuffers RTVs
         D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
         ZeroMemory(&rtvDesc, sizeof(D3D11_RENDER_TARGET_VIEW_DESC));
         rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -27,9 +42,6 @@ namespace JonsEngine
 
         rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
         DXCALL(device->CreateRenderTargetView(mBackbufferTexture, &rtvDesc, &mRTV_SRGB));
-
-        // pixelshader that will output lightAccumBuffer to backbuffer
-        DXCALL(device->CreatePixelShader(gSimpleTexturePixelShader, sizeof(gSimpleTexturePixelShader), nullptr, &mPixelShader))
     }
 
     DX11Backbuffer::~DX11Backbuffer()
@@ -37,11 +49,11 @@ namespace JonsEngine
     }
 
 
-    void DX11Backbuffer::FillBackbuffer()
-    {
-        mContext->PSSetShader(mPixelShader, nullptr, 0);
-        mFullscreenPass.Render();
-    }
+	ID3D11Texture2DPtr DX11Backbuffer::GetDepthbuffer()
+	{
+		return mDepthStencilBuffer;
+	}
+
 
     void DX11Backbuffer::CopyBackbuffer(ID3D11Texture2DPtr dest)
     {

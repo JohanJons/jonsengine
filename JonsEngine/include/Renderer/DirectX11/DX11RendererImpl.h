@@ -4,9 +4,12 @@
 #include "include/Renderer/DirectX11/DX11Material.h"
 #include "include/Renderer/DirectX11/DX11Context.h"
 #include "include/Renderer/DirectX11/DX11Pipeline.h"
+#include "include/Renderer/DirectX11/DX11Backbuffer.h"
+#include "include/Renderer/DirectX11/DX11DepthBufferReadback.h"
 #include "include/Renderer/DirectX11/DX11DepthReductionPass.h"
 #include "include/Renderer/DirectX11/DX11Sampler.h"
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Window/Types.h"
 #include "include/Core/Types.h"
 #include "include/Core/EngineSettings.h"
 #include "include/Core/Containers/IDMap.hpp"
@@ -59,6 +62,7 @@ namespace JonsEngine
         bool IsSSAOEnabled() const;
         void SetSSAO(const bool useSSAO);
 
+		float GetDepthValue(const WindowPosition& position) const;
         float GetZNear() const;
         float GetZFar() const;
 		RenderSettings::ShadowResolution GetShadowResolution() const;
@@ -74,9 +78,10 @@ namespace JonsEngine
         IDMap<DX11Mesh> mMeshes;
         IDMap<DX11Material> mMaterials;
 
-		RenderSettings mRenderSettings;
+		DX11Backbuffer mBackbuffer;
 
-        DX11Pipeline mPipeline;
+		RenderSettings mRenderSettings;
+		DX11DepthBufferReadback mDepthReadback;
         DX11DepthReductionPass mDepthReductionPass;
         ID3D11RasterizerStatePtr mDefaultRasterizerState;
         std::unique_ptr<DX11Sampler, std::function<void(DX11Sampler*)>> mModelSampler;
@@ -84,5 +89,7 @@ namespace JonsEngine
         DX11Sampler mShadowmapSampler;
         DX11Sampler mShadowmapNoCompareSampler;
         bool mSSAOEnabled;
+
+		DX11Pipeline mPipeline;
     };
 }
