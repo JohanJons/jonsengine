@@ -726,5 +726,8 @@
     <FxCompile Include="include\Renderer\DirectX11\Shaders\FullscreenTriangleTexcoord.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\DepthReadback.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

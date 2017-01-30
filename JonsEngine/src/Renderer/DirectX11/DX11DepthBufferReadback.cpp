@@ -4,9 +4,25 @@ namespace JonsEngine
 {
 	DX11DepthBufferReadback::DX11DepthBufferReadback(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, ID3D11Texture2DPtr depthBuffer) :
 		mContext(context),
+		mCSOutputTexture(nullptr),
 		mDepthbuffer(depthBuffer),
-		mStaging1x1(nullptr)
+		mStaging1x1(nullptr),
+		mCBuffer(device, context, DX11ConstantBuffer<CBuffer>::CONSTANT_BUFFER_SLOT_COMPUTE)
 	{
+		D3D11_TEXTURE2D_DESC outputTextureDesc;
+		ZeroMemory(&outputTextureDesc, sizeof(outputTextureDesc));
+		outputTextureDesc.ArraySize = 1;
+		outputTextureDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
+		outputTextureDesc.Width = 1;
+		outputTextureDesc.Height = 1;
+		outputTextureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+		outputTextureDesc.Format = DXGI_FORMAT_D32_FLOAT;
+		outputTextureDesc.MipLevels = 1;
+		outputTextureDesc.SampleDesc.Count = 1;
+		outputTextureDesc.SampleDesc.Quality = 0;
+		outputTextureDesc.Usage = D3D11_USAGE_DEFAULT;
+		device->CreateTexture2D(&outputTextureDesc, NULL, &mCSOutputTexture);
+
 		D3D11_TEXTURE2D_DESC depthTextureDesc;
 		ZeroMemory(&depthTextureDesc, sizeof(depthTextureDesc));
 		depthBuffer->GetDesc(&depthTextureDesc);

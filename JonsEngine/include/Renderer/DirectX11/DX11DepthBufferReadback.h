@@ -18,6 +18,7 @@ namespace JonsEngine
 		struct CBuffer
 		{
 			float mUVCoords;
+			float __padding[3];
 		};
 
 		ID3D11DeviceContextPtr mContext;
