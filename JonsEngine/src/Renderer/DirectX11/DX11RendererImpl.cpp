@@ -242,7 +242,7 @@ namespace JonsEngine
     }
 
 
-	float DX11RendererImpl::GetDepthValue(const WindowPosition& position) const
+	float DX11RendererImpl::GetDepthValue(const WindowPosition& position)
 	{
 		return mDepthReadback.GetDepthValue(position);
 	}

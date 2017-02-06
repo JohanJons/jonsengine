@@ -1,56 +1,70 @@
 #include "include/Renderer/DirectX11/DX11DepthBufferReadback.h"
 
+#include "include/Renderer/DirectX11/Shaders/Compiled/DepthReadback.h"
+
 namespace JonsEngine
 {
 	DX11DepthBufferReadback::DX11DepthBufferReadback(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, ID3D11Texture2DPtr depthBuffer) :
 		mContext(context),
-		mCSOutputTexture(nullptr),
+		mCSBuffer(nullptr),
+		mStagingBuffer(nullptr),
+		mCSUAV(nullptr),
+		mReadbackShader(nullptr),
 		mDepthbuffer(depthBuffer),
-		mStaging1x1(nullptr),
 		mCBuffer(device, context, DX11ConstantBuffer<CBuffer>::CONSTANT_BUFFER_SLOT_COMPUTE)
 	{
-		D3D11_TEXTURE2D_DESC outputTextureDesc;
-		ZeroMemory(&outputTextureDesc, sizeof(outputTextureDesc));
-		outputTextureDesc.ArraySize = 1;
-		outputTextureDesc.BindFlags = D3D11_BIND_RENDER_TARGET;
-		outputTextureDesc.Width = 1;
-		outputTextureDesc.Height = 1;
-		outputTextureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-		outputTextureDesc.Format = DXGI_FORMAT_D32_FLOAT;
-		outputTextureDesc.MipLevels = 1;
-		outputTextureDesc.SampleDesc.Count = 1;
-		outputTextureDesc.SampleDesc.Quality = 0;
-		outputTextureDesc.Usage = D3D11_USAGE_DEFAULT;
-		device->CreateTexture2D(&outputTextureDesc, NULL, &mCSOutputTexture);
+		D3D11_BUFFER_DESC bufferDesc;
+		ZeroMemory(&bufferDesc, sizeof(bufferDesc));
+		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+		bufferDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
+		bufferDesc.ByteWidth = sizeof(float);
+		device->CreateBuffer(&bufferDesc, nullptr, &mCSBuffer);
 
-		D3D11_TEXTURE2D_DESC depthTextureDesc;
-		ZeroMemory(&depthTextureDesc, sizeof(depthTextureDesc));
-		depthBuffer->GetDesc(&depthTextureDesc);
+		bufferDesc.Usage = D3D11_USAGE_STAGING;
+		bufferDesc.BindFlags = 0;
+		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+		device->CreateBuffer(&bufferDesc, nullptr, &mStagingBuffer);
 
-		depthTextureDesc.Usage = D3D11_USAGE_STAGING;
-		depthTextureDesc.BindFlags = 0;
-		depthTextureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-		device->CreateTexture2D(&depthTextureDesc, NULL, &mStaging1x1);
+		D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+		ZeroMemory(&uavDesc, sizeof(uavDesc));
+		uavDesc.Buffer.NumElements = 1;
+		uavDesc.Format = DXGI_FORMAT_R32_FLOAT;
+		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+		device->CreateUnorderedAccessView(mCSBuffer, &uavDesc, &mCSUAV);
+
+		device->CreateComputeShader(gDepthReadbackShader, sizeof(gDepthReadbackShader), nullptr, &mReadbackShader);
 	}
 
 
-	float DX11DepthBufferReadback::GetDepthValue(const WindowPosition& position) const
+	float DX11DepthBufferReadback::GetDepthValue(const WindowPosition& position)
 	{
-		D3D11_BOX box;
-		ZeroMemory(&box, sizeof(box));
-		box.left = position.x;
-		box.right = box.left + 1;
-		box.top = position.y;
-		box.bottom = box.top + 1;
-		box.front = 0;
-		box.back = 1;
+		RenderDepth(position);
 
-		mContext->CopySubresourceRegion(mStaging1x1, 0, 0, 0, 0, mDepthbuffer, 0, &box);
+		return ReadDepthValue();
+	}
+
+
+	void DX11DepthBufferReadback::RenderDepth(const WindowPosition& position)
+	{
+		D3D11_TEXTURE2D_DESC depthDesc;
+		ZeroMemory(&depthDesc, sizeof(D3D11_TEXTURE2D_DESC));
+		mDepthbuffer->GetDesc(&depthDesc);
+
+		mContext->CSSetShader(mReadbackShader, nullptr, 0);
+		mContext->CSSetUnorderedAccessViews(UAV_SLOT, 1, &mCSUAV.p, nullptr);
+		mCBuffer.SetData({ { position.x, position.y } });
+
+		mContext->Dispatch(1, 1, 1);
+	}
+
+	float DX11DepthBufferReadback::ReadDepthValue()
+	{
+		mContext->CopyResource(mStagingBuffer, mCSBuffer);
 
 		D3D11_MAPPED_SUBRESOURCE mappedRes;
-		mContext->Map(mStaging1x1, 0, D3D11_MAP_READ, 0, &mappedRes);
+		mContext->Map(mStagingBuffer, 0, D3D11_MAP_READ, 0, &mappedRes);
 		float depth = *static_cast<float*>(mappedRes.pData);
-		mContext->Unmap(mStaging1x1, 0);
+		mContext->Unmap(mStagingBuffer, 0);
 
 		return depth;
 	}

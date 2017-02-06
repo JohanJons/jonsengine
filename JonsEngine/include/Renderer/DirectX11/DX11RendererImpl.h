@@ -62,7 +62,7 @@ namespace JonsEngine
         bool IsSSAOEnabled() const;
         void SetSSAO(const bool useSSAO);
 
-		float GetDepthValue(const WindowPosition& position) const;
+		float GetDepthValue(const WindowPosition& position);
         float GetZNear() const;
         float GetZFar() const;
 		RenderSettings::ShadowResolution GetShadowResolution() const;

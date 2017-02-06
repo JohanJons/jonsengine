@@ -92,12 +92,12 @@ namespace JonsEditor
 
 		float x = 2.0f * mousePosition.x / windowDimensions.x - 1;
 		float y = -2.0f * mousePosition.y / windowDimensions.y + 1;
-		float z = renderer.GetDepthValue(mousePosition);
-		Vec4 point4{x, y, 0, 1};
+		auto depth = renderer.GetDepthValue(mousePosition);
+		float z = depth;
+		Vec4 point4{x, y, z, 1};
 		point4 = invViewProj * point4;
 		Vec3 point3(point4);
-		//Point3D point3D = new Point3D(x, y, 0);
-		//return viewProjectionInverse.multiply(point3D);
+		point3 /= point4.w;
 
 		_RPT1(0, "%f x %f x %f\n", point3.x, point3.y, point3.z);
 	}
