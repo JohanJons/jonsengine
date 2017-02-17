@@ -14,6 +14,7 @@ namespace JonsEngine
 {
     template <typename PackageStruct>
     typename std::vector<PackageStruct>::const_iterator FindInContainer(const std::string& assetName, const std::vector<PackageStruct>& container);
+	typename std::vector<PackageTexture>::const_iterator FindTextureInContainer(const std::string& assetName, TextureType type, const std::vector<PackageTexture>& container);
 
 
     ResourceManifest::ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator) :
@@ -96,6 +97,41 @@ namespace JonsEngine
     }
 
 
+	MaterialID ResourceManifest::CreateMaterial(const std::string& materialName, const std::string& diffuseTextureName, const std::string& normalTextureName, const std::string& heightTextureName, const JonsPackagePtr jonsPkg)
+	{
+		auto iter = FindInContainer<PackageMaterial>(materialName, jonsPkg->mMaterials);
+		if (iter != jonsPkg->mMaterials.end())
+			return INVALID_MATERIAL_ID;
+
+		bool hasDiffuse = diffuseTextureName != ResourceManifest::NO_TEXTURE,
+			hasNormal = normalTextureName != ResourceManifest::NO_TEXTURE,
+			hasHeight = heightTextureName != ResourceManifest::NO_TEXTURE;
+
+		auto endIter = jonsPkg->mTextures.cend();
+		auto diffuseIter = endIter, normalIter = endIter, heightIter = endIter;
+		if (hasDiffuse)
+			diffuseIter = FindTextureInContainer(diffuseTextureName, TextureType::Diffuse, jonsPkg->mTextures);
+		if (hasNormal)
+			normalIter = FindTextureInContainer(normalTextureName, TextureType::Normal, jonsPkg->mTextures);
+		if (hasHeight)
+			heightIter = FindTextureInContainer(heightTextureName, TextureType::Height, jonsPkg->mTextures);
+
+		bool allTexturesFound = (!hasDiffuse || diffuseIter != endIter) && (!hasNormal || normalIter != endIter) && (!hasHeight || heightIter != endIter);
+		if (!allTexturesFound)
+			return INVALID_MATERIAL_ID;
+
+		DX11TextureID diffuseTexture = INVALID_DX11_TEXTURE_ID, normalTexture = INVALID_DX11_TEXTURE_ID, heightTexture = INVALID_DX11_TEXTURE_ID;
+		if (hasDiffuse)
+			diffuseTexture = mRenderer.CreateTexture(TextureType::Diffuse, diffuseIter->mTextureData, diffuseIter->mTextureWidth, diffuseIter->mTextureHeight);
+		if (hasNormal)
+			normalTexture = mRenderer.CreateTexture(TextureType::Normal, normalIter->mTextureData, normalIter->mTextureWidth, normalIter->mTextureHeight);
+		if (hasHeight)
+			heightTexture = mRenderer.CreateTexture(TextureType::Height, heightIter->mTextureData, heightIter->mTextureWidth, heightIter->mTextureHeight);
+
+		// TODO: material colors
+		return mMaterials.Insert(materialName, diffuseTexture, normalTexture, heightTexture);
+	}
+
     MaterialID ResourceManifest::LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg)
     {
         auto iter = FindInContainer<PackageMaterial>(assetName, jonsPkg->mMaterials);
@@ -103,18 +139,25 @@ namespace JonsEngine
             return INVALID_MATERIAL_ID;
         const PackageMaterial& pkgMaterial = *iter;
 
-        DX11MaterialID diffuseTexture = INVALID_DX11_MATERIAL_ID;
-        DX11MaterialID normalTexture  = INVALID_DX11_MATERIAL_ID;
-        if (pkgMaterial.mHasDiffuseTexture)
-        	diffuseTexture = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_DIFFUSE, pkgMaterial.mDiffuseTexture.mTextureData, pkgMaterial.mDiffuseTexture.mTextureWidth, pkgMaterial.mDiffuseTexture.mTextureHeight);
-        if (pkgMaterial.mHasNormalTexture)
-            normalTexture = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_NORMAL, pkgMaterial.mNormalTexture.mTextureData, pkgMaterial.mNormalTexture.mTextureWidth, pkgMaterial.mNormalTexture.mTextureHeight);
-
-        // TODO: real specular factor
-        const float specularFactor = 0.02f;
+        DX11TextureID diffuseTexture = INVALID_DX11_TEXTURE_ID, normalTexture  = INVALID_DX11_TEXTURE_ID, heightTexture = INVALID_DX11_TEXTURE_ID;
+		if (pkgMaterial.mDiffuseTexture != PackageTexture::INVALID_TEXTURE_INDEX)
+		{
+			auto& pkgTexture = jonsPkg->mTextures.at(pkgMaterial.mDiffuseTexture);
+			diffuseTexture = mRenderer.CreateTexture(TextureType::Diffuse, pkgTexture.mTextureData, pkgTexture.mTextureWidth, pkgTexture.mTextureHeight);
+		}
+		if (pkgMaterial.mNormalTexture != PackageTexture::INVALID_TEXTURE_INDEX)
+		{
+			auto& pkgTexture = jonsPkg->mTextures.at(pkgMaterial.mNormalTexture);
+			normalTexture = mRenderer.CreateTexture(TextureType::Normal, pkgTexture.mTextureData, pkgTexture.mTextureWidth, pkgTexture.mTextureHeight);
+		}
+		if (pkgMaterial.mHeightTexture != PackageTexture::INVALID_TEXTURE_INDEX)
+		{
+			auto& pkgTexture = jonsPkg->mTextures.at(pkgMaterial.mHeightTexture);
+			heightTexture = mRenderer.CreateTexture(TextureType::Height, pkgTexture.mTextureData, pkgTexture.mTextureWidth, pkgTexture.mTextureHeight);
+		}
 
         // TODO: material colors
-        return mMaterials.Insert(pkgMaterial.mName, diffuseTexture, normalTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, specularFactor);
+        return mMaterials.Insert(pkgMaterial.mName, diffuseTexture, normalTexture, heightTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, Material::DEFAULT_SPECULAR_FACTOR);
     }
 
     void ResourceManifest::DeleteMaterial(MaterialID& materialID)
@@ -133,15 +176,14 @@ namespace JonsEngine
 
     SkyboxID ResourceManifest::LoadSkybox(const std::string& skyboxName, const JonsPackagePtr jonsPkg)
     {
-        auto iter = FindInContainer<PackageSkybox>(skyboxName, jonsPkg->mSkyBoxes);
-        if (iter == jonsPkg->mSkyBoxes.end())
+        auto iter = FindTextureInContainer(skyboxName, TextureType::Skybox, jonsPkg->mTextures);
+        if (iter == jonsPkg->mTextures.end())
             return INVALID_SKYBOX_ID;
 
-        const PackageSkybox& pkgSkybox = *iter;
-        const PackageTexture& pkgSkyboxTexture = pkgSkybox.mSkyboxTexture;
+        const PackageTexture& pkgSkyboxTexture = *iter;
 
-        const DX11MaterialID skyboxTextureID = mRenderer.CreateTexture(TextureType::TEXTURE_TYPE_SKYBOX, pkgSkyboxTexture.mTextureData, pkgSkyboxTexture.mTextureWidth, pkgSkyboxTexture.mTextureHeight);
-        assert(skyboxTextureID != INVALID_DX11_MATERIAL_ID);
+        const DX11TextureID skyboxTextureID = mRenderer.CreateTexture(TextureType::Skybox, pkgSkyboxTexture.mTextureData, pkgSkyboxTexture.mTextureWidth, pkgSkyboxTexture.mTextureHeight);
+        assert(skyboxTextureID != INVALID_DX11_TEXTURE_ID);
 
         return mSkyboxes.Insert(skyboxName, skyboxTextureID);
     }
@@ -174,14 +216,14 @@ namespace JonsEngine
                 const PackageMesh& mesh = model.mMeshes.at(meshIndex);
 
                 const DX11MeshID meshID = mRenderer.CreateMesh(mesh.mVertexData, mesh.mNormalData, mesh.mTexCoordsData, mesh.mTangentData, mesh.mBoneWeights, mesh.mIndiceData, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
-                DX11MaterialID materialID = INVALID_DX11_MATERIAL_ID;
+                DX11TextureID materialID = INVALID_DX11_TEXTURE_ID;
                 const bool meshHasMaterial = mesh.mMaterialIndex != PackageMaterial::INVALID_MATERIAL_INDEX;
                 if (meshHasMaterial)
                 {
                     const PackageMaterial& material = jongPkg->mMaterials.at(mesh.mMaterialIndex);
                     materialID = LoadMaterial(material.mName, jongPkg);
 
-                    assert(materialID != INVALID_DX11_MATERIAL_ID);
+                    assert(materialID != INVALID_DX11_TEXTURE_ID);
                 }
 
                 initDataList.emplace_back(mesh, meshID, materialID);
@@ -197,4 +239,11 @@ namespace JonsEngine
 
         return std::find_if(container.begin(), container.end(), [hashedName](const PackageStruct& asset) { return boost::hash_value(asset.mName) == hashedName; });
     }
+
+	typename std::vector<PackageTexture>::const_iterator FindTextureInContainer(const std::string& assetName, TextureType type, const std::vector<PackageTexture>& container)
+	{
+		const size_t hashedName = boost::hash_value(assetName);
+
+		return std::find_if(container.begin(), container.end(), [hashedName, type](const PackageTexture& texture) { return boost::hash_value(texture.mName) == hashedName && texture.mType == type; });
+	}
 }

@@ -20,6 +20,8 @@ namespace JonsEngine
     class ResourceManifest
     {
     public:
+		static constexpr auto NO_TEXTURE = "";
+
         ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator);
 
         ModelID CreateRectangle(const std::string& modelName, const float sizeX, const float sizeY, const float sizeZ);
@@ -29,6 +31,7 @@ namespace JonsEngine
         void DeleteModel(ModelID& modelID);
         const Model& GetModel(const ModelID modelID) const;
 
+		MaterialID CreateMaterial(const std::string& materialName, const std::string& diffuseTextureName, const std::string& normalTextureName, const std::string& heightTextureName, const JonsPackagePtr jonsPkg);
         MaterialID LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg);
         void DeleteMaterial(MaterialID& materialID);
         const Material& GetMaterial(const MaterialID materialID) const;

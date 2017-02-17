@@ -12,19 +12,20 @@ namespace JonsEngine
      * Definitions of general data types commonly used across subsystems
      */
 
-    enum TextureType
+    enum class TextureType : int
     {
-        TEXTURE_TYPE_DIFFUSE = 0,
-        TEXTURE_TYPE_NORMAL,
-        TEXTURE_TYPE_SKYBOX
+        Diffuse,
+        Normal,
+		Height,
+        Skybox
     };
     
     // TODO: move mesh/texture id definitions
     typedef uint32_t DX11MeshID;
-    typedef uint32_t DX11MaterialID;
+    typedef uint32_t DX11TextureID;
 
     static const DX11MeshID INVALID_DX11_MESH_ID = 0;
-    static const DX11MaterialID INVALID_DX11_MATERIAL_ID = 0;
+    static const DX11TextureID INVALID_DX11_TEXTURE_ID = 0;
 
 	typedef glm::uvec2 uVec2;
 	typedef glm::uvec3 uVec3;

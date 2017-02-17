@@ -142,7 +142,6 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Gbuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11IndexBuffer.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11LightAccumulationbuffer.cpp" />
-    <ClCompile Include="src\Renderer\DirectX11\DX11Material.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Mesh.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Pipeline.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11PointLightPass.cpp" />
@@ -153,6 +152,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Sampler.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Shadowmap.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11SkyboxPass.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11Texture.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11ToneMapper.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Utils.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexBufferSet.cpp" />
@@ -238,7 +238,6 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11GBuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11IndexBuffer.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11LightAccumulationbuffer.h" />
-    <ClInclude Include="include\Renderer\DirectX11\DX11Material.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Mesh.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Pipeline.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11PointLightPass.h" />
@@ -250,6 +249,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Shadowmap.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11SkyboxPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11StaticBuffer.hpp" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11Texture.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11ToneMapper.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11VertexBufferSet.hpp" />

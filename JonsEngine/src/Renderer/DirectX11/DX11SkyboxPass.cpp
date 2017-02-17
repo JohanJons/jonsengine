@@ -1,6 +1,6 @@
 #include "include/Renderer/DirectX11/DX11SkyboxPass.h"
 
-#include "include/Renderer/DirectX11/DX11Material.h"
+#include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/SkyboxVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/SkyboxPixel.h"
 
@@ -17,7 +17,7 @@ namespace JonsEngine
     }
 
 
-    void DX11SkyboxPass::Render(const Mat4& viewMatrix, const Mat4& projMatrix, DX11Material& skyboxTexture)
+    void DX11SkyboxPass::Render(const Mat4& viewMatrix, const Mat4& projMatrix, DX11Texture& skyboxTexture)
     {
         mSkyboxCBuffer.SetData(SkyboxCBuffer(glm::inverse(viewMatrix), glm::inverse(projMatrix)));
         skyboxTexture.BindAsShaderResource(SHADER_TEXTURE_SLOT_EXTRA);

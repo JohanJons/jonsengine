@@ -115,7 +115,7 @@ namespace JonsEngine
         // misc
         mSSAOEnabled(mRenderSettings.mSSAOEnabled),
 
-		mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), mBackbuffer, mRenderSettings, mMeshes, mMaterials)
+		mPipeline(mLogger, mDevice, mSwapchain, mContext, GetBackbufferTextureDesc(), mBackbuffer, mRenderSettings, mMeshes, mTextures)
     {
         // set CCW as front face
         D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -162,11 +162,11 @@ namespace JonsEngine
         return mMeshes.Insert(mDevice, mContext, vertexData, normalData, texCoords, tangentData, boneWeights, indexData, minBounds, maxBounds);
     }
 
-    DX11MaterialID DX11RendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
+    DX11TextureID DX11RendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
     {
-        const bool isCubemap = textureType == TextureType::TEXTURE_TYPE_SKYBOX;
+        const bool isCubemap = textureType == TextureType::Skybox;
 
-        return mMaterials.Insert(mDevice, mContext, textureData, GetTextureFormat(textureType), textureWidth, textureHeight, isCubemap);
+        return mTextures.Insert(mDevice, mContext, textureData, GetTextureFormat(textureType), textureWidth, textureHeight, isCubemap);
     }
 
 
@@ -293,11 +293,12 @@ namespace JonsEngine
     {
         switch (textureType)
         {
-            case TextureType::TEXTURE_TYPE_DIFFUSE:
-            case TextureType::TEXTURE_TYPE_SKYBOX:
+            case TextureType::Diffuse:
+            case TextureType::Skybox:
+			case TextureType::Height:
                 return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 
-            case TextureType::TEXTURE_TYPE_NORMAL:
+            case TextureType::Normal:
                 return DXGI_FORMAT_R8G8B8A8_UNORM;
 
             default:

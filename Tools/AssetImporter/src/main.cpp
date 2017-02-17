@@ -42,5 +42,10 @@ int _tmain(int argc, _TCHAR* cmds[])
     if (!result.mSuccess)
         std::cout << "-JonsAssetImporter: FAILED!" << std::endl;
 
+	#ifdef _DEBUG
+		std::cout << "-JonsAssetImporter: Finished!" << std::endl;
+		std::cin.get();
+	#endif
+
     return result.mSuccess ? 0 : -1;
 }

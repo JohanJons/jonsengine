@@ -2,7 +2,7 @@
 
 namespace JonsEngine
 {
-    Skybox::Skybox(const std::string& name, const DX11MaterialID skyboxTexture) : mName(name), mSkyboxTexture(skyboxTexture)
+    Skybox::Skybox(const std::string& name, const DX11TextureID skyboxTexture) : mName(name), mSkyboxTexture(skyboxTexture)
     {
     }
 
@@ -16,7 +16,7 @@ namespace JonsEngine
         return mName;
     }
 
-    DX11MaterialID Skybox::GetSkyboxTexture() const
+    DX11TextureID Skybox::GetSkyboxTexture() const
     {
         return mSkyboxTexture;
     }

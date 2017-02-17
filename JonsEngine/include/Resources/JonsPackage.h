@@ -21,6 +21,7 @@
 namespace JonsEngine
 {
     // TODO: currently a mix of SoA and AoS - refactor into AoS for better performance?
+	// TODO: Refactor into ID/index based system
 
     const uint8_t LatestMajorVersion = 0;
     const uint8_t LatestMinorVersion = 1;
@@ -46,22 +47,18 @@ namespace JonsEngine
 
     struct PackageTexture
     {
-        PackageTexture();
-    
-    
-        std::vector<uint8_t> mTextureData;
-        uint32_t mTextureWidth;         // width/height in pixels
-        uint32_t mTextureHeight;
-    };
+		typedef uint32_t TextureIndex;
+		static const TextureIndex INVALID_TEXTURE_INDEX = UINT32_MAX;
 
-    struct PackageSkybox
-    {
-        PackageSkybox();
-        PackageSkybox(const std::string& name);
-        
+		PackageTexture();
+        PackageTexture(const std::string& name, TextureType type);
     
-        std::string mName;
-        PackageTexture mSkyboxTexture;
+    
+		std::string mName;
+		TextureType mType;
+        std::vector<uint8_t> mTextureData;
+        uint32_t mTextureWidth;
+        uint32_t mTextureHeight;
     };
 
     struct PackageMaterial
@@ -70,14 +67,13 @@ namespace JonsEngine
         static const MaterialIndex INVALID_MATERIAL_INDEX = UINT32_MAX;
 
         PackageMaterial();
-        PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture);
+        PackageMaterial(const std::string& name);
         
         
         std::string mName;
-        bool mHasDiffuseTexture;
-        bool mHasNormalTexture;
-        PackageTexture mDiffuseTexture;
-        PackageTexture mNormalTexture;
+		PackageTexture::TextureIndex mDiffuseTexture;
+		PackageTexture::TextureIndex mNormalTexture;
+		PackageTexture::TextureIndex mHeightTexture;
         Vec3 mDiffuseColor;
         Vec3 mAmbientColor;
         Vec3 mSpecularColor;
@@ -176,7 +172,7 @@ namespace JonsEngine
         PackageHeader mHeader;
         std::vector<PackageModel> mModels;
         std::vector<PackageMaterial> mMaterials;
-        std::vector<PackageSkybox> mSkyBoxes;
+		std::vector<PackageTexture> mTextures;
     };
 
 
@@ -245,26 +241,20 @@ namespace boost
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageTexture& texture, const unsigned int version)
         {
+			ar & texture.mName;
+			ar & texture.mType;
             ar & texture.mTextureData;
             ar & texture.mTextureWidth;
             ar & texture.mTextureHeight;
         }
 
         template<class Archive>
-        void serialize(Archive & ar, JonsEngine::PackageSkybox& skybox, const unsigned int version)
-        {
-            ar & skybox.mName;
-            ar & skybox.mSkyboxTexture;
-        }
-
-        template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageMaterial& material, const unsigned int version)
         {
             ar & material.mName;
-            ar & material.mHasDiffuseTexture;
-            ar & material.mHasNormalTexture;
             ar & material.mDiffuseTexture;
             ar & material.mNormalTexture;
+			ar & material.mHeightTexture;
             ar & material.mDiffuseColor;
             ar & material.mAmbientColor;
             ar & material.mSpecularColor;
@@ -313,7 +303,7 @@ namespace boost
             ar & pkg.mHeader;
             ar & pkg.mModels;
             ar & pkg.mMaterials;
-            ar & pkg.mSkyBoxes;
+            ar & pkg.mTextures;
         }
 
         template<class Archive>

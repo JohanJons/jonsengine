@@ -32,7 +32,7 @@ namespace JonsEngine
 
 
         Vec4 mAmbientLight;
-        DX11MaterialID mSkyboxTextureID;
+        DX11TextureID mSkyboxTextureID;
 
         RenderableCamera mCamera;
         RenderablePointLights mPointLights;

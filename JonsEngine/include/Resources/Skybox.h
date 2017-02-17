@@ -10,16 +10,16 @@ namespace JonsEngine
     class Skybox
     {
     public:
-        Skybox(const std::string& name, const DX11MaterialID skyboxTexture);
+        Skybox(const std::string& name, const DX11TextureID skyboxTexture);
         ~Skybox();
 
         const std::string& GetName() const;
-        DX11MaterialID GetSkyboxTexture() const;
+        DX11TextureID GetSkyboxTexture() const;
 
 
     private:
          std::string mName;
-         DX11MaterialID mSkyboxTexture;
+         DX11TextureID mSkyboxTexture;
     };
 
     typedef IDMap<Skybox>::ItemID SkyboxID;

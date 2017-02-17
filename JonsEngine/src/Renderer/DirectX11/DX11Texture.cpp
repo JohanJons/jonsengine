@@ -1,14 +1,14 @@
-#include "include/Renderer/DirectX11/DX11Material.h"
+#include "include/Renderer/DirectX11/DX11Texture.h"
 
 namespace JonsEngine
 {
-    static DX11MaterialID gNextTextureID = 1;
+    static DX11TextureID gNextTextureID = 1;
 
     uint32_t GetNumMipLevels(uint32_t width, uint32_t height);
 
 
-    DX11Material::DX11Material(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight, const bool isCubeTexture) :
-        mTextureID(gNextTextureID++),
+    DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight, const bool isCubeTexture) :
+        mID(gNextTextureID++),
         mContext(context),
         mTexture(nullptr),
         mSRV(nullptr)
@@ -54,12 +54,12 @@ namespace JonsEngine
         context->GenerateMips(mSRV);
     }
 
-    DX11Material::~DX11Material()
+    DX11Texture::~DX11Texture()
     {
     }
 
 
-    void DX11Material::BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot)
+    void DX11Texture::BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot)
     {
         mContext->PSSetShaderResources(shaderTextureSlot, 1, &mSRV.p);
     }

@@ -15,7 +15,7 @@ namespace JonsGame
         mSkybox(resManifest.LoadSkybox("skybox", mJonsPackage)),
 
         // materials
-        mMaterialCheckers(resManifest.LoadMaterial("checkers", mJonsPackage)),
+        mMaterialCheckers(resManifest.CreateMaterial("checkers", "checkers", ResourceManifest::NO_TEXTURE, ResourceManifest::NO_TEXTURE, mJonsPackage)),
 
         // models
         mModelSectoid(resManifest.LoadModel("sectoid", mJonsPackage)),

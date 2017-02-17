@@ -25,32 +25,29 @@ namespace JonsEngine
     {
     }
 
-    PackageTexture::PackageTexture() :
+	PackageTexture::PackageTexture() :
+		PackageTexture("UNKNOWN", TextureType::Diffuse)
+	{
+	}
+
+    PackageTexture::PackageTexture(const std::string& name, TextureType type) :
+		mName(name),
+		mType(type),
         mTextureWidth(0),
         mTextureHeight(0)
     {
     }
 
-    PackageSkybox::PackageSkybox() :
-        PackageSkybox("")
-    {
-    }
-
-    PackageSkybox::PackageSkybox(const std::string& name) :
-        mName(name)
-    {
-    }
-
     PackageMaterial::PackageMaterial() :
-        PackageMaterial("", false, false)
+        PackageMaterial("")
     {
     }
 
-    PackageMaterial::PackageMaterial(const std::string& name, const bool hasDiffTexture, const bool hasNormalTexture) :
+    PackageMaterial::PackageMaterial(const std::string& name) :
 		mName(name),
-		mHasDiffuseTexture(hasDiffTexture),
-		mHasNormalTexture(hasNormalTexture),
-
+		mDiffuseTexture(PackageTexture::INVALID_TEXTURE_INDEX),
+		mNormalTexture(PackageTexture::INVALID_TEXTURE_INDEX),
+		mHeightTexture(PackageTexture::INVALID_TEXTURE_INDEX),
         mDiffuseColor(1.0f),
         mAmbientColor(1.0f),
         mSpecularColor(1.0f),

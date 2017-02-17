@@ -28,29 +28,9 @@ namespace JonsAssetImporter
     }
 
 
-    bool FreeImage::ProcessMaterial(const boost::filesystem::path& assetPath, const std::string& textureName, const JonsEngine::TextureType textureType, JonsEngine::JonsPackagePtr pkg)
-    {
-        pkg->mMaterials.emplace_back(textureName, textureType == JonsEngine::TEXTURE_TYPE_DIFFUSE, textureType == JonsEngine::TEXTURE_TYPE_NORMAL);
-
-        const std::string fileName = assetPath.filename().string();
-        const std::string filePath = assetPath.string();
-
-        FIBITMAP* bitmap = GetBitmap(filePath, fileName);
-        if (!bitmap)
-            return false;
-
-        auto& material = pkg->mMaterials.back();
-        if (!ProcessTexture(material.mDiffuseTexture, bitmap))
-            return false;
-
-        FreeImage_Unload(bitmap);
-
-        return true;
-    }
-
     bool FreeImage::ProcessSkybox(const boost::filesystem::path& assetPath, const std::string& textureName, JonsEngine::JonsPackagePtr pkg)
     {
-        pkg->mSkyBoxes.emplace_back(textureName);
+        pkg->mTextures.emplace_back(textureName, TextureType::Skybox);
 
         const std::string fileName = assetPath.filename().string();
         const std::string filePath = assetPath.string();
@@ -73,38 +53,44 @@ namespace JonsAssetImporter
         // 1 1 1  or  1 1 1 1
         // 0 1 0      0 1 0 0
         // 0 1 0
-        auto& skybox = pkg->mSkyBoxes.back();
+        auto& skybox = pkg->mTextures.back();
         const auto& skyboxOffsets = isHorizontalSkybox ? gSkyboxHorizontalOffsets : gSkyboxVerticalOffsets;
         for (const auto& offsets : skyboxOffsets)
         {
-            if (!ProcessTexture(skybox.mSkyboxTexture, bitmap, offsets.first * textureWidth, (offsets.second * textureHeight) - 1, textureWidth, textureHeight))
+            if (!ProcessTexture(skybox, bitmap, offsets.first * textureWidth, (offsets.second * textureHeight) - 1, textureWidth, textureHeight))
                 return false;
         }
 
         // width/height per subtexture
-        skybox.mSkyboxTexture.mTextureWidth = textureWidth;
-        skybox.mSkyboxTexture.mTextureHeight = textureHeight;
+        skybox.mTextureWidth = textureWidth;
+        skybox.mTextureHeight = textureHeight;
 
         FreeImage_Unload(bitmap);
 
         return true;
     }
 
-    bool FreeImage::ProcessTexture(JonsEngine::PackageTexture& texture, const boost::filesystem::path& assetPath)
-    {
-        const std::string fileName = assetPath.filename().string();
-        const std::string filePath = assetPath.string();
+	bool FreeImage::ProcessTexture2D(const boost::filesystem::path& assetPath, const std::string& textureName, const TextureType textureType, JonsPackagePtr pkg)
+	{
+		assert(textureType != TextureType::Skybox);
 
-        FIBITMAP* bitmap = GetBitmap(filePath, fileName);
-        if (!bitmap)
-            return false;
+		const std::string fileName = assetPath.filename().string();
+		const std::string filePath = assetPath.string();
 
-        const bool ret = ProcessTexture(texture, bitmap);
+		FIBITMAP* bitmap = GetBitmap(filePath, fileName);
+		if (!bitmap)
+			return false;
 
-        FreeImage_Unload(bitmap);
+		pkg->mTextures.emplace_back(textureName, textureType);
+		auto& texture = pkg->mTextures.back();
 
-        return ret;
-    }
+		const bool ret = ProcessTexture(texture, bitmap);
+
+		FreeImage_Unload(bitmap);
+
+		return ret;
+	}
+
 
     bool FreeImage::ProcessTexture(JonsEngine::PackageTexture& texture, FIBITMAP* bitmap)
     {

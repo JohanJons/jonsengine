@@ -7,12 +7,12 @@
 
 namespace JonsEngine
 {
-    DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, DX11Backbuffer& backbuffer, const RenderSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap)
+    DX11Pipeline::DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, DX11Backbuffer& backbuffer, const RenderSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Texture>& textureMap)
         :
         mLogger(logger),
         mWindowSize(backbufferTextureDesc.Width, backbufferTextureDesc.Height),
         mMeshMap(meshMap),
-        mMaterialMap(materialMap),
+        mTextureMap(textureMap),
 
         mSwapchain(swapchain),
         mContext(context),
@@ -164,8 +164,8 @@ namespace JonsEngine
         mContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);
 
 		// skybox pass
-		if (renderQueue.mSkyboxTextureID != INVALID_DX11_MATERIAL_ID)
-			mSkyboxPass.Render(renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraProjectionMatrix, mMaterialMap.GetItem(renderQueue.mSkyboxTextureID));
+		if (renderQueue.mSkyboxTextureID != INVALID_DX11_TEXTURE_ID)
+			mSkyboxPass.Render(renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraProjectionMatrix, mTextureMap.GetItem(renderQueue.mSkyboxTextureID));
     }
 
     void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags, const RenderSettings& renderSettings)
@@ -195,14 +195,14 @@ namespace JonsEngine
 			if (mesh.mMaterial != RenderableMaterial::INVALID_INDEX)
 			{
 				const RenderableMaterial& material = renderQueue.mRenderData.mMaterials.at(mesh.mMaterial);
-				hasDiffuseTexture = material.mDiffuseTextureID != INVALID_DX11_MATERIAL_ID;
-				hasNormalTexture = material.mNormalTextureID != INVALID_DX11_MATERIAL_ID;
+				hasDiffuseTexture = material.mDiffuseTextureID != INVALID_DX11_TEXTURE_ID;
+				hasNormalTexture = material.mNormalTextureID != INVALID_DX11_TEXTURE_ID;
 
 				if (hasDiffuseTexture)
-					mMaterialMap.GetItem(material.mDiffuseTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_DIFFUSE);
+					mTextureMap.GetItem(material.mDiffuseTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_DIFFUSE);
 
 				if (hasNormalTexture)
-					mMaterialMap.GetItem(material.mNormalTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_NORMAL);
+					mTextureMap.GetItem(material.mNormalTextureID).BindAsShaderResource(SHADER_TEXTURE_SLOT_NORMAL);
 			}
 
 			uint32_t boneOffset = 0;

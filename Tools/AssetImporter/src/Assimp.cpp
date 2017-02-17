@@ -16,7 +16,7 @@ namespace JonsAssetImporter
 	typedef std::set<std::string> BoneNameSet;
 	typedef std::set<const aiBone*> AssimpBoneSet;
 
-	bool ImportTexture(PackageTexture& texture, const boost::filesystem::path& modelPath, const std::string& texturePathStr, FreeImage& freeimageImporter);
+	bool ImportTexture(const boost::filesystem::path& modelPath, const std::string& texturePathStr, TextureType type, FreeImage& freeimageImporter, JonsPackagePtr pkg);
 
     bool OnlyOneNodePerMesh(const aiScene* scene);
     Mat4 GetMeshNodeTransform(const aiScene* scene, const aiNode* node, const uint32_t meshIndex, const Mat4& parentTransform);
@@ -38,6 +38,7 @@ namespace JonsAssetImporter
     void ParseStaticAABBForAnimatedModel(PackageModel& model);
 	void UpdateBoneTransforms(const Milliseconds currTimestamp, const Animation& jonsAnimation, BoneTransforms& boneTransforms, const std::size_t numBones);
 	void TransformsVerticesAndCheckAABB(PackageModel& model, const BoneTransforms& boneTransforms, Vec3& minExtent, Vec3& maxExtent);
+	bool isObjFile(const boost::filesystem::path& modelPath);
 
     Mat4 aiMat4ToJonsMat4(const aiMatrix4x4& aiMat);
     Quaternion aiQuatToJonsQuat(const aiQuaternion& aiQuat);
@@ -67,7 +68,7 @@ namespace JonsAssetImporter
         // process materials
         // map scene material indexes to actual package material indexes
         MaterialMap materialMap;
-		if (!ProcessMaterials(pkg->mMaterials, scene, modelPath, materialMap, freeimageImporter))
+		if (!ProcessMaterials(pkg->mMaterials, scene, modelPath, materialMap, freeimageImporter, pkg))
 			return false;
 
         // process model hierarchy
@@ -83,7 +84,7 @@ namespace JonsAssetImporter
         return true;
     }
 
-    bool Assimp::ProcessMaterials(std::vector<PackageMaterial>& materials, const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter)
+    bool Assimp::ProcessMaterials(std::vector<PackageMaterial>& materials, const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsPackagePtr pkg)
     {
         if (!scene->HasMaterials())
             return true;
@@ -92,12 +93,14 @@ namespace JonsAssetImporter
         for (uint32_t i = 0; i < scene->mNumMaterials; ++i)
         {
             const aiMaterial* material = scene->mMaterials[i];
-
-			aiString diffuseTexturePath("");
-			aiString normalTexturePath("");
-			const bool hasDiffuseTexture = material->GetTextureCount(aiTextureType_DIFFUSE) > 0 && material->GetTexture(aiTextureType_DIFFUSE, 0, &diffuseTexturePath) == aiReturn_SUCCESS;
-			const bool hasNormalTexture = (material->GetTextureCount(aiTextureType_NORMALS) > 0 && material->GetTexture(aiTextureType_NORMALS, 0, &normalTexturePath) == aiReturn_SUCCESS) ||
-										  (material->GetTextureCount(aiTextureType_HEIGHT) > 0 && material->GetTexture(aiTextureType_HEIGHT, 0, &normalTexturePath) == aiReturn_SUCCESS);
+			
+			bool isObj = isObjFile(modelPath);
+			aiString diffusePath(""), normalPath(""), heightPath("");
+			const bool hasDiffuseTexture = material->GetTextureCount(aiTextureType_DIFFUSE) > 0 && material->GetTexture(aiTextureType_DIFFUSE, 0, &diffusePath) == aiReturn_SUCCESS;
+			// .obj files aiTextureType_HEIGHT are actually normal maps
+			const bool hasNormalTexture = (material->GetTextureCount(aiTextureType_NORMALS) > 0 && material->GetTexture(aiTextureType_NORMALS, 0, &normalPath) == aiReturn_SUCCESS) ||
+										  (isObj && material->GetTextureCount(aiTextureType_HEIGHT) > 0 && material->GetTexture(aiTextureType_HEIGHT, 0, &normalPath) == aiReturn_SUCCESS);
+			const bool hasHeightMap = !isObj && material->GetTextureCount(aiTextureType_HEIGHT) > 0 && material->GetTexture(aiTextureType_HEIGHT, 0, &heightPath) == aiReturn_SUCCESS;
 
 			aiString assimpMaterialName("");
 			material->Get(AI_MATKEY_NAME, assimpMaterialName);
@@ -114,30 +117,41 @@ namespace JonsAssetImporter
 				materialAlreadyImported = DoesPkgNameExist<PackageMaterial>(materials, materialName);
 			}
 
-			materials.emplace_back(materialName, hasDiffuseTexture, hasNormalTexture);
+			materials.emplace_back(materialName);
 			PackageMaterial& pkgMaterial = materials.back();
 
 			if (hasDiffuseTexture)
 			{
-				if (!ImportTexture(pkgMaterial.mDiffuseTexture, modelPath, diffuseTexturePath.C_Str(), freeimageImporter))
+				if (!ImportTexture(modelPath, diffusePath.C_Str(), TextureType::Diffuse, freeimageImporter, pkg))
 				{
 					Log("ERROR: Unable to import diffuse texture " + pkgMaterial.mName);
 					return false;
 				}
+
+				pkgMaterial.mDiffuseTexture = pkg->mTextures.size() - 1;
 			}
 			if (hasNormalTexture)
 			{
-				if (!ImportTexture(pkgMaterial.mNormalTexture, modelPath, normalTexturePath.C_Str(), freeimageImporter))
+				if (!ImportTexture(modelPath, normalPath.C_Str(), TextureType::Normal, freeimageImporter, pkg))
 				{
 					Log("ERROR: Unable to import normal texture " + pkgMaterial.mName);
 					return false;
 				}
+
+				pkgMaterial.mNormalTexture = pkg->mTextures.size() - 1;
+			}
+			if (hasHeightMap)
+			{
+				if (!ImportTexture(modelPath, heightPath.C_Str(), TextureType::Height, freeimageImporter, pkg))
+				{
+					Log("ERROR: Unable to import normal texture " + pkgMaterial.mName);
+					return false;
+				}
+
+				pkgMaterial.mHeightTexture = pkg->mTextures.size() - 1;
 			}
 
-            aiColor3D diffuseColor;
-            aiColor3D ambientColor(0.1f);
-            aiColor3D specularColor;
-            aiColor3D emissiveColor;
+            aiColor3D diffuseColor, ambientColor(0.1f), specularColor, emissiveColor;
             material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
             //if (material->Get(AI_MATKEY_COLOR_AMBIENT, ambientColor) == aiReturn_SUCCESS)     TODO
             //    ambientColor = aiColor3D(1.0f);
@@ -495,9 +509,10 @@ namespace JonsAssetImporter
     }
 
 
-	bool ImportTexture(PackageTexture& texture, const boost::filesystem::path& modelPath, const std::string& texturePathStr, FreeImage& freeimageImporter)
+	bool ImportTexture(const boost::filesystem::path& modelPath, const std::string& texturePathStr, TextureType type, FreeImage& freeimageImporter, JonsPackagePtr pkg)
 	{
 		const boost::filesystem::path texturePath = texturePathStr;
+		const std::string textureName = texturePath.filename().string();
 
 		std::string fullTexturePath = "";
 		if (modelPath.has_parent_path())
@@ -507,7 +522,7 @@ namespace JonsAssetImporter
 		}
 		fullTexturePath.append(texturePath.string());
 
-		return freeimageImporter.ProcessTexture(texture, fullTexturePath);
+		return freeimageImporter.ProcessTexture2D(boost::filesystem::path(fullTexturePath), textureName, type, pkg);
 	}
 
 
@@ -879,6 +894,15 @@ namespace JonsAssetImporter
 			minExtent = MinVal(minExtent, mesh.mAABB.mMinBounds);
 			maxExtent = MaxVal(maxExtent, mesh.mAABB.mMaxBounds);
 		}
+	}
+
+	bool isObjFile(const boost::filesystem::path& modelPath)
+	{
+		assert(modelPath.has_extension());
+
+		std::string extensionName = modelPath.filename().extension().string();
+
+		return extensionName == ".obj";
 	}
 
 

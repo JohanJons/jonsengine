@@ -11,12 +11,14 @@ namespace JonsAssetImporter
 {
     enum class ParamType
     {
-        UNKNOWN,
-        MODEL,
-        MATERIAL,
-        SKYBOX,
-        ASSET_NAME,
-        PACKAGE
+        Unknown,
+        Model,
+		Texture_Diffuse,
+		Texture_Normal,
+		Texture_Height,
+        Skybox,
+        AssetName,
+		Package
     };
 
     typedef boost::filesystem::path FilePath;
@@ -49,7 +51,7 @@ namespace JonsAssetImporter
         std::string packageName;
 
         // parse parameters from input
-        ParamType paramType(ParamType::UNKNOWN);
+        ParamType paramType(ParamType::Unknown);
         for (const std::string& parameter : parameters)
         {
             if (CheckForParamType(parameter, paramType))
@@ -100,20 +102,30 @@ namespace JonsAssetImporter
 
             switch (assetType)
             {
-                case ParamType::MODEL:
+				case ParamType::Model:
                 {
                     ret = assimpImporter.ProcessScene(assetPath, assetName, freeimageParser, pkg);
                     break;
                 }
 
-                case ParamType::MATERIAL:
+				case ParamType::Texture_Diffuse:
+				case ParamType::Texture_Normal:
+				case ParamType::Texture_Height:
                 {
-                    // TODO: assume diffuse texture - support normal maps?
-                    ret = freeimageParser.ProcessMaterial(assetPath, assetName, TEXTURE_TYPE_DIFFUSE, pkg);
+					TextureType type;
+					switch (assetType)
+					{
+						default:
+						case ParamType::Texture_Diffuse: type = TextureType::Diffuse; break;
+						case ParamType::Texture_Normal:  type = TextureType::Normal; break;
+						case ParamType::Texture_Height:  type = TextureType::Height; break;
+					}
+
+					ret = freeimageParser.ProcessTexture2D(assetPath, assetName, type, pkg);
                     break;
                 }
 
-                case ParamType::SKYBOX:
+                case ParamType::Skybox:
                 {
                     ret = freeimageParser.ProcessSkybox(assetPath, assetName, pkg);
                     break;
@@ -136,29 +148,39 @@ namespace JonsAssetImporter
 
     bool CheckForParamType(const std::string& parameter, ParamType& paramType)
     {
-        if (parameter.compare("-model") == 0)
+        if (parameter == "-model")
         {
-            paramType = ParamType::MODEL;
+            paramType = ParamType::Model;
             return true;
         }
-        else if (parameter.compare("-material") == 0)
+		else if (parameter == "-texture_diffuse")
+		{
+			paramType = ParamType::Texture_Diffuse;
+			return true;
+		}
+		else if (parameter == "-texture_normal")
+		{
+			paramType = ParamType::Texture_Normal;
+			return true;
+		}
+		else if (parameter == "-texture_height")
+		{
+			paramType = ParamType::Texture_Height;
+			return true;
+		}
+        else if (parameter == "-skybox")
         {
-            paramType = ParamType::MATERIAL;
+            paramType = ParamType::Skybox;
             return true;
         }
-        else if (parameter.compare("-skybox") == 0)
+        else if (parameter == "-name")
         {
-            paramType = ParamType::SKYBOX;
+            paramType = ParamType::AssetName;
             return true;
         }
-        else if (parameter.compare("-name") == 0)
+        else if (parameter == "-package")
         {
-            paramType = ParamType::ASSET_NAME;
-            return true;
-        }
-        else if (parameter.compare("-package") == 0)
-        {
-            paramType = ParamType::PACKAGE;
+            paramType = ParamType::Package;
             return true;
         }
 
@@ -169,21 +191,23 @@ namespace JonsAssetImporter
     {
         switch (type)
         {
-            case ParamType::MODEL:
-            case ParamType::MATERIAL:
-            case ParamType::SKYBOX:
+            case ParamType::Model:
+            case ParamType::Texture_Diffuse:
+			case ParamType::Texture_Normal:
+			case ParamType::Texture_Height:
+            case ParamType::Skybox:
             {
                 assetPaths.emplace_back(type, parameter);
                 return true;
             }
 
-            case ParamType::ASSET_NAME:
+            case ParamType::AssetName:
             {
                 assetNames.push_back(parameter);
                 return true;
             }
 
-            case ParamType::PACKAGE:
+            case ParamType::Package:
             {
                 if (!packageName.empty())
                 {
@@ -197,7 +221,7 @@ namespace JonsAssetImporter
                 return true;
             }
 
-            case ParamType::UNKNOWN:
+            case ParamType::Unknown:
             default:
             {
                 Log("ERROR: Bad parameter");
@@ -235,6 +259,8 @@ namespace JonsAssetImporter
                 Log("ERROR: No such file: " + assetPath.string());
                 false;
             }
+
+			assert(assetPath.has_extension());
 
             assets.emplace_back(assetType, assetPath, assetName != assetNames.end() ? *assetName : assetPath.filename().string());
 

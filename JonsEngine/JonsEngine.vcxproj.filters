@@ -227,9 +227,6 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11SkyboxPass.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\DirectX11\DX11Material.cpp">
-      <Filter>Source Files\Renderer\DirectX11</Filter>
-    </ClCompile>
     <ClCompile Include="src\Resources\Material.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
@@ -318,6 +315,9 @@
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\DirectX11\DX11DepthBufferReadback.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11Texture.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
   </ItemGroup>
@@ -496,9 +496,6 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11SkyboxPass.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\Renderer\DirectX11\DX11Material.h">
-      <Filter>Header Files\Renderer\DirectX11</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\Platform\Windows.h">
       <Filter>Header Files\Core\Platform</Filter>
     </ClInclude>
@@ -633,6 +630,9 @@
     </ClInclude>
     <ClInclude Include="include\Window\Types.h">
       <Filter>Header Files\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11Texture.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

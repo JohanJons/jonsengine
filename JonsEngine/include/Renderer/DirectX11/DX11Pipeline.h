@@ -2,7 +2,7 @@
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11CPUDynamicBuffer.h"
-#include "include/Renderer/DirectX11/DX11Material.h"
+#include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11GBuffer.h"
 #include "include/Renderer/DirectX11/DX11LightAccumulationbuffer.h"
@@ -32,7 +32,7 @@ namespace JonsEngine
     class DX11Pipeline
     {
     public:
-        DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, DX11Backbuffer& backbuffer, const RenderSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Material>& materialMap);
+        DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, DX11Backbuffer& backbuffer, const RenderSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Texture>& textureMap);
         ~DX11Pipeline();
 
         void BeginFrame(const RenderQueue& renderQueue);
@@ -51,7 +51,7 @@ namespace JonsEngine
         Logger& mLogger;
         const Vec2 mWindowSize;
         IDMap<DX11Mesh>& mMeshMap;
-        IDMap<DX11Material>& mMaterialMap;
+        IDMap<DX11Texture>& mTextureMap;
 
         IDXGISwapChainPtr mSwapchain;
         ID3D11DeviceContextPtr mContext;

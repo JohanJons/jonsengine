@@ -4,7 +4,7 @@ namespace JonsEngine
 {
     RenderQueue::RenderQueue() : 
         mAmbientLight(0.0f),
-        mSkyboxTextureID(INVALID_DX11_MATERIAL_ID)
+        mSkyboxTextureID(INVALID_DX11_TEXTURE_ID)
     {
     }
 
@@ -20,7 +20,7 @@ namespace JonsEngine
 		mRenderData.mBones.clear();
 
 		mAmbientLight = Vec4(0.0f);
-		mSkyboxTextureID = INVALID_DX11_MATERIAL_ID;
+		mSkyboxTextureID = INVALID_DX11_TEXTURE_ID;
 
 		mAABBRenderData.mRenderableAABBs.clear();
     }

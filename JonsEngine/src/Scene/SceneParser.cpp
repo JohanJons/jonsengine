@@ -176,7 +176,7 @@ namespace JonsEngine
 	void SceneParser::GetSkybox(const Scene& scene)
 	{
 		const SkyboxID skyboxID = scene.GetSkybox();
-		DX11MaterialID skyboxTexture = INVALID_DX11_MATERIAL_ID;
+		DX11TextureID skyboxTexture = INVALID_DX11_TEXTURE_ID;
 		if (skyboxID != INVALID_SKYBOX_ID)
 		{
 			const Skybox& skybox = mResourceManifest.GetSkybox(skyboxID);
@@ -335,8 +335,8 @@ namespace JonsEngine
 			return RenderableMaterial::INVALID_INDEX;
 
 		const Material& material = resManifest.GetMaterial(materialID);
-		const DX11MaterialID diffuseTexture = material.GetDiffuseTexture();
-		const DX11MaterialID normalTexture = material.GetNormalTexture();
+		const DX11TextureID diffuseTexture = material.GetDiffuseTexture();
+		const DX11TextureID normalTexture = material.GetNormalTexture();
 		const float specularFactor = material.GetSpecularFactor();
 
 		materialContainer.emplace_back(diffuseTexture, normalTexture, specularFactor);
