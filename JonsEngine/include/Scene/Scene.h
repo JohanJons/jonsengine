@@ -71,6 +71,11 @@ namespace JonsEngine
         const DirectionalLight& GetDirectionalLight(const DirectionalLightID dirLightID) const;
         DirectionalLightIterator GetDirectionalLights() const;
 
+		/*TerrainID CreateTerrain(const std::string& name, const DX11MeshID groundMesh, const DX11TextureID heightmap);
+		void DeleteTerrain(StaticActorID& actorID);
+		StaticActor& GetTerrain(const StaticActorID actorID);
+		const StaticActor& GetTerrain(const StaticActorID actorID) const;*/
+
 		void SetAmbientLight(const Vec4& ambientLight);
         const Vec4& GetAmbientLight() const;
 

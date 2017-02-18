@@ -191,6 +191,7 @@
     <ClCompile Include="src\Scene\SceneNode.cpp" />
     <ClCompile Include="src\Scene\SceneParser.cpp" />
     <ClCompile Include="src\Scene\StaticActor.cpp" />
+    <ClCompile Include="src\Scene\Terrain.cpp" />
     <ClCompile Include="src\Window\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -284,6 +285,7 @@
     <ClInclude Include="include\Resources\ModelNode.h" />
     <ClInclude Include="include\Resources\ResourceManifest.h" />
     <ClInclude Include="include\Resources\Skybox.h" />
+    <ClInclude Include="include\Resources\Texture.h" />
     <ClInclude Include="include\Scene\AnimatedActor.h" />
     <ClInclude Include="include\Scene\AnimationUpdater.h" />
     <ClInclude Include="include\Scene\BaseActor.h" />
@@ -296,6 +298,7 @@
     <ClInclude Include="include\Scene\SceneParser.h" />
     <ClInclude Include="include\Scene\SceneSettings.h" />
     <ClInclude Include="include\Scene\StaticActor.h" />
+    <ClInclude Include="include\Scene\Terrain.h" />
     <ClInclude Include="include\Window\KeyCallback.h" />
     <ClInclude Include="include\Window\KeyDefinition.h" />
     <ClInclude Include="include\Window\MouseCallback.h" />
