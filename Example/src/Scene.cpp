@@ -16,6 +16,7 @@ namespace JonsGame
 
         // materials
         mMaterialCheckers(resManifest.CreateMaterial("checkers", "checkers", ResourceManifest::NO_TEXTURE, ResourceManifest::NO_TEXTURE, mJonsPackage)),
+		mMaterialTerrain(resManifest.CreateMaterial("terrain", "checkers", ResourceManifest::NO_TEXTURE, "heightmap", mJonsPackage)),
 
         // models
         mModelSectoid(resManifest.LoadModel("sectoid", mJonsPackage)),
@@ -125,7 +126,7 @@ namespace JonsGame
 
         // ground plane
         StaticActor& actorPlane = mScene.GetStaticActor(mActorPlane);
-        actorPlane.SetMaterial(mMaterialCheckers);
+        actorPlane.SetMaterial(mMaterialTerrain);
         actorPlane.SetMaterialTilingFactor(64.0f);
 
         // sphere

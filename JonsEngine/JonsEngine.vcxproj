@@ -152,6 +152,7 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Sampler.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Shadowmap.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11SkyboxPass.cpp" />
+    <ClCompile Include="src\Renderer\DirectX11\DX11TerrainPass.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Texture.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11ToneMapper.cpp" />
     <ClCompile Include="src\Renderer\DirectX11\DX11Utils.cpp" />
@@ -249,6 +250,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Shadowmap.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11SkyboxPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11StaticBuffer.hpp" />
+    <ClInclude Include="include\Renderer\DirectX11\DX11TerrainPass.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Texture.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11ToneMapper.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h" />
@@ -269,6 +271,7 @@
     <ClInclude Include="include\RenderQueue\RenderableMesh.h" />
     <ClInclude Include="include\RenderQueue\RenderablePointLight.h" />
     <ClInclude Include="include\RenderQueue\RenderableSkeleton.h" />
+    <ClInclude Include="include\RenderQueue\RenderableTerrain.h" />
     <ClInclude Include="include\RenderQueue\RenderQueue.h" />
     <ClInclude Include="include\Resources\Animation.h" />
     <ClInclude Include="include\Resources\AnimationInstance.h" />

@@ -97,15 +97,14 @@ namespace JonsEngine
     }
 
 
-	MaterialID ResourceManifest::CreateMaterial(const std::string& materialName, const std::string& diffuseTextureName, const std::string& normalTextureName, const std::string& heightTextureName, const JonsPackagePtr jonsPkg)
+	MaterialID ResourceManifest::CreateMaterial(const std::string& materialName, const std::string& diffuseTextureName, const std::string& normalTextureName, const JonsPackagePtr jonsPkg)
 	{
 		auto iter = FindInContainer<PackageMaterial>(materialName, jonsPkg->mMaterials);
 		if (iter != jonsPkg->mMaterials.end())
 			return INVALID_MATERIAL_ID;
 
 		bool hasDiffuse = diffuseTextureName != ResourceManifest::NO_TEXTURE,
-			hasNormal = normalTextureName != ResourceManifest::NO_TEXTURE,
-			hasHeight = heightTextureName != ResourceManifest::NO_TEXTURE;
+			hasNormal = normalTextureName != ResourceManifest::NO_TEXTURE;
 
 		auto endIter = jonsPkg->mTextures.cend();
 		auto diffuseIter = endIter, normalIter = endIter, heightIter = endIter;
@@ -113,10 +112,8 @@ namespace JonsEngine
 			diffuseIter = FindTextureInContainer(diffuseTextureName, TextureType::Diffuse, jonsPkg->mTextures);
 		if (hasNormal)
 			normalIter = FindTextureInContainer(normalTextureName, TextureType::Normal, jonsPkg->mTextures);
-		if (hasHeight)
-			heightIter = FindTextureInContainer(heightTextureName, TextureType::Height, jonsPkg->mTextures);
 
-		bool allTexturesFound = (!hasDiffuse || diffuseIter != endIter) && (!hasNormal || normalIter != endIter) && (!hasHeight || heightIter != endIter);
+		bool allTexturesFound = (!hasDiffuse || diffuseIter != endIter) && (!hasNormal || normalIter != endIter);
 		if (!allTexturesFound)
 			return INVALID_MATERIAL_ID;
 
@@ -125,11 +122,9 @@ namespace JonsEngine
 			diffuseTexture = mRenderer.CreateTexture(TextureType::Diffuse, diffuseIter->mTextureData, diffuseIter->mTextureWidth, diffuseIter->mTextureHeight);
 		if (hasNormal)
 			normalTexture = mRenderer.CreateTexture(TextureType::Normal, normalIter->mTextureData, normalIter->mTextureWidth, normalIter->mTextureHeight);
-		if (hasHeight)
-			heightTexture = mRenderer.CreateTexture(TextureType::Height, heightIter->mTextureData, heightIter->mTextureWidth, heightIter->mTextureHeight);
 
 		// TODO: material colors
-		return mMaterials.Insert(materialName, diffuseTexture, normalTexture, heightTexture);
+		return mMaterials.Insert(materialName, diffuseTexture, normalTexture);
 	}
 
     MaterialID ResourceManifest::LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg)

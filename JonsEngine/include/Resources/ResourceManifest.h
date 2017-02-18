@@ -31,7 +31,7 @@ namespace JonsEngine
         void DeleteModel(ModelID& modelID);
         const Model& GetModel(const ModelID modelID) const;
 
-		MaterialID CreateMaterial(const std::string& materialName, const std::string& diffuseTextureName, const std::string& normalTextureName, const std::string& heightTextureName, const JonsPackagePtr jonsPkg);
+		MaterialID CreateMaterial(const std::string& materialName, const std::string& diffuseTextureName, const std::string& normalTextureName, const JonsPackagePtr jonsPkg);
         MaterialID LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg);
         void DeleteMaterial(MaterialID& materialID);
         const Material& GetMaterial(const MaterialID materialID) const;

@@ -37,7 +37,9 @@ namespace JonsEngine
         mPointLightPass(device, mContext, mVertexTransformPass, settings.mShadowResolution, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
 		mToneMapper(device, context, mFullscreenPass),
         mPostProcessor(device, context, mFullscreenPass, backbufferTextureDesc),
-        mSkyboxPass(device, context)
+        mSkyboxPass(device, context),
+
+		mTerrainPass(device, context)
     {
 		auto depthStencilBuffer = backbuffer.GetDepthbuffer();
 
@@ -111,6 +113,8 @@ namespace JonsEngine
     void DX11Pipeline::GeometryStage(const RenderQueue& renderQueue)
     {
         mGBuffer.BindForGeometryStage(mDSV);
+
+		mTerrainPass.Render();
 
         // static meshes
 		const auto staticBeginIndex = renderQueue.mCamera.mStaticMeshesBegin;

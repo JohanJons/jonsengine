@@ -45,7 +45,7 @@ namespace JonsEngine
         {                                                                                                                                               \
             std::stringstream errorSS;                                                                                                                  \
             errorSS << "D3D11 Error: (" << __FILE__ << ":" << __LINE__ << ") in " << BOOST_CURRENT_FUNCTION << ": code " << result;                     \
-            Logger::GetRendererLogger().Log(LogManager::LogLevel::Error, errorSS.str());                                                                    \
+            Logger::GetRendererLogger().Log(LogManager::LogLevel::Error, errorSS.str());                                                                \
             throw new std::runtime_error(errorSS.str());                                                                                                \
         }                                                                                                                                               \
     }

@@ -15,6 +15,7 @@
 #include "include/Renderer/DirectX11/DX11PointLightPass.h"
 #include "include/Renderer/DirectX11/DX11ToneMapper.h"
 #include "include/Renderer/DirectX11/DX11SkyboxPass.h"
+#include "include/Renderer/DirectX11/DX11TerrainPass.h"
 #include "include/Renderer/DirectX11/DX11PostProcessor.h"
 #include "include/Core/DebugOptions.h"
 #include "include/Core/EngineSettings.h"
@@ -77,5 +78,7 @@ namespace JonsEngine
 		DX11ToneMapper mToneMapper;
         DX11PostProcessor mPostProcessor;
         DX11SkyboxPass mSkyboxPass;
+
+		DX11TerrainPass mTerrainPass;
     };
 }

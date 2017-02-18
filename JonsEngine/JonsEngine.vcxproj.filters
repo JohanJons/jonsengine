@@ -320,6 +320,9 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11Texture.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
+    <ClCompile Include="src\Renderer\DirectX11\DX11TerrainPass.cpp">
+      <Filter>Source Files\Renderer\DirectX11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -633,6 +636,12 @@
     </ClInclude>
     <ClInclude Include="include\Renderer\DirectX11\DX11Texture.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\DX11TerrainPass.h">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderableTerrain.h">
+      <Filter>Header Files\RenderQueue</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

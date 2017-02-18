@@ -2,16 +2,15 @@
 
 namespace JonsEngine
 {
-	Material::Material(const std::string& name, const DX11TextureID diffuseTexture, const DX11TextureID normalTexture, const DX11TextureID heightTexture) :
-		Material(name, diffuseTexture, normalTexture, heightTexture, Vec3(DEFAULT_DIFFUSE_COLOR), Vec3(DEFAULT_AMBIENT_COLOR), Vec3(DEFAULT_SPECULAR_COLOR), Vec3(DEFAULT_EMISSIVE_COLOR), DEFAULT_SPECULAR_FACTOR)
+	Material::Material(const std::string& name, const DX11TextureID diffuseTexture, const DX11TextureID normalTexture) :
+		Material(name, diffuseTexture, normalTexture, Vec3(DEFAULT_DIFFUSE_COLOR), Vec3(DEFAULT_AMBIENT_COLOR), Vec3(DEFAULT_SPECULAR_COLOR), Vec3(DEFAULT_EMISSIVE_COLOR), DEFAULT_SPECULAR_FACTOR)
 	{
 	}
 
-    Material::Material(const std::string& name, const DX11TextureID diffuseTexture, const DX11TextureID normalTexture, const DX11TextureID heightTexture, const Vec3& diffuseColor, const Vec3& ambientColor, const Vec3& specularColor, const Vec3& emissiveColor, const float specularFactor) :
+    Material::Material(const std::string& name, const DX11TextureID diffuseTexture, const DX11TextureID normalTexture, const Vec3& diffuseColor, const Vec3& ambientColor, const Vec3& specularColor, const Vec3& emissiveColor, const float specularFactor) :
         mName(name),
 		mDiffuseTexture(diffuseTexture),
 		mNormalTexture(normalTexture),
-		mHeightTexture(heightTexture),
 		mDiffuseColor(diffuseColor),
 		mAmbientColor(ambientColor),
 		mSpecularColor(specularColor),
@@ -40,11 +39,6 @@ namespace JonsEngine
     {
         return mNormalTexture;
     }
-
-	DX11TextureID Material::GetHeightTexture() const
-	{
-		return mHeightTexture;
-	}
 
     float Material::GetSpecularFactor() const
     {
