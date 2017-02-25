@@ -52,6 +52,14 @@ namespace JonsEngine
 			FilmicU2
 		} mToneMapping;
 
+		struct Tesselation
+		{
+			float mMinDistance;
+			float mMaxDistance;
+			float mMinFactor;
+			float mMaxFactor;
+		} mTessellation;
+
 		AutoExposureRate mAutoExposureRate;
 		bool mBloomEnabled;
 		bool mSSAOEnabled;
@@ -67,6 +75,7 @@ namespace JonsEngine
 		mAnisotropicFiltering(Anisotropic::X16),
 		mAntiAliasing(AntiAliasing::Fxaa),
 		mToneMapping(ToneMappingAlghorithm::FilmicU2),
+		mTessellation({ 1.0f , 25.0f, 1.0f, 5.0f }),
 		mAutoExposureRate(DefaultAutoExposureRate()),
 		mBloomEnabled(true),
 		mSSAOEnabled(true)

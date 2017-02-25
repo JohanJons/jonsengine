@@ -2,9 +2,10 @@
 
 namespace JonsEngine
 {
-	DX11TerrainPass::DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context) :
+	DX11TerrainPass::DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const RenderSettings::Tesselation& tessData) :
 		mContext(nullptr),
-		mPixelShader(nullptr)
+		mPixelShader(nullptr),
+		mTessData(tessData)
 	{
 	}
 

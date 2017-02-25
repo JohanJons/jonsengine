@@ -329,6 +329,9 @@
     <ClCompile Include="src\Resources\TerrainData.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderableTerrain.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">

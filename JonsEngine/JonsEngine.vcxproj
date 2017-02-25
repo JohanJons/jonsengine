@@ -168,6 +168,7 @@
     <ClCompile Include="src\RenderQueue\RenderableMesh.cpp" />
     <ClCompile Include="src\RenderQueue\RenderablePointLight.cpp" />
     <ClCompile Include="src\RenderQueue\RenderableSkeleton.cpp" />
+    <ClCompile Include="src\RenderQueue\RenderableTerrain.cpp" />
     <ClCompile Include="src\RenderQueue\RenderQueue.cpp" />
     <ClCompile Include="src\Resources\Animation.cpp" />
     <ClCompile Include="src\Resources\AnimationInstance.cpp" />
