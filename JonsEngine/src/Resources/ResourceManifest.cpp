@@ -103,8 +103,7 @@ namespace JonsEngine
 		if (iter != jonsPkg->mMaterials.end())
 			return INVALID_MATERIAL_ID;
 
-		bool hasDiffuse = diffuseTextureName != ResourceManifest::NO_TEXTURE,
-			hasNormal = normalTextureName != ResourceManifest::NO_TEXTURE;
+		bool hasDiffuse = !diffuseTextureName.empty(), hasNormal = !normalTextureName.empty();
 
 		auto endIter = jonsPkg->mTextures.cend();
 		auto diffuseIter = endIter, normalIter = endIter, heightIter = endIter;
@@ -119,9 +118,9 @@ namespace JonsEngine
 
 		DX11TextureID diffuseTexture = INVALID_DX11_TEXTURE_ID, normalTexture = INVALID_DX11_TEXTURE_ID, heightTexture = INVALID_DX11_TEXTURE_ID;
 		if (hasDiffuse)
-			diffuseTexture = mRenderer.CreateTexture(TextureType::Diffuse, diffuseIter->mTextureData, diffuseIter->mTextureWidth, diffuseIter->mTextureHeight);
+			diffuseTexture = LoadTexture(diffuseTextureName, TextureType::Diffuse, diffuseIter->mTextureData, diffuseIter->mTextureWidth, diffuseIter->mTextureHeight);
 		if (hasNormal)
-			normalTexture = mRenderer.CreateTexture(TextureType::Normal, normalIter->mTextureData, normalIter->mTextureWidth, normalIter->mTextureHeight);
+			normalTexture = LoadTexture(normalTextureName, TextureType::Normal, normalIter->mTextureData, normalIter->mTextureWidth, normalIter->mTextureHeight);
 
 		// TODO: material colors
 		return mMaterials.Insert(materialName, diffuseTexture, normalTexture);
@@ -134,25 +133,20 @@ namespace JonsEngine
             return INVALID_MATERIAL_ID;
         const PackageMaterial& pkgMaterial = *iter;
 
-        DX11TextureID diffuseTexture = INVALID_DX11_TEXTURE_ID, normalTexture  = INVALID_DX11_TEXTURE_ID, heightTexture = INVALID_DX11_TEXTURE_ID;
+        DX11TextureID diffuseTexture = INVALID_DX11_TEXTURE_ID, normalTexture  = INVALID_DX11_TEXTURE_ID;
 		if (pkgMaterial.mDiffuseTexture != PackageTexture::INVALID_TEXTURE_INDEX)
 		{
 			auto& pkgTexture = jonsPkg->mTextures.at(pkgMaterial.mDiffuseTexture);
-			diffuseTexture = mRenderer.CreateTexture(TextureType::Diffuse, pkgTexture.mTextureData, pkgTexture.mTextureWidth, pkgTexture.mTextureHeight);
+			diffuseTexture = LoadTexture(pkgTexture.mName, TextureType::Diffuse, pkgTexture.mTextureData, pkgTexture.mTextureWidth, pkgTexture.mTextureHeight);
 		}
 		if (pkgMaterial.mNormalTexture != PackageTexture::INVALID_TEXTURE_INDEX)
 		{
 			auto& pkgTexture = jonsPkg->mTextures.at(pkgMaterial.mNormalTexture);
-			normalTexture = mRenderer.CreateTexture(TextureType::Normal, pkgTexture.mTextureData, pkgTexture.mTextureWidth, pkgTexture.mTextureHeight);
-		}
-		if (pkgMaterial.mHeightTexture != PackageTexture::INVALID_TEXTURE_INDEX)
-		{
-			auto& pkgTexture = jonsPkg->mTextures.at(pkgMaterial.mHeightTexture);
-			heightTexture = mRenderer.CreateTexture(TextureType::Height, pkgTexture.mTextureData, pkgTexture.mTextureWidth, pkgTexture.mTextureHeight);
+			normalTexture = LoadTexture(pkgTexture.mName, TextureType::Normal, pkgTexture.mTextureData, pkgTexture.mTextureWidth, pkgTexture.mTextureHeight);
 		}
 
         // TODO: material colors
-        return mMaterials.Insert(pkgMaterial.mName, diffuseTexture, normalTexture, heightTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, Material::DEFAULT_SPECULAR_FACTOR);
+        return mMaterials.Insert(pkgMaterial.mName, diffuseTexture, normalTexture, pkgMaterial.mDiffuseColor, pkgMaterial.mAmbientColor, pkgMaterial.mSpecularColor, pkgMaterial.mEmissiveColor, Material::DEFAULT_SPECULAR_FACTOR);
     }
 
     void ResourceManifest::DeleteMaterial(MaterialID& materialID)
@@ -169,6 +163,31 @@ namespace JonsEngine
     }
 
 
+	TerrainDataID ResourceManifest::CreateTerrainData(const std::string& name, const std::string& heightmap, const JonsPackagePtr jonsPkg)
+	{
+		auto heightIter = FindTextureInContainer(heightmap, TextureType::Height, jonsPkg->mTextures);
+		if (heightIter == jonsPkg->mTextures.end())
+			return INVALID_TERRAIN_DATA_ID;
+
+		DX11TextureID heightmapTexture = LoadTexture(heightmap, TextureType::Height, heightIter->mTextureData, heightIter->mTextureWidth, heightIter->mTextureHeight);
+
+		return mTerrainData.Insert(name, INVALID_DX11_MESH_ID, heightmapTexture);
+	}
+
+	void ResourceManifest::DeleteTerrainData(TerrainDataID& terrainDataId)
+	{
+		assert(terrainDataId != INVALID_TERRAIN_DATA_ID);
+
+		mTerrainData.Erase(terrainDataId);
+		terrainDataId = INVALID_TERRAIN_DATA_ID;
+	}
+
+	TerrainData& ResourceManifest::GetTerrainData(const TerrainDataID terrainDataId)
+	{
+		return mTerrainData.GetItem(terrainDataId);
+	}
+
+
     SkyboxID ResourceManifest::LoadSkybox(const std::string& skyboxName, const JonsPackagePtr jonsPkg)
     {
         auto iter = FindTextureInContainer(skyboxName, TextureType::Skybox, jonsPkg->mTextures);
@@ -177,7 +196,7 @@ namespace JonsEngine
 
         const PackageTexture& pkgSkyboxTexture = *iter;
 
-        const DX11TextureID skyboxTextureID = mRenderer.CreateTexture(TextureType::Skybox, pkgSkyboxTexture.mTextureData, pkgSkyboxTexture.mTextureWidth, pkgSkyboxTexture.mTextureHeight);
+        const DX11TextureID skyboxTextureID = LoadTexture(skyboxName, TextureType::Skybox, pkgSkyboxTexture.mTextureData, pkgSkyboxTexture.mTextureWidth, pkgSkyboxTexture.mTextureHeight);
         assert(skyboxTextureID != INVALID_DX11_TEXTURE_ID);
 
         return mSkyboxes.Insert(skyboxName, skyboxTextureID);
@@ -225,6 +244,18 @@ namespace JonsEngine
             }
         }
     }
+
+	DX11TextureID ResourceManifest::LoadTexture(const std::string& name, TextureType type, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
+	{
+		bool isCached = HasCachedDXTexture(name);
+
+		return isCached ? mDXTextureMap.at(name) : mRenderer.CreateTexture(type, textureData, textureWidth, textureHeight);
+	}
+
+	bool ResourceManifest::HasCachedDXTexture(const std::string& name) const
+	{
+		return mDXTextureMap.find(name) != mDXTextureMap.end();
+	}
 
 
     template <typename PackageStruct>

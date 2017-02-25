@@ -47,7 +47,6 @@ namespace JonsEngine
 		mName(name),
 		mDiffuseTexture(PackageTexture::INVALID_TEXTURE_INDEX),
 		mNormalTexture(PackageTexture::INVALID_TEXTURE_INDEX),
-		mHeightTexture(PackageTexture::INVALID_TEXTURE_INDEX),
         mDiffuseColor(1.0f),
         mAmbientColor(1.0f),
         mSpecularColor(1.0f),

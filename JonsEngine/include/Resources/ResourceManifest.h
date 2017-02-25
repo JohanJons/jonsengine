@@ -7,10 +7,12 @@
 #include "include/Resources/Mesh.h"
 #include "include/Resources/Material.h"
 #include "include/Resources/Skybox.h"
+#include "include/Resources/TerrainData.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Renderer/Shapes.h"
 
 #include <unordered_map>
+#include <string>
 
 namespace JonsEngine
 {
@@ -20,8 +22,6 @@ namespace JonsEngine
     class ResourceManifest
     {
     public:
-		static constexpr auto NO_TEXTURE = "";
-
         ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator);
 
         ModelID CreateRectangle(const std::string& modelName, const float sizeX, const float sizeY, const float sizeZ);
@@ -36,6 +36,10 @@ namespace JonsEngine
         void DeleteMaterial(MaterialID& materialID);
         const Material& GetMaterial(const MaterialID materialID) const;
 
+		TerrainDataID CreateTerrainData(const std::string& name, const std::string& heightmap, const JonsPackagePtr jonsPkg);
+		void DeleteTerrainData(TerrainDataID& terrainDataId);
+		TerrainData& GetTerrainData(const TerrainDataID terrainDataId);
+
         SkyboxID LoadSkybox(const std::string& skyboxName, const JonsPackagePtr jonsPkg);
         void DeleteSkybox(SkyboxID& skyboxID);
         Skybox& GetSkybox(const SkyboxID skyboxID);
@@ -44,6 +48,8 @@ namespace JonsEngine
 
     private:
         void ParseModelInitData(ModelNode::InitDataList& initData, const JonsPackagePtr jongPkg, const PackageModel& model);
+		DX11TextureID LoadTexture(const std::string& name, TextureType type, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight);
+		bool HasCachedDXTexture(const std::string& name) const;
 
 
         HeapAllocator& mMemoryAllocator;
@@ -51,6 +57,9 @@ namespace JonsEngine
 
         IDMap<Model> mModels;
         IDMap<Material> mMaterials;
+		IDMap<TerrainData> mTerrainData;
         IDMap<Skybox> mSkyboxes;
+
+		std::unordered_map<std::string, DX11TextureID> mDXTextureMap;
     };
 }

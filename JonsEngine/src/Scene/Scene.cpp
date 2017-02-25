@@ -207,6 +207,30 @@ namespace JonsEngine
     }
 
 
+	TerrainID Scene::CreateTerrain(const std::string& name, const TerrainDataID terrainDataID)
+	{
+		return mTerrains.Insert(name, terrainDataID);
+	}
+
+	void Scene::DeleteTerrain(TerrainDataID& terrainDataID)
+	{
+		assert(terrainDataID != INVALID_TERRAIN_ID);
+
+		mTerrains.Erase(terrainDataID);
+		terrainDataID = INVALID_TERRAIN_ID;
+	}
+
+	Terrain& Scene::GetTerrain(const TerrainDataID terrainDataID)
+	{
+		return mTerrains.GetItem(terrainDataID);
+	}
+
+	const Terrain& Scene::GetTerrain(const TerrainDataID terrainDataID) const
+	{
+		return mTerrains.GetItem(terrainDataID);
+	}
+
+
 	void Scene::SetAmbientLight(const Vec4& ambientLight)
     {
         mAmbientLight = ambientLight;

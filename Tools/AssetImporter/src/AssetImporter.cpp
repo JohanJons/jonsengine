@@ -3,7 +3,9 @@
 #include "include/Utils.h"
 #include "include/Assimp.h"
 #include "include/FreeImage.h"
+
 #include <tuple>
+#include <algorithm>
 
 using namespace JonsEngine;
 
@@ -32,6 +34,7 @@ namespace JonsAssetImporter
     bool ParseParam(const std::string& parameter, const ParamType type, std::vector<AssetPath>& assetPaths, std::vector<AssetName>& assetNames, std::string& packageName);
     bool VerifyParams(std::vector<AssetPath>& assetPaths, std::vector<AssetName>& assetNames, std::string& packageName);
     bool MatchAssetPathAndName(std::vector<AssetPath>& assetPaths, std::vector<AssetName>& assetNames, std::vector<Asset>& assets);
+	bool VerifyNoDuplicateTextureNames(const JonsPackagePtr pkg);
 
 
     ParseResult ParseCommands(const Command command, std::vector<std::string>& parameters)
@@ -139,8 +142,10 @@ namespace JonsAssetImporter
                 return false;
         }
 
-        if (ret)
-            WriteJonsPkg(packageName, pkg);
+		if (!VerifyNoDuplicateTextureNames(pkg))
+			return false;
+
+        WriteJonsPkg(packageName, pkg);
 
         return ret;
     }
@@ -270,4 +275,13 @@ namespace JonsAssetImporter
 
         return true;
     }
+
+	bool VerifyNoDuplicateTextureNames(const JonsPackagePtr pkg)
+	{
+		auto texturesCopy = pkg->mTextures;
+		std::sort(texturesCopy.begin(), texturesCopy.end(), [](const auto& text1, const auto& text2) { return text1.mName < text2.mName; });
+		auto iter = std::adjacent_find(texturesCopy.begin(), texturesCopy.end(), [](const auto& text1, const auto& text2) { return text1.mName == text2.mName; });
+
+		return iter == texturesCopy.end();
+	}
 }

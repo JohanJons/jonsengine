@@ -29,7 +29,7 @@ namespace JonsGame
         JonsEngine::SkyboxID mSkybox;
 
         JonsEngine::MaterialID mMaterialCheckers;
-		JonsEngine::MaterialID mMaterialTerrain;
+		//JonsEngine::MaterialID mMaterialTerrain;
 
         JonsEngine::ModelID mModelSectoid;
         JonsEngine::ModelID mModelCube;

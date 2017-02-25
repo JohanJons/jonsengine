@@ -101,6 +101,8 @@ namespace JonsAssetImporter
 			const bool hasNormalTexture = (material->GetTextureCount(aiTextureType_NORMALS) > 0 && material->GetTexture(aiTextureType_NORMALS, 0, &normalPath) == aiReturn_SUCCESS) ||
 										  (isObj && material->GetTextureCount(aiTextureType_HEIGHT) > 0 && material->GetTexture(aiTextureType_HEIGHT, 0, &normalPath) == aiReturn_SUCCESS);
 			const bool hasHeightMap = !isObj && material->GetTextureCount(aiTextureType_HEIGHT) > 0 && material->GetTexture(aiTextureType_HEIGHT, 0, &heightPath) == aiReturn_SUCCESS;
+			// no support for heightmaps in models
+			assert(!hasHeightMap);
 
 			aiString assimpMaterialName("");
 			material->Get(AI_MATKEY_NAME, assimpMaterialName);
@@ -139,16 +141,6 @@ namespace JonsAssetImporter
 				}
 
 				pkgMaterial.mNormalTexture = pkg->mTextures.size() - 1;
-			}
-			if (hasHeightMap)
-			{
-				if (!ImportTexture(modelPath, heightPath.C_Str(), TextureType::Height, freeimageImporter, pkg))
-				{
-					Log("ERROR: Unable to import normal texture " + pkgMaterial.mName);
-					return false;
-				}
-
-				pkgMaterial.mHeightTexture = pkg->mTextures.size() - 1;
 			}
 
             aiColor3D diffuseColor, ambientColor(0.1f), specularColor, emissiveColor;

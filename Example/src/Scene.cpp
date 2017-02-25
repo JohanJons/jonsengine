@@ -15,8 +15,8 @@ namespace JonsGame
         mSkybox(resManifest.LoadSkybox("skybox", mJonsPackage)),
 
         // materials
-        mMaterialCheckers(resManifest.CreateMaterial("checkers", "checkers", ResourceManifest::NO_TEXTURE, ResourceManifest::NO_TEXTURE, mJonsPackage)),
-		mMaterialTerrain(resManifest.CreateMaterial("terrain", "checkers", ResourceManifest::NO_TEXTURE, "heightmap", mJonsPackage)),
+        mMaterialCheckers(resManifest.CreateMaterial("checkers", "checkers", "", mJonsPackage)),
+		//mMaterialTerrain(resManifest.CreateMaterial("terrain", "checkers", ResourceManifest::NO_TEXTURE, "heightmap", mJonsPackage)),
 
         // models
         mModelSectoid(resManifest.LoadModel("sectoid", mJonsPackage)),
@@ -126,7 +126,7 @@ namespace JonsGame
 
         // ground plane
         StaticActor& actorPlane = mScene.GetStaticActor(mActorPlane);
-        actorPlane.SetMaterial(mMaterialTerrain);
+        actorPlane.SetMaterial(mMaterialCheckers);
         actorPlane.SetMaterialTilingFactor(64.0f);
 
         // sphere

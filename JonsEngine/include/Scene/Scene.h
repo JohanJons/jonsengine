@@ -11,6 +11,7 @@
 #include "include/Scene/PointLight.h"
 #include "include/Scene/SceneNode.h"
 #include "include/Scene/StaticActor.h"
+#include "include/Scene/Terrain.h"
 #include "include/Scene/AnimationUpdater.h"
 #include "include/Resources/Skybox.h"
 
@@ -71,10 +72,10 @@ namespace JonsEngine
         const DirectionalLight& GetDirectionalLight(const DirectionalLightID dirLightID) const;
         DirectionalLightIterator GetDirectionalLights() const;
 
-		/*TerrainID CreateTerrain(const std::string& name, const DX11MeshID groundMesh, const DX11TextureID heightmap);
-		void DeleteTerrain(StaticActorID& actorID);
-		StaticActor& GetTerrain(const StaticActorID actorID);
-		const StaticActor& GetTerrain(const StaticActorID actorID) const;*/
+		TerrainID CreateTerrain(const std::string& name, const TerrainDataID terrainDataID);
+		void DeleteTerrain(TerrainDataID& terrainDataID);
+		Terrain& GetTerrain(const TerrainDataID terrainDataID);
+		const Terrain& GetTerrain(const TerrainDataID terrainDataID) const;
 
 		void SetAmbientLight(const Vec4& ambientLight);
         const Vec4& GetAmbientLight() const;
@@ -109,6 +110,7 @@ namespace JonsEngine
 
 		IDMap<PointLight> mPointLights;
         IDMap<DirectionalLight> mDirectionalLights;
+		IDMap<Terrain> mTerrains;
         IDMap<StaticActor> mStaticActors;
         IDMap<AnimatedActor> mAnimatedActors;
         IDMapTree<SceneNode> mSceneNodeTree;

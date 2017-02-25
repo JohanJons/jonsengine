@@ -73,7 +73,6 @@ namespace JonsEngine
         std::string mName;
 		PackageTexture::TextureIndex mDiffuseTexture;
 		PackageTexture::TextureIndex mNormalTexture;
-		PackageTexture::TextureIndex mHeightTexture;
         Vec3 mDiffuseColor;
         Vec3 mAmbientColor;
         Vec3 mSpecularColor;
@@ -254,7 +253,6 @@ namespace boost
             ar & material.mName;
             ar & material.mDiffuseTexture;
             ar & material.mNormalTexture;
-			ar & material.mHeightTexture;
             ar & material.mDiffuseColor;
             ar & material.mAmbientColor;
             ar & material.mSpecularColor;

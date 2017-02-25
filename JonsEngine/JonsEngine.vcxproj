@@ -180,6 +180,7 @@
     <ClCompile Include="src\Resources\ModelNode.cpp" />
     <ClCompile Include="src\Resources\ResourceManifest.cpp" />
     <ClCompile Include="src\Resources\Skybox.cpp" />
+    <ClCompile Include="src\Resources\TerrainData.cpp" />
     <ClCompile Include="src\Scene\AnimatedActor.cpp" />
     <ClCompile Include="src\Scene\AnimationUpdater.cpp" />
     <ClCompile Include="src\Scene\BaseActor.cpp" />
@@ -285,7 +286,7 @@
     <ClInclude Include="include\Resources\ModelNode.h" />
     <ClInclude Include="include\Resources\ResourceManifest.h" />
     <ClInclude Include="include\Resources\Skybox.h" />
-    <ClInclude Include="include\Resources\Texture.h" />
+    <ClInclude Include="include\Resources\TerrainData.h" />
     <ClInclude Include="include\Scene\AnimatedActor.h" />
     <ClInclude Include="include\Scene\AnimationUpdater.h" />
     <ClInclude Include="include\Scene\BaseActor.h" />

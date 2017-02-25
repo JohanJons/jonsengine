@@ -326,6 +326,9 @@
     <ClCompile Include="src\Scene\Terrain.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Resources\TerrainData.cpp">
+      <Filter>Source Files\Resources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">
@@ -649,7 +652,7 @@
     <ClInclude Include="include\Scene\Terrain.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="include\Resources\Texture.h">
+    <ClInclude Include="include\Resources\TerrainData.h">
       <Filter>Header Files\Resources</Filter>
     </ClInclude>
   </ItemGroup>
