@@ -47,6 +47,7 @@ namespace JonsEngine
     private:
 		void RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end);
 		void PerformTonemapping(const Milliseconds elapstedFrameTime, const RenderSettings::AutoExposureRate exposureRate, const RenderSettings::ToneMappingAlghorithm alghorithm);
+		void SetPerFrameCBuffer(const RenderQueue& renderQueue);
 
 
         Logger& mLogger;

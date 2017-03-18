@@ -39,7 +39,7 @@ namespace JonsEngine
         mPostProcessor(device, context, mFullscreenPass, backbufferTextureDesc),
         mSkyboxPass(device, context),
 
-		mTerrainPass(device, context)
+		mTerrainPass(device, context, settings.mTessellation)
     {
 		auto depthStencilBuffer = backbuffer.GetDepthbuffer();
 
@@ -95,6 +95,8 @@ namespace JonsEngine
     {
         mBackbuffer.ClearBackbuffer(gClearColor);
 
+		SetPerFrameCBuffer(renderQueue);
+
 		// Send all bone transforms to GPU
 		const bool hasBoneData = !renderQueue.mRenderData.mBones.empty();
 		if (hasBoneData)
@@ -114,7 +116,12 @@ namespace JonsEngine
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-		mTerrainPass.Render();
+		mTerrainPass.BindForRendering();
+		for (auto& terrain : renderQueue.mTerrains)
+		{
+			DX11Mesh& mesh = mMeshMap.GetItem(terrain.mMeshID);
+			mTerrainPass.Render(mesh);
+		}
 
         // static meshes
 		const auto staticBeginIndex = renderQueue.mCamera.mStaticMeshesBegin;
@@ -243,5 +250,10 @@ namespace JonsEngine
 			mContext->PSSetShader(mSimpleTextureShader, nullptr, 0);
 			mFullscreenPass.Render();
 		}
+	}
+
+	void DX11Pipeline::SetPerFrameCBuffer(const RenderQueue& renderQueue)
+	{
+
 	}
 }

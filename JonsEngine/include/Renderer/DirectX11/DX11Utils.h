@@ -56,6 +56,8 @@ namespace JonsEngine
     // COM smart pointers
     typedef CComPtr<ID3D11Buffer> ID3D11BufferPtr;
     typedef CComPtr<ID3D11VertexShader> ID3D11VertexShaderPtr;
+	typedef CComPtr<ID3D11DomainShader> ID3D11DomainShaderPtr;
+	typedef CComPtr<ID3D11HullShader> ID3D11HullShaderPtr;
     typedef CComPtr<ID3D11PixelShader> ID3D11PixelShaderPtr;
     typedef CComPtr<ID3D11ComputeShader> ID3D11ComputeShaderPtr;
     typedef CComPtr<ID3D11RasterizerState> ID3D11RasterizerStatePtr;

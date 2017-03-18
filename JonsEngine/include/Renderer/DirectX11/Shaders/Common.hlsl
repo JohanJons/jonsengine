@@ -5,6 +5,11 @@
 
 StructuredBuffer<float4x4> gBones : register (SBUFFER_REGISTER_BONE_TRANSFORMS);
 
+struct PerFrameCB
+{
+
+};
+
 
 float3 SampleNormalTexture(in Texture2D normalTexture, uint2 samplePosition)
 {
