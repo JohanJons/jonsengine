@@ -7,7 +7,10 @@ StructuredBuffer<float4x4> gBones : register (SBUFFER_REGISTER_BONE_TRANSFORMS);
 
 struct PerFrameCB
 {
-
+	float 4x4 gFrameViewProj;
+	float 4x4 gFrameView;
+	float 4x4 gFrameProj;
+	float 4x4 gFrameInvProj;
 };
 
 

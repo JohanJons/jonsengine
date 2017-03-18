@@ -45,6 +45,19 @@ namespace JonsEngine
 
 
     private:
+		struct PerFrameCB
+		{
+			Mat4 mViewProj;
+			Mat4 mView;
+			Mat4 mProj;
+			Mat4 mInvProj;
+
+			PerFrameCB(const Mat4& viewProj, const Mat4& view, const Mat4& proj, const Mat4& invProj) :
+				mViewProj(viewProj), mView(view), mProj(proj), mInvProj(invProj)
+			{
+			}
+		};
+
 		void RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end);
 		void PerformTonemapping(const Milliseconds elapstedFrameTime, const RenderSettings::AutoExposureRate exposureRate, const RenderSettings::ToneMappingAlghorithm alghorithm);
 		void SetPerFrameCBuffer(const RenderQueue& renderQueue);
@@ -81,5 +94,7 @@ namespace JonsEngine
         DX11SkyboxPass mSkyboxPass;
 
 		DX11TerrainPass mTerrainPass;
+
+		DX11ConstantBuffer<PerFrameCB> mPerFrameCB;
     };
 }

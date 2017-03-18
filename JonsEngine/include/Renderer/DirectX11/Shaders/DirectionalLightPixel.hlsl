@@ -11,7 +11,6 @@ static const uint gMaxNumCascades = 4;
 cbuffer DirectionalLightConstants : register(CBUFFER_REGISTER_PIXEL)
 {
     float4x4 gSplitVPMatrices[gMaxNumCascades];
-    float4x4 gInvProjMatrix;
     float4 gSplitDistances;
     float4 gLightColor;
     float4 gLightDirection;
@@ -31,7 +30,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
     const float depth = gDepthTexture[uint2(position.xy)].r;
 	const float4 diffuse = gDiffuseTexture[uint2(position.xy)];
     const float3 normal = SampleNormalTexture(gNormalTexture, uint2(position.xy));
-    float4 viewPosition = float4(ReconstructViewPosition(depth, float2(position.x / gWindowSize.x, position.y / gWindowSize.y), gInvProjMatrix), 1.0);
+    float4 viewPosition = float4(ReconstructViewPosition(depth, float2(position.x / gWindowSize.x, position.y / gWindowSize.y), gFrameInvProj), 1.0);
     
     uint index = 3;
     if (viewPosition.z > gSplitDistances.x)

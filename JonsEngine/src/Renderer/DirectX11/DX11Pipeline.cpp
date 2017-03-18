@@ -39,7 +39,9 @@ namespace JonsEngine
         mPostProcessor(device, context, mFullscreenPass, backbufferTextureDesc),
         mSkyboxPass(device, context),
 
-		mTerrainPass(device, context, settings.mTessellation)
+		mTerrainPass(device, context, settings.mTessellation),
+
+		mPerFrameCB(device, context, mPerFrameCB.CONSTANT_BUFFER_SLOT_PER_FRAME)
     {
 		auto depthStencilBuffer = backbuffer.GetDepthbuffer();
 
@@ -254,6 +256,8 @@ namespace JonsEngine
 
 	void DX11Pipeline::SetPerFrameCBuffer(const RenderQueue& renderQueue)
 	{
-
+		auto& camera = renderQueue.mCamera;
+		mPerFrameCB.SetData({ camera.mCameraViewProjectionMatrix, camera.mCameraViewMatrix, camera.mCameraProjectionMatrix,
+			glm::inverse(camera.mCameraProjectionMatrix) });
 	}
 }
