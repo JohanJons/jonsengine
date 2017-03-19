@@ -26,16 +26,17 @@ DomainOut domain_main(PatchTess patchTess, float3 bary : SV_DomainLocation, cons
 	// Choose the mipmap level based on distance to the eye; specifically, choose
 	// the next miplevel every MipInterval units, and clamp the miplevel in [0,6].
 	const float MipInterval = 20.0f;
-	float mipLevel = clamp((distance(dout.PosW, gEyePosW) - MipInterval) / MipInterval, 0.0f, 6.0f);
+	//float mipLevel = clamp((distance(dout.PosW, gEyePosW) - MipInterval) / MipInterval, 0.0f, 6.0f);
 
 	// Sample height map (stored in alpha channel).
-	float h = gNormalMap.SampleLevel(samLinear, dout.Tex, mipLevel).a;
+	//float h = gNormalMap.SampleLevel(samLinear, dout.Tex, mipLevel).a;
 
 	// Offset vertex along normal.
-	dout.PosW += (gHeightScale*(h - 1.0))*dout.NormalW;
+	//dout.PosW += (gHeightScale*(h - 1.0))*dout.NormalW;
+	dout.PosW += 1.0;
 
 	// Project to homogeneous clip space.
-	dout.PosH = mul(float4(dout.PosW, 1.0f), gViewProj);
+	dout.PosH = 1.0;// mul(float4(dout.PosW, 1.0f), gViewProj);
 
 	return dout;
 }

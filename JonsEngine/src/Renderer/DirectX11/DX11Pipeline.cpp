@@ -154,23 +154,21 @@ namespace JonsEngine
         // disable further depth writing
         mContext->OMSetDepthStencilState(mDepthStencilState, 0);
 
-        const Mat4 invCameraProjMatrix = glm::inverse(renderQueue.mCamera.mCameraProjectionMatrix);
-
         // ambient light
-        mAmbientPass.Render(invCameraProjMatrix, renderQueue.mAmbientLight, mWindowSize, renderSettings.mSSAOEnabled);
+        mAmbientPass.Render(renderQueue.mAmbientLight, mWindowSize, renderSettings.mSSAOEnabled);
 
         // additive blending for adding lighting
         mContext->OMSetBlendState(mAdditiveBlending, nullptr, 0xffffffff);
 
         // do all directional lights
         for (const RenderableDirectionalLight& directionalLight : renderQueue.mDirectionalLights)
-            mDirectionalLightPass.Render(directionalLight, renderQueue.mRenderData, renderSettings.mShadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mCamera.mCameraViewMatrix, invCameraProjMatrix);
+            mDirectionalLightPass.Render(directionalLight, renderQueue.mRenderData, renderSettings.mShadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mCamera.mCameraViewMatrix);
 
         // do all point lights
         for (const RenderablePointLight& pointLight : renderQueue.mPointLights)
         {
             mContext->ClearDepthStencilView(mDSV, D3D11_CLEAR_STENCIL, 1.0f, 0);
-            mPointLightPass.Render(pointLight, renderQueue.mRenderData, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix, invCameraProjMatrix);
+            mPointLightPass.Render(pointLight, renderQueue.mRenderData, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix);
         }
 
         // turn off blending
@@ -178,7 +176,7 @@ namespace JonsEngine
 
 		// skybox pass
 		if (renderQueue.mSkyboxTextureID != INVALID_DX11_TEXTURE_ID)
-			mSkyboxPass.Render(renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraProjectionMatrix, mTextureMap.GetItem(renderQueue.mSkyboxTextureID));
+			mSkyboxPass.Render(mTextureMap.GetItem(renderQueue.mSkyboxTextureID));
     }
 
     void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags, const RenderSettings& renderSettings)
@@ -257,7 +255,6 @@ namespace JonsEngine
 	void DX11Pipeline::SetPerFrameCBuffer(const RenderQueue& renderQueue)
 	{
 		auto& camera = renderQueue.mCamera;
-		mPerFrameCB.SetData({ camera.mCameraViewProjectionMatrix, camera.mCameraViewMatrix, camera.mCameraProjectionMatrix,
-			glm::inverse(camera.mCameraProjectionMatrix) });
+		mPerFrameCB.SetData({ glm::inverse(camera.mCameraViewMatrix), glm::inverse(camera.mCameraProjectionMatrix) });
 	}
 }

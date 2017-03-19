@@ -44,7 +44,7 @@ namespace JonsEngine
     }
 
 
-    void DX11AmbientPass::Render(const Mat4& invCameraProjMatrix, const Vec4& ambientLight, const Vec2& windowSize, const bool useSSAO)
+    void DX11AmbientPass::Render(const Vec4& ambientLight, const Vec2& windowSize, const bool useSSAO)
     {
         if (useSSAO)
         {
@@ -55,7 +55,7 @@ namespace JonsEngine
             // pass 1: render AO to texture
             mContext->OMSetRenderTargets(1, &mSSAORTV.p, nullptr);
             mContext->PSSetShader(mSSAOPixelShader, nullptr, 0);
-            mSSAOCBuffer.SetData(SSAOCBuffer(invCameraProjMatrix, windowSize));
+            mSSAOCBuffer.SetData(SSAOCBuffer(windowSize));
             mFullscreenPass.Render();
 
             // pass 2: horizontal + vertical blur

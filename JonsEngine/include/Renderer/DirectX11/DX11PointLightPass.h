@@ -33,13 +33,12 @@ namespace JonsEngine
         DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const RenderSettings::ShadowResolution shadowmapRes, const uint32_t windowWidth, const uint32_t windowHeight);
         ~DX11PointLightPass();
 
-        void Render(const RenderablePointLight& pointLight, const RenderQueue::RenderData& renderData, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const Mat4& invCameraProjMatrix);
+        void Render(const RenderablePointLight& pointLight, const RenderQueue::RenderData& renderData, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix);
 
 
     private:
         struct PointLightCBuffer
         {
-            Mat4 mInvProjMatrix;
             Vec4 mLightColor;
             Vec4 mLightPosition;
             Vec2 mWindowSize;
@@ -49,8 +48,8 @@ namespace JonsEngine
             float __padding;
 
 
-            PointLightCBuffer(const Mat4& invProjMatrix, const Vec4& lightColor, const Vec4& lightPosition, const Vec2& windowSize, const float lightIntensity, const float zNear, const float maxDistance) :
-                mInvProjMatrix(invProjMatrix), mLightColor(lightColor), mLightPosition(lightPosition), mWindowSize(windowSize), mLightIntensity(lightIntensity), mMaxDistance(maxDistance), mZNear(zNear)
+            PointLightCBuffer(const Vec4& lightColor, const Vec4& lightPosition, const Vec2& windowSize, const float lightIntensity, const float zNear, const float maxDistance) :
+                mLightColor(lightColor), mLightPosition(lightPosition), mWindowSize(windowSize), mLightIntensity(lightIntensity), mMaxDistance(maxDistance), mZNear(zNear)
             {
             }
         };

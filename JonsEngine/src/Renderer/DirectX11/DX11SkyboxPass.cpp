@@ -6,7 +6,7 @@
 
 namespace JonsEngine
 {
-    DX11SkyboxPass::DX11SkyboxPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context) : mContext(context), mVertexShader(nullptr), mPixelShader(nullptr), mSkyboxCBuffer(device, context, mSkyboxCBuffer.CONSTANT_BUFFER_SLOT_VERTEX)
+    DX11SkyboxPass::DX11SkyboxPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context) : mContext(context), mVertexShader(nullptr), mPixelShader(nullptr)
     {
         DXCALL(device->CreateVertexShader(gSkyboxVertexShader, sizeof(gSkyboxVertexShader), nullptr, &mVertexShader));
         DXCALL(device->CreatePixelShader(gSkyboxPixelShader, sizeof(gSkyboxPixelShader), nullptr, &mPixelShader));
@@ -17,9 +17,8 @@ namespace JonsEngine
     }
 
 
-    void DX11SkyboxPass::Render(const Mat4& viewMatrix, const Mat4& projMatrix, DX11Texture& skyboxTexture)
+    void DX11SkyboxPass::Render(DX11Texture& skyboxTexture)
     {
-        mSkyboxCBuffer.SetData(SkyboxCBuffer(glm::inverse(viewMatrix), glm::inverse(projMatrix)));
         skyboxTexture.BindAsShaderResource(SHADER_TEXTURE_SLOT_EXTRA);
 
         mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);

@@ -28,12 +28,12 @@ namespace JonsEngine
 
 	void DX11TerrainPass::Render(DX11Mesh& mesh)
 	{
-		mesh.Draw();
+		//mesh.Draw();
 	}
 
 	void DX11TerrainPass::BindForRendering()
 	{
-		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-		mCBuffer.SetData({ mTessData.mMinDistance, mTessData.mMaxDistance, mTessData.mMinFactor, mTessData.mMaxFactor });
+		//mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+		//mCBuffer.SetData({ mTessData.mMinDistance, mTessData.mMaxDistance, mTessData.mMinFactor, mTessData.mMaxFactor });
 	}
 }
