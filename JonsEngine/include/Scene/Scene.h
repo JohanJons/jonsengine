@@ -32,6 +32,7 @@ namespace JonsEngine
         typedef ConstRangedIterator<IDMap<AnimatedActor>> AnimatedActorIterator;
         typedef ConstRangedIterator<IDMap<PointLight>> PointLightIterator;
         typedef ConstRangedIterator<IDMap<DirectionalLight>> DirectionalLightIterator;
+		typedef ConstRangedIterator<IDMap<Terrain>> TerrainIterator;
 
         Scene(const std::string& sceneName, DX11Renderer& renderer, const ResourceManifest& resourceManifest);
         ~Scene();
@@ -72,10 +73,11 @@ namespace JonsEngine
         const DirectionalLight& GetDirectionalLight(const DirectionalLightID dirLightID) const;
         DirectionalLightIterator GetDirectionalLights() const;
 
-		TerrainID CreateTerrain(const std::string& name, const TerrainDataID terrainDataID);
+		TerrainID CreateTerrain(const std::string& name, const SceneNodeID node, const TerrainDataID terrainDataID);
 		void DeleteTerrain(TerrainDataID& terrainDataID);
 		Terrain& GetTerrain(const TerrainDataID terrainDataID);
 		const Terrain& GetTerrain(const TerrainDataID terrainDataID) const;
+		TerrainIterator GetTerrains() const;
 
 		void SetAmbientLight(const Vec4& ambientLight);
         const Vec4& GetAmbientLight() const;

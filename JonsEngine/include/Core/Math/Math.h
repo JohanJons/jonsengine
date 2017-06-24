@@ -17,7 +17,7 @@ namespace JonsEngine
      * Contains various math functions
      */
 
-    const Mat4 gIdentityMatrix(1.0f);
+    static const Mat4 gIdentityMatrix(1.0f);
 
 
     Mat4 PerspectiveMatrixFov(const float fovDegrees, const float ratio, const float zNear, const float zFar);

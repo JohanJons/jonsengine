@@ -15,6 +15,10 @@ VertexOut vs_main(VertexIn input)
 {
 	VertexOut ret;
 
+	ret.mPositionW = mul(gWorldTransform, input.mPosition);
+	ret.mNormalW = mul(gWorldTransform, input.mNormal);
+	ret.mTexcoordW = mul(gWorldTransform, input.mTexcoord);
+
 	return ret;
 }
 

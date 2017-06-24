@@ -12,10 +12,10 @@ PatchTess PatchHS(InputPatch<VertexOut, 3> patch, uint patchID : SV_PrimitiveID)
 	// calculation based on the edge properties so that edges shared by 
 	// more than one triangle will have the same tessellation factor.  
 	// Otherwise, gaps can appear.
-	pt.EdgeTess[0] = 0.5f*(patch[1].TessFactor + patch[2].TessFactor);
-	pt.EdgeTess[1] = 0.5f*(patch[2].TessFactor + patch[0].TessFactor);
-	pt.EdgeTess[2] = 0.5f*(patch[0].TessFactor + patch[1].TessFactor);
-	pt.InsideTess = pt.EdgeTess[0];
+	pt.mEdgeTess[0] = 0.5f*(patch[1].mTessFactor + patch[2].mTessFactor);
+	pt.mEdgeTess[1] = 0.5f*(patch[2].mTessFactor + patch[0].mTessFactor);
+	pt.mEdgeTess[2] = 0.5f*(patch[0].mTessFactor + patch[1].mTessFactor);
+	pt.mInsideTess = pt.mEdgeTess[0];
 
 	return pt;
 }
@@ -29,9 +29,9 @@ HullOut hull_main(InputPatch<VertexOut, 3> p, uint i : SV_OutputControlPointID, 
 {
 	HullOut hout;
 
-	hout.PosW = p[i].mPosition;
-	hout.NormalW = p[i].mNormal;
-	hout.Tex = p[i].Tex;
+	hout.mPositionW = p[i].mPositionW;
+	hout.mNormalW = p[i].mNormalW;
+	hout.mTexcoordW = p[i].mTexcoordW;
 
 	return hout;
 }

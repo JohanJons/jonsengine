@@ -122,7 +122,7 @@ namespace JonsEngine
 		for (auto& terrain : renderQueue.mTerrains)
 		{
 			DX11Mesh& mesh = mMeshMap.GetItem(terrain.mMeshID);
-			mTerrainPass.Render(mesh);
+			mTerrainPass.Render(mesh, terrain.mWorldTransform);
 		}
 
         // static meshes

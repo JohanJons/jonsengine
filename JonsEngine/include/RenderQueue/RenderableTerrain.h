@@ -1,18 +1,17 @@
 #pragma once
 
-#include "include/RenderQueue/RenderableCollection.h"
+#include "include/RenderQueue/RenderableMesh.h"
 #include "include/Core/Types.h"
 
 namespace JonsEngine
 {
-	struct RenderableTerrain : RenderableContainer<RenderableTerrain>
+	struct RenderableTerrain
 	{
 		RenderableTerrain();
 
 
+		Mat4 mWorldTransform;
 		DX11MeshID mMeshID;
 		DX11TextureID mHeightMap;
 	};
-
-	typedef RenderableTerrain::ContainerType RenderableTerrainContainer;
 }

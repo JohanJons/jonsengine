@@ -207,9 +207,9 @@ namespace JonsEngine
     }
 
 
-	TerrainID Scene::CreateTerrain(const std::string& name, const TerrainDataID terrainDataID)
+	TerrainID Scene::CreateTerrain(const std::string& name, const SceneNodeID node, const TerrainDataID terrainDataID)
 	{
-		return mTerrains.Insert(name, terrainDataID);
+		return mTerrains.Insert(name, node, terrainDataID);
 	}
 
 	void Scene::DeleteTerrain(TerrainDataID& terrainDataID)
@@ -228,6 +228,11 @@ namespace JonsEngine
 	const Terrain& Scene::GetTerrain(const TerrainDataID terrainDataID) const
 	{
 		return mTerrains.GetItem(terrainDataID);
+	}
+
+	Scene::TerrainIterator Scene::GetTerrains() const
+	{
+		return TerrainIterator(mTerrains.cbegin(), mTerrains.cend());
 	}
 
 

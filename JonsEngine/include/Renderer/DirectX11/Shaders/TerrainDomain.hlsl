@@ -11,13 +11,12 @@ DomainOut domain_main(PatchTess patchTess, float3 bary : SV_DomainLocation, cons
 	DomainOut dout;
 
 	// Interpolate patch attributes to generated vertices.
-	dout.PosW = bary.x*tri[0].PosW + bary.y*tri[1].PosW + bary.z*tri[2].PosW;
-	dout.NormalW = bary.x*tri[0].NormalW + bary.y*tri[1].NormalW + bary.z*tri[2].NormalW;
-	dout.TangentW = bary.x*tri[0].TangentW + bary.y*tri[1].TangentW + bary.z*tri[2].TangentW;
-	dout.Tex = bary.x*tri[0].Tex + bary.y*tri[1].Tex + bary.z*tri[2].Tex;
+	dout.mPositionW = bary.x*tri[0].mPositionW + bary.y*tri[1].mPositionW + bary.z*tri[2].mPositionW;
+	dout.mNormalW = bary.x*tri[0].mNormalW + bary.y*tri[1].mNormalW + bary.z*tri[2].mNormalW;
+	dout.mTexcoordW = bary.x*tri[0].mTexcoordW + bary.y*tri[1].mTexcoordW + bary.z*tri[2].mTexcoordW;
 
 	// Interpolating normal can unnormalize it, so normalize it.
-	dout.NormalW = normalize(dout.NormalW);
+	dout.mNormalW = normalize(dout.mNormalW);
 
 	//
 	// Displacement mapping.
@@ -33,10 +32,10 @@ DomainOut domain_main(PatchTess patchTess, float3 bary : SV_DomainLocation, cons
 
 	// Offset vertex along normal.
 	//dout.PosW += (gHeightScale*(h - 1.0))*dout.NormalW;
-	dout.PosW += 1.0;
+	dout.mPositionW += 1.0;
 
 	// Project to homogeneous clip space.
-	dout.PosH = 1.0;// mul(float4(dout.PosW, 1.0f), gViewProj);
+	dout.mPosition = 1.0;// mul(float4(dout.PosW, 1.0f), gViewProj);
 
 	return dout;
 }

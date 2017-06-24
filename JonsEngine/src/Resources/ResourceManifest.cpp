@@ -30,8 +30,7 @@ namespace JonsEngine
 
         std::vector<float> vertexData, normalData, texcoordData, tangentData;
         std::vector<uint16_t> indiceData;
-        if (!CreateRectangleData(sizeX, sizeY, sizeZ, vertexData, normalData, texcoordData, indiceData))
-            return INVALID_MODEL_ID;
+		CreateRectangleData(sizeX, sizeY, sizeZ, vertexData, normalData, texcoordData, indiceData);
 
         const float halfX = sizeX / 2.0f;
         const float halfY = sizeY / 2.0f;
@@ -56,8 +55,7 @@ namespace JonsEngine
 
         std::vector<float> vertexData, normalData, texcoordData, tangentData;
         std::vector<uint16_t> indiceData;
-        if (!CreateSphereData(radius, rings, sectors, vertexData, normalData, texcoordData, indiceData))
-            return INVALID_MODEL_ID;
+		CreateSphereData(radius, rings, sectors, vertexData, normalData, texcoordData, indiceData);
 
         const Vec3 minBounds(-radius, -radius, -radius);
         const Vec3 maxBounds(radius, radius, radius);
@@ -169,7 +167,12 @@ namespace JonsEngine
 		if (heightIter == jonsPkg->mTextures.end())
 			return INVALID_TERRAIN_DATA_ID;
 
+		assert(heightIter->mTextureWidth > 0 && heightIter->mTextureHeight > 0);
 		DX11TextureID heightmapTexture = LoadTexture(heightmap, TextureType::Height, heightIter->mTextureData, heightIter->mTextureWidth, heightIter->mTextureHeight);
+
+		const uint32_t texelDimensionPerPatch = 64;
+		const uint32_t numVerticalPathes = ((heightIter->mTextureHeight - 1) / texelDimensionPerPatch) + 1;
+		const uint32_t numHorizontalPathes = ((heightIter->mTextureWidth - 1) / texelDimensionPerPatch) + 1;
 
 		return mTerrainData.Insert(name, INVALID_DX11_MESH_ID, heightmapTexture);
 	}

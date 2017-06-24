@@ -45,6 +45,11 @@ namespace JonsGame
         mNodeCube3(mScene.CreateSceneNode("nodeCube3", mScene.GetRootNodeID())),
 		mNodeBob(mScene.CreateSceneNode("nodeBob", mScene.GetRootNodeID())),
 		mNodeSAS(mScene.CreateSceneNode("nodeSas", mScene.GetRootNodeID())),
+		mNodeTerrain(mScene.CreateSceneNode("nodeTerrain", mScene.GetRootNodeID())),
+
+		// terrain
+		mTerrainData(resManifest.CreateTerrainData("terraindata", "heightmap", mJonsPackage)),
+		mTerrain(jonsScene.CreateTerrain("terrain", mNodeTerrain, mTerrainData)),
         
         // lights
         mMovingPointLightID(mScene.CreatePointLight("MovingPointLight", mNodePointLight)),

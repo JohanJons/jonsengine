@@ -14,13 +14,14 @@ namespace JonsEngine
 		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const RenderSettings::Tesselation& tessData);
 		~DX11TerrainPass();
 
-		void Render(DX11Mesh& mesh);
+		void Render(DX11Mesh& mesh, const Mat4& worldTransform);
 		void BindForRendering();
 
 
 	private:
 		struct TerrainCBuffer
 		{
+			Mat4 mWorldTransform;
 			float mMinDistance;
 			float mMaxDistance;
 			float mMinFactor;

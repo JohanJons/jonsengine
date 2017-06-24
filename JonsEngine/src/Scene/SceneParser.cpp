@@ -17,6 +17,10 @@ namespace JonsEngine
 	void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator, const bool parseMaterials,
 		RenderQueue::RenderData& renderData, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
 
+	//template <typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
+	//void CullTerrain(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator,
+	//	RenderQueue::RenderData& renderData, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
+
     template <typename VISIBILITY_RESULT_TYPE>
     bool DetermineIfAddAllMeshes(const EngineSettings::CullingStrategy cullingStrat, const VISIBILITY_RESULT_TYPE visibilityResult);
 
@@ -88,13 +92,17 @@ namespace JonsEngine
 
         const auto staticActors = scene.GetStaticActors();
         const auto animatedActors = scene.GetAnimatedActors();
-		const bool parseMaterials = true;
+		bool parseMaterials = true;
 
         CullActors<decltype(staticActors)>(scene, mResourceManifest, mCullingStrategy, staticActors, parseMaterials, mRenderQueue.mRenderData, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
         CullActors<decltype(animatedActors)>(scene, mResourceManifest, mCullingStrategy, animatedActors, parseMaterials, mRenderQueue.mRenderData, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
 
 		mRenderQueue.mCamera.mStaticMeshesEnd =  mRenderQueue.mRenderData.mStaticMeshes.size();
 		mRenderQueue.mCamera.mAnimatedMeshesEnd = mRenderQueue.mRenderData.mAnimatedMeshes.size();
+
+		const auto terrains = scene.GetTerrains();
+		parseMaterials = false;
+		CullActors<decltype(terrains)>(scene, mResourceManifest, mCullingStrategy, terrains, parseMaterials, mRenderQueue.mRenderData, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
     }
 
     void SceneParser::PointLightCulling(const Scene& scene)
@@ -230,6 +238,18 @@ namespace JonsEngine
                 AddAllMeshes(actor, model, worldMatrix, parseMaterials, animationUpdater, resManifest, renderData);
         }
     }
+
+	/*template <typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
+	void CullTerrain(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator,
+		RenderQueue::RenderData& renderData, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args)
+	{
+		const auto visibilityResult = testVisibilityFunc(model, worldMatrix, std::forward<VISIBILITY_ARGS>(args)...);
+
+		// TODO: extend with fine-grained culling, such as adding meshes per-node rather than per-model for AGGRESSIVE culling strategy,
+		const bool addAllMeshes = DetermineIfAddAllMeshes(cullingStrat, visibilityResult);
+		if (addAllMeshes)
+			AddAllMeshes(actor, model, worldMatrix, parseMaterials, animationUpdater, resManifest, renderData);
+	}*/
 
 
     template <>

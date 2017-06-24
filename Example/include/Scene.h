@@ -56,6 +56,10 @@ namespace JonsGame
         JonsEngine::SceneNodeID mNodeCube3;
 		JonsEngine::SceneNodeID mNodeBob;
 		JonsEngine::SceneNodeID mNodeSAS;
+		JonsEngine::SceneNodeID mNodeTerrain;
+
+		JonsEngine::TerrainDataID mTerrainData;
+		JonsEngine::TerrainID mTerrain;
 
         JonsEngine::PointLightID mMovingPointLightID;
         JonsEngine::DirectionalLightID mSunDirLightID;

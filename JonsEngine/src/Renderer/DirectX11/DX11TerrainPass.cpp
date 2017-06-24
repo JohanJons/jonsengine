@@ -26,9 +26,10 @@ namespace JonsEngine
 	}
 
 
-	void DX11TerrainPass::Render(DX11Mesh& mesh)
+	void DX11TerrainPass::Render(DX11Mesh& mesh, const Mat4& worldTransform)
 	{
-		//mesh.Draw();
+		mCBuffer.SetData({ worldTransform, 0.0f, 0.0f, 0.0f, 0.0f });
+		mesh.Draw();
 	}
 
 	void DX11TerrainPass::BindForRendering()

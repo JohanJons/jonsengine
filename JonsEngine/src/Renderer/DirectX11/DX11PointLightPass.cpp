@@ -22,11 +22,7 @@ namespace JonsEngine
 
         std::vector<float> vertexData, normalData, texcoordData, tangentData;
         std::vector<uint16_t> indiceData;
-        if (!CreateSphereData(radius, rings, sectors, vertexData, normalData, texcoordData, indiceData))
-        {
-            JONS_LOG_ERROR(Logger::GetRendererLogger(), "Failed to create sphere for shading pass");
-            throw std::runtime_error("Failed to create sphere for shading pass");
-        }
+		CreateSphereData(radius, rings, sectors, vertexData, normalData, texcoordData, indiceData);
 
         return DX11Mesh(device, context, vertexData, normalData, texcoordData, tangentData, indiceData, Vec3(-radius, -radius, -radius), Vec3(radius, radius, radius));
     }
