@@ -101,8 +101,7 @@ namespace JonsEngine
 		mRenderQueue.mCamera.mAnimatedMeshesEnd = mRenderQueue.mRenderData.mAnimatedMeshes.size();
 
 		const auto terrains = scene.GetTerrains();
-		parseMaterials = false;
-		CullActors<decltype(terrains)>(scene, mResourceManifest, mCullingStrategy, terrains, parseMaterials, mRenderQueue.mRenderData, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
+		//CullTerrain<decltype(terrains)>(scene, mResourceManifest, mCullingStrategy, terrains, mRenderQueue.mRenderData, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
     }
 
     void SceneParser::PointLightCulling(const Scene& scene)
@@ -253,7 +252,7 @@ namespace JonsEngine
 
 
     template <>
-    bool DetermineIfAddAllMeshes<AABBIntersection>(const EngineSettings::CullingStrategy cullingStrat, const AABBIntersection aabbIntersection)
+    bool DetermineIfAddAllMeshes(const EngineSettings::CullingStrategy cullingStrat, const AABBIntersection aabbIntersection)
     {
         switch (cullingStrat)
         {

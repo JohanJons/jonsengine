@@ -4,6 +4,7 @@
 #include "include/Resources/ModelNode.h"
 #include "include/Resources/Mesh.h"
 #include "include/Core/Types.h"
+#include "include/Core/Math/AABB.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/Containers/RangedIterator.hpp"
 

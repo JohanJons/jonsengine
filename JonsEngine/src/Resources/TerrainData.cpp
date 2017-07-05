@@ -2,8 +2,9 @@
 
 namespace JonsEngine
 {
-	TerrainData::TerrainData(const std::string& name, const DX11MeshID groundMesh, const DX11TextureID heightMap) :
+	TerrainData::TerrainData(const std::string& name, const AABB& aabb, const DX11MeshID groundMesh, const DX11TextureID heightMap) :
 		mName(name),
+		mStaticAABB(aabb),
 		mGroundMesh(groundMesh),
 		mHeightMap(heightMap)
 	{
@@ -13,6 +14,11 @@ namespace JonsEngine
 	const std::string& TerrainData::GetName() const
 	{
 		return mName;
+	}
+
+	const AABB& TerrainData::GetStaticAABB() const
+	{
+		return mStaticAABB;
 	}
 
 	DX11MeshID TerrainData::GetMesh() const

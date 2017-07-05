@@ -118,12 +118,12 @@ namespace JonsEngine
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-		mTerrainPass.BindForRendering();
+		/*mTerrainPass.BindForRendering();
 		for (auto& terrain : renderQueue.mTerrains)
 		{
 			DX11Mesh& mesh = mMeshMap.GetItem(terrain.mMeshID);
 			mTerrainPass.Render(mesh, terrain.mWorldTransform);
-		}
+		}*/
 
         // static meshes
 		const auto staticBeginIndex = renderQueue.mCamera.mStaticMeshesBegin;
