@@ -24,10 +24,10 @@ namespace JonsAssetImporter
         ~Assimp();
 
         bool ProcessScene(const boost::filesystem::path& modelPath, const std::string& modelName, FreeImage& freeimageImporter, JonsEngine::JonsPackagePtr pkg);
+		bool ProcessTerrainMap(const std::string& terrainName, JonsEngine::PackageTexture::TextureIndex heightMapTexture, JonsEngine::JonsPackagePtr pkg);
 
 
     private:
-		bool ProcessTerrainMap(const std::string& terrainName, PackageTexture::TextureIndex heightMapTexture, JonsPackagePtr pkg);
         bool ProcessMaterials(std::vector<JonsEngine::PackageMaterial>& materials, const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsEngine::JonsPackagePtr pkg);
         bool ParseModel(const aiScene* scene, const std::string& modelName, const MaterialMap& materialMap, JonsEngine::JonsPackagePtr pkg);
         bool ParseNodeHeirarchy(std::vector<JonsEngine::PackageNode>& nodeContainer, const std::vector<JonsEngine::PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode,

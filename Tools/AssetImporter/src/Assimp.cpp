@@ -45,6 +45,8 @@ namespace JonsAssetImporter
     Vec3 aiColor3DToJonsVec3(const aiColor3D& color);
     Vec3 aiVec3ToJonsVec3(const aiVector3D& vec);
 
+	void CalculateTerrainElevation(const std::vector<uint8_t>& terrainData, float& minElevation, float& maxElevation);
+
 
     Assimp::Assimp()
     {
@@ -85,9 +87,18 @@ namespace JonsAssetImporter
     }
 
 
-	bool ProcessTerrainMap(const std::string& terrainName, PackageTexture::TextureIndex heightMapTexture, JonsPackagePtr pkg)
+	bool Assimp::ProcessTerrainMap(const std::string& terrainName, PackageTexture::TextureIndex heightMapTexture, JonsPackagePtr pkg)
 	{
-		pkg->mTerrainMaps.emplace_back();
+		const PackageTexture& texture = pkg->mTextures.at(heightMapTexture);
+
+		auto& name = texture.mName;
+		float width = texture.mTextureWidth;
+		float height = texture.mTextureHeight;
+
+		float minElevation = 0, maxElevation = 0;
+		CalculateTerrainElevation(texture.mTextureData, minElevation, maxElevation);
+
+		pkg->mTerrainMaps.emplace_back(name, heightMapTexture, minElevation, maxElevation);
 
 		return true;
 	}
@@ -932,4 +943,17 @@ namespace JonsAssetImporter
     {
         return Vec3(vec.x, vec.y, vec.z);
     }
+
+
+	void CalculateTerrainElevation(const std::vector<uint8_t>& terrainData, float& minElevation, float& maxElevation)
+	{
+		minElevation = std::numeric_limits<float>::max();
+		maxElevation = std::numeric_limits<float>::min();
+
+		for (uint8_t texel : terrainData)
+		{
+			if (texel < minElevation) minElevation = texel;
+			if (texel > maxElevation) maxElevation = texel;
+		}
+	}
 }

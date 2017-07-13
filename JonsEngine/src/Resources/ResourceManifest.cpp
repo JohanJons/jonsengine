@@ -15,8 +15,6 @@ namespace JonsEngine
     template <typename PackageStruct>
     typename std::vector<PackageStruct>::const_iterator FindInContainer(const std::string& assetName, const std::vector<PackageStruct>& container);
 	typename std::vector<PackageTexture>::const_iterator FindTextureInContainer(const std::string& assetName, TextureType type, const std::vector<PackageTexture>& container);
-	
-	void CalculateTerrainElevation(const std::vector<uint8_t>& terrainData, float& minElevation, float& maxElevation);
 
 
     ResourceManifest::ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator) :
@@ -166,7 +164,8 @@ namespace JonsEngine
 	TerrainDataID ResourceManifest::CreateTerrainData(const std::string& name, const std::string& heightmap, const JonsPackagePtr jonsPkg)
 	{
 		auto heightIter = FindTextureInContainer(heightmap, TextureType::Height, jonsPkg->mTextures);
-		if (heightIter == jonsPkg->mTextures.end())
+		auto terrainMapIter = FindInContainer(heightmap, jonsPkg->mTerrainMaps);
+		if (heightIter == jonsPkg->mTextures.end() || terrainMapIter == jonsPkg->mTerrainMaps.end())
 			return INVALID_TERRAIN_DATA_ID;
 
 		const float terrainWidth = heightIter->mTextureWidth;
@@ -176,14 +175,13 @@ namespace JonsEngine
 		const auto textureData = heightIter->mTextureData;
 		assert(!textureData.empty());
 
-		DX11TextureID heightmapTexture = LoadTexture(heightmap, TextureType::Height, textureData, terrainWidth, terrainHeight);
+		const DX11TextureID heightmapTexture = LoadTexture(heightmap, TextureType::Height, textureData, terrainWidth, terrainHeight);
 
 		const uint32_t texelDimensionPerPatch = 64;
 		const uint32_t numVerticalPathes = ((terrainHeight - 1) / texelDimensionPerPatch) + 1;
 		const uint32_t numHorizontalPathes = ((terrainWidth - 1) / texelDimensionPerPatch) + 1;
 
-		float minElevation = 0, maxElevation = 0;
-		CalculateTerrainElevation(textureData, minElevation, maxElevation);
+		const float minElevation = terrainMapIter->mMinElevation, maxElevation = terrainMapIter->mMaxElevation;
 
 		return mTerrainData.Insert(name, minElevation, maxElevation, terrainWidth, terrainHeight, INVALID_DX11_MESH_ID, heightmapTexture);
 	}
@@ -285,18 +283,5 @@ namespace JonsEngine
 		const size_t hashedName = boost::hash_value(assetName);
 
 		return std::find_if(container.begin(), container.end(), [hashedName, type](const PackageTexture& texture) { return boost::hash_value(texture.mName) == hashedName && texture.mType == type; });
-	}
-
-
-	void CalculateTerrainElevation(const std::vector<uint8_t>& terrainData, float& minElevation, float& maxElevation)
-	{
-		minElevation = std::numeric_limits<float>::max();
-		maxElevation = std::numeric_limits<float>::min();
-
-		for (uint8_t texel : terrainData)
-		{
-			if (texel < minElevation) minElevation = texel;
-			if (texel > maxElevation) maxElevation = texel;
-		}
 	}
 }
