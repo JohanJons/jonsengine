@@ -2,9 +2,9 @@
 
 namespace JonsEngine
 {
-	TerrainData::TerrainData(const std::string& name, const AABB& aabb, const DX11MeshID groundMesh, const DX11TextureID heightMap) :
+	TerrainData::TerrainData(const std::string& name, float minElevation, float maxElevation, float width, float height, DX11MeshID groundMesh, DX11TextureID heightMap) :
 		mName(name),
-		mStaticAABB(aabb),
+		mStaticAABB({ -(width / 2.0f), minElevation, -(height / 2.0f) }, { width / 2.0f, maxElevation, height / 2.0f }),
 		mGroundMesh(groundMesh),
 		mHeightMap(heightMap)
 	{

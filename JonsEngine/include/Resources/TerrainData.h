@@ -11,7 +11,7 @@ namespace JonsEngine
 	class TerrainData
 	{
 	public:
-		TerrainData(const std::string& name, const AABB& aabb, const DX11MeshID groundMesh, const DX11TextureID heightMap);
+		TerrainData(const std::string& name, float minElevation, float maxElevation, float width, float height, DX11MeshID groundMesh, DX11TextureID heightMap);
 
 		const std::string& GetName() const;
 		const AABB& GetStaticAABB() const;

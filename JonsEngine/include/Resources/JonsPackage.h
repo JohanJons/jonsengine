@@ -61,6 +61,18 @@ namespace JonsEngine
         uint32_t mTextureHeight;
     };
 
+	struct PackageTerrainMap
+	{
+		PackageTerrainMap();
+		PackageTerrainMap(const std::string& name, PackageTexture::TextureIndex heightMapTexture, float minElevation, float maxElevation);
+
+
+		std::string mName;
+		PackageTexture::TextureIndex mTerrainTexture;
+		float mMinElevation;
+		float mMaxElevation;
+	};
+
     struct PackageMaterial
     {
         typedef uint32_t MaterialIndex;
@@ -172,6 +184,7 @@ namespace JonsEngine
         std::vector<PackageModel> mModels;
         std::vector<PackageMaterial> mMaterials;
 		std::vector<PackageTexture> mTextures;
+		std::vector<PackageTerrainMap> mTerrainMaps;
     };
 
 
@@ -247,6 +260,15 @@ namespace boost
             ar & texture.mTextureHeight;
         }
 
+		template<class Archive>
+		void serialize(Archive & ar, JonsEngine::PackageTerrainMap& terrain, const unsigned int version)
+		{
+			ar & terrain.mName;
+			ar & terrain.mTerrainTexture;
+			ar & terrain.mMinElevation;
+			ar & terrain.mMaxElevation;
+		}
+
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageMaterial& material, const unsigned int version)
         {
@@ -302,6 +324,7 @@ namespace boost
             ar & pkg.mModels;
             ar & pkg.mMaterials;
             ar & pkg.mTextures;
+			ar & pkg.mTerrainMaps;
         }
 
         template<class Archive>

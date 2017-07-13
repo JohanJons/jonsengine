@@ -24,30 +24,30 @@ namespace JonsEngine
     public:
         ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator);
 
-        ModelID CreateRectangle(const std::string& modelName, const float sizeX, const float sizeY, const float sizeZ);
-        ModelID CreateCube(const std::string& modelName, const float size);
-        ModelID CreateSphere(const std::string& modelName, const float radius, const uint32_t rings, const uint32_t sectors);
-        ModelID LoadModel(const std::string& assetName, const JonsPackagePtr jonsPkg);
+        ModelID CreateRectangle(const std::string& modelName, float sizeX, float sizeY, float sizeZ);
+        ModelID CreateCube(const std::string& modelName, float size);
+        ModelID CreateSphere(const std::string& modelName, float radius, uint32_t rings, uint32_t sectors);
+        ModelID LoadModel(const std::string& assetName, JonsPackagePtr jonsPkg);
         void DeleteModel(ModelID& modelID);
-        const Model& GetModel(const ModelID modelID) const;
+        const Model& GetModel(ModelID modelID) const;
 
-		MaterialID CreateMaterial(const std::string& materialName, const std::string& diffuseTextureName, const std::string& normalTextureName, const JonsPackagePtr jonsPkg);
+		MaterialID CreateMaterial(const std::string& materialName, const std::string& diffuseTextureName, const std::string& normalTextureName, JonsPackagePtr jonsPkg);
         MaterialID LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg);
         void DeleteMaterial(MaterialID& materialID);
-        const Material& GetMaterial(const MaterialID materialID) const;
+        const Material& GetMaterial(MaterialID materialID) const;
 
-		TerrainDataID CreateTerrainData(const std::string& name, const std::string& heightmap, const JonsPackagePtr jonsPkg);
+		TerrainDataID CreateTerrainData(const std::string& name, const std::string& heightmap, JonsPackagePtr jonsPkg);
 		void DeleteTerrainData(TerrainDataID& terrainDataId);
-		TerrainData& GetTerrainData(const TerrainDataID terrainDataId);
+		TerrainData& GetTerrainData(TerrainDataID terrainDataId);
 
         SkyboxID LoadSkybox(const std::string& skyboxName, const JonsPackagePtr jonsPkg);
         void DeleteSkybox(SkyboxID& skyboxID);
-        Skybox& GetSkybox(const SkyboxID skyboxID);
-        const Skybox& GetSkybox(const SkyboxID skyboxID) const;
+        Skybox& GetSkybox(SkyboxID skyboxID);
+        const Skybox& GetSkybox(SkyboxID skyboxID) const;
 
 
     private:
-        void ParseModelInitData(ModelNode::InitDataList& initData, const JonsPackagePtr jongPkg, const PackageModel& model);
+        void ParseModelInitData(ModelNode::InitDataList& initData, JonsPackagePtr jongPkg, const PackageModel& model);
 		DX11TextureID LoadTexture(const std::string& name, TextureType type, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight);
 		bool HasCachedDXTexture(const std::string& name) const;
 

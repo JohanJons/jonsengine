@@ -38,6 +38,19 @@ namespace JonsEngine
     {
     }
 
+	PackageTerrainMap::PackageTerrainMap() :
+		PackageTerrainMap()
+	{
+	}
+
+	PackageTerrainMap::PackageTerrainMap(const std::string& name, PackageTexture::TextureIndex heightMapTexture, float minElevation, float maxElevation) :
+		mName(name),
+		mTerrainTexture(heightMapTexture),
+		mMinElevation(minElevation),
+		mMaxElevation(maxElevation)
+	{
+	}
+
     PackageMaterial::PackageMaterial() :
         PackageMaterial("")
     {

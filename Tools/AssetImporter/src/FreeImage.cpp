@@ -164,9 +164,3 @@ namespace JonsAssetImporter
         Log(message);
     }
 }
-
-
-
-
-
-

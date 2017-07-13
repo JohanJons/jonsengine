@@ -84,6 +84,14 @@ namespace JonsAssetImporter
         return true;
     }
 
+
+	bool ProcessTerrainMap(const std::string& terrainName, PackageTexture::TextureIndex heightMapTexture, JonsPackagePtr pkg)
+	{
+		pkg->mTerrainMaps.emplace_back();
+
+		return true;
+	}
+
     bool Assimp::ProcessMaterials(std::vector<PackageMaterial>& materials, const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsPackagePtr pkg)
     {
         if (!scene->HasMaterials())
