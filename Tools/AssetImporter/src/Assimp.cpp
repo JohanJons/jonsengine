@@ -92,9 +92,6 @@ namespace JonsAssetImporter
 		const PackageTexture& texture = pkg->mTextures.at(heightMapTexture);
 
 		auto& name = texture.mName;
-		float width = texture.mTextureWidth;
-		float height = texture.mTextureHeight;
-
 		float minElevation = 0, maxElevation = 0;
 		CalculateTerrainElevation(texture.mTextureData, minElevation, maxElevation);
 
