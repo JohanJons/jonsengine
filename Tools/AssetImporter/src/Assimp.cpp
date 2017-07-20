@@ -90,6 +90,11 @@ namespace JonsAssetImporter
 	bool Assimp::ProcessTerrainMap(const std::string& terrainName, PackageTexture::TextureIndex heightMapTexture, JonsPackagePtr pkg)
 	{
 		const PackageTexture& texture = pkg->mTextures.at(heightMapTexture);
+		if (texture.mTextureWidth != texture.mTextureHeight)
+		{
+			Log("ERROR: Heightmaps width/height must be 1:1");
+			return false;
+		}
 
 		auto& name = texture.mName;
 		float minElevation = 0, maxElevation = 0;
