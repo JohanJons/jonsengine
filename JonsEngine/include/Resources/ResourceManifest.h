@@ -38,7 +38,7 @@ namespace JonsEngine
 
 		TerrainDataID CreateTerrainData(const std::string& name, const std::string& heightmap, JonsPackagePtr jonsPkg);
 		void DeleteTerrainData(TerrainDataID& terrainDataId);
-		TerrainData& GetTerrainData(TerrainDataID terrainDataId);
+		const TerrainData& GetTerrainData(TerrainDataID terrainDataId) const;
 
         SkyboxID LoadSkybox(const std::string& skyboxName, const JonsPackagePtr jonsPkg);
         void DeleteSkybox(SkyboxID& skyboxID);

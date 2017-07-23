@@ -13,25 +13,6 @@ namespace JonsEngine
 		mName(other.mName), mWorldTransform(other.mWorldTransform), mOrientation(other.mOrientation), mScale(other.mScale), mTranslation(other.mTranslation), mParent(other.mParent), mOnDirtyFunc(other.mOnDirtyFunc)
 	{
 	}
-
-    /*SceneNode& SceneNode::operator=(SceneNode&& otherSceneNode)
-    {
-        if (this != &otherSceneNode)
-        {
-            mName = std::move(otherSceneNode.mName);
-            mWorldTransform = std::move(otherSceneNode.mWorldTransform);
-            mOrientation = std::move(otherSceneNode.mOrientation);
-            mScale = std::move(otherSceneNode.mScale);
-            mTranslation = std::move(otherSceneNode.mTranslation);
-
-            mParent = std::move(otherSceneNode.mParent);
-            mOnDirtyFunc = std::move(otherSceneNode.mOnDirtyFunc);
-
-            otherSceneNode.mParent = INVALID_SCENE_NODE_ID;
-        }
-
-        return *this;
-    }*/
         
     SceneNode::~SceneNode()
     {

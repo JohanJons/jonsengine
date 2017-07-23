@@ -1,6 +1,6 @@
 #include "include/Renderer/DirectX11/DX11TerrainPass.h"
 
-#include "include/Renderer/DirectX11/DX11Mesh.h"
+#include "include/Renderer/DirectX11/DX11Texture.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/TerrainVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/TerrainHull.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/TerrainDomain.h"
@@ -26,10 +26,13 @@ namespace JonsEngine
 	}
 
 
-	void DX11TerrainPass::Render(DX11Mesh& mesh, const Mat4& worldTransform)
+	void DX11TerrainPass::Render(DX11Texture& texture, const Mat4& worldTransform)
 	{
-		mCBuffer.SetData({ worldTransform, 0.0f, 0.0f, 0.0f, 0.0f });
-		mesh.Draw();
+		texture.BindAsShaderResource();
+
+
+		//mCBuffer.SetData({ worldTransform, 0.0f, 0.0f, 0.0f, 0.0f });
+		//mesh.Draw();
 	}
 
 	void DX11TerrainPass::BindForRendering()

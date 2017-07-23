@@ -16,7 +16,6 @@ namespace JonsGame
 
         // materials
         mMaterialCheckers(resManifest.CreateMaterial("checkers", "checkers", "", mJonsPackage)),
-		//mMaterialTerrain(resManifest.CreateMaterial("terrain", "checkers", ResourceManifest::NO_TEXTURE, "heightmap", mJonsPackage)),
 
         // models
         mModelSectoid(resManifest.LoadModel("sectoid", mJonsPackage)),
@@ -168,6 +167,10 @@ namespace JonsGame
 		nodeSAS.TranslateNode(Vec3(-3.0f, 0.7f, -5.5f));
 		nodeSAS.RotateNode(90.0f, Vec3(-1.0f, 0.0f, 0.0f));
 		nodeSAS.ScaleNode(2.0f);
+
+		// terrain
+		SceneNode& nodeTerrain = mScene.GetSceneNode(mNodeTerrain);
+		nodeTerrain.TranslateNode(Vec3(0.0f, -168.0f, 0.0f));
 
         // load skybox
         mScene.SetSkybox(mSkybox);

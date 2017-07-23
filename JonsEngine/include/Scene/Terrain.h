@@ -15,7 +15,7 @@ namespace JonsEngine
 
 		const std::string& GetName() const;
 		SceneNodeID GetSceneNode() const;
-		TerrainDataID GetTerrainDataID() const;
+		TerrainDataID GetTerrainData() const;
 
 
 	private:

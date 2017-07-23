@@ -20,7 +20,7 @@ namespace JonsEngine
 		return mSceneNodeID;
 	}
 
-	TerrainDataID Terrain::GetTerrainDataID() const
+	TerrainDataID Terrain::GetTerrainData() const
 	{
 		return mTerrainDataID;
 	}

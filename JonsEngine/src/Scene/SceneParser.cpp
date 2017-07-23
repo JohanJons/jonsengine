@@ -12,21 +12,17 @@
 namespace JonsEngine
 {
     // TODO: some cleanup/refactoring is needed
-
+	// Alot of duplicate functionality here... should be merged at some point
     template <typename ACTOR_ITER_TYPE, typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
 	void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator, const bool parseMaterials,
 		RenderQueue::RenderData& renderData, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
 
-	//template <typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
-	//void CullTerrain(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator,
-	//	RenderQueue::RenderData& renderData, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
-
     template <typename VISIBILITY_RESULT_TYPE>
-    bool DetermineIfAddAllMeshes(const EngineSettings::CullingStrategy cullingStrat, const VISIBILITY_RESULT_TYPE visibilityResult);
+    bool InterpretVisibilityResult(const EngineSettings::CullingStrategy cullingStrat, const VISIBILITY_RESULT_TYPE visibilityResult);
 
-    AABBIntersection FrustumCull(const Model& model, const Mat4& worldTransform, const Mat4& viewProjectionMatrix);
-    AABBIntersection PointLightCull(const Model& model, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius);
-    AABBIntersection DirectionalLightCull(const Model& model, const Mat4& worldTransform, const DirectionalLight::BoundingVolume boundingVolume);
+    AABBIntersection FrustumCull(const AABB& aabb, const Mat4& worldTransform, const Mat4& viewProjectionMatrix);
+    AABBIntersection PointLightCull(const AABB& aabb, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius);
+    AABBIntersection DirectionalLightCull(const AABB& aabb, const Mat4& worldTransform, const DirectionalLight::BoundingVolume boundingVolume);
 
 	template <typename ACTOR_TYPE>
 	void AddAllMeshes(const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix, const bool parseMaterials, const AnimationUpdater& AnimationUpdater, const ResourceManifest& resManifest,
@@ -41,6 +37,8 @@ namespace JonsEngine
 	template <typename ACTOR_ITER_TYPE>
 	void CullAABB(const Scene& scene, const ResourceManifest& resManifest, const ACTOR_ITER_TYPE& actorIterator, const EngineSettings::CullingStrategy cullingStrat, AABBRenderData::RenderableAABBsContainer& aabbDataContainer,
 		const Mat4& viewProjTransform);
+
+	void CullTerrain(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const Scene::TerrainIterator& terrainIter, RenderQueue::RenderableTerrains& terrainRenderQueue, const Mat4& cameraViewProj);
 
 
     SceneParser::SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest) :
@@ -101,7 +99,7 @@ namespace JonsEngine
 		mRenderQueue.mCamera.mAnimatedMeshesEnd = mRenderQueue.mRenderData.mAnimatedMeshes.size();
 
 		const auto terrains = scene.GetTerrains();
-		//CullTerrain<decltype(terrains)>(scene, mResourceManifest, mCullingStrategy, terrains, mRenderQueue.mRenderData, FrustumCull, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
+		CullTerrain(scene, mResourceManifest, mCullingStrategy, terrains, mRenderQueue.mTerrains, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
     }
 
     void SceneParser::PointLightCulling(const Scene& scene)
@@ -228,31 +226,20 @@ namespace JonsEngine
             const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
             const Model& model = resManifest.GetModel(modelID);
             const Mat4& worldMatrix = sceneNode.GetWorldTransform();
-
-            const auto visibilityResult = testVisibilityFunc(model, worldMatrix, std::forward<VISIBILITY_ARGS>(args)...);
+			
+			const AABB& aabb = model.GetStaticAABB();
+            const auto visibilityResult = testVisibilityFunc(aabb, worldMatrix, std::forward<VISIBILITY_ARGS>(args)...);
 
             // TODO: extend with fine-grained culling, such as adding meshes per-node rather than per-model for AGGRESSIVE culling strategy,
-            const bool addAllMeshes = DetermineIfAddAllMeshes(cullingStrat, visibilityResult);
+            const bool addAllMeshes = InterpretVisibilityResult<decltype(visibilityResult)>(cullingStrat, visibilityResult);
             if (addAllMeshes)
                 AddAllMeshes(actor, model, worldMatrix, parseMaterials, animationUpdater, resManifest, renderData);
         }
     }
 
-	/*template <typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
-	void CullTerrain(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator,
-		RenderQueue::RenderData& renderData, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args)
-	{
-		const auto visibilityResult = testVisibilityFunc(model, worldMatrix, std::forward<VISIBILITY_ARGS>(args)...);
-
-		// TODO: extend with fine-grained culling, such as adding meshes per-node rather than per-model for AGGRESSIVE culling strategy,
-		const bool addAllMeshes = DetermineIfAddAllMeshes(cullingStrat, visibilityResult);
-		if (addAllMeshes)
-			AddAllMeshes(actor, model, worldMatrix, parseMaterials, animationUpdater, resManifest, renderData);
-	}*/
-
 
     template <>
-    bool DetermineIfAddAllMeshes(const EngineSettings::CullingStrategy cullingStrat, const AABBIntersection aabbIntersection)
+    bool InterpretVisibilityResult(const EngineSettings::CullingStrategy cullingStrat, const AABBIntersection aabbIntersection)
     {
         switch (cullingStrat)
         {
@@ -266,24 +253,23 @@ namespace JonsEngine
     }
 
 
-    AABBIntersection FrustumCull(const Model& model, const Mat4& worldTransform, const Mat4& viewProjMatrix)
+    AABBIntersection FrustumCull(const AABB& aabb, const Mat4& worldTransform, const Mat4& viewProjMatrix)
     {
         const Mat4 wvpMatrix = viewProjMatrix * worldTransform;
-        const AABB modelAABB = model.GetStaticAABB();
 
-        return Intersection(modelAABB, wvpMatrix);
+        return Intersection(aabb, wvpMatrix);
     }
 
-    AABBIntersection PointLightCull(const Model& model, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius)
+    AABBIntersection PointLightCull(const AABB& aabb, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius)
     {
-        const AABB worldAABB = worldTransform * model.GetStaticAABB();
+        const AABB worldAABB = worldTransform * aabb;
 
         return Intersection(worldAABB, sphereCentre, sphereRadius);
     }
 
-    AABBIntersection DirectionalLightCull(const Model& model, const Mat4& worldTransform, const DirectionalLight::BoundingVolume boundingVolume)
+    AABBIntersection DirectionalLightCull(const AABB& aabb, const Mat4& worldTransform, const DirectionalLight::BoundingVolume boundingVolume)
     {
-        const AABB worldAABB = worldTransform * model.GetStaticAABB();
+        const AABB worldAABB = worldTransform * aabb;
 
         return Intersection(worldAABB, boundingVolume);
     }
@@ -379,10 +365,11 @@ namespace JonsEngine
 			const Model& model = resManifest.GetModel(modelID);
 			const Mat4& worldMatrix = sceneNode.GetWorldTransform();
 
-			const auto visibilityResult = FrustumCull(model, worldMatrix, viewProjTransform);
+			const AABB& aabb = model.GetStaticAABB();
+			const AABBIntersection visibilityResult = FrustumCull(aabb, worldMatrix, viewProjTransform);
 
 			// TODO: extend with fine-grained culling, such as adding meshes per-node rather than per-model for AGGRESSIVE culling strategy,
-			const bool addAllMeshes = DetermineIfAddAllMeshes(cullingStrat, visibilityResult);
+			const bool addAllMeshes = InterpretVisibilityResult(cullingStrat, visibilityResult);
 			if (addAllMeshes)
 			{
 				for (const ModelNode& node : model.GetNodes())
@@ -397,6 +384,32 @@ namespace JonsEngine
 					}
 				}
 			}
+		}
+	}
+
+	void CullTerrain(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat,
+		const Scene::TerrainIterator& terrainIter, RenderQueue::RenderableTerrains& terrainRenderQueue, const Mat4& cameraViewProj)
+	{
+		for (const auto& terrain : terrainIter)
+		{
+			auto sceneNodeID = terrain.GetSceneNode();
+			auto terrainDataID = terrain.GetTerrainData();
+			if (sceneNodeID == INVALID_SCENE_NODE_ID || terrainDataID == INVALID_TERRAIN_DATA_ID)
+				continue;
+
+			const TerrainData& terrainData = resManifest.GetTerrainData(terrainDataID);
+			const SceneNode& node = scene.GetSceneNode(sceneNodeID);
+
+			const AABB& aabb = terrainData.GetStaticAABB();
+			const Mat4& worldMatrix = node.GetWorldTransform();
+			const AABBIntersection visibilityResult = FrustumCull(aabb, worldMatrix, cameraViewProj);
+
+			const bool addTerrain = InterpretVisibilityResult(cullingStrat, visibilityResult);
+			if (!addTerrain)
+				continue;
+
+			auto heightmap = terrainData.GetHeightMap();
+			terrainRenderQueue.emplace_back(worldMatrix, heightmap);
 		}
 	}
 }

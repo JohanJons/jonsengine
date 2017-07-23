@@ -91,9 +91,6 @@ namespace JonsEngine
         const AnimationUpdater& GetAnimationUpdater() const;
 
 
-		const std::string mName;
-
-
     private:
         void MarkAsDirty(SceneNode* sceneNode);
         void UpdateDirtyObjects();
@@ -101,6 +98,8 @@ namespace JonsEngine
         void UpdateAnimatedActors(const Milliseconds elapsedTime);
 		void UpdateBoneTransforms(const Milliseconds elapsedTime);
 
+
+		const std::string mName;
 
         DX11Renderer& mRenderer;
         const ResourceManifest& mResourceManifest;

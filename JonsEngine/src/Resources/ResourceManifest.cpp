@@ -183,7 +183,7 @@ namespace JonsEngine
 
 		const float minElevation = terrainMapIter->mMinElevation, maxElevation = terrainMapIter->mMaxElevation;
 
-		return mTerrainData.Insert(name, minElevation, maxElevation, terrainWidth, terrainHeight, INVALID_DX11_MESH_ID, heightmapTexture);
+		return mTerrainData.Insert(name, minElevation, maxElevation, terrainWidth, terrainHeight, heightmapTexture);
 	}
 
 	void ResourceManifest::DeleteTerrainData(TerrainDataID& terrainDataId)
@@ -194,7 +194,7 @@ namespace JonsEngine
 		terrainDataId = INVALID_TERRAIN_DATA_ID;
 	}
 
-	TerrainData& ResourceManifest::GetTerrainData(const TerrainDataID terrainDataId)
+	const TerrainData& ResourceManifest::GetTerrainData(const TerrainDataID terrainDataId) const
 	{
 		return mTerrainData.GetItem(terrainDataId);
 	}

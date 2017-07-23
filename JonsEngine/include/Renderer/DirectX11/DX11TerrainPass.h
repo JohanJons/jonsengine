@@ -6,7 +6,7 @@
 
 namespace JonsEngine
 {
-	class DX11Mesh;
+	class DX11Texture;
 
 	class DX11TerrainPass
 	{
@@ -14,7 +14,7 @@ namespace JonsEngine
 		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const RenderSettings::Tesselation& tessData);
 		~DX11TerrainPass();
 
-		void Render(DX11Mesh& mesh, const Mat4& worldTransform);
+		void Render(DX11Texture& texture, const Mat4& worldTransform);
 		void BindForRendering();
 
 
