@@ -28,7 +28,7 @@ namespace JonsEngine
 
 	void DX11TerrainPass::Render(DX11Texture& texture, const Mat4& worldTransform)
 	{
-		texture.BindAsShaderResource();
+		texture.BindAsShaderResource(SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA);
 
 
 		//mCBuffer.SetData({ worldTransform, 0.0f, 0.0f, 0.0f, 0.0f });
