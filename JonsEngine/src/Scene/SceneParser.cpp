@@ -17,8 +17,7 @@ namespace JonsEngine
 	void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator, const bool parseMaterials,
 		RenderQueue::RenderData& renderData, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
 
-    template <typename VISIBILITY_RESULT_TYPE>
-    bool InterpretVisibilityResult(const EngineSettings::CullingStrategy cullingStrat, const VISIBILITY_RESULT_TYPE visibilityResult);
+    bool InterpretVisibilityResult(const EngineSettings::CullingStrategy cullingStrat, const AABBIntersection visibilityResult);
 
     AABBIntersection FrustumCull(const AABB& aabb, const Mat4& worldTransform, const Mat4& viewProjectionMatrix);
     AABBIntersection PointLightCull(const AABB& aabb, const Mat4& worldTransform, const Vec3& sphereCentre, const float sphereRadius);
@@ -228,17 +227,16 @@ namespace JonsEngine
             const Mat4& worldMatrix = sceneNode.GetWorldTransform();
 			
 			const AABB& aabb = model.GetStaticAABB();
-            const auto visibilityResult = testVisibilityFunc(aabb, worldMatrix, std::forward<VISIBILITY_ARGS>(args)...);
+            const AABBIntersection visibilityResult = testVisibilityFunc(aabb, worldMatrix, std::forward<VISIBILITY_ARGS>(args)...);
 
             // TODO: extend with fine-grained culling, such as adding meshes per-node rather than per-model for AGGRESSIVE culling strategy,
-            const bool addAllMeshes = InterpretVisibilityResult<decltype(visibilityResult)>(cullingStrat, visibilityResult);
+            const bool addAllMeshes = InterpretVisibilityResult(cullingStrat, visibilityResult);
             if (addAllMeshes)
                 AddAllMeshes(actor, model, worldMatrix, parseMaterials, animationUpdater, resManifest, renderData);
         }
     }
 
 
-    template <>
     bool InterpretVisibilityResult(const EngineSettings::CullingStrategy cullingStrat, const AABBIntersection aabbIntersection)
     {
         switch (cullingStrat)

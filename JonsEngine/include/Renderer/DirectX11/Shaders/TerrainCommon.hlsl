@@ -1,6 +1,8 @@
 #ifndef TERRAIN_COMMON_HLSL
 #define TERRAIN_COMMON_HLSL
 
+#include "Common.hlsl"
+
 Texture2D gHeightmap : register(TEXTURE_REGISTER_EXTRA);
 
 cbuffer VertexConstants : register(CBUFFER_REGISTER_VERTEX)

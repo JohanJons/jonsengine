@@ -12,8 +12,6 @@ namespace JonsEngine
 {
 	struct RenderableMesh : RenderableContainer<RenderableMesh>
     {
-		typedef RenderableMaterial::Index MaterialIndex;
-
 		RenderableMesh(const Mat4& localWorldTransform, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID);
 		RenderableMesh(const Mat4& localWorldTransform, const BoneIndexRange& boneRange, const MaterialIndex materialIndex, const float materialTilingFactor, const DX11MeshID meshID);
 
@@ -25,5 +23,6 @@ namespace JonsEngine
         DX11MeshID mMeshID;
     };
 
+	typedef RenderableMesh::Index MeshIndex;
 	typedef RenderableMesh::ContainerType RenderableMeshContainer;
 }

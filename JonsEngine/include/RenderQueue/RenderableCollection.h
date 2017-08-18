@@ -6,8 +6,6 @@ namespace JonsEngine
 {
     struct RenderableCollection
     {
-        typedef RenderableMesh::Index MeshIndex;
-
         RenderableCollection();
 
 

@@ -8,7 +8,7 @@
 namespace JonsEngine
 {
 	DX11TerrainPass::DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const RenderSettings::Tesselation& tessData) :
-		mContext(nullptr),
+		mContext(context),
 		mPixelShader(nullptr),
 		mCBuffer(device, context, mCBuffer.CONSTANT_BUFFER_SLOT_VERTEX),
 		mTessData(tessData),
@@ -37,7 +37,7 @@ namespace JonsEngine
 
 	void DX11TerrainPass::BindForRendering()
 	{
-		//mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-		//mCBuffer.SetData({ mTessData.mMinDistance, mTessData.mMaxDistance, mTessData.mMinFactor, mTessData.mMaxFactor });
+		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+		mCBuffer.SetData({ Mat4(1.0f), mTessData.mMinDistance, mTessData.mMaxDistance, mTessData.mMinFactor, mTessData.mMaxFactor });
 	}
 }

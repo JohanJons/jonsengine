@@ -14,22 +14,24 @@ namespace JonsEngine
     const static uint32_t gTexcoordStride = sizeof(float) * 2;
     const static uint32_t gBoneWeightStride = sizeof(BoneWeight);
     const static uint32_t gStaticOffset = 0;
-    const std::array<uint16_t, 16> gAABBIndices = { 0, 1, 2, 3, 0, 5, 4, 3, 2, 7, 4, 7, 6, 5, 6, 1 };
 
 	// NOTE: not thread-safe, but wont be an issue
     static DX11MeshID gNextMeshID = 1;
 
-    void AppendAABBVertices(std::vector<float>& vertexContainer, const Vec3& minBounds, const Vec3& maxBounds);
 
+	DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<uint16_t>& indexData) :
+		DX11Mesh(device, context, vertexData, std::vector<float>(), std::vector<float>(), std::vector<float>(), std::vector<BoneWeight>(), indexData)
+	{
+	}
 
     DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
-        const std::vector<float>& tangentData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds) :
-        DX11Mesh(device, context, vertexData, normalData, texCoords, tangentData, std::vector<BoneWeight>(), indexData, minBounds, maxBounds)
+        const std::vector<float>& tangentData, const std::vector<uint16_t>& indexData) :
+        DX11Mesh(device, context, vertexData, normalData, texCoords, tangentData, std::vector<BoneWeight>(), indexData)
     {
     }
 
-    DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
-        const std::vector<float>& tangentData, const std::vector<BoneWeight>& boneWeights, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds) :
+	DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
+		const std::vector<float>& tangentData, const std::vector<BoneWeight>& boneWeights, const std::vector<uint16_t>& indexData) :
         mContext(context),
         mVertexBuffer(nullptr),
         mNormalBuffer(nullptr),
@@ -44,9 +46,7 @@ namespace JonsEngine
         mHasBones(!boneWeights.empty())
     {
         // vertex buffer
-        // use a temporary vector to merge vertices and AABB points
         std::vector<float> tempVertexData(vertexData);
-        AppendAABBVertices(tempVertexData, minBounds, maxBounds);
 
         D3D11_BUFFER_DESC bufferDescription;
         ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
@@ -115,7 +115,6 @@ namespace JonsEngine
         // index buffer
         // use a temporary vector to merge vertex indices and AABB indices
         std::vector<uint16_t> tempIndiceData(indexData);
-        tempIndiceData.insert(tempIndiceData.end(), gAABBIndices.begin(), gAABBIndices.end());
 
         ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
         bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
@@ -150,35 +149,16 @@ namespace JonsEngine
 
     void DX11Mesh::DrawPositions()
     {
-        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gPositionStride, &gStaticOffset);
+		DrawPositionsInstanced(1);
+    }
+
+	void DX11Mesh::DrawPositionsInstanced(const uint32_t numInstances)
+	{
+		mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gPositionStride, &gStaticOffset);
 		if (mHasBones)
 			mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_WEIGHTS, 1, &mBoneWeightBuffer.p, &gBoneWeightStride, &gStaticOffset);
 
-        mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-        mContext->DrawIndexed(mNumIndices, 0, 0);
-    }
-
-    void DX11Mesh::DrawAABB()
-    {
-        // AABB indices are offset into the mesh index buffer
-        const uint32_t offset = mNumVertices * sizeof(float);
-        const uint32_t numAABBPoints = gAABBIndices.size();
-
-        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gPositionStride, &offset);
-        mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, mNumIndices * sizeof(uint16_t));
-        mContext->DrawIndexed(numAABBPoints, 0, 0);
-    }
-
-
-    void AppendAABBVertices(std::vector<float>& vertexContainer, const Vec3& minBounds, const Vec3& maxBounds)
-    {
-        vertexContainer.push_back(minBounds.x); vertexContainer.push_back(minBounds.y); vertexContainer.push_back(minBounds.z);
-        vertexContainer.push_back(minBounds.x); vertexContainer.push_back(maxBounds.y); vertexContainer.push_back(minBounds.z);
-        vertexContainer.push_back(minBounds.x); vertexContainer.push_back(maxBounds.y); vertexContainer.push_back(maxBounds.z);
-        vertexContainer.push_back(minBounds.x); vertexContainer.push_back(minBounds.y); vertexContainer.push_back(maxBounds.z);
-        vertexContainer.push_back(maxBounds.x); vertexContainer.push_back(minBounds.y); vertexContainer.push_back(maxBounds.z);
-        vertexContainer.push_back(maxBounds.x); vertexContainer.push_back(minBounds.y); vertexContainer.push_back(minBounds.z);
-        vertexContainer.push_back(maxBounds.x); vertexContainer.push_back(maxBounds.y); vertexContainer.push_back(minBounds.z);
-        vertexContainer.push_back(maxBounds.x); vertexContainer.push_back(maxBounds.y); vertexContainer.push_back(maxBounds.z);
-    }
+		mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+		mContext->DrawIndexedInstanced(mNumIndices, numInstances, 0, 0, 0);
+	}
 }

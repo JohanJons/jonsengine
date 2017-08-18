@@ -22,13 +22,15 @@ namespace JonsEngine
 
 
 	DX11VertexTransformPass::DX11VertexTransformPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDMap<DX11Mesh>& meshMap) :
+		mInstancedDataBuffer(device, context),
+		mTransformCBuffer(device, context, mTransformCBuffer.CONSTANT_BUFFER_SLOT_VERTEX),
+		mMeshMap(meshMap),
+
 		mContext(context),
 		mStaticShader(nullptr),
 		mAnimatedShader(nullptr),
 		mLayoutStatic(nullptr),
-		mLayoutAnimated(nullptr),
-		mTransformCBuffer(device, context, mTransformCBuffer.CONSTANT_BUFFER_SLOT_VERTEX),
-		mMeshMap(meshMap)
+		mLayoutAnimated(nullptr)
     {
 		// static layout
         D3D11_INPUT_ELEMENT_DESC inputDescStatic[StaticLayout::STATIC_NUM_INPUT_LAYOUTS];
@@ -78,9 +80,9 @@ namespace JonsEngine
     }
 
 
-    void DX11VertexTransformPass::RenderStaticMesh(DX11Mesh& mesh, const Mat4& wvpMatrix)
+    void DX11VertexTransformPass::RenderStaticMesh(DX11Mesh& mesh, const Mat4& wvpMatrix, const D3D_PRIMITIVE_TOPOLOGY topology)
     {
-		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		mContext->IASetPrimitiveTopology(topology);
 		BindForStaticRendering();
 
 		const uint32_t noBoneIndexOffset = 0;
@@ -88,43 +90,30 @@ namespace JonsEngine
         mesh.DrawPositions();
     }
 
-	void DX11VertexTransformPass::RenderMeshes(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix)
+	void DX11VertexTransformPass::RenderStaticMeshInstanced(DX11Mesh& mesh, const Mat4& wvpMatrix, const std::vector<Mat4>& worldTransforms, D3D_PRIMITIVE_TOPOLOGY topology)
 	{
-		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// static meshes
+		mContext->IASetPrimitiveTopology(topology);
 		BindForStaticRendering();
-		const auto staticBegin = renderables.mStaticMeshesBegin;
-		const auto staticEnd = renderables.mStaticMeshesEnd;
-		const auto& staticMeshesContainer = renderData.mStaticMeshes;
-		RenderMeshesAux(staticMeshesContainer, staticBegin, staticEnd, viewProjectionMatrix);
 
-		// animated meshes
-		BindForAnimatedRendering();
-		const auto animatedBegin = renderables.mAnimatedMeshesBegin;
-		const auto animatedEnd = renderables.mAnimatedMeshesEnd;
-		const auto& animatedMeshesContainer = renderData.mAnimatedMeshes;
-		RenderMeshesAux(animatedMeshesContainer, animatedBegin, animatedEnd, viewProjectionMatrix);
+		const uint32_t noBoneIndexOffset = 0;
+		mTransformCBuffer.SetData(TransformCBuffer(wvpMatrix, noBoneIndexOffset));
+		mesh.DrawPositionsInstanced();
 	}
 
-	void DX11VertexTransformPass::RenderAABBs(const AABBRenderData& aabbRenderData)
+	void DX11VertexTransformPass::RenderStaticMeshes(const RenderableMeshContainer& renderData, const MeshIndex start, const MeshIndex stop, const Mat4& viewProjectionMatrix, const D3D_PRIMITIVE_TOPOLOGY topology)
 	{
-		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
-
-		// only use static rendering, since AABBs are enlarged enough to cover all poses anyway
+		mContext->IASetPrimitiveTopology(topology);
 		BindForStaticRendering();
 
-		// TODO: separate cbuffer for boneindex
-		const uint32_t noBoneIndexOffset = 0;
-		const Mat4& viewProjMatrix = aabbRenderData.mCameraViewProjectionMatrix;
-		for (const auto& aabbData : aabbRenderData.mRenderableAABBs)
-		{
-			const Mat4& worldTransform = aabbData.first;
-			const DX11MeshID meshID = aabbData.second;
+		RenderMeshesAux(renderData, start, stop, viewProjectionMatrix);
+	}
 
-			mTransformCBuffer.SetData(TransformCBuffer(viewProjMatrix * worldTransform, noBoneIndexOffset));
-			mMeshMap.GetItem(meshID).DrawAABB();
-		}
+	void DX11VertexTransformPass::RenderAnimatedMeshes(const RenderableMeshContainer& renderData, const MeshIndex start, const MeshIndex stop, const Mat4& viewProjectionMatrix, const D3D_PRIMITIVE_TOPOLOGY topology)
+	{
+		mContext->IASetPrimitiveTopology(topology);
+		BindForAnimatedRendering();
+
+		RenderMeshesAux(renderData, start, stop, viewProjectionMatrix);
 	}
 
 

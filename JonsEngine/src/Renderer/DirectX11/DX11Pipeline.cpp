@@ -125,6 +125,8 @@ namespace JonsEngine
 			mTerrainPass.Render(heightmap, terrain.mWorldTransform);
 		}
 
+		mGBuffer.BindForRendering();
+
         // static meshes
 		const auto staticBeginIndex = renderQueue.mCamera.mStaticMeshesBegin;
 		const auto staticEndIndex = renderQueue.mCamera.mStaticMeshesEnd;

@@ -161,7 +161,8 @@ namespace JonsEngine
         // restore screen viewport
         mContext->RSSetViewports(numViewports, &prevViewport);
 
-        mVertexTransformPass.RenderStaticMesh(mSphereMesh, lightMeshWVP);
+		D3D_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+        mVertexTransformPass.RenderStaticMesh(mSphereMesh, lightMeshWVP, topology);
 
 
         //
@@ -177,7 +178,7 @@ namespace JonsEngine
         mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mColor, viewLightPositonV4, mWindowSize, pointLight.mIntensity, Z_NEAR, pointLight.mRadius));
 
         // run transform pass on sphere + point light shading pass
-        mVertexTransformPass.RenderStaticMesh(mSphereMesh, lightMeshWVP);
+        mVertexTransformPass.RenderStaticMesh(mSphereMesh, lightMeshWVP, topology);
 
         // restore state
         mContext->RSSetState(prevRasterizerState);

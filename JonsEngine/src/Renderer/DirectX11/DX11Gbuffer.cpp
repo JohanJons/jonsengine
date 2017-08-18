@@ -145,10 +145,13 @@ namespace JonsEngine
         // default == depth testing/writing on
         mContext->OMSetDepthStencilState(nullptr, 0);
         mContext->OMSetRenderTargets(DX11GBuffer::GBUFFER_NUM_RENDERTARGETS, &(mRenderTargets.begin()->p), dsv);
-        mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-        mContext->PSSetShader(mPixelShader, nullptr, 0);
     }
+
+	void DX11GBuffer::BindForRendering()
+	{
+		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		mContext->PSSetShader(mPixelShader, nullptr, 0);
+	}
 
 	void DX11GBuffer::BindForStaticPass()
 	{

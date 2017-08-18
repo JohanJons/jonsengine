@@ -16,4 +16,6 @@ namespace JonsEngine
         DX11TextureID mNormalTextureID;
         float mSpecularFactor;
     };
+
+	typedef RenderableMaterial::Index MaterialIndex;
 }

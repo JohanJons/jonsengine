@@ -1,6 +1,5 @@
 #pragma once
 
-//#include "include/Renderer/DirectX11/DX11Buffer.hpp"
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Core/Platform/Directx11.h"
 
@@ -19,7 +18,7 @@ namespace JonsEngine
 
         DX11CPUDynamicBuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context);
 
-        void Bind(const Shaderslot shaderSlot, const uint32_t bindSlot);
+        void Bind(Shaderslot shaderSlot, uint32_t bindSlot);
         template <typename T> 
         void SetData(const std::vector<T>& data);
 

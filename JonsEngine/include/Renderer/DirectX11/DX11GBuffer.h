@@ -25,6 +25,7 @@ namespace JonsEngine
 
         void SetConstantData(const Mat4& wvpMatrix, const Mat4& worldMatrix, const float textureTilingFactor, const bool hasDiffuseTexture, const bool hasNormalTexture, const uint32_t boneIndexOffset);
         void BindForGeometryStage(ID3D11DepthStencilViewPtr dsv);
+		void BindForRendering();
 		void BindForStaticPass();
 		void BindForAnimatedPass();
         void BindGeometryTextures();

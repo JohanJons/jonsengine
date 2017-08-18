@@ -39,7 +39,7 @@ namespace JonsEngine
     }
 
 	PackageTerrainMap::PackageTerrainMap() :
-		PackageTerrainMap()
+		PackageTerrainMap("UNKNOWN", PackageTexture::INVALID_TEXTURE_INDEX, std::numeric_limits<float>::max(), std::numeric_limits<float>::lowest())
 	{
 	}
 

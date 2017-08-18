@@ -3,6 +3,7 @@
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/DirectX11/DX11CPUDynamicBuffer.h"
 #include "include/RenderQueue/RenderQueue.h"
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
@@ -14,7 +15,6 @@
 namespace JonsEngine
 {
 	struct AABBRenderData;
-	struct RenderableCollection;
 
     class DX11VertexTransformPass
     {
@@ -22,9 +22,10 @@ namespace JonsEngine
         DX11VertexTransformPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, IDMap<DX11Mesh>& meshMap);
         ~DX11VertexTransformPass();
 
-        void RenderStaticMesh(DX11Mesh& mesh, const Mat4& wvpMatrix);
-		void RenderMeshes(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix);
-		void RenderAABBs(const AABBRenderData& aabbRenderData);
+        void RenderStaticMesh(DX11Mesh& mesh, const Mat4& wvpMatrix, D3D_PRIMITIVE_TOPOLOGY topology);
+		void RenderStaticMeshInstanced(DX11Mesh& mesh, const Mat4& viewProjectionMatrix, const std::vector<Mat4>& worldTransforms, D3D_PRIMITIVE_TOPOLOGY topology);
+		void RenderStaticMeshes(const RenderableMeshContainer& renderData, MeshIndex start, MeshIndex stop, const Mat4& viewProjectionMatrix, D3D_PRIMITIVE_TOPOLOGY topology);
+		void RenderAnimatedMeshes(const RenderableMeshContainer& renderData, MeshIndex start, MeshIndex stop, const Mat4& viewProjectionMatrix, D3D_PRIMITIVE_TOPOLOGY topology);
 
 
     private:
@@ -46,14 +47,14 @@ namespace JonsEngine
         void RenderMeshesAux(const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index beginIndex, const RenderableMesh::Index endIndex, const Mat4& viewProjectionMatrix);
 
 
+		DX11CPUDynamicBuffer mInstancedDataBuffer;
+		DX11ConstantBuffer<TransformCBuffer> mTransformCBuffer;
+		IDMap<DX11Mesh>& mMeshMap;
+
         ID3D11DeviceContextPtr mContext;
         ID3D11VertexShaderPtr mStaticShader;
 		ID3D11VertexShaderPtr mAnimatedShader;
         ID3D11InputLayoutPtr mLayoutStatic;
 		ID3D11InputLayoutPtr mLayoutAnimated;
-
-        DX11ConstantBuffer<TransformCBuffer> mTransformCBuffer;
-
-        IDMap<DX11Mesh>& mMeshMap;
     };
 }
