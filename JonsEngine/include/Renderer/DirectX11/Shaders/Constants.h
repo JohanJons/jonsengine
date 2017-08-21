@@ -1,6 +1,8 @@
 #ifndef CONSTANTS_HLSL
 #define CONSTANTS_HLSL
 
+// Convention: instances named with _EXTRA may be wiped inbetween every pass
+
 // TODO: refactor this into a more efficient system
 #define CBUFFER_SLOT_VERTEX 0
 #define CBUFFER_SLOT_PIXEL 1
@@ -31,6 +33,8 @@
 
 #define SBUFFER_SLOT_BONE_TRANSFORMS 0
 #define SBUFFER_REGISTER_BONE_TRANSFORMS c0
+#define SBUFFER_SLOT_EXTRA 1
+#define SBUFFER_REGISTER_EXTRA c1
 
 #define UAV_SLOT 0
 #define UAV_REGISTER u0

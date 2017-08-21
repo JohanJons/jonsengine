@@ -1,7 +1,9 @@
 #include "include/Renderer/DirectX11/DX11VertexTransformPass.h"
 
 #include "include/Renderer/DirectX11/Shaders/Compiled/TransformStaticVertex.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/TransformStaticInstancedVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/TransformAnimatedVertex.h"
+#include "include/Renderer/DirectX11/Shaders/Constants.h"
 #include "include/RenderQueue/RenderableCollection.h"
 
 namespace JonsEngine
@@ -28,6 +30,7 @@ namespace JonsEngine
 
 		mContext(context),
 		mStaticShader(nullptr),
+		mStaticInstancedShader(nullptr),
 		mAnimatedShader(nullptr),
 		mLayoutStatic(nullptr),
 		mLayoutAnimated(nullptr)
@@ -90,14 +93,20 @@ namespace JonsEngine
         mesh.DrawPositions();
     }
 
-	void DX11VertexTransformPass::RenderStaticMeshInstanced(DX11Mesh& mesh, const Mat4& wvpMatrix, const std::vector<Mat4>& worldTransforms, D3D_PRIMITIVE_TOPOLOGY topology)
+	void DX11VertexTransformPass::RenderStaticMeshInstanced(DX11Mesh& mesh, const Mat4& viewProjectionMatrix, const std::vector<Mat4>& worldTransforms, D3D_PRIMITIVE_TOPOLOGY topology)
 	{
 		mContext->IASetPrimitiveTopology(topology);
 		BindForStaticRendering();
 
+		mInstancedDataBuffer.SetData(worldTransforms);
+		mInstancedDataBuffer.Bind(DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA);
+
 		const uint32_t noBoneIndexOffset = 0;
-		mTransformCBuffer.SetData(TransformCBuffer(wvpMatrix, noBoneIndexOffset));
-		mesh.DrawPositionsInstanced();
+		mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix, noBoneIndexOffset));
+
+		const uint32_t numTransforms = worldTransforms.size();
+		assert(numTransforms > 0);
+		mesh.DrawPositionsInstanced(numTransforms);
 	}
 
 	void DX11VertexTransformPass::RenderStaticMeshes(const RenderableMeshContainer& renderData, const MeshIndex start, const MeshIndex stop, const Mat4& viewProjectionMatrix, const D3D_PRIMITIVE_TOPOLOGY topology)

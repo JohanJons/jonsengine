@@ -53,6 +53,7 @@ namespace JonsEngine
 
         ID3D11DeviceContextPtr mContext;
         ID3D11VertexShaderPtr mStaticShader;
+		ID3D11VertexShaderPtr mStaticInstancedShader;
 		ID3D11VertexShaderPtr mAnimatedShader;
         ID3D11InputLayoutPtr mLayoutStatic;
 		ID3D11InputLayoutPtr mLayoutAnimated;

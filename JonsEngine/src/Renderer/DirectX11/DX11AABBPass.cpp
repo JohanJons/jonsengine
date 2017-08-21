@@ -41,6 +41,6 @@ namespace JonsEngine
     void DX11AABBPass::Render(const AABBRenderData& renderData)
     {
         mContext->PSSetShader(mPixelShader, nullptr, 0);
-        mVertexTransformPass.RenderStaticMeshes(renderData);
+        mVertexTransformPass.RenderStaticMeshInstanced(mAABBMesh, renderData.mCameraViewProjectionMatrix, renderData.mAABBTransforms, D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
     }
 }
