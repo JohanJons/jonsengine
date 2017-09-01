@@ -24,8 +24,6 @@ namespace JonsEngine
         ID3D11DeviceContextPtr mContext;
         ID3D11PixelShaderPtr mPixelShader;
 
-		DX11Mesh mAABBMesh;
-
         DX11VertexTransformPass& mVertexTransformPass;
     };
 }

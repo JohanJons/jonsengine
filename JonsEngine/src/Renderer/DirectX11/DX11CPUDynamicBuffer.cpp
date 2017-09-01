@@ -17,8 +17,18 @@ namespace JonsEngine
         switch (shaderSlot)
         {
             case Shaderslot::Vertex:  mContext->VSSetShaderResources(bindSlot, 1, &mBufferSRV.p); break;
-            case Shaderslot::Pixel:  mContext->VSSetShaderResources(bindSlot, 1, &mBufferSRV.p); break;
+            case Shaderslot::Pixel:  mContext->PSSetShaderResources(bindSlot, 1, &mBufferSRV.p); break;
             default: break;
         }
     }
+
+	void DX11CPUDynamicBuffer::SetDataAndTranspose(const std::vector<Mat4>& transforms)
+	{
+		for (const Mat4& transform : transforms)
+			mTransposedTransforms.emplace_back(glm::transpose(transform));
+
+		SetData(mTransposedTransforms);
+
+		mTransposedTransforms.clear();
+	}
 }

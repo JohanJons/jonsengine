@@ -47,6 +47,7 @@ namespace JonsEngine
 		inputDescStatic[StaticLayout::STATIC_POSITION].InstanceDataStepRate = 0;
 		DXCALL(device->CreateInputLayout(inputDescStatic, StaticLayout::STATIC_NUM_INPUT_LAYOUTS, gTransformStaticVertexShader, sizeof(gTransformStaticVertexShader), &mLayoutStatic));
 		DXCALL(device->CreateVertexShader(gTransformStaticVertexShader, sizeof(gTransformStaticVertexShader), nullptr, &mStaticShader));
+		DXCALL(device->CreateVertexShader(gTransformStaticInstancedVertexShader, sizeof(gTransformStaticInstancedVertexShader), nullptr, &mStaticInstancedShader));
 
 		// animated layout
 		D3D11_INPUT_ELEMENT_DESC inputDescAnimated[AnimatedLayout::ANIMATED_NUM_INPUT_LAYOUTS];
@@ -85,8 +86,7 @@ namespace JonsEngine
 
     void DX11VertexTransformPass::RenderStaticMesh(DX11Mesh& mesh, const Mat4& wvpMatrix, const D3D_PRIMITIVE_TOPOLOGY topology)
     {
-		mContext->IASetPrimitiveTopology(topology);
-		BindForStaticRendering();
+		BindForStaticRendering(StaticRenderMode::NonInstanced, topology);
 
 		const uint32_t noBoneIndexOffset = 0;
         mTransformCBuffer.SetData(TransformCBuffer(wvpMatrix, noBoneIndexOffset));
@@ -95,10 +95,9 @@ namespace JonsEngine
 
 	void DX11VertexTransformPass::RenderStaticMeshInstanced(DX11Mesh& mesh, const Mat4& viewProjectionMatrix, const std::vector<Mat4>& worldTransforms, D3D_PRIMITIVE_TOPOLOGY topology)
 	{
-		mContext->IASetPrimitiveTopology(topology);
-		BindForStaticRendering();
+		BindForStaticRendering(StaticRenderMode::Instanced, topology);
 
-		mInstancedDataBuffer.SetData(worldTransforms);
+		mInstancedDataBuffer.SetDataAndTranspose(worldTransforms);
 		mInstancedDataBuffer.Bind(DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA);
 
 		const uint32_t noBoneIndexOffset = 0;
@@ -111,30 +110,56 @@ namespace JonsEngine
 
 	void DX11VertexTransformPass::RenderStaticMeshes(const RenderableMeshContainer& renderData, const MeshIndex start, const MeshIndex stop, const Mat4& viewProjectionMatrix, const D3D_PRIMITIVE_TOPOLOGY topology)
 	{
-		mContext->IASetPrimitiveTopology(topology);
-		BindForStaticRendering();
-
+		BindForStaticRendering(StaticRenderMode::NonInstanced, topology);
 		RenderMeshesAux(renderData, start, stop, viewProjectionMatrix);
 	}
 
 	void DX11VertexTransformPass::RenderAnimatedMeshes(const RenderableMeshContainer& renderData, const MeshIndex start, const MeshIndex stop, const Mat4& viewProjectionMatrix, const D3D_PRIMITIVE_TOPOLOGY topology)
 	{
-		mContext->IASetPrimitiveTopology(topology);
-		BindForAnimatedRendering();
-
+		BindForAnimatedRendering(topology);
 		RenderMeshesAux(renderData, start, stop, viewProjectionMatrix);
 	}
 
-
-	void DX11VertexTransformPass::BindForStaticRendering()
+	void DX11VertexTransformPass::RenderMeshes(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix, const D3D_PRIMITIVE_TOPOLOGY topology)
 	{
-		mContext->IASetInputLayout(mLayoutStatic);
-		mContext->VSSetShader(mStaticShader, nullptr, 0);
+		RenderStaticMeshes(renderData.mStaticMeshes, renderables.mStaticMeshesBegin, renderables.mStaticMeshesEnd, viewProjectionMatrix, topology);
+		RenderAnimatedMeshes(renderData.mAnimatedMeshes, renderables.mAnimatedMeshesBegin, renderables.mAnimatedMeshesEnd, viewProjectionMatrix, topology);
 	}
 
-	void DX11VertexTransformPass::BindForAnimatedRendering()
+	// TODO: should be refactored into something that uses instanced drawing rather than several draw calls
+	void DX11VertexTransformPass::RenderAABBs(const AABBRenderData& aabbRenderData)
+	{
+		// only use static rendering, since AABBs are enlarged enough to cover all poses anyway
+		BindForStaticRendering(StaticRenderMode::NonInstanced, D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
+
+		// TODO: separate cbuffer for boneindex
+		const uint32_t noBoneIndexOffset = 0;
+		const Mat4& viewProjMatrix = aabbRenderData.mCameraViewProjectionMatrix;
+		for (const auto& aabbData : aabbRenderData.mRenderableAABBs)
+		{
+			const Mat4& worldTransform = aabbData.first;
+			const DX11MeshID meshID = aabbData.second;
+
+			mTransformCBuffer.SetData(TransformCBuffer(viewProjMatrix * worldTransform, noBoneIndexOffset));
+			mMeshMap.GetItem(meshID).DrawAABB();
+		}
+	}
+
+
+	void DX11VertexTransformPass::BindForStaticRendering(const StaticRenderMode mode, const D3D_PRIMITIVE_TOPOLOGY topology)
+	{
+		mContext->IASetInputLayout(mLayoutStatic);
+		mContext->IASetPrimitiveTopology(topology);
+		if (mode == StaticRenderMode::NonInstanced)
+			mContext->VSSetShader(mStaticShader, nullptr, 0);
+		else
+			mContext->VSSetShader(mStaticInstancedShader, nullptr, 0);
+	}
+
+	void DX11VertexTransformPass::BindForAnimatedRendering(const D3D_PRIMITIVE_TOPOLOGY topology)
 	{
 		mContext->IASetInputLayout(mLayoutAnimated);
+		mContext->IASetPrimitiveTopology(topology);
 		mContext->VSSetShader(mAnimatedShader, nullptr, 0);
 	}
 

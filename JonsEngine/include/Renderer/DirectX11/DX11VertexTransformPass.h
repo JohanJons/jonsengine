@@ -26,6 +26,8 @@ namespace JonsEngine
 		void RenderStaticMeshInstanced(DX11Mesh& mesh, const Mat4& viewProjectionMatrix, const std::vector<Mat4>& worldTransforms, D3D_PRIMITIVE_TOPOLOGY topology);
 		void RenderStaticMeshes(const RenderableMeshContainer& renderData, MeshIndex start, MeshIndex stop, const Mat4& viewProjectionMatrix, D3D_PRIMITIVE_TOPOLOGY topology);
 		void RenderAnimatedMeshes(const RenderableMeshContainer& renderData, MeshIndex start, MeshIndex stop, const Mat4& viewProjectionMatrix, D3D_PRIMITIVE_TOPOLOGY topology);
+		void RenderMeshes(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix, D3D_PRIMITIVE_TOPOLOGY topology);
+		void RenderAABBs(const AABBRenderData& aabbRenderData);
 
 
     private:
@@ -42,8 +44,14 @@ namespace JonsEngine
             }
         };
 
-		void BindForStaticRendering();
-		void BindForAnimatedRendering();
+		enum class StaticRenderMode
+		{
+			Instanced,
+			NonInstanced
+		};
+
+		void BindForStaticRendering(StaticRenderMode mode, D3D_PRIMITIVE_TOPOLOGY topology);
+		void BindForAnimatedRendering(D3D_PRIMITIVE_TOPOLOGY topology);
         void RenderMeshesAux(const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index beginIndex, const RenderableMesh::Index endIndex, const Mat4& viewProjectionMatrix);
 
 

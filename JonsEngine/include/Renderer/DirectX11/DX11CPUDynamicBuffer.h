@@ -21,6 +21,8 @@ namespace JonsEngine
         void Bind(Shaderslot shaderSlot, uint32_t bindSlot);
         template <typename T> 
         void SetData(const std::vector<T>& data);
+		// note: StructuredBuffers in HLSL will convert to column-major when loaded. But ours are already in column-major; so we need to transpose them first...
+		void SetDataAndTranspose(const std::vector<Mat4>& transforms);
 
 
     private:
@@ -35,6 +37,8 @@ namespace JonsEngine
         ID3D11BufferPtr mBuffer;
         ID3D11ShaderResourceViewPtr mBufferSRV;
         std::size_t mBufferSizeInBytes;
+
+		std::vector<Mat4> mTransposedTransforms;
     };
 
 

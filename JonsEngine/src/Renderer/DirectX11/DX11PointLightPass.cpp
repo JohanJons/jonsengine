@@ -139,10 +139,10 @@ namespace JonsEngine
         const Mat4 faceProjmatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, pointLight.mRadius);
         for (uint32_t face = 0; face < DX11PointLightPass::POINT_LIGHT_DIR_COUNT; ++face)
         {
-            const Mat4 faceViewMatrix = glm::lookAt(viewLightPositonV3, viewLightPositonV3 + gCubemapDirVectors[face], gCubemapUpVectors[face]);
-
 			mShadowmap.BindDepthView(face);
-            mVertexTransformPass.RenderMeshes(renderData, pointLight, faceProjmatrix * faceViewMatrix * camViewMatrix);
+
+            const Mat4 faceViewMatrix = glm::lookAt(viewLightPositonV3, viewLightPositonV3 + gCubemapDirVectors[face], gCubemapUpVectors[face]);
+			mVertexTransformPass.RenderMeshes(renderData, pointLight, faceProjmatrix * faceViewMatrix * camViewMatrix, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         }
 
 
