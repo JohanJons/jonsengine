@@ -2,19 +2,21 @@
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
+#include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/RenderSettings.h"
 
 namespace JonsEngine
 {
 	class DX11Texture;
+	class DX11VertexTransformPass;
 
 	class DX11TerrainPass
 	{
 	public:
-		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const RenderSettings::Tesselation& tessData);
+		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const RenderSettings::Tesselation& tessData);
 		~DX11TerrainPass();
 
-		void Render(DX11Texture& texture, const Mat4& worldTransform);
+		void Render(DX11Texture& texture, const Mat4& worldTransform, const Mat4& viewProjection);
 		void BindForRendering();
 
 
@@ -30,10 +32,13 @@ namespace JonsEngine
 
 		ID3D11DeviceContextPtr mContext;
 		ID3D11PixelShaderPtr mPixelShader;
-		DX11ConstantBuffer<TerrainCBuffer> mCBuffer;
 		ID3D11VertexShaderPtr mVertexShader;
 		ID3D11HullShaderPtr mHullShader;
 		ID3D11DomainShaderPtr mDomainShader;
+
+		DX11ConstantBuffer<TerrainCBuffer> mCBuffer;
+		DX11Mesh mQuadMesh;
+		DX11VertexTransformPass& mVertexTransformer;
 
 		RenderSettings::Tesselation mTessData;
 	};

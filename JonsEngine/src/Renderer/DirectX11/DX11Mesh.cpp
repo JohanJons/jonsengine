@@ -22,6 +22,11 @@ namespace JonsEngine
     void AppendAABBVertices(std::vector<float>& vertexContainer, const Vec3& minBounds, const Vec3& maxBounds);
 
 
+	DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds) :
+		DX11Mesh(device, context, vertexData, std::vector<float>(), std::vector<float>(), std::vector<float>(), std::vector<BoneWeight>(), indexData, minBounds, maxBounds)
+	{
+	}
+
     DX11Mesh::DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
         const std::vector<float>& tangentData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds) :
         DX11Mesh(device, context, vertexData, normalData, texCoords, tangentData, std::vector<BoneWeight>(), indexData, minBounds, maxBounds)

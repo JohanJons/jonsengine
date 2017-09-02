@@ -170,7 +170,7 @@ namespace JonsGame
 
 		// terrain
 		SceneNode& nodeTerrain = mScene.GetSceneNode(mNodeTerrain);
-		nodeTerrain.TranslateNode(Vec3(0.0f, -168.0f, 0.0f));
+		nodeTerrain.TranslateNode(Vec3(0.0f, 128.0f, 0.0f));
 
         // load skybox
         mScene.SetSkybox(mSkybox);

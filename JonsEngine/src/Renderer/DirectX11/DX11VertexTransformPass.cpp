@@ -84,6 +84,11 @@ namespace JonsEngine
     }
 
 
+	void DX11VertexTransformPass::RenderStaticMesh(DX11Mesh& mesh, const Mat4& wvpMatrix)
+	{
+		RenderStaticMesh(mesh, wvpMatrix, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	}
+
     void DX11VertexTransformPass::RenderStaticMesh(DX11Mesh& mesh, const Mat4& wvpMatrix, const D3D_PRIMITIVE_TOPOLOGY topology)
     {
 		BindForStaticRendering(StaticRenderMode::NonInstanced, topology);
@@ -92,6 +97,11 @@ namespace JonsEngine
         mTransformCBuffer.SetData(TransformCBuffer(wvpMatrix, noBoneIndexOffset));
         mesh.DrawPositions();
     }
+
+	void DX11VertexTransformPass::RenderStaticMeshInstanced(DX11Mesh& mesh, const Mat4& viewProjectionMatrix, const std::vector<Mat4>& worldTransforms)
+	{
+		RenderStaticMeshInstanced(mesh, viewProjectionMatrix, worldTransforms, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	}
 
 	void DX11VertexTransformPass::RenderStaticMeshInstanced(DX11Mesh& mesh, const Mat4& viewProjectionMatrix, const std::vector<Mat4>& worldTransforms, D3D_PRIMITIVE_TOPOLOGY topology)
 	{
@@ -108,16 +118,31 @@ namespace JonsEngine
 		mesh.DrawPositionsInstanced(numTransforms);
 	}
 
+	void DX11VertexTransformPass::RenderStaticMeshes(const RenderableMeshContainer& renderData, const MeshIndex start, const MeshIndex stop, const Mat4& viewProjectionMatrix)
+	{
+		RenderStaticMeshes(renderData, start, stop, viewProjectionMatrix, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	}
+
 	void DX11VertexTransformPass::RenderStaticMeshes(const RenderableMeshContainer& renderData, const MeshIndex start, const MeshIndex stop, const Mat4& viewProjectionMatrix, const D3D_PRIMITIVE_TOPOLOGY topology)
 	{
 		BindForStaticRendering(StaticRenderMode::NonInstanced, topology);
 		RenderMeshesAux(renderData, start, stop, viewProjectionMatrix);
 	}
 
+	void DX11VertexTransformPass::RenderAnimatedMeshes(const RenderableMeshContainer& renderData, const MeshIndex start, const MeshIndex stop, const Mat4& viewProjectionMatrix)
+	{
+		RenderAnimatedMeshes(renderData, start, stop, viewProjectionMatrix, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	}
+
 	void DX11VertexTransformPass::RenderAnimatedMeshes(const RenderableMeshContainer& renderData, const MeshIndex start, const MeshIndex stop, const Mat4& viewProjectionMatrix, const D3D_PRIMITIVE_TOPOLOGY topology)
 	{
 		BindForAnimatedRendering(topology);
 		RenderMeshesAux(renderData, start, stop, viewProjectionMatrix);
+	}
+
+	void DX11VertexTransformPass::RenderMeshes(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix)
+	{
+		RenderMeshes(renderData, renderables, viewProjectionMatrix, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	}
 
 	void DX11VertexTransformPass::RenderMeshes(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix, const D3D_PRIMITIVE_TOPOLOGY topology)

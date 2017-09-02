@@ -142,7 +142,7 @@ namespace JonsEngine
 			mShadowmap.BindDepthView(face);
 
             const Mat4 faceViewMatrix = glm::lookAt(viewLightPositonV3, viewLightPositonV3 + gCubemapDirVectors[face], gCubemapUpVectors[face]);
-			mVertexTransformPass.RenderMeshes(renderData, pointLight, faceProjmatrix * faceViewMatrix * camViewMatrix, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			mVertexTransformPass.RenderMeshes(renderData, pointLight, faceProjmatrix * faceViewMatrix * camViewMatrix);
         }
 
 
@@ -161,8 +161,7 @@ namespace JonsEngine
         // restore screen viewport
         mContext->RSSetViewports(numViewports, &prevViewport);
 
-		D3D_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-        mVertexTransformPass.RenderStaticMesh(mSphereMesh, lightMeshWVP, topology);
+        mVertexTransformPass.RenderStaticMesh(mSphereMesh, lightMeshWVP);
 
 
         //

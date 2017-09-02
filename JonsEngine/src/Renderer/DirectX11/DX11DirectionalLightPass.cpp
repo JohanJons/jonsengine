@@ -143,7 +143,7 @@ namespace JonsEngine
             //const size_t meshEndIndex = cascadeSplit.mMeshEndIndex;
             //ConstRangedIterator<RenderableMeshes> meshIterator(directionalLight.mMeshes, meshStartIndex, meshEndIndex);
 			const Mat4& lightViewProj = lightVPMatrices[cascadeIndex];
-			mVertexTransformPass.RenderMeshes(renderData, cascadeSplit, lightViewProj, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			mVertexTransformPass.RenderMeshes(renderData, cascadeSplit, lightViewProj);
 
             // store view-projection for shading pass
             lightVPMatrices[cascadeIndex] = gBiasMatrix * lightVPMatrices[cascadeIndex] * glm::inverse(cameraViewMatrix);
