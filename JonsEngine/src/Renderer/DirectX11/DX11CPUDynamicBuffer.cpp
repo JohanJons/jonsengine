@@ -21,14 +21,4 @@ namespace JonsEngine
             default: break;
         }
     }
-
-	void DX11CPUDynamicBuffer::SetDataAndTranspose(const std::vector<Mat4>& transforms)
-	{
-		for (const Mat4& transform : transforms)
-			mTransposedTransforms.emplace_back(glm::transpose(transform));
-
-		SetData(mTransposedTransforms);
-
-		mTransposedTransforms.clear();
-	}
 }

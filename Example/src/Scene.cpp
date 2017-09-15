@@ -176,7 +176,7 @@ namespace JonsGame
         mScene.SetSkybox(mSkybox);
 
         // move up camera
-        mScene.GetSceneCamera().TranslateCamera(Vec3(0.0f, 3.0f, 0.0f));
+        mScene.GetSceneCamera().TranslateCamera(Vec3(0.0f, 130.0f, 0.0f));
     }
 
     Scene::~Scene()

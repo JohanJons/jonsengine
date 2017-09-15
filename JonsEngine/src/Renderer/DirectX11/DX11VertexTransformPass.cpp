@@ -41,7 +41,7 @@ namespace JonsEngine
 		inputDescStatic[StaticLayout::STATIC_POSITION].SemanticName = "POSITION";
 		inputDescStatic[StaticLayout::STATIC_POSITION].SemanticIndex = 0;
 		inputDescStatic[StaticLayout::STATIC_POSITION].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		inputDescStatic[StaticLayout::STATIC_POSITION].InputSlot = 0;
+		inputDescStatic[StaticLayout::STATIC_POSITION].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS;
 		inputDescStatic[StaticLayout::STATIC_POSITION].AlignedByteOffset = 0;
 		inputDescStatic[StaticLayout::STATIC_POSITION].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputDescStatic[StaticLayout::STATIC_POSITION].InstanceDataStepRate = 0;
@@ -55,7 +55,7 @@ namespace JonsEngine
 		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].SemanticName = "POSITION";
 		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].SemanticIndex = 0;
 		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].InputSlot = 0;
+		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_POSITIONS;
 		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].AlignedByteOffset = 0;
 		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputDescAnimated[AnimatedLayout::ANIMATED_POSITION].InstanceDataStepRate = 0;
@@ -107,7 +107,12 @@ namespace JonsEngine
 	{
 		BindForStaticRendering(StaticRenderMode::Instanced, topology);
 
-		mInstancedDataBuffer.SetDataAndTranspose(worldTransforms);
+		// need to transpose first...
+		mTransposedTransforms.clear();
+		for (const Mat4& transform : worldTransforms)
+			mTransposedTransforms.emplace_back(glm::transpose(transform));
+
+		mInstancedDataBuffer.SetData(mTransposedTransforms);
 		mInstancedDataBuffer.Bind(DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA);
 
 		const uint32_t noBoneIndexOffset = 0;

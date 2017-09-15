@@ -29,9 +29,9 @@ HullOut hull_main(InputPatch<VertexOut, 3> p, uint i : SV_OutputControlPointID, 
 {
 	HullOut hout;
 
-	hout.mPositionW = p[i].mPositionW;
-	hout.mNormalW = p[i].mNormalW;
-	hout.mTexcoordW = p[i].mTexcoordW;
+	//hout.mPositionW = p[i].mPositionW;
+	//hout.mNormalW = p[i].mNormalW;
+	//hout.mTexcoordW = p[i].mTexcoordW;
 
 	return hout;
 }

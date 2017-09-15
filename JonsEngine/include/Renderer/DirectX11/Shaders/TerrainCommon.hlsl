@@ -3,15 +3,20 @@
 
 #include "Common.hlsl"
 
-Texture2D gHeightmap : register(TEXTURE_REGISTER_EXTRA);
-
-cbuffer VertexConstants : register(CBUFFER_REGISTER_VERTEX)
+// TODO: move to common perframe CB
+cbuffer PerFrameConstants : register(CBUFFER_REGISTER_VERTEX)
 {
-	float4x4 gWorldTransform;
-	float mMinDistance;
-	float mMaxDistance;
-	float mMinFactor;
-	float mMaxFactor;
+	float gMinDistance;
+	float gMaxDistance;
+	float gMinFactor;
+	float gMaxFactor;
+}
+
+cbuffer PerTerrainConstants : register(CBUFFER_REGISTER_EXTRA)
+{
+	float4x4 viewProjection;
+	float2 gWorldMinExtents;
+	float2 gWorldMaxExtents;
 }
 
 
@@ -23,9 +28,8 @@ struct PatchTess
 
 struct VertexOut
 {
-	float3 mPositionW : POSITION;
-	float3 mNormalW : NORMAL;
-	float2 mTexcoordW : TEXCOORD;
+	float4 mWorldPosition : SV_POSITION;
+	float2 mGridTexcoord : TEXCOORD;
 	float mTessFactor : TESS;
 };
 

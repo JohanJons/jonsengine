@@ -8,10 +8,11 @@ namespace JonsEngine
 	struct RenderableTerrain
 	{
 		RenderableTerrain();
-		RenderableTerrain(const Mat4& transform, DX11TextureID heightmap);
+		RenderableTerrain(const Mat4& transform, DX11TextureID heightmap, float patchSize);
 
 
 		Mat4 mWorldTransform;
 		DX11TextureID mHeightMap;
+		float mPatchSize;
 	};
 }

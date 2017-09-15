@@ -16,12 +16,14 @@ namespace JonsEngine
 		const std::string& GetName() const;
 		const AABB& GetStaticAABB() const;
 		DX11TextureID GetHeightMap() const;
+		float GetPatchSize() const;
 
 
 	private:
 		std::string mName;
 		AABB mStaticAABB;
 		DX11TextureID mHeightMap;
+		float mPatchSize;
 	};
 
 	typedef IDMap<TerrainData>::ItemID TerrainDataID;

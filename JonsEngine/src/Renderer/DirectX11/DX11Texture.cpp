@@ -61,6 +61,7 @@ namespace JonsEngine
 
     void DX11Texture::BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot)
     {
+		mContext->VSSetShaderResources(shaderTextureSlot, 1, &mSRV.p);
         mContext->PSSetShaderResources(shaderTextureSlot, 1, &mSRV.p);
     }
 

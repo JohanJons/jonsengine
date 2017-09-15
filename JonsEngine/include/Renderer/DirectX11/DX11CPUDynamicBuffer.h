@@ -19,17 +19,19 @@ namespace JonsEngine
         DX11CPUDynamicBuffer(ID3D11DevicePtr device, ID3D11DeviceContextPtr context);
 
         void Bind(Shaderslot shaderSlot, uint32_t bindSlot);
+
+		// note: StructuredBuffers in HLSL will convert to column-major when loaded. But ours are already in column-major; so remember to transpose first...
+		template <typename T>
+		void SetData(const T* dataptr, std::size_t totalSizeInBytes);
         template <typename T> 
         void SetData(const std::vector<T>& data);
-		// note: StructuredBuffers in HLSL will convert to column-major when loaded. But ours are already in column-major; so we need to transpose them first...
-		void SetDataAndTranspose(const std::vector<Mat4>& transforms);
 
 
     private:
         template <typename T>
-        void ResizeBuffer(const T* data, const std::size_t newSizeInBytes);
+        void ResizeBuffer(const T* data, std::size_t newSizeInBytes);
         template <typename T>
-        void BufferData(const T* data, const std::size_t newSizeInBytes);
+        void BufferData(const T* data, std::size_t newSizeInBytes);
 
 
         ID3D11DevicePtr mDevice;
@@ -42,18 +44,25 @@ namespace JonsEngine
     };
 
 
+	template <typename T>
+	void DX11CPUDynamicBuffer::SetData(const T* dataptr, const std::size_t totalSizeInBytes)
+	{
+		if (totalSizeInBytes > mBufferSizeInBytes)
+			ResizeBuffer(dataptr, totalSizeInBytes);
+		else
+			BufferData(dataptr, totalSizeInBytes);
+
+		mBufferSizeInBytes = totalSizeInBytes;
+	}
+
     template <typename T>
     void DX11CPUDynamicBuffer::SetData(const std::vector<T>& data)
     {
         const std::size_t dataSize = data.size() * sizeof(T);
         const T* dataBegin = &data.front();
-        if (dataSize > mBufferSizeInBytes)
-            ResizeBuffer(dataBegin, dataSize);
-        else
-            BufferData(dataBegin, dataSize);
-
-        mBufferSizeInBytes = dataSize;
-    }
+		
+		SetData(dataBegin, dataSize);
+	}
 
 
     template <typename T>

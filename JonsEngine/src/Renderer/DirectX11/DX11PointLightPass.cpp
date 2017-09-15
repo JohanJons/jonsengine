@@ -177,7 +177,7 @@ namespace JonsEngine
         mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mColor, viewLightPositonV4, mWindowSize, pointLight.mIntensity, Z_NEAR, pointLight.mRadius));
 
         // run transform pass on sphere + point light shading pass
-        mVertexTransformPass.RenderStaticMesh(mSphereMesh, lightMeshWVP, topology);
+        mVertexTransformPass.RenderStaticMesh(mSphereMesh, lightMeshWVP);
 
         // restore state
         mContext->RSSetState(prevRasterizerState);

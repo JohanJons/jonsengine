@@ -16,6 +16,7 @@ namespace JonsEngine
 {
 	struct AABBRenderData;
 
+	// Renders a mesh without normals/texturing; mainly used in shadowmapping scenarios
     class DX11VertexTransformPass
     {
     public:
@@ -70,5 +71,8 @@ namespace JonsEngine
 		ID3D11VertexShaderPtr mAnimatedShader;
         ID3D11InputLayoutPtr mLayoutStatic;
 		ID3D11InputLayoutPtr mLayoutAnimated;
+
+		// for instanced rendering; must transpose transforms before buffering them. See <DX11CPUDynamicBuffer.h>
+		std::vector<Mat4> mTransposedTransforms;
     };
 }
