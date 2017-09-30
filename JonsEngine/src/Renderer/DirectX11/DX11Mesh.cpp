@@ -139,19 +139,24 @@ namespace JonsEngine
 
     void DX11Mesh::Draw()
     {
-        mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gPositionStride, &gStaticOffset);
-        if (mNormalBuffer)
-            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer.p, &gNormalStride, &gStaticOffset);
-        if (mTexcoordBuffer)
-            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer.p, &gTexcoordStride, &gStaticOffset);
-        if (mTangentBuffer)
-            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer.p, &gTangentStride, &gStaticOffset);
-        if (mHasBones)
-            mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_WEIGHTS, 1, &mBoneWeightBuffer.p, &gBoneWeightStride, &gStaticOffset);
-
-        mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
-        mContext->DrawIndexed(mNumIndices, 0, 0);
+		DrawInstanced(1);
     }
+
+	void DX11Mesh::DrawInstanced(uint32_t numInstances)
+	{
+		mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gPositionStride, &gStaticOffset);
+		if (mNormalBuffer)
+			mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer.p, &gNormalStride, &gStaticOffset);
+		if (mTexcoordBuffer)
+			mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer.p, &gTexcoordStride, &gStaticOffset);
+		if (mTangentBuffer)
+			mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer.p, &gTangentStride, &gStaticOffset);
+		if (mHasBones)
+			mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_WEIGHTS, 1, &mBoneWeightBuffer.p, &gBoneWeightStride, &gStaticOffset);
+
+		mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+		mContext->DrawIndexedInstanced(mNumIndices, numInstances, 0, 0, 0);
+	}
 
 	void DX11Mesh::DrawPositions()
 	{
@@ -160,6 +165,8 @@ namespace JonsEngine
 
 	void DX11Mesh::DrawPositionsInstanced(const uint32_t numInstances)
 	{
+		// TODO: maybe separating normal drawing vs drawing positions only is unnecessary. But we do get to skip binding unused buffers... unless that is optimized out
+		// due to not being requested by input descriptor anyway
 		mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gPositionStride, &gStaticOffset);
 		if (mHasBones)
 			mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_WEIGHTS, 1, &mBoneWeightBuffer.p, &gBoneWeightStride, &gStaticOffset);

@@ -6,7 +6,7 @@
 struct PixelOut
 {
 	float4 mDiffuse : SV_Target0;
-	//float3 mNormal : SV_Target1;
+	float3 mNormal : SV_Target1;
 };
 
 
@@ -14,7 +14,8 @@ PixelOut ps_main(VertexOut input)
 {
 	PixelOut ret;
 
-	ret.mDiffuse = float4(0.0, 1.0, 0.0, 0.0);
+	ret.mDiffuse = input.mColor;
+	ret.mNormal = float(0.0, 1.0, 0.0);
 	//ret.mNormal = normalize(input.mNormalW);
 	//ret.mNormal += 1.0;
 	//ret.mNormal *= 0.5;

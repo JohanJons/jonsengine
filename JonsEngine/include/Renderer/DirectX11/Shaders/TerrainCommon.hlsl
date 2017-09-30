@@ -15,8 +15,12 @@ cbuffer PerFrameConstants : register(CBUFFER_REGISTER_VERTEX)
 cbuffer PerTerrainConstants : register(CBUFFER_REGISTER_EXTRA)
 {
 	float4x4 viewProjection;
-	float2 gWorldMinExtents;
-	float2 gWorldMaxExtents;
+	float4x4 view;
+	float gHeightModifier;
+	float gWorldMinExtentsX;
+	float gWorldMinExtentsZ;
+	float gWorldMaxExtentsX;
+	float gWorldMaxExtentsZ;
 }
 
 
@@ -29,16 +33,15 @@ struct PatchTess
 struct VertexOut
 {
 	float4 mWorldPosition : SV_POSITION;
+	float3 mNormal : NORMAL;
 	float2 mGridTexcoord : TEXCOORD;
+	float4 mColor : COLOR;
 	float mTessFactor : TESS;
 };
 
 struct DomainOut
 {
-	float4 mPosition : SV_POSITION;
-	float3 mPositionW : POSITION;
-	float3 mNormalW : NORMAL;
-	float2 mTexcoordW : TEXCOORD;
+	float3 mWorldPosition : POSITION;
 };
 
 struct HullOut

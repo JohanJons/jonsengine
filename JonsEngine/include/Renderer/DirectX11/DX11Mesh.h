@@ -34,6 +34,7 @@ namespace JonsEngine
         ~DX11Mesh();
 
         void Draw();
+		void DrawInstanced(uint32_t numInstances);
         void DrawPositions();
 		void DrawPositionsInstanced(uint32_t numInstances);
         void DrawAABB();

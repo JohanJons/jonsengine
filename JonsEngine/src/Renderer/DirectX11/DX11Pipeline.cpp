@@ -122,7 +122,7 @@ namespace JonsEngine
 		for (const auto& terrain : renderQueue.mTerrains)
 		{
 			DX11Texture& heightmap = mTextureMap.GetItem(terrain.mHeightMap);
-			mTerrainPass.Render(heightmap, terrain.mWorldTransform, terrain.mPatchSize, renderQueue.mCamera.mCameraViewProjectionMatrix);
+			mTerrainPass.Render(heightmap, terrain.mWorldTransform, terrain.mHeightScale, terrain.mPatchSize, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix);
 		}
 
 		mGBuffer.BindForRendering();

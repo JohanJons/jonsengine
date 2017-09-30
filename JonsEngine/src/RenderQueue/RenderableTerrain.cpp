@@ -10,9 +10,10 @@ namespace JonsEngine
 	{
 	}
 
-	RenderableTerrain::RenderableTerrain(const Mat4& transform, const DX11TextureID heightmap, const float patchSize) :
+	RenderableTerrain::RenderableTerrain(const Mat4& transform, const DX11TextureID heightmap, const float heightScale, const float patchSize) :
 		mWorldTransform(transform),
 		mHeightMap(heightmap),
+		mHeightScale(heightScale),
 		mPatchSize(patchSize)
 	{
 	}

@@ -2,11 +2,23 @@
 
 namespace JonsEngine
 {
-	Terrain::Terrain(const std::string& name, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID) :
+	Terrain::Terrain(const std::string& name, float heightScale, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID) :
 		mName(name),
+		mHeightScale(heightScale),
 		mSceneNodeID(sceneNodeID),
 		mTerrainDataID(terrainDataID)
 	{
+	}
+
+
+	float Terrain::GetHeightScale() const
+	{
+		return mHeightScale;
+	}
+
+	void Terrain::SetHeightScale(float heightScale)
+	{
+		mHeightScale = heightScale;
 	}
 
 

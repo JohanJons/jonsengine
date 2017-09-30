@@ -32,7 +32,6 @@ namespace JonsEngine
 	{
 		POSITION = 0,
 		NORMAL,
-		TEXCOORD,
 		NUM_INPUT_LAYOUTS
 	};
 
@@ -73,13 +72,6 @@ namespace JonsEngine
 		inputDescription[VSInputLayout::NORMAL].AlignedByteOffset = 0;
 		inputDescription[VSInputLayout::NORMAL].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputDescription[VSInputLayout::NORMAL].InstanceDataStepRate = 0;
-
-		inputDescription[VSInputLayout::TEXCOORD].SemanticName = "TEXCOORD";
-		inputDescription[VSInputLayout::TEXCOORD].SemanticIndex = 0;
-		inputDescription[VSInputLayout::TEXCOORD].Format = DXGI_FORMAT_R32G32_FLOAT;
-		inputDescription[VSInputLayout::TEXCOORD].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_TEXCOORDS;
-		inputDescription[VSInputLayout::TEXCOORD].AlignedByteOffset = 0;
-		inputDescription[VSInputLayout::TEXCOORD].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		DXCALL(device->CreateInputLayout(inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gTerrainVertexShader, sizeof(gTerrainVertexShader), &mLayout));
 
 		// shaders
@@ -108,17 +100,17 @@ namespace JonsEngine
 	}
 
 
-	void DX11TerrainPass::Render(DX11Texture& heightmap, const Mat4& worldTransform, const float patchSize, float heightMultiplyer, const Mat4& viewProjection)
+	void DX11TerrainPass::Render(DX11Texture& heightmap, const Mat4& worldTransform, const float heightScale, const float patchSize, const Mat4& view, const Mat4& viewProjection)
 	{
 		const Vec4& terrainWorldCenter = worldTransform[3];
 		const Vec4 terrainWorldExtent = terrainWorldCenter + (patchSize * GRID_SIZE / 2);
-		mPerTerrainCBuffer.SetData({ viewProjection , -terrainWorldExtent.x, -terrainWorldExtent.z, terrainWorldExtent.x, terrainWorldExtent.z});
+		mPerTerrainCBuffer.SetData({ viewProjection, view, heightScale, -terrainWorldExtent.x, -terrainWorldExtent.z, terrainWorldExtent.x, terrainWorldExtent.z});
 
 		heightmap.BindAsShaderResource(SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA);
 
 		// concatenate all relevant transforms and buffer them to GPU before instanced rendering
 		float patchExtent = patchSize / 2;
-		Mat4 patchScaleTransform = glm::scale(Vec3(patchExtent, 0.0f, patchExtent));
+		Mat4 patchScaleTransform = glm::scale(Vec3(patchExtent, 1.0f, patchExtent));
 		for (size_t transformIndex = 0; transformIndex < GRID_SIZE; ++transformIndex)
 		{
 			Mat4& transform = mTempPatchTransformBuffer[transformIndex];
@@ -131,7 +123,7 @@ namespace JonsEngine
 		mTransformsBuffer.SetData(dataBegin, sizeInBytes);
 		mTransformsBuffer.Bind(DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA);
 
-		mQuadMesh.DrawPositionsInstanced(GRID_SIZE);
+		mQuadMesh.DrawInstanced(GRID_SIZE);
 	}
 
 	void DX11TerrainPass::BindForRendering()

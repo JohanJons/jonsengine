@@ -3,7 +3,19 @@
 
 #include "TerrainCommon.hlsl"
 
-PatchTess PatchHS(InputPatch<VertexOut, 3> patch, uint patchID : SV_PrimitiveID)
+struct HullIn
+{
+	InputPatch<VertexOut, 3> mVerticeData;
+	uint mIndex : SV_OutputControlPointID;
+};
+
+
+float CalculateTessellationfactor(float3 patchViewPos)
+{
+
+}
+
+PatchTess PatchHS(InputPatch<VertexOut, 3> inputVertices)
 {
 	PatchTess pt;
 
@@ -25,15 +37,13 @@ PatchTess PatchHS(InputPatch<VertexOut, 3> patch, uint patchID : SV_PrimitiveID)
 [outputtopology("triangle_ccw")]
 [outputcontrolpoints(3)]
 [patchconstantfunc("PatchHS")]
-HullOut hull_main(InputPatch<VertexOut, 3> p, uint i : SV_OutputControlPointID, uint patchId : SV_PrimitiveID)
+HullOut hull_main(HullIn input)
 {
-	HullOut hout;
+	HullOut ret;
 
-	//hout.mPositionW = p[i].mPositionW;
-	//hout.mNormalW = p[i].mNormalW;
-	//hout.mTexcoordW = p[i].mTexcoordW;
+	ret.mWorldPosition = input.mVerticeData[input.mIndex].mWorldPosition;
 
-	return hout;
+	return ret;
 }
 
 #endif

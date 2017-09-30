@@ -11,7 +11,10 @@ namespace JonsEngine
 	class Terrain
 	{
 	public:
-		Terrain(const std::string& name, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID);
+		Terrain(const std::string& name, float heightScale, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID);
+
+		float GetHeightScale() const;
+		void SetHeightScale(float heightScale);
 
 		const std::string& GetName() const;
 		SceneNodeID GetSceneNode() const;
@@ -20,6 +23,7 @@ namespace JonsEngine
 
 	private:
 		std::string mName;
+		float mHeightScale;
 		SceneNodeID mSceneNodeID;
 		TerrainDataID mTerrainDataID;
 	};

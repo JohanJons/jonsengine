@@ -207,9 +207,9 @@ namespace JonsEngine
     }
 
 
-	TerrainID Scene::CreateTerrain(const std::string& name, const SceneNodeID node, const TerrainDataID terrainDataID)
+	TerrainID Scene::CreateTerrain(const std::string& name, const float heightScale, const SceneNodeID node, const TerrainDataID terrainDataID)
 	{
-		return mTerrains.Insert(name, node, terrainDataID);
+		return mTerrains.Insert(name, heightScale, node, terrainDataID);
 	}
 
 	void Scene::DeleteTerrain(TerrainDataID& terrainDataID)

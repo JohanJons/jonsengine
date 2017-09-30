@@ -23,7 +23,7 @@ namespace JonsEngine
 		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const RenderSettings::Tesselation& tessData);
 		~DX11TerrainPass();
 
-		void Render(DX11Texture& heightmap, const Mat4& worldTransform, float patchSize, float heightMultiplyer, const Mat4& viewProjection);
+		void Render(DX11Texture& heightmap, const Mat4& worldTransform, float heightScale, float patchSize, const Mat4& view, const Mat4& viewProjection);
 		void BindForRendering();
 
 
@@ -39,6 +39,8 @@ namespace JonsEngine
 		struct PerTerrainCBuffer
 		{
 			Mat4 viewProjection;
+			Mat4 view;
+			float mHeightScale;
 			float mWorldPosMinX;
 			float mWorldPosMinZ;
 			float mWorldPosMaxX;

@@ -37,43 +37,43 @@ namespace JonsEngine
         Scene(const std::string& sceneName, DX11Renderer& renderer, const ResourceManifest& resourceManifest);
         ~Scene();
 
-        void Tick(const Milliseconds elapsedTime, const float windowAspectRatio);
+        void Tick(Milliseconds elapsedTime, float windowAspectRatio);
 
         SceneNode& GetRootNode();
         const SceneNodeID GetRootNodeID() const;
 
-        SceneNodeID CreateSceneNode(const std::string& sceneNodeName, const SceneNodeID parent);
+        SceneNodeID CreateSceneNode(const std::string& sceneNodeName, SceneNodeID parent);
         void DeleteSceneNode(SceneNodeID& sceneNodeID);
-        SceneNode& GetSceneNode(const SceneNodeID sceneNodeID);
-        const SceneNode& GetSceneNode(const SceneNodeID sceneNodeID) const;
+        SceneNode& GetSceneNode(SceneNodeID sceneNodeID);
+        const SceneNode& GetSceneNode(SceneNodeID sceneNodeID) const;
         SceneNodeIterator GetSceneNodes() const;
 
-        StaticActorID CreateStaticActor(const std::string& actorName, const ModelID modelID, const SceneNodeID sceneNodeID);
+        StaticActorID CreateStaticActor(const std::string& actorName, ModelID modelID, SceneNodeID sceneNodeID);
         void DeleteStaticActor(StaticActorID& actorID);
-        StaticActor& GetStaticActor(const StaticActorID actorID);
-        const StaticActor& GetStaticActor(const StaticActorID actorID) const;
+        StaticActor& GetStaticActor(StaticActorID actorID);
+        const StaticActor& GetStaticActor(StaticActorID actorID) const;
         StaticActorIterator GetStaticActors() const;
 
-        AnimatedActorID CreateAnimatedActor(const std::string& actorName, const ModelID modelID, const SceneNodeID sceneNodeID);
+        AnimatedActorID CreateAnimatedActor(const std::string& actorName, ModelID modelID, SceneNodeID sceneNodeID);
         void DeleteAnimatedActor(AnimatedActorID& actorID);
-        AnimatedActor& GetAnimatedActor(const AnimatedActorID actorID);
-        const AnimatedActor& GetAnimatedActor(const AnimatedActorID actorID) const;
+        AnimatedActor& GetAnimatedActor(AnimatedActorID actorID);
+        const AnimatedActor& GetAnimatedActor(AnimatedActorID actorID) const;
         AnimatedActorIterator GetAnimatedActors() const;
 
-        PointLightID CreatePointLight(const std::string& lightName, const SceneNodeID sceneNodeID);
+        PointLightID CreatePointLight(const std::string& lightName, SceneNodeID sceneNodeID);
         void DeletePointLight(PointLightID& pointLightID);
-		PointLight& GetPointLight(const PointLightID pointLightID);
-        const PointLight& GetPointLight(const PointLightID pointLightID) const;
+		PointLight& GetPointLight(PointLightID pointLightID);
+        const PointLight& GetPointLight(PointLightID pointLightID) const;
         PointLightIterator GetPointLights() const;
         
         DirectionalLightID CreateDirectionalLight(const std::string& lightName);
-        DirectionalLightID CreateDirectionalLight(const std::string& lightName, const uint32_t numShadowmapCascades);
+        DirectionalLightID CreateDirectionalLight(const std::string& lightName, uint32_t numShadowmapCascades);
         void DeleteDirectionalLight(DirectionalLightID& dirLightID);
-        DirectionalLight& GetDirectionalLight(const DirectionalLightID dirLightID);
-        const DirectionalLight& GetDirectionalLight(const DirectionalLightID dirLightID) const;
+        DirectionalLight& GetDirectionalLight(DirectionalLightID dirLightID);
+        const DirectionalLight& GetDirectionalLight(DirectionalLightID dirLightID) const;
         DirectionalLightIterator GetDirectionalLights() const;
 
-		TerrainID CreateTerrain(const std::string& name, const SceneNodeID node, const TerrainDataID terrainDataID);
+		TerrainID CreateTerrain(const std::string& name, float heightScale, SceneNodeID node, TerrainDataID terrainDataID);
 		void DeleteTerrain(TerrainDataID& terrainDataID);
 		Terrain& GetTerrain(const TerrainDataID terrainDataID);
 		const Terrain& GetTerrain(const TerrainDataID terrainDataID) const;
@@ -82,7 +82,7 @@ namespace JonsEngine
 		void SetAmbientLight(const Vec4& ambientLight);
         const Vec4& GetAmbientLight() const;
 
-        void SetSkybox(const SkyboxID skyboxID);
+        void SetSkybox(SkyboxID skyboxID);
         SkyboxID GetSkybox() const;
 
         Camera& GetSceneCamera();
@@ -96,9 +96,9 @@ namespace JonsEngine
     private:
         void MarkAsDirty(SceneNode* sceneNode);
         void UpdateDirtyObjects();
-        void UpdateDirLightSplitRanges(const float cameraFov, const float windowAspectRatio);
-        void UpdateAnimatedActors(const Milliseconds elapsedTime);
-		void UpdateBoneTransforms(const Milliseconds elapsedTime);
+        void UpdateDirLightSplitRanges(float cameraFov, float windowAspectRatio);
+        void UpdateAnimatedActors(Milliseconds elapsedTime);
+		void UpdateBoneTransforms(Milliseconds elapsedTime);
 
 
         DX11Renderer& mRenderer;

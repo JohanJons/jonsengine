@@ -408,7 +408,8 @@ namespace JonsEngine
 
 			auto heightmap = terrainData.GetHeightMap();
 			float patchSize = terrainData.GetPatchSize();
-			terrainRenderQueue.emplace_back(worldMatrix, heightmap, patchSize);
+			float heightScale = terrain.GetHeightScale();
+			terrainRenderQueue.emplace_back(worldMatrix, heightmap, heightScale, patchSize);
 		}
 	}
 }

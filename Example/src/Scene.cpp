@@ -4,6 +4,9 @@
 
 using namespace JonsEngine;
 
+static const float gTerrainHeightScale = 64.0f;
+
+
 namespace JonsGame
 {
     Scene::Scene(JonsEngine::Scene& jonsScene, JonsEngine::ResourceManifest& resManifest, const std::string& jonsPkgName) :
@@ -48,7 +51,7 @@ namespace JonsGame
 
 		// terrain
 		mTerrainData(resManifest.CreateTerrainData("terraindata", "heightmap", mJonsPackage)),
-		mTerrain(jonsScene.CreateTerrain("terrain", mNodeTerrain, mTerrainData)),
+		mTerrain(jonsScene.CreateTerrain("terrain", gTerrainHeightScale, mNodeTerrain, mTerrainData)),
         
         // lights
         mMovingPointLightID(mScene.CreatePointLight("MovingPointLight", mNodePointLight)),
@@ -176,7 +179,7 @@ namespace JonsGame
         mScene.SetSkybox(mSkybox);
 
         // move up camera
-        mScene.GetSceneCamera().TranslateCamera(Vec3(0.0f, 130.0f, 0.0f));
+        mScene.GetSceneCamera().TranslateCamera(Vec3(0.0f, 140.0f, 0.0f));
     }
 
     Scene::~Scene()
