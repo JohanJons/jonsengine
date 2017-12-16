@@ -10,12 +10,12 @@ struct PixelOut
 };
 
 
-PixelOut ps_main(VertexOut input)
+PixelOut ps_main(DomainOut input)
 {
 	PixelOut ret;
 
-	ret.mDiffuse = input.mColor;
-	ret.mNormal = float(0.0, 1.0, 0.0);
+	ret.mDiffuse = float4(0.0, 1.0, 0.0, 0.0);
+	ret.mNormal = float3(0.0, 1.0, 0.0);
 	//ret.mNormal = normalize(input.mNormalW);
 	//ret.mNormal += 1.0;
 	//ret.mNormal *= 0.5;

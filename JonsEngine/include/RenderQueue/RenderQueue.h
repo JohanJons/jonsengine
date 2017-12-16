@@ -17,7 +17,6 @@ namespace JonsEngine
     {
         typedef std::vector<RenderablePointLight> RenderablePointLights;
         typedef std::vector<RenderableDirectionalLight> RenderableDirectionalLights;
-		typedef std::vector<RenderableTerrain> RenderableTerrains;
 
 		struct RenderData
 		{
@@ -27,10 +26,10 @@ namespace JonsEngine
 			BoneTransforms mBones;
 		};
 
+
         RenderQueue();
 
         void Clear();
-
 
 
         Vec4 mAmbientLight;

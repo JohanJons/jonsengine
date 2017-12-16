@@ -42,9 +42,6 @@
     <Filter Include="Source Files\Window">
       <UniqueIdentifier>{e86184c8-2353-44b7-b5a4-064316bca867}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Renderer">
-      <UniqueIdentifier>{ff44cc03-febf-440e-aeba-dc7ede80161e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Resources">
       <UniqueIdentifier>{b836645f-6919-4b76-b7de-d4d337b4676e}</UniqueIdentifier>
     </Filter>
@@ -54,14 +51,8 @@
     <Filter Include="Source Files\Renderer">
       <UniqueIdentifier>{a3d5ad5b-531b-4acc-884f-cf6a512e7c46}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Renderer\DirectX11">
-      <UniqueIdentifier>{f229c17a-4bc7-4b31-a5bf-64fdfd6ca5e1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Renderer\DirectX11">
       <UniqueIdentifier>{12243de2-7a17-4a69-949e-1ef6f12919bf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Renderer\DirectX11\Shaders">
-      <UniqueIdentifier>{c2480e19-3446-43fa-8891-a1bd483bb955}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Core\Math">
       <UniqueIdentifier>{b074f7aa-71f8-4a51-b4e6-83de54bfc707}</UniqueIdentifier>
@@ -92,6 +83,15 @@
     </Filter>
     <Filter Include="Source Files\RenderQueue">
       <UniqueIdentifier>{d2394e95-5003-4689-aba2-740258517682}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renderer">
+      <UniqueIdentifier>{ff44cc03-febf-440e-aeba-dc7ede80161e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renderer\DirectX11">
+      <UniqueIdentifier>{f229c17a-4bc7-4b31-a5bf-64fdfd6ca5e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Renderer\DirectX11\Shaders">
+      <UniqueIdentifier>{c2480e19-3446-43fa-8891-a1bd483bb955}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -331,6 +331,9 @@
     </ClCompile>
     <ClCompile Include="src\RenderQueue\RenderableTerrain.cpp">
       <Filter>Source Files\RenderQueue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\TerrainTransforms.cpp">
+      <Filter>Source Files\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -657,6 +660,12 @@
     </ClInclude>
     <ClInclude Include="include\Resources\TerrainData.h">
       <Filter>Header Files\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\TerrainTransforms.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Scene\SceneDirtyFlags.h">
+      <Filter>Header Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

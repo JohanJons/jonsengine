@@ -13,17 +13,19 @@ namespace JonsEngine
 	public:
 		TerrainData(const std::string& name, float minElevation, float maxElevation, float width, float height, DX11TextureID heightMap);
 
-		const std::string& GetName() const;
-		const AABB& GetStaticAABB() const;
-		DX11TextureID GetHeightMap() const;
-		float GetPatchSize() const;
+		const std::string& GetName() const { return mName; }
+		const AABB& GetStaticAABB() const { return mStaticAABB; }
+		float GetWidth() const { return mWidth; }
+		float GetHeight() const { return mHeight; }
+		DX11TextureID GetHeightMap() const { return mHeightMap; }
 
 
 	private:
 		std::string mName;
 		AABB mStaticAABB;
+		float mWidth;
+		float mHeight;
 		DX11TextureID mHeightMap;
-		float mPatchSize;
 	};
 
 	typedef IDMap<TerrainData>::ItemID TerrainDataID;

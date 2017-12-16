@@ -38,13 +38,8 @@ namespace JonsEngine
 
 	DX11TerrainPass::DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const RenderSettings::Tesselation& tessData) :
 		mContext(context),
-		mLayout(nullptr),
-		mVertexShader(nullptr),
-		mHullShader(nullptr),
-		mDomainShader(nullptr),
-		mPixelShader(nullptr),
 
-		mCBuffer(device, context, mCBuffer.CONSTANT_BUFFER_SLOT_VERTEX),
+		mCBuffer(device, context, mCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
 		mPerTerrainCBuffer(device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_EXTRA),
 		mTransformsBuffer(device, context),
 		mQuadMesh(device, context, gQuadVertices, gQuadNormals, std::vector<float>(), std::vector<float>(), gQuadIndices, gAABBMin, gAABBMax),
@@ -80,19 +75,16 @@ namespace JonsEngine
 		DXCALL(device->CreateDomainShader(gTerrainDomainShader, sizeof(gTerrainDomainShader), nullptr, &mDomainShader));
 		DXCALL(device->CreatePixelShader(gTerrainPixelShader, sizeof(gTerrainPixelShader), nullptr, &mPixelShader));
 
-		// patch translation transforms are static and used regardless of patchsize
-		size_t currentTransformIndex = 0;
-		int32_t halfGridHeight = GRID_HEIGHT_IN_PATCHES / 2;
-		for (int32_t colNum = -halfGridHeight; colNum < halfGridHeight; ++colNum)
-		{
-			int32_t halfGridWidth = GRID_WIDTH_IN_PATCHES / 2;
-			for (int32_t rowNum = -halfGridWidth; rowNum < halfGridWidth; ++rowNum)
-			{
-				mPatchTranslationTransforms.at(currentTransformIndex) = glm::translate(Vec3(rowNum, 0.0f, colNum));
-				++currentTransformIndex;
-			}
-		}
-
+		D3D11_RASTERIZER_DESC rasterizerDesc;
+		ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
+		rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
+		rasterizerDesc.CullMode = D3D11_CULL_BACK;
+		rasterizerDesc.FrontCounterClockwise = true;
+		rasterizerDesc.DepthClipEnable = true;
+		rasterizerDesc.ScissorEnable = false;
+		rasterizerDesc.MultisampleEnable = false;
+		rasterizerDesc.AntialiasedLineEnable = false;
+		DXCALL(device->CreateRasterizerState(&rasterizerDesc, &mDebugRasterizer));
 	}
 
 	DX11TerrainPass::~DX11TerrainPass()
@@ -123,16 +115,30 @@ namespace JonsEngine
 		mTransformsBuffer.SetData(dataBegin, sizeInBytes);
 		mTransformsBuffer.Bind(DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA);
 
+		ID3D11RasterizerStatePtr prevRasterizer = nullptr;
+		mContext->RSGetState(&prevRasterizer);
+
+		mContext->RSSetState(mDebugRasterizer);
 		mQuadMesh.DrawInstanced(GRID_SIZE);
+
+		mContext->RSSetState(prevRasterizer);
 	}
 
 	void DX11TerrainPass::BindForRendering()
 	{
 		mContext->VSSetShader(mVertexShader, nullptr, 0);
+		mContext->DSSetShader(mDomainShader, nullptr, 0);
 		mContext->PSSetShader(mPixelShader, nullptr, 0);
+		mContext->DSSetShader(mDomainShader, nullptr, 0);
+		mContext->HSSetShader(mHullShader, nullptr, 0);
 		mContext->IASetInputLayout(mLayout);
-		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		//mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
+		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 		mCBuffer.SetData({ mTessData.mMinDistance, mTessData.mMaxDistance, mTessData.mMinFactor, mTessData.mMaxFactor });
+	}
+
+	void DX11TerrainPass::UnbindRendering()
+	{
+		mContext->DSSetShader(nullptr, nullptr, 0);
+		mContext->HSSetShader(nullptr, nullptr, 0);
 	}
 }

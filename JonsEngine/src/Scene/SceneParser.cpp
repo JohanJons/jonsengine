@@ -1,6 +1,7 @@
 #include "include/Scene/SceneParser.h"
 
 #include "include/Scene/Scene.h"
+#include "include/RenderQueue/RenderableTerrain.h"
 #include "include/Resources/ResourceManifest.h"
 #include "include/Core/Types.h"
 #include "include/Core/DebugOptions.h"
@@ -37,7 +38,7 @@ namespace JonsEngine
 	void CullAABB(const Scene& scene, const ResourceManifest& resManifest, const ACTOR_ITER_TYPE& actorIterator, const EngineSettings::CullingStrategy cullingStrat, AABBRenderData::RenderableAABBsContainer& aabbDataContainer,
 		const Mat4& viewProjTransform);
 
-	void CullTerrain(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const Scene::TerrainIterator& terrainIter, RenderQueue::RenderableTerrains& terrainRenderQueue, const Mat4& cameraViewProj);
+	void CullTerrain(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const Scene::TerrainIterator& terrainIter, RenderableTerrains& terrainRenderQueue, const Mat4& cameraViewProj);
 
 
     SceneParser::SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest) :
@@ -51,7 +52,7 @@ namespace JonsEngine
     }
 
 
-    const RenderQueue& SceneParser::ParseScene(const Scene& scene, const DebugOptions& debugOpts, const float windowAspectRatio, const float zNear, const float zFar)
+    const RenderQueue& SceneParser::ParseScene(const Scene& scene, const DirtyFlagsSet dirtyFlags, const DebugOptions& debugOpts, const float windowAspectRatio, const float zNear, const float zFar)
     {
         mRenderQueue.Clear();
 
@@ -62,6 +63,9 @@ namespace JonsEngine
         ViewFrustumCulling(scene, windowAspectRatio, zNear, zFar);
         PointLightCulling(scene);
         DirectionalLightCulling(scene);
+
+		if (dirtyFlags.test(FlagTerrain))
+			TerrainParsing(scene);
 
 		if (debugOpts.mRenderingFlags.test(debugOpts.RENDER_FLAG_DRAW_AABB))
 			AddAABBDebugData(scene);
@@ -169,6 +173,36 @@ namespace JonsEngine
             }
         }
     }
+
+	void SceneParser::TerrainParsing(const Scene& scene)
+	{
+		mRenderQueue.mTerrains.mTerrainData.clear();
+		mRenderQueue.mTerrains.mTransforms.clear();
+
+		const TerrainTransforms& terrainTransforms = scene.GetTerrainTransforms();
+
+		for (const TerrainTransformData& transformData : terrainTransforms.GetTerrainTransforms())
+		{
+			auto sceneNodeID = transformData.GetSceneNode();
+			auto terrainDataID = terrain.GetTerrainData();
+			if (sceneNodeID == INVALID_SCENE_NODE_ID || terrainDataID == INVALID_TERRAIN_DATA_ID)
+				continue;
+
+			const TerrainData& terrainData = mResourceManifest.GetTerrainData(terrainDataID);
+			const SceneNode& node = scene.GetSceneNode(sceneNodeID);
+
+			// TODO: view culling?
+
+			auto heightmap = terrainData.GetHeightMap();
+			float patchSize = terrain.GetPatchSize();
+			float heightScale = terrain.GetHeightScale();
+
+			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
+			renderableTransforms.insert(renderableTransforms.cend(), terrain.)
+
+			terrainRenderQueue.emplace_back(worldMatrix, heightmap, heightScale, patchSize);
+		}
+	}
 
 	void SceneParser::CopyBoneTransforms(const Scene& scene)
 	{
@@ -385,8 +419,8 @@ namespace JonsEngine
 		}
 	}
 
-	void CullTerrain(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat,
-		const Scene::TerrainIterator& terrainIter, RenderQueue::RenderableTerrains& terrainRenderQueue, const Mat4& cameraViewProj)
+	/*void CullTerrain(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat,
+		const Scene::TerrainIterator& terrainIter, RenderableTerrains& terrainRenderQueue, const Mat4& cameraViewProj)
 	{
 		for (const auto& terrain : terrainIter)
 		{
@@ -407,9 +441,9 @@ namespace JonsEngine
 				continue;
 
 			auto heightmap = terrainData.GetHeightMap();
-			float patchSize = terrainData.GetPatchSize();
+			float patchSize = terrain.GetPatchSize();
 			float heightScale = terrain.GetHeightScale();
 			terrainRenderQueue.emplace_back(worldMatrix, heightmap, heightScale, patchSize);
 		}
-	}
+	}*/
 }

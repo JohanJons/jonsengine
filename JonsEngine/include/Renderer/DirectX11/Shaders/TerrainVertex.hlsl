@@ -28,7 +28,7 @@ VertexOut vs_main(VertexIn input)
 {
 	VertexOut ret;
 
-	const uint transformIndex = input.mInstanceID;
+	/*const uint transformIndex = input.mInstanceID;
 	const float4x4 worldTransform = gWorldTransforms.Load(transformIndex);
 
 	ret.mWorldPosition = mul(worldTransform, input.mPosition);
@@ -42,8 +42,13 @@ VertexOut vs_main(VertexIn input)
 	//ret.mWorldPosition = mul(viewProjection, ret.mWorldPosition);
 	ret.mNormal = mul((float3x3)view, ret.mNormal);
 	
-	ret.mTessFactor = 1.0f;
-	ret.mColor = input.mPosition;
+	ret.mTessFactor = 2.0f;
+	ret.mColor = input.mPosition;*/
+	const uint transformIndex = input.mInstanceID;
+	const float4x4 worldTransform = gWorldTransforms.Load(transformIndex);
+
+	ret.mWorldPosition = mul(worldTransform, input.mPosition + float4(0.0, 1.0 * input.mInstanceID, 0.0, 0.0));
+	ret.mTessFactor = 2.0f;
 
 	return ret;
 }

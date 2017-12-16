@@ -11,21 +11,26 @@ namespace JonsEngine
 	class Terrain
 	{
 	public:
-		Terrain(const std::string& name, float heightScale, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID);
+		Terrain(const std::string& name, float heightScale, uint32_t patchSize, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID);
 
-		float GetHeightScale() const;
 		void SetHeightScale(float heightScale);
+		float GetHeightScale() const { return mHeightScale; }
 
-		const std::string& GetName() const;
-		SceneNodeID GetSceneNode() const;
-		TerrainDataID GetTerrainData() const;
+		void SetPatchSize(uint32_t patchSize);
+		uint32_t GetPatchSize() const { return mPatchSize; }
+
+		const std::string& GetName() const { return mName; }
+		SceneNodeID GetSceneNode() const { return mSceneNodeID; }
+		TerrainDataID GetTerrainData() const { return mTerrainDataID; }
 
 
 	private:
 		std::string mName;
 		float mHeightScale;
-		SceneNodeID mSceneNodeID;
-		TerrainDataID mTerrainDataID;
+		uint32_t mPatchSize;
+
+		SceneNodeID mSceneNodeID = INVALID_SCENE_NODE_ID;
+		TerrainDataID mTerrainDataID = INVALID_TERRAIN_DATA_ID;
 	};
 
 	typedef IDMap<Terrain>::ItemID TerrainID;

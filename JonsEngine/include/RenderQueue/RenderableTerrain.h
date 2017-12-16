@@ -5,15 +5,17 @@
 
 namespace JonsEngine
 {
-	struct RenderableTerrain
+	struct RenderableTerrainData
 	{
-		RenderableTerrain();
-		RenderableTerrain(const Mat4& transform, DX11TextureID heightmap, float heightScale, float patchSize);
-
-
-		Mat4 mWorldTransform;
 		DX11TextureID mHeightMap;
+		std::size_t mEndIndex;
 		float mHeightScale;
 		float mPatchSize;
+	};
+
+	struct RenderableTerrains
+	{
+		std::vector<RenderableTerrainData> mTerrainData;
+		std::vector<Mat4> mTransforms;
 	};
 }

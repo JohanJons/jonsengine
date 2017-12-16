@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/EngineSettings.h"
+#include "include/Scene/SceneDirtyFlags.h"
 #include "include/RenderQueue/RenderQueue.h"
 
 namespace JonsEngine
@@ -15,7 +16,7 @@ namespace JonsEngine
         SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest);
         ~SceneParser();
 
-        const RenderQueue& ParseScene(const Scene& scene, const DebugOptions& debugOpts, const float windowAspectRatio, const float zNear, const float zFar);
+        const RenderQueue& ParseScene(const Scene& scene, DirtyFlagsSet dirtyFlags, const DebugOptions& debugOpts, const float windowAspectRatio, const float zNear, const float zFar);
 
 
     private:
@@ -23,6 +24,7 @@ namespace JonsEngine
         void ViewFrustumCulling(const Scene& scene, const float windowAspectRatio, const float zNear, const float zFar);
         void PointLightCulling(const Scene& scene);
         void DirectionalLightCulling(const Scene& scene);
+		void TerrainParsing(const Scene& scene);
 		void CopyBoneTransforms(const Scene& scene);
 		void GetSkybox(const Scene& scene);
 		void GetAmbientLight(const Scene& scene);

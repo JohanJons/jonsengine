@@ -13,6 +13,8 @@
 #include "include/Scene/StaticActor.h"
 #include "include/Scene/Terrain.h"
 #include "include/Scene/AnimationUpdater.h"
+#include "include/Scene/TerrainTransforms.h"
+#include "include/Scene/SceneDirtyFlags.h"
 #include "include/Resources/Skybox.h"
 
 #include <string>
@@ -35,9 +37,10 @@ namespace JonsEngine
 		typedef ConstRangedIterator<IDMap<Terrain>> TerrainIterator;
 
         Scene(const std::string& sceneName, DX11Renderer& renderer, const ResourceManifest& resourceManifest);
-        ~Scene();
+		~Scene() = default;
 
         void Tick(Milliseconds elapsedTime, float windowAspectRatio);
+		DirtyFlagsSet GetAndResetDirtyFlags();
 
         SceneNode& GetRootNode();
         const SceneNodeID GetRootNodeID() const;
@@ -73,7 +76,7 @@ namespace JonsEngine
         const DirectionalLight& GetDirectionalLight(DirectionalLightID dirLightID) const;
         DirectionalLightIterator GetDirectionalLights() const;
 
-		TerrainID CreateTerrain(const std::string& name, float heightScale, SceneNodeID node, TerrainDataID terrainDataID);
+		TerrainID CreateTerrain(const std::string& name, float heightScale, uint32_t patchSize, SceneNodeID node, TerrainDataID terrainDataID);
 		void DeleteTerrain(TerrainDataID& terrainDataID);
 		Terrain& GetTerrain(const TerrainDataID terrainDataID);
 		const Terrain& GetTerrain(const TerrainDataID terrainDataID) const;
@@ -89,6 +92,7 @@ namespace JonsEngine
         const Camera& GetSceneCamera() const;
 
         const AnimationUpdater& GetAnimationUpdater() const;
+		const TerrainTransforms& GetTerrainTransforms() const;
 
 		const std::string mName;
 
@@ -116,6 +120,9 @@ namespace JonsEngine
         IDMap<AnimatedActor> mAnimatedActors;
         IDMapTree<SceneNode> mSceneNodeTree;
 
+		TerrainTransforms mTerrainTransforms;
+
+		DirtyFlagsSet mDirtyFlags;
         bool mHasDirtySceneNodes;
         const SceneNodeID mRootNodeID;
     };

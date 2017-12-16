@@ -194,6 +194,7 @@
     <ClCompile Include="src\Scene\SceneParser.cpp" />
     <ClCompile Include="src\Scene\StaticActor.cpp" />
     <ClCompile Include="src\Scene\Terrain.cpp" />
+    <ClCompile Include="src\Scene\TerrainTransforms.cpp" />
     <ClCompile Include="src\Window\WindowManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -295,12 +296,14 @@
     <ClInclude Include="include\Scene\DirectionalLight.h" />
     <ClInclude Include="include\Scene\PointLight.h" />
     <ClInclude Include="include\Scene\Scene.h" />
+    <ClInclude Include="include\Scene\SceneDirtyFlags.h" />
     <ClInclude Include="include\Scene\SceneManager.h" />
     <ClInclude Include="include\Scene\SceneNode.h" />
     <ClInclude Include="include\Scene\SceneParser.h" />
     <ClInclude Include="include\Scene\SceneSettings.h" />
     <ClInclude Include="include\Scene\StaticActor.h" />
     <ClInclude Include="include\Scene\Terrain.h" />
+    <ClInclude Include="include\Scene\TerrainTransforms.h" />
     <ClInclude Include="include\Window\KeyCallback.h" />
     <ClInclude Include="include\Window\KeyDefinition.h" />
     <ClInclude Include="include\Window\MouseCallback.h" />

@@ -15,6 +15,8 @@ namespace JonsEngine
             CONSTANT_BUFFER_SLOT_VERTEX = CBUFFER_SLOT_VERTEX,
             CONSTANT_BUFFER_SLOT_PIXEL = CBUFFER_SLOT_PIXEL,
             CONSTANT_BUFFER_SLOT_COMPUTE = CBUFFER_SLOT_COMPUTE,
+			CONSTANT_BUFFER_SLOT_DOMAIN = CBUFFER_SLOT_DOMAIN,
+			CONSTANT_BUFFER_SLOT_HULL = CBUFFER_SLOT_HULL,
 			CONSTANT_BUFFER_SLOT_PER_FRAME = CBUFFER_SLOT_PER_FRAME,
 			CONSTANT_BUFFER_SLOT_EXTRA = CBUFFER_SLOT_EXTRA,
         };
@@ -50,6 +52,8 @@ namespace JonsEngine
             mContext->VSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
             mContext->PSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
             mContext->CSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
+			mContext->DSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
+			mContext->HSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
         }
 
 

@@ -4,8 +4,8 @@
 
 using namespace JonsEngine;
 
-static const float gTerrainHeightScale = 64.0f;
-
+constexpr float gTerrainHeightScale = 64.0f;
+constexpr uint32_t gTerrainPatchSize = 64;
 
 namespace JonsGame
 {
@@ -51,7 +51,7 @@ namespace JonsGame
 
 		// terrain
 		mTerrainData(resManifest.CreateTerrainData("terraindata", "heightmap", mJonsPackage)),
-		mTerrain(jonsScene.CreateTerrain("terrain", gTerrainHeightScale, mNodeTerrain, mTerrainData)),
+		mTerrain(jonsScene.CreateTerrain("terrain", gTerrainHeightScale, gTerrainPatchSize, mNodeTerrain, mTerrainData)),
         
         // lights
         mMovingPointLightID(mScene.CreatePointLight("MovingPointLight", mNodePointLight)),

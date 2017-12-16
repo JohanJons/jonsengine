@@ -8,15 +8,15 @@
 [domain("tri")]
 DomainOut domain_main(PatchTess patchTess, float3 bary : SV_DomainLocation, const OutputPatch<HullOut, 3> tri)
 {
-	DomainOut dout;
+	DomainOut ret;
 
 	// Interpolate patch attributes to generated vertices.
-	dout.mPositionW = bary.x*tri[0].mPositionW + bary.y*tri[1].mPositionW + bary.z*tri[2].mPositionW;
-	dout.mNormalW = bary.x*tri[0].mNormalW + bary.y*tri[1].mNormalW + bary.z*tri[2].mNormalW;
-	dout.mTexcoordW = bary.x*tri[0].mTexcoordW + bary.y*tri[1].mTexcoordW + bary.z*tri[2].mTexcoordW;
+	//dout.mPositionW = bary.x*tri[0].mPositionW + bary.y*tri[1].mPositionW + bary.z*tri[2].mPositionW;
+	//dout.mNormalW = bary.x*tri[0].mNormalW + bary.y*tri[1].mNormalW + bary.z*tri[2].mNormalW;
+	//dout.mTexcoordW = bary.x*tri[0].mTexcoordW + bary.y*tri[1].mTexcoordW + bary.z*tri[2].mTexcoordW;
 
 	// Interpolating normal can unnormalize it, so normalize it.
-	dout.mNormalW = normalize(dout.mNormalW);
+	//dout.mNormalW = normalize(dout.mNormalW);
 
 	//
 	// Displacement mapping.
@@ -30,14 +30,17 @@ DomainOut domain_main(PatchTess patchTess, float3 bary : SV_DomainLocation, cons
 	// Sample height map (stored in alpha channel).
 	//float h = gNormalMap.SampleLevel(samLinear, dout.Tex, mipLevel).a;
 
+	ret.mWorldPosition = bary.x*tri[0].mWorldPosition + bary.y*tri[1].mWorldPosition + bary.z*tri[2].mWorldPosition;
+	//ret.mWorldPosition = mul(viewProjection, ret.mWorldPosition);
+	//ret.mWorldPosition = 
 	// Offset vertex along normal.
 	//dout.PosW += (gHeightScale*(h - 1.0))*dout.NormalW;
-	dout.mPositionW += 1.0;
+	//dout.mPositionW += 1.0;
 
 	// Project to homogeneous clip space.
-	dout.mPosition = 1.0;// mul(float4(dout.PosW, 1.0f), gViewProj);
+	//dout.mPosition = 1.0;// mul(float4(dout.PosW, 1.0f), gViewProj);
 
-	return dout;
+	return ret;
 }
 
 #endif

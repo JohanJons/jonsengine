@@ -13,7 +13,7 @@ namespace JonsEngine
     {
         mDirectionalLights.clear();
         mPointLights.clear();
-		mTerrains.clear();
+		//mTerrains.mTerrainData.clear();
 
         mRenderData.mStaticMeshes.clear();
 		mRenderData.mAnimatedMeshes.clear();

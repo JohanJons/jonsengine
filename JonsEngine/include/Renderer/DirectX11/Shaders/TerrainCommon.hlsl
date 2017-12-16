@@ -4,7 +4,7 @@
 #include "Common.hlsl"
 
 // TODO: move to common perframe CB
-cbuffer PerFrameConstants : register(CBUFFER_REGISTER_VERTEX)
+cbuffer PerFrameConstants : register(CBUFFER_REGISTER_DOMAIN)
 {
 	float gMinDistance;
 	float gMaxDistance;
@@ -32,23 +32,23 @@ struct PatchTess
 
 struct VertexOut
 {
-	float4 mWorldPosition : SV_POSITION;
-	float3 mNormal : NORMAL;
-	float2 mGridTexcoord : TEXCOORD;
-	float4 mColor : COLOR;
+	float4 mWorldPosition : POSITION;
+	//float3 mNormal : NORMAL;
+	//float2 mGridTexcoord : TEXCOORD;
+	//float4 mColor : COLOR;
 	float mTessFactor : TESS;
 };
 
 struct DomainOut
 {
-	float3 mWorldPosition : POSITION;
+	float4 mWorldPosition : SV_POSITION;
 };
 
 struct HullOut
 {
-	float3 mPositionW : POSITION;
-	float3 mNormalW : NORMAL;
-	float2 mTexcoordW : TEXCOORD;
+	float4 mWorldPosition : POSITION;
+	//float3 mNormalW : NORMAL;
+	//float2 mTexcoordW : TEXCOORD;
 };
 
 #endif

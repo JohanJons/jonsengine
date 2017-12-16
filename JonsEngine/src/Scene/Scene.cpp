@@ -16,11 +16,8 @@ namespace JonsEngine
         mAmbientLight(0.2f),
         mSkyboxID(INVALID_SKYBOX_ID),
         mSceneNodeTree("Root", INVALID_SCENE_NODE_ID, std::bind(&Scene::MarkAsDirty, this, std::placeholders::_1)),
+		mTerrainTransforms(mTerrains, mResourceManifest.GetTerrainDataMap(), mSceneNodeTree),
         mRootNodeID(mSceneNodeTree.GetRootNodeID())
-    {
-    }
-
-    Scene::~Scene()
     {
     }
 
@@ -33,7 +30,18 @@ namespace JonsEngine
         UpdateDirLightSplitRanges(cameraFov, windowAspectRatio);
         UpdateAnimatedActors(elapsedTime);
 		UpdateBoneTransforms(elapsedTime);
+
+		uint32_t updatedTransforms = mTerrainTransforms.UpdateTransforms();
+		if (updatedTransforms)
+			mDirtyFlags.set(FlagTerrain, true);
     }
+
+	Scene::DirtyFlagsSet Scene::GetAndResetDirtyFlags()
+	{
+		DirtyFlagsSet set(mDirtyFlags);
+		mDirtyFlags.reset();
+		return set;
+	}
 
 
     SceneNode& Scene::GetRootNode()
@@ -207,9 +215,9 @@ namespace JonsEngine
     }
 
 
-	TerrainID Scene::CreateTerrain(const std::string& name, const float heightScale, const SceneNodeID node, const TerrainDataID terrainDataID)
+	TerrainID Scene::CreateTerrain(const std::string& name, const float heightScale, uint32_t patchSize, const SceneNodeID node, const TerrainDataID terrainDataID)
 	{
-		return mTerrains.Insert(name, heightScale, node, terrainDataID);
+		return mTerrains.Insert(name, heightScale, patchSize, node, terrainDataID);
 	}
 
 	void Scene::DeleteTerrain(TerrainDataID& terrainDataID)
