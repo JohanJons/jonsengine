@@ -25,6 +25,7 @@ namespace JonsEngine
 		void AddDirty(TerrainID ID);
 		uint32_t UpdateTransforms();
 
+		uint32_t GetNumEntries() const;
 		const TerrainTransformData& GetTerrainTransforms() const { return mTerrainTransforms; }
 
 	private:

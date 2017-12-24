@@ -118,13 +118,14 @@ namespace JonsEngine
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-		mTerrainPass.BindForRendering();
-		for (const auto& terrain : renderQueue.mTerrains)
+		//mTerrainPass.BindForRendering();
+		mTerrainPass.Render();
+		/*for (const auto& terrain : renderQueue.mTerrains)
 		{
 			DX11Texture& heightmap = mTextureMap.GetItem(terrain.mHeightMap);
 			mTerrainPass.Render(heightmap, terrain.mWorldTransform, terrain.mHeightScale, terrain.mPatchSize, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix);
-		}
-		mTerrainPass.UnbindRendering();
+		}*/
+		//mTerrainPass.UnbindRendering();
 
 		mGBuffer.BindForRendering();
 

@@ -180,11 +180,17 @@ namespace JonsEngine
 		mRenderQueue.mTerrains.mTransforms.clear();
 
 		const TerrainTransforms& terrainTransforms = scene.GetTerrainTransforms();
+		const TerrainTransformData& transformData = terrainTransforms.GetTerrainTransforms();
 
-		for (const TerrainTransformData& transformData : terrainTransforms.GetTerrainTransforms())
+		for (uint32_t index = 0, numTerrainTransforms = terrainTransforms.GetNumEntries(); index < numTerrainTransforms; ++index)
 		{
-			auto sceneNodeID = transformData.GetSceneNode();
-			auto terrainDataID = terrain.GetTerrainData();
+			TerrainID ID = transformData.mIDEndIndex[index].first;
+			std::size_t endIndex = transformData.mIDEndIndex[index].second;
+			std::size_t beginIndex = index == 0 ? 0 : transformData.mIDEndIndex[index - 1].second;
+
+			const Terrain& terrain = scene.GetTerrain(ID);
+			SceneNodeID sceneNodeID = terrain.GetSceneNode();
+			TerrainDataID terrainDataID = terrain.GetTerrainData();
 			if (sceneNodeID == INVALID_SCENE_NODE_ID || terrainDataID == INVALID_TERRAIN_DATA_ID)
 				continue;
 
@@ -198,9 +204,10 @@ namespace JonsEngine
 			float heightScale = terrain.GetHeightScale();
 
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
-			renderableTransforms.insert(renderableTransforms.cend(), terrain.)
+			renderableTransforms.insert(renderableTransforms.cend(), transformData.mTransforms.cbegin() + beginIndex, transformData.mTransforms.cbegin() + endIndex);
 
-			terrainRenderQueue.emplace_back(worldMatrix, heightmap, heightScale, patchSize);
+			std::size_t renderableEndIndex = renderableTransforms.size();
+			mRenderQueue.mTerrains.mTerrainData.emplace_back(heightmap, renderableEndIndex, heightScale, patchSize);
 		}
 	}
 

@@ -36,7 +36,7 @@ namespace JonsEngine
 			mDirtyFlags.set(FlagTerrain, true);
     }
 
-	Scene::DirtyFlagsSet Scene::GetAndResetDirtyFlags()
+	DirtyFlagsSet Scene::GetAndResetDirtyFlags()
 	{
 		DirtyFlagsSet set(mDirtyFlags);
 		mDirtyFlags.reset();

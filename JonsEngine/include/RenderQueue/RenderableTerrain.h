@@ -7,6 +7,13 @@ namespace JonsEngine
 {
 	struct RenderableTerrainData
 	{
+		RenderableTerrainData(DX11TextureID heightMap, std::size_t endIndex, float heightScale, float patchSize) :
+			mHeightMap(heightMap),
+			mEndIndex(endIndex),
+			mHeightScale(heightScale),
+			mPatchSize(patchSize)
+		{ }
+
 		DX11TextureID mHeightMap;
 		std::size_t mEndIndex;
 		float mHeightScale;

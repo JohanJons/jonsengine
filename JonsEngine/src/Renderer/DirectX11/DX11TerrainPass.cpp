@@ -87,12 +87,12 @@ namespace JonsEngine
 		DXCALL(device->CreateRasterizerState(&rasterizerDesc, &mDebugRasterizer));
 	}
 
-	DX11TerrainPass::~DX11TerrainPass()
+	void DX11TerrainPass::Render(const RenderableTerrains& Terrains, const Mat4& view, const Mat4& viewProjection)
 	{
+
 	}
 
-
-	void DX11TerrainPass::Render(DX11Texture& heightmap, const Mat4& worldTransform, const float heightScale, const float patchSize, const Mat4& view, const Mat4& viewProjection)
+	/*void DX11TerrainPass::Render(DX11Texture& heightmap, const Mat4& worldTransform, const float heightScale, const float patchSize, const Mat4& view, const Mat4& viewProjection)
 	{
 		const Vec4& terrainWorldCenter = worldTransform[3];
 		const Vec4 terrainWorldExtent = terrainWorldCenter + (patchSize * GRID_SIZE / 2);
@@ -122,7 +122,7 @@ namespace JonsEngine
 		mQuadMesh.DrawInstanced(GRID_SIZE);
 
 		mContext->RSSetState(prevRasterizer);
-	}
+	}*/
 
 	void DX11TerrainPass::BindForRendering()
 	{

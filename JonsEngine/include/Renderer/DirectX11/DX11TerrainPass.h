@@ -5,6 +5,7 @@
 #include "include/Renderer/DirectX11/DX11CPUDynamicBuffer.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/RenderSettings.h"
+#include "include/RenderQueue/RenderableTerrain.h"
 
 #include <array>
 
@@ -21,12 +22,8 @@ namespace JonsEngine
 		static constexpr int32_t GRID_SIZE = GRID_WIDTH_IN_PATCHES * GRID_HEIGHT_IN_PATCHES;
 
 		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const RenderSettings::Tesselation& tessData);
-		~DX11TerrainPass();
 
-		void Render(DX11Texture& heightmap, const Mat4& worldTransform, float heightScale, float patchSize, const Mat4& view, const Mat4& viewProjection);
-		void BindForRendering();
-		void UnbindRendering();
-
+		void Render(const RenderableTerrains& Terrains, const Mat4& view, const Mat4& viewProjection);
 
 	private:
 		struct TerrainCBuffer
@@ -47,6 +44,10 @@ namespace JonsEngine
 			float mWorldPosMaxX;
 			float mWorldPosMaxZ;
 		};
+
+	private:
+		void BindForRendering();
+		void UnbindRendering();
 
 		ID3D11DeviceContextPtr mContext = nullptr;
 		ID3D11InputLayoutPtr mLayout = nullptr;
