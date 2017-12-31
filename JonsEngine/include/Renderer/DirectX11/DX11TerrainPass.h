@@ -5,7 +5,6 @@
 #include "include/Renderer/DirectX11/DX11CPUDynamicBuffer.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/RenderSettings.h"
-#include "include/RenderQueue/RenderableTerrain.h"
 
 #include <array>
 
@@ -13,6 +12,7 @@ namespace JonsEngine
 {
 	class DX11Texture;
 	class DX11VertexTransformPass;
+	struct RenderableTerrains;
 
 	class DX11TerrainPass
 	{
@@ -21,13 +21,15 @@ namespace JonsEngine
 		static constexpr int32_t GRID_HEIGHT_IN_PATCHES = 8;
 		static constexpr int32_t GRID_SIZE = GRID_WIDTH_IN_PATCHES * GRID_HEIGHT_IN_PATCHES;
 
-		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const RenderSettings::Tesselation& tessData);
+		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, const RenderSettings::Tesselation& tessData);
 
-		void Render(const RenderableTerrains& Terrains, const Mat4& view, const Mat4& viewProjection);
+		void Render(const RenderableTerrains& terrains, const Mat4& view, const Mat4& viewProjection);
 
 	private:
 		struct TerrainCBuffer
 		{
+			Mat4 mViewProjection;
+			Mat4 mView;
 			float mMinDistance;
 			float mMaxDistance;
 			float mMinFactor;
@@ -36,8 +38,7 @@ namespace JonsEngine
 
 		struct PerTerrainCBuffer
 		{
-			Mat4 viewProjection;
-			Mat4 view;
+			uint32_t mStartIndex;
 			float mHeightScale;
 			float mWorldPosMinX;
 			float mWorldPosMinZ;
@@ -46,7 +47,7 @@ namespace JonsEngine
 		};
 
 	private:
-		void BindForRendering();
+		void BindForRendering( const Mat4& view, const Mat4& viewProjection );
 		void UnbindRendering();
 
 		ID3D11DeviceContextPtr mContext = nullptr;
@@ -63,9 +64,8 @@ namespace JonsEngine
 		DX11CPUDynamicBuffer mTransformsBuffer;
 		DX11Mesh mQuadMesh;
 		DX11VertexTransformPass& mVertexTransformer;
+		const IDMap<DX11Texture>& mTextureMap;
 
 		RenderSettings::Tesselation mTessData;
-		// row-major layout
-		std::array<Mat4, GRID_SIZE> mTempPatchTransformBuffer;
 	};
 }

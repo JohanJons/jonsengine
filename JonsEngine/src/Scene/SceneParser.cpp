@@ -203,6 +203,9 @@ namespace JonsEngine
 			float patchSize = terrain.GetPatchSize();
 			float heightScale = terrain.GetHeightScale();
 
+			const Vec4& terrainWorldCenter = node.GetWorldTransform()[ 3 ];
+			const Vec4 terrainWorldExtent = terrainWorldCenter + ( patchSize * GRID_SIZE / 2 );
+
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
 			renderableTransforms.insert(renderableTransforms.cend(), transformData.mTransforms.cbegin() + beginIndex, transformData.mTransforms.cbegin() + endIndex);
 

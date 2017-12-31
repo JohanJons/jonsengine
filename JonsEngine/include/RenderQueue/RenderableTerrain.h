@@ -24,5 +24,7 @@ namespace JonsEngine
 	{
 		std::vector<RenderableTerrainData> mTerrainData;
 		std::vector<Mat4> mTransforms;
+
+		uint32_t GetNumTerrains() const { return mTerrainData.size(); }
 	};
 }

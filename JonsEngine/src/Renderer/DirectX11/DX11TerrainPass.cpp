@@ -6,6 +6,7 @@
 #include "include/Renderer/DirectX11/Shaders/Compiled/TerrainHull.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/TerrainDomain.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/TerrainPixel.h"
+#include "include/RenderQueue/RenderableTerrain.h"
 #include "include/Core/Math/Math.h"
 
 namespace JonsEngine
@@ -87,44 +88,44 @@ namespace JonsEngine
 		DXCALL(device->CreateRasterizerState(&rasterizerDesc, &mDebugRasterizer));
 	}
 
-	void DX11TerrainPass::Render(const RenderableTerrains& Terrains, const Mat4& view, const Mat4& viewProjection)
+	void DX11TerrainPass::Render(const RenderableTerrains& terrains, const Mat4& view, const Mat4& viewProjection)
 	{
-
-	}
-
-	/*void DX11TerrainPass::Render(DX11Texture& heightmap, const Mat4& worldTransform, const float heightScale, const float patchSize, const Mat4& view, const Mat4& viewProjection)
-	{
-		const Vec4& terrainWorldCenter = worldTransform[3];
-		const Vec4 terrainWorldExtent = terrainWorldCenter + (patchSize * GRID_SIZE / 2);
-		mPerTerrainCBuffer.SetData({ viewProjection, view, heightScale, -terrainWorldExtent.x, -terrainWorldExtent.z, terrainWorldExtent.x, terrainWorldExtent.z});
-
-		heightmap.BindAsShaderResource(SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA);
-
-		// concatenate all relevant transforms and buffer them to GPU before instanced rendering
-		float patchExtent = patchSize / 2;
-		Mat4 patchScaleTransform = glm::scale(Vec3(patchExtent, 1.0f, patchExtent));
-		for (size_t transformIndex = 0; transformIndex < GRID_SIZE; ++transformIndex)
-		{
-			Mat4& transform = mTempPatchTransformBuffer[transformIndex];
-			transform = worldTransform * patchScaleTransform * mPatchTranslationTransforms.at(transformIndex);
-			transform = glm::transpose(transform);
-		}
-
-		auto dataBegin = &mTempPatchTransformBuffer.front();
-		std::size_t sizeInBytes = mTempPatchTransformBuffer.size() * sizeof(Mat4);
-		mTransformsBuffer.SetData(dataBegin, sizeInBytes);
-		mTransformsBuffer.Bind(DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA);
+		BindForRendering( view, viewProjection );
 
 		ID3D11RasterizerStatePtr prevRasterizer = nullptr;
-		mContext->RSGetState(&prevRasterizer);
+		mContext->RSGetState( &prevRasterizer );
+		mContext->RSSetState( mDebugRasterizer );
 
-		mContext->RSSetState(mDebugRasterizer);
-		mQuadMesh.DrawInstanced(GRID_SIZE);
+		auto dataBegin = &terrains.mTransforms.front();
+		std::size_t sizeInBytes = terrains.mTransforms.size() * sizeof( Mat4 );
+		mTransformsBuffer.SetData( dataBegin, sizeInBytes );
+		mTransformsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA );
 
-		mContext->RSSetState(prevRasterizer);
-	}*/
+		uint32_t beginIndex = 0;
+		for ( uint32_t terrainIndex = 0, numTerrains = terrains.GetNumTerrains(); terrainIndex < numTerrains; ++terrainIndex )
+		{
+			const RenderableTerrainData& terrainData = terrains.mTerrainData.at( terrainIndex );
+			const DX11Texture& heightmap = mTextureMap.GetItem( terrainData.mHeightMap );
 
-	void DX11TerrainPass::BindForRendering()
+			heightmap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
+
+			mPerTerrainCBuffer.SetData( { beginIndex, terrainData.mHeightScale } );
+
+			uint32_t endIndex = terrainData.mEndIndex;
+			assert( endIndex > beginIndex );
+
+			uint32_t numTransforms = endIndex - beginIndex;
+			mQuadMesh.DrawInstanced( numTransforms );
+
+			beginIndex = endIndex;
+		}
+
+		mContext->RSSetState( prevRasterizer );
+
+		UnbindRendering();
+	}
+
+	void DX11TerrainPass::BindForRendering( const Mat4& view, const Mat4& viewProjection )
 	{
 		mContext->VSSetShader(mVertexShader, nullptr, 0);
 		mContext->DSSetShader(mDomainShader, nullptr, 0);
@@ -133,7 +134,7 @@ namespace JonsEngine
 		mContext->HSSetShader(mHullShader, nullptr, 0);
 		mContext->IASetInputLayout(mLayout);
 		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-		mCBuffer.SetData({ mTessData.mMinDistance, mTessData.mMaxDistance, mTessData.mMinFactor, mTessData.mMaxFactor });
+		mCBuffer.SetData({ view, viewProjection, mTessData.mMinDistance, mTessData.mMaxDistance, mTessData.mMinFactor, mTessData.mMaxFactor });
 	}
 
 	void DX11TerrainPass::UnbindRendering()
