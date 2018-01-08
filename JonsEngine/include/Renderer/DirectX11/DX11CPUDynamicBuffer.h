@@ -47,6 +47,8 @@ namespace JonsEngine
 	template <typename T>
 	void DX11CPUDynamicBuffer::SetData(const T* dataptr, const std::size_t totalSizeInBytes)
 	{
+		assert( dataptr );
+
 		if (totalSizeInBytes > mBufferSizeInBytes)
 			ResizeBuffer(dataptr, totalSizeInBytes);
 		else
@@ -68,9 +70,6 @@ namespace JonsEngine
     template <typename T>
     void DX11CPUDynamicBuffer::ResizeBuffer(const T* data, const std::size_t newSizeInBytes)
     {
-        assert(data);
-        assert(newSizeInBytes > 0);
-
 		mBuffer.Release();
 		mBufferSRV.Release();
 
@@ -95,9 +94,6 @@ namespace JonsEngine
     template <typename T>
     void DX11CPUDynamicBuffer::BufferData(const T* data, const std::size_t newSizeInBytes)
     {
-        assert(data);
-        assert(newSizeInBytes > 0);
-
         D3D11_MAPPED_SUBRESOURCE mappedResource;
         ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 

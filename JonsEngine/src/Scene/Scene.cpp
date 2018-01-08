@@ -276,11 +276,6 @@ namespace JonsEngine
         return mSceneCamera;
     }
 
-    const AnimationUpdater& Scene::GetAnimationUpdater() const
-    {
-        return mAnimationUpdater;
-    }
-
 
     void Scene::MarkAsDirty(SceneNode* sceneNode)
     {

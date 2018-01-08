@@ -82,6 +82,7 @@ namespace JonsEngine
 		mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mLuminanceSRVs.at(!mCurrentLumTexture).p);
 		const float elapsedSeconds = ConvertTimeUnitToFloat(TimeInSeconds(elapstedFrameTime));
 		mAvgLuminanceCBuffer.SetData({ elapsedSeconds, exposureRate });
+		mAvgLuminanceCBuffer.Bind();
 
 		mFullscreenPass.RenderWithTexcoords();
 
@@ -101,6 +102,7 @@ namespace JonsEngine
 		mContext->PSSetShader(mTonemapPixelShader, nullptr, 0);
 		const uint32_t mipMapLevel = static_cast<uint32_t>(std::log2(LUM_MAP_WIDTH));
 		mTonemappingCBuffer.SetData({ mipMapLevel });
+		mTonemappingCBuffer.Bind();
 
 		mFullscreenPass.RenderWithTexcoords();
 

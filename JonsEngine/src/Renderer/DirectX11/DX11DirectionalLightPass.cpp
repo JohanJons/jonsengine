@@ -171,7 +171,8 @@ namespace JonsEngine
 
         // set dir light cbuffer data
         mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, splitDistances, directionalLight.mColor, camLightDir, mWindowSize, static_cast<float>(mShadowmap.GetTextureSize())));
-        
+		mDirLightCBuffer.Bind();
+
         // bind appropiate shading pixel shader for shadow filtering argument
         BindShadingPixelShader(shadowFiltering);
 

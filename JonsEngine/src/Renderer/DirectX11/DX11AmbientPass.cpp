@@ -56,6 +56,7 @@ namespace JonsEngine
             mContext->OMSetRenderTargets(1, &mSSAORTV.p, nullptr);
             mContext->PSSetShader(mSSAOPixelShader, nullptr, 0);
             mSSAOCBuffer.SetData(SSAOCBuffer(windowSize));
+			mSSAOCBuffer.Bind();
             mFullscreenPass.Render();
 
             // pass 2: horizontal + vertical blur
@@ -72,6 +73,7 @@ namespace JonsEngine
         // pass 3: render ambient light
         mContext->PSSetShader(mAmbientPixelShader, nullptr, 0);
         mAmbientCBuffer.SetData(AmbientCBuffer(ambientLight, useSSAO));
+		mAmbientCBuffer.Bind();
 
         mFullscreenPass.Render();
     }

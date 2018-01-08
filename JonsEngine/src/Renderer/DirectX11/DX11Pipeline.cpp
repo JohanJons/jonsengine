@@ -39,7 +39,7 @@ namespace JonsEngine
         mPostProcessor(device, context, mFullscreenPass, backbufferTextureDesc),
         mSkyboxPass(device, context),
 
-		mTerrainPass(device, context, mVertexTransformPass, settings.mTessellation),
+		mTerrainPass(device, context, mVertexTransformPass, mTextureMap, settings.mTessellation),
 
 		mPerFrameCB(device, context, mPerFrameCB.CONSTANT_BUFFER_SLOT_PER_FRAME)
     {
@@ -118,14 +118,7 @@ namespace JonsEngine
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-		//mTerrainPass.BindForRendering();
-		mTerrainPass.Render();
-		/*for (const auto& terrain : renderQueue.mTerrains)
-		{
-			DX11Texture& heightmap = mTextureMap.GetItem(terrain.mHeightMap);
-			mTerrainPass.Render(heightmap, terrain.mWorldTransform, terrain.mHeightScale, terrain.mPatchSize, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix);
-		}*/
-		//mTerrainPass.UnbindRendering();
+		mTerrainPass.Render( renderQueue.mTerrains, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix );
 
 		mGBuffer.BindForRendering();
 
@@ -260,5 +253,6 @@ namespace JonsEngine
 	{
 		auto& camera = renderQueue.mCamera;
 		mPerFrameCB.SetData({ glm::inverse(camera.mCameraViewMatrix), glm::inverse(camera.mCameraProjectionMatrix) });
+		mPerFrameCB.Bind();
 	}
 }

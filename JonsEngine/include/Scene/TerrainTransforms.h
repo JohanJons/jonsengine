@@ -11,9 +11,19 @@ namespace JonsEngine
 {
 	struct TerrainTransformData
 	{
-		typedef std::pair<TerrainID, std::size_t> IDIndexPair;
+		struct Metadata
+		{
+			Metadata( TerrainID id, uint32_t endIndex, uint32_t gridSize ) :
+				mID(id), mEndIndex(endIndex), mGridSize(gridSize)
+			{
+			}
 
-		std::vector<IDIndexPair> mIDEndIndex;
+			TerrainID mID;
+			uint32_t mEndIndex;
+			uint32_t mGridSize;
+		};
+
+		std::vector<Metadata> mTerrainMetadata;
 		std::vector<Mat4> mTransforms;
 	};
 
@@ -26,7 +36,7 @@ namespace JonsEngine
 		uint32_t UpdateTransforms();
 
 		uint32_t GetNumEntries() const;
-		const TerrainTransformData& GetTerrainTransforms() const { return mTerrainTransforms; }
+		const TerrainTransformData& GetTransformData() const { return mTerrainTransforms; }
 
 	private:
 		const IDMap<Terrain>& mTerrainLookup;

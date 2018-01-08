@@ -37,7 +37,7 @@ namespace JonsEngine
 	};
 
 
-	DX11TerrainPass::DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const RenderSettings::Tesselation& tessData) :
+	DX11TerrainPass::DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, const RenderSettings::Tesselation& tessData) :
 		mContext(context),
 
 		mCBuffer(device, context, mCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
@@ -45,6 +45,7 @@ namespace JonsEngine
 		mTransformsBuffer(device, context),
 		mQuadMesh(device, context, gQuadVertices, gQuadNormals, std::vector<float>(), std::vector<float>(), gQuadIndices, gAABBMin, gAABBMax),
 		mVertexTransformer(vertexTransformer),
+		mTextureMap(textureMap),
 
 		mTessData(tessData)
 	{
@@ -90,6 +91,9 @@ namespace JonsEngine
 
 	void DX11TerrainPass::Render(const RenderableTerrains& terrains, const Mat4& view, const Mat4& viewProjection)
 	{
+		if ( !terrains.GetNumTerrains() )
+			return;
+
 		BindForRendering( view, viewProjection );
 
 		ID3D11RasterizerStatePtr prevRasterizer = nullptr;
@@ -110,6 +114,7 @@ namespace JonsEngine
 			heightmap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
 
 			mPerTerrainCBuffer.SetData( { beginIndex, terrainData.mHeightScale } );
+			mPerTerrainCBuffer.Bind();
 
 			uint32_t endIndex = terrainData.mEndIndex;
 			assert( endIndex > beginIndex );
@@ -135,6 +140,7 @@ namespace JonsEngine
 		mContext->IASetInputLayout(mLayout);
 		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 		mCBuffer.SetData({ view, viewProjection, mTessData.mMinDistance, mTessData.mMaxDistance, mTessData.mMinFactor, mTessData.mMaxFactor });
+		mCBuffer.Bind();
 	}
 
 	void DX11TerrainPass::UnbindRendering()

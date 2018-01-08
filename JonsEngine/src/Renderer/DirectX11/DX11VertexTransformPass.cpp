@@ -95,6 +95,7 @@ namespace JonsEngine
 
 		const uint32_t noBoneIndexOffset = 0;
         mTransformCBuffer.SetData(TransformCBuffer(wvpMatrix, noBoneIndexOffset));
+		mTransformCBuffer.Bind();
         mesh.DrawPositions();
     }
 
@@ -117,6 +118,7 @@ namespace JonsEngine
 
 		const uint32_t noBoneIndexOffset = 0;
 		mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix, noBoneIndexOffset));
+		mTransformCBuffer.Bind();
 
 		const uint32_t numTransforms = worldTransforms.size();
 		assert(numTransforms > 0);
@@ -171,6 +173,7 @@ namespace JonsEngine
 			const DX11MeshID meshID = aabbData.second;
 
 			mTransformCBuffer.SetData(TransformCBuffer(viewProjMatrix * worldTransform, noBoneIndexOffset));
+			mTransformCBuffer.Bind();
 			mMeshMap.GetItem(meshID).DrawAABB();
 		}
 	}
@@ -205,6 +208,7 @@ namespace JonsEngine
 				boneOffset = mesh.mSkeleton.mBoneRange.first;
 
 			mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix * mesh.mLocalWorldTransform, boneOffset));
+			mTransformCBuffer.Bind();
 			mMeshMap.GetItem(mesh.mMeshID).DrawPositions();
 		}
 	}

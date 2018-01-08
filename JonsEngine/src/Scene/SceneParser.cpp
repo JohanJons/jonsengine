@@ -38,8 +38,6 @@ namespace JonsEngine
 	void CullAABB(const Scene& scene, const ResourceManifest& resManifest, const ACTOR_ITER_TYPE& actorIterator, const EngineSettings::CullingStrategy cullingStrat, AABBRenderData::RenderableAABBsContainer& aabbDataContainer,
 		const Mat4& viewProjTransform);
 
-	void CullTerrain(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const Scene::TerrainIterator& terrainIter, RenderableTerrains& terrainRenderQueue, const Mat4& cameraViewProj);
-
 
     SceneParser::SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest) :
 		mResourceManifest(resManifest),
@@ -100,9 +98,6 @@ namespace JonsEngine
 
 		mRenderQueue.mCamera.mStaticMeshesEnd =  mRenderQueue.mRenderData.mStaticMeshes.size();
 		mRenderQueue.mCamera.mAnimatedMeshesEnd = mRenderQueue.mRenderData.mAnimatedMeshes.size();
-
-		const auto terrains = scene.GetTerrains();
-		CullTerrain(scene, mResourceManifest, mCullingStrategy, terrains, mRenderQueue.mTerrains, mRenderQueue.mCamera.mCameraViewProjectionMatrix);
     }
 
     void SceneParser::PointLightCulling(const Scene& scene)
@@ -180,13 +175,15 @@ namespace JonsEngine
 		mRenderQueue.mTerrains.mTransforms.clear();
 
 		const TerrainTransforms& terrainTransforms = scene.GetTerrainTransforms();
-		const TerrainTransformData& transformData = terrainTransforms.GetTerrainTransforms();
+		const TerrainTransformData& transformData = terrainTransforms.GetTransformData();
 
 		for (uint32_t index = 0, numTerrainTransforms = terrainTransforms.GetNumEntries(); index < numTerrainTransforms; ++index)
 		{
-			TerrainID ID = transformData.mIDEndIndex[index].first;
-			std::size_t endIndex = transformData.mIDEndIndex[index].second;
-			std::size_t beginIndex = index == 0 ? 0 : transformData.mIDEndIndex[index - 1].second;
+			TerrainTransformData::Metadata terrainMetadata = transformData.mTerrainMetadata[ index ];
+
+			TerrainID ID = terrainMetadata.mID;
+			std::size_t endIndex = terrainMetadata.mEndIndex;
+			std::size_t beginIndex = index == 0 ? 0 : transformData.mTerrainMetadata[index - 1].mEndIndex;
 
 			const Terrain& terrain = scene.GetTerrain(ID);
 			SceneNodeID sceneNodeID = terrain.GetSceneNode();
@@ -201,10 +198,11 @@ namespace JonsEngine
 
 			auto heightmap = terrainData.GetHeightMap();
 			float patchSize = terrain.GetPatchSize();
+			float gridSize = terrainMetadata.mGridSize;
 			float heightScale = terrain.GetHeightScale();
 
 			const Vec4& terrainWorldCenter = node.GetWorldTransform()[ 3 ];
-			const Vec4 terrainWorldExtent = terrainWorldCenter + ( patchSize * GRID_SIZE / 2 );
+			const Vec4 terrainWorldExtent = terrainWorldCenter + ( patchSize * gridSize / 2 );
 
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
 			renderableTransforms.insert(renderableTransforms.cend(), transformData.mTransforms.cbegin() + beginIndex, transformData.mTransforms.cbegin() + endIndex);

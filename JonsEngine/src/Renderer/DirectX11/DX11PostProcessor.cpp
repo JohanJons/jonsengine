@@ -36,6 +36,7 @@ namespace JonsEngine
         mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mFXAASRV.p);
         mContext->PSSetShader(mFXAAPixelShader, nullptr, 0);
         mFXAACBuffer.SetData(FXAACBuffer(windowSize));
+		mFXAACBuffer.Bind();
 
         mFullscreenPass.Render();
     }

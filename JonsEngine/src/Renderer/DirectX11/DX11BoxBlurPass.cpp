@@ -42,6 +42,7 @@ namespace JonsEngine
         mContext->OMSetRenderTargets(1, &mBoxBlurRTV.p, nullptr);
         mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &textureToBlur.p);
         mBoxBlurCBuffer.SetData(BoxBlurCBuffer(Vec2(1.0f / windowSize.x, 0.0f)));
+		mBoxBlurCBuffer.Bind();
 
         mFullscreenPass.Render();
 
@@ -51,6 +52,7 @@ namespace JonsEngine
         mContext->OMSetRenderTargets(1, &prevRTV.p, prevDSV);
         mContext->PSSetShaderResources(SHADER_TEXTURE_SLOT_EXTRA, 1, &mBoxBlurSRV.p);
         mBoxBlurCBuffer.SetData(BoxBlurCBuffer(Vec2(0.0f, 1.0f / windowSize.y)));
+		mBoxBlurCBuffer.Bind();
 
         mFullscreenPass.Render();
     }

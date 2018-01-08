@@ -91,8 +91,8 @@ namespace JonsEngine
         Camera& GetSceneCamera();
         const Camera& GetSceneCamera() const;
 
-        const AnimationUpdater& GetAnimationUpdater() const;
-		const TerrainTransforms& GetTerrainTransforms() const;
+		const AnimationUpdater& GetAnimationUpdater() const { return mAnimationUpdater; }
+		const TerrainTransforms& GetTerrainTransforms() const { return mTerrainTransforms; }
 
 		const std::string mName;
 

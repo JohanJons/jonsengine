@@ -47,14 +47,17 @@ namespace JonsEngine
             DXCALL(mContext->Map(mConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
             std::memcpy(mappedResource.pData, &content, sizeof(ContentType));
             mContext->Unmap(mConstantBuffer, 0);
-
-            // TODO: split per type?
-            mContext->VSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
-            mContext->PSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
-            mContext->CSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
-			mContext->DSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
-			mContext->HSSetConstantBuffers(mConstantBufferSlot, 1, &mConstantBuffer.p);
         }
+
+		void Bind()
+		{
+			// TODO: split per type?
+			mContext->VSSetConstantBuffers( mConstantBufferSlot, 1, &mConstantBuffer.p );
+			mContext->PSSetConstantBuffers( mConstantBufferSlot, 1, &mConstantBuffer.p );
+			mContext->CSSetConstantBuffers( mConstantBufferSlot, 1, &mConstantBuffer.p );
+			mContext->DSSetConstantBuffers( mConstantBufferSlot, 1, &mConstantBuffer.p );
+			mContext->HSSetConstantBuffers( mConstantBufferSlot, 1, &mConstantBuffer.p );
+		}
 
 
     private:

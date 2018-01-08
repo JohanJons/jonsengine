@@ -175,6 +175,7 @@ namespace JonsEngine
         // set point light pixel shader and its cbuffer
         mContext->PSSetShader(mPixelShader, nullptr, 0);
         mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mColor, viewLightPositonV4, mWindowSize, pointLight.mIntensity, Z_NEAR, pointLight.mRadius));
+		mPointLightCBuffer.Bind();
 
         // run transform pass on sphere + point light shading pass
         mVertexTransformPass.RenderStaticMesh(mSphereMesh, lightMeshWVP);

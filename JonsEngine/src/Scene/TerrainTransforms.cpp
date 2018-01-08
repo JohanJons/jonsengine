@@ -6,7 +6,7 @@ namespace JonsEngine
 {
 	namespace
 	{
-		typedef std::vector<TerrainTransformData::IDIndexPair>::const_iterator IDIndexIterator;
+		typedef std::vector<TerrainTransformData::Metadata>::const_iterator IDIndexIterator;
 		typedef std::vector<Mat4>::iterator TransformIterator;
 
 		uint32_t GetNumTransforms(const float patchSize, const float width, const float height)
@@ -14,14 +14,26 @@ namespace JonsEngine
 			return width / patchSize * height / patchSize;
 		}
 
+		int32_t GetNumColumns( const float patchSize, const float width )
+		{
+			return width / patchSize;
+		}
+
+		int32_t GetNumRows( const float patchSize, const float height )
+		{
+			return height / patchSize;
+		}
+
 		IDIndexIterator AddTransforms(TerrainTransformData& TransformsData, TerrainID ID, const float patchSize, const float width, const float height)
 		{
 			uint32_t numTransforms = GetNumTransforms(patchSize, width, height);
 			TransformsData.mTransforms.insert(TransformsData.mTransforms.cend(), numTransforms, gIdentityMatrix);
 
-			TransformsData.mIDEndIndex.emplace_back(ID, TransformsData.mTransforms.size());
+			uint32_t gridSize = static_cast<uint32_t>( GetNumColumns( patchSize, width ) );
+			assert( gridSize == GetNumRows( patchSize, height ) );
+			TransformsData.mTerrainMetadata.emplace_back(ID, TransformsData.mTransforms.size(), gridSize );
 
-			return TransformsData.mIDEndIndex.cend() - 1;
+			return TransformsData.mTerrainMetadata.cend() - 1;
 		}
 
 		void RebuildTransforms(TransformIterator begin, const Mat4& worldTransform, const float patchSize, const float width, const float height)
@@ -29,7 +41,7 @@ namespace JonsEngine
 			assert(patchSize && width && height);
 			assert(width == static_cast<uint32_t>(width) && height == static_cast<uint32_t>(height));
 
-			int32_t numWidth = width / patchSize, numHeight = height / patchSize;
+			int32_t numWidth = GetNumColumns( patchSize, width ), numHeight = GetNumRows(patchSize, height);
 			assert(numWidth + numHeight == GetNumTransforms(patchSize, width, height));
 
 			auto iter = begin;
@@ -69,9 +81,9 @@ namespace JonsEngine
 
 		for (TerrainID ID : mDirtyTransforms)
 		{
-			auto funcIDComparison = [ID](const TerrainTransformData::IDIndexPair& pair) { return ID == pair.first; };
+			auto funcIDComparison = [ID](const TerrainTransformData::Metadata& metadata) { return ID == metadata.mID; };
 
-			auto beginIter = mTerrainTransforms.mIDEndIndex.cbegin(), endIter = mTerrainTransforms.mIDEndIndex.cend();
+			auto beginIter = mTerrainTransforms.mTerrainMetadata.cbegin(), endIter = mTerrainTransforms.mTerrainMetadata.cend();
 			auto iter = std::find_if(beginIter, endIter, funcIDComparison);
 			
 			const Terrain& terrain = mTerrainLookup.GetItem(ID);
@@ -82,11 +94,11 @@ namespace JonsEngine
 			if (iter == endIter)
 			{
 				iter = AddTransforms(mTerrainTransforms, ID, patchSize, width, height);
-				beginIter = mTerrainTransforms.mIDEndIndex.cbegin();
+				beginIter = mTerrainTransforms.mTerrainMetadata.cbegin();
 			}
 
 			const Mat4& worldTransform = mSceneNodeLookup.GetNode(terrain.GetSceneNode()).GetWorldTransform();
-			std::size_t beginIndex = iter == beginIter ? 0 : (iter - 1)->second;
+			std::size_t beginIndex = iter == beginIter ? 0 : (iter - 1)->mEndIndex;
 			auto iterTransformsBegin = mTerrainTransforms.mTransforms.begin();
 			RebuildTransforms(iterTransformsBegin + beginIndex, worldTransform, patchSize, width, height);
 
@@ -98,7 +110,7 @@ namespace JonsEngine
 
 	uint32_t TerrainTransforms::GetNumEntries() const
 	{
-		assert(mTerrainTransforms.mTransforms.size() == mTerrainTransforms.mIDEndIndex.size());
+		assert(mTerrainTransforms.mTransforms.size() == mTerrainTransforms.mTerrainMetadata.size());
 
 		return mTerrainTransforms.mTransforms.size();
 	}

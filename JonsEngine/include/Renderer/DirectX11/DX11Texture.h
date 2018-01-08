@@ -15,7 +15,7 @@ namespace JonsEngine
         DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight, const bool isCubeTexture);
         ~DX11Texture();
 
-        void BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot);
+        void BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot) const;
 
         const DX11TextureID mID;
 

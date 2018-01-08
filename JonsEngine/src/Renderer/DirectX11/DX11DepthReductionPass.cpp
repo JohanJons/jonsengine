@@ -61,6 +61,7 @@ namespace JonsEngine
         const float perspClipNear = PerspectiveNearPlane(Z_NEAR, Z_FAR);
         const float perspClipFar = PerspectiveFarPlane(Z_NEAR, Z_FAR);
         mSDSMCBuffer.SetData(SDSMCBuffer(-perspClipNear, perspClipFar, Z_NEAR, Z_FAR));
+		mSDSMCBuffer.Bind();
 
         auto& initialRTV = mDepthReductionRTVs.front();
         mContext->CSSetUnorderedAccessViews(UAV_SLOT, 1, &initialRTV.mUAV.p, nullptr);

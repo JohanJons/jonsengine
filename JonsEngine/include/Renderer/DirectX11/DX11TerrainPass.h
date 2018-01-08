@@ -5,6 +5,7 @@
 #include "include/Renderer/DirectX11/DX11CPUDynamicBuffer.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/RenderSettings.h"
+#include "include/Core/Containers/IDMap.hpp"
 
 #include <array>
 
@@ -44,6 +45,7 @@ namespace JonsEngine
 			float mWorldPosMinZ;
 			float mWorldPosMaxX;
 			float mWorldPosMaxZ;
+			float __padding[ 2 ];
 		};
 
 	private:
