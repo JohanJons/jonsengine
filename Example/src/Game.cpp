@@ -20,7 +20,13 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
-    Game::Game() : mEngine(mSettings), mGameScene(mEngine.GetSceneManager().GetActiveScene(), mEngine.GetResourceManifest(), "assets.jons"), mSun(mGameScene.GetSun()), mRunning(true), mMoveSpeed(0.1f)
+    Game::Game() : 
+		mEngine(mSettings),
+		mGameScene( mEngine.GetSceneManager(), mEngine.GetResourceManifest() ),
+		mTessellationScene( mEngine.GetSceneManager(), mEngine.GetResourceManifest() ),
+		mSun(mGameScene.GetSun()),
+		mRunning(true),
+		mMoveSpeed(0.1f)
     {
         SetupInputCallbacks();
         mEngine.GetWindow().ShowMouseCursor(false);
@@ -43,7 +49,7 @@ namespace JonsGame
 
     void Game::OnKeyEvent(const KeyEvent& evnt)
     {
-        Camera& camera = mGameScene.GetJonsScene().GetSceneCamera();
+		Camera& camera = mEngine.GetSceneManager().GetActiveScene().GetSceneCamera();
 
         // SHIFT-modifier activated
         if ((evnt.mState == KeyEvent::KeyState::STATE_PRESSED || evnt.mState == KeyEvent::KeyState::STATE_REPEAT) && evnt.mShiftPressed)
@@ -110,6 +116,10 @@ namespace JonsGame
                 case Key::C: mEngine.GetWindow().SetScreenResolution(1920, 1080); break;
                 case Key::ESC: mRunning = false; break;
 
+				// scene-switch
+				case Key::F1: mEngine.GetSceneManager().SetActiveScene( mGameScene.GetSceneID() ); break;
+				case Key::F2: mEngine.GetSceneManager().SetActiveScene( mTessellationScene.GetSceneID() ); break;
+
                 default:
                     break;
             }
@@ -122,7 +132,7 @@ namespace JonsGame
 
     void Game::OnMouseMovementEvent(const JonsEngine::MouseMovementEvent& evnt)
     {
-        Camera& camera = mGameScene.GetJonsScene().GetSceneCamera();
+        Camera& camera = mEngine.GetSceneManager().GetActiveScene().GetSceneCamera();
 
         const float sens = 0.1f;
         float newXPos = (float)evnt.x * sens;

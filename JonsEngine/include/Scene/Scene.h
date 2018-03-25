@@ -126,4 +126,7 @@ namespace JonsEngine
         bool mHasDirtySceneNodes;
         const SceneNodeID mRootNodeID;
     };
+
+	typedef IDMap<Scene>::ItemID SceneID;
+	static const SceneID INVALID_SCENE_ID = IDMap<Scene>::INVALID_ITEM_ID;
 }

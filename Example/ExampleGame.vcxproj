@@ -14,11 +14,13 @@
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\SceneTessellation.cpp" />
     <ClCompile Include="src\Sun.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Game.h" />
     <ClInclude Include="include\Scene.h" />
+    <ClInclude Include="include\SceneTessellation.h" />
     <ClInclude Include="include\Sun.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

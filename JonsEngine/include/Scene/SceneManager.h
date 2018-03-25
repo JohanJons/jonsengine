@@ -8,8 +8,6 @@ namespace JonsEngine
 {
     class ResourceManifest;
 
-    typedef uint32_t SceneID;
-
     class SceneManager
     {
     public:

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Scene.h"
+#include "include/SceneTessellation.h"
 #include "include/Sun.h"
 
 #include "include/Core/Engine.h"
@@ -26,16 +27,15 @@ namespace JonsGame
         void OnMouseMovementEvent(const JonsEngine::MouseMovementEvent& evnt);
         void OnKeyEvent(const JonsEngine::KeyEvent& evnt);
 
-
     private:
         void SetupInputCallbacks();
-
 
         JonsEngine::EngineSettings mSettings;
         JonsEngine::Engine mEngine;
         JonsEngine::DebugOptions mDebugOptions;
 
         Scene mGameScene;
+		SceneTessellation mTessellationScene;
         Sun mSun;
 
         bool mRunning;

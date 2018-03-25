@@ -11,8 +11,10 @@ namespace JonsGame
     class Scene
     {
     public:
-        Scene(JonsEngine::Scene& jonsScene, JonsEngine::ResourceManifest& resManifest, const std::string& jonsPkgName);
+        Scene( JonsEngine::SceneManager& sceneMgr, JonsEngine::ResourceManifest& resManifest );
         ~Scene();
+
+		JonsEngine::SceneID GetSceneID() const { return mID; }
 
         void ToggleAnimationWuson();
 		void ToggleAnimationBob();
@@ -23,7 +25,8 @@ namespace JonsGame
 
 
     private:
-        JonsEngine::Scene& mScene;
+		const JonsEngine::SceneNodeID mID;
+        JonsEngine::SceneManager& mSceneMgr;
         JonsEngine::JonsPackagePtr mJonsPackage;
 
         JonsEngine::SkyboxID mSkybox;
@@ -55,10 +58,6 @@ namespace JonsGame
         JonsEngine::SceneNodeID mNodeCube3;
 		JonsEngine::SceneNodeID mNodeBob;
 		JonsEngine::SceneNodeID mNodeSAS;
-		JonsEngine::SceneNodeID mNodeTerrain;
-
-		JonsEngine::TerrainDataID mTerrainData;
-		JonsEngine::TerrainID mTerrain;
 
         JonsEngine::PointLightID mMovingPointLightID;
         JonsEngine::DirectionalLightID mSunDirLightID;
