@@ -48,10 +48,12 @@ namespace JonsEngine
     private:
 		struct PerFrameCB
 		{
+			Mat4 mViewProj;
+			Mat4 mView;
 			Mat4 mInvView;
 			Mat4 mInvProj;
 
-			PerFrameCB(const Mat4& invView, const Mat4& invProj) : mInvView(invView), mInvProj(invProj)
+			PerFrameCB( const Mat4& viewProj, const Mat4& view, const Mat4& invView, const Mat4& invProj) : mViewProj(viewProj), mView(view), mInvView(invView), mInvProj(invProj)
 			{
 			}
 		};

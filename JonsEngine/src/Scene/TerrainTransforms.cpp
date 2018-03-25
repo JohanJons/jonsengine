@@ -42,7 +42,7 @@ namespace JonsEngine
 			assert(width == static_cast<uint32_t>(width) && height == static_cast<uint32_t>(height));
 
 			int32_t numWidth = GetNumColumns( patchSize, width ), numHeight = GetNumRows(patchSize, height);
-			assert(numWidth + numHeight == GetNumTransforms(patchSize, width, height));
+			assert(numWidth * numHeight == GetNumTransforms(patchSize, width, height));
 
 			auto iter = begin;
 			float patchExtent = patchSize / 2;
@@ -69,7 +69,7 @@ namespace JonsEngine
 	void TerrainTransforms::AddDirty(TerrainID ID)
 	{
 		auto iter = std::find(mDirtyTransforms.cbegin(), mDirtyTransforms.cend(), ID);
-		if (iter == mDirtyTransforms.cend())
+		if (iter != mDirtyTransforms.cend())
 			return;
 
 		mDirtyTransforms.push_back(ID);
@@ -110,8 +110,6 @@ namespace JonsEngine
 
 	uint32_t TerrainTransforms::GetNumEntries() const
 	{
-		assert(mTerrainTransforms.mTransforms.size() == mTerrainTransforms.mTerrainMetadata.size());
-
-		return mTerrainTransforms.mTransforms.size();
+		return mTerrainTransforms.mTerrainMetadata.size();
 	}
 }

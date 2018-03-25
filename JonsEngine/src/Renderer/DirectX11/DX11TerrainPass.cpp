@@ -13,9 +13,9 @@ namespace JonsEngine
 {
 	const std::vector<float> gQuadVertices{
 		-1.0f, 0.0f, -1.0f,
-		-1.0f, 0.0f, 1.0f,
+		1.0f, 0.0f, -1.0f,
 		1.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, -1.0f
+		-1.0f, 0.0f, 1.0f
 	};
 
 	const std::vector<float> gQuadNormals{
@@ -27,7 +27,7 @@ namespace JonsEngine
 
 	const Vec3 gAABBMax(1.0f, 0.0f, 1.0f), gAABBMin(-1.0f, 0.0f, -1.0f);
 
-	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 2, 3, 0 };
+	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3 };
 
 	enum VSInputLayout
 	{
@@ -89,12 +89,12 @@ namespace JonsEngine
 		DXCALL(device->CreateRasterizerState(&rasterizerDesc, &mDebugRasterizer));
 	}
 
-	void DX11TerrainPass::Render(const RenderableTerrains& terrains, const Mat4& view, const Mat4& viewProjection)
+	void DX11TerrainPass::Render(const RenderableTerrains& terrains)
 	{
 		if ( !terrains.GetNumTerrains() )
 			return;
 
-		BindForRendering( view, viewProjection );
+		BindForRendering();
 
 		ID3D11RasterizerStatePtr prevRasterizer = nullptr;
 		mContext->RSGetState( &prevRasterizer );
@@ -130,7 +130,7 @@ namespace JonsEngine
 		UnbindRendering();
 	}
 
-	void DX11TerrainPass::BindForRendering( const Mat4& view, const Mat4& viewProjection )
+	void DX11TerrainPass::BindForRendering()
 	{
 		mContext->VSSetShader(mVertexShader, nullptr, 0);
 		mContext->DSSetShader(mDomainShader, nullptr, 0);
@@ -138,8 +138,8 @@ namespace JonsEngine
 		mContext->DSSetShader(mDomainShader, nullptr, 0);
 		mContext->HSSetShader(mHullShader, nullptr, 0);
 		mContext->IASetInputLayout(mLayout);
-		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
-		mCBuffer.SetData({ view, viewProjection, mTessData.mMinDistance, mTessData.mMaxDistance, mTessData.mMinFactor, mTessData.mMaxFactor });
+		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST);
+		mCBuffer.SetData({ mTessData.mMinDistance, mTessData.mMaxDistance, mTessData.mMinFactor, mTessData.mMaxFactor });
 		mCBuffer.Bind();
 	}
 

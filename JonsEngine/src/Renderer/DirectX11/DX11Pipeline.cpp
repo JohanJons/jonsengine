@@ -118,7 +118,7 @@ namespace JonsEngine
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-		mTerrainPass.Render( renderQueue.mTerrains, renderQueue.mCamera.mCameraViewMatrix, renderQueue.mCamera.mCameraViewProjectionMatrix );
+		mTerrainPass.Render( renderQueue.mTerrains );
 
 		mGBuffer.BindForRendering();
 
@@ -252,7 +252,7 @@ namespace JonsEngine
 	void DX11Pipeline::SetPerFrameCBuffer(const RenderQueue& renderQueue)
 	{
 		auto& camera = renderQueue.mCamera;
-		mPerFrameCB.SetData({ glm::inverse(camera.mCameraViewMatrix), glm::inverse(camera.mCameraProjectionMatrix) });
+		mPerFrameCB.SetData({ camera.mCameraViewProjectionMatrix, camera.mCameraViewMatrix, glm::inverse(camera.mCameraViewMatrix), glm::inverse(camera.mCameraProjectionMatrix) });
 		mPerFrameCB.Bind();
 	}
 }

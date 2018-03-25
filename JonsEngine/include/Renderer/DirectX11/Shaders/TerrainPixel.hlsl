@@ -14,11 +14,10 @@ PixelOut ps_main(DomainOut input)
 {
 	PixelOut ret;
 
-	ret.mDiffuse = float4(0.0, 1.0, 0.0, 0.0);
-	ret.mNormal = float3(0.0, 1.0, 0.0);
-	//ret.mNormal = normalize(input.mNormalW);
-	//ret.mNormal += 1.0;
-	//ret.mNormal *= 0.5;
+	ret.mDiffuse = float4(0.0f, 1.0f, 0.0f, 1.0f);
+	ret.mNormal = normalize(input.mNormal);
+	ret.mNormal += 1.0f;
+	ret.mNormal *= 0.5f;
 
 	return ret;
 }

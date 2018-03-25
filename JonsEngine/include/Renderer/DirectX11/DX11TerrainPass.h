@@ -24,13 +24,11 @@ namespace JonsEngine
 
 		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, const RenderSettings::Tesselation& tessData);
 
-		void Render(const RenderableTerrains& terrains, const Mat4& view, const Mat4& viewProjection);
+		void Render(const RenderableTerrains& terrains);
 
 	private:
 		struct TerrainCBuffer
 		{
-			Mat4 mViewProjection;
-			Mat4 mView;
 			float mMinDistance;
 			float mMaxDistance;
 			float mMinFactor;
@@ -49,7 +47,7 @@ namespace JonsEngine
 		};
 
 	private:
-		void BindForRendering( const Mat4& view, const Mat4& viewProjection );
+		void BindForRendering();
 		void UnbindRendering();
 
 		ID3D11DeviceContextPtr mContext = nullptr;

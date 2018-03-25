@@ -7,6 +7,8 @@ StructuredBuffer<float4x4> gBones : register (SBUFFER_REGISTER_BONE_TRANSFORMS);
 
 cbuffer PerFrameCB : register(CBUFFER_REGISTER_PER_FRAME)
 {
+	float4x4 gFrameViewProj;
+	float4x4 gFrameView;
 	float4x4 gFrameInvView;
 	float4x4 gFrameInvProj;
 };
