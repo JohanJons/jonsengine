@@ -117,6 +117,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c" />
+    <ClCompile Include="src\Core\Containers\GridQuadTree.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Core\Logging\OutputStream.cpp" />
     <ClCompile Include="src\Core\Logging\StreamBuf.cpp" />
@@ -200,6 +201,7 @@
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
     <ClInclude Include="include\Core\Containers\DataPool.hpp" />
+    <ClInclude Include="include\Core\Containers\GridQuadTree.hpp" />
     <ClInclude Include="include\Core\Containers\IDMap.hpp" />
     <ClInclude Include="include\Core\Containers\IDMapBase.hpp" />
     <ClInclude Include="include\Core\Containers\IDMapPointer.hpp" />

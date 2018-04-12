@@ -6,14 +6,6 @@ namespace JonsEngine
 {
 	namespace
 	{
-		typedef std::vector<TerrainTransformData::Metadata>::const_iterator IDIndexIterator;
-		typedef std::vector<Mat4>::iterator TransformIterator;
-
-		uint32_t GetNumTransforms(const float patchSize, const float width, const float height)
-		{
-			return width / patchSize * height / patchSize;
-		}
-
 		int32_t GetNumColumns( const float patchSize, const float width )
 		{
 			return width / patchSize;
@@ -24,27 +16,18 @@ namespace JonsEngine
 			return height / patchSize;
 		}
 
-		IDIndexIterator AddTransforms(TerrainTransformData& TransformsData, TerrainID ID, const float patchSize, const float width, const float height)
-		{
-			uint32_t numTransforms = GetNumTransforms(patchSize, width, height);
-			TransformsData.mTransforms.insert(TransformsData.mTransforms.cend(), numTransforms, gIdentityMatrix);
-
-			uint32_t gridSize = static_cast<uint32_t>( GetNumColumns( patchSize, width ) );
-			assert( gridSize == GetNumRows( patchSize, height ) );
-			TransformsData.mTerrainMetadata.emplace_back(ID, TransformsData.mTransforms.size(), gridSize );
-
-			return TransformsData.mTerrainMetadata.cend() - 1;
-		}
-
-		void RebuildTransforms(TransformIterator begin, const Mat4& worldTransform, const float patchSize, const float width, const float height)
+		void RebuildTransforms( TerrainTransformData& TransformData, const Mat4& worldTransform, const float patchSize, const float width, const float height)
 		{
 			assert(patchSize && width && height);
 			assert(width == static_cast<uint32_t>(width) && height == static_cast<uint32_t>(height));
 
 			int32_t numWidth = GetNumColumns( patchSize, width ), numHeight = GetNumRows(patchSize, height);
-			assert(numWidth * numHeight == GetNumTransforms(patchSize, width, height));
+			int32_t gridSize = numWidth * numHeight;
 
-			auto iter = begin;
+			std::vector<Mat4>& GridNodes = TransformData.mQuadTree.GetNodes();
+			GridNodes.resize( gridSize );
+
+			auto iter = GridNodes.begin();
 			float patchExtent = patchSize / 2;
 			Mat4 patchScaleTransform = glm::scale(Vec3(patchExtent, 1.0f, patchExtent));
 			for (int32_t colNum = -numHeight; colNum < numHeight; colNum += 2)
@@ -72,6 +55,9 @@ namespace JonsEngine
 		if (iter != mDirtyTransforms.cend())
 			return;
 
+		if ( !HasAdded( ID ) )
+			mTerrainTransforms.emplace_back( ID );
+
 		mDirtyTransforms.push_back(ID);
 	}
 
@@ -81,26 +67,15 @@ namespace JonsEngine
 
 		for (TerrainID ID : mDirtyTransforms)
 		{
-			auto funcIDComparison = [ID](const TerrainTransformData::Metadata& metadata) { return ID == metadata.mID; };
-
-			auto beginIter = mTerrainTransforms.mTerrainMetadata.cbegin(), endIter = mTerrainTransforms.mTerrainMetadata.cend();
-			auto iter = std::find_if(beginIter, endIter, funcIDComparison);
-			
 			const Terrain& terrain = mTerrainLookup.GetItem(ID);
 			const TerrainData& terrainData = mTerrainDataLookup.GetItem(terrain.GetTerrainData());
 			float patchSize = terrain.GetPatchSize();
 			float width = terrainData.GetWidth(), height = terrainData.GetHeight();
-			
-			if (iter == endIter)
-			{
-				iter = AddTransforms(mTerrainTransforms, ID, patchSize, width, height);
-				beginIter = mTerrainTransforms.mTerrainMetadata.cbegin();
-			}
 
 			const Mat4& worldTransform = mSceneNodeLookup.GetNode(terrain.GetSceneNode()).GetWorldTransform();
-			std::size_t beginIndex = iter == beginIter ? 0 : (iter - 1)->mEndIndex;
-			auto iterTransformsBegin = mTerrainTransforms.mTransforms.begin();
-			RebuildTransforms(iterTransformsBegin + beginIndex, worldTransform, patchSize, width, height);
+
+			TerrainTransformData& TransformData = GetTransformData( ID );
+			RebuildTransforms( TransformData, worldTransform, patchSize, width, height);
 
 			++numUpdated;
 		}
@@ -110,6 +85,25 @@ namespace JonsEngine
 
 	uint32_t TerrainTransforms::GetNumEntries() const
 	{
-		return mTerrainTransforms.mTerrainMetadata.size();
+		return mTerrainTransforms.size();
+	}
+
+	bool TerrainTransforms::HasAdded( TerrainID ID ) const
+	{
+		auto funcIDComparison = [ ID ]( const TerrainTransformData& metadata ) { return ID == metadata.mID; };
+		auto beginIter = mTerrainTransforms.cbegin(), endIter = mTerrainTransforms.cend();
+		auto iter = std::find_if( beginIter, endIter, funcIDComparison );
+
+		return iter != endIter;
+	}
+
+	TerrainTransformData& TerrainTransforms::GetTransformData( TerrainID ID )
+	{
+		auto funcIDComparison = [ ID ]( const TerrainTransformData& metadata ) { return ID == metadata.mID; };
+		auto beginIter = mTerrainTransforms.begin(), endIter = mTerrainTransforms.end();
+		auto iter = std::find_if( beginIter, endIter, funcIDComparison );
+		assert( iter != endIter );
+
+		return *iter;
 	}
 }

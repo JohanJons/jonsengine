@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/Core/Types.h"
+#include "include/Core/Containers/GridQuadTree.hpp"
 #include "include/Scene/Terrain.h"
 #include "include/Scene/SceneNode.h"
 
@@ -11,20 +12,12 @@ namespace JonsEngine
 {
 	struct TerrainTransformData
 	{
-		struct Metadata
-		{
-			Metadata( TerrainID id, uint32_t endIndex, uint32_t gridSize ) :
-				mID(id), mEndIndex(endIndex), mGridSize(gridSize)
-			{
-			}
+		TerrainTransformData( TerrainID ID )
+			: mID( ID )
+		{ }
 
-			TerrainID mID;
-			uint32_t mEndIndex;
-			uint32_t mGridSize;
-		};
-
-		std::vector<Metadata> mTerrainMetadata;
-		std::vector<Mat4> mTransforms;
+		TerrainID mID;
+		TransformGridQuadTree mQuadTree;
 	};
 
 	class TerrainTransforms
@@ -36,14 +29,17 @@ namespace JonsEngine
 		uint32_t UpdateTransforms();
 
 		uint32_t GetNumEntries() const;
-		const TerrainTransformData& GetTransformData() const { return mTerrainTransforms; }
+		const std::vector<TerrainTransformData>& GetTransforms() const { return mTerrainTransforms; }
 
 	private:
+		bool HasAdded( TerrainID ID ) const;
+		TerrainTransformData& GetTransformData( TerrainID ID );
+
 		const IDMap<Terrain>& mTerrainLookup;
 		const IDMap<TerrainData>& mTerrainDataLookup;
 		const IDMapTree<SceneNode>& mSceneNodeLookup;
 
-		TerrainTransformData mTerrainTransforms;
+		std::vector<TerrainTransformData> mTerrainTransforms;
 		std::vector<TerrainID> mDirtyTransforms;
 	};
 }

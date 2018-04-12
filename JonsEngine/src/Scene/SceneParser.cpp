@@ -175,15 +175,11 @@ namespace JonsEngine
 		mRenderQueue.mTerrains.mTransforms.clear();
 
 		const TerrainTransforms& terrainTransforms = scene.GetTerrainTransforms();
-		const TerrainTransformData& transformData = terrainTransforms.GetTransformData();
+		const std::vector<TerrainTransformData>& transforms = terrainTransforms.GetTransforms();
 
-		for (uint32_t index = 0, numTerrainTransforms = terrainTransforms.GetNumEntries(); index < numTerrainTransforms; ++index)
+		for ( const TerrainTransformData& transform : transforms )
 		{
-			TerrainTransformData::Metadata terrainMetadata = transformData.mTerrainMetadata[ index ];
-
-			TerrainID ID = terrainMetadata.mID;
-			std::size_t endIndex = terrainMetadata.mEndIndex;
-			std::size_t beginIndex = index == 0 ? 0 : transformData.mTerrainMetadata[index - 1].mEndIndex;
+			TerrainID ID = transform.mID;
 
 			const Terrain& terrain = scene.GetTerrain(ID);
 			SceneNodeID sceneNodeID = terrain.GetSceneNode();
@@ -198,14 +194,16 @@ namespace JonsEngine
 
 			auto heightmap = terrainData.GetHeightMap();
 			float patchSize = terrain.GetPatchSize();
-			float gridSize = terrainMetadata.mGridSize;
+			float gridSize = transform.mQuadTree.GetGridSize();
 			float heightScale = terrain.GetHeightScale();
 
 			const Vec4& terrainWorldCenter = node.GetWorldTransform()[ 3 ];
 			const Vec4 terrainWorldExtent = terrainWorldCenter + ( patchSize * gridSize / 2 );
 
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
-			renderableTransforms.insert(renderableTransforms.cend(), transformData.mTransforms.cbegin() + beginIndex, transformData.mTransforms.cbegin() + endIndex);
+			renderableTransforms.insert( renderableTransforms.begin(), transform.mQuadTree.GetNodes().begin(), transform.mQuadTree.GetNodes().end() );
+			//for ( const TransformGridNode& node : transform.mQuadTree.GetNodes() )
+			//	renderableTransforms.emplace_back( node.GetItem() );
 
 			std::size_t renderableEndIndex = renderableTransforms.size();
 			mRenderQueue.mTerrains.mTerrainData.emplace_back(heightmap, renderableEndIndex, heightScale, patchSize);
