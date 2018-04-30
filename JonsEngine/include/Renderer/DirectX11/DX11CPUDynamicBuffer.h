@@ -20,14 +20,13 @@ namespace JonsEngine
 
         void Bind(Shaderslot shaderSlot, uint32_t bindSlot);
 
-		// note: StructuredBuffers in HLSL will convert to column-major when loaded. But ours are already in column-major; so remember to transpose first...
-		template <typename T>
-		void SetData(const T* dataptr, std::size_t totalSizeInBytes);
         template <typename T> 
-        void SetData(const std::vector<T>& data);
+        void SetData( const std::vector<T>& data );
 
 
     private:
+		template <typename T>
+		void SetData( const T* dataptr, std::size_t totalSizeInBytes );
         template <typename T>
         void ResizeBuffer(const T* data, std::size_t newSizeInBytes);
         template <typename T>
@@ -39,23 +38,8 @@ namespace JonsEngine
         ID3D11BufferPtr mBuffer;
         ID3D11ShaderResourceViewPtr mBufferSRV;
         std::size_t mBufferSizeInBytes;
-
-		std::vector<Mat4> mTransposedTransforms;
     };
 
-
-	template <typename T>
-	void DX11CPUDynamicBuffer::SetData(const T* dataptr, const std::size_t totalSizeInBytes)
-	{
-		assert( dataptr );
-
-		if (totalSizeInBytes > mBufferSizeInBytes)
-			ResizeBuffer(dataptr, totalSizeInBytes);
-		else
-			BufferData(dataptr, totalSizeInBytes);
-
-		mBufferSizeInBytes = totalSizeInBytes;
-	}
 
     template <typename T>
     void DX11CPUDynamicBuffer::SetData(const std::vector<T>& data)
@@ -64,6 +48,19 @@ namespace JonsEngine
         const T* dataBegin = &data.front();
 		
 		SetData(dataBegin, dataSize);
+	}
+
+	template <typename T>
+	void DX11CPUDynamicBuffer::SetData( const T* dataptr, const std::size_t totalSizeInBytes )
+	{
+		assert( dataptr );
+
+		if ( totalSizeInBytes > mBufferSizeInBytes )
+			ResizeBuffer( dataptr, totalSizeInBytes );
+		else
+			BufferData( dataptr, totalSizeInBytes );
+
+		mBufferSizeInBytes = totalSizeInBytes;
 	}
 
 

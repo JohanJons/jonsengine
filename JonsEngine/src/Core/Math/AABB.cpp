@@ -6,6 +6,9 @@
 
 namespace JonsEngine
 {
+	AABB AABB::gUnitAABB = AABB( { 1.0f, 1.0f, 1.0f }, { -1.0f, -1.0f, -1.0f } );
+	AABB AABB::gUnitQuadAABB = AABB( { 1.0f, 0.0f, 1.0f }, { -1.0f, 0.0f, -1.0f } );
+
 	AABB::AABB(const PackageAABB& pkgAABB) :
 		AABB(pkgAABB.mMinBounds, pkgAABB.mMaxBounds)
 	{
@@ -42,21 +45,10 @@ namespace JonsEngine
 
     AABB operator*(const Mat4& transform, const AABB& aabb)
     {
-        const Vec3 oldMin = aabb.Min();
-        const Vec3 oldMax = aabb.Max();
+        const Vec4 oldMin = Vec4( aabb.Min(), 1.0f );
+		const Vec4 oldMax = Vec4( aabb.Max(), 1.0f );
 
-        Vec4 xa = transform[0] * oldMin.x;
-        Vec4 xb = transform[0] * oldMax.x;
-
-        Vec4 ya = transform[1] * oldMin.y;
-        Vec4 yb = transform[1] * oldMax.y;
-
-        Vec4 za = transform[2] * oldMin.z;
-        Vec4 zb = transform[2] * oldMax.z;
-
-        // TODO: unnecessary temp objects - why dosnt glm provide mat4/vec3 multiplication?
-        return AABB(Vec3(MinVal(xa, xb) + MinVal(ya, yb) + MinVal(za, zb) + transform[3]),
-                    Vec3(MaxVal(xa, xb) + MaxVal(ya, yb) + MaxVal(za, zb) + transform[3]));
+		return AABB( Vec3( oldMin * transform ), Vec3( oldMax * transform ) );
     }
 
     AABB operator*(const AABB& aabb, const Mat4& transform)

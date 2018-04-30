@@ -98,8 +98,9 @@ namespace JonsGame
                 case Key::G: mGameScene.GetMovingLightNode().TranslateNode(Vec3(0.0f, 0.0f, 0.05f));  break;
 
                 //  renderering
-                case Key::ONE: mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_DRAW_AABB); break;
-                case Key::TWO: mDebugOptions.mRenderingFlags.flip(DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS); break;
+                case Key::ONE: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_MODEL_AABB ); break;
+				case Key::TWO: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_AABB ); break;
+                case Key::THREE: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS ); break;
                 case Key::U: mEngine.GetRenderer().SetSSAO(false); break;
                 case Key::I: mEngine.GetRenderer().SetSSAO(true); break;
                 case Key::H: mEngine.GetRenderer().SetAnisotropicFiltering(RenderSettings::Anisotropic::X1); break;

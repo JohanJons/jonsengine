@@ -161,7 +161,6 @@
     <ClCompile Include="src\Renderer\DirectX11\DX11VertexTransformPass.cpp" />
     <ClCompile Include="src\Renderer\RenderDefs.cpp" />
     <ClCompile Include="src\Renderer\Shapes.cpp" />
-    <ClCompile Include="src\RenderQueue\AABBRenderData.cpp" />
     <ClCompile Include="src\RenderQueue\RenderableCamera.cpp" />
     <ClCompile Include="src\RenderQueue\RenderableCollection.cpp" />
     <ClCompile Include="src\RenderQueue\RenderableDirectionalLight.cpp" />
@@ -201,7 +200,7 @@
   <ItemGroup>
     <ClInclude Include="..\Thirdparty\dlmalloc\dlmalloc.h" />
     <ClInclude Include="include\Core\Containers\DataPool.hpp" />
-    <ClInclude Include="include\Core\Containers\GridQuadTree.hpp" />
+    <ClInclude Include="include\Core\Containers\FixedGridQuadTree.hpp" />
     <ClInclude Include="include\Core\Containers\IDMap.hpp" />
     <ClInclude Include="include\Core\Containers\IDMapBase.hpp" />
     <ClInclude Include="include\Core\Containers\IDMapPointer.hpp" />

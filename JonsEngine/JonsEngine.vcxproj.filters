@@ -305,9 +305,6 @@
     <ClCompile Include="src\Resources\Bone.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderQueue\AABBRenderData.cpp">
-      <Filter>Source Files\RenderQueue</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer\DirectX11\DX11ToneMapper.cpp">
       <Filter>Source Files\Renderer\DirectX11</Filter>
     </ClCompile>
@@ -670,7 +667,7 @@
     <ClInclude Include="include\Scene\SceneDirtyFlags.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Containers\GridQuadTree.hpp">
+    <ClInclude Include="include\Core\Containers\FixedGridQuadTree.hpp">
       <Filter>Header Files\Core\Containers</Filter>
     </ClInclude>
   </ItemGroup>

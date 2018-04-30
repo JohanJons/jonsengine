@@ -8,14 +8,13 @@
 #include "include/Core/Types.h"
 #include "include/Core/Containers/IDMap.hpp"
 #include "include/Core/Platform/Directx11.h"
+#include "include/Core/Math/AABB.h"
 
 #include <vector>
 #include <array>
 
 namespace JonsEngine
 {
-	struct AABBRenderData;
-
 	// Renders a mesh without normals/texturing; mainly used in shadowmapping scenarios
     class DX11VertexTransformPass
     {
@@ -25,6 +24,7 @@ namespace JonsEngine
 
 		void RenderStaticMesh(DX11Mesh& mesh, const Mat4& wvpMatrix);
         void RenderStaticMesh(DX11Mesh& mesh, const Mat4& wvpMatrix, D3D_PRIMITIVE_TOPOLOGY topology);
+		// remember, transpose in shader due to StructuredBuffer...
 		void RenderStaticMeshInstanced(DX11Mesh& mesh, const Mat4& viewProjectionMatrix, const std::vector<Mat4>& worldTransforms);
 		void RenderStaticMeshInstanced(DX11Mesh& mesh, const Mat4& viewProjectionMatrix, const std::vector<Mat4>& worldTransforms, D3D_PRIMITIVE_TOPOLOGY topology);
 		void RenderStaticMeshes(const RenderableMeshContainer& renderData, MeshIndex start, MeshIndex stop, const Mat4& viewProjectionMatrix);
@@ -33,7 +33,7 @@ namespace JonsEngine
 		void RenderAnimatedMeshes(const RenderableMeshContainer& renderData, MeshIndex start, MeshIndex stop, const Mat4& viewProjectionMatrix, D3D_PRIMITIVE_TOPOLOGY topology);
 		void RenderMeshes(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix);
 		void RenderMeshes(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix, D3D_PRIMITIVE_TOPOLOGY topology);
-		void RenderAABBs(const AABBRenderData& aabbRenderData);
+		void RenderAABBs( const RenderableAABBsContainer& aabbRenderData, const Mat4& viewProjMatrix );
 
 
     private:
@@ -71,8 +71,5 @@ namespace JonsEngine
 		ID3D11VertexShaderPtr mAnimatedShader;
         ID3D11InputLayoutPtr mLayoutStatic;
 		ID3D11InputLayoutPtr mLayoutAnimated;
-
-		// for instanced rendering; must transpose transforms before buffering them. See <DX11CPUDynamicBuffer.h>
-		std::vector<Mat4> mTransposedTransforms;
     };
 }

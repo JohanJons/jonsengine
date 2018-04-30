@@ -24,7 +24,7 @@ namespace JonsEngine
         void ViewFrustumCulling(const Scene& scene, const float windowAspectRatio, const float zNear, const float zFar);
         void PointLightCulling(const Scene& scene);
         void DirectionalLightCulling(const Scene& scene);
-		void TerrainParsing(const Scene& scene);
+		void TerrainParsing( const Scene& scene, bool bAABBDebug );
 		void CopyBoneTransforms(const Scene& scene);
 		void GetSkybox(const Scene& scene);
 		void GetAmbientLight(const Scene& scene);
@@ -34,6 +34,7 @@ namespace JonsEngine
 
         const ResourceManifest& mResourceManifest;
         const EngineSettings::CullingStrategy mCullingStrategy;
+		DX11MeshID mDebugAABBMesh = INVALID_DX11_MESH_ID;
         RenderQueue mRenderQueue;
     };
 }

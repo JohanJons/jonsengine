@@ -12,8 +12,9 @@ namespace JonsEngine
 {
 	struct TerrainTransformData
 	{
-		TerrainTransformData( TerrainID ID )
+		TerrainTransformData( TerrainID ID, std::vector<Mat4>&& transforms, std::vector<AABB>&& AABBs )
 			: mID( ID )
+			, mQuadTree( std::move(transforms), std::move(AABBs) )
 		{ }
 
 		TerrainID mID;
@@ -32,8 +33,9 @@ namespace JonsEngine
 		const std::vector<TerrainTransformData>& GetTransforms() const { return mTerrainTransforms; }
 
 	private:
-		bool HasAdded( TerrainID ID ) const;
-		TerrainTransformData& GetTransformData( TerrainID ID );
+		void RemoveIfAdded( TerrainID ID );
+		bool HasAddedDirty( TerrainID ID ) const;
+		void RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const float patchSize, const float width, const float height );
 
 		const IDMap<Terrain>& mTerrainLookup;
 		const IDMap<TerrainData>& mTerrainDataLookup;

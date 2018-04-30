@@ -22,22 +22,17 @@ namespace JonsEngine
 		AABB mAABB;
 	};*/
 
-	template<typename Item>
-	class GridQuadNode
+	struct GridQuadNodeAABB
 	{
-	public:
-
-
-	private:
 		AABB mAABB;
-		std::array<Item, 4> NodeQuad;
+		//std::array<GridQuadNodeAABB, 4> mNodeQuad;
 	};
 
 	template<typename Item>
-	class GridQuadTree
+	class FixedGridQuadTree
 	{
 	public:
-		GridQuadTree() = default;
+		FixedGridQuadTree( const std::vector<Item>& Items, const std::vector<AABB>& AABBs );
 
 		uint32_t GetGridSize() const { return mNodes.size(); }
 
@@ -49,8 +44,33 @@ namespace JonsEngine
 
 
 	private:
+		//GridQuadNodeAABB mQuadAABB;
 		std::vector<Item> mNodes;
+		std::vector<AABB> mNodeAABBs;
+		//std::vector<GridQuadNodeAABB> mQuadAABBs;
 	};
 
-	typedef GridQuadTree<Mat4> TransformGridQuadTree;
+	typedef FixedGridQuadTree<Mat4> TransformGridQuadTree;
+
+	template<typename Item>
+	void FixedGridQuadTree<Item>::Clear()
+	{
+		mNodes.Clear();
+		mNodeAABBs.Clear();
+	}
+	
+	template<typename Item>
+	void FixedGridQuadTree<Item>::Insert( Item& Item, AABB aabb )
+	{
+		assert( mNodes.size() == mNodeAABBs.size() );
+
+		uint32_t offset = 0;
+		auto iter = mNodes.begin();
+		for ( AABB& aabb : mNodeAABBs )
+		{
+			
+
+			++offset;
+		}
+	}
 }

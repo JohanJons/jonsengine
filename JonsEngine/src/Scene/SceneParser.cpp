@@ -35,7 +35,7 @@ namespace JonsEngine
 	RenderableMaterial::Index ParseMaterial(const ACTOR_TYPE& actor, const Mesh& mesh, const bool parseMaterial, const ResourceManifest& resManifest, RenderableMaterial::ContainerType& materialContainer);
 
 	template <typename ACTOR_ITER_TYPE>
-	void CullAABB(const Scene& scene, const ResourceManifest& resManifest, const ACTOR_ITER_TYPE& actorIterator, const EngineSettings::CullingStrategy cullingStrat, AABBRenderData::RenderableAABBsContainer& aabbDataContainer,
+	void CullAABB(const Scene& scene, const ResourceManifest& resManifest, const ACTOR_ITER_TYPE& actorIterator, const EngineSettings::CullingStrategy cullingStrat, RenderableAABBsContainer& aabbDataContainer,
 		const Mat4& viewProjTransform);
 
 
@@ -52,7 +52,7 @@ namespace JonsEngine
 
     const RenderQueue& SceneParser::ParseScene(const Scene& scene, const DirtyFlagsSet dirtyFlags, const DebugOptions& debugOpts, const float windowAspectRatio, const float zNear, const float zFar)
     {
-        mRenderQueue.Clear();
+        mRenderQueue.PerFrameClear();
 
 		GetAmbientLight(scene);
 		GetSkybox(scene);
@@ -62,10 +62,11 @@ namespace JonsEngine
         PointLightCulling(scene);
         DirectionalLightCulling(scene);
 
-		if (dirtyFlags.test(FlagTerrain))
-			TerrainParsing(scene);
+		// TODO: needs to be done per-frame always
+		if (dirtyFlags.test(FlagTerrain) || debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_AABB ) )
+			TerrainParsing( scene, debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_AABB ) );
 
-		if (debugOpts.mRenderingFlags.test(debugOpts.RENDER_FLAG_DRAW_AABB))
+		if (debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_MODEL_AABB ))
 			AddAABBDebugData(scene);
 
         return mRenderQueue;
@@ -169,7 +170,7 @@ namespace JonsEngine
         }
     }
 
-	void SceneParser::TerrainParsing(const Scene& scene)
+	void SceneParser::TerrainParsing( const Scene& scene, bool bAABBDebug )
 	{
 		mRenderQueue.mTerrains.mTerrainData.clear();
 		mRenderQueue.mTerrains.mTransforms.clear();
@@ -202,11 +203,21 @@ namespace JonsEngine
 
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
 			renderableTransforms.insert( renderableTransforms.begin(), transform.mQuadTree.GetNodes().begin(), transform.mQuadTree.GetNodes().end() );
-			//for ( const TransformGridNode& node : transform.mQuadTree.GetNodes() )
-			//	renderableTransforms.emplace_back( node.GetItem() );
 
 			std::size_t renderableEndIndex = renderableTransforms.size();
 			mRenderQueue.mTerrains.mTerrainData.emplace_back(heightmap, renderableEndIndex, heightScale, patchSize);
+
+			if ( bAABBDebug )
+			{
+				DX11MeshID unitCubeMeshID = mResourceManifest.GetUnitCubeModel().GetMeshes().begin()->GetMesh();
+				assert( unitCubeMeshID != INVALID_DX11_MESH_ID );
+
+				RenderableAABBsContainer& AABBRenderData = mRenderQueue.mTerrains.mDebugAABBs;
+
+				AABBRenderData.clear();
+				for ( const Mat4& transform : renderableTransforms )
+					AABBRenderData.emplace_back( transform, unitCubeMeshID );
+			}
 		}
 	}
 
@@ -237,12 +248,10 @@ namespace JonsEngine
 
 	void SceneParser::AddAABBDebugData(const Scene& scene)
 	{
-		mRenderQueue.mAABBRenderData.mCameraViewProjectionMatrix = mRenderQueue.mCamera.mCameraViewProjectionMatrix;
-
 		const auto staticActors = scene.GetStaticActors();
 		const auto animatedActors = scene.GetAnimatedActors();
-		auto& aabbDataContainer = mRenderQueue.mAABBRenderData.mRenderableAABBs;
-		const Mat4& viewProjTransform = mRenderQueue.mAABBRenderData.mCameraViewProjectionMatrix;
+		auto& aabbDataContainer = mRenderQueue.mAABBRenderData;
+		const Mat4& viewProjTransform = mRenderQueue.mCamera.mCameraViewProjectionMatrix;
 
 		CullAABB<decltype(staticActors)>(scene, mResourceManifest, staticActors, mCullingStrategy, aabbDataContainer, viewProjTransform);
 		CullAABB<decltype(animatedActors)>(scene, mResourceManifest, animatedActors, mCullingStrategy, aabbDataContainer, viewProjTransform);
@@ -389,7 +398,7 @@ namespace JonsEngine
 	}
 
 	template <typename ACTOR_ITER_TYPE>
-	void CullAABB(const Scene& scene, const ResourceManifest& resManifest, const ACTOR_ITER_TYPE& actorIterator, const EngineSettings::CullingStrategy cullingStrat, AABBRenderData::RenderableAABBsContainer& aabbDataContainer,
+	void CullAABB(const Scene& scene, const ResourceManifest& resManifest, const ACTOR_ITER_TYPE& actorIterator, const EngineSettings::CullingStrategy cullingStrat, RenderableAABBsContainer& aabbDataContainer,
 		const Mat4& viewProjTransform)
 	{
 		for (const auto& actor : actorIterator)

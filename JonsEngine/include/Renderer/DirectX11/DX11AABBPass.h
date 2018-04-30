@@ -2,11 +2,12 @@
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
+#include "include/RenderQueue/AABBRenderData.h"
+#include "include/Core/Math/AABB.h"
 #include "include/Core/Types.h"
 
 namespace JonsEngine
 {
-    struct AABBRenderData;
     class DX11VertexTransformPass;
 
 	// TODO: refactor into something else?
@@ -17,7 +18,8 @@ namespace JonsEngine
         DX11AABBPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass);
         ~DX11AABBPass();
 
-        void Render(const AABBRenderData& renderData);
+        void Render( const RenderableAABBsContainer& renderData, const Mat4& viewProj );
+		void Render( const std::vector<AABB>& worldAABBs, const Mat4& viewProj );
 
 
     private:

@@ -30,6 +30,7 @@ namespace JonsEngine
         ModelID LoadModel(const std::string& assetName, JonsPackagePtr jonsPkg);
         void DeleteModel(ModelID& modelID);
         const Model& GetModel(ModelID modelID) const;
+		const Model& GetUnitCubeModel() const;
 
 		MaterialID CreateMaterial(const std::string& materialName, const std::string& diffuseTextureName, const std::string& normalTextureName, JonsPackagePtr jonsPkg);
         MaterialID LoadMaterial(const std::string& assetName, const JonsPackagePtr jonsPkg);
@@ -60,6 +61,8 @@ namespace JonsEngine
         IDMap<Material> mMaterials;
 		IDMap<TerrainData> mTerrainData;
         IDMap<Skybox> mSkyboxes;
+
+		const ModelID mUnitCubeModelID = INVALID_MODEL_ID;
 
 		std::unordered_map<std::string, DX11TextureID> mDXTextureMap;
     };

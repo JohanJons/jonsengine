@@ -26,7 +26,8 @@ VertexOut vs_main(VertexIn input)
 	VertexOut ret;
 
 	const uint transformIndex = input.mInstanceID;
-	const float4x4 worldTransform = gWorldTransforms.Load(transformIndex);
+	// silly that we have to transpose this...
+	const float4x4 worldTransform = transpose( gWorldTransforms.Load(transformIndex) );
 
 	ret.mWorldPosition = mul(worldTransform, input.mPosition);
 	ret.mTessFactor = 2.0f;

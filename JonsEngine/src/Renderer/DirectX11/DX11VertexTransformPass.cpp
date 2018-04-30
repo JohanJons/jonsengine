@@ -5,6 +5,7 @@
 #include "include/Renderer/DirectX11/Shaders/Compiled/TransformAnimatedVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Constants.h"
 #include "include/RenderQueue/RenderableCollection.h"
+#include "include/RenderQueue/AABBRenderData.h"
 
 namespace JonsEngine
 {
@@ -108,12 +109,7 @@ namespace JonsEngine
 	{
 		BindForStaticRendering(StaticRenderMode::Instanced, topology);
 
-		// need to transpose first...
-		mTransposedTransforms.clear();
-		for (const Mat4& transform : worldTransforms)
-			mTransposedTransforms.emplace_back(glm::transpose(transform));
-
-		mInstancedDataBuffer.SetData(mTransposedTransforms);
+		mInstancedDataBuffer.SetData( worldTransforms );
 		mInstancedDataBuffer.Bind(DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA);
 
 		const uint32_t noBoneIndexOffset = 0;
@@ -159,15 +155,14 @@ namespace JonsEngine
 	}
 
 	// TODO: should be refactored into something that uses instanced drawing rather than several draw calls
-	void DX11VertexTransformPass::RenderAABBs(const AABBRenderData& aabbRenderData)
+	void DX11VertexTransformPass::RenderAABBs( const RenderableAABBsContainer& aabbRenderData, const Mat4& viewProjMatrix )
 	{
 		// only use static rendering, since AABBs are enlarged enough to cover all poses anyway
 		BindForStaticRendering(StaticRenderMode::NonInstanced, D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
 		// TODO: separate cbuffer for boneindex
 		const uint32_t noBoneIndexOffset = 0;
-		const Mat4& viewProjMatrix = aabbRenderData.mCameraViewProjectionMatrix;
-		for (const auto& aabbData : aabbRenderData.mRenderableAABBs)
+		for (const RenderAABBPair& aabbData : aabbRenderData)
 		{
 			const Mat4& worldTransform = aabbData.first;
 			const DX11MeshID meshID = aabbData.second;

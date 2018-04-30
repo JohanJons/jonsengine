@@ -187,8 +187,11 @@ namespace JonsEngine
         if (renderSettings.mAntiAliasing == RenderSettings::AntiAliasing::Fxaa)
             mPostProcessor.FXAAPass(mBackbuffer, mWindowSize);
 
-        if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_AABB))
-            mAABBPass.Render(renderQueue.mAABBRenderData);
+        if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_MODEL_AABB))
+            mAABBPass.Render( renderQueue.mAABBRenderData, renderQueue.mCamera.mCameraViewProjectionMatrix );
+
+		if ( debugFlags.test( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_AABB ) )
+			mAABBPass.Render( renderQueue.mTerrains.mDebugAABBs, renderQueue.mCamera.mCameraViewProjectionMatrix );
     }
 
 

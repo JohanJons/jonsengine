@@ -8,6 +8,7 @@
 #include "include/Renderer/DirectX11/Shaders/Compiled/TerrainPixel.h"
 #include "include/RenderQueue/RenderableTerrain.h"
 #include "include/Core/Math/Math.h"
+#include "include/Core/Math/AABB.h"
 
 namespace JonsEngine
 {
@@ -25,8 +26,6 @@ namespace JonsEngine
 		0.0f, 1.0f, 0.0f
 	};
 
-	const Vec3 gAABBMax(1.0f, 0.0f, 1.0f), gAABBMin(-1.0f, 0.0f, -1.0f);
-
 	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3 };
 
 	enum VSInputLayout
@@ -43,7 +42,7 @@ namespace JonsEngine
 		mCBuffer(device, context, mCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
 		mPerTerrainCBuffer(device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_EXTRA),
 		mTransformsBuffer(device, context),
-		mQuadMesh(device, context, gQuadVertices, gQuadNormals, std::vector<float>(), std::vector<float>(), gQuadIndices, gAABBMin, gAABBMax),
+		mQuadMesh(device, context, gQuadVertices, gQuadNormals, std::vector<float>(), std::vector<float>(), gQuadIndices, AABB::gUnitQuadAABB.Min(), AABB::gUnitQuadAABB.Max()),
 		mVertexTransformer(vertexTransformer),
 		mTextureMap(textureMap),
 
@@ -100,9 +99,7 @@ namespace JonsEngine
 		mContext->RSGetState( &prevRasterizer );
 		mContext->RSSetState( mDebugRasterizer );
 
-		auto dataBegin = &terrains.mTransforms.front();
-		std::size_t sizeInBytes = terrains.mTransforms.size() * sizeof( Mat4 );
-		mTransformsBuffer.SetData( dataBegin, sizeInBytes );
+		mTransformsBuffer.SetData( terrains.mTransforms );
 		mTransformsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA );
 
 		uint32_t beginIndex = 0;

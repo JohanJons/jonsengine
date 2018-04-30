@@ -29,7 +29,7 @@ namespace JonsEngine
 
         RenderQueue();
 
-        void Clear();
+        void PerFrameClear();
 
 
         Vec4 mAmbientLight;
@@ -42,6 +42,6 @@ namespace JonsEngine
 		RenderData mRenderData;
 
 		// debug-related stuff
-		AABBRenderData mAABBRenderData;
+		RenderableAABBsContainer mAABBRenderData;
     };
 }

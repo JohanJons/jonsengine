@@ -1,6 +1,7 @@
 #pragma once
 
 #include "include/RenderQueue/RenderableMesh.h"
+#include "include/RenderQueue/AABBRenderData.h"
 #include "include/Core/Types.h"
 
 namespace JonsEngine
@@ -24,6 +25,7 @@ namespace JonsEngine
 	{
 		std::vector<RenderableTerrainData> mTerrainData;
 		std::vector<Mat4> mTransforms;
+		RenderableAABBsContainer mDebugAABBs;
 
 		uint32_t GetNumTerrains() const { return mTerrainData.size(); }
 	};

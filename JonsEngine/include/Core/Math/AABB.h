@@ -12,8 +12,11 @@ namespace JonsEngine
     class AABB
     {
     public:
-		AABB(const PackageAABB& pkgAABB);
-        AABB(const Vec3& minBounds, const Vec3& maxBounds);
+		static AABB gUnitAABB;
+		static AABB gUnitQuadAABB;
+
+		AABB( const PackageAABB& pkgAABB );
+        AABB( const Vec3& minBounds, const Vec3& maxBounds );
 
         Vec3 Min() const;
         Vec3 Max() const;

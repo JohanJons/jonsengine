@@ -10,19 +10,17 @@ namespace JonsEngine
     /* DebugOptions definition */
     struct DebugOptions
     {
-        typedef std::bitset<sizeof(uint32_t)> RenderingFlags;
-
         enum RenderingFlag
         {
-            RENDER_FLAG_DRAW_AABB = 0,
+            RENDER_FLAG_DRAW_MODEL_AABB = 0,
+			RENDER_FLAG_DRAW_TERRAIN_AABB,
+			RENDER_FLAG_DRAW_TERRAIN_WIREFRAME,
             RENDER_FLAG_DRAW_LIGHTS,
-            RENDER_FLAG_SHADOWMAP_SPLITS
+            RENDER_FLAG_SHADOWMAP_SPLITS,
+			NUM_RENDER_FLAGS
         };
 
-
-        DebugOptions() : mRenderingFlags()
-        {
-        }
+		typedef std::bitset<NUM_RENDER_FLAGS> RenderingFlags;
 
 
         RenderingFlags mRenderingFlags;

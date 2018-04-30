@@ -19,7 +19,8 @@ namespace JonsEngine
 
     ResourceManifest::ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator) :
         mMemoryAllocator(memoryAllocator),
-        mRenderer(renderer)
+        mRenderer(renderer),
+		mUnitCubeModelID( CreateCube( "_ENGINE_UNIT_CUBE", 1.0f ) )
     {
     }
 
@@ -93,6 +94,11 @@ namespace JonsEngine
     {
         return mModels.GetItem(modelID);
     }
+
+	const Model& ResourceManifest::GetUnitCubeModel() const
+	{
+		return GetModel( mUnitCubeModelID );
+	}
 
 
 	MaterialID ResourceManifest::CreateMaterial(const std::string& materialName, const std::string& diffuseTextureName, const std::string& normalTextureName, const JonsPackagePtr jonsPkg)
