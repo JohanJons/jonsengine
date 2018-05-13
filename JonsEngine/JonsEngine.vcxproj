@@ -117,7 +117,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Thirdparty\dlmalloc\dlmalloc.c" />
-    <ClCompile Include="src\Core\Containers\GridQuadTree.cpp" />
     <ClCompile Include="src\Core\Engine.cpp" />
     <ClCompile Include="src\Core\Logging\OutputStream.cpp" />
     <ClCompile Include="src\Core\Logging\StreamBuf.cpp" />

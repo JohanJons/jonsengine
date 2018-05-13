@@ -332,9 +332,6 @@
     <ClCompile Include="src\Scene\TerrainTransforms.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Containers\GridQuadTree.cpp">
-      <Filter>Source Files\Core\Containers</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Engine.h">

@@ -20,7 +20,7 @@ namespace JonsEngine
     ResourceManifest::ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator) :
         mMemoryAllocator(memoryAllocator),
         mRenderer(renderer),
-		mUnitCubeModelID( CreateCube( "_ENGINE_UNIT_CUBE", 1.0f ) )
+		mUnitCubeModelID( CreateCube( "_ENGINE_UNIT_CUBE", 2.0f ) )
     {
     }
 

@@ -16,7 +16,7 @@ namespace JonsEngine
 
     AABB::AABB(const Vec3& minBounds, const Vec3& maxBounds) :
 		mAABBCenter(0.5f * (minBounds + maxBounds)),
-		mAABBExtent(0.5f * (maxBounds - minBounds))
+		mAABBExtent(0.5f * abs(maxBounds - minBounds))
     {
     }
 
@@ -45,10 +45,10 @@ namespace JonsEngine
 
     AABB operator*(const Mat4& transform, const AABB& aabb)
     {
-        const Vec4 oldMin = Vec4( aabb.Min(), 1.0f );
-		const Vec4 oldMax = Vec4( aabb.Max(), 1.0f );
+        const Vec4 newMin = transform * Vec4( aabb.Min(), 1.0f );
+		const Vec4 newMax = transform * Vec4( aabb.Max(), 1.0f );
 
-		return AABB( Vec3( oldMin * transform ), Vec3( oldMax * transform ) );
+		return AABB( Vec3( newMin ), Vec3( newMax ) );
     }
 
     AABB operator*(const AABB& aabb, const Mat4& transform)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "include/Core/Types.h"
-#include "include/Core/Containers/GridQuadTree.hpp"
+#include "include/Core/Containers/FixedGridQuadTree.hpp"
 #include "include/Scene/Terrain.h"
 #include "include/Scene/SceneNode.h"
 

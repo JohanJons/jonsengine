@@ -23,11 +23,4 @@ namespace JonsEngine
 
         mVertexTransformPass.RenderAABBs( renderData, viewProj );
     }
-
-	void DX11AABBPass::Render( const std::vector<AABB>& worldAABBs, const Mat4& viewProj )
-	{
-		mContext->PSSetShader( mPixelShader, nullptr, 0 );
-
-		mVertexTransformPass.RenderAABBs( worldAABBs, viewProj );
-	}
 }

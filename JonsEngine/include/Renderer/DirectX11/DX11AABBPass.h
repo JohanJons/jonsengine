@@ -19,7 +19,6 @@ namespace JonsEngine
         ~DX11AABBPass();
 
         void Render( const RenderableAABBsContainer& renderData, const Mat4& viewProj );
-		void Render( const std::vector<AABB>& worldAABBs, const Mat4& viewProj );
 
 
     private:
