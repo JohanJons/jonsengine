@@ -23,5 +23,21 @@ namespace JonsEngine
 		mSkyboxTextureID = INVALID_DX11_TEXTURE_ID;
 
 		mAABBRenderData.clear();
+		mColorsToAABBsList.clear();
     }
+
+	void RenderQueue::AddAABB( const Mat4& transform, DX11MeshID mesh, Color color )
+	{
+		auto iter = std::find_if( mColorsToAABBsList.begin(), mColorsToAABBsList.end(), [ &color ]( const AABBsOfColor& ColorAABBMap ) { return ColorAABBMap.first == color; } );
+		if ( iter == mColorsToAABBsList.end() )
+		{
+			mColorsToAABBsList.emplace_back( color );
+			AABBsOfColor& colorAABBs = mColorsToAABBsList.back();
+			colorAABBs.second.emplace_back( transform, mesh );
+		}
+		else
+		{
+			iter->second.emplace_back( transform, mesh );
+		}
+	}
 }

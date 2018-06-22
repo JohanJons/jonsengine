@@ -269,27 +269,6 @@
     <ClCompile Include="src\Scene\AnimationUpdater.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderQueue\RenderableCamera.cpp">
-      <Filter>Source Files\RenderQueue</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RenderQueue\RenderableCollection.cpp">
-      <Filter>Source Files\RenderQueue</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RenderQueue\RenderableDirectionalLight.cpp">
-      <Filter>Source Files\RenderQueue</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RenderQueue\RenderableMaterial.cpp">
-      <Filter>Source Files\RenderQueue</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RenderQueue\RenderableMesh.cpp">
-      <Filter>Source Files\RenderQueue</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RenderQueue\RenderablePointLight.cpp">
-      <Filter>Source Files\RenderQueue</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RenderQueue\RenderableSkeleton.cpp">
-      <Filter>Source Files\RenderQueue</Filter>
-    </ClCompile>
     <ClCompile Include="src\RenderQueue\RenderQueue.cpp">
       <Filter>Source Files\RenderQueue</Filter>
     </ClCompile>
@@ -326,11 +305,11 @@
     <ClCompile Include="src\Resources\TerrainData.cpp">
       <Filter>Source Files\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\RenderQueue\RenderableTerrain.cpp">
-      <Filter>Source Files\RenderQueue</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scene\TerrainTransforms.cpp">
       <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueue\RenderQueueTypes.cpp">
+      <Filter>Source Files\RenderQueue</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -577,31 +556,7 @@
     <ClInclude Include="include\Scene\AnimationUpdater.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="include\RenderQueue\RenderableCamera.h">
-      <Filter>Header Files\RenderQueue</Filter>
-    </ClInclude>
-    <ClInclude Include="include\RenderQueue\RenderableMaterial.h">
-      <Filter>Header Files\RenderQueue</Filter>
-    </ClInclude>
-    <ClInclude Include="include\RenderQueue\RenderableMesh.h">
-      <Filter>Header Files\RenderQueue</Filter>
-    </ClInclude>
-    <ClInclude Include="include\RenderQueue\RenderablePointLight.h">
-      <Filter>Header Files\RenderQueue</Filter>
-    </ClInclude>
-    <ClInclude Include="include\RenderQueue\RenderableSkeleton.h">
-      <Filter>Header Files\RenderQueue</Filter>
-    </ClInclude>
     <ClInclude Include="include\RenderQueue\RenderQueue.h">
-      <Filter>Header Files\RenderQueue</Filter>
-    </ClInclude>
-    <ClInclude Include="include\RenderQueue\RenderableCollection.h">
-      <Filter>Header Files\RenderQueue</Filter>
-    </ClInclude>
-    <ClInclude Include="include\RenderQueue\RenderableContainer.h">
-      <Filter>Header Files\RenderQueue</Filter>
-    </ClInclude>
-    <ClInclude Include="include\RenderQueue\RenderableDirectionalLight.h">
       <Filter>Header Files\RenderQueue</Filter>
     </ClInclude>
     <ClInclude Include="include\Renderer\RenderDefs.h">
@@ -649,9 +604,6 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11TerrainPass.h">
       <Filter>Header Files\Renderer\DirectX11</Filter>
     </ClInclude>
-    <ClInclude Include="include\RenderQueue\RenderableTerrain.h">
-      <Filter>Header Files\RenderQueue</Filter>
-    </ClInclude>
     <ClInclude Include="include\Scene\Terrain.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
@@ -666,6 +618,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\Containers\FixedGridQuadTree.hpp">
       <Filter>Header Files\Core\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RenderQueue\RenderQueueTypes.h">
+      <Filter>Header Files\RenderQueue</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

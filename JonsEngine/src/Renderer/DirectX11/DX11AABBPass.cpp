@@ -7,7 +7,10 @@
 namespace JonsEngine
 {
     DX11AABBPass::DX11AABBPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass) :
-        mContext(context), mPixelShader(nullptr), mVertexTransformPass(vertexTransformPass)
+		mContext( context ),
+		mPixelShader( nullptr ),
+		mVertexTransformPass( vertexTransformPass ),
+		mCBuffer( device, context, mCBuffer.CONSTANT_BUFFER_SLOT_PIXEL )
     {
         DXCALL(device->CreatePixelShader(gSimpleColorPixelShader, sizeof(gSimpleColorPixelShader), nullptr, &mPixelShader));
     }

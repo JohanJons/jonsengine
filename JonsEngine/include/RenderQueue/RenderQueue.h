@@ -1,12 +1,6 @@
 #pragma once
 
-#include "include/RenderQueue/RenderableCamera.h"
-#include "include/RenderQueue/RenderableDirectionalLight.h"
-#include "include/RenderQueue/RenderablePointLight.h"
-#include "include/RenderQueue/RenderableTerrain.h"
-#include "include/RenderQueue/RenderableMaterial.h"
-#include "include/RenderQueue/RenderableMesh.h"
-#include "include/RenderQueue/AABBRenderData.h"
+#include "include/RenderQueue/RenderQueueTypes.h"
 #include "include/Resources/Bone.h"
 
 #include <vector>
@@ -15,22 +9,11 @@ namespace JonsEngine
 {
     struct RenderQueue
     {
-        typedef std::vector<RenderablePointLight> RenderablePointLights;
-        typedef std::vector<RenderableDirectionalLight> RenderableDirectionalLights;
+		RenderQueue();
 
-		struct RenderData
-		{
-			RenderableMeshContainer mStaticMeshes;
-			RenderableMeshContainer mAnimatedMeshes;
-			RenderableMaterial::ContainerType mMaterials;
-			BoneTransforms mBones;
-		};
+		void PerFrameClear();
 
-
-        RenderQueue();
-
-        void PerFrameClear();
-
+		//void AddAABB( const Mat4& transform, DX11MeshID mesh, Color color );
 
         Vec4 mAmbientLight;
         DX11TextureID mSkyboxTextureID;
@@ -42,6 +25,6 @@ namespace JonsEngine
 		RenderData mRenderData;
 
 		// debug-related stuff
-		RenderableAABBsContainer mAABBRenderData;
+		std::vector<AABBsOfColor> mColorsToAABBsList;
     };
 }
