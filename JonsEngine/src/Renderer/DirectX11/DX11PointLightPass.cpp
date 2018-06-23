@@ -109,7 +109,7 @@ namespace JonsEngine
     }
 
 
-    void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const RenderQueue::RenderData& renderData, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix)
+    void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const RenderData& renderData, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix)
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;

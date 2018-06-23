@@ -1,7 +1,6 @@
 #include "include/Scene/SceneParser.h"
 
 #include "include/Scene/Scene.h"
-#include "include/RenderQueue/RenderableTerrain.h"
 #include "include/Resources/ResourceManifest.h"
 #include "include/Core/Types.h"
 #include "include/Core/DebugOptions.h"
@@ -16,7 +15,7 @@ namespace JonsEngine
 	// Alot of duplicate functionality here... should be merged at some point
     template <typename ACTOR_ITER_TYPE, typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
 	void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator, const bool parseMaterials,
-		RenderQueue::RenderData& renderData, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
+		RenderData& renderData, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args);
 
     bool InterpretVisibilityResult(const EngineSettings::CullingStrategy cullingStrat, const AABBIntersection visibilityResult);
 
@@ -26,10 +25,12 @@ namespace JonsEngine
 
 	template <typename ACTOR_TYPE>
 	void AddAllMeshes(const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix, const bool parseMaterials, const AnimationUpdater& AnimationUpdater, const ResourceManifest& resManifest,
-		RenderQueue::RenderData& renderData);
+		RenderData& renderData);
 
 	template <typename ACTOR_TYPE>
-    void AddMesh(const ACTOR_TYPE& actor, const Mat4& worldTransform, const Mat4& localTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData);
+    void AddMesh(const ACTOR_TYPE& actor, const Mat4& worldTransform, const Mat4& localTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderData& renderData);
+
+	void AddAABB( RenderableAABBsContainer& AABBContainer, const Mat4& transform, DX11MeshID mesh, Color color );
 
 	template <typename ACTOR_TYPE>
 	RenderableMaterial::Index ParseMaterial(const ACTOR_TYPE& actor, const Mesh& mesh, const bool parseMaterial, const ResourceManifest& resManifest, RenderableMaterial::ContainerType& materialContainer);
@@ -216,7 +217,7 @@ namespace JonsEngine
 
 				AABBRenderData.clear();
 				for ( const Mat4& transform : renderableTransforms )
-					AABBRenderData.emplace_back( transform, unitCubeMeshID );
+					AddAABB( AABBRenderData, transform, unitCubeMeshID, gGreen );
 			}
 		}
 	}
@@ -250,7 +251,7 @@ namespace JonsEngine
 	{
 		const auto staticActors = scene.GetStaticActors();
 		const auto animatedActors = scene.GetAnimatedActors();
-		auto& aabbDataContainer = mRenderQueue.mAABBRenderData;
+		auto& aabbDataContainer = mRenderQueue.mColorsToAABBsList;
 		const Mat4& viewProjTransform = mRenderQueue.mCamera.mCameraViewProjectionMatrix;
 
 		CullAABB<decltype(staticActors)>(scene, mResourceManifest, staticActors, mCullingStrategy, aabbDataContainer, viewProjTransform);
@@ -260,7 +261,7 @@ namespace JonsEngine
 
     template <typename ACTOR_ITER_TYPE, typename VISIBLITY_FUNC, typename ...VISIBILITY_ARGS>
     void CullActors(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat, const ACTOR_ITER_TYPE& actorIterator, const bool parseMaterials,
-		RenderQueue::RenderData& renderData, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args)
+		RenderData& renderData, const VISIBLITY_FUNC& testVisibilityFunc, VISIBILITY_ARGS&&... args)
     {
         const AnimationUpdater& animationUpdater = scene.GetAnimationUpdater();
 
@@ -324,7 +325,7 @@ namespace JonsEngine
 
 	template <typename ACTOR_TYPE>
 	void AddAllMeshes(const ACTOR_TYPE& actor, const Model& model, const Mat4& worldMatrix, const bool parseMaterials, const AnimationUpdater& animationUpdater, const ResourceManifest& resManifest,
-		RenderQueue::RenderData& renderData)
+		RenderData& renderData)
 	{
 		for (const ModelNode& node : model.GetNodes())
 		{
@@ -345,7 +346,7 @@ namespace JonsEngine
 	
 
 	template <>
-	void AddMesh(const StaticActor& actor, const Mat4& worldTransform, const Mat4& localTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData)
+	void AddMesh(const StaticActor& actor, const Mat4& worldTransform, const Mat4& localTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderData& renderData)
 	{
 		const Mat4 localWorldTransform = worldTransform * localTransform;
 
@@ -353,7 +354,7 @@ namespace JonsEngine
 	}
 
 	template <>
-	void AddMesh(const AnimatedActor& actor, const Mat4& worldTransform, const Mat4& localTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderQueue::RenderData& renderData)
+	void AddMesh(const AnimatedActor& actor, const Mat4& worldTransform, const Mat4& localTransform, const RenderableMaterial::Index materialIndex, const float materialTilingFactor, const DX11MeshID mesh, const AnimationUpdater& animationUpdater, RenderData& renderData)
 	{
 		const Mat4 localWorldTransform = worldTransform * localTransform;
 
@@ -367,6 +368,21 @@ namespace JonsEngine
 		}
 		else
 			renderData.mStaticMeshes.emplace_back(localWorldTransform, materialIndex, materialTilingFactor, mesh);
+	}
+
+	void AddAABB( RenderableAABBsContainer& AABBContainer, const Mat4& transform, DX11MeshID mesh, Color color )
+	{
+		auto iter = std::find_if( AABBContainer.begin(), AABBContainer.end(), [ &color ]( const AABBsOfColor& ColorAABBMap ) { return ColorAABBMap.first == color; } );
+		if ( iter == AABBContainer.end() )
+		{
+			AABBContainer.emplace_back( color, std::vector<AABBRenderData>() );
+			AABBsOfColor& colorAABBs = AABBContainer.back();
+			colorAABBs.second.emplace_back( transform, mesh );
+		}
+		else
+		{
+			iter->second.emplace_back( transform, mesh );
+		}
 	}
 
 
@@ -427,7 +443,7 @@ namespace JonsEngine
 					for (const Mesh& mesh : node.GetMeshes())
 					{
 						const DX11MeshID meshID = mesh.GetMesh();
-						aabbDataContainer.emplace_back(worldMatrix, meshID);
+						AddAABB( aabbDataContainer, worldMatrix, meshID, gGreen );
 					}
 				}
 			}

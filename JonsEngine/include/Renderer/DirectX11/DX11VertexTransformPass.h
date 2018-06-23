@@ -31,9 +31,9 @@ namespace JonsEngine
 		void RenderStaticMeshes(const RenderableMeshContainer& renderData, MeshIndex start, MeshIndex stop, const Mat4& viewProjectionMatrix, D3D_PRIMITIVE_TOPOLOGY topology);
 		void RenderAnimatedMeshes(const RenderableMeshContainer& renderData, MeshIndex start, MeshIndex stop, const Mat4& viewProjectionMatrix);
 		void RenderAnimatedMeshes(const RenderableMeshContainer& renderData, MeshIndex start, MeshIndex stop, const Mat4& viewProjectionMatrix, D3D_PRIMITIVE_TOPOLOGY topology);
-		void RenderMeshes(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix);
-		void RenderMeshes(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix, D3D_PRIMITIVE_TOPOLOGY topology);
-		void RenderAABBs( const RenderableAABBsContainer& aabbRenderData, const Mat4& viewProjMatrix );
+		void RenderMeshes(const RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix);
+		void RenderMeshes(const RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix, D3D_PRIMITIVE_TOPOLOGY topology);
+		void RenderAABBs( const std::vector<AABBRenderData>& aabbRenderData, const Mat4& viewProjMatrix );
 
 
     private:

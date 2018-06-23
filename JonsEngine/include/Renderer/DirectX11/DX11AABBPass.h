@@ -3,7 +3,7 @@
 #include "include/Renderer/DirectX11/DX11Utils.h"
 #include "include/Renderer/DirectX11/DX11Mesh.h"
 #include "include/Renderer/DirectX11/DX11ConstantBuffer.hpp"
-#include "include/RenderQueue/AABBRenderData.h"
+#include "include/RenderQueue/RenderQueueTypes.h"
 #include "include/Core/Math/AABB.h"
 #include "include/Core/Types.h"
 
@@ -26,11 +26,13 @@ namespace JonsEngine
 		struct AABBCBuffer
 		{
 			Vec3 mColor;
+			float __padding;
 		};
 
         ID3D11DeviceContextPtr mContext;
         ID3D11PixelShaderPtr mPixelShader;
 
+		AABBCBuffer mAABBCBuffer;
         DX11VertexTransformPass& mVertexTransformPass;
 		DX11ConstantBuffer<AABBCBuffer> mCBuffer;
     };

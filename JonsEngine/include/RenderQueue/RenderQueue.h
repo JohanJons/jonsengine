@@ -13,8 +13,6 @@ namespace JonsEngine
 
 		void PerFrameClear();
 
-		//void AddAABB( const Mat4& transform, DX11MeshID mesh, Color color );
-
         Vec4 mAmbientLight;
         DX11TextureID mSkyboxTextureID;
 

@@ -4,8 +4,6 @@
 #include "include/Renderer/DirectX11/Shaders/Compiled/TransformStaticInstancedVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/TransformAnimatedVertex.h"
 #include "include/Renderer/DirectX11/Shaders/Constants.h"
-#include "include/RenderQueue/RenderableCollection.h"
-#include "include/RenderQueue/AABBRenderData.h"
 
 namespace JonsEngine
 {
@@ -143,33 +141,33 @@ namespace JonsEngine
 		RenderMeshesAux(renderData, start, stop, viewProjectionMatrix);
 	}
 
-	void DX11VertexTransformPass::RenderMeshes(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix)
+	void DX11VertexTransformPass::RenderMeshes(const RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix)
 	{
 		RenderMeshes(renderData, renderables, viewProjectionMatrix, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	}
 
-	void DX11VertexTransformPass::RenderMeshes(const RenderQueue::RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix, const D3D_PRIMITIVE_TOPOLOGY topology)
+	void DX11VertexTransformPass::RenderMeshes(const RenderData& renderData, const RenderableCollection& renderables, const Mat4& viewProjectionMatrix, const D3D_PRIMITIVE_TOPOLOGY topology)
 	{
 		RenderStaticMeshes(renderData.mStaticMeshes, renderables.mStaticMeshesBegin, renderables.mStaticMeshesEnd, viewProjectionMatrix, topology);
 		RenderAnimatedMeshes(renderData.mAnimatedMeshes, renderables.mAnimatedMeshesBegin, renderables.mAnimatedMeshesEnd, viewProjectionMatrix, topology);
 	}
 
 	// TODO: should be refactored into something that uses instanced drawing rather than several draw calls
-	void DX11VertexTransformPass::RenderAABBs( const RenderableAABBsContainer& aabbRenderData, const Mat4& viewProjMatrix )
+	void DX11VertexTransformPass::RenderAABBs( const std::vector<AABBRenderData>& aabbRenderData, const Mat4& viewProjMatrix )
 	{
 		// only use static rendering, since AABBs are enlarged enough to cover all poses anyway
 		BindForStaticRendering(StaticRenderMode::NonInstanced, D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP);
 
 		// TODO: separate cbuffer for boneindex
 		const uint32_t noBoneIndexOffset = 0;
-		for (const RenderAABBPair& aabbData : aabbRenderData)
+		for ( const AABBRenderData& AABBData : aabbRenderData )
 		{
-			const Mat4& worldTransform = aabbData.first;
-			const DX11MeshID meshID = aabbData.second;
+			const Mat4& worldTransform = AABBData.first;
+			const DX11MeshID meshID = AABBData.second;
 
-			mTransformCBuffer.SetData(TransformCBuffer(viewProjMatrix * worldTransform, noBoneIndexOffset));
+			mTransformCBuffer.SetData( TransformCBuffer( viewProjMatrix * worldTransform, noBoneIndexOffset ) );
 			mTransformCBuffer.Bind();
-			mMeshMap.GetItem(meshID).DrawAABB();
+			mMeshMap.GetItem( meshID ).DrawAABB();
 		}
 	}
 

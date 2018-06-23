@@ -21,19 +21,18 @@ namespace JonsEngine
 		static constexpr Index INVALID_INDEX = std::numeric_limits<Index>::max();
 	};
 
-	struct RenderableCollection
+	struct RenderableSkeleton
 	{
-		RenderableCollection::RenderableCollection() :
-			mStaticMeshesBegin( RenderableMesh::INVALID_INDEX ),
-			mStaticMeshesEnd( RenderableMesh::INVALID_INDEX ),
-			mAnimatedMeshesBegin( RenderableMesh::INVALID_INDEX ),
-			mAnimatedMeshesEnd( RenderableMesh::INVALID_INDEX )
+		RenderableSkeleton::RenderableSkeleton() : RenderableSkeleton( INVALID_BONE_INDEX, INVALID_BONE_INDEX )
+		{ }
+		RenderableSkeleton::RenderableSkeleton( const BoneIndex begin, const BoneIndex end ) :
+			mBoneRange( begin, end )
+		{ }
+		RenderableSkeleton::RenderableSkeleton( const BoneIndexRange& boneRange ) :
+			mBoneRange( boneRange )
 		{ }
 
-		MeshIndex mStaticMeshesBegin;
-		MeshIndex mStaticMeshesEnd;
-		MeshIndex mAnimatedMeshesBegin;
-		MeshIndex mAnimatedMeshesEnd;
+		BoneIndexRange mBoneRange;
 	};
 
 	struct RenderableMaterial : RenderableContainer<RenderableMaterial>
@@ -77,18 +76,19 @@ namespace JonsEngine
 	typedef RenderableMesh::Index MeshIndex;
 	typedef RenderableMesh::ContainerType RenderableMeshContainer;
 
-	struct RenderableSkeleton
+	struct RenderableCollection
 	{
-		RenderableSkeleton::RenderableSkeleton() : RenderableSkeleton( INVALID_BONE_INDEX, INVALID_BONE_INDEX )
-		{ }
-		RenderableSkeleton::RenderableSkeleton( const BoneIndex begin, const BoneIndex end ) :
-			mBoneRange( begin, end )
-		{ }
-		RenderableSkeleton::RenderableSkeleton( const BoneIndexRange& boneRange ) :
-			mBoneRange( boneRange )
+		RenderableCollection::RenderableCollection() :
+			mStaticMeshesBegin( RenderableMesh::INVALID_INDEX ),
+			mStaticMeshesEnd( RenderableMesh::INVALID_INDEX ),
+			mAnimatedMeshesBegin( RenderableMesh::INVALID_INDEX ),
+			mAnimatedMeshesEnd( RenderableMesh::INVALID_INDEX )
 		{ }
 
-		BoneIndexRange mBoneRange;
+		MeshIndex mStaticMeshesBegin;
+		MeshIndex mStaticMeshesEnd;
+		MeshIndex mAnimatedMeshesBegin;
+		MeshIndex mAnimatedMeshesEnd;
 	};
 
 	struct RenderableDirectionalLight

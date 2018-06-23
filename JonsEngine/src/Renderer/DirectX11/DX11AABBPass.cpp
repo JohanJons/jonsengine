@@ -24,6 +24,13 @@ namespace JonsEngine
     {
         mContext->PSSetShader(mPixelShader, nullptr, 0);
 
-        mVertexTransformPass.RenderAABBs( renderData, viewProj );
+		for ( const AABBsOfColor& AABBsByColor : renderData )
+		{
+			mAABBCBuffer.mColor = AABBsByColor.first;
+			mCBuffer.SetData( mAABBCBuffer );
+			mCBuffer.Bind();
+
+			mVertexTransformPass.RenderAABBs( AABBsByColor.second, viewProj );
+		}
     }
 }

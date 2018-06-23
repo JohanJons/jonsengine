@@ -97,7 +97,7 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::Render(const RenderableDirectionalLight& directionalLight, const RenderQueue::RenderData& renderData, const RenderSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix)
+    void DX11DirectionalLightPass::Render(const RenderableDirectionalLight& directionalLight, const RenderData& renderData, const RenderSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix)
     {
         // preserve current state
         D3D11_VIEWPORT prevViewport;

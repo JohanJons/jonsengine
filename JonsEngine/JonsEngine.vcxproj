@@ -259,7 +259,6 @@
     <ClInclude Include="include\Renderer\RenderDefs.h" />
     <ClInclude Include="include\Renderer\RenderSettings.h" />
     <ClInclude Include="include\Renderer\Shapes.h" />
-    <ClInclude Include="include\RenderQueue\AABBRenderData.h" />
     <ClInclude Include="include\RenderQueue\RenderQueue.h" />
     <ClInclude Include="include\RenderQueue\RenderQueueTypes.h" />
     <ClInclude Include="include\Resources\Animation.h" />

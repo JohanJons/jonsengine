@@ -6,7 +6,6 @@
 #include "include/Renderer/DirectX11/Shaders/Compiled/TerrainHull.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/TerrainDomain.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/TerrainPixel.h"
-#include "include/RenderQueue/RenderableTerrain.h"
 #include "include/Core/Math/Math.h"
 #include "include/Core/Math/AABB.h"
 

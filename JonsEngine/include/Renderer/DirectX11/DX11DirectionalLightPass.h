@@ -28,7 +28,7 @@ namespace JonsEngine
             const RenderSettings::ShadowReadbackLatency readbackLatency, const uint32_t windowWidth, const uint32_t windowHeight);
         ~DX11DirectionalLightPass();
 
-        void Render(const RenderableDirectionalLight& directionalLight, const RenderQueue::RenderData& renderData, const RenderSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix);
+        void Render(const RenderableDirectionalLight& directionalLight, const RenderData& renderData, const RenderSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix);
 
 
     private:
