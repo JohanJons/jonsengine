@@ -22,6 +22,9 @@ namespace JonsEngine
 		mAmbientLight = Vec4(0.0f);
 		mSkyboxTextureID = INVALID_DX11_TEXTURE_ID;
 
+		mTerrains.mTerrainData.clear();
+		mTerrains.mTransforms.clear();
+
 		mColorsToAABBsList.clear();
     }
 }

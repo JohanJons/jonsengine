@@ -173,9 +173,6 @@ namespace JonsEngine
 
 	void SceneParser::TerrainParsing( const Scene& scene, bool bAABBDebug )
 	{
-		mRenderQueue.mTerrains.mTerrainData.clear();
-		mRenderQueue.mTerrains.mTransforms.clear();
-
 		const TerrainTransforms& terrainTransforms = scene.GetTerrainTransforms();
 		const std::vector<TerrainTransformData>& transforms = terrainTransforms.GetTransforms();
 
@@ -192,18 +189,16 @@ namespace JonsEngine
 			const TerrainData& terrainData = mResourceManifest.GetTerrainData(terrainDataID);
 			const SceneNode& node = scene.GetSceneNode(sceneNodeID);
 
-			// TODO: view culling?
-
 			auto heightmap = terrainData.GetHeightMap();
 			float patchSize = terrain.GetPatchSize();
-			float gridSize = transform.mQuadTree.GetGridSize();
 			float heightScale = terrain.GetHeightScale();
 
-			const Vec4& terrainWorldCenter = node.GetWorldTransform()[ 3 ];
-			const Vec4 terrainWorldExtent = terrainWorldCenter + ( patchSize * gridSize / 2 );
+			//const Vec4& terrainWorldCenter = node.GetWorldTransform()[ 3 ];
+			//const Vec4 terrainWorldExtent = terrainWorldCenter + ( patchSize * gridSize / 2 );
 
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
-			renderableTransforms.insert( renderableTransforms.begin(), transform.mQuadTree.GetNodes().begin(), transform.mQuadTree.GetNodes().end() );
+			transform.mQuadTree.CullNodes( renderableTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
+			//renderableTransforms.insert( renderableTransforms.begin(), transform.mQuadTree.GetNodes().begin(), transform.mQuadTree.GetNodes().end() );
 
 			std::size_t renderableEndIndex = renderableTransforms.size();
 			mRenderQueue.mTerrains.mTerrainData.emplace_back(heightmap, renderableEndIndex, heightScale, patchSize);

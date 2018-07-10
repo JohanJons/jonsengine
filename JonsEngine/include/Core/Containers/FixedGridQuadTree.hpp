@@ -8,20 +8,6 @@
 
 namespace JonsEngine
 {
-	/*template<typename Item>
-	class SingleItemGridNode
-	{
-	public:
-		SingleItemGridNode() = default;
-
-		Item& GetItem() { return mItem; }
-		const Item& GetItem() const { return mItem; }
-
-	private:
-		Item mItem;
-		AABB mAABB;
-	};*/
-
 	struct GridQuadNodeAABB
 	{
 		enum ChildOffset : uint32_t
@@ -33,13 +19,15 @@ namespace JonsEngine
 			NUM_CHILDREN
 		};
 
-		GridQuadNodeAABB( const Vec3& minAABB, const Vec3& maxAABB )
+		GridQuadNodeAABB( const Vec3& minAABB, const Vec3& maxAABB, uint16_t beginIndex, uint16_t endIndex )
 			: mAABB( minAABB, maxAABB )
+			, mBeginIndex( beginIndex )
+			, mEndIndex( endIndex )
 		{ }
 
 		AABB mAABB;
-		const GridQuadNodeAABB* mChildBegin = nullptr;
-		uint16_t mNumCols = 0, mNumRows = 0;
+		GridQuadNodeAABB* mChildBegin = nullptr;
+		uint16_t mBeginIndex = 0, mEndIndex = 0;
 	};
 
 	template<typename Item>
@@ -54,20 +42,30 @@ namespace JonsEngine
 		Item& GetNode( uint32_t index ) { return mNodes.at( index ); }
 		const Item& GetNode( uint32_t index ) const { return mNodes.at( index ); }
 
+		// AABBs are in worldspace already
+		void CullNodes( std::vector<Item>& nodes, const Mat4& cameraViewProjTransform ) const;
+
 		std::vector<Item>& GetNodes() { return mNodes; }
 		const std::vector<Item>& GetNodes() const { return mNodes; }
 		const std::vector<AABB>& GetAABBs() const { return mNodeAABBs; }
 
 
 	private:
+		static constexpr uint32_t gNodeAABBCutoffPoint = 64;
+
+		void CullQuad( std::vector<Item>& Nodes, const GridQuadNodeAABB& QuadAABB, const Mat4& cameraViewProjTransform ) const;
+
 		void BuildAABBTraversal();
 		void ProcessQuadNode( GridQuadNodeAABB& quadAABB );
 		bool VerifyMemoryLayout() const;
 		bool CheckUniformSize() const;
 		bool CheckAABBBoundaries( uint32_t numCols ) const;
 
+		uint32_t GetColumn( uint32_t index ) const;
+		uint32_t GetRow( uint32_t index ) const;
 		uint32_t GetNumColumns() const;
 		uint32_t GetNumRows( uint32_t numCols ) const;
+		uint32_t GetNumNodeElements() const;
 
 		std::vector<Item> mNodes;
 		std::vector<AABB> mNodeAABBs;
@@ -86,6 +84,18 @@ namespace JonsEngine
 		BuildAABBTraversal();
 	}
 
+	template <typename Item>
+	void FixedGridQuadTree<Item>::CullNodes( std::vector<Item>& nodes, const Mat4& cameraViewProjTransform ) const
+	{
+		CullQuad( nodes, mGridTraversal.front(), cameraViewProjTransform );
+	}
+
+	template <typename Item>
+	void FixedGridQuadTree<Item>::CullQuad( std::vector<Item>& Nodes, const GridQuadNodeAABB& QuadAABB, const Mat4& cameraViewProjTransform ) const
+	{
+		AABBIntersection intersection = Intersection( QuadAABB.mAABB, cameraViewProjTransform );
+
+	}
 
 	template <typename Item>
 	void FixedGridQuadTree<Item>::BuildAABBTraversal()
@@ -99,12 +109,11 @@ namespace JonsEngine
 		// only square quads for now
 		assert( numCols == numRows );
 
-		mGridTraversal.reserve( numCols * numRows );
+		mGridTraversal.reserve( GetNumNodeElements() );
 
 		AABB& topLeftAABB = mNodeAABBs.front();
 		AABB& bottomRightAABB = mNodeAABBs.back();
-
-		mGridTraversal.emplace_back( topLeftAABB.Min(), bottomRightAABB.Max() );
+		mGridTraversal.emplace_back( topLeftAABB.Min(), bottomRightAABB.Max(), 0, ( numCols * numRows ) - 1 );
 		GridQuadNodeAABB& quadAABB = mGridTraversal.back();
 		ProcessQuadNode( quadAABB );
 	}
@@ -112,18 +121,26 @@ namespace JonsEngine
 	template <typename Item>
 	void FixedGridQuadTree<Item>::ProcessQuadNode( GridQuadNodeAABB& quadAABB )
 	{
+		if ( quadAABB.mAABB.GetExtent().x <= static_cast<float>( gNodeAABBCutoffPoint ) )
+			return;
+
 		const Vec3 splitExtent( quadAABB.mAABB.GetExtent().x, 0, 0 );
 		const Vec3 tlAABBMin = quadAABB.mAABB.Min(), brAABBMax = quadAABB.mAABB.Max();
 		const Vec3 center = quadAABB.mAABB.GetCenter();
 
-		mGridTraversal.emplace_back( tlAABBMin, center );
+		const uint16_t parentBegin = quadAABB.mBeginIndex, parentEnd = quadAABB.mEndIndex;
+
+		uint32_t beginColumn = GetColumn( parentBegin ), beginRow = GetRow( parentBegin );
+		uint32_t endColumn = GetColumn( parentEnd ), endRow = GetRow( parentEnd );
+
+		mGridTraversal.emplace_back( tlAABBMin, center, parentBegin, parentEnd / 2 );
 		quadAABB.mChildBegin = &mGridTraversal.back();
-		mGridTraversal.emplace_back( tlAABBMin + splitExtent, center + splitExtent );
-		mGridTraversal.emplace_back( center - splitExtent, brAABBMax - splitExtent );
-		mGridTraversal.emplace_back( center, brAABBMax );
+		mGridTraversal.emplace_back( tlAABBMin + splitExtent, center + splitExtent, 0, 0 );
+		mGridTraversal.emplace_back( center - splitExtent, brAABBMax - splitExtent, 0, 0 );
+		mGridTraversal.emplace_back( center, brAABBMax, 0, 0 );
 
 		for ( uint32_t offset = GridQuadNodeAABB::TOP_LEFT; offset < GridQuadNodeAABB::NUM_CHILDREN; ++offset )
-			ProcessQuadNode( *(mGridTraversal.begin() + offset) );
+			ProcessQuadNode( *( quadAABB.mChildBegin + offset ) );
 	}
 
 	template <typename Item>
@@ -192,6 +209,20 @@ namespace JonsEngine
 	}
 
 	template <typename Item>
+	uint32_t FixedGridQuadTree<Item>::GetColumn( uint32_t index ) const
+	{
+		return index % GetNumColumns();
+	}
+
+	template <typename Item>
+	uint32_t FixedGridQuadTree<Item>::GetRow( uint32_t index ) const
+	{
+		uint32_t columns = GetNumColumns();
+
+		return index / GetNumRows( columns );
+	}
+
+	template <typename Item>
 	uint32_t FixedGridQuadTree<Item>::GetNumColumns() const
 	{
 		assert( !mNodeAABBs.empty() );
@@ -227,5 +258,29 @@ namespace JonsEngine
 		assert( mNodeAABBs.size() % numCols == 0 );
 
 		return mNodeAABBs.size() / numCols;
+	}
+
+	template <typename Item>
+	uint32_t FixedGridQuadTree<Item>::GetNumNodeElements() const
+	{
+		assert( !mNodeAABBs.empty() );
+
+		const AABB& topLeftAABB = mNodeAABBs.front();
+		const AABB& bottomRightAABB = mNodeAABBs.back();
+		const Vec3 min = topLeftAABB.Min(), max = bottomRightAABB.Max();
+		AABB totalAABB( min, max );
+
+		uint32_t curr = static_cast<uint32_t>( totalAABB.GetExtent().x );
+		uint32_t pow = 2;
+		// +1 for toplevel AABB node
+		uint32_t numAABBs = 1;
+		while ( curr > gNodeAABBCutoffPoint )
+		{
+			numAABBs += 1 << pow;
+			curr /= 2;
+			pow += 2;
+		}
+
+		return numAABBs;
 	}
 }
