@@ -5,6 +5,7 @@
 
 #include "include/Core/Types.h"
 #include "include/Core/Math/AABB.h"
+#include "include/RenderQueue/RenderQueueTypes.h"
 
 namespace JonsEngine
 {
@@ -27,10 +28,11 @@ namespace JonsEngine
 
 		AABB mAABB;
 		GridQuadNodeAABB* mChildBegin = nullptr;
+		// endIndex inclusive
 		uint16_t mBeginIndex = 0, mEndIndex = 0;
 	};
 
-	template<typename Item>
+	template<typename Item, uint32_t gNodeAABBCutoffPoint>
 	class FixedGridQuadTree
 	{
 	public:
@@ -45,22 +47,17 @@ namespace JonsEngine
 		// AABBs are in worldspace already
 		void CullNodes( std::vector<Item>& nodes, const Mat4& cameraViewProjTransform ) const;
 
-		std::vector<Item>& GetNodes() { return mNodes; }
-		const std::vector<Item>& GetNodes() const { return mNodes; }
-		const std::vector<AABB>& GetAABBs() const { return mNodeAABBs; }
-
-
 	private:
-		static constexpr uint32_t gNodeAABBCutoffPoint = 64;
-
-		void CullQuad( std::vector<Item>& Nodes, const GridQuadNodeAABB& QuadAABB, const Mat4& cameraViewProjTransform ) const;
+		void CullQuad( std::vector<Item>& nodes, const GridQuadNodeAABB& quadAABB, const Mat4& cameraViewProjTransform ) const;
+		void AddAllItems( std::vector<Item>& nodes, const GridQuadNodeAABB& quadAABB ) const;
 
 		void BuildAABBTraversal();
 		void ProcessQuadNode( GridQuadNodeAABB& quadAABB );
 		bool VerifyMemoryLayout() const;
 		bool CheckUniformSize() const;
-		bool CheckAABBBoundaries( uint32_t numCols ) const;
+		bool CheckAABBBoundaries() const;
 
+		uint32_t GetIndex( uint32_t rowIndex, uint32_t columnIndex ) const;
 		uint32_t GetColumn( uint32_t index ) const;
 		uint32_t GetRow( uint32_t index ) const;
 		uint32_t GetNumColumns() const;
@@ -70,56 +67,93 @@ namespace JonsEngine
 		std::vector<Item> mNodes;
 		std::vector<AABB> mNodeAABBs;
 
+		uint32_t mNumColumns;
+		uint32_t mNumRows;
+
 		std::vector<GridQuadNodeAABB> mGridTraversal;
 	};
 
-	typedef FixedGridQuadTree<Mat4> TransformGridQuadTree;
 
-
-	template <typename Item>
-	FixedGridQuadTree<Item>::FixedGridQuadTree( std::vector<Item>&& Items, std::vector<AABB>&& AABBs )
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::FixedGridQuadTree( std::vector<Item>&& Items, std::vector<AABB>&& AABBs )
 		: mNodes( Items )
 		, mNodeAABBs( AABBs )
+		, mNumColumns( GetNumColumns() )
+		, mNumRows( GetNumRows( mNumColumns ) )
 	{
 		BuildAABBTraversal();
 	}
 
-	template <typename Item>
-	void FixedGridQuadTree<Item>::CullNodes( std::vector<Item>& nodes, const Mat4& cameraViewProjTransform ) const
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	void FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::CullNodes( std::vector<Item>& nodes, const Mat4& cameraViewProjTransform ) const
 	{
+		assert( !mGridTraversal.empty() );
 		CullQuad( nodes, mGridTraversal.front(), cameraViewProjTransform );
 	}
 
-	template <typename Item>
-	void FixedGridQuadTree<Item>::CullQuad( std::vector<Item>& Nodes, const GridQuadNodeAABB& QuadAABB, const Mat4& cameraViewProjTransform ) const
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	void FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::CullQuad( std::vector<Item>& nodes, const GridQuadNodeAABB& quadAABB, const Mat4& cameraViewProjTransform ) const
 	{
-		AABBIntersection intersection = Intersection( QuadAABB.mAABB, cameraViewProjTransform );
+		AABBIntersection intersection = Intersection( quadAABB.mAABB, cameraViewProjTransform );
+		switch ( intersection )
+		{
+			case AABBIntersection::Partial:
+			{
+				if ( !quadAABB.mChildBegin )
+					AddAllItems( nodes, quadAABB );
 
+				for ( uint32_t childIndex = GridQuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < GridQuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
+					CullQuad( nodes, *( quadAABB.mChildBegin + childIndex ), cameraViewProjTransform );
+
+				break;
+			}
+			case AABBIntersection::Inside:
+			{
+				AddAllItems( nodes, quadAABB );
+				break;
+			}
+			default:
+				break;
+		}
 	}
 
-	template <typename Item>
-	void FixedGridQuadTree<Item>::BuildAABBTraversal()
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	void FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::AddAllItems( std::vector<Item>& nodes, const GridQuadNodeAABB& quadAABB ) const
+	{
+		uint32_t begin = quadAABB.mBeginIndex, end = quadAABB.mEndIndex;
+		uint32_t beginRow = GetRow( begin ), endRow = GetRow( end );
+		uint32_t beginCol = GetColumn( begin ), endCol = GetColumn( end );
+		assert( beginRow >= 0 && endRow >= beginRow && endRow < mNumRows );
+		assert( beginCol >= 0 && endCol >= beginCol && endCol < mNumColumns );
+
+		// endRow/endColumn are inclusive indices
+		for ( uint32_t i = beginRow; i <= endRow; ++i )
+		{
+			uint32_t rowBeginIndex = GetIndex( i, beginCol ), rowEndIndex = GetIndex( i, endCol );
+			nodes.insert( nodes.end(), mNodes.begin() + rowBeginIndex, mNodes.begin() + rowEndIndex + 1 );
+		}
+	}
+
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	void FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::BuildAABBTraversal()
 	{
 		assert( mNodes.size() == mNodeAABBs.size() );
 		assert( VerifyMemoryLayout() );
 
-		uint32_t numCols = GetNumColumns();
-		uint32_t numRows = GetNumRows( numCols );
-
 		// only square quads for now
-		assert( numCols == numRows );
+		assert( mNumColumns == mNumRows );
 
 		mGridTraversal.reserve( GetNumNodeElements() );
 
 		AABB& topLeftAABB = mNodeAABBs.front();
 		AABB& bottomRightAABB = mNodeAABBs.back();
-		mGridTraversal.emplace_back( topLeftAABB.Min(), bottomRightAABB.Max(), 0, ( numCols * numRows ) - 1 );
+		mGridTraversal.emplace_back( topLeftAABB.Min(), bottomRightAABB.Max(), 0, ( mNumColumns * mNumRows ) - 1 );
 		GridQuadNodeAABB& quadAABB = mGridTraversal.back();
 		ProcessQuadNode( quadAABB );
 	}
 
-	template <typename Item>
-	void FixedGridQuadTree<Item>::ProcessQuadNode( GridQuadNodeAABB& quadAABB )
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	void FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::ProcessQuadNode( GridQuadNodeAABB& quadAABB )
 	{
 		if ( quadAABB.mAABB.GetExtent().x <= static_cast<float>( gNodeAABBCutoffPoint ) )
 			return;
@@ -132,19 +166,25 @@ namespace JonsEngine
 
 		uint32_t beginColumn = GetColumn( parentBegin ), beginRow = GetRow( parentBegin );
 		uint32_t endColumn = GetColumn( parentEnd ), endRow = GetRow( parentEnd );
+		assert( endColumn > beginColumn && endRow > beginRow );
 
-		mGridTraversal.emplace_back( tlAABBMin, center, parentBegin, parentEnd / 2 );
+		uint32_t numCols = endColumn - beginColumn, numRows = endRow - beginRow;
+		uint32_t indexTL = GetIndex( beginRow, beginColumn ), indexTM = GetIndex( beginRow, beginColumn + numCols / 2 );
+		uint32_t indexML = GetIndex( beginRow + numRows / 2, beginColumn ), indexMM = GetIndex( beginRow + numRows / 2, beginColumn + numCols / 2 ), indexMR = GetIndex( beginRow + numRows / 2, endColumn );
+		uint32_t indexLM = GetIndex( endRow, beginColumn + numCols / 2 ), indexLR = GetIndex( endRow, endColumn );
+
+		mGridTraversal.emplace_back( tlAABBMin, center, indexTL, indexMM );
 		quadAABB.mChildBegin = &mGridTraversal.back();
-		mGridTraversal.emplace_back( tlAABBMin + splitExtent, center + splitExtent, 0, 0 );
-		mGridTraversal.emplace_back( center - splitExtent, brAABBMax - splitExtent, 0, 0 );
-		mGridTraversal.emplace_back( center, brAABBMax, 0, 0 );
+		mGridTraversal.emplace_back( tlAABBMin + splitExtent, center + splitExtent, indexTM, indexMR );
+		mGridTraversal.emplace_back( center - splitExtent, brAABBMax - splitExtent, indexML, indexLM );
+		mGridTraversal.emplace_back( center, brAABBMax, indexMM, indexLR );
 
 		for ( uint32_t offset = GridQuadNodeAABB::TOP_LEFT; offset < GridQuadNodeAABB::NUM_CHILDREN; ++offset )
 			ProcessQuadNode( *( quadAABB.mChildBegin + offset ) );
 	}
 
-	template <typename Item>
-	bool FixedGridQuadTree<Item>::VerifyMemoryLayout() const
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	bool FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::VerifyMemoryLayout() const
 	{
 		if ( mNodeAABBs.size() <= 0 )
 		{
@@ -153,20 +193,18 @@ namespace JonsEngine
 		
 		// some unnecessary re-traversal inflicted
 		CheckUniformSize();
-		uint32_t numCols = GetNumColumns();
-		assert( numCols > 0 );
-		if ( mNodeAABBs.size() % numCols != 0 )
+		assert( mNumColumns > 0 );
+		if ( mNodeAABBs.size() % mNumColumns != 0 )
 			return false;
 
-		uint32_t numRows = GetNumRows(numCols );
-		if ( numCols * numRows != mNodeAABBs.size() )
+		if ( mNumColumns * mNumRows != mNodeAABBs.size() )
 			return false;
 
-		return CheckAABBBoundaries( numCols );
+		return CheckAABBBoundaries();
 	}
 
-	template <typename Item>
-	bool FixedGridQuadTree<Item>::CheckUniformSize() const
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	bool FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::CheckUniformSize() const
 	{
 		assert( !mNodeAABBs.empty() );
 
@@ -182,22 +220,22 @@ namespace JonsEngine
 		return true;
 	}
 
-	template <typename Item>
-	bool FixedGridQuadTree<Item>::CheckAABBBoundaries( uint32_t numCols ) const
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	bool FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::CheckAABBBoundaries() const
 	{
-		assert( numCols >= 1 );
+		assert( mNumColumns >= 1 );
 
-		for ( uint32_t index = 0, numNodes = mNodes.size() - numCols; index < numNodes; ++index )
+		for ( uint32_t index = 0, numNodes = mNodes.size() - mNumColumns; index < numNodes; ++index )
 		{
 			const AABB* currAABB = &mNodeAABBs[ index ];
 			const AABB* nextAABB = &mNodeAABBs[ index + 1 ];
-			const AABB* bottomAABB = &mNodeAABBs[ index + numCols ];
+			const AABB* bottomAABB = &mNodeAABBs[ index + mNumColumns ];
 
 			Vec3 currMin = currAABB->Min(), currMax = currAABB->Max();
 			Vec3 nextMin = nextAABB->Min();
 			Vec3 bottomMin = bottomAABB->Min();
 
-			bool bIsNotAtEndColumn = ( index + 1 ) % numCols != 0;
+			bool bIsNotAtEndColumn = ( index + 1 ) % mNumColumns != 0;
 			if ( bIsNotAtEndColumn && currMax.x != nextMin.x )
 				return false;
 
@@ -208,22 +246,29 @@ namespace JonsEngine
 		return true;
 	}
 
-	template <typename Item>
-	uint32_t FixedGridQuadTree<Item>::GetColumn( uint32_t index ) const
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	uint32_t FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::GetIndex( uint32_t rowIndex, uint32_t columnIndex ) const
 	{
-		return index % GetNumColumns();
+		uint32_t index = columnIndex + ( rowIndex * mNumColumns );
+		assert( index >= 0 && index < mGridTraversal.size() );
+
+		return index;
 	}
 
-	template <typename Item>
-	uint32_t FixedGridQuadTree<Item>::GetRow( uint32_t index ) const
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	uint32_t FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::GetColumn( uint32_t index ) const
 	{
-		uint32_t columns = GetNumColumns();
-
-		return index / GetNumRows( columns );
+		return index % mNumColumns;
 	}
 
-	template <typename Item>
-	uint32_t FixedGridQuadTree<Item>::GetNumColumns() const
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	uint32_t FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::GetRow( uint32_t index ) const
+	{
+		return index / GetNumRows( mNumColumns );
+	}
+
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	uint32_t FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::GetNumColumns() const
 	{
 		assert( !mNodeAABBs.empty() );
 
@@ -251,8 +296,8 @@ namespace JonsEngine
 		return numCols;
 	}
 
-	template <typename Item>
-	uint32_t FixedGridQuadTree<Item>::GetNumRows( uint32_t numCols ) const
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	uint32_t FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::GetNumRows( uint32_t numCols ) const
 	{
 		assert( numCols > 0 );
 		assert( mNodeAABBs.size() % numCols == 0 );
@@ -260,8 +305,8 @@ namespace JonsEngine
 		return mNodeAABBs.size() / numCols;
 	}
 
-	template <typename Item>
-	uint32_t FixedGridQuadTree<Item>::GetNumNodeElements() const
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	uint32_t FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::GetNumNodeElements() const
 	{
 		assert( !mNodeAABBs.empty() );
 

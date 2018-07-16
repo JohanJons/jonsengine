@@ -49,4 +49,9 @@ namespace JonsGame
 	{
 		return mSceneMgr.GetScene( mID );
 	}
+
+	JonsEngine::Terrain& SceneTessellation::GetTerrain()
+	{
+		return mSceneMgr.GetScene( mID ).GetTerrain( mTerrain );
+	}
 }

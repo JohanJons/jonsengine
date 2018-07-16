@@ -24,9 +24,7 @@ namespace JonsGame
 		mEngine(mSettings),
 		mGameScene( mEngine.GetSceneManager(), mEngine.GetResourceManifest() ),
 		mTessellationScene( mEngine.GetSceneManager(), mEngine.GetResourceManifest() ),
-		mSun(mGameScene.GetSun()),
-		mRunning(true),
-		mMoveSpeed(0.1f)
+		mSun(mGameScene.GetSun())
     {
         SetupInputCallbacks();
         mEngine.GetWindow().ShowMouseCursor(false);
@@ -50,9 +48,14 @@ namespace JonsGame
     void Game::OnKeyEvent(const KeyEvent& evnt)
     {
 		Camera& camera = mEngine.GetSceneManager().GetActiveScene().GetSceneCamera();
+		const bool isKeyPressed = evnt.mState == KeyEvent::KeyState::STATE_PRESSED || evnt.mState == KeyEvent::KeyState::STATE_REPEAT;
+		if ( !isKeyPressed )
+			return;
+
+		if mIsDefaultScene ....
 
         // SHIFT-modifier activated
-        if ((evnt.mState == KeyEvent::KeyState::STATE_PRESSED || evnt.mState == KeyEvent::KeyState::STATE_REPEAT) && evnt.mShiftPressed)
+        if ( evnt.mShiftPressed )
         {
             switch (evnt.mKey)
             {
@@ -78,8 +81,18 @@ namespace JonsGame
                     break;
             }
         }
+		// CONTROL-modifier pressed
+		else if ( evnt.mControlPressed )
+		{
+			switch ( evnt.mKey )
+			{
+				case Key::ONE: mTessellationScene.GetTerrain().SetHeightScale( 48.0f ); break;
+				case Key::TWO: mTessellationScene.GetTerrain().SetHeightScale( 64.0f ); break;
+				case Key::THREE: mTessellationScene.GetTerrain().SetHeightScale( 80.0f ); break;
+			}
+		}
         // no modifiers
-        else if (evnt.mState == KeyEvent::KeyState::STATE_PRESSED || evnt.mState == KeyEvent::KeyState::STATE_REPEAT)
+        else
         {
             switch (evnt.mKey)
             {
@@ -119,8 +132,8 @@ namespace JonsGame
                 case Key::ESC: mRunning = false; break;
 
 				// scene-switch
-				case Key::F1: mEngine.GetSceneManager().SetActiveScene( mGameScene.GetSceneID() ); break;
-				case Key::F2: mEngine.GetSceneManager().SetActiveScene( mTessellationScene.GetSceneID() ); break;
+				case Key::F1: mEngine.GetSceneManager().SetActiveScene( mGameScene.GetSceneID() ); mIsDefaultScene = true; break;
+				case Key::F2: mEngine.GetSceneManager().SetActiveScene( mTessellationScene.GetSceneID() ); mIsDefaultScene = false; break;
 
                 default:
                     break;

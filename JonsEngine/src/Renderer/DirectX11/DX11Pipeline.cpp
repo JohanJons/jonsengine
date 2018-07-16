@@ -151,17 +151,14 @@ namespace JonsEngine
         // disable further depth writing
         mContext->OMSetDepthStencilState(mDepthStencilState, 0);
 
-        // ambient light
         mAmbientPass.Render(renderQueue.mAmbientLight, mWindowSize, renderSettings.mSSAOEnabled);
 
         // additive blending for adding lighting
         mContext->OMSetBlendState(mAdditiveBlending, nullptr, 0xffffffff);
 
-        // do all directional lights
         for (const RenderableDirectionalLight& directionalLight : renderQueue.mDirectionalLights)
             mDirectionalLightPass.Render(directionalLight, renderQueue.mRenderData, renderSettings.mShadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mCamera.mCameraViewMatrix);
 
-        // do all point lights
         for (const RenderablePointLight& pointLight : renderQueue.mPointLights)
         {
             mContext->ClearDepthStencilView(mDSV, D3D11_CLEAR_STENCIL, 1.0f, 0);
@@ -171,7 +168,6 @@ namespace JonsEngine
         // turn off blending
         mContext->OMSetBlendState(nullptr, nullptr, 0xffffffff);
 
-		// skybox pass
 		if (renderQueue.mSkyboxTextureID != INVALID_DX11_TEXTURE_ID)
 			mSkyboxPass.Render(mTextureMap.GetItem(renderQueue.mSkyboxTextureID));
     }
@@ -187,11 +183,9 @@ namespace JonsEngine
         if (renderSettings.mAntiAliasing == RenderSettings::AntiAliasing::Fxaa)
             mPostProcessor.FXAAPass(mBackbuffer, mWindowSize);
 
-        if (debugFlags.test(DebugOptions::RENDER_FLAG_DRAW_MODEL_AABB))
-            mAABBPass.Render( renderQueue.mColorsToAABBsList, renderQueue.mCamera.mCameraViewProjectionMatrix );
-
-		if ( debugFlags.test( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_AABB ) )
-			mAABBPass.Render( renderQueue.mTerrains.mDebugAABBs, renderQueue.mCamera.mCameraViewProjectionMatrix );
+		const bool renderAABBs = !renderQueue.mColorsToAABBsList.empty();
+		if ( renderAABBs )
+			mAABBPass.Render( renderQueue.mColorsToAABBsList, renderQueue.mCamera.mCameraViewProjectionMatrix );
     }
 
 

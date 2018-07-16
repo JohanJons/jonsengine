@@ -17,6 +17,7 @@ namespace JonsGame
 		JonsEngine::SceneID GetSceneID() const { return mID; }
 
 		JonsEngine::Scene& GetJonsScene();
+		JonsEngine::Terrain& GetTerrain();
 
 	private:
 		const JonsEngine::SceneNodeID mID;

@@ -24,12 +24,13 @@ namespace JonsEngine
         void ViewFrustumCulling(const Scene& scene, const float windowAspectRatio, const float zNear, const float zFar);
         void PointLightCulling(const Scene& scene);
         void DirectionalLightCulling(const Scene& scene);
-		void TerrainParsing( const Scene& scene, bool bAABBDebug );
+		void TerrainParsing( const Scene& scene );
 		void CopyBoneTransforms(const Scene& scene);
 		void GetSkybox(const Scene& scene);
 		void GetAmbientLight(const Scene& scene);
 		// needs to run after ViewFrustumCulling
-		void AddAABBDebugData(const Scene& scene);
+		void AddModelAABBDebugData(const Scene& scene);
+		void AddTerrainAABBDebugData( const Scene& scene );
 
 
         const ResourceManifest& mResourceManifest;

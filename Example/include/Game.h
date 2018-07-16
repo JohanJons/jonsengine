@@ -38,7 +38,8 @@ namespace JonsGame
 		SceneTessellation mTessellationScene;
         Sun mSun;
 
-        bool mRunning;
-        float mMoveSpeed;
+		bool mRunning = true;
+		bool mIsDefaultScene = true;
+		float mMoveSpeed = 0.1f;
     };
 }

@@ -223,22 +223,22 @@ namespace JonsEngine
 		return ID;
 	}
 
-	void Scene::DeleteTerrain(TerrainDataID& terrainDataID)
+	void Scene::DeleteTerrain( TerrainID& terrainID )
 	{
-		assert(terrainDataID != INVALID_TERRAIN_ID);
+		assert( terrainID != INVALID_TERRAIN_ID);
 
-		mTerrains.Erase(terrainDataID);
-		terrainDataID = INVALID_TERRAIN_ID;
+		mTerrains.Erase( terrainID );
+		terrainID = INVALID_TERRAIN_ID;
 	}
 
-	Terrain& Scene::GetTerrain(const TerrainDataID terrainDataID)
+	Terrain& Scene::GetTerrain(const TerrainID terrainID )
 	{
-		return mTerrains.GetItem(terrainDataID);
+		return mTerrains.GetItem( terrainID );
 	}
 
-	const Terrain& Scene::GetTerrain(const TerrainDataID terrainDataID) const
+	const Terrain& Scene::GetTerrain(const TerrainID terrainID ) const
 	{
-		return mTerrains.GetItem(terrainDataID);
+		return mTerrains.GetItem( terrainID );
 	}
 
 	Scene::TerrainIterator Scene::GetTerrains() const

@@ -64,11 +64,15 @@ namespace JonsEngine
         DirectionalLightCulling(scene);
 
 		// TODO: needs to be done per-frame always
-		if (dirtyFlags.test(FlagTerrain) || debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_AABB ) )
-			TerrainParsing( scene, debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_AABB ) );
+		if ( dirtyFlags.test( FlagTerrain ) )
+		{
+			TerrainParsing( scene );
+			if ( debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_AABB ) )
+				AddTerrainAABBDebugData( scene );
+		}
 
 		if (debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_MODEL_AABB ))
-			AddAABBDebugData(scene);
+			AddModelAABBDebugData( scene );
 
         return mRenderQueue;
     }
@@ -171,7 +175,7 @@ namespace JonsEngine
         }
     }
 
-	void SceneParser::TerrainParsing( const Scene& scene, bool bAABBDebug )
+	void SceneParser::TerrainParsing( const Scene& scene )
 	{
 		const TerrainTransforms& terrainTransforms = scene.GetTerrainTransforms();
 		const std::vector<TerrainTransformData>& transforms = terrainTransforms.GetTransforms();
@@ -193,27 +197,11 @@ namespace JonsEngine
 			float patchSize = terrain.GetPatchSize();
 			float heightScale = terrain.GetHeightScale();
 
-			//const Vec4& terrainWorldCenter = node.GetWorldTransform()[ 3 ];
-			//const Vec4 terrainWorldExtent = terrainWorldCenter + ( patchSize * gridSize / 2 );
-
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
 			transform.mQuadTree.CullNodes( renderableTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
-			//renderableTransforms.insert( renderableTransforms.begin(), transform.mQuadTree.GetNodes().begin(), transform.mQuadTree.GetNodes().end() );
 
 			std::size_t renderableEndIndex = renderableTransforms.size();
 			mRenderQueue.mTerrains.mTerrainData.emplace_back(heightmap, renderableEndIndex, heightScale, patchSize);
-
-			if ( bAABBDebug )
-			{
-				DX11MeshID unitCubeMeshID = mResourceManifest.GetUnitCubeModel().GetMeshes().begin()->GetMesh();
-				assert( unitCubeMeshID != INVALID_DX11_MESH_ID );
-
-				RenderableAABBsContainer& AABBRenderData = mRenderQueue.mTerrains.mDebugAABBs;
-
-				AABBRenderData.clear();
-				for ( const Mat4& transform : renderableTransforms )
-					AddAABB( AABBRenderData, transform, unitCubeMeshID, gGreen );
-			}
 		}
 	}
 
@@ -242,7 +230,7 @@ namespace JonsEngine
 		mRenderQueue.mAmbientLight = scene.GetAmbientLight();
 	}
 
-	void SceneParser::AddAABBDebugData(const Scene& scene)
+	void SceneParser::AddModelAABBDebugData(const Scene& scene)
 	{
 		const auto staticActors = scene.GetStaticActors();
 		const auto animatedActors = scene.GetAnimatedActors();
@@ -251,6 +239,18 @@ namespace JonsEngine
 
 		CullAABB<decltype(staticActors)>(scene, mResourceManifest, staticActors, mCullingStrategy, aabbDataContainer, viewProjTransform);
 		CullAABB<decltype(animatedActors)>(scene, mResourceManifest, animatedActors, mCullingStrategy, aabbDataContainer, viewProjTransform);
+	}
+
+	void SceneParser::AddTerrainAABBDebugData( const Scene& scene )
+	{
+		DX11MeshID unitCubeMeshID = mResourceManifest.GetUnitCubeModel().GetMeshes().begin()->GetMesh();
+		assert( unitCubeMeshID != INVALID_DX11_MESH_ID );
+
+		RenderableAABBsContainer& AABBRenderData = mRenderQueue.mColorsToAABBsList;
+
+		AABBRenderData.clear();
+		for ( const Mat4& transform : mRenderQueue.mTerrains.mTransforms )
+			AddAABB( AABBRenderData, transform, unitCubeMeshID, gGreen );
 	}
 
 
@@ -444,32 +444,4 @@ namespace JonsEngine
 			}
 		}
 	}
-
-	/*void CullTerrain(const Scene& scene, const ResourceManifest& resManifest, const EngineSettings::CullingStrategy cullingStrat,
-		const Scene::TerrainIterator& terrainIter, RenderableTerrains& terrainRenderQueue, const Mat4& cameraViewProj)
-	{
-		for (const auto& terrain : terrainIter)
-		{
-			auto sceneNodeID = terrain.GetSceneNode();
-			auto terrainDataID = terrain.GetTerrainData();
-			if (sceneNodeID == INVALID_SCENE_NODE_ID || terrainDataID == INVALID_TERRAIN_DATA_ID)
-				continue;
-
-			const TerrainData& terrainData = resManifest.GetTerrainData(terrainDataID);
-			const SceneNode& node = scene.GetSceneNode(sceneNodeID);
-
-			const AABB& aabb = terrainData.GetStaticAABB();
-			const Mat4& worldMatrix = node.GetWorldTransform();
-			const AABBIntersection visibilityResult = FrustumCull(aabb, worldMatrix, cameraViewProj);
-
-			const bool addTerrain = InterpretVisibilityResult(cullingStrat, visibilityResult);
-			if (!addTerrain)
-				continue;
-
-			auto heightmap = terrainData.GetHeightMap();
-			float patchSize = terrain.GetPatchSize();
-			float heightScale = terrain.GetHeightScale();
-			terrainRenderQueue.emplace_back(worldMatrix, heightmap, heightScale, patchSize);
-		}
-	}*/
 }
