@@ -52,92 +52,112 @@ namespace JonsGame
 		if ( !isKeyPressed )
 			return;
 
-		if mIsDefaultScene ....
-
         // SHIFT-modifier activated
         if ( evnt.mShiftPressed )
         {
-            switch (evnt.mKey)
-            {
-                //  renderering
-                case Key::ONE: mEngine.GetRenderer().SetShadowFiltering(RenderSettings::ShadowFiltering::PCF_2x2); break;
-                case Key::TWO: mEngine.GetRenderer().SetShadowFiltering(RenderSettings::ShadowFiltering::PCF_3x3); break;
-                case Key::THREE: mEngine.GetRenderer().SetShadowFiltering(RenderSettings::ShadowFiltering::PCF_5x5); break;
-                case Key::FOUR: mEngine.GetRenderer().SetShadowFiltering(RenderSettings::ShadowFiltering::PCF_7x7); break;
-
-				case Key::FIVE: mEngine.GetRenderer().SetToneMappingAlghorithm(RenderSettings::ToneMappingAlghorithm::None); break;
-				case Key::SIX: mEngine.GetRenderer().SetToneMappingAlghorithm(RenderSettings::ToneMappingAlghorithm::FilmicU2); break;
-
-                // sun
-                case Key::Q: mSun.SetIsMoving(true); break;
-                case Key::W: mSun.SetIsMoving(false); break;
-
-                // animated actors
-				case Key::E: mGameScene.ToggleAnimationWuson(); break;
-				case Key::R: mGameScene.ToggleAnimationBob(); break;
-                //case Key::R: mSunSpeed -= 0.005f; break;
-                
-                default:
-                    break;
-            }
-        }
-		// CONTROL-modifier pressed
-		else if ( evnt.mControlPressed )
-		{
 			switch ( evnt.mKey )
 			{
-				case Key::ONE: mTessellationScene.GetTerrain().SetHeightScale( 48.0f ); break;
-				case Key::TWO: mTessellationScene.GetTerrain().SetHeightScale( 64.0f ); break;
-				case Key::THREE: mTessellationScene.GetTerrain().SetHeightScale( 80.0f ); break;
+				// camera
+				case Key::A: camera.TranslateCamera( -camera.Right() * mMoveSpeed * 10.0f );   break;
+				case Key::W: camera.TranslateCamera( camera.Forward() * mMoveSpeed * 10.0f );  break;
+				case Key::S: camera.TranslateCamera( -camera.Forward() * mMoveSpeed * 10.0f ); break;
+				case Key::D: camera.TranslateCamera( camera.Right() * mMoveSpeed * 10.0f );    break;
+				default:
+					break;
 			}
-		}
+
+			if ( mIsDefaultScene )
+			{
+				switch ( evnt.mKey )
+				{
+					//  renderering
+					case Key::ONE: mEngine.GetRenderer().SetShadowFiltering( RenderSettings::ShadowFiltering::PCF_2x2 ); break;
+					case Key::TWO: mEngine.GetRenderer().SetShadowFiltering( RenderSettings::ShadowFiltering::PCF_3x3 ); break;
+					case Key::THREE: mEngine.GetRenderer().SetShadowFiltering( RenderSettings::ShadowFiltering::PCF_5x5 ); break;
+					case Key::FOUR: mEngine.GetRenderer().SetShadowFiltering( RenderSettings::ShadowFiltering::PCF_7x7 ); break;
+
+					case Key::FIVE: mEngine.GetRenderer().SetToneMappingAlghorithm( RenderSettings::ToneMappingAlghorithm::None ); break;
+					case Key::SIX: mEngine.GetRenderer().SetToneMappingAlghorithm( RenderSettings::ToneMappingAlghorithm::FilmicU2 ); break;
+
+					// sun
+					case Key::Q: mSun.SetIsMoving( true ); break;
+					case Key::W: mSun.SetIsMoving( false ); break;
+
+					// animated actors
+					case Key::E: mGameScene.ToggleAnimationWuson(); break;
+					case Key::R: mGameScene.ToggleAnimationBob(); break;
+					//case Key::R: mSunSpeed -= 0.005f; break;
+
+					default:
+						break;
+				}
+			}
+        }
         // no modifiers
         else
         {
-            switch (evnt.mKey)
-            {
-                // camera
-                case Key::A: camera.TranslateCamera(-camera.Right() * mMoveSpeed);   break;
-                case Key::W: camera.TranslateCamera(camera.Forward() * mMoveSpeed);  break;
-                case Key::S: camera.TranslateCamera(-camera.Forward() * mMoveSpeed); break;
-                case Key::D: camera.TranslateCamera(camera.Right() * mMoveSpeed);    break;
-                
-                // moving the point light 
-                case Key::Q: mGameScene.GetMovingLightNode().TranslateNode(Vec3(-0.05f, 0.0f, 0.0f)); break;
-                case Key::E: mGameScene.GetMovingLightNode().TranslateNode(Vec3(0.05f, 0.0f, 0.0f));  break;
-                case Key::R: mGameScene.GetMovingLightNode().TranslateNode(Vec3(0.0f, -0.05f, 0.0f)); break;
-                case Key::T: mGameScene.GetMovingLightNode().TranslateNode(Vec3(0.0f, 0.05f, 0.0f));  break;
-                case Key::F: mGameScene.GetMovingLightNode().TranslateNode(Vec3(0.0f, 0.0f, -0.05f)); break;
-                case Key::G: mGameScene.GetMovingLightNode().TranslateNode(Vec3(0.0f, 0.0f, 0.05f));  break;
+			switch ( evnt.mKey )
+			{
+				// camera
+				case Key::A: camera.TranslateCamera( -camera.Right() * mMoveSpeed );   break;
+				case Key::W: camera.TranslateCamera( camera.Forward() * mMoveSpeed );  break;
+				case Key::S: camera.TranslateCamera( -camera.Forward() * mMoveSpeed ); break;
+				case Key::D: camera.TranslateCamera( camera.Right() * mMoveSpeed );    break;
 
-                //  renderering
-                case Key::ONE: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_MODEL_AABB ); break;
-				case Key::TWO: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_AABB ); break;
-				case Key::THREE: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME ); break;
-                case Key::FOUR: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS ); break;
-                case Key::U: mEngine.GetRenderer().SetSSAO(false); break;
-                case Key::I: mEngine.GetRenderer().SetSSAO(true); break;
-                case Key::H: mEngine.GetRenderer().SetAnisotropicFiltering(RenderSettings::Anisotropic::X1); break;
-                case Key::J: mEngine.GetRenderer().SetAnisotropicFiltering(RenderSettings::Anisotropic::X16); break;
-                case Key::K: mEngine.GetRenderer().SetAntiAliasing(RenderSettings::AntiAliasing::None); break;
-                case Key::L: mEngine.GetRenderer().SetAntiAliasing(RenderSettings::AntiAliasing::Fxaa); break;
-
-                //  misc
-                case Key::N: mEngine.GetWindow().SetFullscreen(true); break;
-                case Key::M: mEngine.GetWindow().SetFullscreen(false); break;
-                case Key::V: mEngine.GetWindow().ShowMouseCursor(true); break;
-                case Key::B: mEngine.GetWindow().ShowMouseCursor(false); break;
-                case Key::X: mEngine.GetWindow().SetScreenResolution(1080, 720); break;
-                case Key::C: mEngine.GetWindow().SetScreenResolution(1920, 1080); break;
-                case Key::ESC: mRunning = false; break;
+				//  misc
+				case Key::N: mEngine.GetWindow().SetFullscreen( true ); break;
+				case Key::M: mEngine.GetWindow().SetFullscreen( false ); break;
+				case Key::V: mEngine.GetWindow().ShowMouseCursor( true ); break;
+				case Key::B: mEngine.GetWindow().ShowMouseCursor( false ); break;
+				case Key::X: mEngine.GetWindow().SetScreenResolution( 1080, 720 ); break;
+				case Key::C: mEngine.GetWindow().SetScreenResolution( 1920, 1080 ); break;
+				case Key::ESC: mRunning = false; break;
 
 				// scene-switch
 				case Key::F1: mEngine.GetSceneManager().SetActiveScene( mGameScene.GetSceneID() ); mIsDefaultScene = true; break;
 				case Key::F2: mEngine.GetSceneManager().SetActiveScene( mTessellationScene.GetSceneID() ); mIsDefaultScene = false; break;
 
-                default:
-                    break;
-            }
+				default:
+					break;
+			}
+
+			if ( mIsDefaultScene )
+			{
+				switch ( evnt.mKey )
+				{
+					// moving the point light 
+					case Key::Q: mGameScene.GetMovingLightNode().TranslateNode( Vec3( -0.05f, 0.0f, 0.0f ) ); break;
+					case Key::E: mGameScene.GetMovingLightNode().TranslateNode( Vec3( 0.05f, 0.0f, 0.0f ) );  break;
+					case Key::R: mGameScene.GetMovingLightNode().TranslateNode( Vec3( 0.0f, -0.05f, 0.0f ) ); break;
+					case Key::T: mGameScene.GetMovingLightNode().TranslateNode( Vec3( 0.0f, 0.05f, 0.0f ) );  break;
+					case Key::F: mGameScene.GetMovingLightNode().TranslateNode( Vec3( 0.0f, 0.0f, -0.05f ) ); break;
+					case Key::G: mGameScene.GetMovingLightNode().TranslateNode( Vec3( 0.0f, 0.0f, 0.05f ) );  break;
+
+					//  renderering
+					case Key::ONE: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_MODEL_AABB ); break;
+					case Key::FOUR: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS ); break;
+					case Key::U: mEngine.GetRenderer().SetSSAO( false ); break;
+					case Key::I: mEngine.GetRenderer().SetSSAO( true ); break;
+					case Key::H: mEngine.GetRenderer().SetAnisotropicFiltering( RenderSettings::Anisotropic::X1 ); break;
+					case Key::J: mEngine.GetRenderer().SetAnisotropicFiltering( RenderSettings::Anisotropic::X16 ); break;
+					case Key::K: mEngine.GetRenderer().SetAntiAliasing( RenderSettings::AntiAliasing::None ); break;
+					case Key::L: mEngine.GetRenderer().SetAntiAliasing( RenderSettings::AntiAliasing::Fxaa ); break;
+
+					default:
+						break;
+				}
+			}
+			else
+			{
+				switch ( evnt.mKey )
+				{
+					case Key::ONE: mTessellationScene.GetTerrain().SetHeightScale( 48.0f ); break;
+					case Key::TWO: mTessellationScene.GetTerrain().SetHeightScale( 64.0f ); break;
+					case Key::THREE: mTessellationScene.GetTerrain().SetHeightScale( 80.0f ); break;
+					case Key::FOUR: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_AABB ); break;
+					case Key::FIVE: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME ); break;
+				}
+			}
         }
     }
 

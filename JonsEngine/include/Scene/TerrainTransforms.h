@@ -12,7 +12,7 @@ namespace JonsEngine
 {
 	struct TerrainTransformData
 	{
-		typedef FixedGridQuadTree<Mat4, 64> TerrainTransformGridQuadTree;
+		typedef FixedGridQuadTree<Mat4, 32> TerrainTransformGridQuadTree;
 
 		TerrainTransformData( TerrainID ID, std::vector<Mat4>&& transforms, std::vector<AABB>&& AABBs )
 			: mID( ID )

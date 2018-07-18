@@ -63,13 +63,9 @@ namespace JonsEngine
         PointLightCulling(scene);
         DirectionalLightCulling(scene);
 
-		// TODO: needs to be done per-frame always
-		if ( dirtyFlags.test( FlagTerrain ) )
-		{
-			TerrainParsing( scene );
-			if ( debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_AABB ) )
-				AddTerrainAABBDebugData( scene );
-		}
+		TerrainParsing( scene );
+		if ( debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_AABB ) )
+			AddTerrainAABBDebugData( scene );
 
 		if (debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_MODEL_AABB ))
 			AddModelAABBDebugData( scene );
@@ -199,6 +195,8 @@ namespace JonsEngine
 
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
 			transform.mQuadTree.CullNodes( renderableTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
+			if ( renderableTransforms.empty() )
+				continue;
 
 			std::size_t renderableEndIndex = renderableTransforms.size();
 			mRenderQueue.mTerrains.mTerrainData.emplace_back(heightmap, renderableEndIndex, heightScale, patchSize);
@@ -234,7 +232,7 @@ namespace JonsEngine
 	{
 		const auto staticActors = scene.GetStaticActors();
 		const auto animatedActors = scene.GetAnimatedActors();
-		auto& aabbDataContainer = mRenderQueue.mColorsToAABBsList;
+		RenderableAABBsContainer& aabbDataContainer = mRenderQueue.mColorsToAABBsList;
 		const Mat4& viewProjTransform = mRenderQueue.mCamera.mCameraViewProjectionMatrix;
 
 		CullAABB<decltype(staticActors)>(scene, mResourceManifest, staticActors, mCullingStrategy, aabbDataContainer, viewProjTransform);
@@ -247,10 +245,8 @@ namespace JonsEngine
 		assert( unitCubeMeshID != INVALID_DX11_MESH_ID );
 
 		RenderableAABBsContainer& AABBRenderData = mRenderQueue.mColorsToAABBsList;
-
-		AABBRenderData.clear();
 		for ( const Mat4& transform : mRenderQueue.mTerrains.mTransforms )
-			AddAABB( AABBRenderData, transform, unitCubeMeshID, gGreen );
+			AddAABB( AABBRenderData, transform, unitCubeMeshID, gRed );
 	}
 
 

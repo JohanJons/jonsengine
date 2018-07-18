@@ -101,10 +101,11 @@ namespace JonsEngine
 			{
 				if ( !quadAABB.mChildBegin )
 					AddAllItems( nodes, quadAABB );
-
-				for ( uint32_t childIndex = GridQuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < GridQuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
-					CullQuad( nodes, *( quadAABB.mChildBegin + childIndex ), cameraViewProjTransform );
-
+				else
+				{
+					for ( uint32_t childIndex = GridQuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < GridQuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
+						CullQuad( nodes, *( quadAABB.mChildBegin + childIndex ), cameraViewProjTransform );
+				}
 				break;
 			}
 			case AABBIntersection::Inside:
@@ -166,18 +167,15 @@ namespace JonsEngine
 
 		uint32_t beginColumn = GetColumn( parentBegin ), beginRow = GetRow( parentBegin );
 		uint32_t endColumn = GetColumn( parentEnd ), endRow = GetRow( parentEnd );
-		assert( endColumn > beginColumn && endRow > beginRow );
+		assert( endColumn >= beginColumn && endRow >= beginRow );
 
 		uint32_t numCols = endColumn - beginColumn, numRows = endRow - beginRow;
-		uint32_t indexTL = GetIndex( beginRow, beginColumn ), indexTM = GetIndex( beginRow, beginColumn + numCols / 2 );
-		uint32_t indexML = GetIndex( beginRow + numRows / 2, beginColumn ), indexMM = GetIndex( beginRow + numRows / 2, beginColumn + numCols / 2 ), indexMR = GetIndex( beginRow + numRows / 2, endColumn );
-		uint32_t indexLM = GetIndex( endRow, beginColumn + numCols / 2 ), indexLR = GetIndex( endRow, endColumn );
 
-		mGridTraversal.emplace_back( tlAABBMin, center, indexTL, indexMM );
+		mGridTraversal.emplace_back( tlAABBMin, center, GetIndex( beginRow, beginColumn ), GetIndex( beginRow + numRows / 2, beginColumn + numCols / 2 ) );
 		quadAABB.mChildBegin = &mGridTraversal.back();
-		mGridTraversal.emplace_back( tlAABBMin + splitExtent, center + splitExtent, indexTM, indexMR );
-		mGridTraversal.emplace_back( center - splitExtent, brAABBMax - splitExtent, indexML, indexLM );
-		mGridTraversal.emplace_back( center, brAABBMax, indexMM, indexLR );
+		mGridTraversal.emplace_back( tlAABBMin + splitExtent, center + splitExtent, GetIndex( beginRow, ( beginColumn + numCols / 2 ) + 1 ), GetIndex( beginRow + numRows / 2, endColumn ) );
+		mGridTraversal.emplace_back( center - splitExtent, brAABBMax - splitExtent, GetIndex( ( beginRow + numRows / 2 ) + 1, beginColumn ), GetIndex( endRow, beginColumn + numCols / 2 ) );
+		mGridTraversal.emplace_back( center, brAABBMax, GetIndex( ( beginRow + numRows / 2 ) + 1, ( beginColumn + numCols / 2 ) + 1 ), GetIndex( endRow, endColumn ) );
 
 		for ( uint32_t offset = GridQuadNodeAABB::TOP_LEFT; offset < GridQuadNodeAABB::NUM_CHILDREN; ++offset )
 			ProcessQuadNode( *( quadAABB.mChildBegin + offset ) );
@@ -250,7 +248,6 @@ namespace JonsEngine
 	uint32_t FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::GetIndex( uint32_t rowIndex, uint32_t columnIndex ) const
 	{
 		uint32_t index = columnIndex + ( rowIndex * mNumColumns );
-		assert( index >= 0 && index < mGridTraversal.size() );
 
 		return index;
 	}
