@@ -46,6 +46,7 @@ namespace JonsEngine
 
 		// AABBs are in worldspace already
 		void CullNodes( std::vector<Item>& nodes, const Mat4& cameraViewProjTransform ) const;
+		void GetWorldXZBounds( Vec2& worldMin, Vec2& worldMax ) const;
 
 	private:
 		void CullQuad( std::vector<Item>& nodes, const GridQuadNodeAABB& quadAABB, const Mat4& cameraViewProjTransform ) const;
@@ -89,6 +90,16 @@ namespace JonsEngine
 	{
 		assert( !mGridTraversal.empty() );
 		CullQuad( nodes, mGridTraversal.front(), cameraViewProjTransform );
+	}
+
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	void FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::GetWorldXZBounds( Vec2& worldMin, Vec2& worldMax ) const
+	{
+		const GridQuadNodeAABB& toplevelNode = mGridTraversal.front();
+		Vec3 minAABB = toplevelNode.mAABB.Min(), maxAABB = toplevelNode.mAABB.Max();
+
+		worldMin = Vec2( minAABB.x, minAABB.z );
+		worldMax = Vec2( maxAABB.x, maxAABB.z );
 	}
 
 	template <typename Item, uint32_t gNodeAABBCutoffPoint>

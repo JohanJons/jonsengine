@@ -37,13 +37,10 @@ namespace JonsEngine
 
 		struct PerTerrainCBuffer
 		{
-			uint32_t mStartIndex;
 			float mHeightScale;
-			float mWorldPosMinX;
-			float mWorldPosMinZ;
-			float mWorldPosMaxX;
-			float mWorldPosMaxZ;
-			float __padding[ 2 ];
+			Vec2 mWorldMin;
+			Vec2 mWorldMax;
+			float __padding[3];
 		};
 
 	private:

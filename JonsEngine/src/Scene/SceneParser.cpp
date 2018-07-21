@@ -198,8 +198,10 @@ namespace JonsEngine
 			if ( renderableTransforms.empty() )
 				continue;
 
+			Vec2 worldMin, worldMax;
+			transform.mQuadTree.GetWorldXZBounds( worldMin, worldMax );
 			std::size_t renderableEndIndex = renderableTransforms.size();
-			mRenderQueue.mTerrains.mTerrainData.emplace_back(heightmap, renderableEndIndex, heightScale, patchSize);
+			mRenderQueue.mTerrains.mTerrainData.emplace_back(heightmap, renderableEndIndex, worldMin, worldMax, heightScale, patchSize);
 		}
 	}
 
