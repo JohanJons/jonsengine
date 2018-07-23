@@ -6,6 +6,7 @@
 using namespace JonsEngine;
 
 constexpr float gTerrainHeightScale = 64.0f;
+constexpr float gTerrainMultiplyer = 8.0f;
 constexpr uint32_t gTerrainPatchSize = 64;
 
 namespace JonsGame
@@ -17,7 +18,7 @@ namespace JonsGame
 		mSkybox( resManifest.LoadSkybox( "skybox", mJonsPackage ) ),
 		mNodeTerrain( sceneMgr.GetScene( mID ).CreateSceneNode( "nodeTerrain", sceneMgr.GetScene( mID ).GetRootNodeID() ) ),
 		mTerrainData( resManifest.CreateTerrainData( "terraindata", "heightmap", mJonsPackage ) ),
-		mTerrain( sceneMgr.GetScene( mID ).CreateTerrain( "terrain", gTerrainHeightScale, gTerrainPatchSize, mNodeTerrain, mTerrainData ) ),
+		mTerrain( sceneMgr.GetScene( mID ).CreateTerrain( "terrain", gTerrainHeightScale, gTerrainPatchSize, gTerrainMultiplyer, mNodeTerrain, mTerrainData ) ),
 		mSunDirLightID( sceneMgr.GetScene( mID ).CreateDirectionalLight( "DirectionalLight", 4 ) )
 	{
 		JonsEngine::Scene& scene = sceneMgr.GetScene( mID );
@@ -32,7 +33,7 @@ namespace JonsGame
 
 		scene.SetSkybox( mSkybox );
 
-		scene.GetSceneCamera().TranslateCamera( Vec3( 950.0f, 6.0f, 0.0f ) );
+		scene.GetSceneCamera().TranslateCamera( Vec3( 90.0f, 20.0f, 0.0f ) );
 	}
 
 	SceneTessellation::~SceneTessellation()

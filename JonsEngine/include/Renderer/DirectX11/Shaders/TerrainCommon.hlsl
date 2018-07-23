@@ -15,8 +15,10 @@ cbuffer PerFrameConstants : register(CBUFFER_REGISTER_DOMAIN)
 cbuffer PerTerrainConstants : register(CBUFFER_REGISTER_EXTRA)
 {
 	float gHeightModifier;
-	float2 gWorldMin;
-	float2 gWorldMax;
+	float gWorldMinX;
+	float gWorldMinZ;
+	float gWorldMaxX;
+	float gWorldMaxZ;
 }
 
 
@@ -29,6 +31,7 @@ struct PatchTess
 struct VertexOut
 {
 	float4 mWorldPosition : POSITION;
+	float2 mTexcoord : TEXCOORD;
 	float mTessFactor : TESS;
 };
 
@@ -36,11 +39,13 @@ struct DomainOut
 {
 	float4 mPosition : SV_POSITION;
 	float3 mNormal : NORMAL;
+	float2 mTexcoord : TEXCOORD;
 };
 
 struct HullOut
 {
 	float4 mWorldPosition : POSITION;
+	float2 mTexcoord : TEXCOORD;
 };
 
 #endif

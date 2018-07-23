@@ -2,12 +2,13 @@
 
 namespace JonsEngine
 {
-	Terrain::Terrain(const std::string& name, float heightScale, uint32_t patchSize, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID) :
-		mName(name),
-		mHeightScale(heightScale),
-		mPatchSize(patchSize),
-		mSceneNodeID(sceneNodeID),
-		mTerrainDataID(terrainDataID)
+	Terrain::Terrain(const std::string& name, float heightScale, uint32_t patchSize, float heightmapMultiplyer, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID) :
+		mName( name ),
+		mHeightScale( heightScale ),
+		mHeightmapMultiplyer( heightmapMultiplyer ),
+		mPatchSize( patchSize ),
+		mSceneNodeID( sceneNodeID ),
+		mTerrainDataID( terrainDataID )
 	{
 	}
 
@@ -20,5 +21,10 @@ namespace JonsEngine
 	void Terrain::SetPatchSize(uint32_t patchSize)
 	{
 		mPatchSize = patchSize;
+	}
+
+	void Terrain::SetHeightmapMultiplyer( float heightmapMultiplyer )
+	{
+		mHeightmapMultiplyer = heightmapMultiplyer;
 	}
 }

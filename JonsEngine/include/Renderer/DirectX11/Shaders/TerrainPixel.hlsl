@@ -14,7 +14,7 @@ PixelOut ps_main(DomainOut input)
 {
 	PixelOut ret;
 
-	ret.mDiffuse = float4(0.0f, 1.0f, 0.0f, 1.0f);
+	ret.mDiffuse = float4( input.mTexcoord, 0.0f, 1.0f);
 	ret.mNormal = normalize(input.mNormal);
 	ret.mNormal += 1.0f;
 	ret.mNormal *= 0.5f;

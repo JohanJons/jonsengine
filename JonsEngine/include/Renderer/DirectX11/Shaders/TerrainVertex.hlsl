@@ -11,7 +11,7 @@ struct VertexIn
 };
 
 StructuredBuffer<float4x4> gWorldTransforms : register (SBUFFER_REGISTER_EXTRA);
-
+Texture2D gHeightmap : register( TEXTURE_REGISTER_EXTRA );
 
 float2 WorldXZToTexcoord(float2 worldMinExtent, float2 worldMaxExtent, float2 worldPos)
 {
@@ -28,6 +28,10 @@ VertexOut vs_main(VertexIn input)
 
 	ret.mWorldPosition = mul(worldTransform, input.mPosition);
 	ret.mTessFactor = 2.0f;
+
+	ret.mTexcoord = 1.0f / ( float2(gWorldMaxX, gWorldMaxZ) + ( -float2(gWorldMinX, gWorldMinZ) ) );
+	ret.mTexcoord = ( -float2( gWorldMinX, gWorldMinZ ) + ret.mWorldPosition.xz ) * ret.mTexcoord;
+	ret.mTexcoord = clamp( ret.mTexcoord, 0.0f, 1.0f );
 
 	return ret;
 }

@@ -76,7 +76,7 @@ namespace JonsEngine
         const DirectionalLight& GetDirectionalLight(DirectionalLightID dirLightID) const;
         DirectionalLightIterator GetDirectionalLights() const;
 
-		TerrainID CreateTerrain(const std::string& name, float heightScale, uint32_t patchSize, SceneNodeID node, TerrainDataID terrainDataID);
+		TerrainID CreateTerrain(const std::string& name, float heightScale, uint32_t patchSize, float heightmapMultiplyer, SceneNodeID node, TerrainDataID terrainDataID);
 		void DeleteTerrain( TerrainID& terrainDataID);
 		Terrain& GetTerrain(const TerrainID terrainDataID);
 		const Terrain& GetTerrain(const TerrainID terrainDataID) const;

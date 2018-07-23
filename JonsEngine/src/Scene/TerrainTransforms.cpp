@@ -43,7 +43,7 @@ namespace JonsEngine
 			const Terrain& terrain = mTerrainLookup.GetItem(ID);
 			const TerrainData& terrainData = mTerrainDataLookup.GetItem(terrain.GetTerrainData());
 			float patchSize = terrain.GetPatchSize();
-			float width = terrainData.GetWidth(), height = terrainData.GetHeight();
+			float width = terrainData.GetWidth() / terrain.GetHeightmapMultiplyer(), height = terrainData.GetHeight() / terrain.GetHeightmapMultiplyer();
 
 			const Mat4& worldTransform = mSceneNodeLookup.GetNode(terrain.GetSceneNode()).GetWorldTransform();
 
