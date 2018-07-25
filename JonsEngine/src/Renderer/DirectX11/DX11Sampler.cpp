@@ -33,8 +33,10 @@ namespace JonsEngine
     
     void DX11Sampler::BindSampler()
     {
-		mContext->VSSetSamplers(mSamplerSlot, 1, &mTextureSampler.p);
-        mContext->PSSetSamplers(mSamplerSlot, 1, &mTextureSampler.p);
+		mContext->VSSetSamplers( mSamplerSlot, 1, &mTextureSampler.p );
+        mContext->PSSetSamplers( mSamplerSlot, 1, &mTextureSampler.p );
+		mContext->HSSetSamplers( mSamplerSlot, 1, &mTextureSampler.p );
+		mContext->DSSetSamplers( mSamplerSlot, 1, &mTextureSampler.p );
     }
     
 	RenderSettings::Anisotropic DX11Sampler::GetMaxAnisotropicFiltering() const

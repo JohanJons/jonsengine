@@ -57,7 +57,7 @@ namespace JonsAssetImporter
         const auto& skyboxOffsets = isHorizontalSkybox ? gSkyboxHorizontalOffsets : gSkyboxVerticalOffsets;
         for (const auto& offsets : skyboxOffsets)
         {
-            if (!ProcessTexture(skybox, bitmap, offsets.first * textureWidth, (offsets.second * textureHeight) - 1, textureWidth, textureHeight))
+            if (!ProcessTextureRGB(skybox, bitmap, offsets.first * textureWidth, (offsets.second * textureHeight) - 1, textureWidth, textureHeight))
                 return false;
         }
 
@@ -84,7 +84,7 @@ namespace JonsAssetImporter
 		pkg->mTextures.emplace_back(textureName, textureType);
 		auto& texture = pkg->mTextures.back();
 
-		const bool ret = ProcessTexture(texture, bitmap);
+		const bool ret = ProcessTexture( texture, bitmap, textureType );
 
 		FreeImage_Unload(bitmap);
 
@@ -92,27 +92,38 @@ namespace JonsAssetImporter
 	}
 
 
-    bool FreeImage::ProcessTexture(JonsEngine::PackageTexture& texture, FIBITMAP* bitmap)
+    bool FreeImage::ProcessTexture( PackageTexture& texture, FIBITMAP* bitmap, TextureType textureType )
     {
         const uint32_t widthInPixels = FreeImage_GetWidth(bitmap);
         const uint32_t heightInPixels = FreeImage_GetHeight(bitmap);
 
-        return ProcessTexture(texture, bitmap, 0, heightInPixels - 1, widthInPixels, heightInPixels);
+		texture.mTextureWidth = widthInPixels;
+		texture.mTextureHeight = heightInPixels;
+
+		switch ( textureType )
+		{
+			case TextureType::Diffuse:
+			case TextureType::Normal:	// TODO: normals into R8...
+			case TextureType::Skybox:
+				return ProcessTextureRGB( texture, bitmap, 0, heightInPixels - 1, widthInPixels, heightInPixels );
+			case TextureType::Height:
+				return ProcessTextureGreyscale( texture, bitmap, 0, heightInPixels - 1, widthInPixels, heightInPixels );
+			default:
+				break;
+		}
+
+		return false;
     }
 
-    bool FreeImage::ProcessTexture(JonsEngine::PackageTexture& texture, FIBITMAP* bitmap, const uint32_t offsetWidth, const uint32_t offsetHeight, const uint32_t width, const uint32_t height)
+    bool FreeImage::ProcessTextureRGB(JonsEngine::PackageTexture& texture, FIBITMAP* bitmap, const uint32_t offsetWidth, const uint32_t offsetHeight, const uint32_t width, const uint32_t height)
     {
-        assert(bitmap != nullptr);
+        assert( bitmap );
 
         const FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType(bitmap);
         const uint32_t bytesPerPixel = FreeImage_GetBPP(bitmap) / 8;
 
-        // NOTE: only R8B8G8A8 textures supported in JonsEngine
         // R8B8G8 or R8B8G8A8
         assert(bytesPerPixel == 3 || bytesPerPixel == 4);
-
-        texture.mTextureWidth = width;
-        texture.mTextureHeight = height;
 
         // NOTE: FreeImage implicitly converts image format to RGB/RGBA from BRG/BRGA
         for (unsigned y = 0; y < height; ++y) {
@@ -136,6 +147,28 @@ namespace JonsAssetImporter
         return true;
     }
 
+	bool FreeImage::ProcessTextureGreyscale( JonsEngine::PackageTexture& texture, FIBITMAP* bitmap, const uint32_t offsetWidth, const uint32_t offsetHeight, const uint32_t width, const uint32_t height )
+	{
+		assert( bitmap );
+
+		const FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType( bitmap );
+		const uint32_t bytesPerPixel = FreeImage_GetBPP( bitmap ) / 8;
+
+		// R8 only
+		assert( bytesPerPixel == 1 );
+
+		for ( unsigned y = 0; y < height; ++y ) {
+			BYTE *bits = FreeImage_GetScanLine( bitmap, offsetHeight - y );
+			bits += ( offsetWidth * bytesPerPixel );
+
+			for ( unsigned x = 0; x < width; ++x ) {
+				texture.mTextureData.push_back( bits[ FI_RGBA_RED ] );
+				bits += bytesPerPixel;
+			}
+		}
+
+		return true;
+	}
 
     FIBITMAP* GetBitmap(const std::string& filePath, const std::string& filename)
     {

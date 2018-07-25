@@ -5,7 +5,7 @@ namespace JonsEngine
     static DX11TextureID gNextTextureID = 1;
 
     uint32_t GetNumMipLevels(uint32_t width, uint32_t height);
-
+	uint32_t GetBytesPerTextureFormat( DXGI_FORMAT textureFormat );
 
     DX11Texture::DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight, const bool isCubeTexture) :
         mID(gNextTextureID++),
@@ -39,7 +39,7 @@ namespace JonsEngine
         DXCALL(device->CreateShaderResourceView(mTexture, &srvDesc, &mSRV));
 
         // mip-level 0 data
-        uint32_t sizeWidth = textureWidth * sizeof(uint8_t) * 4;
+        uint32_t sizeWidth = textureWidth * sizeof(uint8_t) * GetBytesPerTextureFormat( textureFormat );
         if (isCubeTexture)
         {
             for (uint32_t index = 0; index < 6; ++index)
@@ -80,4 +80,17 @@ namespace JonsEngine
 
         return numLevels;
     }
+
+	uint32_t GetBytesPerTextureFormat( DXGI_FORMAT textureFormat )
+	{
+		switch ( textureFormat )
+		{
+			case DXGI_FORMAT_R8G8B8A8_UNORM:
+			case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB: return 4;
+			case DXGI_FORMAT_R8_UNORM: return 1;
+			default: assert( false && "Unsupported texture format!" );
+		}
+
+		return 0;
+	}
 }

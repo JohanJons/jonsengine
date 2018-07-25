@@ -247,8 +247,17 @@ namespace JonsEngine
 		assert( unitCubeMeshID != INVALID_DX11_MESH_ID );
 
 		RenderableAABBsContainer& AABBRenderData = mRenderQueue.mColorsToAABBsList;
-		for ( const Mat4& transform : mRenderQueue.mTerrains.mTransforms )
-			AddAABB( AABBRenderData, transform, unitCubeMeshID, gRed );
+		
+		const TerrainTransforms& terrainTransforms = scene.GetTerrainTransforms();
+		const std::vector<TerrainTransformData>& transforms = terrainTransforms.GetTransforms();
+
+		for ( const TerrainTransformData& transform : transforms )
+		{
+
+		}
+		//transform.mQuadTree.
+		//for ( const Mat4& transform : mRenderQueue.mTerrains.mTransforms )
+		//	AddAABB( AABBRenderData, transform, unitCubeMeshID, gRed );
 	}
 
 

@@ -13,7 +13,7 @@ namespace JonsEngine
 	public:
 		Terrain(const std::string& name, float heightScale, uint32_t patchSize, float heightmapMultiplyer, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID);
 
-		void SetHeightScale(float heightScale);
+		void SetHeightScale( float heightScale );
 		float GetHeightScale() const { return mHeightScale; }
 
 		void SetPatchSize(uint32_t patchSize);

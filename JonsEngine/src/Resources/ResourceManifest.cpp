@@ -174,8 +174,8 @@ namespace JonsEngine
 		if (heightIter == jonsPkg->mTextures.end() || terrainMapIter == jonsPkg->mTerrainMaps.end())
 			return INVALID_TERRAIN_DATA_ID;
 
-		const float terrainWidth = heightIter->mTextureWidth;
-		const float terrainHeight = heightIter->mTextureHeight;
+		const uint32_t terrainWidth = heightIter->mTextureWidth;
+		const uint32_t terrainHeight = heightIter->mTextureHeight;
 		assert(terrainWidth > 0 && terrainHeight > 0);
 
 		const auto textureData = heightIter->mTextureData;
@@ -189,7 +189,7 @@ namespace JonsEngine
 
 		const float minElevation = terrainMapIter->mMinElevation, maxElevation = terrainMapIter->mMaxElevation;
 
-		return mTerrainData.Insert(name, minElevation, maxElevation, terrainWidth, terrainHeight, heightmapTexture);
+		return mTerrainData.Insert( name, minElevation, maxElevation, terrainWidth, terrainHeight, heightmapTexture, textureData );
 	}
 
 	void ResourceManifest::DeleteTerrainData(TerrainDataID& terrainDataId)

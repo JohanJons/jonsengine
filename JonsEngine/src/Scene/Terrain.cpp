@@ -13,12 +13,12 @@ namespace JonsEngine
 	}
 
 
-	void Terrain::SetHeightScale(float heightScale)
+	void Terrain::SetHeightScale( float heightScale )
 	{
 		mHeightScale = heightScale;
 	}
 
-	void Terrain::SetPatchSize(uint32_t patchSize)
+	void Terrain::SetPatchSize( uint32_t patchSize )
 	{
 		mPatchSize = patchSize;
 	}

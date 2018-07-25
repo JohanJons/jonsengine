@@ -33,4 +33,15 @@ namespace JonsEngine
 
     bool IsEqual(const float val1, const float val2);
     bool IsEqual(const double val1, const double val2);
+
+	template<typename ValueType>
+	float Normalize( ValueType val );
+
+
+	template<typename ValueType>
+	float Normalize( ValueType val )
+	{
+		ValueType minVal = std::numeric_limits<ValueType>::min(), maxVal = std::numeric_limits<ValueType>::max();
+		return ( val - minVal ) / static_cast<float>( maxVal - minVal );
+	}
 }

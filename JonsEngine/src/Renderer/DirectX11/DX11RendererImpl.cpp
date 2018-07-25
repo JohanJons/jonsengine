@@ -297,9 +297,9 @@ namespace JonsEngine
         {
             case TextureType::Diffuse:
             case TextureType::Skybox:
-			case TextureType::Height:
                 return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-
+			case TextureType::Height:
+				return DXGI_FORMAT_R8_UNORM;
             case TextureType::Normal:
                 return DXGI_FORMAT_R8G8B8A8_UNORM;
 

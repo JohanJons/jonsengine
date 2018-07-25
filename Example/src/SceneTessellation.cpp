@@ -6,7 +6,7 @@
 using namespace JonsEngine;
 
 constexpr float gTerrainHeightScale = 64.0f;
-constexpr float gTerrainMultiplyer = 8.0f;
+constexpr float gTerrainMultiplyer = 4.0f;
 constexpr uint32_t gTerrainPatchSize = 64;
 
 namespace JonsGame

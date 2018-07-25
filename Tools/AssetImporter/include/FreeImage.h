@@ -20,7 +20,8 @@ namespace JonsAssetImporter
         
 
     private:
-        bool ProcessTexture(JonsEngine::PackageTexture& texture, FIBITMAP* bitmap);
-        bool ProcessTexture(JonsEngine::PackageTexture& texture, FIBITMAP* bitmap, const uint32_t offsetWidth, const uint32_t offsetHeight, const uint32_t width, const uint32_t height);
+        bool ProcessTexture(JonsEngine::PackageTexture& texture, FIBITMAP* bitmap, JonsEngine::TextureType textureType );
+        bool ProcessTextureRGB(JonsEngine::PackageTexture& texture, FIBITMAP* bitmap, const uint32_t offsetWidth, const uint32_t offsetHeight, const uint32_t width, const uint32_t height);
+		bool ProcessTextureGreyscale( JonsEngine::PackageTexture& texture, FIBITMAP* bitmap, const uint32_t offsetWidth, const uint32_t offsetHeight, const uint32_t width, const uint32_t height );
     };
 }

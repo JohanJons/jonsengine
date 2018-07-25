@@ -5,6 +5,7 @@
 #include "Common.hlsl"
 
 Texture2D gHeightmap : register( TEXTURE_REGISTER_EXTRA );
+SamplerState gPointSampler : register( SAMPLER_REGISTER_POINT );
 
 float2 GetMidpoint( const OutputPatch<HullOut, 4> quad, float2 uv )
 {
@@ -29,15 +30,7 @@ DomainOut domain_main(PatchTess patchTess, float2 uv : SV_DomainLocation, const 
 	float2 midPointTexcoord = lerp( topMidpointTexcoord, bottomMidpointTexcoord, uv.y );
 
 	float y = quad[ 0 ].mWorldPosition.y;
-	y += ( gHeightmap[ midPointTexcoord ].x * gHeightModifier );
-
-	//float2 texcoord =  1.0f / ( gWorldMax + ( -gWorldMin ) );
-	//texcoord = ( -gWorldMin * midPoint ) * texcoord;
-	//texcoord = clamp( texcoord, 0.0f, 1.0f );
-
-	//float2 texcoord = 1.0f / ( float2( gWorldMaxX, gWorldMaxZ ) + ( -float2( gWorldMinX, gWorldMinZ ) ) );
-	//texcoord = ( -float2( gWorldMinX, gWorldMinZ ) + midPoint ) * texcoord;
-	//texcoord = clamp( texcoord, 0.0f, 1.0f );
+	y += ( gHeightmap.SampleLevel( gPointSampler, midPointTexcoord, 0.0f ).r * gHeightModifier );
 
 	ret.mPosition = float4( midPointWorld.x, y, midPointWorld.y, 1 );
 	ret.mPosition = mul( gFrameViewProj, ret.mPosition );

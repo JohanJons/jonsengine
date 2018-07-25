@@ -37,7 +37,7 @@ namespace JonsEngine
 	private:
 		void RemoveIfAdded( TerrainID ID );
 		bool HasAddedDirty( TerrainID ID ) const;
-		void RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const float patchSize, const float width, const float height );
+		void RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const Terrain& terrain, const TerrainData& terrainData );
 
 		const IDMap<Terrain>& mTerrainLookup;
 		const IDMap<TerrainData>& mTerrainDataLookup;
