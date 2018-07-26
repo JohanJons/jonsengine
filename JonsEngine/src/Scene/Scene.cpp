@@ -9,15 +9,15 @@
 namespace JonsEngine
 {
     Scene::Scene(const std::string& sceneName, DX11Renderer& renderer, const ResourceManifest& resourceManifest) :
-        mName(sceneName),
-        mRenderer(renderer),
-        mResourceManifest(resourceManifest),
-        mAnimationUpdater(resourceManifest),
-        mAmbientLight(0.2f),
-        mSkyboxID(INVALID_SKYBOX_ID),
-        mSceneNodeTree("Root", INVALID_SCENE_NODE_ID, std::bind(&Scene::MarkAsDirty, this, std::placeholders::_1)),
-		mTerrainTransforms(mTerrains, mResourceManifest.GetTerrainDataMap(), mSceneNodeTree),
-        mRootNodeID(mSceneNodeTree.GetRootNodeID())
+        mName( sceneName ),
+        mRenderer( renderer ),
+        mResourceManifest( resourceManifest ),
+        mAnimationUpdater( resourceManifest ),
+        mAmbientLight( 0.2f ),
+        mSkyboxID( INVALID_SKYBOX_ID ),
+        mSceneNodeTree( "Root", INVALID_SCENE_NODE_ID, std::bind( static_cast<void( Scene::* )( SceneNode* sceneNode )> ( &Scene::MarkAsDirty ), this, std::placeholders::_1 ) ),
+		mTerrainTransforms( mTerrains, mResourceManifest.GetTerrainDataMap(), mSceneNodeTree ),
+        mRootNodeID( mSceneNodeTree.GetRootNodeID() )
     {
     }
 
@@ -32,7 +32,7 @@ namespace JonsEngine
 		UpdateBoneTransforms(elapsedTime);
 
 		uint32_t updatedTransforms = mTerrainTransforms.UpdateTransforms();
-		if (updatedTransforms)
+		if ( updatedTransforms )
 			mDirtyFlags.set(FlagTerrain, true);
     }
 
@@ -57,7 +57,7 @@ namespace JonsEngine
     
     SceneNodeID Scene::CreateSceneNode(const std::string& sceneNodeName, const SceneNodeID parent)
     {
-        return mSceneNodeTree.AddNode(parent, sceneNodeName, parent, std::bind(&Scene::MarkAsDirty, this, std::placeholders::_1));
+        return mSceneNodeTree.AddNode(parent, sceneNodeName, parent, std::bind( static_cast<void( Scene::* )( SceneNode* sceneNode )> ( &Scene::MarkAsDirty ), this, std::placeholders::_1 ));
     }
 
     void Scene::DeleteSceneNode(SceneNodeID& sceneNodeID)
@@ -217,7 +217,7 @@ namespace JonsEngine
 
 	TerrainID Scene::CreateTerrain(const std::string& name, const float heightScale, uint32_t patchSize, float heightmapMultiplyer, const SceneNodeID node, const TerrainDataID terrainDataID)
 	{
-		TerrainID ID = mTerrains.Insert( name, heightScale, patchSize, heightmapMultiplyer, node, terrainDataID );
+		TerrainID ID = mTerrains.Insert( name, heightScale, patchSize, heightmapMultiplyer, node, terrainDataID, std::bind( static_cast<void( Scene::* )( Terrain* terrain )> ( &Scene::MarkAsDirty ), this, std::placeholders::_1 ) );
 		mTerrainTransforms.AddDirty( ID );
 
 		return ID;
@@ -280,10 +280,18 @@ namespace JonsEngine
     }
 
 
-    void Scene::MarkAsDirty(SceneNode* sceneNode)
+    void Scene::MarkAsDirty( SceneNode* sceneNode )
     {
         mHasDirtySceneNodes = true;
     }
+
+	void Scene::MarkAsDirty( Terrain* terrain )
+	{
+		TerrainID id = mTerrains.GetID( *terrain );
+		assert( id != INVALID_TERRAIN_ID );
+
+		mTerrainTransforms.AddDirty( id );
+	}
 
 
     void Scene::UpdateDirtyObjects()
@@ -299,10 +307,10 @@ namespace JonsEngine
         for (auto nodeIter = mSceneNodeTree.begin() + 1; nodeIter != mSceneNodeTree.end(); ++nodeIter)
         {
             SceneNode& node = *nodeIter;
-            SceneNode& parent = mSceneNodeTree.GetNode(node.GetParentID());
+            SceneNode& parent = mSceneNodeTree.GetNode( node.GetParentID() );
             const Mat4& parentWorldTransform = parent.GetWorldTransform();
 
-            node.UpdateWorldMatrix(parentWorldTransform);
+            node.UpdateWorldMatrix( parentWorldTransform );
         }
 
         mHasDirtySceneNodes = false;

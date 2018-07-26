@@ -58,10 +58,10 @@ namespace JonsEngine
 
 
     protected:
-        ItemIterator GetItemIter(const ItemID nodeID);
-        ConstItemIterator GetItemIter(const ItemID nodeID) const;
-        ItemID& GetIndirectionID(const ItemID publicID);
-        const ItemID& GetIndirectionID(const ItemID publicID) const;
+        ItemIterator GetItemIter( const ItemID nodeID );
+        ConstItemIterator GetItemIter( const ItemID nodeID ) const;
+        ItemID& GetIndirectionID( const ItemID publicID );
+        const ItemID& GetIndirectionID( const ItemID publicID ) const;
 
 
         std::vector<Item> mItems;
@@ -137,7 +137,7 @@ namespace JonsEngine
     //
     
     template <typename T, typename StorageType>
-    typename IDMapBase<T, StorageType>::ItemIterator IDMapBase<T, StorageType>::GetItemIter(const ItemID nodeID)
+    typename IDMapBase<T, StorageType>::ItemIterator IDMapBase<T, StorageType>::GetItemIter( const ItemID nodeID )
     {
         const ItemID& itemID = GetIndirectionID(nodeID);
         const uint16_t itemIndex = IDMAP_INDEX_MASK(itemID);
@@ -148,7 +148,7 @@ namespace JonsEngine
     }
     
     template <typename T, typename StorageType>
-    typename IDMapBase<T, StorageType>::ItemID& IDMapBase<T, StorageType>::GetIndirectionID(const ItemID publicID)
+    typename IDMapBase<T, StorageType>::ItemID& IDMapBase<T, StorageType>::GetIndirectionID( const ItemID publicID )
     {
         assert(publicID != INVALID_ITEM_ID);
 
@@ -164,7 +164,7 @@ namespace JonsEngine
 
 
     template <typename T, typename StorageType>
-    typename IDMapBase<T, StorageType>::ConstItemIterator IDMapBase<T, StorageType>::GetItemIter(const ItemID nodeID) const
+    typename IDMapBase<T, StorageType>::ConstItemIterator IDMapBase<T, StorageType>::GetItemIter( const ItemID nodeID ) const
     {
         const ItemID& itemID = GetIndirectionID(nodeID);
         const uint16_t itemIndex = IDMAP_INDEX_MASK(itemID);
@@ -175,7 +175,7 @@ namespace JonsEngine
     }
 
     template <typename T, typename StorageType>
-    const typename IDMapBase<T, StorageType>::ItemID& IDMapBase<T, StorageType>::GetIndirectionID(const ItemID publicID) const
+    const typename IDMapBase<T, StorageType>::ItemID& IDMapBase<T, StorageType>::GetIndirectionID( const ItemID publicID ) const
     {
         assert(publicID != INVALID_ITEM_ID);
 

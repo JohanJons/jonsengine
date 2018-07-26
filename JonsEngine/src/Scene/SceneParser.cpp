@@ -251,13 +251,16 @@ namespace JonsEngine
 		const TerrainTransforms& terrainTransforms = scene.GetTerrainTransforms();
 		const std::vector<TerrainTransformData>& transforms = terrainTransforms.GetTransforms();
 
+		std::vector<Mat4> aabbTransforms;
+		aabbTransforms.reserve( mRenderQueue.mTerrains.mTransforms.size() );
 		for ( const TerrainTransformData& transform : transforms )
 		{
+			transform.mQuadTree.CullAABBs( aabbTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
+			for ( const Mat4& transform : aabbTransforms )
+				AddAABB( AABBRenderData, transform, unitCubeMeshID, gRed );
 
+			aabbTransforms.clear();
 		}
-		//transform.mQuadTree.
-		//for ( const Mat4& transform : mRenderQueue.mTerrains.mTransforms )
-		//	AddAABB( AABBRenderData, transform, unitCubeMeshID, gRed );
 	}
 
 

@@ -8,10 +8,13 @@
 
 namespace JonsEngine
 {
+	class Terrain;
+	typedef std::function<void( Terrain* )> OnTerrainDirtyFunc;
+
 	class Terrain
 	{
 	public:
-		Terrain(const std::string& name, float heightScale, uint32_t patchSize, float heightmapMultiplyer, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID);
+		Terrain(const std::string& name, float heightScale, uint32_t patchSize, float heightmapMultiplyer, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID, const OnTerrainDirtyFunc& onDirtyFunc );
 
 		void SetHeightScale( float heightScale );
 		float GetHeightScale() const { return mHeightScale; }
@@ -35,6 +38,7 @@ namespace JonsEngine
 
 		SceneNodeID mSceneNodeID = INVALID_SCENE_NODE_ID;
 		TerrainDataID mTerrainDataID = INVALID_TERRAIN_DATA_ID;
+		OnTerrainDirtyFunc mOnDirtyFunc;
 	};
 
 	typedef IDMap<Terrain>::ItemID TerrainID;

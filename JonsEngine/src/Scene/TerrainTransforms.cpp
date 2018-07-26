@@ -50,8 +50,8 @@ namespace JonsEngine
 
 	void TerrainTransforms::AddDirty(TerrainID ID)
 	{
-		auto iter = std::find(mDirtyTransforms.cbegin(), mDirtyTransforms.cend(), ID);
-		if (iter != mDirtyTransforms.cend())
+		auto iter = std::find( mDirtyTransforms.cbegin(), mDirtyTransforms.cend(), ID );
+		if ( iter != mDirtyTransforms.cend() )
 			return;
 
 		if ( !HasAddedDirty( ID ) )
@@ -61,7 +61,6 @@ namespace JonsEngine
 	uint32_t TerrainTransforms::UpdateTransforms()
 	{
 		uint32_t numUpdated = 0;
-
 		for (TerrainID ID : mDirtyTransforms)
 		{
 			const Terrain& terrain = mTerrainLookup.GetItem(ID);
@@ -113,9 +112,9 @@ namespace JonsEngine
 		int32_t gridSize = numWidth * numHeight;
 
 		std::vector<Mat4> transforms;
-		std::vector<AABB> AABBs;
+		std::vector<Mat4> AABBTransformss;
 		transforms.reserve( gridSize );
-		AABBs.reserve( gridSize );
+		AABBTransformss.reserve( gridSize );
 
 		uint32_t patchExtent = patchSize / 2;
 		for ( int32_t rowNum = -numHeight; rowNum < numHeight; rowNum += 2 )
@@ -128,10 +127,10 @@ namespace JonsEngine
 
 				Mat4 patchScaleTransform = glm::scale( Vec3( patchExtent, 1.0f, patchExtent ) );
 				transforms.emplace_back( worldTransform * patchScaleTransform * glm::translate( Vec3( colNum, 0.0f, rowNum ) ) );
-				AABBs.emplace_back( AABB::gUnitAABB * glm::translate( Vec3( 0.0f, minY, 0.0f ) ) * transforms.back() );
+				AABBTransformss.emplace_back( glm::translate( Vec3( 0.0f, minY, 0.0f ) ) * transforms.back() );
 			}
 		}
 
-		mTerrainTransforms.emplace_back( ID, std::move( transforms ), std::move( AABBs ) );
+		mTerrainTransforms.emplace_back( ID, std::move( transforms ), std::move( AABBTransformss ) );
 	}
 }

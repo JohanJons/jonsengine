@@ -5,12 +5,24 @@
 namespace JonsEngine
 {
     SceneNode::SceneNode(const std::string& nodeName, const SceneNodeID parent, const OnSceneNodeDirtyFunc& onDirty) :
-        mName(nodeName), mWorldTransform(gIdentityMatrix), mOrientation(1.0f, 0.0f, 0.0f, 0.0f), mScale(1.0f), mTranslation(0.0f), mParent(parent), mOnDirtyFunc(onDirty)
+        mName(nodeName),
+		mWorldTransform(gIdentityMatrix),
+		mOrientation(1.0f, 0.0f, 0.0f, 0.0f),
+		mScale(1.0f),
+		mTranslation(0.0f),
+		mParent(parent),
+		mOnDirtyFunc(onDirty)
     {
     }
 
 	SceneNode::SceneNode(const SceneNode& other) :
-		mName(other.mName), mWorldTransform(other.mWorldTransform), mOrientation(other.mOrientation), mScale(other.mScale), mTranslation(other.mTranslation), mParent(other.mParent), mOnDirtyFunc(other.mOnDirtyFunc)
+		mName(other.mName),
+		mWorldTransform(other.mWorldTransform),
+		mOrientation(other.mOrientation),
+		mScale(other.mScale),
+		mTranslation(other.mTranslation),
+		mParent(other.mParent),
+		mOnDirtyFunc(other.mOnDirtyFunc)
 	{
 	}
         

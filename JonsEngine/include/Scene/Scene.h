@@ -98,11 +98,12 @@ namespace JonsEngine
 
 
     private:
-        void MarkAsDirty(SceneNode* sceneNode);
+        void MarkAsDirty( SceneNode* sceneNode );
+		void MarkAsDirty( Terrain* terrain );
         void UpdateDirtyObjects();
-        void UpdateDirLightSplitRanges(float cameraFov, float windowAspectRatio);
-        void UpdateAnimatedActors(Milliseconds elapsedTime);
-		void UpdateBoneTransforms(Milliseconds elapsedTime);
+        void UpdateDirLightSplitRanges( float cameraFov, float windowAspectRatio );
+        void UpdateAnimatedActors( Milliseconds elapsedTime );
+		void UpdateBoneTransforms( Milliseconds elapsedTime );
 
 
         DX11Renderer& mRenderer;

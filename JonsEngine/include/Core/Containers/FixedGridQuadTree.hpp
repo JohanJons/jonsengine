@@ -38,7 +38,7 @@ namespace JonsEngine
 	{
 	public:
 		// Items and AABBs must be sorted left-to-right, row-major in memory, uniform in size
-		FixedGridQuadTree( std::vector<Item>&& Items, std::vector<AABB>&& AABBs );
+		FixedGridQuadTree( std::vector<Item>&& Items, std::vector<Mat4>&& AABBTransforms );
 
 		uint32_t GetGridSize() const { return mNodes.size(); }
 
@@ -47,7 +47,7 @@ namespace JonsEngine
 
 		// AABBs are in worldspace already hence we only need VP transform
 		void CullNodes( std::vector<Item>& nodes, const Mat4& cameraViewProjTransform ) const;
-		void CullAABBs( std::vector<AABB>& aabbs, const Mat4& cameraViewProjTransform ) const;
+		void CullAABBs( std::vector<Mat4>& aabbTransforms, const Mat4& cameraViewProjTransform ) const;
 		void GetWorldXZBounds( Vec2& worldMin, Vec2& worldMax ) const;
 
 	private:
@@ -68,9 +68,10 @@ namespace JonsEngine
 		uint32_t GetNumColumns() const;
 		uint32_t GetNumRows( uint32_t numCols ) const;
 		uint32_t GetNumNodeElements() const;
+		AABB GetAABB( uint32_t index ) const;
 
 		std::vector<Item> mNodes;
-		std::vector<AABB> mNodeAABBs;
+		std::vector<Mat4> mNodeAABBs;
 
 		uint32_t mNumColumns;
 		uint32_t mNumRows;
@@ -80,9 +81,9 @@ namespace JonsEngine
 
 
 	template <typename Item, uint32_t gNodeAABBCutoffPoint>
-	FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::FixedGridQuadTree( std::vector<Item>&& Items, std::vector<AABB>&& AABBs )
+	FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::FixedGridQuadTree( std::vector<Item>&& Items, std::vector<Mat4>&& AABBTransforms )
 		: mNodes( Items )
-		, mNodeAABBs( AABBs )
+		, mNodeAABBs( AABBTransforms )
 		, mNumColumns( GetNumColumns() )
 		, mNumRows( GetNumRows( mNumColumns ) )
 	{
@@ -102,9 +103,15 @@ namespace JonsEngine
 	}
 
 	template <typename Item, uint32_t gNodeAABBCutoffPoint>
-	void FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::CullAABBs( std::vector<AABB>& aabbs, const Mat4& cameraViewProjTransform ) const
+	void FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::CullAABBs( std::vector<Mat4>& aabbTransforms, const Mat4& cameraViewProjTransform ) const
 	{
-		...
+		assert( mNodeAABBs.size() == mNodes.size() );
+		std::vector<uint32_t> culledIndices;
+		culledIndices.reserve( mNumColumns );	// some reasonable number of items
+
+		CullQuad( culledIndices, mGridTraversal.front(), cameraViewProjTransform );
+		for ( uint32_t index : culledIndices )
+			aabbTransforms.emplace_back( mNodeAABBs.at( index ) );
 	}
 
 	template <typename Item, uint32_t gNodeAABBCutoffPoint>
@@ -195,7 +202,7 @@ namespace JonsEngine
 			for ( uint32_t col = beginCol; col <= endCol; ++col )
 			{
 				uint32_t index = ( row * mNumColumns ) + col;
-				const AABB& aabb = mNodeAABBs.at( index );
+				const AABB aabb = GetAABB( index );
 				
 				min = MinVal( min, aabb.Min() );
 				max = MaxVal( max, aabb.Max() );
@@ -265,12 +272,12 @@ namespace JonsEngine
 	{
 		assert( !mNodeAABBs.empty() );
 
-		const AABB* prevAABB = &mNodeAABBs[ 0 ];
+		const AABB prevAABB = GetAABB( 0 );
 		for ( uint32_t index = 1, numNodes = mNodes.size(); index < numNodes; ++index )
 		{
-			const AABB* currAABB = &mNodeAABBs[ index ];
+			const AABB currAABB = GetAABB( index );
 
-			if ( prevAABB->GetExtent() != currAABB->GetExtent() )
+			if ( prevAABB.GetExtent() != currAABB.GetExtent() )
 				return false;
 		}
 
@@ -284,13 +291,13 @@ namespace JonsEngine
 
 		for ( uint32_t index = 0, numNodes = mNodes.size() - mNumColumns; index < numNodes; ++index )
 		{
-			const AABB* currAABB = &mNodeAABBs[ index ];
-			const AABB* nextAABB = &mNodeAABBs[ index + 1 ];
-			const AABB* bottomAABB = &mNodeAABBs[ index + mNumColumns ];
+			const AABB currAABB = GetAABB( index );
+			const AABB nextAABB = GetAABB( index + 1 );
+			const AABB bottomAABB = GetAABB( index + mNumColumns );
 
-			Vec3 currMin = currAABB->Min(), currMax = currAABB->Max();
-			Vec3 nextMin = nextAABB->Min();
-			Vec3 bottomMin = bottomAABB->Min();
+			Vec3 currMin = currAABB.Min(), currMax = currAABB.Max();
+			Vec3 nextMin = nextAABB.Min();
+			Vec3 bottomMin = bottomAABB.Min();
 
 			bool bIsNotAtEndColumn = ( index + 1 ) % mNumColumns != 0;
 			if ( bIsNotAtEndColumn && currMax.x != nextMin.x )
@@ -329,13 +336,13 @@ namespace JonsEngine
 		assert( !mNodeAABBs.empty() );
 
 		uint32_t numCols = 1;
-		const AABB* prevAABB = &mNodeAABBs[ 0 ];
+		AABB prevAABB = GetAABB( 0 );
 		for ( uint32_t index = 1, numNodes = mNodes.size(); index < numNodes; ++index )
 		{
-			const AABB* currAABB = &mNodeAABBs[ index ];
+			const AABB currAABB = GetAABB( index );
 
-			Vec3 currCenter = currAABB->GetCenter(), currExtent = currAABB->GetExtent();
-			Vec3 prevCenter = prevAABB->GetCenter(), prevExtent = prevAABB->GetExtent();
+			Vec3 currCenter = currAABB.GetCenter(), currExtent = currAABB.GetExtent();
+			Vec3 prevCenter = prevAABB.GetCenter(), prevExtent = prevAABB.GetExtent();
 
 			// row-jump
 			if ( currCenter.z != prevCenter.z )
@@ -366,8 +373,9 @@ namespace JonsEngine
 	{
 		assert( !mNodeAABBs.empty() );
 
-		const AABB& topLeftAABB = mNodeAABBs.front();
-		const AABB& bottomRightAABB = mNodeAABBs.back();
+		const AABB topLeftAABB = GetAABB( 0 );
+		const AABB bottomRightAABB = GetAABB( mNodeAABBs.size() - 1 );
+
 		const Vec3 min = topLeftAABB.Min(), max = bottomRightAABB.Max();
 		AABB totalAABB( min, max );
 
@@ -383,5 +391,13 @@ namespace JonsEngine
 		}
 
 		return numAABBs;
+	}
+
+	template <typename Item, uint32_t gNodeAABBCutoffPoint>
+	AABB FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::GetAABB( uint32_t index ) const
+	{
+		const Mat4& aabbTransform = mNodeAABBs.at( index );
+
+		return AABB::gUnitAABB * aabbTransform;
 	}
 }

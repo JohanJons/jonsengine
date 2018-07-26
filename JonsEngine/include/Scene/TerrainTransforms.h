@@ -14,9 +14,9 @@ namespace JonsEngine
 	{
 		typedef FixedGridQuadTree<Mat4, 32> TerrainTransformGridQuadTree;
 
-		TerrainTransformData( TerrainID ID, std::vector<Mat4>&& transforms, std::vector<AABB>&& AABBs )
+		TerrainTransformData( TerrainID ID, std::vector<Mat4>&& transforms, std::vector<Mat4>&& AABBTransforms )
 			: mID( ID )
-			, mQuadTree( std::move(transforms), std::move(AABBs) )
+			, mQuadTree( std::move( transforms ), std::move( AABBTransforms ) )
 		{ }
 
 		TerrainID mID;

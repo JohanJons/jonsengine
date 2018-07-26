@@ -4,6 +4,7 @@
 #include "include/Core/Types.h"
 
 #include <vector>
+#include <algorithm>
 #include <assert.h>
 
 namespace JonsEngine
@@ -27,11 +28,12 @@ namespace JonsEngine
     {
     public:
         template <typename... Arguments>
-        ItemID Insert(Arguments&&... args);
-        void Erase(ItemID& id);
+        ItemID Insert( Arguments&&... args );
+        void Erase( ItemID& id );
 
-        T& GetItem(const ItemID id);
-        const T& GetItem(const ItemID id) const;
+        T& GetItem( const ItemID id );
+        const T& GetItem( const ItemID id ) const;
+		ItemID GetID( const T& item ) const;
 
         void Clear();
     };
@@ -55,7 +57,7 @@ namespace JonsEngine
 
     template <typename T>
 	template <typename... Arguments>
-	typename IDMap<T>::ItemID IDMap<T>::Insert(Arguments&&... args)
+	typename IDMap<T>::ItemID IDMap<T>::Insert( Arguments&&... args )
 	{
         const size_t newChildIndex = mItems.size();
 
@@ -88,7 +90,7 @@ namespace JonsEngine
 	}
 
 	template <typename T>
-    void IDMap<T>::Erase(ItemID& id)
+    void IDMap<T>::Erase( ItemID& id )
 	{
         ItemIterator item = GetItemIter(id);
 
@@ -102,16 +104,26 @@ namespace JonsEngine
 	}
 
 	template <typename T>
-	T& IDMap<T>::GetItem(const ItemID id)
+	T& IDMap<T>::GetItem( const ItemID id )
 	{
-		return GetItemIter(id)->mItem;
+		return GetItemIter( id )->mItem;
 	}
 
     template <typename T>
-    const T& IDMap<T>::GetItem(const ItemID id) const
+    const T& IDMap<T>::GetItem( const ItemID id ) const
     {
-        return GetItemIter(id)->mItem;
+        return GetItemIter( id )->mItem;
     }
+
+	template <typename T>
+	ItemID IDMap<T>::GetID( const T& item ) const
+	{
+		auto iter = std::find_if( mItems.cbegin(), mItems.cend(), [ item ]( const IDMapItem<T>& itemBase ) { return true;  } );
+		if ( iter == mItems.cend() )
+			return INVALID_ITEM_ID;
+
+		return INVALID_ITEM_ID;
+	}
 
 	template <typename T>
 	void IDMap<T>::Clear()
