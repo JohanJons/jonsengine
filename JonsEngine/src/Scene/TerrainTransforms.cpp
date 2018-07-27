@@ -17,26 +17,22 @@ namespace JonsEngine
 			return height / patchSize;
 		}
 
-		void GetPatchHeight( float& minY, float& maxY, const std::vector<uint8_t>& heightmapData, float heightmapScale, uint32_t width, uint32_t patchExtent, uint32_t rowIndex, uint32_t colIndex )
+		void GetPatchHeight( float& minY, float& maxY, const std::vector<uint8_t>& heightmapData, float heightmapScale, uint32_t width, uint32_t textureExtentWidth, uint32_t textureExtentHeight, uint32_t rowIndex, uint32_t colIndex )
 		{
-			uint32_t currX = colIndex * patchExtent, currY = rowIndex * patchExtent;
-			uint32_t endX = ( colIndex + 1 ) * patchExtent, endY = ( rowIndex + 1 ) * patchExtent;
+			uint32_t currX = colIndex * textureExtentWidth, currY = rowIndex * textureExtentHeight;
+			uint32_t endX = ( colIndex + 1 ) * textureExtentWidth, endY = ( rowIndex + 1 ) * textureExtentHeight;
 
 			minY = std::numeric_limits<float>::max(), maxY = std::numeric_limits<float>::min();
-			while ( currY < endY )
+			for ( uint32_t y = currY; y < endY; ++y )
 			{
-				while ( currX < endX )
+				for ( uint32_t x = currX; x < endX; ++x )
 				{
-					uint32_t textureIndex = ( currY * width ) + currX;
-					float y = Normalize( heightmapData[ textureIndex ] ) * heightmapScale;
+					uint32_t textureIndex = ( y * width ) + x;
+					float val = Normalize( heightmapData[ textureIndex ] ) * heightmapScale;
 
-					maxY = std::max( maxY, y );
-					minY = std::min( minY, y );
-
-					++currX;
+					maxY = std::max( maxY, val );
+					minY = std::min( minY, val );
 				}
-
-				++currY;
 			}
 		}
 	}
@@ -122,12 +118,16 @@ namespace JonsEngine
 			for ( int32_t colNum = -numWidth; colNum < numWidth; colNum += 2 )
 			{
 				float minY, maxY;
+				uint32_t textureExtentWidth = heightmapWidth / numWidth, textureExtentHeight = heightmapHeight / numHeight;
 				uint32_t rowIndex = ( rowNum + numWidth ) / 2, colIndex = ( colNum + numHeight ) / 2;
-				GetPatchHeight( minY, maxY, heightmapData, terrain.GetHeightScale(), heightmapWidth, patchExtent, rowIndex, colIndex );
+				GetPatchHeight( minY, maxY, heightmapData, terrain.GetHeightScale(), heightmapWidth, textureExtentWidth, textureExtentHeight, rowIndex, colIndex );
 
 				Mat4 patchScaleTransform = glm::scale( Vec3( patchExtent, 1.0f, patchExtent ) );
 				transforms.emplace_back( worldTransform * patchScaleTransform * glm::translate( Vec3( colNum, 0.0f, rowNum ) ) );
-				AABBTransformss.emplace_back( glm::translate( Vec3( 0.0f, minY, 0.0f ) ) * transforms.back() );
+
+				float minMaxHeightDiff = maxY - minY;
+				minMaxHeightDiff /= 2;
+				AABBTransformss.emplace_back( glm::translate( Vec3( 0.0f, minMaxHeightDiff, 0.0f ) ) * glm::scale( Vec3( 1.0, minMaxHeightDiff, 1.0f ) ) *  transforms.back() );
 			}
 		}
 
