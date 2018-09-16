@@ -96,6 +96,8 @@ namespace JonsAssetImporter
     {
         const uint32_t widthInPixels = FreeImage_GetWidth(bitmap);
         const uint32_t heightInPixels = FreeImage_GetHeight(bitmap);
+		if ( widthInPixels % 2 != 0 || heightInPixels % 2 != 0 )
+			return false;
 
 		texture.mTextureWidth = widthInPixels;
 		texture.mTextureHeight = heightInPixels;

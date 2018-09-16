@@ -125,12 +125,6 @@ namespace JonsAssetImporter
 					}
 
 					ret = freeimageParser.ProcessTexture2D(assetPath, assetName, type, pkg);
-					
-					if (type == TextureType::Height)
-					{
-						PackageTexture::TextureIndex index = pkg->mTextures.size() - 1;
-						ret &= assimpImporter.ProcessTerrainMap(assetName, index, pkg);
-					}
 
                     break;
                 }

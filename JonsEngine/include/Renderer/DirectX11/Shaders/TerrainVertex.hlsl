@@ -26,7 +26,8 @@ VertexOut vs_main(VertexIn input)
 	// silly that we have to transpose this...
 	const float4x4 worldTransform = transpose( gWorldTransforms.Load( transformIndex ) );
 
-	ret.mWorldPosition = mul(worldTransform, input.mPosition);
+	ret.mWorldPosition = mul( worldTransform, input.mPosition );
+	ret.mWorldNormal = mul( (float3x3)worldTransform, input.mNormal );
 	ret.mTessFactor = 2.0f;
 
 	ret.mTexcoord = 1.0f / ( float2(gWorldMaxX, gWorldMaxZ) + ( -float2(gWorldMinX, gWorldMinZ) ) );

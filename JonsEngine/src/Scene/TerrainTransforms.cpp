@@ -119,7 +119,7 @@ namespace JonsEngine
 			{
 				float minY, maxY;
 				uint32_t textureExtentWidth = heightmapWidth / numWidth, textureExtentHeight = heightmapHeight / numHeight;
-				uint32_t rowIndex = ( rowNum + numWidth ) / 2, colIndex = ( colNum + numHeight ) / 2;
+				uint32_t rowIndex = ( rowNum + numHeight ) / 2, colIndex = ( colNum + numWidth ) / 2;
 				GetPatchHeight( minY, maxY, heightmapData, terrain.GetHeightScale(), heightmapWidth, textureExtentWidth, textureExtentHeight, rowIndex, colIndex );
 
 				Mat4 patchScaleTransform = glm::scale( Vec3( patchExtent, 1.0f, patchExtent ) );

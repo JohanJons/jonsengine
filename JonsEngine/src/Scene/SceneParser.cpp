@@ -189,7 +189,7 @@ namespace JonsEngine
 			const TerrainData& terrainData = mResourceManifest.GetTerrainData(terrainDataID);
 			const SceneNode& node = scene.GetSceneNode(sceneNodeID);
 
-			auto heightmap = terrainData.GetHeightMap();
+			DX11TextureID heightmap = terrainData.GetHeightMap();
 			float patchSize = terrain.GetPatchSize();
 			float heightScale = terrain.GetHeightScale();
 

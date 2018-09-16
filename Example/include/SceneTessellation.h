@@ -3,6 +3,7 @@
 #include "include/Core/Engine.h"
 #include "include/Resources/JonsPackage.h"
 #include "include/Scene/Scene.h"
+#include "include/Sun.h"
 
 #include <string>
 
@@ -13,6 +14,8 @@ namespace JonsGame
 	public:
 		SceneTessellation( JonsEngine::SceneManager& sceneMgr, JonsEngine::ResourceManifest& resManifest );
 		~SceneTessellation();
+
+		void Update();
 
 		JonsEngine::SceneID GetSceneID() const { return mID; }
 
@@ -31,5 +34,6 @@ namespace JonsGame
 		JonsEngine::TerrainID mTerrain;
 
 		JonsEngine::DirectionalLightID mSunDirLightID;
+		Sun mSun;
 	};
 }

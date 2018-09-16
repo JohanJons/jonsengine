@@ -33,6 +33,7 @@ HullOut hull_main(InputPatch<VertexOut, 4> verticeData, uint index : SV_OutputCo
 	HullOut ret;
 
 	ret.mWorldPosition = verticeData[ index ].mWorldPosition;
+	ret.mWorldNormal = verticeData[ index ].mWorldNormal;
 	ret.mTexcoord = verticeData[ index ].mTexcoord;
 
 	return ret;

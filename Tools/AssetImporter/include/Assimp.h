@@ -24,7 +24,6 @@ namespace JonsAssetImporter
         ~Assimp();
 
         bool ProcessScene(const boost::filesystem::path& modelPath, const std::string& modelName, FreeImage& freeimageImporter, JonsEngine::JonsPackagePtr pkg);
-		bool ProcessTerrainMap(const std::string& terrainName, JonsEngine::PackageTexture::TextureIndex heightMapTexture, JonsEngine::JonsPackagePtr pkg);
 
 
     private:

@@ -17,9 +17,10 @@ namespace JonsGame
 		mJonsPackage( ReadJonsPkg( "assets.jons" ) ),
 		mSkybox( resManifest.LoadSkybox( "skybox", mJonsPackage ) ),
 		mNodeTerrain( sceneMgr.GetScene( mID ).CreateSceneNode( "nodeTerrain", sceneMgr.GetScene( mID ).GetRootNodeID() ) ),
-		mTerrainData( resManifest.CreateTerrainData( "terraindata", "heightmap", mJonsPackage ) ),
+		mTerrainData( resManifest.CreateTerrainData( "terraindata", "terrain_heightmap", mJonsPackage ) ),
 		mTerrain( sceneMgr.GetScene( mID ).CreateTerrain( "terrain", gTerrainHeightScale, gTerrainPatchSize, gTerrainMultiplyer, mNodeTerrain, mTerrainData ) ),
-		mSunDirLightID( sceneMgr.GetScene( mID ).CreateDirectionalLight( "DirectionalLight", 4 ) )
+		mSunDirLightID( sceneMgr.GetScene( mID ).CreateDirectionalLight( "DirectionalLight", 4 ) ),
+		mSun( mSceneMgr.GetScene( mID ).GetDirectionalLight( mSunDirLightID ) )
 	{
 		JonsEngine::Scene& scene = sceneMgr.GetScene( mID );
 
@@ -41,6 +42,11 @@ namespace JonsGame
 		// TODO: cleanup...
 	}
 
+
+	void SceneTessellation::Update()
+	{
+		mSun.Update();
+	}
 
 	JonsEngine::Scene& SceneTessellation::GetJonsScene()
 	{

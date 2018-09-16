@@ -75,7 +75,9 @@ namespace JonsGame
 		// misc animaition - bob
 		mAnimBob(INVALID_ANIMATION_ID),
 		mAnimDurationBob(0),
-		mIsAnimatingBob(false)
+		mIsAnimatingBob(false),
+		
+		mSun( mSceneMgr.GetScene( mID ).GetDirectionalLight( mSunDirLightID ) )
     {
 		JonsEngine::Scene& scene = sceneMgr.GetScene( mID );
 
@@ -182,6 +184,11 @@ namespace JonsGame
     }
 
 
+	void Scene::Update()
+	{
+		mSun.Update();
+	}
+
     void Scene::ToggleAnimationWuson()
     {
         AnimatedActor& animWuson = GetJonsScene().GetAnimatedActor(mActorAnimWuson);
@@ -213,10 +220,5 @@ namespace JonsGame
     JonsEngine::SceneNode& Scene::GetMovingLightNode()
     {
         return GetJonsScene().GetSceneNode(mNodePointLight);
-    }
-
-    JonsEngine::DirectionalLight& Scene::GetSun()
-    {
-        return GetJonsScene().GetDirectionalLight(mSunDirLightID);
     }
 }

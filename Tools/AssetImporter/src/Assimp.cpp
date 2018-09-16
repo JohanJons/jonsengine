@@ -87,24 +87,6 @@ namespace JonsAssetImporter
     }
 
 
-	bool Assimp::ProcessTerrainMap(const std::string& terrainName, PackageTexture::TextureIndex heightMapTexture, JonsPackagePtr pkg)
-	{
-		const PackageTexture& texture = pkg->mTextures.at(heightMapTexture);
-		if (texture.mTextureWidth != texture.mTextureHeight)
-		{
-			Log("ERROR: Heightmaps width/height must be 1:1");
-			return false;
-		}
-
-		auto& name = texture.mName;
-		float minElevation = 0, maxElevation = 0;
-		CalculateTerrainElevation(texture.mTextureData, minElevation, maxElevation);
-
-		pkg->mTerrainMaps.emplace_back(name, heightMapTexture, minElevation, maxElevation);
-
-		return true;
-	}
-
     bool Assimp::ProcessMaterials(std::vector<PackageMaterial>& materials, const aiScene* scene, const boost::filesystem::path& modelPath, MaterialMap& materialMap, FreeImage& freeimageImporter, JonsPackagePtr pkg)
     {
         if (!scene->HasMaterials())

@@ -11,10 +11,9 @@ namespace JonsEngine
 	class TerrainData
 	{
 	public:
-		TerrainData(const std::string& name, float minElevation, float maxElevation, uint32_t width, uint32_t height, DX11TextureID heightMap, const std::vector<uint8_t>& heightmapData);
+		TerrainData(const std::string& name, uint32_t width, uint32_t height, DX11TextureID heightMap, const std::vector<uint8_t>& heightmapData);
 
 		const std::string& GetName() const { return mName; }
-		const AABB& GetStaticAABB() const { return mStaticAABB; }
 		uint32_t GetWidth() const { return mWidth; }
 		uint32_t GetHeight() const { return mHeight; }
 		DX11TextureID GetHeightMap() const { return mHeightMap; }
@@ -22,7 +21,6 @@ namespace JonsEngine
 
 	private:
 		std::string mName;
-		AABB mStaticAABB;
 		uint32_t mWidth;
 		uint32_t mHeight;
 		DX11TextureID mHeightMap;

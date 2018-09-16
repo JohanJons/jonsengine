@@ -178,9 +178,9 @@ namespace JonsEngine
     DirectionalLightID Scene::CreateDirectionalLight(const std::string& lightName)
     {
         const uint32_t defaultNumCascades = 4;
-        assert(defaultNumCascades < gMaxNumShadowmapCascades);
+        assert(defaultNumCascades <= gMaxNumShadowmapCascades);
 
-        return mDirectionalLights.Insert(lightName, defaultNumCascades);
+		return CreateDirectionalLight( lightName, defaultNumCascades );
     }
 
     DirectionalLightID Scene::CreateDirectionalLight(const std::string& lightName, const uint32_t numShadowmapCascades)

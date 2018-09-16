@@ -167,29 +167,23 @@ namespace JonsEngine
     }
 
 
-	TerrainDataID ResourceManifest::CreateTerrainData(const std::string& name, const std::string& heightmap, const JonsPackagePtr jonsPkg)
+	TerrainDataID ResourceManifest::CreateTerrainData( const std::string& name, const std::string& heightmap, const JonsPackagePtr jonsPkg )
 	{
-		auto heightIter = FindTextureInContainer(heightmap, TextureType::Height, jonsPkg->mTextures);
-		auto terrainMapIter = FindInContainer(heightmap, jonsPkg->mTerrainMaps);
-		if (heightIter == jonsPkg->mTextures.end() || terrainMapIter == jonsPkg->mTerrainMaps.end())
+		auto heightIter = FindTextureInContainer( heightmap, TextureType::Height, jonsPkg->mTextures );
+		auto textureEndIter = jonsPkg->mTextures.cend();
+		if ( heightIter == textureEndIter )
 			return INVALID_TERRAIN_DATA_ID;
 
-		const uint32_t terrainWidth = heightIter->mTextureWidth;
-		const uint32_t terrainHeight = heightIter->mTextureHeight;
-		assert(terrainWidth > 0 && terrainHeight > 0);
+		uint32_t terrainWidth = heightIter->mTextureWidth;
+		uint32_t terrainHeight = heightIter->mTextureHeight;
+		assert( terrainWidth > 0 && terrainHeight > 0 );
 
-		const auto textureData = heightIter->mTextureData;
-		assert(!textureData.empty());
+		const std::vector<uint8_t>& heightMapData = heightIter->mTextureData;
+		assert( !heightMapData.empty() );
 
-		const DX11TextureID heightmapTexture = LoadTexture(heightmap, TextureType::Height, textureData, terrainWidth, terrainHeight);
+		DX11TextureID heightMapTexture = LoadTexture( heightmap, TextureType::Height, heightMapData, terrainWidth, terrainHeight );
 
-		const uint32_t texelDimensionPerPatch = 64;
-		const uint32_t numVerticalPathes = ((terrainHeight - 1) / texelDimensionPerPatch) + 1;
-		const uint32_t numHorizontalPathes = ((terrainWidth - 1) / texelDimensionPerPatch) + 1;
-
-		const float minElevation = terrainMapIter->mMinElevation, maxElevation = terrainMapIter->mMaxElevation;
-
-		return mTerrainData.Insert( name, minElevation, maxElevation, terrainWidth, terrainHeight, heightmapTexture, textureData );
+		return mTerrainData.Insert( name, terrainWidth, terrainHeight, heightMapTexture, heightMapData );
 	}
 
 	void ResourceManifest::DeleteTerrainData(TerrainDataID& terrainDataId)

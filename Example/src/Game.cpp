@@ -23,8 +23,7 @@ namespace JonsGame
     Game::Game() : 
 		mEngine(mSettings),
 		mGameScene( mEngine.GetSceneManager(), mEngine.GetResourceManifest() ),
-		mTessellationScene( mEngine.GetSceneManager(), mEngine.GetResourceManifest() ),
-		mSun(mGameScene.GetSun())
+		mTessellationScene( mEngine.GetSceneManager(), mEngine.GetResourceManifest() )
     {
         SetupInputCallbacks();
         mEngine.GetWindow().ShowMouseCursor(false);
@@ -39,7 +38,10 @@ namespace JonsGame
     {
         while (mRunning)
         {
-            mSun.Update();
+			if ( mIsDefaultScene )
+				mGameScene.Update();
+			else
+				mTessellationScene.Update();
 
             mEngine.Tick(mDebugOptions);
         }
@@ -79,14 +81,9 @@ namespace JonsGame
 					case Key::FIVE: mEngine.GetRenderer().SetToneMappingAlghorithm( RenderSettings::ToneMappingAlghorithm::None ); break;
 					case Key::SIX: mEngine.GetRenderer().SetToneMappingAlghorithm( RenderSettings::ToneMappingAlghorithm::FilmicU2 ); break;
 
-					// sun
-					case Key::Q: mSun.SetIsMoving( true ); break;
-					case Key::W: mSun.SetIsMoving( false ); break;
-
 					// animated actors
 					case Key::E: mGameScene.ToggleAnimationWuson(); break;
 					case Key::R: mGameScene.ToggleAnimationBob(); break;
-					//case Key::R: mSunSpeed -= 0.005f; break;
 
 					default:
 						break;

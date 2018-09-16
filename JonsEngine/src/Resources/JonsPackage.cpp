@@ -38,19 +38,6 @@ namespace JonsEngine
     {
     }
 
-	PackageTerrainMap::PackageTerrainMap() :
-		PackageTerrainMap("UNKNOWN", PackageTexture::INVALID_TEXTURE_INDEX, std::numeric_limits<float>::max(), std::numeric_limits<float>::lowest())
-	{
-	}
-
-	PackageTerrainMap::PackageTerrainMap(const std::string& name, PackageTexture::TextureIndex heightMapTexture, float minElevation, float maxElevation) :
-		mName(name),
-		mTerrainTexture(heightMapTexture),
-		mMinElevation(minElevation),
-		mMaxElevation(maxElevation)
-	{
-	}
-
     PackageMaterial::PackageMaterial() :
         PackageMaterial("")
     {

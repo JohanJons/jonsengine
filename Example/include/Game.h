@@ -2,7 +2,6 @@
 
 #include "include/Scene.h"
 #include "include/SceneTessellation.h"
-#include "include/Sun.h"
 
 #include "include/Core/Engine.h"
 #include "include/Core/EngineSettings.h"
@@ -36,7 +35,6 @@ namespace JonsGame
 
         Scene mGameScene;
 		SceneTessellation mTessellationScene;
-        Sun mSun;
 
 		bool mRunning = true;
 		bool mIsDefaultScene = true;

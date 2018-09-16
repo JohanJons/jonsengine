@@ -21,11 +21,13 @@ namespace JonsEngine
 			NUM_CHILDREN
 		};
 
-		GridQuadNodeAABB( const Vec3& minAABB, const Vec3& maxAABB, uint16_t beginIndex, uint16_t endIndex )
-			: mAABB( minAABB, maxAABB )
-			, mBeginIndex( beginIndex )
-			, mEndIndex( endIndex )
+		GridQuadNodeAABB( const Vec3& minAABB, const Vec3& maxAABB, uint16_t beginIndex, uint16_t endIndex ) :
+			mAABB( minAABB, maxAABB ),
+			mBeginIndex( beginIndex ),
+			mEndIndex( endIndex )
 		{ }
+
+		bool IsValid() const { return mEndIndex >= mBeginIndex; }
 
 		AABB mAABB;
 		GridQuadNodeAABB* mChildBegin = nullptr;
@@ -137,7 +139,13 @@ namespace JonsEngine
 				else
 				{
 					for ( uint32_t childIndex = GridQuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < GridQuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
-						CullQuad( nodes, *( quadAABB.mChildBegin + childIndex ), cameraViewProjTransform );
+					{
+						const GridQuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
+						if ( !childQuad.IsValid() )
+							continue;
+
+						CullQuad( nodes, childQuad, cameraViewProjTransform );
+					}
 				}
 				break;
 			}
@@ -154,6 +162,9 @@ namespace JonsEngine
 	template <typename Item, uint32_t gNodeAABBCutoffPoint>
 	void FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::AddAllItems( std::vector<uint32_t>& nodes, const GridQuadNodeAABB& quadAABB ) const
 	{
+		if ( !quadAABB.IsValid() )
+			return;
+
 		uint32_t begin = quadAABB.mBeginIndex, end = quadAABB.mEndIndex;
 		uint32_t beginRow = GetRow( begin ), endRow = GetRow( end );
 		uint32_t beginCol = GetColumn( begin ), endCol = GetColumn( end );
@@ -175,9 +186,6 @@ namespace JonsEngine
 		assert( mNodes.size() == mNodeAABBs.size() );
 		assert( VerifyMemoryLayout() );
 
-		// only square quads for now
-		assert( mNumColumns == mNumRows );
-
 		mGridTraversal.reserve( GetNumNodeElements() );
 
 		uint32_t beginIndex = 0, endIndex = mNodes.size() - 1;
@@ -190,6 +198,9 @@ namespace JonsEngine
 	template <typename Item, uint32_t gNodeAABBCutoffPoint>
 	void FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::GetAABBBounds( Vec3& min, Vec3& max, uint32_t beginIndex, uint32_t endIndex ) const
 	{
+		if ( beginIndex > endIndex )
+			return;
+
 		uint32_t beginRow = GetRow( beginIndex ), endRow = GetRow( endIndex );
 		uint32_t beginCol = GetColumn( beginIndex ), endCol = GetColumn( endIndex );
 		assert( beginRow >= 0 && endRow >= beginRow && endRow < mNumRows );
@@ -213,7 +224,7 @@ namespace JonsEngine
 	template <typename Item, uint32_t gNodeAABBCutoffPoint>
 	void FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::ProcessQuadNode( GridQuadNodeAABB& quadAABB )
 	{
-		if ( quadAABB.mAABB.GetExtent().x <= static_cast<float>( gNodeAABBCutoffPoint ) )
+		if ( !quadAABB.IsValid() || ( quadAABB.mAABB.GetExtent().x <= static_cast<float>( gNodeAABBCutoffPoint ) ) )
 			return;
 
 		const Vec3 splitExtent( quadAABB.mAABB.GetExtent().x, 0, 0 );
@@ -327,7 +338,7 @@ namespace JonsEngine
 	template <typename Item, uint32_t gNodeAABBCutoffPoint>
 	uint32_t FixedGridQuadTree<Item, gNodeAABBCutoffPoint>::GetRow( uint32_t index ) const
 	{
-		return index / GetNumRows( mNumColumns );
+		return index / mNumColumns;
 	}
 
 	template <typename Item, uint32_t gNodeAABBCutoffPoint>

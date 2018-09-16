@@ -14,10 +14,13 @@ PixelOut ps_main(DomainOut input)
 {
 	PixelOut ret;
 
-	ret.mDiffuse = float4( 0.0f, 1.0f, 0.0f, 1.0f);
-	ret.mNormal = normalize(input.mNormal);
+	float3 dFdxPos = ddx( input.mViewPosition.xyz );
+	float3 dFdyPos = ddy( input.mViewPosition.xyz );
+	ret.mNormal = normalize( cross( dFdxPos, dFdyPos ) );
 	ret.mNormal += 1.0f;
 	ret.mNormal *= 0.5f;
+
+	ret.mDiffuse = float4( 0.0f, 1.0f, 0.0f, 1.0f);
 
 	return ret;
 }

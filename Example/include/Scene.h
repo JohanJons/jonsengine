@@ -3,6 +3,7 @@
 #include "include/Core/Engine.h"
 #include "include/Resources/JonsPackage.h"
 #include "include/Scene/Scene.h"
+#include "include/Sun.h"
 
 #include <string>
 
@@ -14,6 +15,8 @@ namespace JonsGame
         Scene( JonsEngine::SceneManager& sceneMgr, JonsEngine::ResourceManifest& resManifest );
         ~Scene();
 
+		void Update();
+
 		JonsEngine::SceneID GetSceneID() const { return mID; }
 
         void ToggleAnimationWuson();
@@ -21,7 +24,6 @@ namespace JonsGame
 
         JonsEngine::Scene& GetJonsScene();
         JonsEngine::SceneNode& GetMovingLightNode();
-        JonsEngine::DirectionalLight& GetSun();
 
 
     private:
@@ -81,5 +83,7 @@ namespace JonsGame
 		JonsEngine::Milliseconds mAnimDurationBob;
 		bool mIsAnimatingWuson;
 		bool mIsAnimatingBob;
+
+		Sun mSun;
     };
 }
