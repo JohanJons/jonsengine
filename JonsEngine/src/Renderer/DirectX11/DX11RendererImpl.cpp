@@ -177,8 +177,9 @@ namespace JonsEngine
         mPipeline.BeginFrame(renderQueue);
 
         mPipeline.GeometryStage(renderQueue);
-        mPipeline.LightingStage(renderQueue, debugFlags, mRenderSettings);
-        mPipeline.PostProcessingStage(renderQueue, elapstedFrameTime, debugFlags, mRenderSettings);
+        mPipeline.LightingStage(renderQueue, mRenderSettings);
+        mPipeline.PostProcessingStage(renderQueue, elapstedFrameTime, mRenderSettings);
+		mPipeline.DebugStage( renderQueue, debugFlags );
 
         mPipeline.EndFrame();
     }

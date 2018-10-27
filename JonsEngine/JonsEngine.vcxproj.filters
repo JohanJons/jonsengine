@@ -732,5 +732,8 @@
     <FxCompile Include="include\Renderer\DirectX11\Shaders\TerrainPixel.hlsl">
       <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="include\Renderer\DirectX11\Shaders\TerrainPixelDebug.hlsl">
+      <Filter>Header Files\Renderer\DirectX11\Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

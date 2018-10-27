@@ -6,6 +6,7 @@
 #include "include/Renderer/DirectX11/Shaders/Compiled/TerrainHull.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/TerrainDomain.h"
 #include "include/Renderer/DirectX11/Shaders/Compiled/TerrainPixel.h"
+#include "include/Renderer/DirectX11/Shaders/Compiled/TerrainPixelDebug.h"
 #include "include/Core/Math/Math.h"
 #include "include/Core/Math/AABB.h"
 
@@ -74,10 +75,11 @@ namespace JonsEngine
 		DXCALL(device->CreateHullShader(gTerrainHullShader, sizeof(gTerrainHullShader), nullptr, &mHullShader));
 		DXCALL(device->CreateDomainShader(gTerrainDomainShader, sizeof(gTerrainDomainShader), nullptr, &mDomainShader));
 		DXCALL(device->CreatePixelShader(gTerrainPixelShader, sizeof(gTerrainPixelShader), nullptr, &mPixelShader));
+		DXCALL( device->CreatePixelShader( gTerrainPixelDebugShader, sizeof( gTerrainPixelDebugShader ), nullptr, &mPixelDebugShader ) );
 
 		D3D11_RASTERIZER_DESC rasterizerDesc;
 		ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
-		rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+		rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
 		rasterizerDesc.CullMode = D3D11_CULL_BACK;
 		rasterizerDesc.FrontCounterClockwise = true;
 		rasterizerDesc.DepthClipEnable = true;
@@ -87,17 +89,37 @@ namespace JonsEngine
 		DXCALL(device->CreateRasterizerState(&rasterizerDesc, &mDebugRasterizer));
 	}
 
-	void DX11TerrainPass::Render(const RenderableTerrains& terrains)
+	void DX11TerrainPass::Render( const RenderableTerrains& terrains )
+	{
+		if ( !terrains.GetNumTerrains() )
+			return;
+
+		BindForRendering();
+		RenderInternal( terrains );
+		UnbindRendering();
+	}
+
+	void DX11TerrainPass::RenderDebug( const RenderableTerrains& terrains )
 	{
 		if ( !terrains.GetNumTerrains() )
 			return;
 
 		BindForRendering();
 
+		mContext->PSSetShader( mPixelDebugShader, nullptr, 0 );
 		ID3D11RasterizerStatePtr prevRasterizer = nullptr;
 		mContext->RSGetState( &prevRasterizer );
 		mContext->RSSetState( mDebugRasterizer );
 
+		RenderInternal( terrains );
+
+		mContext->RSSetState( prevRasterizer );
+
+		UnbindRendering();
+	}
+
+	void DX11TerrainPass::RenderInternal( const RenderableTerrains& terrains )
+	{
 		mTransformsBuffer.SetData( terrains.mTransforms );
 		mTransformsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA );
 
@@ -120,10 +142,6 @@ namespace JonsEngine
 
 			beginIndex = endIndex;
 		}
-
-		mContext->RSSetState( prevRasterizer );
-
-		UnbindRendering();
 	}
 
 	void DX11TerrainPass::BindForRendering()

@@ -12,13 +12,13 @@ PatchTess PatchHS(InputPatch<VertexOut, 4> inputVertices)
 {
 	PatchTess patch;
 
-	patch.mEdgeTess[ 0 ] = 16;
-	patch.mEdgeTess[ 1 ] = 16;
-	patch.mEdgeTess[ 2 ] = 16;
-	patch.mEdgeTess[ 3 ] = 16;
+	patch.mEdgeTess[ 0 ] = 64;
+	patch.mEdgeTess[ 1 ] = 64;
+	patch.mEdgeTess[ 2 ] = 64;
+	patch.mEdgeTess[ 3 ] = 64;
 	
-	patch.mInsideTess[ 0 ] = 16;
-	patch.mInsideTess[ 1 ] = 16;
+	patch.mInsideTess[ 0 ] = 64;
+	patch.mInsideTess[ 1 ] = 64;
 
 	return patch;
 }

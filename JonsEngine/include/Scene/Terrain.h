@@ -22,6 +22,7 @@ namespace JonsEngine
 		void SetPatchSize(uint32_t patchSize);
 		uint32_t GetPatchSize() const { return mPatchSize; }
 
+		// terrain size in relation to the heightmap
 		void SetHeightmapMultiplyer( float heightmapMultiplyer );
 		float GetHeightmapMultiplyer() const { return mHeightmapMultiplyer; }
 

@@ -40,9 +40,9 @@ namespace JonsEngine
         void EndFrame();
 
         void GeometryStage(const RenderQueue& renderQueue);
-        void LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags, const RenderSettings& renderSettings);
-        void PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags, const RenderSettings& renderSettings);
-
+        void LightingStage(const RenderQueue& renderQueue, const RenderSettings& renderSettings);
+        void PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const RenderSettings& renderSettings);
+		void DebugStage( const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags );
 
     private:
 		struct PerFrameCB

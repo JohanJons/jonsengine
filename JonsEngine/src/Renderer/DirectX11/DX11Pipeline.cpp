@@ -137,7 +137,7 @@ namespace JonsEngine
 		RenderMeshes(renderQueue, animatedMeshesContainer, animatedBeginIndex, animatedEndIndex);
     }
 
-    void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugExtra, const RenderSettings& renderSettings)
+    void DX11Pipeline::LightingStage(const RenderQueue& renderQueue, const RenderSettings& renderSettings)
     {
         mLightAccbuffer.Clear();
         mLightAccbuffer.BindAsRenderTarget(mDSVReadOnly);
@@ -172,7 +172,7 @@ namespace JonsEngine
 			mSkyboxPass.Render(mTextureMap.GetItem(renderQueue.mSkyboxTextureID));
     }
 
-    void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags, const RenderSettings& renderSettings)
+    void DX11Pipeline::PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const RenderSettings& renderSettings)
     {
 		PerformTonemapping(elapstedFrameTime, renderSettings.mAutoExposureRate, renderSettings.mToneMapping);
 
@@ -182,12 +182,17 @@ namespace JonsEngine
         // FXAA done in sRGB space
         if (renderSettings.mAntiAliasing == RenderSettings::AntiAliasing::Fxaa)
             mPostProcessor.FXAAPass(mBackbuffer, mWindowSize);
-
-		const bool renderAABBs = !renderQueue.mColorsToAABBsList.empty();
-		if ( renderAABBs )
-			mAABBPass.Render( renderQueue.mColorsToAABBsList, renderQueue.mCamera.mCameraViewProjectionMatrix );
     }
 
+	void DX11Pipeline::DebugStage( const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags )
+	{
+		bool renderAABBs = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_MODEL_AABB ) || debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_AABB );
+		if ( renderAABBs )
+			mAABBPass.Render( renderQueue.mColorsToAABBsList, renderQueue.mCamera.mCameraViewProjectionMatrix );
+
+		if ( debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME ) )
+			mTerrainPass.RenderDebug( renderQueue.mTerrains );
+	}
 
 	void DX11Pipeline::RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end)
 	{

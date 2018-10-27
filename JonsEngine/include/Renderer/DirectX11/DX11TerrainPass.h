@@ -24,7 +24,8 @@ namespace JonsEngine
 
 		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, const RenderSettings::Tesselation& tessData);
 
-		void Render(const RenderableTerrains& terrains);
+		void Render( const RenderableTerrains& terrains );
+		void RenderDebug( const RenderableTerrains& terrains );
 
 	private:
 		struct TerrainCBuffer
@@ -44,6 +45,7 @@ namespace JonsEngine
 		};
 
 	private:
+		void RenderInternal( const RenderableTerrains& terrains );
 		void BindForRendering();
 		void UnbindRendering();
 
@@ -53,6 +55,7 @@ namespace JonsEngine
 		ID3D11HullShaderPtr mHullShader = nullptr;
 		ID3D11DomainShaderPtr mDomainShader = nullptr;
 		ID3D11PixelShaderPtr mPixelShader = nullptr;
+		ID3D11PixelShaderPtr mPixelDebugShader = nullptr;
 
 		ID3D11RasterizerStatePtr mDebugRasterizer = nullptr;
 

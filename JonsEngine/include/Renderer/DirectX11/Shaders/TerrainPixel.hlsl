@@ -20,7 +20,7 @@ PixelOut ps_main(DomainOut input)
 	ret.mNormal += 1.0f;
 	ret.mNormal *= 0.5f;
 
-	ret.mDiffuse = float4( 0.0f, 1.0f, 0.0f, 1.0f);
+	ret.mDiffuse = float4( 0.0f, 1.0f, 1.0f, 1.0f);
 
 	return ret;
 }
