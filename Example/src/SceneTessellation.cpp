@@ -6,7 +6,7 @@
 using namespace JonsEngine;
 
 constexpr float gTerrainHeightScale = 64.0f;
-constexpr float gTerrainMultiplyer = 4.0f;
+constexpr float gTerrainMultiplyer = 1.0f;
 constexpr uint32_t gTerrainPatchSize = 64;
 
 namespace JonsGame
@@ -28,6 +28,7 @@ namespace JonsGame
 
 		DirectionalLight& sun = scene.GetDirectionalLight( mSunDirLightID );
 		sun.SetLightColor( Vec4( 6.0f ) );
+		sun.SetLightDirection( Vec3( -0.735238075f, 0.207724974f, 0.645194054f ) );
 
 		SceneNode& nodeTerrain = scene.GetSceneNode( mNodeTerrain );
 		nodeTerrain.TranslateNode( Vec3( 0.0f, 0.0f, 0.0f ) );
@@ -45,7 +46,7 @@ namespace JonsGame
 
 	void SceneTessellation::Update()
 	{
-		mSun.Update();
+		//mSun.Update();
 	}
 
 	JonsEngine::Scene& SceneTessellation::GetJonsScene()
