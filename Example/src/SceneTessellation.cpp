@@ -28,14 +28,14 @@ namespace JonsGame
 
 		DirectionalLight& sun = scene.GetDirectionalLight( mSunDirLightID );
 		sun.SetLightColor( Vec4( 6.0f ) );
-		sun.SetLightDirection( Vec3( -0.735238075f, 0.207724974f, 0.645194054f ) );
+		sun.SetLightDirection( Vec3( -0.735238075f, -0.607724974f, 0.645194054f ) );
 
 		SceneNode& nodeTerrain = scene.GetSceneNode( mNodeTerrain );
 		nodeTerrain.TranslateNode( Vec3( 0.0f, 0.0f, 0.0f ) );
 
 		scene.SetSkybox( mSkybox );
 
-		scene.GetSceneCamera().TranslateCamera( Vec3( 90.0f, 20.0f, 0.0f ) );
+		scene.GetSceneCamera().TranslateCamera( Vec3( 90.0f, 40.0f, 0.0f ) );
 	}
 
 	SceneTessellation::~SceneTessellation()

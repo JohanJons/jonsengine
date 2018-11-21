@@ -14,9 +14,7 @@ PixelOut ps_main(DomainOut input)
 {
 	PixelOut ret;
 
-	float3 dFdxPos = ddx( input.mViewPosition.xyz );
-	float3 dFdyPos = ddy( input.mViewPosition.xyz );
-	ret.mNormal = normalize( cross( dFdxPos, dFdyPos ) );
+	ret.mNormal = input.mNormal;
 	ret.mNormal += 1.0f;
 	ret.mNormal *= 0.5f;
 
