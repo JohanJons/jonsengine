@@ -24,7 +24,7 @@ namespace JonsGame
 	{
 		JonsEngine::Scene& scene = sceneMgr.GetScene( mID );
 
-		scene.SetAmbientLight( Vec4( 0.03f ) );
+		scene.SetAmbientLight( Vec4( 0.1f ) );
 
 		DirectionalLight& sun = scene.GetDirectionalLight( mSunDirLightID );
 		sun.SetLightColor( Vec4( 6.0f ) );

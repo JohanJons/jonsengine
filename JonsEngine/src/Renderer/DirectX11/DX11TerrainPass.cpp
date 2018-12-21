@@ -149,7 +149,6 @@ namespace JonsEngine
 		mContext->VSSetShader(mVertexShader, nullptr, 0);
 		mContext->DSSetShader(mDomainShader, nullptr, 0);
 		mContext->PSSetShader(mPixelShader, nullptr, 0);
-		mContext->DSSetShader(mDomainShader, nullptr, 0);
 		mContext->HSSetShader(mHullShader, nullptr, 0);
 		mContext->IASetInputLayout(mLayout);
 		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST);
@@ -159,7 +158,9 @@ namespace JonsEngine
 
 	void DX11TerrainPass::UnbindRendering()
 	{
-		mContext->DSSetShader(nullptr, nullptr, 0);
-		mContext->HSSetShader(nullptr, nullptr, 0);
+		mContext->VSSetShader( nullptr, nullptr, 0 );
+		mContext->DSSetShader( nullptr, nullptr, 0 );
+		mContext->HSSetShader( nullptr, nullptr, 0 );
+		mContext->PSSetShader( nullptr, nullptr, 0 );
 	}
 }
