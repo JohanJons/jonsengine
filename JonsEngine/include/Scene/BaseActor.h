@@ -11,7 +11,6 @@ namespace JonsEngine
     {
     public:
         BaseActor(const std::string& name, const ModelID modelId, const SceneNodeID sceneNodeID);
-        ~BaseActor();
 
         void SetModel(const ModelID modelID);
         void SetMaterial(const MaterialID materialID);

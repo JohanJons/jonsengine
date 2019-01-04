@@ -118,11 +118,11 @@ namespace JonsEngine
 	template <typename T>
 	ItemID IDMap<T>::GetID( const T& item ) const
 	{
-		auto iter = std::find_if( mItems.cbegin(), mItems.cend(), [ item ]( const IDMapItem<T>& itemBase ) { return true;  } );
+		auto iter = std::find_if( mItems.cbegin(), mItems.cend(), [ &item ]( const IDMapItem<T>& itemBase ) { return &item == &itemBase.mItem; } );
 		if ( iter == mItems.cend() )
 			return INVALID_ITEM_ID;
 
-		return INVALID_ITEM_ID;
+		return iter->mID;
 	}
 
 	template <typename T>

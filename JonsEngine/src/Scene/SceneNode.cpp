@@ -93,4 +93,10 @@ namespace JonsEngine
     {
         return mParent;
     }
+
+
+	void SceneNode::SetCallback( const OnSceneNodeDirtyFunc& onDirty )
+	{
+		mOnDirtyFunc = onDirty;
+	}
 }

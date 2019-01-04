@@ -19,9 +19,10 @@ namespace JonsEngine
         T mItem;
 
 
-		IDMapTreeItem(const IDMapTreeItem&);
         template <typename... Arguments>
-        IDMapTreeItem(const ItemID id, const ItemID next, Arguments&&... args);
+        IDMapTreeItem( const ItemID id, const ItemID next, Arguments&&... args );
+		IDMapTreeItem( IDMapTreeItem&& );
+		IDMapTreeItem& operator=( IDMapTreeItem&& other );
     };
 
     // Contigous-memory ID-based tree container
@@ -31,8 +32,9 @@ namespace JonsEngine
     class IDMapTree : public IDMapBase<T, IDMapTreeItem<T>>
     {
     public:
+		IDMapTree( IDMapTree&& args ) = default;
         template <typename... Arguments>
-        IDMapTree(Arguments&&... args);
+        IDMapTree( Arguments&&... args );
         ~IDMapTree();
 
         template <typename... Arguments>
@@ -64,10 +66,19 @@ namespace JonsEngine
     {
     }
 
+	template <typename T>
+	IDMapTreeItem<T>::IDMapTreeItem( IDMapTreeItem&& other ) : mID( other.mID ), mNext( other.mNext ), mItem( std::move( other.mItem ) )
+	{
+	}
 
 	template <typename T>
-	IDMapTreeItem<T>::IDMapTreeItem(const IDMapTreeItem& other) : mID(other.mID), mNext(other.mNext), mItem(std::move(other.mItem))
+	typename IDMapTreeItem<T>::IDMapTreeItem& IDMapTreeItem<T>::operator=( IDMapTreeItem<T>&& other )
 	{
+		mID = other.mID;
+		mNext = other.mNext;
+		mItem = std::move( other.mItem );
+
+		return *this;
 	}
 
 

@@ -39,7 +39,6 @@ struct VertexOut
 struct DomainOut
 {
 	float4 mPosition : SV_POSITION;
-	float3 mViewPosition : POSITION;
 	float3 mNormal : NORMAL;
 	float2 mTexcoord : TEXCOORD;
 };

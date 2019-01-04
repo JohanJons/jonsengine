@@ -18,7 +18,7 @@
 // Name                                 Type  Format         Dim Slot Elements
 // ------------------------------ ---------- ------- ----------- ---- --------
 // gPointSampler                     sampler      NA          NA    1        1
-// gFinalTexture                     texture  float4          2d    3        1
+// gFinalTexture                     texture  float4          2d    4        1
 // FXAACBuffer                       cbuffer      NA          NA    1        1
 //
 //
@@ -40,7 +40,7 @@ ps_5_0
 dcl_globalFlags refactoringAllowed | skipOptimization
 dcl_constantbuffer cb1[1], immediateIndexed
 dcl_sampler s1, mode_default
-dcl_resource_texture2d (float,float,float,float) t3
+dcl_resource_texture2d (float,float,float,float) t4
 dcl_input_ps_siv linear noperspective v0.xy, position
 dcl_output o0.xyzw
 dcl_temps 7
@@ -64,12 +64,12 @@ mov r0.x, r0.x  // r0.x <- posM.x
 mov r0.y, r0.y  // r0.y <- posM.y
 
 #line 903
-sample_l_indexable(texture2d)(float,float,float,float) r2.xyzw, r0.xyxx, t3.xyzw, s1, l(0.000000)  // r2.x <- rgbyM.x; r2.y <- rgbyM.y; r2.z <- rgbyM.z; r2.w <- rgbyM.w
+sample_l_indexable(texture2d)(float,float,float,float) r2.xyzw, r0.xyxx, t4.xyzw, s1, l(0.000000)  // r2.x <- rgbyM.x; r2.y <- rgbyM.y; r2.z <- rgbyM.z; r2.w <- rgbyM.w
 
 #line 914
-gather4_indexable(texture2d)(float,float,float,float) r3.xyz, r0.xyxx, t3.xyzw, s1.y  // r3.x <- luma4A.x; r3.z <- luma4A.z
+gather4_indexable(texture2d)(float,float,float,float) r3.xyz, r0.xyxx, t4.xyzw, s1.y  // r3.x <- luma4A.x; r3.z <- luma4A.z
 mov r3.xyz, r3.xyzx  // r3.y <- luma4A.y
-gather4_aoffimmi_indexable(-1,-1,0)(texture2d)(float,float,float,float) r4.xyz, r0.xyxx, t3.zxwy, s1.y  // r4.y <- luma4B.x; r4.x <- luma4B.z
+gather4_aoffimmi_indexable(-1,-1,0)(texture2d)(float,float,float,float) r4.xyz, r0.xyxx, t4.zxwy, s1.y  // r4.y <- luma4B.x; r4.x <- luma4B.z
 mov r4.xyz, r4.xyzx  // r4.z <- luma4B.w
 
 #line 939
@@ -97,7 +97,7 @@ endif   // r5.x <- <FxaaPixelShader return value>.x; r5.y <- <FxaaPixelShader re
 #line 965
 if_z r1.y
   nop 
-  sample_l_aoffimmi_indexable(1,-1,0)(texture2d)(float,float,float,float) r1.y, r0.xyxx, t3.xyzw, s1, l(0.000000)
+  sample_l_aoffimmi_indexable(1,-1,0)(texture2d)(float,float,float,float) r1.y, r0.xyxx, t4.xyzw, s1, l(0.000000)
 
 #line 726
   mov r1.y, r1.y  // r1.y <- <FxaaLuma return value>
@@ -105,7 +105,7 @@ if_z r1.y
 #line 965
   mov r1.y, r1.y  // r1.y <- lumaNE
   nop 
-  sample_l_aoffimmi_indexable(-1,1,0)(texture2d)(float,float,float,float) r1.z, r0.xyxx, t3.xzyw, s1, l(0.000000)
+  sample_l_aoffimmi_indexable(-1,1,0)(texture2d)(float,float,float,float) r1.z, r0.xyxx, t4.xzyw, s1, l(0.000000)
 
 #line 726
   mov r1.z, r1.z  // r1.z <- <FxaaLuma return value>
@@ -229,7 +229,7 @@ if_z r1.y
   mul r1.w, r1.z, l(-2.000000)
   add r1.w, r1.w, l(3.000000)  // r1.w <- subpixD
   nop 
-  sample_l_indexable(texture2d)(float,float,float,float) r2.w, r4.xyxx, t3.xzwy, s1, l(0.000000)
+  sample_l_indexable(texture2d)(float,float,float,float) r2.w, r4.xyxx, t4.xzwy, s1, l(0.000000)
   mov r2.w, r2.w
 
 #line 726
@@ -239,7 +239,7 @@ if_z r1.y
   mov r2.w, r2.w  // r2.w <- lumaEndN
   mul r1.z, r1.z, r1.z  // r1.z <- subpixE
   nop 
-  sample_l_indexable(texture2d)(float,float,float,float) r3.w, r4.zwzz, t3.xzwy, s1, l(0.000000)
+  sample_l_indexable(texture2d)(float,float,float,float) r3.w, r4.zwzz, t4.xzwy, s1, l(0.000000)
 
 #line 726
   mov r3.w, r3.w  // r3.w <- <FxaaLuma return value>
@@ -294,7 +294,7 @@ if_z r1.y
   if_nz r3.z
     if_z r2.w
       nop 
-      sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t3.yxzw, s1, l(0.000000)
+      sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t4.yxzw, s1, l(0.000000)
 
 #line 726
       mov r6.x, r6.x  // r6.x <- <FxaaLuma return value>
@@ -304,7 +304,7 @@ if_z r1.y
     endif 
     if_z r3.x
       nop 
-      sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t3.xyzw, s1, l(0.000000)
+      sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t4.xyzw, s1, l(0.000000)
 
 #line 726
       mov r6.y, r6.y  // r6.y <- <FxaaLuma return value>
@@ -354,7 +354,7 @@ if_z r1.y
     if_nz r3.z
       if_z r2.w
         nop 
-        sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t3.yxzw, s1, l(0.000000)
+        sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t4.yxzw, s1, l(0.000000)
 
 #line 726
         mov r6.x, r6.x  // r6.x <- <FxaaLuma return value>
@@ -364,7 +364,7 @@ if_z r1.y
       endif 
       if_z r3.x
         nop 
-        sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t3.xyzw, s1, l(0.000000)
+        sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t4.xyzw, s1, l(0.000000)
 
 #line 726
         mov r6.y, r6.y  // r6.y <- <FxaaLuma return value>
@@ -414,7 +414,7 @@ if_z r1.y
       if_nz r3.z
         if_z r2.w
           nop 
-          sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t3.yxzw, s1, l(0.000000)
+          sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t4.yxzw, s1, l(0.000000)
 
 #line 726
           mov r6.x, r6.x  // r6.x <- <FxaaLuma return value>
@@ -424,7 +424,7 @@ if_z r1.y
         endif 
         if_z r3.x
           nop 
-          sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t3.xyzw, s1, l(0.000000)
+          sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t4.xyzw, s1, l(0.000000)
 
 #line 726
           mov r6.y, r6.y  // r6.y <- <FxaaLuma return value>
@@ -474,7 +474,7 @@ if_z r1.y
         if_nz r3.z
           if_z r2.w
             nop 
-            sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t3.yxzw, s1, l(0.000000)
+            sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t4.yxzw, s1, l(0.000000)
 
 #line 726
             mov r6.x, r6.x  // r6.x <- <FxaaLuma return value>
@@ -484,7 +484,7 @@ if_z r1.y
           endif 
           if_z r3.x
             nop 
-            sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t3.xyzw, s1, l(0.000000)
+            sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t4.xyzw, s1, l(0.000000)
 
 #line 726
             mov r6.y, r6.y  // r6.y <- <FxaaLuma return value>
@@ -534,7 +534,7 @@ if_z r1.y
           if_nz r3.z
             if_z r2.w
               nop 
-              sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t3.yxzw, s1, l(0.000000)
+              sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t4.yxzw, s1, l(0.000000)
 
 #line 726
               mov r6.x, r6.x  // r6.x <- <FxaaLuma return value>
@@ -544,7 +544,7 @@ if_z r1.y
             endif 
             if_z r3.x
               nop 
-              sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t3.xyzw, s1, l(0.000000)
+              sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t4.xyzw, s1, l(0.000000)
 
 #line 726
               mov r6.y, r6.y  // r6.y <- <FxaaLuma return value>
@@ -594,7 +594,7 @@ if_z r1.y
             if_nz r3.z
               if_z r2.w
                 nop 
-                sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t3.yxzw, s1, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t4.yxzw, s1, l(0.000000)
 
 #line 726
                 mov r6.x, r6.x  // r6.x <- <FxaaLuma return value>
@@ -604,7 +604,7 @@ if_z r1.y
               endif 
               if_z r3.x
                 nop 
-                sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t3.xyzw, s1, l(0.000000)
+                sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t4.xyzw, s1, l(0.000000)
 
 #line 726
                 mov r6.y, r6.y  // r6.y <- <FxaaLuma return value>
@@ -654,7 +654,7 @@ if_z r1.y
               if_nz r3.z
                 if_z r2.w
                   nop 
-                  sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t3.yxzw, s1, l(0.000000)
+                  sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t4.yxzw, s1, l(0.000000)
 
 #line 726
                   mov r6.x, r6.x  // r6.x <- <FxaaLuma return value>
@@ -664,7 +664,7 @@ if_z r1.y
                 endif 
                 if_z r3.x
                   nop 
-                  sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t3.xyzw, s1, l(0.000000)
+                  sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t4.xyzw, s1, l(0.000000)
 
 #line 726
                   mov r6.y, r6.y  // r6.y <- <FxaaLuma return value>
@@ -714,7 +714,7 @@ if_z r1.y
                 if_nz r3.z
                   if_z r2.w
                     nop 
-                    sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t3.yxzw, s1, l(0.000000)
+                    sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t4.yxzw, s1, l(0.000000)
 
 #line 726
                     mov r6.x, r6.x  // r6.x <- <FxaaLuma return value>
@@ -724,7 +724,7 @@ if_z r1.y
                   endif 
                   if_z r3.x
                     nop 
-                    sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t3.xyzw, s1, l(0.000000)
+                    sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t4.xyzw, s1, l(0.000000)
 
 #line 726
                     mov r6.y, r6.y  // r6.y <- <FxaaLuma return value>
@@ -774,7 +774,7 @@ if_z r1.y
                   if_nz r3.z
                     if_z r2.w
                       nop 
-                      sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t3.yxzw, s1, l(0.000000)
+                      sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t4.yxzw, s1, l(0.000000)
 
 #line 726
                       mov r6.x, r6.x  // r6.x <- <FxaaLuma return value>
@@ -784,7 +784,7 @@ if_z r1.y
                     endif 
                     if_z r3.x
                       nop 
-                      sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t3.xyzw, s1, l(0.000000)
+                      sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t4.xyzw, s1, l(0.000000)
 
 #line 726
                       mov r6.y, r6.y  // r6.y <- <FxaaLuma return value>
@@ -834,7 +834,7 @@ if_z r1.y
                     if_nz r3.z
                       if_z r2.w
                         nop 
-                        sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t3.yxzw, s1, l(0.000000)
+                        sample_l_indexable(texture2d)(float,float,float,float) r6.x, r4.xyxx, t4.yxzw, s1, l(0.000000)
 
 #line 726
                         mov r6.x, r6.x  // r6.x <- <FxaaLuma return value>
@@ -844,7 +844,7 @@ if_z r1.y
                       endif 
                       if_z r3.x
                         nop 
-                        sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t3.xyzw, s1, l(0.000000)
+                        sample_l_indexable(texture2d)(float,float,float,float) r6.y, r4.zwzz, t4.xyzw, s1, l(0.000000)
 
 #line 726
                         mov r6.y, r6.y  // r6.y <- <FxaaLuma return value>
@@ -956,7 +956,7 @@ if_z r1.y
   endif 
 
 #line 1254
-  sample_l_indexable(texture2d)(float,float,float,float) r5.xyz, r0.xyxx, t3.xyzw, s1, l(0.000000)
+  sample_l_indexable(texture2d)(float,float,float,float) r5.xyz, r0.xyxx, t4.xyzw, s1, l(0.000000)
   mov r5.w, r2.y
 endif   // r0.x <- coords.x; r0.y <- coords.y; r0.x <- pos.x; r0.y <- pos.y
 
@@ -968,10 +968,10 @@ ret
 
 const BYTE gFXAAPixelShader[] =
 {
-     68,  88,  66,  67,  18, 194, 
-    205, 244, 203, 245,  64, 118, 
-    165, 149,  98, 195, 104, 209, 
-     71, 114,   1,   0,   0,   0, 
+     68,  88,  66,  67,  88, 148, 
+     16, 101,  52,  72,  17, 148, 
+    189, 107,  79,  13,  92, 237, 
+    163, 181,   1,   0,   0,   0, 
      24, 214,   3,   0,   6,   0, 
       0,   0,  56,   0,   0,   0, 
     188,   1,   0,   0, 240,   1, 
@@ -997,7 +997,7 @@ const BYTE gFXAAPixelShader[] =
     170,   0,   0,   0,   2,   0, 
       0,   0,   5,   0,   0,   0, 
       4,   0,   0,   0, 255, 255, 
-    255, 255,   3,   0,   0,   0, 
+    255, 255,   4,   0,   0,   0, 
       1,   0,   0,   0,  13,   0, 
       0,   0, 184,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
@@ -1068,7 +1068,7 @@ const BYTE gFXAAPixelShader[] =
       0,   0,  90,   0,   0,   3, 
       0,  96,  16,   0,   1,   0, 
       0,   0,  88,  24,   0,   4, 
-      0, 112,  16,   0,   3,   0, 
+      0, 112,  16,   0,   4,   0, 
       0,   0,  85,  85,   0,   0, 
     100,  32,   0,   4,  50,  16, 
      16,   0,   0,   0,   0,   0, 
@@ -1116,7 +1116,7 @@ const BYTE gFXAAPixelShader[] =
      21,   0, 242,   0,  16,   0, 
       2,   0,   0,   0,  70,   0, 
      16,   0,   0,   0,   0,   0, 
-     70, 126,  16,   0,   3,   0, 
+     70, 126,  16,   0,   4,   0, 
       0,   0,   0,  96,  16,   0, 
       1,   0,   0,   0,   1,  64, 
       0,   0,   0,   0,   0,   0, 
@@ -1125,7 +1125,7 @@ const BYTE gFXAAPixelShader[] =
     114,   0,  16,   0,   3,   0, 
       0,   0,  70,   0,  16,   0, 
       0,   0,   0,   0,  70, 126, 
-     16,   0,   3,   0,   0,   0, 
+     16,   0,   4,   0,   0,   0, 
      26,  96,  16,   0,   1,   0, 
       0,   0,  54,   0,   0,   5, 
     114,   0,  16,   0,   3,   0, 
@@ -1136,7 +1136,7 @@ const BYTE gFXAAPixelShader[] =
      21,   0, 114,   0,  16,   0, 
       4,   0,   0,   0,  70,   0, 
      16,   0,   0,   0,   0,   0, 
-     38, 119,  16,   0,   3,   0, 
+     38, 119,  16,   0,   4,   0, 
       0,   0,  26,  96,  16,   0, 
       1,   0,   0,   0,  54,   0, 
       0,   5, 114,   0,  16,   0, 
@@ -1216,7 +1216,7 @@ const BYTE gFXAAPixelShader[] =
      21,   0,  34,   0,  16,   0, 
       1,   0,   0,   0,  70,   0, 
      16,   0,   0,   0,   0,   0, 
-     70, 126,  16,   0,   3,   0, 
+     70, 126,  16,   0,   4,   0, 
       0,   0,   0,  96,  16,   0, 
       1,   0,   0,   0,   1,  64, 
       0,   0,   0,   0,   0,   0, 
@@ -1233,7 +1233,7 @@ const BYTE gFXAAPixelShader[] =
      66,   0,  16,   0,   1,   0, 
       0,   0,  70,   0,  16,   0, 
       0,   0,   0,   0, 134, 125, 
-     16,   0,   3,   0,   0,   0, 
+     16,   0,   4,   0,   0,   0, 
       0,  96,  16,   0,   1,   0, 
       0,   0,   1,  64,   0,   0, 
       0,   0,   0,   0,  54,   0, 
@@ -1676,7 +1676,7 @@ const BYTE gFXAAPixelShader[] =
      21,   0, 130,   0,  16,   0, 
       2,   0,   0,   0,  70,   0, 
      16,   0,   4,   0,   0,   0, 
-    134, 119,  16,   0,   3,   0, 
+    134, 119,  16,   0,   4,   0, 
       0,   0,   0,  96,  16,   0, 
       1,   0,   0,   0,   1,  64, 
       0,   0,   0,   0,   0,   0, 
@@ -1700,7 +1700,7 @@ const BYTE gFXAAPixelShader[] =
      21,   0, 130,   0,  16,   0, 
       3,   0,   0,   0, 230,  10, 
      16,   0,   4,   0,   0,   0, 
-    134, 119,  16,   0,   3,   0, 
+    134, 119,  16,   0,   4,   0, 
       0,   0,   0,  96,  16,   0, 
       1,   0,   0,   0,   1,  64, 
       0,   0,   0,   0,   0,   0, 
@@ -1879,7 +1879,7 @@ const BYTE gFXAAPixelShader[] =
      18,   0,  16,   0,   6,   0, 
       0,   0,  70,   0,  16,   0, 
       4,   0,   0,   0,  22, 126, 
-     16,   0,   3,   0,   0,   0, 
+     16,   0,   4,   0,   0,   0, 
       0,  96,  16,   0,   1,   0, 
       0,   0,   1,  64,   0,   0, 
       0,   0,   0,   0,  54,   0, 
@@ -1898,7 +1898,7 @@ const BYTE gFXAAPixelShader[] =
      16,   0,   6,   0,   0,   0, 
     230,  10,  16,   0,   4,   0, 
       0,   0,  70, 126,  16,   0, 
-      3,   0,   0,   0,   0,  96, 
+      4,   0,   0,   0,   0,  96, 
      16,   0,   1,   0,   0,   0, 
       1,  64,   0,   0,   0,   0, 
       0,   0,  54,   0,   0,   5, 
@@ -2044,7 +2044,7 @@ const BYTE gFXAAPixelShader[] =
      21,   0,  18,   0,  16,   0, 
       6,   0,   0,   0,  70,   0, 
      16,   0,   4,   0,   0,   0, 
-     22, 126,  16,   0,   3,   0, 
+     22, 126,  16,   0,   4,   0, 
       0,   0,   0,  96,  16,   0, 
       1,   0,   0,   0,   1,  64, 
       0,   0,   0,   0,   0,   0, 
@@ -2063,7 +2063,7 @@ const BYTE gFXAAPixelShader[] =
      34,   0,  16,   0,   6,   0, 
       0,   0, 230,  10,  16,   0, 
       4,   0,   0,   0,  70, 126, 
-     16,   0,   3,   0,   0,   0, 
+     16,   0,   4,   0,   0,   0, 
       0,  96,  16,   0,   1,   0, 
       0,   0,   1,  64,   0,   0, 
       0,   0,   0,   0,  54,   0, 
@@ -2210,7 +2210,7 @@ const BYTE gFXAAPixelShader[] =
      16,   0,   6,   0,   0,   0, 
      70,   0,  16,   0,   4,   0, 
       0,   0,  22, 126,  16,   0, 
-      3,   0,   0,   0,   0,  96, 
+      4,   0,   0,   0,   0,  96, 
      16,   0,   1,   0,   0,   0, 
       1,  64,   0,   0,   0,   0, 
       0,   0,  54,   0,   0,   5, 
@@ -2228,7 +2228,7 @@ const BYTE gFXAAPixelShader[] =
      21,   0,  34,   0,  16,   0, 
       6,   0,   0,   0, 230,  10, 
      16,   0,   4,   0,   0,   0, 
-     70, 126,  16,   0,   3,   0, 
+     70, 126,  16,   0,   4,   0, 
       0,   0,   0,  96,  16,   0, 
       1,   0,   0,   0,   1,  64, 
       0,   0,   0,   0,   0,   0, 
@@ -2375,7 +2375,7 @@ const BYTE gFXAAPixelShader[] =
      18,   0,  16,   0,   6,   0, 
       0,   0,  70,   0,  16,   0, 
       4,   0,   0,   0,  22, 126, 
-     16,   0,   3,   0,   0,   0, 
+     16,   0,   4,   0,   0,   0, 
       0,  96,  16,   0,   1,   0, 
       0,   0,   1,  64,   0,   0, 
       0,   0,   0,   0,  54,   0, 
@@ -2394,7 +2394,7 @@ const BYTE gFXAAPixelShader[] =
      16,   0,   6,   0,   0,   0, 
     230,  10,  16,   0,   4,   0, 
       0,   0,  70, 126,  16,   0, 
-      3,   0,   0,   0,   0,  96, 
+      4,   0,   0,   0,   0,  96, 
      16,   0,   1,   0,   0,   0, 
       1,  64,   0,   0,   0,   0, 
       0,   0,  54,   0,   0,   5, 
@@ -2540,7 +2540,7 @@ const BYTE gFXAAPixelShader[] =
      21,   0,  18,   0,  16,   0, 
       6,   0,   0,   0,  70,   0, 
      16,   0,   4,   0,   0,   0, 
-     22, 126,  16,   0,   3,   0, 
+     22, 126,  16,   0,   4,   0, 
       0,   0,   0,  96,  16,   0, 
       1,   0,   0,   0,   1,  64, 
       0,   0,   0,   0,   0,   0, 
@@ -2559,7 +2559,7 @@ const BYTE gFXAAPixelShader[] =
      34,   0,  16,   0,   6,   0, 
       0,   0, 230,  10,  16,   0, 
       4,   0,   0,   0,  70, 126, 
-     16,   0,   3,   0,   0,   0, 
+     16,   0,   4,   0,   0,   0, 
       0,  96,  16,   0,   1,   0, 
       0,   0,   1,  64,   0,   0, 
       0,   0,   0,   0,  54,   0, 
@@ -2706,7 +2706,7 @@ const BYTE gFXAAPixelShader[] =
      16,   0,   6,   0,   0,   0, 
      70,   0,  16,   0,   4,   0, 
       0,   0,  22, 126,  16,   0, 
-      3,   0,   0,   0,   0,  96, 
+      4,   0,   0,   0,   0,  96, 
      16,   0,   1,   0,   0,   0, 
       1,  64,   0,   0,   0,   0, 
       0,   0,  54,   0,   0,   5, 
@@ -2724,7 +2724,7 @@ const BYTE gFXAAPixelShader[] =
      21,   0,  34,   0,  16,   0, 
       6,   0,   0,   0, 230,  10, 
      16,   0,   4,   0,   0,   0, 
-     70, 126,  16,   0,   3,   0, 
+     70, 126,  16,   0,   4,   0, 
       0,   0,   0,  96,  16,   0, 
       1,   0,   0,   0,   1,  64, 
       0,   0,   0,   0,   0,   0, 
@@ -2871,7 +2871,7 @@ const BYTE gFXAAPixelShader[] =
      18,   0,  16,   0,   6,   0, 
       0,   0,  70,   0,  16,   0, 
       4,   0,   0,   0,  22, 126, 
-     16,   0,   3,   0,   0,   0, 
+     16,   0,   4,   0,   0,   0, 
       0,  96,  16,   0,   1,   0, 
       0,   0,   1,  64,   0,   0, 
       0,   0,   0,   0,  54,   0, 
@@ -2890,7 +2890,7 @@ const BYTE gFXAAPixelShader[] =
      16,   0,   6,   0,   0,   0, 
     230,  10,  16,   0,   4,   0, 
       0,   0,  70, 126,  16,   0, 
-      3,   0,   0,   0,   0,  96, 
+      4,   0,   0,   0,   0,  96, 
      16,   0,   1,   0,   0,   0, 
       1,  64,   0,   0,   0,   0, 
       0,   0,  54,   0,   0,   5, 
@@ -3036,7 +3036,7 @@ const BYTE gFXAAPixelShader[] =
      21,   0,  18,   0,  16,   0, 
       6,   0,   0,   0,  70,   0, 
      16,   0,   4,   0,   0,   0, 
-     22, 126,  16,   0,   3,   0, 
+     22, 126,  16,   0,   4,   0, 
       0,   0,   0,  96,  16,   0, 
       1,   0,   0,   0,   1,  64, 
       0,   0,   0,   0,   0,   0, 
@@ -3055,7 +3055,7 @@ const BYTE gFXAAPixelShader[] =
      34,   0,  16,   0,   6,   0, 
       0,   0, 230,  10,  16,   0, 
       4,   0,   0,   0,  70, 126, 
-     16,   0,   3,   0,   0,   0, 
+     16,   0,   4,   0,   0,   0, 
       0,  96,  16,   0,   1,   0, 
       0,   0,   1,  64,   0,   0, 
       0,   0,   0,   0,  54,   0, 
@@ -3202,7 +3202,7 @@ const BYTE gFXAAPixelShader[] =
      16,   0,   6,   0,   0,   0, 
      70,   0,  16,   0,   4,   0, 
       0,   0,  22, 126,  16,   0, 
-      3,   0,   0,   0,   0,  96, 
+      4,   0,   0,   0,   0,  96, 
      16,   0,   1,   0,   0,   0, 
       1,  64,   0,   0,   0,   0, 
       0,   0,  54,   0,   0,   5, 
@@ -3220,7 +3220,7 @@ const BYTE gFXAAPixelShader[] =
      21,   0,  34,   0,  16,   0, 
       6,   0,   0,   0, 230,  10, 
      16,   0,   4,   0,   0,   0, 
-     70, 126,  16,   0,   3,   0, 
+     70, 126,  16,   0,   4,   0, 
       0,   0,   0,  96,  16,   0, 
       1,   0,   0,   0,   1,  64, 
       0,   0,   0,   0,   0,   0, 
@@ -3367,7 +3367,7 @@ const BYTE gFXAAPixelShader[] =
      18,   0,  16,   0,   6,   0, 
       0,   0,  70,   0,  16,   0, 
       4,   0,   0,   0,  22, 126, 
-     16,   0,   3,   0,   0,   0, 
+     16,   0,   4,   0,   0,   0, 
       0,  96,  16,   0,   1,   0, 
       0,   0,   1,  64,   0,   0, 
       0,   0,   0,   0,  54,   0, 
@@ -3386,7 +3386,7 @@ const BYTE gFXAAPixelShader[] =
      16,   0,   6,   0,   0,   0, 
     230,  10,  16,   0,   4,   0, 
       0,   0,  70, 126,  16,   0, 
-      3,   0,   0,   0,   0,  96, 
+      4,   0,   0,   0,   0,  96, 
      16,   0,   1,   0,   0,   0, 
       1,  64,   0,   0,   0,   0, 
       0,   0,  54,   0,   0,   5, 
@@ -3664,7 +3664,7 @@ const BYTE gFXAAPixelShader[] =
      16,   0,   5,   0,   0,   0, 
      70,   0,  16,   0,   0,   0, 
       0,   0,  70, 126,  16,   0, 
-      3,   0,   0,   0,   0,  96, 
+      4,   0,   0,   0,   0,  96, 
      16,   0,   1,   0,   0,   0, 
       1,  64,   0,   0,   0,   0, 
       0,   0,  54,   0,   0,   5, 
@@ -4130,10 +4130,10 @@ const BYTE gFXAAPixelShader[] =
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0, 148,  46,  49,   1, 
-    141,  40, 255,  90,   1,   0, 
-      0,   0, 116, 136, 102,   0, 
-     16,  56, 125,  72, 173,  28, 
-    170,  14, 238, 220, 102, 183, 
+     69,  57,  38,  92,   1,   0, 
+      0,   0,   4, 197, 243, 111, 
+    210, 211,  72,  79, 136, 109, 
+    184,  74,  68, 229, 159, 253, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   1,   0,   0,   0, 
       1,   0,   0,   0,   0,   0, 
@@ -4216,7 +4216,7 @@ const BYTE gFXAAPixelShader[] =
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0, 254, 239, 
     254, 239,   1,   0,   0,   0, 
-    215, 101,   1,   0,   0,  67, 
+    103, 102,   1,   0,   0,  67, 
      58,  92,  85, 115, 101, 114, 
     115,  92,  74, 111, 104,  97, 
     110,  92,  68, 101, 115, 107, 
@@ -4303,17 +4303,17 @@ const BYTE gFXAAPixelShader[] =
     119, 115,   0,   0, 120,  62, 
       0,   0, 138, 110,   0,   0, 
     191,  79,   0,   0,  47,  44, 
-      0,   0,  77, 117,   0,   0, 
-     98, 114,   0,   0,  68,  62, 
+      0,   0, 162,  78,   0,   0, 
+    243,  37,   0,   0,  68,  62, 
       0,   0, 158,  39,   0,   0, 
     184,   3,   0,   0, 212,  24, 
       0,   0, 205,  25,   0,   0, 
      15,  59,   0,   0,  99,  13, 
       0,   0, 135,  50,   0,   0, 
     215,  28,   0,   0, 133,  68, 
-      0,   0, 226,  35,   0,   0, 
-     49,  45,   0,   0,   0,  16, 
-      0,   0,   0,   0,   0,   0, 
+      0,   0,  77, 117,   0,   0, 
+    127, 126,   0,   0,  22,  51, 
+      0,   0,   0,  16,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
@@ -4860,6 +4860,12 @@ const BYTE gFXAAPixelShader[] =
      69,  65,  82,  32,  51,  13, 
      10,  35, 100, 101, 102, 105, 
     110, 101,  32,  83,  65,  77, 
+     80,  76,  69,  82,  95,  83, 
+     76,  79,  84,  95,  76,  73, 
+     78,  69,  65,  82,  95,  87, 
+     82,  65,  80,  32,  52,  13, 
+     10,  35, 100, 101, 102, 105, 
+    110, 101,  32,  83,  65,  77, 
      80,  76,  69,  82,  95,  82, 
      69,  71,  73,  83,  84,  69, 
      82,  95,  65,  78,  73,  83, 
@@ -4884,27 +4890,39 @@ const BYTE gFXAAPixelShader[] =
      71,  73,  83,  84,  69,  82, 
      95,  76,  73,  78,  69,  65, 
      82,  32, 115,  51,  13,  10, 
-     13,  10,  35, 100, 101, 102, 
-    105, 110, 101,  32,  84,  69, 
-     88,  84,  85,  82,  69,  95, 
-     83,  76,  79,  84,  95,  68, 
-     73,  70,  70,  85,  83,  69, 
-     32,  48,  13,  10,  35, 100, 
+     35, 100, 101, 102, 105, 110, 
+    101,  32,  83,  65,  77,  80, 
+     76,  69,  82,  95,  82,  69, 
+     71,  73,  83,  84,  69,  82, 
+     95,  76,  73,  78,  69,  65, 
+     82,  95,  87,  82,  65,  80, 
+     32, 115,  52,  13,  10,  13, 
+     10,  35, 100, 101, 102, 105, 
+    110, 101,  32,  84,  69,  88, 
+     84,  85,  82,  69,  95,  83, 
+     76,  79,  84,  95,  68,  73, 
+     70,  70,  85,  83,  69,  32, 
+     48,  13,  10,  35, 100, 101, 
+    102, 105, 110, 101,  32,  84, 
+     69,  88,  84,  85,  82,  69, 
+     95,  83,  76,  79,  84,  95, 
+     78,  79,  82,  77,  65,  76, 
+     32,  49,  13,  10,  35, 100, 
     101, 102, 105, 110, 101,  32, 
      84,  69,  88,  84,  85,  82, 
      69,  95,  83,  76,  79,  84, 
-     95,  78,  79,  82,  77,  65, 
-     76,  32,  49,  13,  10,  35, 
-    100, 101, 102, 105, 110, 101, 
-     32,  84,  69,  88,  84,  85, 
-     82,  69,  95,  83,  76,  79, 
-     84,  95,  68,  69,  80,  84, 
-     72,  32,  50,  13,  10,  35, 
+     95,  68,  69,  80,  84,  72, 
+     32,  50,  13,  10,  35, 100, 
+    101, 102, 105, 110, 101,  32, 
+     84,  69,  88,  84,  85,  82, 
+     69,  95,  83,  76,  79,  84, 
+     95,  80,  69,  82,  76,  73, 
+     78,  32,  51,  13,  10,  35, 
     100, 101, 102, 105, 110, 101, 
      32,  84,  69,  88,  84,  85, 
      82,  69,  95,  83,  76,  79, 
      84,  95,  69,  88,  84,  82, 
-     65,  32,  51,  13,  10,  35, 
+     65,  32,  52,  13,  10,  35, 
     100, 101, 102, 105, 110, 101, 
      32,  83,  66,  85,  70,  70, 
      69,  82,  95,  83,  76,  79, 
@@ -4938,8 +4956,14 @@ const BYTE gFXAAPixelShader[] =
     102, 105, 110, 101,  32,  84, 
      69,  88,  84,  85,  82,  69, 
      95,  82,  69,  71,  73,  83, 
+     84,  69,  82,  95,  80,  69, 
+     82,  76,  73,  78,  32, 116, 
+     51,  13,  10,  35, 100, 101, 
+    102, 105, 110, 101,  32,  84, 
+     69,  88,  84,  85,  82,  69, 
+     95,  82,  69,  71,  73,  83, 
      84,  69,  82,  95,  69,  88, 
-     84,  82,  65,  32, 116,  51, 
+     84,  82,  65,  32, 116,  52, 
      13,  10,  35, 100, 101, 102, 
     105, 110, 101,  32,  83,  66, 
      85,  70,  70,  69,  82,  95, 
@@ -4998,30 +5022,6 @@ const BYTE gFXAAPixelShader[] =
      48,  50,  52,  13,  10,  13, 
      10,  35, 101, 110, 100, 105, 
     102,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
@@ -19917,8 +19917,8 @@ const BYTE gFXAAPixelShader[] =
      97, 115,  78, 101, 103,  84, 
     119, 111,  44,  13,  10,  32, 
      27, 226,  48,   1, 216,   0, 
-      0,   0, 138, 137, 132, 234, 
-    221, 238, 211,   1,   1,   0, 
+      0,   0, 103,   1, 120,  79, 
+    189, 158, 212,   1,   1,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
@@ -19939,8 +19939,8 @@ const BYTE gFXAAPixelShader[] =
       0,   0,   0,   0,   0,   0, 
       0,   0,  28,   1,   0,   0, 
      40,   0,   0,   0,  27, 226, 
-     48,   1, 156,  10, 215, 250, 
-     87,   6,   0,   0, 192,   0, 
+     48,   1, 183, 217, 238, 120, 
+    231,   6,   0,   0, 192,   0, 
       0,   0,  96,   0,   0,   0, 
      28,   1,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
@@ -23049,10 +23049,10 @@ const BYTE gFXAAPixelShader[] =
     160, 228, 237,  95, 192, 229, 
      80,  79,  66,  57,  67,  20, 
     109, 246,   0,   0, 192,   0, 
-      0,   0,  16,   1, 132, 172, 
-    203,  70,  66,  31,  41, 160, 
-     36, 186,  69, 168, 234, 238, 
-    168, 163,   0,   0, 120,   1, 
+      0,   0,  16,   1,  13, 243, 
+    255,  37, 188, 163,  96,  36, 
+    219, 180, 221,  51, 215,  93, 
+    141,   7,   0,   0, 120,   1, 
       0,   0,  16,   1,  41,   1, 
      33, 143, 191, 248,  27, 136, 
      93, 105, 210, 201, 198, 132, 
@@ -26147,13 +26147,13 @@ const BYTE gFXAAPixelShader[] =
       0,   0,   0,   0,   0,   0, 
       0,   0,  11, 202,  49,   1, 
      56,   0,   0,   0,   0,  16, 
-      0,   0,  19,  16,   0,   0, 
-    120,   1,   0,   0,  12,   0, 
+      0,   0,  20,  16,   0,   0, 
+    136,   1,   0,   0,  12,   0, 
     255, 255,   4,   0,   0,   0, 
       3, 128,   0,   0,   0,   0, 
-      0,   0,  76,   0,   0,   0, 
-     76,   0,   0,   0,   8,   0, 
-      0,   0,  84,   0,   0,   0, 
+      0,   0,  80,   0,   0,   0, 
+     80,   0,   0,   0,   8,   0, 
+      0,   0,  88,   0,   0,   0, 
       0,   0,   0,   0,  22,   0, 
      27,  21,  64,   0,   0,   0, 
       4,   0,   0,   0,  16,   0, 
@@ -26171,9 +26171,9 @@ const BYTE gFXAAPixelShader[] =
     111,  97, 116,  50,   0, 243, 
     242, 241,  14,   0,  23,  21, 
       0,   0,   0,   0,  10,   2, 
-      0,   0,   0,   0, 242, 241, 
+    160,   0,   0,   0, 242, 241, 
      14,   0,  23,  21,   0,  16, 
-      0,   0,   3,   2,  64,   1, 
+      0,   0,   3,   2, 144,   0, 
       0,   0, 242, 241,  34,   0, 
       3,  18,  13,  21,   3,   0, 
       5,  16,   0,   0,   0,   0, 
@@ -26213,13 +26213,13 @@ const BYTE gFXAAPixelShader[] =
       6,  16,   0,   0,   1,   0, 
       1,   0,  10,   0,  24,  21, 
      15,  16,   0,   0,   1,   0, 
-      0,   2,  10,   0,  24,  21, 
-      5,  16,   0,   0,   1,   0, 
-      1,   0,  10,   0,  24,  21, 
-     17,  16,   0,   0,   1,   0, 
-      0,   2,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
+      0,   2,  14,   0,  23,  21, 
+      0,   0,   0,   0,  10,   2, 
+      0,   0,   0,   0, 242, 241, 
+     10,   0,  24,  21,  17,  16, 
+      0,   0,   1,   0,   1,   0, 
+     10,   0,  24,  21,  18,  16, 
+      0,   0,   1,   0,   0,   2, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
@@ -26583,6 +26583,12 @@ const BYTE gFXAAPixelShader[] =
      51,  13,  10,  35, 100, 101, 
     102, 105, 110, 101,  32,  83, 
      65,  77,  80,  76,  69,  82, 
+     95,  83,  76,  79,  84,  95, 
+     76,  73,  78,  69,  65,  82, 
+     95,  87,  82,  65,  80,  32, 
+     52,  13,  10,  35, 100, 101, 
+    102, 105, 110, 101,  32,  83, 
+     65,  77,  80,  76,  69,  82, 
      95,  82,  69,  71,  73,  83, 
      84,  69,  82,  95,  65,  78, 
      73,  83,  79,  84,  82,  79, 
@@ -26606,27 +26612,39 @@ const BYTE gFXAAPixelShader[] =
      82,  69,  71,  73,  83,  84, 
      69,  82,  95,  76,  73,  78, 
      69,  65,  82,  32, 115,  51, 
-     13,  10,  13,  10,  35, 100, 
-    101, 102, 105, 110, 101,  32, 
-     84,  69,  88,  84,  85,  82, 
-     69,  95,  83,  76,  79,  84, 
-     95,  68,  73,  70,  70,  85, 
-     83,  69,  32,  48,  13,  10, 
+     13,  10,  35, 100, 101, 102, 
+    105, 110, 101,  32,  83,  65, 
+     77,  80,  76,  69,  82,  95, 
+     82,  69,  71,  73,  83,  84, 
+     69,  82,  95,  76,  73,  78, 
+     69,  65,  82,  95,  87,  82, 
+     65,  80,  32, 115,  52,  13, 
+     10,  13,  10,  35, 100, 101, 
+    102, 105, 110, 101,  32,  84, 
+     69,  88,  84,  85,  82,  69, 
+     95,  83,  76,  79,  84,  95, 
+     68,  73,  70,  70,  85,  83, 
+     69,  32,  48,  13,  10,  35, 
+    100, 101, 102, 105, 110, 101, 
+     32,  84,  69,  88,  84,  85, 
+     82,  69,  95,  83,  76,  79, 
+     84,  95,  78,  79,  82,  77, 
+     65,  76,  32,  49,  13,  10, 
      35, 100, 101, 102, 105, 110, 
     101,  32,  84,  69,  88,  84, 
      85,  82,  69,  95,  83,  76, 
-     79,  84,  95,  78,  79,  82, 
-     77,  65,  76,  32,  49,  13, 
-     10,  35, 100, 101, 102, 105, 
-    110, 101,  32,  84,  69,  88, 
-     84,  85,  82,  69,  95,  83, 
-     76,  79,  84,  95,  68,  69, 
-     80,  84,  72,  32,  50,  13, 
+     79,  84,  95,  68,  69,  80, 
+     84,  72,  32,  50,  13,  10, 
+     35, 100, 101, 102, 105, 110, 
+    101,  32,  84,  69,  88,  84, 
+     85,  82,  69,  95,  83,  76, 
+     79,  84,  95,  80,  69,  82, 
+     76,  73,  78,  32,  51,  13, 
      10,  35, 100, 101, 102, 105, 
     110, 101,  32,  84,  69,  88, 
      84,  85,  82,  69,  95,  83, 
      76,  79,  84,  95,  69,  88, 
-     84,  82,  65,  32,  51,  13, 
+     84,  82,  65,  32,  52,  13, 
      10,  35, 100, 101, 102, 105, 
     110, 101,  32,  83,  66,  85, 
      70,  70,  69,  82,  95,  83, 
@@ -26661,8 +26679,14 @@ const BYTE gFXAAPixelShader[] =
      32,  84,  69,  88,  84,  85, 
      82,  69,  95,  82,  69,  71, 
      73,  83,  84,  69,  82,  95, 
+     80,  69,  82,  76,  73,  78, 
+     32, 116,  51,  13,  10,  35, 
+    100, 101, 102, 105, 110, 101, 
+     32,  84,  69,  88,  84,  85, 
+     82,  69,  95,  82,  69,  71, 
+     73,  83,  84,  69,  82,  95, 
      69,  88,  84,  82,  65,  32, 
-    116,  51,  13,  10,  35, 100, 
+    116,  52,  13,  10,  35, 100, 
     101, 102, 105, 110, 101,  32, 
      83,  66,  85,  70,  70,  69, 
      82,  95,  82,  69,  71,  73, 
@@ -41331,10 +41355,10 @@ const BYTE gFXAAPixelShader[] =
      42,  47,  13,  10,  35, 101, 
     110, 100, 105, 102,   0,  17, 
       0,   0,   0,   0,   0,   0, 
-      0, 106,  15,   0,   0,  44, 
-      2,   0,   0,   0,   0,   0, 
+      0, 250,  15,   0,   0,  44, 
+      2,   0,   0,  18,   9,   0, 
       0,  96,   0,   0,   0,   0, 
-      0,   0,   0,  18,   9,   0, 
+      0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0, 120,   1,   0,   0, 192, 
@@ -41342,30 +41366,6 @@ const BYTE gFXAAPixelShader[] =
       0,   1,   0,   0,   0, 210, 
       1,   0,   0,  97,   0,   0, 
       0,   0,   0,   0,   0,  10, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
-      0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
@@ -41775,11 +41775,11 @@ const BYTE gFXAAPixelShader[] =
     108,   0,   0,   0,  34,   0, 
      81,  17,  16,  16,   0,   0, 
       7,   0, 255, 255, 255, 255, 
-      3,   0, 255, 255, 255, 255, 
+      4,   0, 255, 255, 255, 255, 
     103,  70, 105, 110,  97, 108, 
      84, 101, 120, 116, 117, 114, 
     101,   0,   0,   0,  34,   0, 
-     81,  17,  18,  16,   0,   0, 
+     81,  17,  19,  16,   0,   0, 
       6,   0, 255, 255, 255, 255, 
     255, 255,   1,   0, 255, 255, 
     103,  80, 111, 105, 110, 116, 
@@ -41951,13 +41951,13 @@ const BYTE gFXAAPixelShader[] =
       2,   0,  11,   0,  76,  71, 
       0,   0,   0,   0,   0,   0, 
     228,  71,   0,   0,   3,   0, 
-      0,   0,  80, 115,  85,   1, 
+      0,   0,  32, 103, 174,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0, 112, 115,  95, 109, 
      97, 105, 110,   0, 110, 111, 
     110, 101,   0,   0,   0,   0, 
      45, 186,  46, 241,   1,   0, 
-    194,   1,   0,   0,   0,   0, 
+     58,   1,   0,   0,   0,   0, 
      72,  61,   0,   0,  32,   0, 
       0,  96,   0,   0,  74,   0, 
       0,   0,   0,   0,   0,   0, 
@@ -42103,11 +42103,11 @@ const BYTE gFXAAPixelShader[] =
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0,   0,   0, 
       0,   0,   0,   0, 148,  46, 
-     49,   1, 141,  40, 255,  90, 
-      1,   0,   0,   0, 116, 136, 
-    102,   0,  16,  56, 125,  72, 
-    173,  28, 170,  14, 238, 220, 
-    102, 183,  88,   1,   0,   0, 
+     49,   1,  69,  57,  38,  92, 
+      1,   0,   0,   0,   4, 197, 
+    243, 111, 210, 211,  72,  79, 
+    136, 109, 184,  74,  68, 229, 
+    159, 253,  88,   1,   0,   0, 
      47,  76, 105, 110, 107,  73, 
     110, 102, 111,   0,  47, 110, 
      97, 109, 101, 115,   0,  47, 
@@ -42190,13 +42190,13 @@ const BYTE gFXAAPixelShader[] =
       0,   0,   0,   0,   0,   0, 
      18,   0,   0,   0,  32,   0, 
       0,   0, 196,   1,   0,   0, 
-    176,   1,   0,   0,  55,   2, 
+    192,   1,   0,   0,  55,   2, 
       0,   0, 108,   0,   0,   0, 
-      0,   0,   0,   0,  47, 102, 
+      0,   0,   0,   0, 191, 102, 
       1,   0, 216,   0,   0,   0, 
-    229,   6,   0,   0,  87,   6, 
+    229,   6,   0,   0, 231,   6, 
       0,   0, 108,  86,   1,   0, 
-     68, 143,   0,   0,  84,   0, 
+     68, 143,   0,   0,  88,   0, 
       0,   0,  16,   0,   0,   0, 
      40,   0,   0,   0,  68,   2, 
       0,   0,  44,   0,   0,   0, 

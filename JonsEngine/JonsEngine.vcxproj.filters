@@ -619,6 +619,9 @@
     <ClInclude Include="include\RenderQueue\RenderQueueTypes.h">
       <Filter>Header Files\RenderQueue</Filter>
     </ClInclude>
+    <ClInclude Include="include\Renderer\DirectX11\PerlinNoise.hpp">
+      <Filter>Header Files\Renderer\DirectX11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="include\Renderer\DirectX11\Shaders\GBufferPixel.hlsl">

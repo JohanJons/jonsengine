@@ -91,4 +91,12 @@ namespace JonsEngine
     {
         return mAnimationData;
     }
+
+
+	void AnimatedActor::SetCallbacks( const OnPlayAnimationFunc& onPlayAnimation, const OnRestartAnimationFunc& onRestartAnimation, const OnStopAnimationFunc& onStopAnimation )
+	{
+		mOnPlayAnimationFunc = onPlayAnimation;
+		mOnRestartAnimationFunc = onRestartAnimation;
+		mOnStopAnimationFunc = onStopAnimation;
+	}
 }

@@ -9,6 +9,7 @@
 
 namespace JonsEngine
 {
+	class Scene;
     class SceneNode;
 
     typedef std::function<void(SceneNode*)> OnSceneNodeDirtyFunc;
@@ -37,6 +38,9 @@ namespace JonsEngine
         const std::string& GetName() const;
         SceneNodeID GetParentID() const;
 
+	private:
+		friend class Scene;
+		void SetCallback( const OnSceneNodeDirtyFunc& onDirty );
 
     private:
         std::string mName;

@@ -36,8 +36,8 @@ namespace JonsEngine
         typedef ConstRangedIterator<IDMap<DirectionalLight>> DirectionalLightIterator;
 		typedef ConstRangedIterator<IDMap<Terrain>> TerrainIterator;
 
-        Scene(const std::string& sceneName, DX11Renderer& renderer, const ResourceManifest& resourceManifest);
-		~Scene() = default;
+        Scene( const std::string& sceneName, DX11Renderer& renderer, const ResourceManifest& resourceManifest );
+		Scene( Scene&& other );
 
         void Tick(Milliseconds elapsedTime, float windowAspectRatio);
 		DirtyFlagsSet GetAndResetDirtyFlags();

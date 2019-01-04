@@ -253,6 +253,7 @@
     <ClInclude Include="include\Renderer\DirectX11\DX11Utils.h" />
     <ClInclude Include="include\Renderer\DirectX11\DX11VertexBufferSet.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\DX11VertexTransformPass.h" />
+    <ClInclude Include="include\Renderer\DirectX11\PerlinNoise.hpp" />
     <ClInclude Include="include\Renderer\DirectX11\Shaders\Constants.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClInclude>

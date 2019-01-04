@@ -6,16 +6,9 @@
 
 Texture2D gNormalmap : register( TEXTURE_REGISTER_NORMAL );
 Texture2D gHeightmap : register( TEXTURE_REGISTER_EXTRA );
+Texture2D gPerlinNoiseTexture : register( TEXTURE_REGISTER_PERLIN );
 SamplerState gPointSampler : register( SAMPLER_REGISTER_POINT );
-
-float2 GetMidpoint( const OutputPatch<HullOut, 4> quad, float2 uv )
-{
-	float2 topMidpoint = lerp( quad[ 0 ].mWorldPosition.xz, quad[ 1 ].mWorldPosition.xz, uv.x );
-	float2 bottomMidpoint = lerp( quad[ 3 ].mWorldPosition.xz, quad[ 2 ].mWorldPosition.xz, uv.x );
-	float2 midPoint = lerp( topMidpoint, bottomMidpoint, uv.y );
-
-	return midPoint;
-}
+SamplerState gLinearWrapSampler : register( SAMPLER_REGISTER_LINEAR_WRAP );
 
 float SampleHeightmap( float2 uv, int2 offset )
 {
@@ -58,15 +51,20 @@ DomainOut domain_main(PatchTess patchTess, float2 uv : SV_DomainLocation, const 
 	float2 bottomMidpointTexcoord = lerp( quad[ 3 ].mTexcoord, quad[ 2 ].mTexcoord, uv.x );
 	float2 midPointTexcoord = lerp( topMidpointTexcoord, bottomMidpointTexcoord, uv.y );
 
+	ret.mNormal = CalculateNormal( midPointTexcoord );
+
+	float displacement = gPerlinNoiseTexture.SampleLevel( gLinearWrapSampler, midPointTexcoord, 0 ).r;
+	float4 displaceVec = float4( displacement * ret.mNormal, 0 );
+
+	ret.mNormal = mul( ( float3x3 )gFrameView, ( float3 )ret.mNormal );
+	ret.mNormal = normalize( ret.mNormal );
+
 	float y = quad[ 0 ].mWorldPosition.y + ( SampleHeightmap( midPointTexcoord ) * gHeightModifier );
+	//float displacement = gPerlinNoiseTexture.SampleLevel( gLinearWrapSampler, midPointTexcoord, 0 ).r;
 
 	ret.mPosition = float4( midPointWorld.x, y, midPointWorld.y, 1.0 );
-	ret.mViewPosition = mul( (float3x3)gFrameView, (float3)ret.mPosition );
+	ret.mPosition += displaceVec;
 	ret.mPosition = mul( gFrameViewProj, ret.mPosition );
-
-	ret.mNormal = CalculateNormal( midPointTexcoord );
-	ret.mNormal = mul( (float3x3)gFrameView, (float3)ret.mNormal );
-	ret.mNormal = normalize( ret.mNormal );
 
 	ret.mTexcoord = midPointTexcoord;
 

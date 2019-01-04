@@ -6,10 +6,6 @@ namespace JonsEngine
     {
     }
 
-    BaseActor::~BaseActor()
-    {
-    }
-
 
     void BaseActor::SetModel(const ModelID modelID)
     {

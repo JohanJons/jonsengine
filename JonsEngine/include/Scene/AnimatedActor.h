@@ -10,6 +10,8 @@
 
 namespace JonsEngine
 {
+	class Scene;
+
     class AnimatedActor : public BaseActor
     {
     public:
@@ -17,7 +19,7 @@ namespace JonsEngine
 		typedef std::function<void(const AnimationInstanceID)> OnRestartAnimationFunc;
         typedef std::function<void(AnimationInstanceID&)> OnStopAnimationFunc;
 
-        AnimatedActor(const OnPlayAnimationFunc& onPlayAnimation, const OnRestartAnimationFunc& onRestartAnimation, const OnStopAnimationFunc& onStopAnimation,
+        AnimatedActor( const OnPlayAnimationFunc& onPlayAnimation, const OnRestartAnimationFunc& onRestartAnimation, const OnStopAnimationFunc& onStopAnimation,
 			const std::string& name, const ModelID modelId, const SceneNodeID sceneNodeID);
         ~AnimatedActor();
 
@@ -33,6 +35,9 @@ namespace JonsEngine
         void UpdateTimestamp(const Milliseconds elapsedTime);
         AnimationInstanceID GetAnimationInstance() const;
 
+	private:
+		friend class Scene;
+		void SetCallbacks( const OnPlayAnimationFunc& onPlayAnimation, const OnRestartAnimationFunc& onRestartAnimation, const OnStopAnimationFunc& onStopAnimation );
 
     private:
         OnPlayAnimationFunc mOnPlayAnimationFunc;

@@ -1,6 +1,7 @@
 #include "include/Renderer/DirectX11/DX11RendererImpl.h"
 
 #include "include/Renderer/DirectX11/DX11Utils.h"
+#include "include/Renderer/DirectX11/PerlinNoise.hpp"
 #include "include/Renderer/RenderSettings.h"
 #include "include/Core/Logging/Logger.h"
 #include "include/Core/Memory/HeapAllocator.h"
@@ -15,8 +16,6 @@ namespace JonsEngine
     static DX11RendererImpl* gDX11RendererImpl = nullptr;
 
     const UINT_PTR gSubClassID = 1;
-
-    DXGI_FORMAT GetTextureFormat(const TextureType textureType);
 
 
     LRESULT CALLBACK DX11RendererImpl::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
@@ -111,6 +110,7 @@ namespace JonsEngine
 		// note2: revisit and refactor whole sampler part...
         mModelSampler(mMemoryAllocator.AllocateObject<DX11Sampler>(mDevice, mContext, mRenderSettings.mAnisotropicFiltering, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_ANISOTROPIC), [this](DX11Sampler* sampler) { mMemoryAllocator.DeallocateObject(sampler); }),
         mLinearSampler(mDevice, mContext, RenderSettings::Anisotropic::X1, D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_LINEAR),
+		mLinearWrapSampler( mDevice, mContext, RenderSettings::Anisotropic::X1, D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_LINEAR_WRAP ),
         mShadowmapSampler(mDevice, mContext, RenderSettings::Anisotropic::X1, D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_LESS_EQUAL, DX11Sampler::SHADER_SAMPLER_SLOT_POINT_COMPARE),
         mShadowmapNoCompareSampler(mDevice, mContext, RenderSettings::Anisotropic::X1, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_ALWAYS, DX11Sampler::SHADER_SAMPLER_SLOT_POINT),
 
@@ -140,6 +140,11 @@ namespace JonsEngine
             throw std::runtime_error("DX11Renderer::DX11Renderer(): SetWindowSubclass() failed");
         }
 
+		// general usage perlin-noise texture exposed to shaders
+		std::vector<uint8_t> perlinNoiseVec( gPerlinNoiseArr, gPerlinNoiseArr + ( gPerlinNoiseArrWidth * gPerlinNoiseArrHeight ) );
+		DX11TextureID perlinNoiseID = CreateTexture( TextureType::Height, perlinNoiseVec, gPerlinNoiseArrWidth, gPerlinNoiseArrHeight );
+		mTextures.GetItem( perlinNoiseID ).BindAsShaderResource( SHADER_TEXTURE_SLOT_PERLIN );
+
         gDX11RendererImpl = this;
     }
 
@@ -166,9 +171,7 @@ namespace JonsEngine
 
     DX11TextureID DX11RendererImpl::CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight)
     {
-        const bool isCubemap = textureType == TextureType::Skybox;
-
-        return mTextures.Insert(mDevice, mContext, textureData, GetTextureFormat(textureType), textureWidth, textureHeight, isCubemap);
+        return mTextures.Insert( mDevice, mContext, textureData, textureType, textureWidth, textureHeight );
     }
 
 
@@ -287,28 +290,8 @@ namespace JonsEngine
 
         mModelSampler->BindSampler();
         mLinearSampler.BindSampler();
+		mLinearWrapSampler.BindSampler();
         mShadowmapSampler.BindSampler();
         mShadowmapNoCompareSampler.BindSampler();
-    }
-
-
-    DXGI_FORMAT GetTextureFormat(const TextureType textureType)
-    {
-        switch (textureType)
-        {
-            case TextureType::Diffuse:
-            case TextureType::Skybox:
-                return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-			case TextureType::Height:
-				return DXGI_FORMAT_R8_UNORM;
-            case TextureType::Normal:
-                return DXGI_FORMAT_R8G8B8A8_UNORM;
-
-            default:
-            {
-                JONS_LOG_ERROR(Logger::GetRendererLogger(), "Bad TextureType provided");
-                throw std::runtime_error("Bad TextureType provided");
-            }
-        }
     }
 }

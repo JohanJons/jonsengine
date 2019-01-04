@@ -34,4 +34,10 @@ namespace JonsEngine
 
 		mOnDirtyFunc( this );
 	}
+
+
+	void Terrain::SetCallback( const OnTerrainDirtyFunc& onDirty )
+	{
+		mOnDirtyFunc = onDirty;
+	}
 }

@@ -21,6 +21,42 @@ namespace JonsEngine
     {
     }
 
+	Scene::Scene( Scene&& other ) :
+		mName( std::move( other.mName )),
+		mRenderer( other.mRenderer ),
+		mResourceManifest( other.mResourceManifest ),
+		mAnimationUpdater( std::move( other.mAnimationUpdater ) ),
+		mSceneCamera( std::move( other.mSceneCamera )),
+		mAmbientLight( std::move( other.mAmbientLight ) ),
+		mSkyboxID( std::move( other.mSkyboxID ) ),
+		mPointLights( std::move( other.mPointLights )),
+		mDirectionalLights( std::move( other.mDirectionalLights ) ),
+		mTerrains( std::move( other.mTerrains ) ),
+		mStaticActors( std::move( other.mStaticActors ) ),
+		mAnimatedActors( std::move( other.mAnimatedActors ) ),
+		mSceneNodeTree( std::move( other.mSceneNodeTree ) ),
+		mTerrainTransforms( std::move( other.mTerrainTransforms )),
+		mDirtyFlags( std::move( other.mDirtyFlags )),
+		mHasDirtySceneNodes( other.mHasDirtySceneNodes ),
+		mRootNodeID( std::move( other.mRootNodeID ))
+	{
+		// the objects with callbacks to the scene needs special care
+
+		auto onPlayAnim = std::bind( &AnimationUpdater::PlayAnimation, &mAnimationUpdater, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 );
+		auto onRestartAnim = std::bind( &AnimationUpdater::RestartAnimation, &mAnimationUpdater, std::placeholders::_1 );
+		auto onStopAnim = std::bind( &AnimationUpdater::StopAnimation, &mAnimationUpdater, std::placeholders::_1 );
+		for ( AnimatedActor& actor : mAnimatedActors )
+			actor.SetCallbacks( onPlayAnim, onRestartAnim, onStopAnim );
+
+		auto onNodeDirty = std::bind( static_cast<void( Scene::* )( SceneNode* sceneNode )> ( &Scene::MarkAsDirty ), this, std::placeholders::_1 );
+		for ( SceneNode& node : mSceneNodeTree )
+			node.SetCallback( onNodeDirty );
+
+		auto onTerrainDirty = std::bind( static_cast<void( Scene::* )( Terrain* terrain )> ( &Scene::MarkAsDirty ), this, std::placeholders::_1 );
+		for ( Terrain& terrain : mTerrains )
+			terrain.SetCallback( onTerrainDirty );
+	}
+
 
     void Scene::Tick(const Milliseconds elapsedTime, const float windowAspectRatio)
     {

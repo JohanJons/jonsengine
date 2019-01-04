@@ -8,6 +8,7 @@
 
 namespace JonsEngine
 {
+	class Scene;
 	class Terrain;
 	typedef std::function<void( Terrain* )> OnTerrainDirtyFunc;
 
@@ -30,6 +31,9 @@ namespace JonsEngine
 		SceneNodeID GetSceneNode() const { return mSceneNodeID; }
 		TerrainDataID GetTerrainData() const { return mTerrainDataID; }
 
+	private:
+		friend class Scene;
+		void SetCallback( const OnTerrainDirtyFunc& onDirty );
 
 	private:
 		std::string mName;

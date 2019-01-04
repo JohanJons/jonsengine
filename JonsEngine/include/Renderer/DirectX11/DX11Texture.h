@@ -12,8 +12,7 @@ namespace JonsEngine
     class DX11Texture
     {
     public:
-        DX11Texture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight, const bool isCubeTexture);
-        ~DX11Texture();
+        DX11Texture( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const TextureType textureType, const uint32_t textureWidth, const uint32_t textureHeight );
 
         void BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot) const;
 
@@ -22,7 +21,7 @@ namespace JonsEngine
 
     private:
         ID3D11DeviceContextPtr mContext;
-        ID3D11Texture2DPtr mTexture;
-        ID3D11ShaderResourceViewPtr mSRV;
+		ID3D11Texture2DPtr mTexture = nullptr;
+		ID3D11ShaderResourceViewPtr mSRV = nullptr;
     };
 }
