@@ -97,9 +97,9 @@ namespace JonsEngine
 	void TerrainTransforms::RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const Terrain& terrain, const TerrainData& terrainData )
 	{
 		uint32_t patchSize = terrain.GetPatchSize();
-		float heightmapMultiplyer = terrain.GetHeightmapMultiplyer();
+		float terrainSizeMultiplyer = terrain.GetTerrainSizeMultiplyer();
 		uint32_t heightmapWidth = terrainData.GetWidth(), heightmapHeight = terrainData.GetHeight();
-		uint32_t terrainWidth = terrainData.GetWidth() / heightmapMultiplyer, terrainHeight = terrainData.GetHeight() / heightmapMultiplyer;
+		uint32_t terrainWidth = terrainData.GetWidth() * terrainSizeMultiplyer, terrainHeight = terrainData.GetHeight() * terrainSizeMultiplyer;
 		const std::vector<uint8_t>& heightmapData = terrainData.GetHeightMapData();
 
 		assert( patchSize && heightmapWidth && heightmapHeight );

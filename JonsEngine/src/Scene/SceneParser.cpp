@@ -192,6 +192,7 @@ namespace JonsEngine
 			DX11TextureID heightmap = terrainData.GetHeightMap();
 			float patchSize = terrain.GetPatchSize();
 			float heightScale = terrain.GetHeightScale();
+			float variationScale = terrain.GetVariationScale();
 
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
 			transform.mQuadTree.CullNodes( renderableTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
@@ -201,7 +202,7 @@ namespace JonsEngine
 			Vec2 worldMin, worldMax;
 			transform.mQuadTree.GetWorldXZBounds( worldMin, worldMax );
 			std::size_t renderableEndIndex = renderableTransforms.size();
-			mRenderQueue.mTerrains.mTerrainData.emplace_back(heightmap, renderableEndIndex, worldMin, worldMax, heightScale, patchSize);
+			mRenderQueue.mTerrains.mTerrainData.emplace_back(heightmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale, patchSize);
 		}
 	}
 

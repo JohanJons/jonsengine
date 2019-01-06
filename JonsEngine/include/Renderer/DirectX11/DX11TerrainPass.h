@@ -18,10 +18,6 @@ namespace JonsEngine
 	class DX11TerrainPass
 	{
 	public:
-		static constexpr int32_t GRID_WIDTH_IN_PATCHES = 8;
-		static constexpr int32_t GRID_HEIGHT_IN_PATCHES = 8;
-		static constexpr int32_t GRID_SIZE = GRID_WIDTH_IN_PATCHES * GRID_HEIGHT_IN_PATCHES;
-
 		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, const RenderSettings::Tesselation& tessData);
 
 		void Render( const RenderableTerrains& terrains );
@@ -39,9 +35,10 @@ namespace JonsEngine
 		struct PerTerrainCBuffer
 		{
 			float mHeightScale;
+			float mVariationScale;
 			Vec2 mWorldMin;
 			Vec2 mWorldMax;
-			float __padding[3];
+			float __padding[2];
 		};
 
 	private:

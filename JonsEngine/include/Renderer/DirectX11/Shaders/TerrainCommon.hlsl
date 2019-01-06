@@ -15,6 +15,7 @@ cbuffer PerFrameConstants : register(CBUFFER_REGISTER_DOMAIN)
 cbuffer PerTerrainConstants : register(CBUFFER_REGISTER_EXTRA)
 {
 	float gHeightModifier;
+	float gVariationScale;
 	float gWorldMinX;
 	float gWorldMinZ;
 	float gWorldMaxX;

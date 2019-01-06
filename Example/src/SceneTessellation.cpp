@@ -5,8 +5,9 @@
 
 using namespace JonsEngine;
 
-constexpr float gTerrainHeightScale = 64.0f;
-constexpr float gTerrainMultiplyer = 1.0f;
+constexpr float gTerrainHeightScale = 128.0f;
+constexpr float gTerrainVariationScale = 2.0f;
+constexpr float gTerrainSizeMultiplyer = 2.0f;
 constexpr uint32_t gTerrainPatchSize = 64;
 
 namespace JonsGame
@@ -18,7 +19,7 @@ namespace JonsGame
 		mSkybox( resManifest.LoadSkybox( "skybox", mJonsPackage ) ),
 		mNodeTerrain( sceneMgr.GetScene( mID ).CreateSceneNode( "nodeTerrain", sceneMgr.GetScene( mID ).GetRootNodeID() ) ),
 		mTerrainData( resManifest.CreateTerrainData( "terraindata", "terrain_heightmap", mJonsPackage ) ),
-		mTerrain( sceneMgr.GetScene( mID ).CreateTerrain( "terrain", gTerrainHeightScale, gTerrainPatchSize, gTerrainMultiplyer, mNodeTerrain, mTerrainData ) ),
+		mTerrain( sceneMgr.GetScene( mID ).CreateTerrain( "terrain", gTerrainHeightScale, gTerrainVariationScale, gTerrainPatchSize, gTerrainSizeMultiplyer, mNodeTerrain, mTerrainData ) ),
 		mSunDirLightID( sceneMgr.GetScene( mID ).CreateDirectionalLight( "DirectionalLight", 4 ) ),
 		mSun( mSceneMgr.GetScene( mID ).GetDirectionalLight( mSunDirLightID ) )
 	{

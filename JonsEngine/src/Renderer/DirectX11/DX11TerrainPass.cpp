@@ -131,7 +131,7 @@ namespace JonsEngine
 
 			heightmap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
 
-			mPerTerrainCBuffer.SetData( { terrainData.mHeightScale, terrainData.mWorldMin, terrainData.mWorldMax } );
+			mPerTerrainCBuffer.SetData( { terrainData.mHeightScale, terrainData.mVariationScale, terrainData.mWorldMin, terrainData.mWorldMax } );
 			mPerTerrainCBuffer.Bind();
 
 			uint32_t endIndex = terrainData.mEndIndex;

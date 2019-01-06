@@ -148,11 +148,14 @@ namespace JonsGame
 			{
 				switch ( evnt.mKey )
 				{
-					case Key::ONE: mTessellationScene.GetTerrain().SetHeightScale( 48.0f ); break;
-					case Key::TWO: mTessellationScene.GetTerrain().SetHeightScale( 64.0f ); break;
-					case Key::THREE: mTessellationScene.GetTerrain().SetHeightScale( 80.0f ); break;
-					case Key::FOUR: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_AABB ); break;
-					case Key::FIVE: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME ); break;
+					case Key::ONE: mTessellationScene.GetTerrain().SetHeightScale( 80.0f ); break;
+					case Key::TWO: mTessellationScene.GetTerrain().SetHeightScale( 120.0f ); break;
+					case Key::THREE: mTessellationScene.GetTerrain().SetHeightScale( 160.0f ); break;
+					case Key::FOUR: mTessellationScene.GetTerrain().SetVariationScale( 0.0f ); break;
+					case Key::FIVE: mTessellationScene.GetTerrain().SetVariationScale( 3.0f ); break;
+					case Key::SIX: mTessellationScene.GetTerrain().SetVariationScale( 6.0f ); break;
+					case Key::SEVEN: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_AABB ); break;
+					case Key::EIGHT: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME ); break;
 				}
 			}
         }

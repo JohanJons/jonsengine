@@ -53,17 +53,19 @@ DomainOut domain_main(PatchTess patchTess, float2 uv : SV_DomainLocation, const 
 
 	ret.mNormal = CalculateNormal( midPointTexcoord );
 
-	float displacement = gPerlinNoiseTexture.SampleLevel( gLinearWrapSampler, midPointTexcoord, 0 ).r;
-	float4 displaceVec = float4( displacement * ret.mNormal, 0 );
+	// TODO: texcoord
+	float variation = gPerlinNoiseTexture.SampleLevel( gLinearWrapSampler, midPointTexcoord, 0 ).r;
+	variation = ( variation * 2.0 ) - 1.0;
+	variation *= gVariationScale;
+	float4 variationVec = float4( variation * ret.mNormal, 0 );
 
 	ret.mNormal = mul( ( float3x3 )gFrameView, ( float3 )ret.mNormal );
 	ret.mNormal = normalize( ret.mNormal );
 
 	float y = quad[ 0 ].mWorldPosition.y + ( SampleHeightmap( midPointTexcoord ) * gHeightModifier );
-	//float displacement = gPerlinNoiseTexture.SampleLevel( gLinearWrapSampler, midPointTexcoord, 0 ).r;
 
 	ret.mPosition = float4( midPointWorld.x, y, midPointWorld.y, 1.0 );
-	ret.mPosition += displaceVec;
+	ret.mPosition += variationVec;
 	ret.mPosition = mul( gFrameViewProj, ret.mPosition );
 
 	ret.mTexcoord = midPointTexcoord;

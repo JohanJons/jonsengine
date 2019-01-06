@@ -2,10 +2,11 @@
 
 namespace JonsEngine
 {
-	Terrain::Terrain( const std::string& name, float heightScale, uint32_t patchSize, float heightmapMultiplyer, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID, const OnTerrainDirtyFunc& onDirtyFunc ) :
+	Terrain::Terrain( const std::string& name, float heightScale, float variationScale, uint32_t patchSize, float terrainSizeMultiplyer, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID, const OnTerrainDirtyFunc& onDirtyFunc ) :
 		mName( name ),
 		mHeightScale( heightScale ),
-		mHeightmapMultiplyer( heightmapMultiplyer ),
+		mVariationScale( variationScale ),
+		mTerrainSizeMultiplyer( terrainSizeMultiplyer ),
 		mPatchSize( patchSize ),
 		mSceneNodeID( sceneNodeID ),
 		mTerrainDataID( terrainDataID ),
@@ -21,6 +22,13 @@ namespace JonsEngine
 		mOnDirtyFunc( this );
 	}
 
+	void Terrain::SetVariationScale( float variationScale )
+	{
+		mVariationScale = variationScale;
+
+		// no need to dirty for this
+	}
+
 	void Terrain::SetPatchSize( uint32_t patchSize )
 	{
 		mPatchSize = patchSize;
@@ -28,9 +36,9 @@ namespace JonsEngine
 		mOnDirtyFunc( this );
 	}
 
-	void Terrain::SetHeightmapMultiplyer( float heightmapMultiplyer )
+	void Terrain::SetTerrainSizeMultiplyer( float terrainSizeMultiplyer )
 	{
-		mHeightmapMultiplyer = heightmapMultiplyer;
+		mTerrainSizeMultiplyer = terrainSizeMultiplyer;
 
 		mOnDirtyFunc( this );
 	}
