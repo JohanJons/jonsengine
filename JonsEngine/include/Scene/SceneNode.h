@@ -31,6 +31,9 @@ namespace JonsEngine
         void UpdateWorldMatrix();
         void UpdateWorldMatrix(const Mat4& parentMatrix);
 
+		void SetVisible( bool visible ) { mVisibile = visible; }
+		bool IsVisible() const { return mVisibile; }
+
         const Vec3& Position() const;
         const Vec3& Scale() const;
         const Mat4& GetWorldTransform() const;
@@ -47,7 +50,8 @@ namespace JonsEngine
         Mat4 mWorldTransform;
         Quaternion mOrientation;
         Vec3 mScale;
-        Vec3 mTranslation;
+		Vec3 mTranslation;
+		bool mVisibile = true;
 
         SceneNodeID mParent;
         OnSceneNodeDirtyFunc mOnDirtyFunc;

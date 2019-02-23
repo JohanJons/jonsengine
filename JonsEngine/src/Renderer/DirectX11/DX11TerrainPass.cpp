@@ -12,6 +12,27 @@
 
 namespace JonsEngine
 {
+	/*
+	
+	const std::vector<float> gQuadVertices{
+		-1.0f, 0.0f, -1.0f,
+		1.0f, 0.0f, -1.0f,
+		1.0f, 0.0f, 1.0f,
+		-1.0f, 0.0f, 1.0f,
+		1.0f, 0.0f, 3.0f,
+		-1.0f, 0.0f, 3.0f,
+		-1.0f, 0.0f, -3.0f,
+		1.0f, 0.0f, -3.0f,
+		3.0f, 0.0f, -1.0f,
+		3.0f, 0.0f, 1.0f,
+		-3.0f, 0.0f, 1.0f,
+		-3.0f, 0.0f, -1.0f,
+	};
+
+	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+
+	*/
+
 	const std::vector<float> gQuadVertices{
 		-1.0f, 0.0f, -1.0f,
 		1.0f, 0.0f, -1.0f,
@@ -19,19 +40,11 @@ namespace JonsEngine
 		-1.0f, 0.0f, 1.0f
 	};
 
-	const std::vector<float> gQuadNormals{
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f
-	};
-
 	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3 };
 
 	enum VSInputLayout
 	{
 		POSITION = 0,
-		NORMAL,
 		NUM_INPUT_LAYOUTS
 	};
 
@@ -42,7 +55,7 @@ namespace JonsEngine
 		mCBuffer(device, context, mCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
 		mPerTerrainCBuffer(device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_EXTRA),
 		mTransformsBuffer(device, context),
-		mQuadMesh(device, context, gQuadVertices, gQuadNormals, std::vector<float>(), std::vector<float>(), gQuadIndices, AABB::gUnitQuadAABB.Min(), AABB::gUnitQuadAABB.Max()),
+		mQuadMesh(device, context, gQuadVertices, gQuadIndices, AABB::gUnitQuadAABB.Min(), AABB::gUnitQuadAABB.Max()),
 		mVertexTransformer(vertexTransformer),
 		mTextureMap(textureMap),
 
@@ -60,14 +73,6 @@ namespace JonsEngine
 		inputDescription[VSInputLayout::POSITION].AlignedByteOffset = 0;
 		inputDescription[VSInputLayout::POSITION].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputDescription[VSInputLayout::POSITION].InstanceDataStepRate = 0;
-
-		inputDescription[VSInputLayout::NORMAL].SemanticName = "NORMAL";
-		inputDescription[VSInputLayout::NORMAL].SemanticIndex = 0;
-		inputDescription[VSInputLayout::NORMAL].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		inputDescription[VSInputLayout::NORMAL].InputSlot = DX11Mesh::VERTEX_BUFFER_SLOT_NORMALS;
-		inputDescription[VSInputLayout::NORMAL].AlignedByteOffset = 0;
-		inputDescription[VSInputLayout::NORMAL].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputDescription[VSInputLayout::NORMAL].InstanceDataStepRate = 0;
 		DXCALL(device->CreateInputLayout(inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gTerrainVertexShader, sizeof(gTerrainVertexShader), &mLayout));
 
 		// shaders

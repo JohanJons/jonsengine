@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\Assimp.cpp">
@@ -1263,9 +1263,6 @@
     <ClInclude Include="C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\include\assimp\Compiler\pstdint.h">
       <Filter>Compiler</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">

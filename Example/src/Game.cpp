@@ -89,6 +89,13 @@ namespace JonsGame
 						break;
 				}
 			}
+			else
+			{
+				switch ( evnt.mKey )
+				{
+					case Key::ONE: mTessellationScene.FlipTerrain(); break;
+				}
+			}
         }
         // no modifiers
         else

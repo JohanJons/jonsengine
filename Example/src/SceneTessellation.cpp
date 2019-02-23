@@ -18,8 +18,11 @@ namespace JonsGame
 		mJonsPackage( ReadJonsPkg( "assets.jons" ) ),
 		mSkybox( resManifest.LoadSkybox( "skybox", mJonsPackage ) ),
 		mNodeTerrain( sceneMgr.GetScene( mID ).CreateSceneNode( "nodeTerrain", sceneMgr.GetScene( mID ).GetRootNodeID() ) ),
+		mNodeTerrainTest( sceneMgr.GetScene( mID ).CreateSceneNode( "nodeTerrainTest", sceneMgr.GetScene( mID ).GetRootNodeID() ) ),
 		mTerrainData( resManifest.CreateTerrainData( "terraindata", "terrain_heightmap", mJonsPackage ) ),
+		mTerrainDataTest( resManifest.CreateTerrainData( "terrainDataTest", "terrain_test", mJonsPackage ) ),
 		mTerrain( sceneMgr.GetScene( mID ).CreateTerrain( "terrain", gTerrainHeightScale, gTerrainVariationScale, gTerrainPatchSize, gTerrainSizeMultiplyer, mNodeTerrain, mTerrainData ) ),
+		mTerrainTest( sceneMgr.GetScene( mID ).CreateTerrain( "terrainTest", gTerrainHeightScale, gTerrainVariationScale, gTerrainPatchSize, gTerrainSizeMultiplyer, mNodeTerrainTest, mTerrainDataTest ) ),
 		mSunDirLightID( sceneMgr.GetScene( mID ).CreateDirectionalLight( "DirectionalLight", 4 ) ),
 		mSun( mSceneMgr.GetScene( mID ).GetDirectionalLight( mSunDirLightID ) )
 	{
@@ -32,7 +35,10 @@ namespace JonsGame
 		sun.SetLightDirection( Vec3( -0.735238075f, -0.607724974f, 0.645194054f ) );
 
 		SceneNode& nodeTerrain = scene.GetSceneNode( mNodeTerrain );
+		SceneNode& nodeTerrainTest = scene.GetSceneNode( mNodeTerrainTest );
 		nodeTerrain.TranslateNode( Vec3( 0.0f, 0.0f, 0.0f ) );
+		nodeTerrainTest.TranslateNode( Vec3( 0.0f, 0.0f, 0.0f ) );
+		nodeTerrainTest.SetVisible( false );
 
 		scene.SetSkybox( mSkybox );
 
@@ -48,6 +54,17 @@ namespace JonsGame
 	void SceneTessellation::Update()
 	{
 		//mSun.Update();
+	}
+
+	void SceneTessellation::FlipTerrain()
+	{
+		JonsEngine::Scene& scene = mSceneMgr.GetScene( mID );
+
+		SceneNode& nodeTerrain = scene.GetSceneNode( mNodeTerrain );
+		SceneNode& nodeTerrainTest = scene.GetSceneNode( mNodeTerrainTest );
+
+		nodeTerrain.SetVisible( !nodeTerrain.IsVisible() );
+		nodeTerrainTest.SetVisible( !nodeTerrainTest.IsVisible() );
 	}
 
 	JonsEngine::Scene& SceneTessellation::GetJonsScene()

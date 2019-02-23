@@ -51,8 +51,20 @@ namespace JonsEngine
 			Mat4 mView;
 			Mat4 mInvView;
 			Mat4 mInvProj;
+			Vec3 mWorldEyePos;
+			float mMinZ;
+			float mMaxZ;
+			float __padding[ 3 ];
 
-			PerFrameCB( const Mat4& viewProj, const Mat4& view, const Mat4& invView, const Mat4& invProj) : mViewProj(viewProj), mView(view), mInvView(invView), mInvProj(invProj)
+			PerFrameCB() {}
+			PerFrameCB( const Mat4& viewProj, const Mat4& view, const Mat4& invView, const Mat4& invProj, const Vec3& worldEyePos, float minZ, float maxZ ) :
+				mViewProj(viewProj),
+				mView(view),
+				mInvView(invView),
+				mInvProj(invProj),
+				mWorldEyePos( worldEyePos ),
+				mMinZ( minZ ),
+				mMaxZ( maxZ )
 			{
 			}
 		};

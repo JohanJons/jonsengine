@@ -43,10 +43,6 @@ DomainOut domain_main(PatchTess patchTess, float2 uv : SV_DomainLocation, const 
 	float2 bottomMidpointWorld = lerp( quad[ 3 ].mWorldPosition.xz, quad[ 2 ].mWorldPosition.xz, uv.x );
 	float2 midPointWorld = lerp( topMidpointWorld, bottomMidpointWorld, uv.y );
 
-	float3 topMidpointN = lerp( quad[ 0 ].mWorldNormal.xyz, quad[ 1 ].mWorldNormal.xyz, uv.x );
-	float3 bottomMidpointN = lerp( quad[ 3 ].mWorldNormal.xyz, quad[ 2 ].mWorldNormal.xyz, uv.x );
-	float3 midPointN = lerp( topMidpointN, bottomMidpointN, uv.y );
-
 	float2 topMidpointTexcoord = lerp( quad[ 0 ].mTexcoord, quad[ 1 ].mTexcoord, uv.x );
 	float2 bottomMidpointTexcoord = lerp( quad[ 3 ].mTexcoord, quad[ 2 ].mTexcoord, uv.x );
 	float2 midPointTexcoord = lerp( topMidpointTexcoord, bottomMidpointTexcoord, uv.y );

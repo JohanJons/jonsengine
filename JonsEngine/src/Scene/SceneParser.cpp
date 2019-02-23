@@ -113,6 +113,9 @@ namespace JonsEngine
                 continue;
 
             const SceneNode& sceneNode = scene.GetSceneNode(pointLight.GetSceneNode());
+			if ( !sceneNode.IsVisible() )
+				continue;
+
 			const Vec4& color = pointLight.GetLightColor();
             const Vec3 position = sceneNode.Position();
             const float intensity = pointLight.GetIntensity();
@@ -186,8 +189,11 @@ namespace JonsEngine
 			if (sceneNodeID == INVALID_SCENE_NODE_ID || terrainDataID == INVALID_TERRAIN_DATA_ID)
 				continue;
 
-			const TerrainData& terrainData = mResourceManifest.GetTerrainData(terrainDataID);
 			const SceneNode& node = scene.GetSceneNode(sceneNodeID);
+			if ( !node.IsVisible() )
+				continue;
+
+			const TerrainData& terrainData = mResourceManifest.GetTerrainData( terrainDataID );
 
 			DX11TextureID heightmap = terrainData.GetHeightMap();
 			float patchSize = terrain.GetPatchSize();
@@ -279,6 +285,9 @@ namespace JonsEngine
                 continue;
 
             const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
+			if ( !sceneNode.IsVisible() )
+				continue;
+
             const Model& model = resManifest.GetModel(modelID);
             const Mat4& worldMatrix = sceneNode.GetWorldTransform();
 			
@@ -431,6 +440,9 @@ namespace JonsEngine
 				continue;
 
 			const SceneNode& sceneNode = scene.GetSceneNode(sceneNodeID);
+			if ( !sceneNode.IsVisible() )
+				continue;
+
 			const Model& model = resManifest.GetModel(modelID);
 			const Mat4& worldMatrix = sceneNode.GetWorldTransform();
 

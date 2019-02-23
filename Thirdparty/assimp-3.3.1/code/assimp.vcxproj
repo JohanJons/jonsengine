@@ -135,6 +135,9 @@
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
+    <CustomBuild>
+      <LinkObjects>false</LinkObjects>
+    </CustomBuild>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -273,62 +276,6 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
     </ProjectReference>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <CustomBuild Include="C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeLists.txt">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule C:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1/code/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -HC:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1 -BC:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1 --check-stamp-file C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeFiles\generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1/code/CMakeLists.txt;C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeLists.txt;C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule C:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1/code/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -HC:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1 -BC:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1 --check-stamp-file C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeFiles\generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1/code/CMakeLists.txt;C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeLists.txt;C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule C:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1/code/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -HC:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1 -BC:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1 --check-stamp-file C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeFiles\generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1/code/CMakeLists.txt;C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeLists.txt;C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule C:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1/code/CMakeLists.txt</Message>
-      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -HC:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1 -BC:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1 --check-stamp-file C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeFiles\generate.stamp
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:/Users/Johan/Desktop/JonsEngine/Thirdparty/assimp-3.3.1/code/CMakeLists.txt;C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeLists.txt;C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\CMakeFiles\generate.stamp</Outputs>
-      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">false</LinkObjects>
-    </CustomBuild>
-  </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\fast_atof.h" />
     <ClInclude Include="C:\Users\Johan\Desktop\JonsEngine\Thirdparty\assimp-3.3.1\code\qnan.h" />

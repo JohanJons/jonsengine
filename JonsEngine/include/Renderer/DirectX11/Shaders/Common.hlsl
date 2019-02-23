@@ -11,6 +11,9 @@ cbuffer PerFrameCB : register(CBUFFER_REGISTER_PER_FRAME)
 	float4x4 gFrameView;
 	float4x4 gFrameInvView;
 	float4x4 gFrameInvProj;
+	float3 gWorldEyePos;
+	float gMinZ;
+	float gMaxZ;
 };
 
 

@@ -16,6 +16,7 @@ namespace JonsGame
 		~SceneTessellation();
 
 		void Update();
+		void FlipTerrain();
 
 		JonsEngine::SceneID GetSceneID() const { return mID; }
 
@@ -30,8 +31,11 @@ namespace JonsGame
 		JonsEngine::SkyboxID mSkybox;
 
 		JonsEngine::SceneNodeID mNodeTerrain;
+		JonsEngine::SceneNodeID mNodeTerrainTest;
 		JonsEngine::TerrainDataID mTerrainData;
+		JonsEngine::TerrainDataID mTerrainDataTest;
 		JonsEngine::TerrainID mTerrain;
+		JonsEngine::TerrainID mTerrainTest;
 
 		JonsEngine::DirectionalLightID mSunDirLightID;
 		Sun mSun;

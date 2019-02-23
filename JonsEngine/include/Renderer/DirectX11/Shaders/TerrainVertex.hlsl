@@ -5,8 +5,7 @@
 
 struct VertexIn
 {
-	float4 mPosition : POSITION;
-	float3 mNormal : NORMAL;
+	float3 mPosition : POSITION;
 	uint mInstanceID : SV_InstanceID;
 };
 
@@ -26,9 +25,7 @@ VertexOut vs_main(VertexIn input)
 	// silly that we have to transpose this...
 	const float4x4 worldTransform = transpose( gWorldTransforms.Load( transformIndex ) );
 
-	ret.mWorldPosition = mul( worldTransform, input.mPosition );
-	ret.mWorldNormal = mul( (float3x3)worldTransform, input.mNormal );
-	ret.mTessFactor = 2.0f;
+	ret.mWorldPosition = mul( worldTransform, float4( input.mPosition, 1 ) ).xyz;
 
 	ret.mTexcoord = 1.0f / ( float2(gWorldMaxX, gWorldMaxZ) + ( -float2(gWorldMinX, gWorldMinZ) ) );
 	ret.mTexcoord = ( -float2( gWorldMinX, gWorldMinZ ) + ret.mWorldPosition.xz ) * ret.mTexcoord;

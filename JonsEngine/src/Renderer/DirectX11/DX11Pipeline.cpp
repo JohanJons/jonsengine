@@ -254,7 +254,16 @@ namespace JonsEngine
 	void DX11Pipeline::SetPerFrameCBuffer(const RenderQueue& renderQueue)
 	{
 		auto& camera = renderQueue.mCamera;
-		mPerFrameCB.SetData({ camera.mCameraViewProjectionMatrix, camera.mCameraViewMatrix, glm::inverse(camera.mCameraViewMatrix), glm::inverse(camera.mCameraProjectionMatrix) });
+
+		mPerFrameCB.SetData({ 
+			camera.mCameraViewProjectionMatrix,
+			camera.mCameraViewMatrix,
+			glm::inverse(camera.mCameraViewMatrix),
+			glm::inverse(camera.mCameraProjectionMatrix),
+			camera.mCameraPosition,
+			Z_NEAR,
+			Z_FAR
+		});
 		mPerFrameCB.Bind();
 	}
 }

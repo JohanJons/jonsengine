@@ -31,10 +31,8 @@ struct PatchTess
 
 struct VertexOut
 {
-	float4 mWorldPosition : POSITION;
-	float3 mWorldNormal : NORMAL;
+	float3 mWorldPosition : POSITION;
 	float2 mTexcoord : TEXCOORD;
-	float mTessFactor : TESS;
 };
 
 struct DomainOut
@@ -46,8 +44,7 @@ struct DomainOut
 
 struct HullOut
 {
-	float4 mWorldPosition : POSITION;
-	float3 mWorldNormal : NORMAL;
+	float3 mWorldPosition : POSITION;
 	float2 mTexcoord : TEXCOORD;
 };
 
