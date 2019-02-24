@@ -12,9 +12,7 @@
 
 namespace JonsEngine
 {
-	/*
-	
-	const std::vector<float> gQuadVertices{
+	/*const std::vector<float> gQuadVertices{
 		-1.0f, 0.0f, -1.0f,
 		1.0f, 0.0f, -1.0f,
 		1.0f, 0.0f, 1.0f,
@@ -27,20 +25,24 @@ namespace JonsEngine
 		3.0f, 0.0f, 1.0f,
 		-3.0f, 0.0f, 1.0f,
 		-3.0f, 0.0f, -1.0f,
-	};
-
-	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
-
-	*/
+	};*/
 
 	const std::vector<float> gQuadVertices{
 		-1.0f, 0.0f, -1.0f,
 		1.0f, 0.0f, -1.0f,
 		1.0f, 0.0f, 1.0f,
-		-1.0f, 0.0f, 1.0f
+		-1.0f, 0.0f, 1.0f,
+		-1.0f, 0.0f, -3.0f,
+		1.0f, 0.0f, -3.0f,
+		3.0f, 0.0f, -1.0f,
+		3.0f, 0.0f, 1.0f,
+		1.0f, 0.0f, 3.0f,
+		-1.0f, 0.0f, 3.0f,
+		-3.0f, 0.0f, 1.0f,
+		-3.0f, 0.0f, -1.0f,
 	};
 
-	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3 };
+	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 
 	enum VSInputLayout
 	{
@@ -156,7 +158,7 @@ namespace JonsEngine
 		mContext->PSSetShader(mPixelShader, nullptr, 0);
 		mContext->HSSetShader(mHullShader, nullptr, 0);
 		mContext->IASetInputLayout(mLayout);
-		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST);
+		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_12_CONTROL_POINT_PATCHLIST);
 		mCBuffer.SetData({ mTessData.mMinDistance, mTessData.mMaxDistance, mTessData.mMinFactor, mTessData.mMaxFactor });
 		mCBuffer.Bind();
 	}

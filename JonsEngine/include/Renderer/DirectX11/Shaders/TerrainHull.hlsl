@@ -8,11 +8,6 @@ float3 ComputePatchMidpoint( float3 corner1, float3 corner2, float3 corner3, flo
 	return ( corner1 + corner2 + corner3 + corner4 ) / 4.0f;
 }
 
-float3 ComputeEdgeMidpoint( float3 point1, float3 point2 )
-{
-	return ( point1 + point2 ) / 2.0f;
-}
-
 float CalculateTessellationfactor( float3 worldPatchMidpoint )
 {
 	float cameraToPatchDistance = distance( gWorldEyePos, worldPatchMidpoint );
@@ -22,43 +17,43 @@ float CalculateTessellationfactor( float3 worldPatchMidpoint )
 	return pow( 2, lerp( 6.0f, 2.0f, scaledDistance ) );
 }
 
-PatchTess PatchHS( InputPatch<VertexOut, 4> inputVertices )
+PatchTess PatchHS( InputPatch<VertexOut, 12> inputVertices )
 {
 	PatchTess patch;
 
-	float3 worldPatchMidpoint = ComputePatchMidpoint( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition );
-	float3 edgeMidpoints[] = {
-		ComputeEdgeMidpoint( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition ),
-		ComputeEdgeMidpoint( inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition ),
-		ComputeEdgeMidpoint( inputVertices[ 2 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition ),
-		ComputeEdgeMidpoint( inputVertices[ 3 ].mWorldPosition, inputVertices[ 0 ].mWorldPosition ),
+	float3 midPatchMidpoint = ComputePatchMidpoint( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition );
+	float3 edgePatchMidpoint[] = {
+		ComputePatchMidpoint( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 4 ].mWorldPosition, inputVertices[ 5 ].mWorldPosition ),
+		ComputePatchMidpoint( inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 6 ].mWorldPosition, inputVertices[ 7 ].mWorldPosition ),
+		ComputePatchMidpoint( inputVertices[ 2 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition, inputVertices[ 8 ].mWorldPosition, inputVertices[ 9 ].mWorldPosition ),
+		ComputePatchMidpoint( inputVertices[ 3 ].mWorldPosition, inputVertices[ 0 ].mWorldPosition, inputVertices[ 10 ].mWorldPosition, inputVertices[ 11 ].mWorldPosition )
 	};
 
-	float patchTessFactor = CalculateTessellationfactor( worldPatchMidpoint );
-	float edgeTessFactors[] = {
-		CalculateTessellationfactor( edgeMidpoints[ 0 ] ),
-		CalculateTessellationfactor( edgeMidpoints[ 1 ] ),
-		CalculateTessellationfactor( edgeMidpoints[ 2 ] ),
-		CalculateTessellationfactor( edgeMidpoints[ 3 ] )
+	float midPatchTessFactor = CalculateTessellationfactor( midPatchMidpoint );
+	float edgePatchTessFactors[] = {
+		CalculateTessellationfactor( edgePatchMidpoint[ 3 ] ),
+		CalculateTessellationfactor( edgePatchMidpoint[ 0 ] ),
+		CalculateTessellationfactor( edgePatchMidpoint[ 1 ] ),
+		CalculateTessellationfactor( edgePatchMidpoint[ 2 ] )
 	};
 
-	patch.mEdgeTess[ 0 ] = min( patchTessFactor, edgeTessFactors[ 0 ] );
-	patch.mEdgeTess[ 1 ] = min( patchTessFactor, edgeTessFactors[ 1 ] );
-	patch.mEdgeTess[ 2 ] = min( patchTessFactor, edgeTessFactors[ 2 ] );
-	patch.mEdgeTess[ 3 ] = min( patchTessFactor, edgeTessFactors[ 3 ] );
+	patch.mEdgeTess[ 0 ] = min( midPatchTessFactor, edgePatchTessFactors[ 0 ] );
+	patch.mEdgeTess[ 1 ] = min( midPatchTessFactor, edgePatchTessFactors[ 1 ] );
+	patch.mEdgeTess[ 2 ] = min( midPatchTessFactor, edgePatchTessFactors[ 2 ] );
+	patch.mEdgeTess[ 3 ] = min( midPatchTessFactor, edgePatchTessFactors[ 3 ] );
 	
-	patch.mInsideTess[ 0 ] = patchTessFactor;
-	patch.mInsideTess[ 1 ] = patchTessFactor;
+	patch.mInsideTess[ 0 ] = midPatchTessFactor;
+	patch.mInsideTess[ 1 ] = midPatchTessFactor;
 
 	return patch;
 }
 
 [domain("quad")]
-[partitioning("integer")]
+[partitioning("fractional_odd")]
 [outputtopology("triangle_ccw")]
 [outputcontrolpoints(4)]
 [patchconstantfunc("PatchHS")]
-HullOut hull_main( InputPatch<VertexOut, 4> verticeData, uint index : SV_OutputControlPointID )
+HullOut hull_main( InputPatch<VertexOut, 12> verticeData, uint index : SV_OutputControlPointID )
 {
 	HullOut ret;
 
