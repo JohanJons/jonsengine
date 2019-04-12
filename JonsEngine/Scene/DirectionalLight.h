@@ -3,7 +3,7 @@
 #include "Types.h"
 #include "Plane.h"
 #include "Frustum.h"
-#include "Math.h"
+#include "MathUtils.h"
 #include "RangedIterator.hpp"
 #include "IDMap.hpp"
 

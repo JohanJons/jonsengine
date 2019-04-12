@@ -4,7 +4,7 @@
 #include "Types.h"
 #include "EngineSettings.h"
 #include "DebugOptions.h"
-#include "Time.h"
+#include "TimeUtils.h"
 #include "Bone.h"
 
 #include <string>

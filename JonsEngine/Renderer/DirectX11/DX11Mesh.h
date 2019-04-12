@@ -3,7 +3,7 @@
 #include "DX11Utils.h"
 #include "DX11VertexBufferSet.hpp"
 #include "Types.h"
-#include "Directx11.h"
+#include "Platform.h"
 #include "Bone.h"
 
 #include <vector>

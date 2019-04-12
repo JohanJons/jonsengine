@@ -7,7 +7,7 @@
 #include "Shaders/Compiled/TerrainDomain.h"
 #include "Shaders/Compiled/TerrainPixel.h"
 #include "Shaders/Compiled/TerrainPixelDebug.h"
-#include "Math.h"
+#include "MathUtils.h"
 #include "AABB.h"
 
 namespace JonsEngine

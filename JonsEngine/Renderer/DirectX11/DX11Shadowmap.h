@@ -3,7 +3,7 @@
 #include "DX11Utils.h"
 #include "Types.h"
 #include "EngineSettings.h"
-#include "Directx11.h"
+#include "Platform.h"
 
 #include <vector>
 

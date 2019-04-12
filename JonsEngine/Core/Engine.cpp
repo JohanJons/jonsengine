@@ -4,7 +4,7 @@
 #include "HeapAllocator.h"
 #include "EngineSettings.h"
 #include "DebugOptions.h"
-#include "Time.h"
+#include "TimeUtils.h"
 #include "Scene.h"
 #include "WindowManager.h"
 #include "ResourceManifest.h"

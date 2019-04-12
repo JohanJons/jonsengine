@@ -1,7 +1,7 @@
 #pragma once
 
 #include "DX11Utils.h"
-#include "Directx11.h"
+#include "Platform.h"
 
 namespace JonsEngine
 {

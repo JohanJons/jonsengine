@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-#include "Math.h"
+#include "MathUtils.h"
 
 namespace JonsEngine
 {

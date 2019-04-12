@@ -1,7 +1,6 @@
 #include "HeapAllocator.h"
 
-#include "../Thirdparty/dlmalloc/dlmalloc.h"
-
+#include "dlmalloc.h"
 
 namespace JonsEngine
 {

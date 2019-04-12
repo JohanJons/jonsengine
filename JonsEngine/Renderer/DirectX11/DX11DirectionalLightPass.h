@@ -8,7 +8,7 @@
 #include "Types.h"
 #include "Frustum.h"
 #include "EngineSettings.h"
-#include "Directx11.h"
+#include "Platform.h"
 
 #include <array>
 #include <vector>

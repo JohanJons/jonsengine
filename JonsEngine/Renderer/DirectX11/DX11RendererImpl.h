@@ -14,8 +14,8 @@
 #include "EngineSettings.h"
 #include "IDMap.hpp"
 #include "DebugOptions.h"
-#include "Time.h"
-#include "Directx11.h"
+#include "TimeUtils.h"
+#include "Platform.h"
 #include "Bone.h"
 
 #include <string>

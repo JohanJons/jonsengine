@@ -4,7 +4,7 @@
 #include "ResourceManifest.h"
 #include "Types.h"
 #include "DebugOptions.h"
-#include "Math.h"
+#include "MathUtils.h"
 #include "Intersection.h"
 
 #include <vector>

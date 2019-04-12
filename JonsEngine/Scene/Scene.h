@@ -4,7 +4,7 @@
 #include "RangedIterator.hpp"
 #include "IDMap.hpp"
 #include "IDMapTree.hpp"
-#include "Time.h"
+#include "TimeUtils.h"
 #include "AnimatedActor.h"
 #include "Camera.h"
 #include "DirectionalLight.h"

@@ -2,7 +2,7 @@
 
 #include "Shaders/Compiled/SDSMInitialCompute.h"
 #include "Shaders/Compiled/SDSMFinalCompute.h"
-#include "Math.h"
+#include "MathUtils.h"
 
 namespace JonsEngine
 {

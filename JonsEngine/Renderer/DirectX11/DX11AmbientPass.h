@@ -3,7 +3,7 @@
 #include "DX11ConstantBuffer.hpp"
 #include "DX11Utils.h"
 #include "DX11BoxBlurPass.h"
-#include "Directx11.h"
+#include "Platform.h"
 #include "Types.h"
 
 namespace JonsEngine

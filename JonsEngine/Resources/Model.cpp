@@ -1,6 +1,6 @@
 #include "Model.h"
 
-#include "Math.h"
+#include "MathUtils.h"
 #include "JonsPackage.h"
 
 namespace JonsEngine

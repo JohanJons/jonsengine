@@ -5,7 +5,7 @@
 #include "AnimationInstance.h"
 #include "IDMap.hpp"
 #include "Types.h"
-#include "Time.h"
+#include "TimeUtils.h"
 #include "IDGenerator.hpp"
 
 #include <vector>

@@ -3,7 +3,7 @@
 #include "Shapes.h"
 #include "DX11VertexTransformPass.h"
 #include "Shaders/Compiled/PointLightPixel.h"
-#include "Math.h"
+#include "MathUtils.h"
 #include "Logger.h"
 
 namespace JonsEngine

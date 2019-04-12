@@ -6,8 +6,8 @@
         Frustum.h
         Intersection.cpp
         Intersection.h
-        Math.cpp
-        Math.h
+        MathUtils.cpp
+        MathUtils.h
         Plane.cpp
         Plane.h
 )

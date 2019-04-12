@@ -23,3 +23,6 @@ foreach( SOURCE ${SOURCES})
 	string(REPLACE "/" "\\" REL_SOURCE_DIR_NO_SLASH "${REL_SOURCE_DIR}")
 	source_group("${REL_SOURCE_DIR_NO_SLASH}" FILES "${SOURCE}")
 endforeach()
+
+find_package(Boost 1.56 REQUIRED)
+target_link_libraries( JonsEngine glm dlmalloc Boost::boost )

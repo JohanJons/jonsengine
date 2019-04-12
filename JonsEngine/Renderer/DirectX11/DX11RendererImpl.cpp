@@ -5,7 +5,7 @@
 #include "RenderSettings.h"
 #include "Logger.h"
 #include "HeapAllocator.h"
-#include "Math.h"
+#include "MathUtils.h"
 
 #include <Commctrl.h>
 #include <array>

@@ -1,5 +1,5 @@
 #include "SceneNode.h"
-#include "Math.h"
+#include "MathUtils.h"
 #include "HeapAllocator.h"
 
 namespace JonsEngine

@@ -2,7 +2,7 @@
 
 #include "EngineSettings.h"
 #include "Logger.h"
-#include "Windows.h"
+#include "Platform.h"
 
 #include <exception>
 #include <functional>

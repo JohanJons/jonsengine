@@ -2,7 +2,7 @@
 
 #include "DX11Utils.h"
 #include "RenderDefs.h"
-#include "Math.h"
+#include "MathUtils.h"
 
 namespace JonsEngine
 {

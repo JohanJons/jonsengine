@@ -2,7 +2,7 @@
 
 #include "DX11Utils.h"
 #include "Shaders/Constants.h"
-#include "Directx11.h"
+#include "Platform.h"
 
 namespace JonsEngine
 {

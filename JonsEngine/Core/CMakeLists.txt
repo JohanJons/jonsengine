@@ -3,7 +3,6 @@
 	Logging
 	Math
 	Memory
-	Platform
 	Utils
 )
 

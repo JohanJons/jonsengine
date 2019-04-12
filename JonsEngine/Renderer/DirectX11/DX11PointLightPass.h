@@ -6,7 +6,7 @@
 #include "DX11Shadowmap.h"
 #include "RenderQueue.h"
 #include "Types.h"
-#include "Directx11.h"
+#include "Platform.h"
 
 #include <vector>
 #include <array>

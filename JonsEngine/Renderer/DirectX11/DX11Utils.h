@@ -5,7 +5,7 @@
 #include "Logger.h"
 #include "EngineSettings.h"
 #include "Types.h"
-#include "Directx11.h"
+#include "Platform.h"
 
 #include "boost/current_function.hpp"
 #include <atlbase.h>

@@ -3,10 +3,10 @@
 #include "Bone.h"
 #include "BoneKeyframe.h"
 #include "Shaders/Constants.h"
-#include "Time.h"
+#include "TimeUtils.h"
 #include "IDGenerator.hpp"
 #include "Types.h"
-#include "Math.h"
+#include "MathUtils.h"
 #include "RangedIterator.hpp"
 
 #include <string>

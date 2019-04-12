@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Types.h"
-#include "Directx11.h"
+#include "Platform.h"
 #include "DX11Utils.h"
 
 #include <vector>

@@ -4,7 +4,7 @@
 #include <array>
 
 #include "Types.h"
-#include "Math.h"
+#include "MathUtils.h"
 #include "AABB.h"
 #include "RenderQueueTypes.h"
 

@@ -9,7 +9,7 @@
 #include "Shaders/Compiled/DirectionalLightPCF3X3Pixel.h"
 #include "Shaders/Compiled/DirectionalLightPCF5X5Pixel.h"
 #include "Shaders/Compiled/DirectionalLightPCF7X7Pixel.h"
-#include "Math.h"
+#include "MathUtils.h"
 
 #include <array>
 #include <limits>

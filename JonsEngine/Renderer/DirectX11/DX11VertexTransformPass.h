@@ -7,7 +7,7 @@
 #include "RenderQueue.h"
 #include "Types.h"
 #include "IDMap.hpp"
-#include "Directx11.h"
+#include "Platform.h"
 #include "AABB.h"
 
 #include <vector>

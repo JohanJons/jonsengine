@@ -21,8 +21,8 @@
 #include "EngineSettings.h"
 #include "Types.h"
 #include "IDMap.hpp"
-#include "Time.h"
-#include "Directx11.h"
+#include "TimeUtils.h"
+#include "Platform.h"
 
 namespace JonsEngine
 {
