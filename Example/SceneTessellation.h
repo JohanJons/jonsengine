@@ -1,9 +1,10 @@
 #pragma once
 
-#include "include/Core/Engine.h"
-#include "include/Resources/JonsPackage.h"
-#include "include/Scene/Scene.h"
-#include "include/Sun.h"
+#include "Engine.h"
+#include "JonsPackage.h"
+#include "Scene.h"
+
+#include "Sun.h"
 
 #include <string>
 

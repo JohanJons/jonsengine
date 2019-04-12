@@ -1,5 +1,5 @@
-﻿target_sources( ${ENGINE_NAME}
-    PUBLIC
+﻿target_sources( JonsEngine
+    PRIVATE
         DX11AABBPass.cpp
         DX11AABBPass.h
         DX11AmbientPass.cpp
@@ -64,4 +64,4 @@
         PerlinNoise.hpp
 )
 
-target_include_directories( ${ENGINE_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+target_include_directories( JonsEngine PUBLIC ${CMAKE_CURRENT_LIST_DIR})

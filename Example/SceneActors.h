@@ -1,19 +1,20 @@
 #pragma once
 
-#include "include/Core/Engine.h"
-#include "include/Resources/JonsPackage.h"
-#include "include/Scene/Scene.h"
-#include "include/Sun.h"
+#include "Engine.h"
+#include "JonsPackage.h"
+#include "Scene.h"
+
+#include "Sun.h"
 
 #include <string>
 
 namespace JonsGame
 {
-    class Scene
+    class SceneActors
     {
     public:
-        Scene( JonsEngine::SceneManager& sceneMgr, JonsEngine::ResourceManifest& resManifest );
-        ~Scene();
+        SceneActors( JonsEngine::SceneManager& sceneMgr, JonsEngine::ResourceManifest& resManifest );
+        ~SceneActors();
 
 		void Update();
 

@@ -1,9 +1,9 @@
-#include "include/Assimp.h"
+#include "Assimp.h"
 
-#include "include/Core/Math/Math.h"
-#include "include/Core/Math/AABB.h"
-#include "include/Resources/Animation.h"
-#include "include/FreeImage.h"
+#include "Math.h"
+#include "AABB.h"
+#include "Animation.h"
+#include "FreeImage.h"
 
 #include <limits>
 #include <set>
