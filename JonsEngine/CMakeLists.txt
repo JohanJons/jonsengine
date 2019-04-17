@@ -25,4 +25,4 @@ foreach( SOURCE ${SOURCES})
 endforeach()
 
 find_package(Boost 1.56 REQUIRED)
-target_link_libraries( JonsEngine glm dlmalloc Boost::boost )
+target_link_libraries( JonsEngine glm dlmalloc assimp Boost::boost )
