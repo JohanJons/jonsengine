@@ -12,7 +12,6 @@ add_library( JonsEngine STATIC "" )
 foreach( SUBDIR ${SUBDIR_NAMES})
 	SET( SOURCES_GROUP_FILES "" )
 	add_subdirectory( ${SUBDIR} )
-	#source_group( ${SUBDIR} REGULAR_EXPRESSION "${SUBDIR}")
 endforeach()
 
 # Build filters for VS

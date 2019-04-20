@@ -3,7 +3,7 @@
 #include "Math.h"
 #include "AABB.h"
 #include "Animation.h"
-#include "FreeImage.h"
+#include "FreeImageParser.h"
 
 #include <limits>
 #include <set>

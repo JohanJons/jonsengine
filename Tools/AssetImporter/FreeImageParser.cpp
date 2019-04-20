@@ -1,4 +1,4 @@
-#include "FreeImage.h"
+#include "FreeImageParser.h"
 
 #include "FreeImage.h"
 #include <utility>

@@ -7,8 +7,8 @@ target_sources( JonsAssetImporter
         main.cpp
         Assimp.cpp
         Assimp.h
-        FreeImage.cpp
-        FreeImage.h
+        FreeImageParser.cpp
+        FreeImageParser.h
         Utils.cpp
         Utils.h
 )
@@ -16,4 +16,4 @@ target_sources( JonsAssetImporter
 get_target_property( SOURCES JonsAssetImporter SOURCES )
 source_group("" FILES ${SOURCES} )
 
-target_link_libraries( JonsAssetImporter JonsEngine )
+target_link_libraries( JonsAssetImporter JonsEngine FreeImage Assimp )

@@ -14,7 +14,7 @@ namespace JonsEngine
 {
     template <typename PackageStruct>
     typename std::vector<PackageStruct>::const_iterator FindInContainer(const std::string& assetName, const std::vector<PackageStruct>& container);
-	typename std::vector<PackageTexture>::const_iterator FindTextureInContainer(const std::string& assetName, TextureType type, const std::vector<PackageTexture>& container);
+	std::vector<PackageTexture>::const_iterator FindTextureInContainer(const std::string& assetName, TextureType type, const std::vector<PackageTexture>& container);
 
 
     ResourceManifest::ResourceManifest(DX11Renderer& renderer, HeapAllocator& memoryAllocator) :
@@ -278,7 +278,7 @@ namespace JonsEngine
         return std::find_if(container.begin(), container.end(), [hashedName](const PackageStruct& asset) { return boost::hash_value(asset.mName) == hashedName; });
     }
 
-	typename std::vector<PackageTexture>::const_iterator FindTextureInContainer(const std::string& assetName, TextureType type, const std::vector<PackageTexture>& container)
+	std::vector<PackageTexture>::const_iterator FindTextureInContainer(const std::string& assetName, TextureType type, const std::vector<PackageTexture>& container)
 	{
 		const size_t hashedName = boost::hash_value(assetName);
 

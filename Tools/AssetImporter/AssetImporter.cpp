@@ -2,10 +2,7 @@
 
 #include "Utils.h"
 #include "Assimp.h"
-#include "FreeImage.h"
-
-#include <tuple>
-#include <algorithm>
+#include "FreeImageParser.h"
 
 using namespace JonsEngine;
 
