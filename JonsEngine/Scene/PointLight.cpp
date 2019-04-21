@@ -1,4 +1,4 @@
-#include "PointLight.h"
+#include "Scene/PointLight.h"
 
 namespace JonsEngine
 {

@@ -3,10 +3,10 @@
 #include <vector>
 #include <array>
 
-#include "Types.h"
-#include "MathUtils.h"
-#include "AABB.h"
-#include "RenderQueueTypes.h"
+#include "Core/Types.h"
+#include "Core/Math/MathUtils.h"
+#include "Core/Math/AABB.h"
+#include "RenderQueue/RenderQueueTypes.h"
 
 namespace JonsEngine
 {

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Types.h"
-#include "FixedGridQuadTree.hpp"
-#include "Terrain.h"
-#include "SceneNode.h"
+#include "Core/Types.h"
+#include "Core/Containers/FixedGridQuadTree.hpp"
+#include "Scene/Terrain.h"
+#include "Scene/SceneNode.h"
 
 #include <vector>
 #include <utility>

@@ -1,7 +1,7 @@
-#include "DX11Renderer.h"
+#include "Renderer/DirectX11/DX11Renderer.h"
 
-#include "DX11RendererImpl.h"
-#include "HeapAllocator.h"
+#include "Renderer/DirectX11/DX11RendererImpl.h"
+#include "Core/Memory/HeapAllocator.h"
 
 
 namespace JonsEngine

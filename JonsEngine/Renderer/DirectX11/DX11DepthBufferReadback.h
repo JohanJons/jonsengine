@@ -1,8 +1,8 @@
 #pragma once
 
-#include "DX11Utils.h"
-#include "DX11ConstantBuffer.hpp"
-#include "Types.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/DX11ConstantBuffer.hpp"
+#include "Core/Types.h"
 
 namespace JonsEngine
 {

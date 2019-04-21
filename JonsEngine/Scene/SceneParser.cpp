@@ -1,11 +1,11 @@
 #include "SceneParser.h"
 
-#include "Scene.h"
-#include "ResourceManifest.h"
-#include "Types.h"
-#include "DebugOptions.h"
-#include "MathUtils.h"
-#include "Intersection.h"
+#include "Scene/Scene.h"
+#include "Resources/ResourceManifest.h"
+#include "Core/Types.h"
+#include "Core/DebugOptions.h"
+#include "Core/Math/MathUtils.h"
+#include "Core/Math/Intersection.h"
 
 #include <vector>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AnimationInstance.h"
+#include "Resources/AnimationInstance.h"
 
 namespace JonsEngine
 {

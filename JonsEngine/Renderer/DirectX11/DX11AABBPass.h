@@ -1,11 +1,11 @@
 #pragma once
 
-#include "DX11Utils.h"
-#include "DX11Mesh.h"
-#include "DX11ConstantBuffer.hpp"
-#include "RenderQueueTypes.h"
-#include "AABB.h"
-#include "Types.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/DX11Mesh.h"
+#include "Renderer/DirectX11/DX11ConstantBuffer.hpp"
+#include "RenderQueue/RenderQueueTypes.h"
+#include "Core/Math/AABB.h"
+#include "Core/Types.h"
 
 namespace JonsEngine
 {

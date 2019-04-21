@@ -1,7 +1,7 @@
-#include "DX11Backbuffer.h"
+#include "Renderer/DirectX11/DX11Backbuffer.h"
 
-#include "DX11Utils.h"
-#include "DX11FullscreenTrianglePass.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 
 
 namespace JonsEngine

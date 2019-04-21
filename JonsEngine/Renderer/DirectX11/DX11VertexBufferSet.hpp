@@ -1,9 +1,9 @@
 #pragma once
 
-#include "DX11Utils.h"
-#include "DX11Buffer.hpp"
-#include "Types.h"
-#include "Platform.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/DX11Buffer.hpp"
+#include "Core/Types.h"
+#include "Core/Platform.h"
 
 #include <vector>
 

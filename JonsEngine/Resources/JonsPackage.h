@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Types.h"
-#include "TimeUtils.h"
-#include "Bone.h"
-#include "BoneKeyframe.h"
+#include "Core/Types.h"
+#include "Core/Utils/TimeUtils.h"
+#include "Resources/Bone.h"
+#include "Resources/BoneKeyframe.h"
 
 #include <array>
 #include <vector>

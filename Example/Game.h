@@ -3,12 +3,12 @@
 #include "SceneActors.h"
 #include "SceneTessellation.h"
 
-#include "Engine.h"
-#include "EngineSettings.h"
-#include "HeapAligned.h"
-#include "MouseCallback.h"
-#include "KeyCallback.h"
-#include "JonsPackage.h"
+#include "Core/Engine.h"
+#include "Core/EngineSettings.h"
+#include "Core/Memory/HeapAligned.h"
+#include "Window/MouseCallback.h"
+#include "Window/KeyCallback.h"
+#include "Resources/JonsPackage.h"
 
 #include <functional>
 

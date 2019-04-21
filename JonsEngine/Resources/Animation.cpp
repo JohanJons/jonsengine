@@ -1,7 +1,7 @@
-#include "Animation.h"
+#include "Resources/Animation.h"
 
-#include "JonsPackage.h"
-#include <Windows.h>
+#include "Resources/JonsPackage.h"
+
 namespace JonsEngine
 {
     Animation::Animation(const PackageAnimation& pkgAnimation, const BoneParentMap& parentMap, const BoneTransforms& boneOffsets) :

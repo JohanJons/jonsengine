@@ -1,6 +1,6 @@
 #include "AnimationUpdater.h"
 
-#include "ResourceManifest.h"
+#include "Resources/ResourceManifest.h"
 
 namespace JonsEngine
 {

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Bone.h"
-#include "BoneKeyframe.h"
-#include "Shaders/Constants.h"
-#include "TimeUtils.h"
-#include "IDGenerator.hpp"
-#include "Types.h"
-#include "MathUtils.h"
-#include "RangedIterator.hpp"
+#include "Resources/Bone.h"
+#include "Resources/BoneKeyframe.h"
+#include "Renderer/DirectX11/Shaders/Constants.h"
+#include "Core/Utils/TimeUtils.h"
+#include "Core/Utils/IDGenerator.hpp"
+#include "Core/Types.h"
+#include "Core/Math/MathUtils.h"
+#include "Core/Containers/RangedIterator.hpp"
 
 #include <string>
 #include <vector>

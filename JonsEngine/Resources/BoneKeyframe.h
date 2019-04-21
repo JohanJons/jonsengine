@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Types.h"
-#include "TimeUtils.h"
+#include "Core/Types.h"
+#include "Core/Utils/TimeUtils.h"
 
 #include <vector>
 

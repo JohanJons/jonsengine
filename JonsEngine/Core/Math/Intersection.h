@@ -1,10 +1,10 @@
 #pragma once
 
-#include "AABB.h"
-#include "Plane.h"
-#include "Frustum.h"
-#include "Types.h"
-#include "RangedIterator.hpp"
+#include "Core/Math/AABB.h"
+#include "Core/Math/Plane.h"
+#include "Core/Math/Frustum.h"
+#include "Core/Types.h"
+#include "Core/Containers/RangedIterator.hpp"
 
 namespace JonsEngine
 {

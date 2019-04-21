@@ -1,7 +1,7 @@
 #pragma once
 
-#include "DX11Buffer.hpp"
-#include "Platform.h"
+#include "Renderer/DirectX11/DX11Buffer.hpp"
+#include "Core/Platform.h"
 
 #include <vector>
 

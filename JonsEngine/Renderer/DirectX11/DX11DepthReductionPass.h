@@ -1,10 +1,10 @@
 #pragma once
 
-#include "DX11Utils.h"
-#include "DX11RenderTarget2D.h"
-#include "DX11ConstantBuffer.hpp"
-#include "Types.h"
-#include "EngineSettings.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/DX11RenderTarget2D.h"
+#include "Renderer/DirectX11/DX11ConstantBuffer.hpp"
+#include "Core/Types.h"
+#include "Core/EngineSettings.h"
 
 #include <array>
 #include <vector>

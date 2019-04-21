@@ -1,8 +1,8 @@
 #include "DirectionalLight.h"
 
-#include "DX11Utils.h"
-#include "RenderDefs.h"
-#include "MathUtils.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/RenderDefs.h"
+#include "Core/Math/MathUtils.h"
 
 namespace JonsEngine
 {

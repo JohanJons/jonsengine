@@ -1,7 +1,7 @@
-#include "JonsPackage.h"
+#include "Resources/JonsPackage.h"
 
-#include "HeapAllocator.h"
-#include "MathUtils.h"
+#include "Core/Memory/HeapAllocator.h"
+#include "Core/Math/MathUtils.h"
 
 #include <string>
 #include <iostream>

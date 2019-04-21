@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Types.h"
-#include "Plane.h"
-#include "Frustum.h"
-#include "MathUtils.h"
-#include "RangedIterator.hpp"
-#include "IDMap.hpp"
+#include "Core/Types.h"
+#include "Core/Math/Plane.h"
+#include "Core/Math/Frustum.h"
+#include "Core/Math/MathUtils.h"
+#include "Core/Containers/RangedIterator.hpp"
+#include "Core/Containers/IDMap.hpp"
 
 #include <string>
 #include <memory>

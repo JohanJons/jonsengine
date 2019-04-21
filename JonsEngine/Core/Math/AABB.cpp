@@ -1,6 +1,6 @@
-#include "AABB.h"
-#include "MathUtils.h"
-#include "JonsPackage.h"
+#include "Core/Math/AABB.h"
+#include "Core/Math/MathUtils.h"
+#include "Resources/JonsPackage.h"
 
 #include <cmath>
 

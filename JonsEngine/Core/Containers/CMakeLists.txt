@@ -8,5 +8,3 @@
         IDMapTree.hpp
         RangedIterator.hpp
 )
-
-target_include_directories( JonsEngine PUBLIC ${CMAKE_CURRENT_LIST_DIR})

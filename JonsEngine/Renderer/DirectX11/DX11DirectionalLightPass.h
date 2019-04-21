@@ -1,14 +1,14 @@
 #pragma once
 
-#include "DX11ConstantBuffer.hpp"
-#include "DX11Utils.h"
-#include "DX11Mesh.h"
-#include "DX11Shadowmap.h"
-#include "RenderQueue.h"
-#include "Types.h"
-#include "Frustum.h"
-#include "EngineSettings.h"
-#include "Platform.h"
+#include "Renderer/DirectX11/DX11ConstantBuffer.hpp"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/DX11Mesh.h"
+#include "Renderer/DirectX11/DX11Shadowmap.h"
+#include "RenderQueue/RenderQueue.h"
+#include "Core/Types.h"
+#include "Core/Math/Frustum.h"
+#include "Core/EngineSettings.h"
+#include "Core/Platform.h"
 
 #include <array>
 #include <vector>

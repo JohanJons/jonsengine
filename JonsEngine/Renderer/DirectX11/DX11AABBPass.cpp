@@ -1,8 +1,8 @@
-#include "DX11AABBPass.h"
+#include "Renderer/DirectX11/DX11AABBPass.h"
 
-#include "DX11Utils.h"
-#include "DX11VertexTransformPass.h"
-#include "Shaders/Compiled/SimpleColorPixel.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/DX11VertexTransformPass.h"
+#include "Renderer/DirectX11/Shaders/Compiled/SimpleColorPixel.h"
 
 namespace JonsEngine
 {

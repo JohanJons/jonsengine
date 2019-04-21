@@ -1,8 +1,8 @@
 #pragma once
 
-#include "RenderSettings.h"
-#include "WindowSettings.h"
-#include "SceneSettings.h"
+#include "Renderer/RenderSettings.h"
+#include "Window/WindowSettings.h"
+#include "Scene/SceneSettings.h"
 
 namespace JonsEngine
 {

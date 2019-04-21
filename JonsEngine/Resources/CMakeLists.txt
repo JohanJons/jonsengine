@@ -25,5 +25,3 @@
         TerrainData.cpp
         TerrainData.h
 )
-
-target_include_directories( JonsEngine PUBLIC ${CMAKE_CURRENT_LIST_DIR})

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Engine.h"
-#include "JonsPackage.h"
-#include "Scene.h"
+#include "Core/Engine.h"
+#include "Resources/JonsPackage.h"
+#include "Scene/Scene.h"
 
 #include "Sun.h"
 

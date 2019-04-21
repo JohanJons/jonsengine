@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Types.h"
-#include "HeapAllocator.h"
-#include "Clock.hpp"
-#include "WindowManager.h"
-#include "DX11Renderer.h"
-#include "ResourceManifest.h"
-#include "SceneManager.h"
-#include "SceneParser.h"
+#include "Core/Types.h"
+#include "Core/Memory/HeapAllocator.h"
+#include "Core/Utils/Clock.hpp"
+#include "Window/WindowManager.h"
+#include "Renderer/DirectX11/DX11Renderer.h"
+#include "Resources/ResourceManifest.h"
+#include "Scene/SceneManager.h"
+#include "Scene/SceneParser.h"
 
 namespace JonsEngine
 {

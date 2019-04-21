@@ -1,9 +1,9 @@
 #pragma once
 
-#include "KeyCallback.h"
-#include "KeyDefinition.h"
-#include "MouseCallback.h"
-#include "Types.h"
+#include "Window/KeyCallback.h"
+#include "Window/KeyDefinition.h"
+#include "Window/MouseCallback.h"
+#include "Core/Types.h"
 
 #include <string>
 #include <vector>

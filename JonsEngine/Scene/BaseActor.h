@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SceneNode.h"
-#include "Model.h"
+#include "Scene/SceneNode.h"
+#include "Resources/Model.h"
 
 #include <string>
 

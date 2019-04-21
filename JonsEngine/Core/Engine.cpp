@@ -1,13 +1,13 @@
-#include "Engine.h"
+#include "Core/Engine.h"
 
-#include "Logger.h"
-#include "HeapAllocator.h"
-#include "EngineSettings.h"
-#include "DebugOptions.h"
-#include "TimeUtils.h"
-#include "Scene.h"
-#include "WindowManager.h"
-#include "ResourceManifest.h"
+#include "Core/Logging/Logger.h"
+#include "Core/Memory/HeapAllocator.h"
+#include "Core/EngineSettings.h"
+#include "Core/DebugOptions.h"
+#include "Core/Utils/TimeUtils.h"
+#include "Scene/Scene.h"
+#include "Window/WindowManager.h"
+#include "Resources/ResourceManifest.h"
 
 #include <exception>
 #include <functional>

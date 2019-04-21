@@ -1,7 +1,7 @@
 #pragma once
 
-#include "IDMapBase.hpp"
-#include "Types.h"
+#include "Core/Containers/IDMapBase.hpp"
+#include "Core/Types.h"
 
 #include <vector>
 #include <algorithm>

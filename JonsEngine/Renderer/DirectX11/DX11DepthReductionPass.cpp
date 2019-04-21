@@ -1,8 +1,8 @@
-#include "DX11DepthReductionPass.h"
+#include "Renderer/DirectX11/DX11DepthReductionPass.h"
 
-#include "Shaders/Compiled/SDSMInitialCompute.h"
-#include "Shaders/Compiled/SDSMFinalCompute.h"
-#include "MathUtils.h"
+#include "Renderer/DirectX11/Shaders/Compiled/SDSMInitialCompute.h"
+#include "Renderer/DirectX11/Shaders/Compiled/SDSMFinalCompute.h"
+#include "Core/Math/MathUtils.h"
 
 namespace JonsEngine
 {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Plane.h"
-#include "Types.h"
+#include "Core/Math/Plane.h"
+#include "Core/Types.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtx/rotate_vector.hpp"

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Utils.h"
-#include "JonsPackage.h"
-#include "Animation.h"
-#include "Types.h"
+#include "Resources/JonsPackage.h"
+#include "Resources/Animation.h"
+#include "Core/Types.h"
 
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>

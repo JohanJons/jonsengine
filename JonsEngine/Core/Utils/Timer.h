@@ -1,7 +1,7 @@
 #pragma once
 
-#include "TimeUtils.h"
-#include "Clock.hpp"
+#include "Core/Utils/TimeUtils.h"
+#include "Core/Utils/Clock.hpp"
 
 #include <chrono>
 

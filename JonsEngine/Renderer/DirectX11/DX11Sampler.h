@@ -1,10 +1,10 @@
 #pragma once
 
-#include "DX11Utils.h"
-#include "Shaders/Constants.h"
-#include "EngineSettings.h"
-#include "Types.h"
-#include "Platform.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/Shaders/Constants.h"
+#include "Core/EngineSettings.h"
+#include "Core/Types.h"
+#include "Core/Platform.h"
 
 namespace JonsEngine
 {

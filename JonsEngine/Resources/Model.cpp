@@ -1,7 +1,7 @@
-#include "Model.h"
+#include "Resources/Model.h"
 
-#include "MathUtils.h"
-#include "JonsPackage.h"
+#include "Core/Math/MathUtils.h"
+#include "Resources/JonsPackage.h"
 
 namespace JonsEngine
 {

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Bone.h"
-#include "Animation.h"
-#include "AnimationInstance.h"
-#include "IDMap.hpp"
-#include "Types.h"
-#include "TimeUtils.h"
-#include "IDGenerator.hpp"
+#include "Resources/Bone.h"
+#include "Resources/Animation.h"
+#include "Resources/AnimationInstance.h"
+#include "Core/Containers/IDMap.hpp"
+#include "Core/Types.h"
+#include "Core/Utils/TimeUtils.h"
+#include "Core/Utils/IDGenerator.hpp"
 
 #include <vector>
 #include <unordered_map>

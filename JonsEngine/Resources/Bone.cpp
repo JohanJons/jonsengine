@@ -1,4 +1,4 @@
-#include "Bone.h"
+#include "Resources/Bone.h"
 
 namespace JonsEngine
 {

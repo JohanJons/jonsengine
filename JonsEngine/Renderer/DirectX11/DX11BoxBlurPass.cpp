@@ -1,7 +1,7 @@
-#include "DX11BoxBlurPass.h"
+#include "Renderer/DirectX11/DX11BoxBlurPass.h"
 
-#include "DX11FullscreenTrianglePass.h"
-#include "Shaders/Compiled/BoxBlurPixel.h"
+#include "Renderer/DirectX11/DX11FullscreenTrianglePass.h"
+#include "Renderer/DirectX11/Shaders/Compiled/BoxBlurPixel.h"
 
 namespace JonsEngine
 {

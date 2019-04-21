@@ -1,7 +1,7 @@
 #pragma once
 
-#include "IDMap.hpp"
-#include "NonCopyable.h"
+#include "Core/Containers/IDMap.hpp"
+#include "Core/Utils/NonCopyable.h"
 
 namespace JonsEngine
 {

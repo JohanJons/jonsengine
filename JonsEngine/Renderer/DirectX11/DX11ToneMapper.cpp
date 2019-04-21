@@ -1,9 +1,9 @@
-#include "DX11ToneMapper.h"
+#include "Renderer/DirectX11/DX11ToneMapper.h"
 
-#include "DX11FullscreenTrianglePass.h"
-#include "Shaders/Constants.h"
-#include "Shaders/Compiled/Tonemapping.h"
-#include "Shaders/Compiled/AvgLuminance.h"
+#include "Renderer/DirectX11/DX11FullscreenTrianglePass.h"
+#include "Renderer/DirectX11/Shaders/Constants.h"
+#include "Renderer/DirectX11/Shaders/Compiled/Tonemapping.h"
+#include "Renderer/DirectX11/Shaders/Compiled/AvgLuminance.h"
 
 namespace JonsEngine
 {

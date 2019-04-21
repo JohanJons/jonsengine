@@ -1,6 +1,6 @@
-#include "DX11DepthBufferReadback.h"
+#include "Renderer/DirectX11/DX11DepthBufferReadback.h"
 
-#include "Shaders/Compiled/DepthReadback.h"
+#include "Renderer/DirectX11/Shaders/Compiled/DepthReadback.h"
 
 namespace JonsEngine
 {

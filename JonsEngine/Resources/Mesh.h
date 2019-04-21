@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Material.h"
-#include "Types.h"
-#include "AABB.h"
+#include "Resources/Material.h"
+#include "Core/Types.h"
+#include "Core/Math/AABB.h"
 
 #include <string>
 

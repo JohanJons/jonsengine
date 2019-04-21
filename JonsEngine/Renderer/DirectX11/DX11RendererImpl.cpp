@@ -1,11 +1,11 @@
-#include "DX11RendererImpl.h"
+#include "Renderer/DirectX11/DX11RendererImpl.h"
 
-#include "DX11Utils.h"
-#include "PerlinNoise.hpp"
-#include "RenderSettings.h"
-#include "Logger.h"
-#include "HeapAllocator.h"
-#include "MathUtils.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/PerlinNoise.hpp"
+#include "Renderer/RenderSettings.h"
+#include "Core/Logging/Logger.h"
+#include "Core/Memory/HeapAllocator.h"
+#include "Core/Math/MathUtils.h"
 
 #include <Commctrl.h>
 #include <array>

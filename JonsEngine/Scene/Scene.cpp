@@ -1,7 +1,7 @@
-#include "Scene.h"
-#include "ResourceManifest.h"
-#include "DX11Renderer.h"
-#include "RenderDefs.h"
+#include "Scene/Scene.h"
+#include "Resources/ResourceManifest.h"
+#include "Renderer/DirectX11/DX11Renderer.h"
+#include "Renderer/RenderDefs.h"
 
 #include <algorithm>
 #include <functional>

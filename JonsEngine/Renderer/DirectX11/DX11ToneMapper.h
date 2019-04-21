@@ -1,10 +1,10 @@
 #pragma once
 
-#include "DX11Utils.h"
-#include "DX11ConstantBuffer.hpp"
-#include "TimeUtils.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/DX11ConstantBuffer.hpp"
+#include "Core/Utils/TimeUtils.h"
 
-#include "EngineSettings.h"
+#include "Core/EngineSettings.h"
 
 #include <array>
 

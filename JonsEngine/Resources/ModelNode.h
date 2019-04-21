@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Mesh.h"
-#include "JonsPackage.h"
-#include "RangedIterator.hpp"
-#include "Types.h"
-#include "AABB.h"
+#include "Resources/Mesh.h"
+#include "Resources/JonsPackage.h"
+#include "Core/Containers/RangedIterator.hpp"
+#include "Core/Types.h"
+#include "Core/Math/AABB.h"
 
 #include <vector>
 #include <string>

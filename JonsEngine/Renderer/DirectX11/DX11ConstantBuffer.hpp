@@ -1,8 +1,8 @@
 #pragma once
 
-#include "DX11Utils.h"
-#include "Shaders/Constants.h"
-#include "Platform.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/Shaders/Constants.h"
+#include "Core/Platform.h"
 
 namespace JonsEngine
 {

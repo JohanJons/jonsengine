@@ -1,4 +1,4 @@
-#include "Mesh.h"
+#include "Resources/Mesh.h"
 
 namespace JonsEngine
 {

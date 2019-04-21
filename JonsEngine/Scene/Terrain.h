@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SceneNode.h"
-#include "Model.h"
-#include "TerrainData.h"
+#include "Scene/SceneNode.h"
+#include "Resources/Model.h"
+#include "Resources/TerrainData.h"
 
 #include <string>
 

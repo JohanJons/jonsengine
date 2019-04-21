@@ -1,4 +1,4 @@
-#include "OutputStream.h"
+#include "Core/Logging/OutputStream.h"
 
 namespace JonsEngine
 {

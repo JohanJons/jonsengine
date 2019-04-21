@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Shaders/Constants.h"
-#include "RenderSettings.h"
-#include "Logger.h"
-#include "EngineSettings.h"
-#include "Types.h"
-#include "Platform.h"
+#include "Renderer/DirectX11/Shaders/Constants.h"
+#include "Renderer/RenderSettings.h"
+#include "Core/Logging/Logger.h"
+#include "Core/EngineSettings.h"
+#include "Core/Types.h"
+#include "Core/Platform.h"
 
 #include "boost/current_function.hpp"
 #include <atlbase.h>

@@ -1,7 +1,7 @@
-#include "DX11FullscreenTrianglePass.h"
+#include "Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 
-#include "Shaders/Compiled/FullscreenTriangle.h"
-#include "Shaders/Compiled/FullscreenTriangleTexcoord.h"
+#include "Renderer/DirectX11/Shaders/Compiled/FullscreenTriangle.h"
+#include "Renderer/DirectX11/Shaders/Compiled/FullscreenTriangleTexcoord.h"
 
 namespace JonsEngine
 {

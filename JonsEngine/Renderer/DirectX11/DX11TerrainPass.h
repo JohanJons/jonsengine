@@ -1,11 +1,11 @@
 #pragma once
 
-#include "DX11Utils.h"
-#include "DX11ConstantBuffer.hpp"
-#include "DX11CPUDynamicBuffer.h"
-#include "DX11Mesh.h"
-#include "RenderSettings.h"
-#include "IDMap.hpp"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/DX11ConstantBuffer.hpp"
+#include "Renderer/DirectX11/DX11CPUDynamicBuffer.h"
+#include "Renderer/DirectX11/DX11Mesh.h"
+#include "Renderer/RenderSettings.h"
+#include "Core/Containers/IDMap.hpp"
 
 #include <array>
 

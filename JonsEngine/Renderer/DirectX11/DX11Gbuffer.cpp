@@ -1,10 +1,10 @@
-#include "DX11GBuffer.h"
+#include "Renderer/DirectX11/DX11GBuffer.h"
 
-#include "DX11Utils.h"
-#include "DX11Mesh.h"
-#include "Shaders/Compiled/GBufferVertexStatic.h"
-#include "Shaders/Compiled/GBufferVertexAnimated.h"
-#include "Shaders/Compiled/GBufferPixel.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/DX11Mesh.h"
+#include "Renderer/DirectX11/Shaders/Compiled/GBufferVertexStatic.h"
+#include "Renderer/DirectX11/Shaders/Compiled/GBufferVertexAnimated.h"
+#include "Renderer/DirectX11/Shaders/Compiled/GBufferPixel.h"
 
 namespace JonsEngine
 {

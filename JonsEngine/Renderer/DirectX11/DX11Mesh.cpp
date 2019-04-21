@@ -1,8 +1,8 @@
-#include "DX11Mesh.h"
+#include "Renderer/DirectX11/DX11Mesh.h"
 
-#include "DX11VertexBufferSet.hpp"
-#include "DX11Utils.h"
-#include "Animation.h"
+#include "Renderer/DirectX11/DX11VertexBufferSet.hpp"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Resources/Animation.h"
 
 #include <array>
 

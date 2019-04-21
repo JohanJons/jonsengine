@@ -1,9 +1,9 @@
-#include "DX11AmbientPass.h"
+#include "Renderer/DirectX11/DX11AmbientPass.h"
 
-#include "DX11Utils.h"
-#include "DX11FullscreenTrianglePass.h"
-#include "Shaders/Compiled/AmbientPixel.h"
-#include "Shaders/Compiled/SSAOPixel.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/DX11FullscreenTrianglePass.h"
+#include "Renderer/DirectX11/Shaders/Compiled/AmbientPixel.h"
+#include "Renderer/DirectX11/Shaders/Compiled/SSAOPixel.h"
 
 namespace JonsEngine
 {

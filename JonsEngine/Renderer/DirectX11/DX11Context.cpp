@@ -1,6 +1,6 @@
-#include "DX11Context.h"
+#include "Renderer/DirectX11/DX11Context.h"
 
-#include "DX11Utils.h"
+#include "Renderer/DirectX11/DX11Utils.h"
 
 namespace JonsEngine
 {

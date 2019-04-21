@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DirectionalLight.h"
+#include "Scene/DirectionalLight.h"
 
 #include <chrono>
 

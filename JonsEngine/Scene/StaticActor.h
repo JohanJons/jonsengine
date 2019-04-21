@@ -1,7 +1,7 @@
 #pragma once
 
-#include "IDMap.hpp"
-#include "BaseActor.h"
+#include "Core/Containers/IDMap.hpp"
+#include "Scene/BaseActor.h"
 
 namespace JonsEngine
 {

@@ -1,4 +1,4 @@
-#include "Skybox.h"
+#include "Resources/Skybox.h"
 
 namespace JonsEngine
 {

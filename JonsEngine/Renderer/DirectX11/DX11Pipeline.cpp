@@ -1,9 +1,9 @@
-#include "DX11Pipeline.h"
+#include "Renderer/DirectX11/DX11Pipeline.h"
 
-#include "DX11Utils.h"
-#include "Shaders/Compiled/SimpleTexturePixel.h"
-#include "RenderSettings.h"
-#include "RenderQueue.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/Shaders/Compiled/SimpleTexturePixel.h"
+#include "Renderer/RenderSettings.h"
+#include "RenderQueue/RenderQueue.h"
 
 namespace JonsEngine
 {

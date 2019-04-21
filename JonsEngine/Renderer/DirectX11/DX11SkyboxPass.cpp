@@ -1,8 +1,8 @@
-#include "DX11SkyboxPass.h"
+#include "Renderer/DirectX11/DX11SkyboxPass.h"
 
-#include "DX11Texture.h"
-#include "Shaders/Compiled/SkyboxVertex.h"
-#include "Shaders/Compiled/SkyboxPixel.h"
+#include "Renderer/DirectX11/DX11Texture.h"
+#include "Renderer/DirectX11/Shaders/Compiled/SkyboxVertex.h"
+#include "Renderer/DirectX11/Shaders/Compiled/SkyboxPixel.h"
 
 namespace JonsEngine
 {

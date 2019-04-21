@@ -1,8 +1,8 @@
 #pragma once
 
-#include "EngineSettings.h"
-#include "SceneDirtyFlags.h"
-#include "RenderQueue.h"
+#include "Core/EngineSettings.h"
+#include "Scene/SceneDirtyFlags.h"
+#include "RenderQueue/RenderQueue.h"
 
 namespace JonsEngine
 {

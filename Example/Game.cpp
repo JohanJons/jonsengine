@@ -2,12 +2,12 @@
 
 #include "Sun.h"
 
-#include "Logger.h"
-#include "Types.h"
-#include "IDMap.hpp"
-#include "Timer.h"
-#include "Scene.h"
-#include "ResourceManifest.h"
+#include "Core/Logging/Logger.h"
+#include "Core/Types.h"
+#include "Core/Containers/IDMap.hpp"
+#include "Core/Utils/Timer.h"
+#include "Scene/Scene.h"
+#include "Resources/ResourceManifest.h"
 
 #include "boost/bind.hpp"
 

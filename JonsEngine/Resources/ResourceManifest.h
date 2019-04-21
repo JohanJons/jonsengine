@@ -1,15 +1,15 @@
 #pragma once
 
-#include "JonsPackage.h"
-#include "Model.h"
-#include "Animation.h"
-#include "ModelNode.h"
-#include "Mesh.h"
-#include "Material.h"
-#include "Skybox.h"
-#include "TerrainData.h"
-#include "IDMap.hpp"
-#include "Shapes.h"
+#include "Resources/JonsPackage.h"
+#include "Resources/Model.h"
+#include "Resources/Animation.h"
+#include "Resources/ModelNode.h"
+#include "Resources/Mesh.h"
+#include "Resources/Material.h"
+#include "Resources/Skybox.h"
+#include "Resources/TerrainData.h"
+#include "Core/Containers/IDMap.hpp"
+#include "Renderer/Shapes.h"
 
 #include <unordered_map>
 #include <string>

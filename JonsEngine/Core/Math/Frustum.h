@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Types.h"
-#include "Plane.h"
+#include "Core/Types.h"
+#include "Core/Math/Plane.h"
 
 #include <array>
 #include <vector>

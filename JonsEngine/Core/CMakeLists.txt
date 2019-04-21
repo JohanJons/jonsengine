@@ -19,5 +19,3 @@ foreach( SUBDIR ${SUBDIR_NAMES})
 	SET( SOURCES_GROUP_FILES "" )
 	add_subdirectory( ${SUBDIR} )
 endforeach()
-
-target_include_directories( JonsEngine PUBLIC ${CMAKE_CURRENT_LIST_DIR})

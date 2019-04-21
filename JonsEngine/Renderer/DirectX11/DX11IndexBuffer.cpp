@@ -1,4 +1,4 @@
-#include "DX11IndexBuffer.h"
+#include "Renderer/DirectX11/DX11IndexBuffer.h"
 
 namespace JonsEngine
 {

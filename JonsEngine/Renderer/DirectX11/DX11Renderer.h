@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Types.h"
-#include "Types.h"
-#include "EngineSettings.h"
-#include "DebugOptions.h"
-#include "TimeUtils.h"
-#include "Bone.h"
+#include "Core/Types.h"
+#include "Core/Types.h"
+#include "Core/EngineSettings.h"
+#include "Core/DebugOptions.h"
+#include "Core/Utils/TimeUtils.h"
+#include "Resources/Bone.h"
 
 #include <string>
 #include <vector>

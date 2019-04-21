@@ -1,14 +1,14 @@
-#include "DX11TerrainPass.h"
+#include "Renderer/DirectX11/DX11TerrainPass.h"
 
-#include "DX11Texture.h"
-#include "DX11VertexTransformPass.h"
-#include "Shaders/Compiled/TerrainVertex.h"
-#include "Shaders/Compiled/TerrainHull.h"
-#include "Shaders/Compiled/TerrainDomain.h"
-#include "Shaders/Compiled/TerrainPixel.h"
-#include "Shaders/Compiled/TerrainPixelDebug.h"
-#include "MathUtils.h"
-#include "AABB.h"
+#include "Renderer/DirectX11/DX11Texture.h"
+#include "Renderer/DirectX11/DX11VertexTransformPass.h"
+#include "Renderer/DirectX11/Shaders/Compiled/TerrainVertex.h"
+#include "Renderer/DirectX11/Shaders/Compiled/TerrainHull.h"
+#include "Renderer/DirectX11/Shaders/Compiled/TerrainDomain.h"
+#include "Renderer/DirectX11/Shaders/Compiled/TerrainPixel.h"
+#include "Renderer/DirectX11/Shaders/Compiled/TerrainPixelDebug.h"
+#include "Core/Math/MathUtils.h"
+#include "Core/Math/AABB.h"
 
 namespace JonsEngine
 {

@@ -23,5 +23,7 @@ foreach( SOURCE ${SOURCES})
 	source_group("${REL_SOURCE_DIR_NO_SLASH}" FILES "${SOURCE}")
 endforeach()
 
+target_include_directories( JonsEngine PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+
 find_package(Boost 1.56 REQUIRED)
 target_link_libraries( JonsEngine glm dlmalloc assimp Boost::boost )

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "RenderQueueTypes.h"
-#include "Bone.h"
+#include "RenderQueue/RenderQueueTypes.h"
+#include "Resources/Bone.h"
 
 #include <vector>
 

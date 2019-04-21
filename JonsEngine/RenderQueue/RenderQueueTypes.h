@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Types.h"
-#include "Bone.h"
-#include "RenderDefs.h"
+#include "Core/Types.h"
+#include "Resources/Bone.h"
+#include "Renderer/RenderDefs.h"
 
 #include <limits>
 #include <vector>

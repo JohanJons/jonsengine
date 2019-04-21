@@ -1,10 +1,10 @@
 #pragma once
 
-#include "IDMap.hpp"
-#include "TimeUtils.h"
-#include "Animation.h"
-#include "AnimationInstance.h"
-#include "BaseActor.h"
+#include "Core/Containers/IDMap.hpp"
+#include "Core/Utils/TimeUtils.h"
+#include "Resources/Animation.h"
+#include "Resources/AnimationInstance.h"
+#include "Scene/BaseActor.h"
 
 #include <functional>
 

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Model.h"
-#include "Animation.h"
-#include "Bone.h"
-#include "TimeUtils.h"
-#include "Types.h"
-#include "IDGenerator.hpp"
+#include "Resources/Model.h"
+#include "Resources/Animation.h"
+#include "Resources/Bone.h"
+#include "Core/Utils/TimeUtils.h"
+#include "Core/Types.h"
+#include "Core/Utils/IDGenerator.hpp"
 
 namespace JonsEngine
 {

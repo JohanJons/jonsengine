@@ -1,6 +1,6 @@
 #include "SceneActors.h"
 
-#include "Types.h"
+#include "Core/Types.h"
 
 using namespace JonsEngine;
 

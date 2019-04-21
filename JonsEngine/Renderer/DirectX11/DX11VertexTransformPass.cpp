@@ -1,9 +1,9 @@
-#include "DX11VertexTransformPass.h"
+#include "Renderer/DirectX11/DX11VertexTransformPass.h"
 
-#include "Shaders/Compiled/TransformStaticVertex.h"
-#include "Shaders/Compiled/TransformStaticInstancedVertex.h"
-#include "Shaders/Compiled/TransformAnimatedVertex.h"
-#include "Shaders/Constants.h"
+#include "Renderer/DirectX11/Shaders/Compiled/TransformStaticVertex.h"
+#include "Renderer/DirectX11/Shaders/Compiled/TransformStaticInstancedVertex.h"
+#include "Renderer/DirectX11/Shaders/Compiled/TransformAnimatedVertex.h"
+#include "Renderer/DirectX11/Shaders/Constants.h"
 
 namespace JonsEngine
 {

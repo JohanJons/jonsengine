@@ -1,8 +1,8 @@
-#include "WindowManager.h"
+#include "Window/WindowManager.h"
 
-#include "EngineSettings.h"
-#include "Logger.h"
-#include "Platform.h"
+#include "Core/EngineSettings.h"
+#include "Core/Logging/Logger.h"
+#include "Core/Platform.h"
 
 #include <exception>
 #include <functional>

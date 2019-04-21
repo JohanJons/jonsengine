@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Logger.h"
+#include "Core/Logging/Logger.h"
 
 #include <exception>
 

@@ -1,4 +1,4 @@
-#include "AnimatedActor.h"
+#include "Scene/AnimatedActor.h"
 
 namespace JonsEngine
 {

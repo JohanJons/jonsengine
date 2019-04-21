@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "StreamBuf.h"
+#include "Core/Logging/StreamBuf.h"
 
 namespace JonsEngine
 {

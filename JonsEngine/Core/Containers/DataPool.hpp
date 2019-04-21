@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Types.h"
-#include "IDMap.hpp"
+#include "Core/Types.h"
+#include "Core/Containers/IDMap.hpp"
 
 namespace JonsEngine
 {

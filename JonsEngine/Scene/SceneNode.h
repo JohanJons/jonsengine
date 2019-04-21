@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Types.h"
-#include "IDMapTree.hpp"
+#include "Core/Types.h"
+#include "Core/Containers/IDMapTree.hpp"
 
 #include <string>
 #include <vector>

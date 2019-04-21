@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SceneNode.h"
-#include "Types.h"
-#include "IDMap.hpp"
+#include "Scene/SceneNode.h"
+#include "Core/Types.h"
+#include "Core/Containers/IDMap.hpp"
 
 #include <string>
 #include <memory>

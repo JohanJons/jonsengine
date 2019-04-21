@@ -1,7 +1,7 @@
 #include "SceneTessellation.h"
 
-#include "Types.h"
-#include "SceneManager.h"
+#include "Core/Types.h"
+#include "Scene/SceneManager.h"
 
 using namespace JonsEngine;
 

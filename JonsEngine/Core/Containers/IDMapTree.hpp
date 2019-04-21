@@ -1,8 +1,8 @@
 #pragma once
 
-#include "IDMapBase.hpp"
-#include "RangedIterator.hpp"
-#include "HeapAllocator.h"
+#include "Core/Containers/IDMapBase.hpp"
+#include "Core/Containers/RangedIterator.hpp"
+#include "Core/Memory/HeapAllocator.h"
 
 #include <algorithm>
 #include <limits>

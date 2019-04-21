@@ -1,9 +1,9 @@
-#include "DX11PostProcessor.h"
+#include "Renderer/DirectX11/DX11PostProcessor.h"
 
-#include "DX11FullscreenTrianglePass.h"
-#include "DX11Backbuffer.h"
-#include "Shaders/Compiled/FXAAPixel.h"
-#include "Shaders/Compiled/SSAOPixel.h"
+#include "Renderer/DirectX11/DX11FullscreenTrianglePass.h"
+#include "Renderer/DirectX11/DX11Backbuffer.h"
+#include "Renderer/DirectX11/Shaders/Compiled/FXAAPixel.h"
+#include "Renderer/DirectX11/Shaders/Compiled/SSAOPixel.h"
 
 namespace JonsEngine
 {

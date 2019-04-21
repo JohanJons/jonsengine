@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LogManager.h"
+#include "Core/Logging/LogManager.h"
 
 #include <string>
 

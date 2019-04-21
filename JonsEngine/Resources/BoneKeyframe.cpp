@@ -1,7 +1,7 @@
 #pragma once
 
-#include "BoneKeyframe.h"
-#include "JonsPackage.h"
+#include "Resources/BoneKeyframe.h"
+#include "Resources/JonsPackage.h"
 
 namespace JonsEngine
 {

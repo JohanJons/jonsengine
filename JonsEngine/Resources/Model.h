@@ -1,12 +1,12 @@
 #pragma once
 
-#include "Animation.h"
-#include "ModelNode.h"
-#include "Mesh.h"
-#include "Types.h"
-#include "AABB.h"
-#include "IDMap.hpp"
-#include "RangedIterator.hpp"
+#include "Resources/Animation.h"
+#include "Resources/ModelNode.h"
+#include "Resources/Mesh.h"
+#include "Core/Types.h"
+#include "Core/Math/AABB.h"
+#include "Core/Containers/IDMap.hpp"
+#include "Core/Containers/RangedIterator.hpp"
 
 #include <string>
 #include <vector>

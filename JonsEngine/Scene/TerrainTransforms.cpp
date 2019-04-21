@@ -1,5 +1,5 @@
-#include "TerrainTransforms.h"
-#include "MathUtils.h"
+#include "Scene/TerrainTransforms.h"
+#include "Core/Math/MathUtils.h"
 
 #include <algorithm>
 

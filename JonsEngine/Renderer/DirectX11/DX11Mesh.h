@@ -1,10 +1,10 @@
 #pragma once
 
-#include "DX11Utils.h"
-#include "DX11VertexBufferSet.hpp"
-#include "Types.h"
-#include "Platform.h"
-#include "Bone.h"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/DX11VertexBufferSet.hpp"
+#include "Core/Types.h"
+#include "Core/Platform.h"
+#include "Resources/Bone.h"
 
 #include <vector>
 #include <memory>

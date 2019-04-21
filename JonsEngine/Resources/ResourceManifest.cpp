@@ -1,7 +1,7 @@
-#include "ResourceManifest.h"
-#include "Shapes.h"
-#include "DX11Renderer.h"
-#include "HeapAllocator.h"
+#include "Resources/ResourceManifest.h"
+#include "Renderer/Shapes.h"
+#include "Renderer/DirectX11/DX11Renderer.h"
+#include "Core/Memory/HeapAllocator.h"
 
 #include "boost/functional/hash.hpp"
 #include <algorithm>

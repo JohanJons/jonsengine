@@ -1,6 +1,6 @@
-#include "DX11Utils.h"
+#include "Renderer/DirectX11/DX11Utils.h"
 
-#include "Error.h"
+#include "Core/Utils/Error.h"
 
 namespace JonsEngine
 {

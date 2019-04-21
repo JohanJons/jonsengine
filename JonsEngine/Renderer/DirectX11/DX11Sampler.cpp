@@ -1,4 +1,4 @@
-#include "DX11Sampler.h"
+#include "Renderer/DirectX11/DX11Sampler.h"
 
 namespace JonsEngine
 {

@@ -1,6 +1,6 @@
-#include "TerrainData.h"
+#include "Resources/TerrainData.h"
 
-#include "DX11TerrainPass.h"
+#include "Renderer/DirectX11/DX11TerrainPass.h"
 
 namespace JonsEngine
 {

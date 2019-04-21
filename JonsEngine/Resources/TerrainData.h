@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Types.h"
-#include "AABB.h"
-#include "IDMap.hpp"
+#include "Core/Types.h"
+#include "Core/Math/AABB.h"
+#include "Core/Containers/IDMap.hpp"
 
 #include <string>
 

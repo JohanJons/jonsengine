@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Types.h"
-#include "KeyDefinition.h"
+#include "Core/Types.h"
+#include "Window/KeyDefinition.h"
 
 #include <functional>
 

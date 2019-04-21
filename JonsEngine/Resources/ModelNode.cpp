@@ -1,4 +1,4 @@
-#include "ModelNode.h"
+#include "Resources/ModelNode.h"
 
 #include <algorithm>
 

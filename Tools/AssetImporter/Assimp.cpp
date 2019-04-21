@@ -1,8 +1,8 @@
 #include "Assimp.h"
 
-#include "Math.h"
-#include "AABB.h"
-#include "Animation.h"
+#include "Core/Math/MathUtils.h"
+#include "Core/Math/AABB.h"
+#include "Resources/Animation.h"
 #include "FreeImageParser.h"
 
 #include <limits>

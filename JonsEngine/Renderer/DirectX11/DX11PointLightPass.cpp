@@ -1,10 +1,10 @@
-#include "DX11PointLightPass.h"
+#include "Renderer/DirectX11/DX11PointLightPass.h"
 
-#include "Shapes.h"
-#include "DX11VertexTransformPass.h"
-#include "Shaders/Compiled/PointLightPixel.h"
-#include "MathUtils.h"
-#include "Logger.h"
+#include "Renderer/Shapes.h"
+#include "Renderer/DirectX11/DX11VertexTransformPass.h"
+#include "Renderer/DirectX11/Shaders/Compiled/PointLightPixel.h"
+#include "Core/Math/MathUtils.h"
+#include "Core/Logging/Logger.h"
 
 namespace JonsEngine
 {

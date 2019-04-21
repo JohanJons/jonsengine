@@ -1,4 +1,4 @@
-#include "Logger.h"
+#include "Core/Logging/Logger.h"
 
 namespace JonsEngine
 {

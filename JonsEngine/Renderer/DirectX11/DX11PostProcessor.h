@@ -1,9 +1,9 @@
 #pragma once
 
-#include "DX11ConstantBuffer.hpp"
-#include "DX11Utils.h"
-#include "DX11BoxBlurPass.h"
-#include "Types.h"
+#include "Renderer/DirectX11/DX11ConstantBuffer.hpp"
+#include "Renderer/DirectX11/DX11Utils.h"
+#include "Renderer/DirectX11/DX11BoxBlurPass.h"
+#include "Core/Types.h"
 
 namespace JonsEngine
 {

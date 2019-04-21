@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Types.h"
-#include "StreamBuf.h"
-#include "OutputStream.h"
+#include "Core/Types.h"
+#include "Core/Logging/StreamBuf.h"
+#include "Core/Logging/OutputStream.h"
 
 #include <iostream>
 #include <fstream>

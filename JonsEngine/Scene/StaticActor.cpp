@@ -1,4 +1,4 @@
-#include "StaticActor.h"
+#include "Scene/StaticActor.h"
 
 namespace JonsEngine
 {
