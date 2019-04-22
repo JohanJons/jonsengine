@@ -1,4 +1,4 @@
-﻿target_sources( JonsEngine
+target_sources( JonsEngine
     PRIVATE
         AmbientPixel.hlsl
         AvgLuminance.hlsl
