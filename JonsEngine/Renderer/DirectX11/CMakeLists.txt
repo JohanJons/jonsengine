@@ -63,3 +63,5 @@
         DX11VertexTransformPass.h
         PerlinNoise.hpp
 )
+
+add_subdirectory( Shaders )

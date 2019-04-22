@@ -25,5 +25,6 @@ endforeach()
 
 target_include_directories( JonsEngine PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
-find_package(Boost 1.56 REQUIRED)
-target_link_libraries( JonsEngine glm dlmalloc assimp Boost::boost )
+find_package( Boost 1.70 REQUIRED serialization )
+target_link_libraries( JonsEngine glm dlmalloc Boost::serialization )
+# set_source_files_properties(ile1,fil2  props)

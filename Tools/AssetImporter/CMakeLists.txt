@@ -16,4 +16,4 @@ target_sources( JonsAssetImporter
 get_target_property( SOURCES JonsAssetImporter SOURCES )
 source_group("" FILES ${SOURCES} )
 
-target_link_libraries( JonsAssetImporter JonsEngine FreeImage Assimp )
+target_link_libraries( JonsAssetImporter JonsEngine FreeImage assimp )
