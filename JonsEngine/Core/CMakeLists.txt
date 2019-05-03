@@ -16,6 +16,5 @@ target_sources( JonsEngine
 )
 
 foreach( SUBDIR ${SUBDIR_NAMES})
-	SET( SOURCES_GROUP_FILES "" )
 	add_subdirectory( ${SUBDIR} )
 endforeach()
