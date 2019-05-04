@@ -31,6 +31,18 @@ namespace JonsEngine
     {
     }
     
+    Animation& Animation::operator=( const Animation& other )
+    {
+        mName = other.mName;
+        mAnimationDuration = other.mAnimationDuration;
+        mInverseRootMatrix = other.mInverseRootMatrix;
+        mKeyframes = other.mKeyframes;
+
+        assert( mParentMap == other.mParentMap );
+        assert( mBoneOffsetTransforms == other.mBoneOffsetTransforms );
+
+        return *this;
+    }
 
     const std::string& Animation::GetName() const
     {
@@ -44,7 +56,7 @@ namespace JonsEngine
 
     uint32_t Animation::GetNumberOfBones() const
     {
-        return mBoneOffsetTransforms.size();
+        return static_cast< uint32_t >( mBoneOffsetTransforms.size() );
     }
 
 

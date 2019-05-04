@@ -1,7 +1,7 @@
 #ifndef DEPTH_READBACK_HLSL
 #define DEPTH_READBACK_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 #include "Common.hlsl"
 
 

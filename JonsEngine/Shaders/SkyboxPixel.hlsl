@@ -1,7 +1,7 @@
 #ifndef SKYBOX_PIXEL_HLSL
 #define SKYBOX_PIXEL_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 #include "SkyboxVertex.hlsl"
 
 TextureCube gSkybox : register(TEXTURE_REGISTER_EXTRA);

@@ -1,7 +1,7 @@
 #ifndef TRANSFORM_ANIMATED_VERTEX_HLSL
 #define TRANSFORM_ANIMATED_VERTEX_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 #include "Common.hlsl"
 
 struct TransformVSInput

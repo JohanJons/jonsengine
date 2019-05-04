@@ -1,7 +1,7 @@
 #ifndef COMMON_HLSL
 #define COMMON_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 
 StructuredBuffer<float4x4> gBones : register (SBUFFER_REGISTER_BONE_TRANSFORMS);
 

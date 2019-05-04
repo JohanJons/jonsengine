@@ -1,7 +1,7 @@
 #ifndef SDSM_FINAL_COMPUTE_HLSL
 #define SDSM_FINAL_COMPUTE_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 #include "Common.hlsl"
 
 // shared memory

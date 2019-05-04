@@ -1,4 +1,4 @@
-#include "Constants.h"
+#include "Constants.hlsl"
 
 #define FXAA_PC 1
 #define FXAA_HLSL_5 1

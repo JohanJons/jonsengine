@@ -1,7 +1,7 @@
 #ifndef POINT_LIGHT_PIXEL_HLSL
 #define POINT_LIGHT_PIXEL_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 #include "Common.hlsl"
 #include "Shadowmapping.hlsl"
 

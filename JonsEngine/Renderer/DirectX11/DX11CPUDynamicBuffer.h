@@ -26,32 +26,32 @@ namespace JonsEngine
 
     private:
 		template <typename T>
-		void SetData( const T* dataptr, std::size_t totalSizeInBytes );
+		void SetData( const T* dataptr, uint32_t totalSizeInBytes );
         template <typename T>
-        void ResizeBuffer(const T* data, std::size_t newSizeInBytes);
+        void ResizeBuffer(const T* data, uint32_t newSizeInBytes);
         template <typename T>
-        void BufferData(const T* data, std::size_t newSizeInBytes);
+        void BufferData(const T* data, uint32_t newSizeInBytes);
 
 
         ID3D11DevicePtr mDevice;
         ID3D11DeviceContextPtr mContext;
         ID3D11BufferPtr mBuffer;
         ID3D11ShaderResourceViewPtr mBufferSRV;
-        std::size_t mBufferSizeInBytes;
+        uint32_t mBufferSizeInBytes;
     };
 
 
     template <typename T>
     void DX11CPUDynamicBuffer::SetData(const std::vector<T>& data)
     {
-        const std::size_t dataSize = data.size() * sizeof(T);
+        uint32_t dataSize = static_cast< uint32_t >( data.size() * sizeof( T ) );
         const T* dataBegin = &data.front();
 		
 		SetData(dataBegin, dataSize);
 	}
 
 	template <typename T>
-	void DX11CPUDynamicBuffer::SetData( const T* dataptr, const std::size_t totalSizeInBytes )
+	void DX11CPUDynamicBuffer::SetData( const T* dataptr, uint32_t totalSizeInBytes )
 	{
 		assert( dataptr );
 
@@ -65,7 +65,7 @@ namespace JonsEngine
 
 
     template <typename T>
-    void DX11CPUDynamicBuffer::ResizeBuffer(const T* data, const std::size_t newSizeInBytes)
+    void DX11CPUDynamicBuffer::ResizeBuffer(const T* data, uint32_t newSizeInBytes)
     {
 		mBuffer.Release();
 		mBufferSRV.Release();
@@ -89,7 +89,7 @@ namespace JonsEngine
     }
 
     template <typename T>
-    void DX11CPUDynamicBuffer::BufferData(const T* data, const std::size_t newSizeInBytes)
+    void DX11CPUDynamicBuffer::BufferData(const T* data, uint32_t newSizeInBytes)
     {
         D3D11_MAPPED_SUBRESOURCE mappedResource;
         ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));

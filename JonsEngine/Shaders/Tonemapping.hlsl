@@ -1,7 +1,7 @@
 #ifndef TONEMAPPING_VERTEX_HLSL
 #define TONEMAPPING_VERTEX_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 #include "Common.hlsl"
 #include "FullscreenTriangleTexcoord.hlsl"
 

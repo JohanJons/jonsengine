@@ -1,7 +1,7 @@
 #ifndef GBUFFER_VERTEX_HLSL
 #define GBUFFER_VERTEX_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 #include "Common.hlsl"
 
 #if GBUFFER_IS_ANIMATED_MESHES

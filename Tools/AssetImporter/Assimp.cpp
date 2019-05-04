@@ -133,7 +133,7 @@ namespace JonsAssetImporter
 					return false;
 				}
 
-				pkgMaterial.mDiffuseTexture = pkg->mTextures.size() - 1;
+				pkgMaterial.mDiffuseTexture = static_cast<uint32_t>( pkg->mTextures.size() ) - 1;
 			}
 			if (hasNormalTexture)
 			{
@@ -143,7 +143,7 @@ namespace JonsAssetImporter
 					return false;
 				}
 
-				pkgMaterial.mNormalTexture = pkg->mTextures.size() - 1;
+				pkgMaterial.mNormalTexture = static_cast<uint32_t>( pkg->mTextures.size() ) - 1;
 			}
 
             aiColor3D diffuseColor, ambientColor(0.1f), specularColor, emissiveColor;
@@ -157,7 +157,7 @@ namespace JonsAssetImporter
             pkgMaterial.mSpecularColor = aiColor3DToJonsVec3(specularColor);
             pkgMaterial.mEmissiveColor = aiColor3DToJonsVec3(emissiveColor);
 
-			const uint32_t pkgMaterialIndex = materials.size() - 1;
+			const uint32_t pkgMaterialIndex = static_cast<uint32_t>( materials.size() ) - 1;
             materialMap.insert(MaterialPair(i, pkgMaterialIndex));
         }
 
@@ -199,7 +199,7 @@ namespace JonsAssetImporter
 
     bool Assimp::ParseNodeHeirarchy(std::vector<PackageNode>& nodeContainer, const std::vector<PackageMesh>& meshContainer, const aiScene* scene, const aiNode* assimpNode, const PackageNode::NodeIndex parentNodeIndex, const Mat4& parentTransform)
     {
-        const uint32_t nodeIndex = nodeContainer.size();
+        const uint32_t nodeIndex = static_cast<uint32_t>( nodeContainer.size() );
 		const Mat4 nodeTransform = parentTransform * aiMat4ToJonsMat4(assimpNode->mTransformation);
         nodeContainer.emplace_back(assimpNode->mName.C_Str(), nodeTransform, nodeIndex, parentNodeIndex);
         PackageNode& jonsNode = nodeContainer.back();
@@ -261,16 +261,22 @@ namespace JonsAssetImporter
     // the bones of jonsMesh must've been parsed already
     bool Assimp::AddMeshGeometricData(PackageMesh& jonsMesh, const aiMesh* assimpMesh, const aiScene* scene, const uint32_t meshIndex)
     {
-        const uint32_t numFloatsPerTriangle = 3;
-        const uint32_t numFloatsPerTexcoord = 2;
+        uint32_t numFloatsPerTriangle = 3;
+        uint32_t numFloatsPerTexcoord = 2;
+
+        uint32_t numTriangleFloats = assimpMesh->mNumVertices * numFloatsPerTriangle;
+        uint32_t numNormalFloats = assimpMesh->mNumVertices * numFloatsPerTriangle;
+        uint32_t numTexcoordFloats = assimpMesh->mNumVertices * numFloatsPerTexcoord;
+        uint32_t numTangentFloats = assimpMesh->mNumVertices * numFloatsPerTriangle * 2;
+        uint32_t numIndices = assimpMesh->mNumFaces * numFloatsPerTriangle;
 
         // reserve storage
-        jonsMesh.mVertexData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle);
-        jonsMesh.mNormalData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle);
-        jonsMesh.mTexCoordsData.reserve(assimpMesh->mNumVertices * numFloatsPerTexcoord);
+        jonsMesh.mVertexData.reserve( numTriangleFloats );
+        jonsMesh.mNormalData.reserve( numNormalFloats );
+        jonsMesh.mTexCoordsData.reserve( numTexcoordFloats );
         // store both tangents and bitangents in same buffer
-        jonsMesh.mTangentData.reserve(assimpMesh->mNumVertices * numFloatsPerTriangle * 2);
-        jonsMesh.mIndiceData.reserve(assimpMesh->mNumFaces * numFloatsPerTriangle);
+        jonsMesh.mTangentData.reserve( numTangentFloats );
+        jonsMesh.mIndiceData.reserve( numIndices );
 
         // NOTE: commented pre-transform code out, might need some additional thinking to get it right (inverse transforms for animated meshes?)
         // if the mesh is static, pre-multiply all the vertices with the transformation hierarchy
@@ -585,7 +591,7 @@ namespace JonsAssetImporter
     {
         for (const PackageMesh& mesh : meshes)
         {
-            const uint32_t numBones = bones.size();
+            const uint32_t numBones = static_cast<uint32_t>( bones.size() );
             for (BoneIndex boneIndex = 0; boneIndex < numBones; ++boneIndex)
             {
                 const PackageBone& bone = bones.at(boneIndex);
@@ -717,7 +723,7 @@ namespace JonsAssetImporter
 
 		// number of nodeanim channels should be same as num bones
 		// TODO: vector of vectors - rearrange boneanims for better cache utilization?
-		const uint32_t numBones = model.mSkeleton.size();
+        const uint32_t numBones = static_cast<uint32_t>( model.mSkeleton.size() );
 		pkgAnimation.mBoneAnimations.resize(numBones);
 
 		return pkgAnimation;

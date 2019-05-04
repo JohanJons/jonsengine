@@ -76,7 +76,7 @@ namespace JonsEngine
 
 	uint32_t TerrainTransforms::GetNumEntries() const
 	{
-		return mTerrainTransforms.size();
+		return static_cast<uint32_t>( mTerrainTransforms.size() );
 	}
 
 	void TerrainTransforms::RemoveIfAdded( TerrainID ID )

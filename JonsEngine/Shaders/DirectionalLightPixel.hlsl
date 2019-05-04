@@ -1,7 +1,7 @@
 #ifndef DIRECTIONAL_LIGHT_PIXEL_HLSL
 #define DIRECTIONAL_LIGHT_PIXEL_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 #include "Common.hlsl"
 #include "Shadowmapping.hlsl"
 #include "OptimizedPCF.hlsl"

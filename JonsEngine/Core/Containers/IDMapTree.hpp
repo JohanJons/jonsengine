@@ -139,7 +139,7 @@ namespace JonsEngine
             const ItemID indirectionID = newChildIndex | (static_cast<uint32_t>(version) << 16);
             mIndirectionLayer.emplace_back(indirectionID);
 
-            publicChildID = (mIndirectionLayer.size() - 1) | (static_cast<uint32_t>(version) << 16);
+            publicChildID = (static_cast<uint32_t>( mIndirectionLayer.size() ) - 1) | (static_cast<uint32_t>(version) << 16);
         }
 
         ItemIterator firstChildIter = parentIter + 1;

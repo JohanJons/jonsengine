@@ -1,7 +1,7 @@
 #ifndef SIMPLE_TEXTURE_PIXEL_HLSL
 #define SIMPLE_TEXTURE_PIXEL_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 
 Texture2D gTexture : register(TEXTURE_REGISTER_DIFFUSE);
 

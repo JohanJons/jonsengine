@@ -108,7 +108,7 @@ namespace JonsEngine
     {
         const uint32_t numChildren = CountNumChildren(model, pkgNode);
         // not -1 since its not added yet
-        const uint32_t thisNodeIndex = mNodes.size();
+        const uint32_t thisNodeIndex = static_cast<uint32_t>( mNodes.size() );
         const uint32_t firstChildIndex = thisNodeIndex + 1;
 
         const auto iterFirstChild = mNodes.begin() + firstChildIndex;
@@ -145,11 +145,11 @@ namespace JonsEngine
 
     ModelNode::MeshIterator Model::ParseMeshes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode)
     {
-        const uint32_t numMeshes = pkgNode.mMeshes.size();
+        const uint32_t numMeshes = static_cast<uint32_t>( pkgNode.mMeshes.size() );
         if (numMeshes == 0)
             return ModelNode::MeshIterator(mMeshes.end(), mMeshes.end());
 
-        const uint32_t meshesSizeBegin = mMeshes.size() == 0 ? 0 : mMeshes.size() - 1;
+        const uint32_t meshesSizeBegin = mMeshes.empty() ? 0 : static_cast<uint32_t>( mMeshes.size() ) - 1;
         for (const PackageMesh::MeshIndex meshIndex : pkgNode.mMeshes)
         {
             const PackageMesh& mesh = model.mMeshes.at(meshIndex);
@@ -163,7 +163,7 @@ namespace JonsEngine
 
             mMeshes.emplace_back(mesh.mName, meshID, defaultMaterialID, mesh.mAABB.mMinBounds, mesh.mAABB.mMaxBounds);
         }
-        const uint32_t meshesSizeEnd = mMeshes.size();
+        const uint32_t meshesSizeEnd = static_cast<uint32_t>( mMeshes.size() );
 
         return ModelNode::MeshIterator(mMeshes.begin() + meshesSizeBegin, mMeshes.begin() + meshesSizeEnd);
     }
@@ -183,7 +183,7 @@ namespace JonsEngine
 
 	void Model::CopyNodeHierarchy(const Model& otherModel)
 	{
-		const uint32_t numNodes = otherModel.mNodes.size();
+		const uint32_t numNodes = static_cast<uint32_t>( otherModel.mNodes.size() );
 		mNodes.reserve(numNodes);
 
 		for (const ModelNode& otherNode : otherModel.mNodes)
@@ -237,7 +237,7 @@ namespace JonsEngine
         uint32_t numMeshes = 0;
 
         for (const PackageNode& node : model.mNodes)
-            numMeshes += node.mMeshes.size();
+            numMeshes += static_cast<uint32_t>( node.mMeshes.size() );
 
         return numMeshes;
     }
@@ -277,8 +277,8 @@ namespace JonsEngine
         // count meshes/nodes and reserve() space in containers before parsing them
         // otherwise iterators gets invalidated as parsing goes on and containers grow
         const uint32_t numMeshes = CountNumMeshes(model);
-        const uint32_t numNodes = model.mNodes.size();
-		const uint32_t numAnimations = model.mAnimations.size();
+        const uint32_t numNodes = static_cast<uint32_t>( model.mNodes.size() );
+		const uint32_t numAnimations = static_cast<uint32_t>( model.mAnimations.size() );
 
         meshContainer.reserve(numMeshes);
         nodeContainer.reserve(numNodes);

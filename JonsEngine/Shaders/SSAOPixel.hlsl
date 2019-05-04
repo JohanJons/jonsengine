@@ -1,7 +1,7 @@
 #ifndef SSAO_PIXEL_HLSL
 #define SSAO_PIXEL_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 #include "Common.hlsl"
 
 static const float gNumSamples = 11.0;

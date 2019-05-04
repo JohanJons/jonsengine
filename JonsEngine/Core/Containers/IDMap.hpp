@@ -59,7 +59,7 @@ namespace JonsEngine
 	template <typename... Arguments>
 	typename IDMap<T>::ItemID IDMap<T>::Insert( Arguments&&... args )
 	{
-        const size_t newChildIndex = mItems.size();
+        const uint32_t newChildIndex = static_cast<uint32_t>( mItems.size() );
 
 		if (!mFreeIndirectionIndices.empty())
 		{
@@ -78,7 +78,7 @@ namespace JonsEngine
 		else
 		{
             const uint32_t version = 1;
-            const size_t indirectionIndex = mItems.size();
+            const uint32_t indirectionIndex = static_cast<uint32_t>( mItems.size() );
             const ItemID indirectionID = newChildIndex | (version << 16);
             mIndirectionLayer.emplace_back(indirectionID);
 

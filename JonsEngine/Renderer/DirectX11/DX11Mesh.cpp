@@ -44,8 +44,8 @@ namespace JonsEngine
         mIndexBuffer(nullptr),
         mMeshID(gNextMeshID++),
 
-        mNumVertices(vertexData.size()),
-        mNumIndices(indexData.size()),
+        mNumVertices( static_cast<uint32_t>( vertexData.size() )),
+        mNumIndices( static_cast<uint32_t>( indexData.size() )),
         mHasBones(!boneWeights.empty())
     {
         // vertex buffer
@@ -56,7 +56,7 @@ namespace JonsEngine
         D3D11_BUFFER_DESC bufferDescription;
         ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
         bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-        bufferDescription.ByteWidth = tempVertexData.size() * sizeof(float);
+        bufferDescription.ByteWidth = static_cast<uint32_t>( tempVertexData.size() * sizeof(float) );
         bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
         D3D11_SUBRESOURCE_DATA initData;
@@ -69,7 +69,7 @@ namespace JonsEngine
         {
             ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
             bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-            bufferDescription.ByteWidth = normalData.size() * sizeof(float);
+            bufferDescription.ByteWidth = static_cast< uint32_t >( normalData.size() * sizeof(float) );
             bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
             ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
@@ -83,7 +83,7 @@ namespace JonsEngine
         {
             ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
             bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-            bufferDescription.ByteWidth = tangentDataSize * sizeof(float);
+            bufferDescription.ByteWidth = static_cast< uint32_t >( tangentDataSize * sizeof(float) );
             bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
             ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
@@ -96,7 +96,7 @@ namespace JonsEngine
         {
             ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
             bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-            bufferDescription.ByteWidth = texCoords.size() * sizeof(float);
+            bufferDescription.ByteWidth = static_cast< uint32_t >( texCoords.size() * sizeof(float) );
             bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
             ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
@@ -109,7 +109,7 @@ namespace JonsEngine
         {
 			ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
 			bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-			bufferDescription.ByteWidth = boneWeights.size() * sizeof(BoneWeight);
+			bufferDescription.ByteWidth = static_cast< uint32_t >( boneWeights.size() * sizeof(BoneWeight) );
 			bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
 			ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
@@ -124,7 +124,7 @@ namespace JonsEngine
 
         ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
         bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-        bufferDescription.ByteWidth = tempIndiceData.size() * sizeof(uint16_t);
+        bufferDescription.ByteWidth = static_cast< uint32_t >( tempIndiceData.size() * sizeof(uint16_t) );
         bufferDescription.BindFlags = D3D11_BIND_INDEX_BUFFER;
 
         ZeroMemory(&initData, sizeof(D3D11_SUBRESOURCE_DATA));
@@ -179,7 +179,7 @@ namespace JonsEngine
     {
         // AABB indices are offset into the mesh index buffer
         const uint32_t offset = mNumVertices * sizeof(float);
-        const uint32_t numAABBPoints = gAABBIndices.size();
+        const uint32_t numAABBPoints = static_cast< uint32_t >( gAABBIndices.size() );
 
         mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gPositionStride, &offset);
         mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, mNumIndices * sizeof(uint16_t));

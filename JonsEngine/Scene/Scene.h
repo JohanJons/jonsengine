@@ -29,7 +29,7 @@ namespace JonsEngine
     class Scene
     {
     public:
-        typedef ConstRangedIterator<IDMapTree<SceneNode>, IDMapTree<SceneNode>::const_iterator> SceneNodeIterator;
+        typedef ConstRangedIterator<IDMapTree<SceneNode>> SceneNodeIterator;
         typedef ConstRangedIterator<IDMap<StaticActor>> StaticActorIterator;
         typedef ConstRangedIterator<IDMap<AnimatedActor>> AnimatedActorIterator;
         typedef ConstRangedIterator<IDMap<PointLight>> PointLightIterator;

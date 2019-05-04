@@ -1,7 +1,7 @@
 #ifndef AMBIENT_PIXEL_HLSL
 #define AMBIENT_PIXEL_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 
 cbuffer AmbientConstants : register(CBUFFER_REGISTER_PIXEL)
 {

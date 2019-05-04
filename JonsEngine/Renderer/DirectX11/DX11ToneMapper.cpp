@@ -1,7 +1,7 @@
 #include "Renderer/DirectX11/DX11ToneMapper.h"
 
 #include "Renderer/DirectX11/DX11FullscreenTrianglePass.h"
-#include "Renderer/DirectX11/Shaders/Constants.h"
+#include "Shaders/Constants.hlsl"
 #include "Renderer/DirectX11/Shaders/Compiled/Tonemapping.h"
 #include "Renderer/DirectX11/Shaders/Compiled/AvgLuminance.h"
 

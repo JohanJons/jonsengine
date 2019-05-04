@@ -2,7 +2,7 @@
 
 #include "Resources/Bone.h"
 #include "Resources/BoneKeyframe.h"
-#include "Renderer/DirectX11/Shaders/Constants.h"
+#include "Shaders/Constants.hlsl"
 #include "Core/Utils/TimeUtils.h"
 #include "Core/Utils/IDGenerator.hpp"
 #include "Core/Types.h"
@@ -28,6 +28,7 @@ namespace JonsEngine
 
         Animation(const PackageAnimation& pkgAnimation, const BoneParentMap& parentMap, const BoneTransforms& boneOffsets);
 		Animation(const Animation& other, const BoneParentMap& parentMap, const BoneTransforms& boneOffsets);
+        Animation& operator=( const Animation& other );
 
         const std::string& GetName() const;
         Milliseconds GetAnimationDuration() const;

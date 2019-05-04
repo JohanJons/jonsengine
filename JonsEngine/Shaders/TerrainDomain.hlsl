@@ -35,7 +35,7 @@ float3 CalculateNormal( float2 uv )
 }
 
 [domain("quad")]
-DomainOut domain_main(PatchTess patchTess, float2 uv : SV_DomainLocation, const OutputPatch<HullOut, 4> quad)
+DomainOut ds_main(PatchTess patchTess, float2 uv : SV_DomainLocation, const OutputPatch<HullOut, 4> quad)
 {
 	DomainOut ret;
 

@@ -1,4 +1,5 @@
-﻿add_executable( JonsExample "" )
+﻿set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:WinMainCRTStartup" )
+add_executable( JonsExample "" )
 
 target_sources( JonsExample
     PRIVATE

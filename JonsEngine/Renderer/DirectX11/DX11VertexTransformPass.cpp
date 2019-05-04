@@ -3,7 +3,7 @@
 #include "Renderer/DirectX11/Shaders/Compiled/TransformStaticVertex.h"
 #include "Renderer/DirectX11/Shaders/Compiled/TransformStaticInstancedVertex.h"
 #include "Renderer/DirectX11/Shaders/Compiled/TransformAnimatedVertex.h"
-#include "Renderer/DirectX11/Shaders/Constants.h"
+#include "Shaders/Constants.hlsl"
 
 namespace JonsEngine
 {
@@ -114,7 +114,7 @@ namespace JonsEngine
 		mTransformCBuffer.SetData(TransformCBuffer(viewProjectionMatrix, noBoneIndexOffset));
 		mTransformCBuffer.Bind();
 
-		const uint32_t numTransforms = worldTransforms.size();
+		const uint32_t numTransforms = static_cast<uint32_t>( worldTransforms.size() );
 		assert(numTransforms > 0);
 		mesh.DrawPositionsInstanced(numTransforms);
 	}

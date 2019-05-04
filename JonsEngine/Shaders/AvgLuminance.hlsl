@@ -1,7 +1,7 @@
 #ifndef AVG_LUMINANCE_HLSL
 #define AVG_LUMINANCE_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 #include "Common.hlsl"
 #include "FullscreenTriangleTexcoord.hlsl"
 

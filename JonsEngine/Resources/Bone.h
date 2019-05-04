@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Types.h"
-#include "Renderer/DirectX11/Shaders/Constants.h"
+#include "Shaders/Constants.hlsl"
 
 #include <vector>
 #include <array>

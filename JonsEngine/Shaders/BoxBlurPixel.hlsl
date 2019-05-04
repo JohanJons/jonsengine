@@ -1,7 +1,7 @@
 #ifndef BOX_BLUR_PIXEL_HLSL
 #define BOX_BLUR_PIXEL_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 
 cbuffer BoxBlurConstants : register(CBUFFER_REGISTER_PIXEL)
 {

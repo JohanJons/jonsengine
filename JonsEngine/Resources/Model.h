@@ -24,11 +24,11 @@ namespace JonsEngine
         typedef std::vector<ModelNode> NodeContainer;
 
     public:
-        typedef ConstRangedIterator<MeshContainer, MeshContainer::const_iterator> MeshIterator;
-        typedef ConstRangedIterator<NodeContainer, NodeContainer::const_iterator> NodeIterator;
+        typedef ConstRangedIterator<MeshContainer> MeshIterator;
+        typedef ConstRangedIterator<NodeContainer> NodeIterator;
         typedef std::unordered_map<AnimationID, Animation> AnimationMap;
 		typedef std::unordered_map<std::string, AnimationID> AnimationNameMap;
-        typedef ConstRangedIterator<AnimationMap, AnimationMap::const_iterator> AnimationIterator;
+        typedef ConstRangedIterator<AnimationMap> AnimationIterator;
 
         Model(const std::string& name, const Vec3& minBounds, const Vec3& maxBounds, const DX11MeshID meshID);
         Model(const PackageModel& pkgModel, const ModelNode::InitDataList& initData);

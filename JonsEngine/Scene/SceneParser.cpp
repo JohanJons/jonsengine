@@ -207,7 +207,7 @@ namespace JonsEngine
 
 			Vec2 worldMin, worldMax;
 			transform.mQuadTree.GetWorldXZBounds( worldMin, worldMax );
-			std::size_t renderableEndIndex = renderableTransforms.size();
+			uint32_t renderableEndIndex = static_cast<uint32_t>( renderableTransforms.size() );
 			mRenderQueue.mTerrains.mTerrainData.emplace_back(heightmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale, patchSize);
 		}
 	}

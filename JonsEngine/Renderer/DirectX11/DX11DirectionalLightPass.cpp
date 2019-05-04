@@ -4,7 +4,7 @@
 #include "Renderer/DirectX11/DX11Pipeline.h"
 #include "Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "Renderer/DirectX11/DX11VertexTransformPass.h"
-#include "Renderer/DirectX11/Shaders/Constants.h"
+#include "Shaders/Constants.hlsl"
 #include "Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF2X2Pixel.h"
 #include "Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF3X3Pixel.h"
 #include "Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF5X5Pixel.h"

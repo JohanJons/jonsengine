@@ -37,11 +37,11 @@ namespace JonsEngine
     };
 
 
-    template <class Container, class InternalIterator = typename Container::const_iterator>
+    template <class Container>
     class ConstRangedIterator
     {
     public:
-        typedef InternalIterator Iterator;
+        typedef typename Container::const_iterator Iterator;
 
         ConstRangedIterator(const Container& container, const size_t beginIndex, const size_t upToIndex) : mIterBegin(container.cbegin() + beginIndex), mIterEnd(container.cbegin() + upToIndex)
         {

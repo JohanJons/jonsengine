@@ -53,7 +53,7 @@ PatchTess PatchHS( InputPatch<VertexOut, 12> inputVertices )
 [outputtopology("triangle_ccw")]
 [outputcontrolpoints(4)]
 [patchconstantfunc("PatchHS")]
-HullOut hull_main( InputPatch<VertexOut, 12> verticeData, uint index : SV_OutputControlPointID )
+HullOut hs_main( InputPatch<VertexOut, 12> verticeData, uint index : SV_OutputControlPointID )
 {
 	HullOut ret;
 

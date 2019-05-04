@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Renderer/DirectX11/Shaders/Constants.h"
+#include "Shaders/Constants.hlsl"
 #include "Renderer/RenderSettings.h"
 #include "Core/Logging/Logger.h"
 #include "Core/EngineSettings.h"

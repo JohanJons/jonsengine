@@ -1,7 +1,7 @@
 #ifndef TRANSFORM_STATIC_VERTEX_HLSL
 #define TRANSFORM_STATIC_VERTEX_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 
 cbuffer TransformConstants : register(CBUFFER_REGISTER_VERTEX)
 {

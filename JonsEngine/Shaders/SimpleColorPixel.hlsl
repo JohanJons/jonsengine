@@ -1,7 +1,7 @@
 #ifndef SIMPLE_COLOR_PIXEL_HLSL
 #define SIMPLE_COLOR_PIXEL_HLSL
 
-#include "Constants.h"
+#include "Constants.hlsl"
 
 cbuffer ColorConstants : register(CBUFFER_REGISTER_PIXEL)
 {
