@@ -37,7 +37,7 @@ namespace JonsEngine
         ~DX11Pipeline();
 
         void BeginFrame(const RenderQueue& renderQueue);
-        void EndFrame();
+        void EndFrame(const RenderSettings& renderSettings);
 
         void GeometryStage(const RenderQueue& renderQueue);
         void LightingStage(const RenderQueue& renderQueue, const RenderSettings& renderSettings);

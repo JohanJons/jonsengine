@@ -108,9 +108,16 @@ namespace JonsEngine
 		}
     }
 
-    void DX11Pipeline::EndFrame()
+    void DX11Pipeline::EndFrame(const RenderSettings& renderSettings)
     {
-        DXCALL(mSwapchain->Present(0, 0));
+        if ( renderSettings.mVSync )
+        {
+            DXCALL(mSwapchain->Present(1, 0));
+        }
+        else
+        {
+            DXCALL(mSwapchain->Present(0, 0));
+        }
     }
 
 

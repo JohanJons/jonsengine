@@ -63,6 +63,7 @@ namespace JonsEngine
 		AutoExposureRate mAutoExposureRate;
 		bool mBloomEnabled;
 		bool mSSAOEnabled;
+        bool mVSync;
 
 
 		RenderSettings();
@@ -78,7 +79,8 @@ namespace JonsEngine
 		mTessellation({ 1.0f , 25.0f, 1.0f, 5.0f }),
 		mAutoExposureRate(DefaultAutoExposureRate()),
 		mBloomEnabled(true),
-		mSSAOEnabled(true)
+		mSSAOEnabled(true),
+        mVSync(true)
 	{
 	}
 }
