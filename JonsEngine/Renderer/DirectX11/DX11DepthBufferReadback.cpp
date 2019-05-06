@@ -1,6 +1,6 @@
 #include "Renderer/DirectX11/DX11DepthBufferReadback.h"
 
-#include "Renderer/DirectX11/Shaders/Compiled/DepthReadback.h"
+#include "Compiled/DepthReadback.h"
 
 namespace JonsEngine
 {
@@ -17,7 +17,7 @@ namespace JonsEngine
 		ZeroMemory(&bufferDesc, sizeof(bufferDesc));
 		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 		bufferDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
-		bufferDesc.ByteWidth = sizeof(float);
+		bufferDesc.ByteWidth = static_cast<uint32_t>( sizeof(float) );
 		device->CreateBuffer(&bufferDesc, nullptr, &mCSBuffer);
 
 		bufferDesc.Usage = D3D11_USAGE_STAGING;
@@ -32,7 +32,7 @@ namespace JonsEngine
 		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
 		device->CreateUnorderedAccessView(mCSBuffer, &uavDesc, &mCSUAV);
 
-		device->CreateComputeShader(gDepthReadbackShader, sizeof(gDepthReadbackShader), nullptr, &mReadbackShader);
+		device->CreateComputeShader(gDepthReadback, sizeof(gDepthReadback), nullptr, &mReadbackShader);
 	}
 
 

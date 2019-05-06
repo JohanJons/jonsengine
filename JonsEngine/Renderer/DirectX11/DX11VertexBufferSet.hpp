@@ -59,7 +59,7 @@ namespace JonsEngine
             D3D11_BUFFER_DESC bufferDescription;
             ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
             bufferDescription.Usage = D3D11_USAGE_IMMUTABLE;
-            bufferDescription.ByteWidth = data.size() * sizeof(T);
+            bufferDescription.ByteWidth = static_cast<uint32_t>( data.size() * sizeof(T) );
             bufferDescription.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 
             D3D11_SUBRESOURCE_DATA initData;

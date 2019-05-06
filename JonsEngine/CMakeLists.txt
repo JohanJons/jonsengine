@@ -24,7 +24,7 @@ foreach( SOURCE ${SOURCES})
 endforeach()
 
 target_compile_definitions( JonsEngine PUBLIC BOOST_ALL_NO_LIB )
-target_include_directories( JonsEngine PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_CURRENT_BINARY_DIR}/Shaders )
+target_include_directories( JonsEngine PUBLIC ${CMAKE_CURRENT_LIST_DIR} )
 
 find_package( Boost 1.70 REQUIRED serialization filesystem )
 target_link_libraries( JonsEngine JonsShaders glm dlmalloc Boost::serialization Boost::filesystem d3d11 Comctl32 winmm )

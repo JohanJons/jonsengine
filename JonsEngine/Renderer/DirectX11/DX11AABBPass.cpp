@@ -2,7 +2,7 @@
 
 #include "Renderer/DirectX11/DX11Utils.h"
 #include "Renderer/DirectX11/DX11VertexTransformPass.h"
-#include "Renderer/DirectX11/Shaders/Compiled/SimpleColorPixel.h"
+#include "Compiled/SimpleColorPixel.h"
 
 namespace JonsEngine
 {
@@ -12,7 +12,7 @@ namespace JonsEngine
 		mVertexTransformPass( vertexTransformPass ),
 		mCBuffer( device, context, mCBuffer.CONSTANT_BUFFER_SLOT_PIXEL )
     {
-        DXCALL(device->CreatePixelShader(gSimpleColorPixelShader, sizeof(gSimpleColorPixelShader), nullptr, &mPixelShader));
+        DXCALL(device->CreatePixelShader(gSimpleColorPixel, sizeof(gSimpleColorPixel), nullptr, &mPixelShader));
     }
     
     DX11AABBPass::~DX11AABBPass()

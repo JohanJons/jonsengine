@@ -2,8 +2,8 @@
 
 #include "Renderer/DirectX11/DX11Utils.h"
 #include "Renderer/DirectX11/DX11FullscreenTrianglePass.h"
-#include "Renderer/DirectX11/Shaders/Compiled/AmbientPixel.h"
-#include "Renderer/DirectX11/Shaders/Compiled/SSAOPixel.h"
+#include "Compiled/AmbientPixel.h"
+#include "Compiled/SSAOPixel.h"
 
 namespace JonsEngine
 {
@@ -35,8 +35,8 @@ namespace JonsEngine
         DXCALL(device->CreateShaderResourceView(mSSAOTexture, nullptr, &mSSAOSRV));
         DXCALL(device->CreateRenderTargetView(mSSAOTexture, nullptr, &mSSAORTV));
 
-        DXCALL(device->CreatePixelShader(gAmbientPixelShader, sizeof(gAmbientPixelShader), nullptr, &mAmbientPixelShader));
-        DXCALL(device->CreatePixelShader(gSSAOPixelShader, sizeof(gSSAOPixelShader), nullptr, &mSSAOPixelShader));
+        DXCALL(device->CreatePixelShader(gAmbientPixel, sizeof(gAmbientPixel), nullptr, &mAmbientPixelShader));
+        DXCALL(device->CreatePixelShader(gSSAOPixel, sizeof(gSSAOPixel), nullptr, &mSSAOPixelShader));
     }
 
     DX11AmbientPass::~DX11AmbientPass()

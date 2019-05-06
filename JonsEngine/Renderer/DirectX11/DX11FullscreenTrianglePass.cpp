@@ -1,7 +1,7 @@
 #include "Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 
-#include "Renderer/DirectX11/Shaders/Compiled/FullscreenTriangle.h"
-#include "Renderer/DirectX11/Shaders/Compiled/FullscreenTriangleTexcoord.h"
+#include "Compiled/FullscreenTriangle.h"
+#include "Compiled/FullscreenTriangleTexcoord.h"
 
 namespace JonsEngine
 {
@@ -10,8 +10,8 @@ namespace JonsEngine
 		mFSVertexShader(nullptr),
 		mFSTexcoordVertexShader(nullptr)
     {
-        DXCALL(device->CreateVertexShader(gFullscreenTriangleShader, sizeof(gFullscreenTriangleShader), nullptr, &mFSVertexShader));
-		DXCALL(device->CreateVertexShader(gFullscreenTriangleTexcoordShader, sizeof(gFullscreenTriangleTexcoordShader), nullptr, &mFSTexcoordVertexShader));
+        DXCALL(device->CreateVertexShader(gFullscreenTriangle, sizeof(gFullscreenTriangle), nullptr, &mFSVertexShader));
+		DXCALL(device->CreateVertexShader(gFullscreenTriangleTexcoord, sizeof(gFullscreenTriangleTexcoord), nullptr, &mFSTexcoordVertexShader));
     }
 
     DX11FullscreenTrianglePass::~DX11FullscreenTrianglePass()

@@ -73,6 +73,8 @@ namespace JonsEngine
             const ItemID publicID = freeIndirectionIndex | (version << 16);
             mItems.emplace_back(publicID, std::forward<Arguments>(args)...);
             
+            assert( publicID != INVALID_ITEM_ID );
+
             return publicID;
 		}
 		else
@@ -85,6 +87,8 @@ namespace JonsEngine
             const ItemID publicID = indirectionIndex | (version << 16);
             mItems.emplace_back(publicID, std::forward<Arguments>(args)...);
             
+            assert( publicID != INVALID_ITEM_ID );
+
             return publicID;
 		}
 	}

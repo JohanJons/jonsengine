@@ -1,15 +1,15 @@
 #include "Renderer/DirectX11/DX11SkyboxPass.h"
 
 #include "Renderer/DirectX11/DX11Texture.h"
-#include "Renderer/DirectX11/Shaders/Compiled/SkyboxVertex.h"
-#include "Renderer/DirectX11/Shaders/Compiled/SkyboxPixel.h"
+#include "Compiled/SkyboxVertex.h"
+#include "Compiled/SkyboxPixel.h"
 
 namespace JonsEngine
 {
     DX11SkyboxPass::DX11SkyboxPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context) : mContext(context), mVertexShader(nullptr), mPixelShader(nullptr)
     {
-        DXCALL(device->CreateVertexShader(gSkyboxVertexShader, sizeof(gSkyboxVertexShader), nullptr, &mVertexShader));
-        DXCALL(device->CreatePixelShader(gSkyboxPixelShader, sizeof(gSkyboxPixelShader), nullptr, &mPixelShader));
+        DXCALL(device->CreateVertexShader(gSkyboxVertex, sizeof(gSkyboxVertex), nullptr, &mVertexShader));
+        DXCALL(device->CreatePixelShader(gSkyboxPixel, sizeof(gSkyboxPixel), nullptr, &mPixelShader));
     }
 
     DX11SkyboxPass::~DX11SkyboxPass()

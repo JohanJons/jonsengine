@@ -29,6 +29,7 @@ namespace JonsEngine
         class BaseIterator
         {
         public:
+            BaseIterator() = default;
             BaseIterator(typename const InternalIter& iter);
 
             bool operator!=(const BaseIterator& iter) const;
@@ -49,6 +50,8 @@ namespace JonsEngine
         typedef BaseIterator<T&, ItemIterator> iterator;
         typedef BaseIterator<const T&, ConstItemIterator> const_iterator;
 
+        size_t Size() const;
+        size_t Capacity() const;
 
         iterator begin();
         iterator end();
@@ -189,6 +192,17 @@ namespace JonsEngine
         return indirID;
     }
 
+    template <typename T, typename StorageType>
+    size_t IDMapBase<T, StorageType>::Size() const
+    {
+        return mItems.size();
+    }
+
+    template <typename T, typename StorageType>
+    size_t IDMapBase<T, StorageType>::Capacity() const
+    {
+        return mItems.capacity();
+    }
 
     template <typename T, typename StorageType>
     typename IDMapBase<T, StorageType>::iterator IDMapBase<T, StorageType>::begin()

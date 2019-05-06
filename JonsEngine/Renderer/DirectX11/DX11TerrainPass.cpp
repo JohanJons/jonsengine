@@ -2,11 +2,11 @@
 
 #include "Renderer/DirectX11/DX11Texture.h"
 #include "Renderer/DirectX11/DX11VertexTransformPass.h"
-#include "Renderer/DirectX11/Shaders/Compiled/TerrainVertex.h"
-#include "Renderer/DirectX11/Shaders/Compiled/TerrainHull.h"
-#include "Renderer/DirectX11/Shaders/Compiled/TerrainDomain.h"
-#include "Renderer/DirectX11/Shaders/Compiled/TerrainPixel.h"
-#include "Renderer/DirectX11/Shaders/Compiled/TerrainPixelDebug.h"
+#include "Compiled/TerrainVertex.h"
+#include "Compiled/TerrainHull.h"
+#include "Compiled/TerrainDomain.h"
+#include "Compiled/TerrainPixel.h"
+#include "Compiled/TerrainPixelDebug.h"
 #include "Core/Math/MathUtils.h"
 #include "Core/Math/AABB.h"
 
@@ -75,14 +75,14 @@ namespace JonsEngine
 		inputDescription[VSInputLayout::POSITION].AlignedByteOffset = 0;
 		inputDescription[VSInputLayout::POSITION].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputDescription[VSInputLayout::POSITION].InstanceDataStepRate = 0;
-		DXCALL(device->CreateInputLayout(inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gTerrainVertexShader, sizeof(gTerrainVertexShader), &mLayout));
+		DXCALL(device->CreateInputLayout(inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gTerrainVertex, sizeof(gTerrainVertex), &mLayout));
 
 		// shaders
-		DXCALL(device->CreateVertexShader(gTerrainVertexShader, sizeof(gTerrainVertexShader), nullptr, &mVertexShader));
-		DXCALL(device->CreateHullShader(gTerrainHullShader, sizeof(gTerrainHullShader), nullptr, &mHullShader));
-		DXCALL(device->CreateDomainShader(gTerrainDomainShader, sizeof(gTerrainDomainShader), nullptr, &mDomainShader));
-		DXCALL(device->CreatePixelShader(gTerrainPixelShader, sizeof(gTerrainPixelShader), nullptr, &mPixelShader));
-		DXCALL( device->CreatePixelShader( gTerrainPixelDebugShader, sizeof( gTerrainPixelDebugShader ), nullptr, &mPixelDebugShader ) );
+		DXCALL(device->CreateVertexShader(gTerrainVertex, sizeof(gTerrainVertex), nullptr, &mVertexShader));
+		DXCALL(device->CreateHullShader(gTerrainHull, sizeof(gTerrainHull), nullptr, &mHullShader));
+		DXCALL(device->CreateDomainShader(gTerrainDomain, sizeof(gTerrainDomain), nullptr, &mDomainShader));
+		DXCALL(device->CreatePixelShader(gTerrainPixel, sizeof(gTerrainPixel), nullptr, &mPixelShader));
+		DXCALL( device->CreatePixelShader( gTerrainPixelDebug, sizeof( gTerrainPixelDebug ), nullptr, &mPixelDebugShader ) );
 
 		D3D11_RASTERIZER_DESC rasterizerDesc;
 		ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));

@@ -2,70 +2,43 @@
 
 namespace JonsEngine
 {
-    // TODO: this duplication of code must be redundant
-
-    template <class Container, class InternalIterator = typename Container::iterator>
-    class RangedIterator
-    {
-    public:
-        typedef InternalIterator Iterator;
-
-        RangedIterator(Container& container, const size_t beginIndex, const size_t upToIndex) : mIterBegin(container.begin() + beginIndex), mIterEnd(container.begin() + upToIndex)
-        {
-            assert(upToIndex >= beginIndex);
-        }
-
-        RangedIterator(const Iterator& begin, const Iterator& end) : mIterBegin(begin), mIterEnd(end)
-        {
-        }
-
-
-        Iterator begin()
-        {
-            return mIterBegin;
-        }
-
-        Iterator end()
-        {
-            return mIterEnd;
-        }
-
-
-    private:
-        Iterator mIterBegin;
-        Iterator mIterEnd;
-    };
-
-
     template <class Container>
     class ConstRangedIterator
     {
     public:
         typedef typename Container::const_iterator Iterator;
 
-        ConstRangedIterator(const Container& container, const size_t beginIndex, const size_t upToIndex) : mIterBegin(container.cbegin() + beginIndex), mIterEnd(container.cbegin() + upToIndex)
+        ConstRangedIterator() = default;
+        ConstRangedIterator(const Container& container, const size_t beginIndex, const size_t upToIndex) : 
+            mContainer( &container ),
+            mBeginIndex( beginIndex ),
+            mEndIndex( upToIndex )
         {
             assert(upToIndex >= beginIndex);
         }
 
-        ConstRangedIterator(const Iterator& begin, const Iterator& end) : mIterBegin(begin), mIterEnd(end)
-        {
-        }
-
+        bool IsValid() const { return mContainer != nullptr; }
 
         Iterator begin() const
         {
-            return mIterBegin;
+            if ( !mContainer )
+                return Iterator();
+
+            return mContainer->cbegin() + mBeginIndex;
         }
 
         Iterator end() const
         {
-            return mIterEnd;
+            if ( !mContainer )
+                return Iterator();
+
+            return mContainer->cbegin() + mEndIndex;
         }
 
 
     private:
-        Iterator mIterBegin;
-        Iterator mIterEnd;
+        const Container* mContainer = nullptr;
+        size_t mBeginIndex = 0;
+        size_t mEndIndex = 0;
     };
 }

@@ -2,7 +2,7 @@
 
 #include "Renderer/Shapes.h"
 #include "Renderer/DirectX11/DX11VertexTransformPass.h"
-#include "Renderer/DirectX11/Shaders/Compiled/PointLightPixel.h"
+#include "Compiled/PointLightPixel.h"
 #include "Core/Math/MathUtils.h"
 #include "Core/Logging/Logger.h"
 
@@ -101,7 +101,7 @@ namespace JonsEngine
         depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_EQUAL;
         DXCALL(device->CreateDepthStencilState(&depthStencilDesc, &mDSSShadingPass));
 
-        DXCALL(device->CreatePixelShader(gPointLightPixelShader, sizeof(gPointLightPixelShader), nullptr, &mPixelShader));
+        DXCALL(device->CreatePixelShader(gPointLightPixel, sizeof(gPointLightPixel), nullptr, &mPixelShader));
     }
 
     DX11PointLightPass::~DX11PointLightPass()

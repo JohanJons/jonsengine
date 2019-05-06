@@ -1,7 +1,7 @@
 #include "Renderer/DirectX11/DX11BoxBlurPass.h"
 
 #include "Renderer/DirectX11/DX11FullscreenTrianglePass.h"
-#include "Renderer/DirectX11/Shaders/Compiled/BoxBlurPixel.h"
+#include "Compiled/BoxBlurPixel.h"
 
 namespace JonsEngine
 {
@@ -22,7 +22,7 @@ namespace JonsEngine
         DXCALL(device->CreateShaderResourceView(mBoxBlurTexture, nullptr, &mBoxBlurSRV));
         DXCALL(device->CreateRenderTargetView(mBoxBlurTexture, nullptr, &mBoxBlurRTV));
 
-        DXCALL(device->CreatePixelShader(gBoxBlurPixelShader, sizeof(gBoxBlurPixelShader), nullptr, &mPixelShader));
+        DXCALL(device->CreatePixelShader(gBoxBlurPixel, sizeof(gBoxBlurPixel), nullptr, &mPixelShader));
     }
 
     DX11BoxBlurPass::~DX11BoxBlurPass()

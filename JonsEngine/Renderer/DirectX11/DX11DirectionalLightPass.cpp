@@ -5,10 +5,10 @@
 #include "Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "Shaders/Constants.hlsl"
-#include "Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF2X2Pixel.h"
-#include "Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF3X3Pixel.h"
-#include "Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF5X5Pixel.h"
-#include "Renderer/DirectX11/Shaders/Compiled/DirectionalLightPCF7X7Pixel.h"
+#include "Compiled/DirectionalLightPCF2X2Pixel.h"
+#include "Compiled/DirectionalLightPCF3X3Pixel.h"
+#include "Compiled/DirectionalLightPCF5X5Pixel.h"
+#include "Compiled/DirectionalLightPCF7X7Pixel.h"
 #include "Core/Math/MathUtils.h"
 
 #include <array>
@@ -72,10 +72,10 @@ namespace JonsEngine
         mShadowmap(device, context, shadowmapRes, NUM_SHADOWMAP_CASCADES, false),
         mDirLightCBuffer(device, context, mDirLightCBuffer.CONSTANT_BUFFER_SLOT_PIXEL)
     {
-        DXCALL(device->CreatePixelShader(gDirectionalLightPCF2X2PixelShader, sizeof(gDirectionalLightPCF2X2PixelShader), nullptr, &mPCF2x2Shader));
-        DXCALL(device->CreatePixelShader(gDirectionalLightPCF3X3PixelShader, sizeof(gDirectionalLightPCF3X3PixelShader), nullptr, &mPCF3x3Shader));
-        DXCALL(device->CreatePixelShader(gDirectionalLightPCF5X5PixelShader, sizeof(gDirectionalLightPCF5X5PixelShader), nullptr, &mPCF5x5Shader));
-        DXCALL(device->CreatePixelShader(gDirectionalLightPCF7X7PixelShader, sizeof(gDirectionalLightPCF7X7PixelShader), nullptr, &mPCF7x7Shader));
+        DXCALL(device->CreatePixelShader(gDirectionalLightPCF2X2Pixel, sizeof(gDirectionalLightPCF2X2Pixel), nullptr, &mPCF2x2Shader));
+        DXCALL(device->CreatePixelShader(gDirectionalLightPCF3X3Pixel, sizeof(gDirectionalLightPCF3X3Pixel), nullptr, &mPCF3x3Shader));
+        DXCALL(device->CreatePixelShader(gDirectionalLightPCF5X5Pixel, sizeof(gDirectionalLightPCF5X5Pixel), nullptr, &mPCF5x5Shader));
+        DXCALL(device->CreatePixelShader(gDirectionalLightPCF7X7Pixel, sizeof(gDirectionalLightPCF7X7Pixel), nullptr, &mPCF7x7Shader));
 
         // depth clamp to avoid meshes between frustrum split issues
         D3D11_RASTERIZER_DESC rasterizerDesc;

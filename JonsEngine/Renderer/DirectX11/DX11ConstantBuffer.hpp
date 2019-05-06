@@ -26,7 +26,7 @@ namespace JonsEngine
         {
             D3D11_BUFFER_DESC bufferDescription;
             ZeroMemory(&bufferDescription, sizeof(D3D11_BUFFER_DESC));
-            bufferDescription.ByteWidth = sizeof(ContentType);
+            bufferDescription.ByteWidth = static_cast<uint32_t>( sizeof(ContentType) );
             bufferDescription.Usage = D3D11_USAGE_DYNAMIC;
             bufferDescription.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
             bufferDescription.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;

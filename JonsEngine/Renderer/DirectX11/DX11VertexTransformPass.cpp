@@ -1,8 +1,8 @@
 #include "Renderer/DirectX11/DX11VertexTransformPass.h"
 
-#include "Renderer/DirectX11/Shaders/Compiled/TransformStaticVertex.h"
-#include "Renderer/DirectX11/Shaders/Compiled/TransformStaticInstancedVertex.h"
-#include "Renderer/DirectX11/Shaders/Compiled/TransformAnimatedVertex.h"
+#include "Compiled/TransformStaticVertex.h"
+#include "Compiled/TransformStaticInstancedVertex.h"
+#include "Compiled/TransformAnimatedVertex.h"
 #include "Shaders/Constants.hlsl"
 
 namespace JonsEngine
@@ -44,9 +44,9 @@ namespace JonsEngine
 		inputDescStatic[StaticLayout::STATIC_POSITION].AlignedByteOffset = 0;
 		inputDescStatic[StaticLayout::STATIC_POSITION].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputDescStatic[StaticLayout::STATIC_POSITION].InstanceDataStepRate = 0;
-		DXCALL(device->CreateInputLayout(inputDescStatic, StaticLayout::STATIC_NUM_INPUT_LAYOUTS, gTransformStaticVertexShader, sizeof(gTransformStaticVertexShader), &mLayoutStatic));
-		DXCALL(device->CreateVertexShader(gTransformStaticVertexShader, sizeof(gTransformStaticVertexShader), nullptr, &mStaticShader));
-		DXCALL(device->CreateVertexShader(gTransformStaticInstancedVertexShader, sizeof(gTransformStaticInstancedVertexShader), nullptr, &mStaticInstancedShader));
+		DXCALL(device->CreateInputLayout(inputDescStatic, StaticLayout::STATIC_NUM_INPUT_LAYOUTS, gTransformStaticVertex, sizeof(gTransformStaticVertex), &mLayoutStatic));
+		DXCALL(device->CreateVertexShader(gTransformStaticVertex, sizeof(gTransformStaticVertex), nullptr, &mStaticShader));
+		DXCALL(device->CreateVertexShader(gTransformStaticInstancedVertex, sizeof(gTransformStaticInstancedVertex), nullptr, &mStaticInstancedShader));
 
 		// animated layout
 		D3D11_INPUT_ELEMENT_DESC inputDescAnimated[AnimatedLayout::ANIMATED_NUM_INPUT_LAYOUTS];
@@ -74,8 +74,8 @@ namespace JonsEngine
 		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_WEIGHT].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_WEIGHT].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputDescAnimated[AnimatedLayout::ANIMATED_BONE_WEIGHT].InstanceDataStepRate = 0;
-        DXCALL(device->CreateInputLayout(inputDescAnimated, AnimatedLayout::ANIMATED_NUM_INPUT_LAYOUTS, gTransformAnimatedVertexShader, sizeof(gTransformAnimatedVertexShader), &mLayoutAnimated));
-        DXCALL(device->CreateVertexShader(gTransformAnimatedVertexShader, sizeof(gTransformAnimatedVertexShader), nullptr, &mAnimatedShader));
+        DXCALL(device->CreateInputLayout(inputDescAnimated, AnimatedLayout::ANIMATED_NUM_INPUT_LAYOUTS, gTransformAnimatedVertex, sizeof(gTransformAnimatedVertex), &mLayoutAnimated));
+        DXCALL(device->CreateVertexShader(gTransformAnimatedVertex, sizeof(gTransformAnimatedVertex), nullptr, &mAnimatedShader));
     }
 
     DX11VertexTransformPass::~DX11VertexTransformPass()

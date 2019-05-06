@@ -1,8 +1,8 @@
 #include "Renderer/DirectX11/DX11DepthReductionPass.h"
 
-#include "Renderer/DirectX11/Shaders/Compiled/SDSMInitialCompute.h"
-#include "Renderer/DirectX11/Shaders/Compiled/SDSMFinalCompute.h"
 #include "Core/Math/MathUtils.h"
+#include "Compiled/SDSMInitialCompute.h"
+#include "Compiled/SDSMFinalCompute.h"
 
 namespace JonsEngine
 {
@@ -19,8 +19,8 @@ namespace JonsEngine
     DX11DepthReductionPass::DX11DepthReductionPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const RenderSettings::ShadowReadbackLatency readbackLatency, const uint16_t windowWidth, const uint16_t windowHeight) :
         mReadbackLatency(RenderSettingsToVal(readbackLatency)), mCurrFrame(0), mContext(context), mSDSMInitialShader(nullptr), mSDSMFinalShader(nullptr), mSDSMCBuffer(device, context, mSDSMCBuffer.CONSTANT_BUFFER_SLOT_COMPUTE)
     {
-        DXCALL(device->CreateComputeShader(gSDSMInitialComputeShader, sizeof(gSDSMInitialComputeShader), nullptr, &mSDSMInitialShader));
-        DXCALL(device->CreateComputeShader(gSDSMFinalComputeShader, sizeof(gSDSMFinalComputeShader), nullptr, &mSDSMFinalShader));
+        DXCALL(device->CreateComputeShader(gSDSMInitialCompute, sizeof(gSDSMInitialCompute), nullptr, &mSDSMInitialShader));
+        DXCALL(device->CreateComputeShader(gSDSMFinalCompute, sizeof(gSDSMFinalCompute), nullptr, &mSDSMFinalShader));
 
         // setup UAVs for compute shader
         uint32_t width = windowWidth;

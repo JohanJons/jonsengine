@@ -45,7 +45,7 @@ namespace JonsEngine
             float mLightIntensity;
             float mZNear;
             float mMaxDistance;
-            float __padding;
+            uint32_t __padding[3];
 
 
             PointLightCBuffer(const Vec4& lightColor, const Vec4& lightPosition, const Vec2& windowSize, const float lightIntensity, const float zNear, const float maxDistance) :

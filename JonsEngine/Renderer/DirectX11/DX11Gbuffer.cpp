@@ -2,9 +2,9 @@
 
 #include "Renderer/DirectX11/DX11Utils.h"
 #include "Renderer/DirectX11/DX11Mesh.h"
-#include "Renderer/DirectX11/Shaders/Compiled/GBufferVertexStatic.h"
-#include "Renderer/DirectX11/Shaders/Compiled/GBufferVertexAnimated.h"
-#include "Renderer/DirectX11/Shaders/Compiled/GBufferPixel.h"
+#include "Compiled/GBufferVertexStatic.h"
+#include "Compiled/GBufferVertexAnimated.h"
+#include "Compiled/GBufferPixel.h"
 
 namespace JonsEngine
 {
@@ -109,13 +109,13 @@ namespace JonsEngine
         inputDescription[VSInputLayout::BONE_WEIGHT].InstanceDataStepRate = 0;
 
 		const uint32_t animatedNumExtraInputs = 2;
-        DXCALL(device->CreateInputLayout(inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS - animatedNumExtraInputs, gGBufferVertexStaticShader, sizeof(gGBufferVertexStaticShader), &mStaticLayout));
-		DXCALL(device->CreateInputLayout(inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gGBufferVertexAnimatedShader, sizeof(gGBufferVertexAnimatedShader), &mAnimatedLayout));
+        DXCALL(device->CreateInputLayout(inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS - animatedNumExtraInputs, gGBufferVertexStatic, sizeof(gGBufferVertexStatic), &mStaticLayout));
+		DXCALL(device->CreateInputLayout(inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gGBufferVertexAnimated, sizeof(gGBufferVertexAnimated), &mAnimatedLayout));
 
         // create shader objects
-        DXCALL(device->CreateVertexShader(gGBufferVertexStaticShader, sizeof(gGBufferVertexStaticShader), nullptr, &mStaticVertexShader));
-		DXCALL(device->CreateVertexShader(gGBufferVertexAnimatedShader, sizeof(gGBufferVertexAnimatedShader), nullptr, &mAnimatedVertexShader));
-        DXCALL(device->CreatePixelShader(gGBufferPixelShader, sizeof(gGBufferPixelShader), nullptr, &mPixelShader));
+        DXCALL(device->CreateVertexShader(gGBufferVertexStatic, sizeof(gGBufferVertexStatic), nullptr, &mStaticVertexShader));
+		DXCALL(device->CreateVertexShader(gGBufferVertexAnimated, sizeof(gGBufferVertexAnimated), nullptr, &mAnimatedVertexShader));
+        DXCALL(device->CreatePixelShader(gGBufferPixel, sizeof(gGBufferPixel), nullptr, &mPixelShader));
     }
 
     DX11GBuffer::~DX11GBuffer()

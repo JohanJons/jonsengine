@@ -2,8 +2,7 @@
 
 #include "Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "Renderer/DirectX11/DX11Backbuffer.h"
-#include "Renderer/DirectX11/Shaders/Compiled/FXAAPixel.h"
-#include "Renderer/DirectX11/Shaders/Compiled/SSAOPixel.h"
+#include "Compiled/FXAAPixel.h"
 
 namespace JonsEngine
 {
@@ -21,7 +20,7 @@ namespace JonsEngine
         DXCALL(device->CreateTexture2D(&backbufferTextureDesc, nullptr, &mFXAABackbufferTexture));
         DXCALL(device->CreateRenderTargetView(mFXAABackbufferTexture, nullptr, &mFXAARTV));
         DXCALL(device->CreateShaderResourceView(mFXAABackbufferTexture, nullptr, &mFXAASRV));
-        DXCALL(device->CreatePixelShader(gFXAAPixelShader, sizeof(gFXAAPixelShader), nullptr, &mFXAAPixelShader));
+        DXCALL(device->CreatePixelShader(gFXAAPixel, sizeof(gFXAAPixel), nullptr, &mFXAAPixelShader));
     }
 
     DX11PostProcessor::~DX11PostProcessor()

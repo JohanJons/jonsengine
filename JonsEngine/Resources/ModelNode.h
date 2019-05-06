@@ -22,38 +22,12 @@ namespace JonsEngine
         typedef std::tuple<const PackageMesh&, const DX11MeshID, const MaterialID> InitData;
         typedef std::vector<InitData> InitDataList;
 
-        typedef std::vector<ModelNode> NodeContainer;
         typedef std::vector<Mesh> MeshContainer;
-
         typedef ConstRangedIterator<MeshContainer> MeshIterator;
-        typedef ConstRangedIterator<NodeContainer> AllChildrenIterator;
-        typedef NodeContainer::const_iterator NodeIterator;
-
-    private:
-        // this iterator is defined because traversing immediate children must be different since the node tree is built depth-first
-        // some standard iterator operators are deleted to make it play nicer
-        // not a perfect solution but good enough for the limited purpose at hand
-        class ImmediateChildrenIter : public NodeIterator
-        {
-        public:
-            ImmediateChildrenIter(const NodeIterator& iter);
-
-            ImmediateChildrenIter& operator++();
-
-            ImmediateChildrenIter& operator--() = delete;
-            ImmediateChildrenIter operator--(int) = delete;
-            ImmediateChildrenIter& operator+=(difference_type) = delete;
-            ImmediateChildrenIter operator+(difference_type) const = delete;
-            ImmediateChildrenIter& operator-=(difference_type) = delete;
-        };
 
     public:
-        typedef ConstRangedIterator<NodeContainer> ImmediateChildrenIterator;
-
-        ModelNode(const PackageNode& pkgNode, const ImmediateChildrenIterator& immChildIter, const AllChildrenIterator& childIter, const MeshIterator& meshIter, const NodeIterator& next);
-        ModelNode(const std::string& name, const ModelNodeIndex nodeID, const Mat4& localTransform, const ImmediateChildrenIterator& immChildIter,
-			const AllChildrenIterator& allChildIter, const MeshIterator& meshIter, const NodeIterator& next);
-        ~ModelNode();
+        ModelNode( const PackageNode& pkgNode, const MeshIterator& meshIter );
+        ModelNode( const std::string& name, const ModelNodeIndex nodeID, const Mat4& localTransform, const MeshIterator& meshIter );
 
         uint32_t GetNumMeshes() const;
         const std::string& GetName() const;
@@ -61,9 +35,6 @@ namespace JonsEngine
 		const Mat4& GetLocalTransform() const;
 
         MeshIterator GetMeshes() const;
-        AllChildrenIterator GetAllChildren() const;
-        ImmediateChildrenIterator GetImmediateChildren() const;
-
 
     private:
         std::string mName;
@@ -71,11 +42,6 @@ namespace JonsEngine
 		Mat4 mLocalTransform;
         uint32_t mNumMeshes;
 
-        ImmediateChildrenIterator mImmediateChildNodes;
-        AllChildrenIterator mAllChildNodes;
         MeshIterator mMeshes;
-
-        // points to the next sibling in the same node depth level or end() if none available
-        NodeIterator mNext;
     };
 }

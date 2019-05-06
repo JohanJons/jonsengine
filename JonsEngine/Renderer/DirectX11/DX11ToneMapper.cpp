@@ -2,8 +2,8 @@
 
 #include "Renderer/DirectX11/DX11FullscreenTrianglePass.h"
 #include "Shaders/Constants.hlsl"
-#include "Renderer/DirectX11/Shaders/Compiled/Tonemapping.h"
-#include "Renderer/DirectX11/Shaders/Compiled/AvgLuminance.h"
+#include "Compiled/Tonemapping.h"
+#include "Compiled/AvgLuminance.h"
 
 namespace JonsEngine
 {
@@ -50,8 +50,8 @@ namespace JonsEngine
 			mContext->ClearRenderTargetView(lumRTV, &avgLuminanceClearColor.front());
 		}
 
-		DXCALL(device->CreatePixelShader(gAvgLuminanceShader, sizeof(gAvgLuminanceShader), nullptr, &mAvgLuminancePixelShader));
-		DXCALL(device->CreatePixelShader(gTonemappingShader, sizeof(gTonemappingShader), nullptr, &mTonemapPixelShader));
+		DXCALL(device->CreatePixelShader(gAvgLuminance, sizeof(gAvgLuminance), nullptr, &mAvgLuminancePixelShader));
+		DXCALL(device->CreatePixelShader(gTonemapping, sizeof(gTonemapping), nullptr, &mTonemapPixelShader));
 
 		// viewport used during shadow pass
 		ZeroMemory(&mAvgLuminanceViewport, sizeof(D3D11_VIEWPORT));

@@ -47,10 +47,6 @@ namespace JonsEngine
 
         void Clear();
 
-        size_t Size() const;
-        size_t Capacity() const;
-
-
     private:
         ItemID mRootNodeID;
     };
@@ -113,8 +109,8 @@ namespace JonsEngine
 
         ItemIterator parentIter = GetItemIter(parentID);
         const ItemID parentNextID = parentIter->mNext;
-        ItemIterator endIter = mItems.end();
-        ItemIterator parentNextIter = parentNextID != INVALID_ITEM_ID ? GetItemIter(parentNextID) : endIter;
+        const ItemIterator endIter = mItems.end();
+        const ItemIterator parentNextIter = parentNextID != INVALID_ITEM_ID ? GetItemIter(parentNextID) : endIter;
         ItemIterator newChildIter = parentIter + 1;
 
         while (newChildIter != parentNextIter)
@@ -143,8 +139,9 @@ namespace JonsEngine
         }
 
         ItemIterator firstChildIter = parentIter + 1;
+        const bool parentHasChildren = ( firstChildIter != endIter );
         // if parent already has a child
-        if (firstChildIter->mID != parentNextID)
+        if (parentHasChildren && firstChildIter->mID != parentNextID)
         {
             // if parent has more than one children
             if (firstChildIter->mNext != parentNextID)
@@ -204,18 +201,5 @@ namespace JonsEngine
     void IDMapTree<T>::Clear()
     {
         mItems.clear();
-    }
-
-
-    template <typename T>
-    size_t IDMapTree<T>::Size() const
-    {
-        return mItems.size();
-    }
-
-    template <typename T>
-    size_t IDMapTree<T>::Capacity() const
-    {
-        return mItems.capacity();
     }
 }

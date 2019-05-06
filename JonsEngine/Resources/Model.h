@@ -19,13 +19,12 @@ namespace JonsEngine
 
     class Model
     {
-    private:
+    public:
         typedef std::vector<Mesh> MeshContainer;
         typedef std::vector<ModelNode> NodeContainer;
-
-    public:
         typedef ConstRangedIterator<MeshContainer> MeshIterator;
         typedef ConstRangedIterator<NodeContainer> NodeIterator;
+
         typedef std::unordered_map<AnimationID, Animation> AnimationMap;
 		typedef std::unordered_map<std::string, AnimationID> AnimationNameMap;
         typedef ConstRangedIterator<AnimationMap> AnimationIterator;
@@ -49,7 +48,7 @@ namespace JonsEngine
         
 
     private:
-        void ParseNodes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode, const ModelNode::NodeIterator& next);
+        void ParseNodes( const PackageModel& model, const ModelNode::InitDataList& initDataList, const std::vector<PackageNode>& pkgNodes );
         ModelNode::MeshIterator ParseMeshes(const PackageModel& model, const ModelNode::InitDataList& initDataList, const PackageNode& pkgNode);
 		void ParseSkeleton(const PackageModel& model);
 		void ParseAnimations(const PackageModel& pkgModel);

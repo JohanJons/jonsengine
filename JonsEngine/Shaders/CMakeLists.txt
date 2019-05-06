@@ -19,6 +19,7 @@ list( APPEND PIXEL_SHADERS
   DirectionalLightPCF5X5Pixel.hlsl
   DirectionalLightPCF7X7Pixel.hlsl
   FXAAPixel.hlsl
+  GBufferPixel.hlsl
   PointLightPixel.hlsl
   SimpleColorPixel.hlsl
   SimpleTexturePixel.hlsl
@@ -55,7 +56,8 @@ list( APPEND NON_COMPILE_SHADERS
 )
 
 add_library( JonsShaders OBJECT ${VERTEX_SHADERS} ${PIXEL_SHADERS} ${COMPUTE_SHADERS} ${DOMAIN_SHADERS} ${HULL_SHADERS} ${NON_COMPILE_SHADERS} )
-set_target_properties( JonsShaders PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties( JonsShaders PROPERTIES LINKER_LANGUAGE CXX )
+target_include_directories( JonsEngine PUBLIC "${CMAKE_CURRENT_BINARY_DIR}" )
 
 set_source_files_properties( ${VERTEX_SHADERS} PROPERTIES VS_SHADER_ENTRYPOINT vs_main VS_SHADER_TYPE Vertex )
 set_source_files_properties( ${PIXEL_SHADERS} PROPERTIES VS_SHADER_ENTRYPOINT ps_main VS_SHADER_TYPE Pixel )
@@ -67,5 +69,5 @@ set_source_files_properties( ${NON_COMPILE_SHADERS} PROPERTIES HEADER_FILE_ONLY 
 list( APPEND SHADER_SOURCES ${VERTEX_SHADERS} ${PIXEL_SHADERS} ${COMPUTE_SHADERS} ${HULL_SHADERS} ${DOMAIN_SHADERS} ${NON_COMPILE_SHADERS} )
 foreach( SHADER ${SHADER_SOURCES})
 	get_filename_component(SHADER_FILENAME "${SHADER}" NAME_WE)
-	set_source_files_properties( ${SHADER} PROPERTIES VS_SHADER_OUTPUT_HEADER_FILE ${SHADER_FILENAME}.h VS_SHADER_MODEL 5.0 )
+	set_source_files_properties( ${SHADER} PROPERTIES VS_SHADER_OUTPUT_HEADER_FILE "Compiled/${SHADER_FILENAME}.h" VS_SHADER_VARIABLE_NAME "g${SHADER_FILENAME}" VS_SHADER_MODEL 5.0 )
 endforeach()

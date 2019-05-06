@@ -41,7 +41,7 @@ namespace JonsEngine
         {
             Mat4 mWVPMatrix;
 			uint32_t mBoneIndexOffset;
-
+            uint32_t __padding[ 3 ];
 
             TransformCBuffer(const Mat4& wvpMatrix, const uint32_t boneIndexOffset) :
 				mWVPMatrix(wvpMatrix),

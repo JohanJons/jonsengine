@@ -1,8 +1,8 @@
 #include "Renderer/DirectX11/DX11Pipeline.h"
 
 #include "Renderer/DirectX11/DX11Utils.h"
-#include "Renderer/DirectX11/Shaders/Compiled/SimpleTexturePixel.h"
 #include "Renderer/RenderSettings.h"
+#include "Compiled/SimpleTexturePixel.h"
 #include "RenderQueue/RenderQueue.h"
 
 namespace JonsEngine
@@ -85,7 +85,7 @@ namespace JonsEngine
         DXCALL(device->CreateBlendState(&blendDesc, &mAdditiveBlending));
 
 		// pixelshader that will output lightAccumBuffer to backbuffer
-		DXCALL(device->CreatePixelShader(gSimpleTexturePixelShader, sizeof(gSimpleTexturePixelShader), nullptr, &mSimpleTextureShader))
+		DXCALL(device->CreatePixelShader(gSimpleTexturePixel, sizeof(gSimpleTexturePixel), nullptr, &mSimpleTextureShader))
     }
 
     DX11Pipeline::~DX11Pipeline()

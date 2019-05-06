@@ -116,7 +116,7 @@ namespace JonsEngine
 
     Scene::SceneNodeIterator Scene::GetSceneNodes() const
     {
-        return SceneNodeIterator(mSceneNodeTree.cbegin(), mSceneNodeTree.cend());
+        return SceneNodeIterator( mSceneNodeTree, 0, mSceneNodeTree.Size() );
     }
 
 
@@ -145,7 +145,7 @@ namespace JonsEngine
 
     Scene::StaticActorIterator Scene::GetStaticActors() const
     {
-        return StaticActorIterator(mStaticActors.cbegin(), mStaticActors.cend());
+        return StaticActorIterator( mStaticActors, 0, mStaticActors.Size() );
     }
 
 
@@ -178,7 +178,7 @@ namespace JonsEngine
 
     Scene::AnimatedActorIterator Scene::GetAnimatedActors() const
     {
-        return AnimatedActorIterator(mAnimatedActors.cbegin(), mAnimatedActors.cend());
+        return AnimatedActorIterator( mAnimatedActors, 0, mAnimatedActors.Size() );
     }
 
 
@@ -207,7 +207,7 @@ namespace JonsEngine
 
     Scene::PointLightIterator Scene::GetPointLights() const
     {
-        return PointLightIterator(mPointLights.cbegin(), mPointLights.cend());
+        return PointLightIterator( mPointLights, 0, mPointLights.Size() );
     }
     
 
@@ -247,7 +247,7 @@ namespace JonsEngine
 
     Scene::DirectionalLightIterator Scene::GetDirectionalLights() const
     {
-        return DirectionalLightIterator(mDirectionalLights.cbegin(), mDirectionalLights.cend());
+        return DirectionalLightIterator( mDirectionalLights, 0, mDirectionalLights.Size() );
     }
 
 
@@ -279,7 +279,7 @@ namespace JonsEngine
 
 	Scene::TerrainIterator Scene::GetTerrains() const
 	{
-		return TerrainIterator(mTerrains.cbegin(), mTerrains.cend());
+		return TerrainIterator( mTerrains, 0, mTerrains.Size() );
 	}
 
 
