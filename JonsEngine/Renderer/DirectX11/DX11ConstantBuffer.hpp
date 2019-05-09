@@ -34,10 +34,6 @@ namespace JonsEngine
             DXCALL(device->CreateBuffer(&bufferDescription, NULL, &mConstantBuffer));
         }
 
-        ~DX11ConstantBuffer()
-        {
-        }
-
 
         void SetData(const ContentType& content)
         {

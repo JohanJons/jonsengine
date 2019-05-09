@@ -2,6 +2,7 @@
 #define TERRAIN_HULL_HLSL
 
 #include "TerrainCommon.hlsl"
+#include "Common.hlsl"
 
 float3 ComputePatchMidpoint( float3 corner1, float3 corner2, float3 corner3, float3 corner4 )
 {
@@ -10,7 +11,7 @@ float3 ComputePatchMidpoint( float3 corner1, float3 corner2, float3 corner3, flo
 
 float CalculateTessellationfactor( float3 worldPatchMidpoint )
 {
-	float cameraToPatchDistance = distance( gWorldEyePos, worldPatchMidpoint );
+    float cameraToPatchDistance = distance( gWorldEyePos, worldPatchMidpoint );
 	float scaledDistance = ( cameraToPatchDistance - gMinZ ) / ( gMaxZ - gMinZ );
 	scaledDistance = clamp( scaledDistance, 0.0f, 1.0f );
 
@@ -21,7 +22,7 @@ PatchTess PatchHS( InputPatch<VertexOut, 12> inputVertices )
 {
 	PatchTess patch;
 
-	float3 midPatchMidpoint = ComputePatchMidpoint( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition );
+    float3 midPatchMidpoint = ComputePatchMidpoint( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition );
 	float3 edgePatchMidpoint[] = {
 		ComputePatchMidpoint( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 4 ].mWorldPosition, inputVertices[ 5 ].mWorldPosition ),
 		ComputePatchMidpoint( inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 6 ].mWorldPosition, inputVertices[ 7 ].mWorldPosition ),

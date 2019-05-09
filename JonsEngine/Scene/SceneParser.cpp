@@ -262,6 +262,11 @@ namespace JonsEngine
 		aabbTransforms.reserve( mRenderQueue.mTerrains.mTransforms.size() );
 		for ( const TerrainTransformData& transform : transforms )
 		{
+            const Terrain& terrain = scene.GetTerrain( transform.mID );
+            const SceneNode& node = scene.GetSceneNode( terrain.GetSceneNode() );
+            if ( !node.IsVisible() )
+                continue;
+
 			transform.mQuadTree.CullAABBs( aabbTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
 			for ( const Mat4& transform : aabbTransforms )
 				AddAABB( AABBRenderData, transform, unitCubeMeshID, gRed );
