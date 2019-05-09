@@ -184,7 +184,7 @@ namespace JonsEngine
         mPipeline.PostProcessingStage(renderQueue, elapstedFrameTime, mRenderSettings);
 		mPipeline.DebugStage( renderQueue, debugFlags );
 
-        mPipeline.EndFrame();
+        mPipeline.EndFrame( mRenderSettings );
     }
 
     void DX11RendererImpl::ReduceDepth(float& minDepth, float& maxDepth)
