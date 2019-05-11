@@ -16,7 +16,7 @@ namespace JonsEngine
         DXCALL(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&mBackbufferTexture));
 
 		D3D11_TEXTURE2D_DESC backbufferTextureDesc;
-		ZeroMemory(&backbufferTextureDesc, sizeof(backbufferTextureDesc));
+		ZeroMemory(&backbufferTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
 		mBackbufferTexture->GetDesc(&backbufferTextureDesc);
 
 		// create depth buffer

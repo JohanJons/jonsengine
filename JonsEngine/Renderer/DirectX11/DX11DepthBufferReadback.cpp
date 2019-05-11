@@ -14,7 +14,7 @@ namespace JonsEngine
 		mCBuffer(device, context, DX11ConstantBuffer<CBuffer>::CONSTANT_BUFFER_SLOT_COMPUTE)
 	{
 		D3D11_BUFFER_DESC bufferDesc;
-		ZeroMemory(&bufferDesc, sizeof(bufferDesc));
+		ZeroMemory(&bufferDesc, sizeof(D3D11_BUFFER_DESC));
 		bufferDesc.Usage = D3D11_USAGE_DEFAULT;
 		bufferDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS;
 		bufferDesc.ByteWidth = static_cast<uint32_t>( sizeof(float) );
@@ -26,7 +26,7 @@ namespace JonsEngine
 		device->CreateBuffer(&bufferDesc, nullptr, &mStagingBuffer);
 
 		D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
-		ZeroMemory(&uavDesc, sizeof(uavDesc));
+		ZeroMemory(&uavDesc, sizeof(D3D11_UNORDERED_ACCESS_VIEW_DESC));
 		uavDesc.Buffer.NumElements = 1;
 		uavDesc.Format = DXGI_FORMAT_R32_FLOAT;
 		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;

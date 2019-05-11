@@ -42,7 +42,7 @@ namespace JonsEngine
 			assert(gMouseCallback);
 
 			RAWINPUT rawInput;
-			UINT rawInputSize = sizeof(rawInput);
+			UINT rawInputSize = sizeof(RAWINPUT);
 
 			GetRawInputData((HRAWINPUT)(lParam), RID_INPUT, &rawInput, &rawInputSize, sizeof(RAWINPUTHEADER));
 
@@ -101,7 +101,7 @@ namespace JonsEngine
 
 		// Register class
 		WNDCLASSEX wcex;
-		ZeroMemory(&wcex, sizeof(wcex));
+		ZeroMemory(&wcex, sizeof(WNDCLASSEX));
 		wcex.cbSize = sizeof(WNDCLASSEX);
 		wcex.style = CS_HREDRAW | CS_VREDRAW;
 		wcex.lpfnWndProc = WndProc;
@@ -142,7 +142,7 @@ namespace JonsEngine
 			{ 0x01, 0x06, RIDEV_NOLEGACY, mNativeHandles->mWindowHandle }   // keyboard
 		};
 
-		if (!RegisterRawInputDevices(rawInputDevices, 2, sizeof(rawInputDevices[0])))
+		if (!RegisterRawInputDevices(rawInputDevices, 2, sizeof(RAWINPUTDEVICE)))
 		{
 			const std::string win32Error = GetWin32ErrorString();
 			JONS_LOG_ERROR(mLogger, "WindowManager::WindowManager(): RegisterRawInputDevices failed: " + win32Error);
@@ -296,7 +296,7 @@ namespace JonsEngine
 	WindowPosition WindowManager::GetCurrentMousePosition() const
 	{
 		POINT p;
-		ZeroMemory(&p, sizeof(p));
+		ZeroMemory(&p, sizeof(POINT));
 		assert(GetCursorPos(&p));
 
 		// note: screen, not clientwindow coordinates!

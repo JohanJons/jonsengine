@@ -34,7 +34,6 @@ namespace JonsEngine
             DXCALL(device->CreateBuffer(&bufferDescription, NULL, &mConstantBuffer));
         }
 
-
         void SetData(const ContentType& content)
         {
             D3D11_MAPPED_SUBRESOURCE mappedResource;
