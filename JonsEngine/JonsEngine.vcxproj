@@ -71,7 +71,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>winmm.lib;libboost_serialization-vc140-mt-sgd-1_56.lib;d3d11.lib;Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>winmm.lib;libboost_serialization-vc140-mt-sgd-x32-1_70.lib;libboost_filesystem-vc140-mt-sgd-x32-1_70.lib;d3d11.lib;Comctl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>$(SolutionDir)/Thirdparty/boost_1_56_0/bin.v2/libs/serialization/build/msvc-14.0/debug/link-static/runtime-link-static/threading-multi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>

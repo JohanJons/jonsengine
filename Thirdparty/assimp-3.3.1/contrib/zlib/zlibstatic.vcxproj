@@ -84,7 +84,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Thirdparty\assimp-3.3.1;$(SolutionDir)\Thirdparty\assimp-3.3.1\include;$(SolutionDir)\Thirdparty\assimp-3.3.1\contrib\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Johan\Desktop\JonsEngine\Thirdparty\FreeImage\Source\ZLib;$(SolutionDir)\Thirdparty\assimp-3.3.1;$(SolutionDir)\Thirdparty\assimp-3.3.1\include;$(SolutionDir)\Thirdparty\assimp-3.3.1\contrib\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Debug/</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <CompileAs>CompileAsC</CompileAs>
