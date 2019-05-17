@@ -33,14 +33,15 @@ namespace JonsEngine
                 displayDesc.Height = height;
                 displayDesc.Format = DXGI_FORMAT_UNKNOWN;
 
-                if (wParam)     // --> to fullscreen
+                bool doFullscreen = static_cast<bool>( wParam );
+                if (doFullscreen)     // --> to fullscreen
                 {
                     DXCALL(gDX11RendererImpl->mSwapchain->ResizeTarget(&displayDesc));
-                    DXCALL(gDX11RendererImpl->mSwapchain->SetFullscreenState(wParam, NULL));
+                    DXCALL(gDX11RendererImpl->mSwapchain->SetFullscreenState(doFullscreen, NULL));
                 }
                 else
                 {
-                    DXCALL(gDX11RendererImpl->mSwapchain->SetFullscreenState(wParam, NULL));
+                    DXCALL(gDX11RendererImpl->mSwapchain->SetFullscreenState(doFullscreen, NULL));
                     DXCALL(gDX11RendererImpl->mSwapchain->ResizeTarget(&displayDesc));
                 }
 

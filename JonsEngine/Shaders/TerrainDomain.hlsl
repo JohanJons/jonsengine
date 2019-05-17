@@ -65,6 +65,7 @@ DomainOut ds_main(PatchTess patchTess, float2 uv : SV_DomainLocation, const Outp
 	ret.mPosition = mul( gFrameViewProj, ret.mPosition );
 
 	ret.mTexcoord = midPointTexcoord;
+    ret.mTesellation = patchTess.mInsideTess[ 0 ];
 
 	return ret;
 }
