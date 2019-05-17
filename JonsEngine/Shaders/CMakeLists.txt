@@ -62,7 +62,8 @@ target_include_directories( JonsEngine PUBLIC "${CMAKE_CURRENT_BINARY_DIR}" )
 set_source_files_properties( ${VERTEX_SHADERS} PROPERTIES VS_SHADER_ENTRYPOINT vs_main VS_SHADER_TYPE Vertex )
 set_source_files_properties( ${PIXEL_SHADERS} PROPERTIES VS_SHADER_ENTRYPOINT ps_main VS_SHADER_TYPE Pixel )
 set_source_files_properties( ${COMPUTE_SHADERS} PROPERTIES VS_SHADER_ENTRYPOINT cs_main VS_SHADER_TYPE Compute )
-set_source_files_properties( ${HULL_SHADERS} PROPERTIES VS_SHADER_ENTRYPOINT hs_main VS_SHADER_TYPE Hull )
+# some bug with hull shader and optimizations - disable for now
+set_source_files_properties( ${HULL_SHADERS} PROPERTIES VS_SHADER_ENTRYPOINT hs_main VS_SHADER_TYPE Hull VS_SHADER_DISABLE_OPTIMIZATIONS true )
 set_source_files_properties( ${DOMAIN_SHADERS} PROPERTIES VS_SHADER_ENTRYPOINT ds_main VS_SHADER_TYPE Domain )
 set_source_files_properties( ${NON_COMPILE_SHADERS} PROPERTIES HEADER_FILE_ONLY TRUE )
 
