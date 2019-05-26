@@ -67,7 +67,8 @@ namespace JonsEngine
         UpdateAnimatedActors(elapsedTime);
 		UpdateBoneTransforms(elapsedTime);
 
-		uint32_t updatedTransforms = mTerrainTransforms.UpdateTransforms();
+        uint32_t patchSize = RenderSettingsToVal( mRenderer.GetTerrainPatchSize() );
+		uint32_t updatedTransforms = mTerrainTransforms.UpdateTransforms( patchSize );
 		if ( updatedTransforms )
 			mDirtyFlags.set(FlagTerrain, true);
     }
@@ -251,9 +252,9 @@ namespace JonsEngine
     }
 
 
-	TerrainID Scene::CreateTerrain(const std::string& name, float heightScale, float variationScale, uint32_t patchSize, float terrainSizeMultiplyer, const SceneNodeID node, const TerrainDataID terrainDataID)
+	TerrainID Scene::CreateTerrain(const std::string& name, float heightScale, float variationScale, float terrainSizeMultiplyer, const SceneNodeID node, const TerrainDataID terrainDataID)
 	{
-		TerrainID ID = mTerrains.Insert( name, heightScale, variationScale, patchSize, terrainSizeMultiplyer, node, terrainDataID, std::bind( static_cast<void( Scene::* )( Terrain* terrain )> ( &Scene::MarkAsDirty ), this, std::placeholders::_1 ) );
+		TerrainID ID = mTerrains.Insert( name, heightScale, variationScale, terrainSizeMultiplyer, node, terrainDataID, std::bind( static_cast<void( Scene::* )( Terrain* terrain )> ( &Scene::MarkAsDirty ), this, std::placeholders::_1 ) );
 		mTerrainTransforms.AddDirty( ID );
 
 		return ID;
@@ -327,6 +328,7 @@ namespace JonsEngine
 		assert( id != INVALID_TERRAIN_ID );
 
 		mTerrainTransforms.AddDirty( id );
+        mDirtyFlags.set( FlagTerrain, true );
 	}
 
 

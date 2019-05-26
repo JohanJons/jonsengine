@@ -2,8 +2,12 @@
 
 #include "Renderer/DirectX11/DX11Texture.h"
 #include "Renderer/DirectX11/DX11VertexTransformPass.h"
+#include "Renderer/RenderSettings.h"
 #include "Compiled/TerrainVertex.h"
 #include "Compiled/TerrainHull.h"
+#include "Compiled/TerrainComputeCoplanarity16.h"
+#include "Compiled/TerrainComputeCoplanarity32.h"
+#include "Compiled/TerrainComputeCoplanarity64.h"
 #include "Compiled/TerrainDomain.h"
 #include "Compiled/TerrainPixel.h"
 #include "Compiled/TerrainPixelDebug.h"
@@ -53,6 +57,7 @@ namespace JonsEngine
 
 	DX11TerrainPass::DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, const RenderSettings::Tesselation& tessData) :
 		mContext(context),
+        mDevice(device),
 
 		mCBuffer(device, context, mCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
 		mPerTerrainCBuffer(device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_EXTRA),
@@ -80,6 +85,7 @@ namespace JonsEngine
 		// shaders
 		DXCALL(device->CreateVertexShader(gTerrainVertex, sizeof(gTerrainVertex), nullptr, &mVertexShader));
 		DXCALL(device->CreateHullShader(gTerrainHull, sizeof(gTerrainHull), nullptr, &mHullShader));
+        DXCALL(device->CreateComputeShader(gTerrainComputeCoplanarity, sizeof(gTerrainComputeCoplanarity), nullptr, &mCoplanarityComputeShader));
 		DXCALL(device->CreateDomainShader(gTerrainDomain, sizeof(gTerrainDomain), nullptr, &mDomainShader));
 		DXCALL(device->CreatePixelShader(gTerrainPixel, sizeof(gTerrainPixel), nullptr, &mPixelShader));
 		DXCALL( device->CreatePixelShader( gTerrainPixelDebug, sizeof( gTerrainPixelDebug ), nullptr, &mPixelDebugShader ) );
@@ -125,15 +131,25 @@ namespace JonsEngine
 		UnbindRendering();
 	}
 
+    void DX11TerrainPass::CreateCoplanarityMap( DX11TextureID heightmapID, RenderSettings::TerrainPatchSize patchSizeEnum )
+    {
+        uint32_t patchSize = RenderSettingsToVal( patchSizeEnum );
+        CreateCoplanarityMap( heightmapID, patchSize );
+    }
+
+    void DX11TerrainPass::UpdatePatchSize( RenderSettings::TerrainPatchSize patchSize )
+    {
+
+    }
+
 	void DX11TerrainPass::RenderInternal( const RenderableTerrains& terrains )
 	{
 		mTransformsBuffer.SetData( terrains.mTransforms );
 		mTransformsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA );
 
 		uint32_t beginIndex = 0;
-		for ( uint32_t terrainIndex = 0, numTerrains = terrains.GetNumTerrains(); terrainIndex < numTerrains; ++terrainIndex )
+		for ( const RenderableTerrainData& terrainData : terrains.mTerrainData )
 		{
-			const RenderableTerrainData& terrainData = terrains.mTerrainData.at( terrainIndex );
 			const DX11Texture& heightmap = mTextureMap.GetItem( terrainData.mHeightMap );
 
 			heightmap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
@@ -150,6 +166,51 @@ namespace JonsEngine
 			beginIndex = endIndex;
 		}
 	}
+
+    // this should probably not be called too often
+    void DX11TerrainPass::CreateCoplanarityMap( DX11TextureID heightmapID, uint32_t patchSize )
+    {
+        assert( patchSize );
+
+        //ID3D11Texture2DPtr& coplanarityTexture = mTerrainCoplanarityMap.at( heightmapID );
+
+        //ID3D11Texture2DPtr coplanarityTexture = nullptr;
+
+        D3D11_TEXTURE2D_DESC desc;
+        ZeroMemory(&desc, sizeof(D3D11_TEXTURE2D_DESC));
+        mTextureMap.GetItem( heightmapID ).GetDesc( desc );
+
+        uint32_t width = desc.Width / patchSize;
+        uint32_t height = desc.Height / patchSize;
+
+        mTerrainCoplanarityMap.erase( heightmapID );
+        mTerrainCoplanarityMap.emplace( std::piecewise_construct, std::forward_as_tuple( heightmapID ), std::forward_as_tuple( mDevice, DXGI_FORMAT_R16_UNORM, width, height, true ) );
+
+        // coplanarity value between [0, 1]
+        /*D3D11_TEXTURE2D_DESC coplanarityTextureDesc;
+        ZeroMemory(&coplanarityTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+        coplanarityTextureDesc.ArraySize = 1;
+        coplanarityTextureDesc.Format = DXGI_FORMAT_R16_UNORM;
+        coplanarityTextureDesc.Width = width;
+        coplanarityTextureDesc.Height = height;
+        coplanarityTextureDesc.MipLevels = 1;
+        coplanarityTextureDesc.SampleDesc.Count = 1;
+        coplanarityTextureDesc.Usage = D3D11_USAGE_DEFAULT;
+        coplanarityTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+        DXCALL(mDevice->CreateTexture2D(&coplanarityTextureDesc, nullptr, &coplanarityTexture));
+
+        mTerrainCoplanarityMap[ heightmapID ] = coplanarityTexture;*/
+    }
+
+    void DX11TerrainPass::UpdateCoplanarityTexture( DX11TextureID heightmapID )
+    {
+        const DX11DynamicTexture& texture = mTerrainCoplanarityMap.at( heightmapID );
+
+        mContext->CSSetShader(mCoplanarityComputeShader, nullptr, 0);
+        mContext->CSSetUnorderedAccessViews( UAV_SLOT, 1, &texture.mUAV.p, nullptr ); 
+        mContext->Dispatch(1, 1, 1);
+        mContext->CSSetUnorderedAccessViews( UAV_SLOT, 1, &gNullUAV.p, nullptr );
+    }
 
 	void DX11TerrainPass::BindForRendering()
 	{

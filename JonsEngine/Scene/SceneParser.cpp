@@ -63,7 +63,7 @@ namespace JonsEngine
         PointLightCulling(scene);
         DirectionalLightCulling(scene);
 
-		TerrainParsing( scene );
+		TerrainParsing( scene, dirtyFlags );
 		if ( debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_AABB ) )
 			AddTerrainAABBDebugData( scene );
 
@@ -174,7 +174,7 @@ namespace JonsEngine
         }
     }
 
-	void SceneParser::TerrainParsing( const Scene& scene )
+	void SceneParser::TerrainParsing( const Scene& scene, const DirtyFlagsSet dirtyFlags )
 	{
 		const TerrainTransforms& terrainTransforms = scene.GetTerrainTransforms();
 		const std::vector<TerrainTransformData>& transforms = terrainTransforms.GetTransforms();
@@ -196,7 +196,6 @@ namespace JonsEngine
 			const TerrainData& terrainData = mResourceManifest.GetTerrainData( terrainDataID );
 
 			DX11TextureID heightmap = terrainData.GetHeightMap();
-			float patchSize = terrain.GetPatchSize();
 			float heightScale = terrain.GetHeightScale();
 			float variationScale = terrain.GetVariationScale();
 
@@ -208,7 +207,7 @@ namespace JonsEngine
 			Vec2 worldMin, worldMax;
 			transform.mQuadTree.GetWorldXZBounds( worldMin, worldMax );
 			uint32_t renderableEndIndex = static_cast<uint32_t>( renderableTransforms.size() );
-			mRenderQueue.mTerrains.mTerrainData.emplace_back(heightmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale, patchSize);
+			mRenderQueue.mTerrains.mTerrainData.emplace_back( heightmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale );
 		}
 	}
 

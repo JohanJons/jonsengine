@@ -1,8 +1,8 @@
-#include "Renderer/DirectX11/DX11RenderTarget2D.h"
+#include "Renderer/DirectX11/DX11DynamicTexture.h"
 
 namespace JonsEngine
 {
-    DX11RenderTarget2D::DX11RenderTarget2D(ID3D11DevicePtr device, const DXGI_FORMAT textureFormat, const uint32_t textureWidth, const uint32_t textureHeight, const bool createUAV)
+    DX11DynamicTexture::DX11DynamicTexture(ID3D11DevicePtr device, DXGI_FORMAT textureFormat, uint32_t textureWidth, uint32_t textureHeight, bool createUAV)
     {
         D3D11_TEXTURE2D_DESC textureDesc;
         ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
@@ -21,9 +21,5 @@ namespace JonsEngine
         DXCALL(device->CreateShaderResourceView(mTexture, nullptr, &mSRV));
         if (createUAV)
             DXCALL(device->CreateUnorderedAccessView(mTexture, nullptr, &mUAV));
-    }
-    
-    DX11RenderTarget2D::~DX11RenderTarget2D()
-    {
     }
 }

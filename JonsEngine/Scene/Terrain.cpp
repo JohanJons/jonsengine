@@ -2,12 +2,11 @@
 
 namespace JonsEngine
 {
-	Terrain::Terrain( const std::string& name, float heightScale, float variationScale, uint32_t patchSize, float terrainSizeMultiplyer, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID, const OnTerrainDirtyFunc& onDirtyFunc ) :
+	Terrain::Terrain( const std::string& name, float heightScale, float variationScale, float terrainSizeMultiplyer, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID, const OnTerrainDirtyFunc& onDirtyFunc ) :
 		mName( name ),
 		mHeightScale( heightScale ),
 		mVariationScale( variationScale ),
 		mTerrainSizeMultiplyer( terrainSizeMultiplyer ),
-		mPatchSize( patchSize ),
 		mSceneNodeID( sceneNodeID ),
 		mTerrainDataID( terrainDataID ),
 		mOnDirtyFunc( onDirtyFunc )
@@ -27,13 +26,6 @@ namespace JonsEngine
 		mVariationScale = variationScale;
 
 		// no need to dirty for this
-	}
-
-	void Terrain::SetPatchSize( uint32_t patchSize )
-	{
-		mPatchSize = patchSize;
-
-		mOnDirtyFunc( this );
 	}
 
 	void Terrain::SetTerrainSizeMultiplyer( float terrainSizeMultiplyer )

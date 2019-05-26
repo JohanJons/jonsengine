@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/Types.h"
+
 namespace JonsEngine
 {
 	struct RenderSettings
@@ -60,6 +62,13 @@ namespace JonsEngine
 			float mMaxFactor;
 		} mTessellation;
 
+        enum class TerrainPatchSize
+        {
+            X16,
+            X32,
+            X64
+        } mTerrainPatchSize;
+
 		AutoExposureRate mAutoExposureRate;
 		bool mBloomEnabled;
 		bool mSSAOEnabled;
@@ -77,6 +86,7 @@ namespace JonsEngine
 		mAntiAliasing(AntiAliasing::Fxaa),
 		mToneMapping(ToneMappingAlghorithm::FilmicU2),
 		mTessellation({ 1.0f , 25.0f, 1.0f, 5.0f }),
+        mTerrainPatchSize( TerrainPatchSize::X64 ),
 		mAutoExposureRate(DefaultAutoExposureRate()),
 		mBloomEnabled(true),
 		mSSAOEnabled(true),

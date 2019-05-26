@@ -29,7 +29,7 @@ namespace JonsEngine
 		TerrainTransforms(const IDMap<Terrain>& terrainLookup, const IDMap<TerrainData>& terrainDataLookup, const IDMapTree<SceneNode>& sceneNodeLookup);
 
 		void AddDirty(TerrainID ID);
-		uint32_t UpdateTransforms();
+		uint32_t UpdateTransforms( uint32_t patchSize );
 
 		uint32_t GetNumEntries() const;
 		const std::vector<TerrainTransformData>& GetTransforms() const { return mTerrainTransforms; }
@@ -37,7 +37,7 @@ namespace JonsEngine
 	private:
 		void RemoveIfAdded( TerrainID ID );
 		bool HasAddedDirty( TerrainID ID ) const;
-		void RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const Terrain& terrain, const TerrainData& terrainData );
+		void RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const Terrain& terrain, const TerrainData& terrainData, uint32_t patchSize );
 
 		const IDMap<Terrain>& mTerrainLookup;
 		const IDMap<TerrainData>& mTerrainDataLookup;

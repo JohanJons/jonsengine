@@ -20,6 +20,8 @@
         DX11DepthReductionPass.h
         DX11DirectionalLightPass.cpp
         DX11DirectionalLightPass.h
+		DX11DynamicTexture.h
+		DX11DynamicTexture.cpp
         DX11FullscreenTrianglePass.cpp
         DX11FullscreenTrianglePass.h
         DX11GBuffer.cpp
@@ -38,10 +40,6 @@
         DX11PostProcessor.h
         DX11Renderer.cpp
         DX11Renderer.h
-        DX11RendererImpl.cpp
-        DX11RendererImpl.h
-        DX11RenderTarget2D.cpp
-        DX11RenderTarget2D.h
         DX11Sampler.cpp
         DX11Sampler.h
         DX11Shadowmap.cpp

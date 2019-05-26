@@ -40,7 +40,7 @@ struct DomainOut
 	float4 mPosition : SV_POSITION;
 	float3 mNormal : NORMAL;
 	float2 mTexcoord : TEXCOORD;
-    uint mTesellation : TESS_FACTOR;
+    float mTesellation : TESS_FACTOR;
 };
 
 struct HullOut

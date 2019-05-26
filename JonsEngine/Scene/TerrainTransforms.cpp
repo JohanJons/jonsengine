@@ -54,7 +54,7 @@ namespace JonsEngine
 			mDirtyTransforms.push_back( ID );
 	}
 
-	uint32_t TerrainTransforms::UpdateTransforms()
+	uint32_t TerrainTransforms::UpdateTransforms( uint32_t patchSize )
 	{
 		uint32_t numUpdated = 0;
 		for (TerrainID ID : mDirtyTransforms)
@@ -64,7 +64,7 @@ namespace JonsEngine
 			const Mat4& worldTransform = mSceneNodeLookup.GetNode(terrain.GetSceneNode()).GetWorldTransform();
 
 			RemoveIfAdded( ID );
-			RebuildTransforms( ID, worldTransform, terrain, terrainData );
+			RebuildTransforms( ID, worldTransform, terrain, terrainData, patchSize );
 
 			++numUpdated;
 		}
@@ -94,9 +94,8 @@ namespace JonsEngine
 		return iter != endIter;
 	}
 
-	void TerrainTransforms::RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const Terrain& terrain, const TerrainData& terrainData )
+	void TerrainTransforms::RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const Terrain& terrain, const TerrainData& terrainData, uint32_t patchSize )
 	{
-		uint32_t patchSize = terrain.GetPatchSize();
 		float terrainSizeMultiplyer = terrain.GetTerrainSizeMultiplyer();
 		uint32_t heightmapWidth = terrainData.GetWidth(), heightmapHeight = terrainData.GetHeight();
 		uint32_t terrainWidth = terrainData.GetWidth() * terrainSizeMultiplyer, terrainHeight = terrainData.GetHeight() * terrainSizeMultiplyer;

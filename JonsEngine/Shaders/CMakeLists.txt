@@ -34,6 +34,9 @@ list( APPEND COMPUTE_SHADERS
   DepthReadback.hlsl
   SDSMInitialCompute.hlsl
   SDSMFinalCompute.hlsl
+  TerrainComputeCoplanarity16.hlsl
+  TerrainComputeCoplanarity32.hlsl
+  TerrainComputeCoplanarity64.hlsl
 )
 
 list( APPEND DOMAIN_SHADERS 
@@ -53,6 +56,7 @@ list( APPEND NON_COMPILE_SHADERS
   OptimizedPCF.hlsl
   Shadowmapping.hlsl
   TerrainCommon.hlsl
+  TerrainComputeCoplanarity.hlsl
 )
 
 add_library( JonsShaders OBJECT ${VERTEX_SHADERS} ${PIXEL_SHADERS} ${COMPUTE_SHADERS} ${DOMAIN_SHADERS} ${HULL_SHADERS} ${NON_COMPILE_SHADERS} )

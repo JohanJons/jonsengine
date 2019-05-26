@@ -8,7 +8,6 @@ using namespace JonsEngine;
 constexpr float gTerrainHeightScale = 128.0f;
 constexpr float gTerrainVariationScale = 2.0f;
 constexpr float gTerrainSizeMultiplyer = 2.0f;
-constexpr uint32_t gTerrainPatchSize = 64;
 
 namespace JonsGame
 {
@@ -21,8 +20,8 @@ namespace JonsGame
 		mNodeTerrainTest( sceneMgr.GetScene( mID ).CreateSceneNode( "nodeTerrainTest", sceneMgr.GetScene( mID ).GetRootNodeID() ) ),
 		mTerrainData( resManifest.CreateTerrainData( "terraindata", "terrain_heightmap", mJonsPackage ) ),
 		mTerrainDataTest( resManifest.CreateTerrainData( "terrainDataTest", "terrain_test", mJonsPackage ) ),
-		mTerrain( sceneMgr.GetScene( mID ).CreateTerrain( "terrain", gTerrainHeightScale, gTerrainVariationScale, gTerrainPatchSize, gTerrainSizeMultiplyer, mNodeTerrain, mTerrainData ) ),
-		mTerrainTest( sceneMgr.GetScene( mID ).CreateTerrain( "terrainTest", gTerrainHeightScale, gTerrainVariationScale, gTerrainPatchSize, gTerrainSizeMultiplyer, mNodeTerrainTest, mTerrainDataTest ) ),
+		mTerrain( sceneMgr.GetScene( mID ).CreateTerrain( "terrain", gTerrainHeightScale, gTerrainVariationScale, gTerrainSizeMultiplyer, mNodeTerrain, mTerrainData ) ),
+		mTerrainTest( sceneMgr.GetScene( mID ).CreateTerrain( "terrainTest", gTerrainHeightScale, gTerrainVariationScale, gTerrainSizeMultiplyer, mNodeTerrainTest, mTerrainDataTest ) ),
 		mSunDirLightID( sceneMgr.GetScene( mID ).CreateDirectionalLight( "DirectionalLight", 4 ) ),
 		mSun( mSceneMgr.GetScene( mID ).GetDirectionalLight( mSunDirLightID ) )
 	{

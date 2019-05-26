@@ -44,7 +44,7 @@ namespace JonsEngine
 
         // update scene actors
 		Scene& activeScene = mSceneManager.GetActiveScene();
-        activeScene.Tick(elapstedFrameTime, windowAspectRatio);
+        activeScene.Tick( elapstedFrameTime, windowAspectRatio );
 		auto dirtyFlags = activeScene.GetAndResetDirtyFlags();
 
         // parse scene into renderqueue for renderer

@@ -65,6 +65,11 @@ namespace JonsEngine
         mContext->PSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
     }
 
+    void DX11Texture::GetDesc( D3D11_TEXTURE2D_DESC& desc ) const
+    {
+        return mTexture->GetDesc( &desc );
+    }
+
 
 	DXGI_FORMAT GetTextureFormat( const TextureType textureType )
 	{

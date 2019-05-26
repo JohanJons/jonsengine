@@ -4,7 +4,7 @@
 
 namespace JonsEngine
 {
-    uint32_t RenderSettingsToVal(const RenderSettings::Anisotropic anisotropicEnum)
+    uint32_t RenderSettingsToVal( RenderSettings::Anisotropic anisotropicEnum )
     {
         switch (anisotropicEnum)
         {
@@ -23,7 +23,7 @@ namespace JonsEngine
         }
     }
 
-    uint32_t RenderSettingsToVal(const RenderSettings::ShadowReadbackLatency shadowReadbackLatencyEnum)
+    uint32_t RenderSettingsToVal( RenderSettings::ShadowReadbackLatency shadowReadbackLatencyEnum )
     {
         switch (shadowReadbackLatencyEnum)
         {
@@ -40,7 +40,7 @@ namespace JonsEngine
         }
     }
 
-    uint32_t RenderSettingsToVal(const RenderSettings::ShadowResolution shadowResolutionEnum)
+    uint32_t RenderSettingsToVal( RenderSettings::ShadowResolution shadowResolutionEnum )
     {
         switch (shadowResolutionEnum)
         {
@@ -52,6 +52,17 @@ namespace JonsEngine
                 return 2048;
             case RenderSettings::ShadowResolution::Resolution_4092:
                 return 4092;
+        }
+    }
+
+    uint32_t RenderSettingsToVal( const RenderSettings::TerrainPatchSize patchSizeEnum )
+    {
+        switch ( patchSizeEnum )
+        {
+            case RenderSettings::TerrainPatchSize::X16: return 16;
+            case RenderSettings::TerrainPatchSize::X32: return 32;
+            default: JONS_ERROR(Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainPatchSize): Invalid enum");
+            case RenderSettings::TerrainPatchSize::X64: return 64;
         }
     }
 }

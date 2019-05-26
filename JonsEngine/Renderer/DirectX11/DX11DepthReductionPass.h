@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Renderer/DirectX11/DX11Utils.h"
-#include "Renderer/DirectX11/DX11RenderTarget2D.h"
+#include "Renderer/DirectX11/DX11DynamicTexture.h"
 #include "Renderer/DirectX11/DX11ConstantBuffer.hpp"
 #include "Core/Types.h"
 #include "Core/EngineSettings.h"
@@ -47,7 +47,7 @@ namespace JonsEngine
         ID3D11ComputeShaderPtr mSDSMFinalShader;
 
         std::array<ID3D11Texture2DPtr, MAX_READBACK_LATENCY> mReadbackTextures;
-        std::vector<DX11RenderTarget2D> mDepthReductionRTVs;
+        std::vector<DX11DynamicTexture> mDepthReductionRTVs;
 
         DX11ConstantBuffer<SDSMCBuffer> mSDSMCBuffer;
     };

@@ -34,9 +34,10 @@ namespace JonsEngine
         NUM_SHADER_TEXTURE_SLOTS
     };
 
-    uint32_t RenderSettingsToVal(const RenderSettings::Anisotropic anisotropicEnum);
-    uint32_t RenderSettingsToVal(const RenderSettings::ShadowReadbackLatency shadowReadbackLatencyEnum);
-    uint32_t RenderSettingsToVal(const RenderSettings::ShadowResolution shadowResolutionEnum);
+    uint32_t RenderSettingsToVal( RenderSettings::Anisotropic anisotropicEnum );
+    uint32_t RenderSettingsToVal( RenderSettings::ShadowReadbackLatency shadowReadbackLatencyEnum );
+    uint32_t RenderSettingsToVal( RenderSettings::ShadowResolution shadowResolutionEnum );
+    uint32_t RenderSettingsToVal( RenderSettings::TerrainPatchSize patchSizeEnum );
 
     #ifdef _DEBUG
     #define DXCALL(function)                                                                                                                            \

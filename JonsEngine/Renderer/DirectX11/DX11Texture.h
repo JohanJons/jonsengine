@@ -12,9 +12,10 @@ namespace JonsEngine
     class DX11Texture
     {
     public:
-        DX11Texture( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, const TextureType textureType, const uint32_t textureWidth, const uint32_t textureHeight );
+        DX11Texture( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, TextureType textureType, uint32_t textureWidth, uint32_t textureHeight );
 
         void BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot) const;
+        void GetDesc( D3D11_TEXTURE2D_DESC& desc )  const;
 
         const DX11TextureID mID;
 

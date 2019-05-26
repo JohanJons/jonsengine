@@ -3,6 +3,10 @@
 
 #include "Constants.hlsl"
 
+static const float3 RED = float3( 1.0, 0.0, 0.0 );
+static const float3 GREEN = float3( 0.0, 1.0, 0.0 );
+static const float3 BLUE = float3( 0.0, 0.0, 1.0 );
+
 StructuredBuffer<float4x4> gBones : register (SBUFFER_REGISTER_BONE_TRANSFORMS);
 
 cbuffer PerFrameCB : register(CBUFFER_REGISTER_PER_FRAME)

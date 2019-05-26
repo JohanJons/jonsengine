@@ -153,14 +153,13 @@ namespace JonsEngine
 
 	struct RenderableTerrainData
 	{
-		RenderableTerrainData( DX11TextureID heightMap, uint32_t endIndex, Vec2 worldMin, Vec2 worldMax, float heightScale, float variationScale, float patchSize ) :
+		RenderableTerrainData( DX11TextureID heightMap, uint32_t endIndex, Vec2 worldMin, Vec2 worldMax, float heightScale, float variationScale ) :
 			mHeightMap( heightMap ),
 			mEndIndex( endIndex ),
 			mWorldMin( worldMin ),
 			mWorldMax( worldMax ),
 			mHeightScale( heightScale ),
-			mVariationScale( variationScale ),
-			mPatchSize( patchSize )
+			mVariationScale( variationScale )
 		{ }
 
 		DX11TextureID mHeightMap;
@@ -169,7 +168,6 @@ namespace JonsEngine
 		Vec2 mWorldMax;
 		float mHeightScale;
 		float mVariationScale;
-		float mPatchSize;
 	};
 
 	struct RenderableTerrains
