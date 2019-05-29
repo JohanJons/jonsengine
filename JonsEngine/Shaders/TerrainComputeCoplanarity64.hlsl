@@ -1,7 +1,7 @@
 #ifndef TERRAIN_COMPUTE_64_HLSL
 #define TERRAIN_COMPUTE_64_HLSL
 
-#define TERRAIN_COMPUTE_NUM_THREADS 64
-//#include "TerrainComputeCoplanarity.hlsl"
+#define TERRAIN_COMPUTE_PATCH_EXTENT 64
+#include "TerrainComputeCoplanarity.hlsl"
 
 #endif
