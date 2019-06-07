@@ -21,12 +21,12 @@ namespace JonsEngine
 	class DX11TerrainPass
 	{
 	public:
-		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, const RenderSettings::Tesselation& tessData);
+		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, RenderSettings::TerrainPatchSize patchSize);
 
 		void Render( const RenderableTerrains& terrains );
 		void RenderDebug( const RenderableTerrains& terrains );
 
-        void CreateCoplanarityMap( DX11TextureID heightmapID, RenderSettings::TerrainPatchSize patchSizeEnum );
+        void CreateCoplanarityMap( DX11TextureID heightmapID );
         void UpdatePatchSize( RenderSettings::TerrainPatchSize patchSize );
 
 	private:
@@ -49,8 +49,8 @@ namespace JonsEngine
 
 	private:
 		void RenderInternal( const RenderableTerrains& terrains );
-        void CreateCoplanarityMap( DX11TextureID heightmapID, uint32_t patchSize );
         void UpdateCoplanarityTexture( DX11TextureID heightmapID );
+        void BindComputeShader();
 		void BindForRendering();
 		void UnbindRendering();
 
@@ -59,7 +59,9 @@ namespace JonsEngine
 		ID3D11InputLayoutPtr mLayout = nullptr;
 		ID3D11VertexShaderPtr mVertexShader = nullptr;
 		ID3D11HullShaderPtr mHullShader = nullptr;
-        ID3D11ComputeShaderPtr mCoplanarityComputeShader = nullptr;
+        ID3D11ComputeShaderPtr mCoplanarityComputeShader16 = nullptr;
+        ID3D11ComputeShaderPtr mCoplanarityComputeShader32 = nullptr;
+        ID3D11ComputeShaderPtr mCoplanarityComputeShader64 = nullptr;
 		ID3D11DomainShaderPtr mDomainShader = nullptr;
 		ID3D11PixelShaderPtr mPixelShader = nullptr;
 		ID3D11PixelShaderPtr mPixelDebugShader = nullptr;
@@ -75,6 +77,7 @@ namespace JonsEngine
 		DX11VertexTransformPass& mVertexTransformer;
 		const IDMap<DX11Texture>& mTextureMap;
 
-		RenderSettings::Tesselation mTessData;
+        RenderSettings::TerrainPatchSize mPatchSize;
+		RenderSettings::Tesselation mTessData; // TODO: remove
 	};
 }

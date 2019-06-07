@@ -44,6 +44,8 @@ namespace JonsEngine
         void PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const RenderSettings& renderSettings);
 		void DebugStage( const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags );
 
+        void SetTerrainPatchSize( RenderSettings::TerrainPatchSize patchSize );
+
     private:
 		struct PerFrameCB
 		{

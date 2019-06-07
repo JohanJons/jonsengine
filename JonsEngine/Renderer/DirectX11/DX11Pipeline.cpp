@@ -39,7 +39,7 @@ namespace JonsEngine
         mPostProcessor(device, context, mFullscreenPass, backbufferTextureDesc),
         mSkyboxPass(device, context),
 
-		mTerrainPass(device, context, mVertexTransformPass, mTextureMap, settings.mTessellation),
+		mTerrainPass(device, context, mVertexTransformPass, mTextureMap, settings.mTerrainPatchSize),
 
 		mPerFrameCB(device, context, mPerFrameCB.CONSTANT_BUFFER_SLOT_PER_FRAME)
     {
@@ -200,6 +200,11 @@ namespace JonsEngine
 		if ( debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME ) )
 			mTerrainPass.RenderDebug( renderQueue.mTerrains );
 	}
+
+    void DX11Pipeline::SetTerrainPatchSize( RenderSettings::TerrainPatchSize patchSize )
+    {
+        mTerrainPass.UpdatePatchSize( patchSize );
+    }
 
 	void DX11Pipeline::RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end)
 	{

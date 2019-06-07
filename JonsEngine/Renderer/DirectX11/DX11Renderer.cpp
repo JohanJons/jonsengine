@@ -240,6 +240,7 @@ namespace JonsEngine
     void DX11Renderer::SetTerrainPatchSize( RenderSettings::TerrainPatchSize patchSize )
     {
         mRenderSettings.mTerrainPatchSize = patchSize;
+        mPipeline.SetTerrainPatchSize( patchSize );
     }
 
 
