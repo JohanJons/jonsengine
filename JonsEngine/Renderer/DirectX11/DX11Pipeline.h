@@ -39,12 +39,10 @@ namespace JonsEngine
         void BeginFrame(const RenderQueue& renderQueue);
         void EndFrame(const RenderSettings& renderSettings);
 
-        void GeometryStage(const RenderQueue& renderQueue);
-        void LightingStage(const RenderQueue& renderQueue, const RenderSettings& renderSettings);
+        void GeometryStage( const RenderQueue& renderQueue, const RenderSettings& renderSettings );
+        void LightingStage( const RenderQueue& renderQueue, const RenderSettings& renderSettings );
         void PostProcessingStage(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const RenderSettings& renderSettings);
-		void DebugStage( const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags );
-
-        void SetTerrainPatchSize( RenderSettings::TerrainPatchSize patchSize );
+		void DebugStage( const RenderQueue& renderQueue, const RenderSettings& renderSettings, const DebugOptions::RenderingFlags debugFlags );
 
     private:
 		struct PerFrameCB

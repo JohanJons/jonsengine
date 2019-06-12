@@ -36,7 +36,6 @@ list( APPEND COMPUTE_SHADERS
   SDSMFinalCompute.hlsl
   TerrainComputeCoplanarity16.hlsl
   TerrainComputeCoplanarity32.hlsl
-  TerrainComputeCoplanarity64.hlsl
 )
 
 list( APPEND DOMAIN_SHADERS 

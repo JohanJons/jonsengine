@@ -23,11 +23,8 @@ namespace JonsEngine
 	public:
 		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, RenderSettings::TerrainPatchSize patchSize);
 
-		void Render( const RenderableTerrains& terrains );
-		void RenderDebug( const RenderableTerrains& terrains );
-
-        void CreateCoplanarityMap( DX11TextureID heightmapID );
-        void UpdatePatchSize( RenderSettings::TerrainPatchSize patchSize );
+		void Render( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize );
+		void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize );
 
 	private:
 		struct TerrainCBuffer
@@ -48,11 +45,14 @@ namespace JonsEngine
 		};
 
 	private:
-		void RenderInternal( const RenderableTerrains& terrains );
+		void RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize );
         void UpdateCoplanarityTexture( DX11TextureID heightmapID );
+        void CreateCoplanarityMap( DX11TextureID heightmapID );
+        void UpdatePatchSize( RenderSettings::TerrainPatchSize patchSize );
         void BindComputeShader();
 		void BindForRendering();
 		void UnbindRendering();
+        bool HasCoplanarityTexture( DX11TextureID heightmapID ) const;
 
 		ID3D11DeviceContextPtr mContext = nullptr;
         ID3D11DevicePtr mDevice = nullptr;
@@ -61,7 +61,6 @@ namespace JonsEngine
 		ID3D11HullShaderPtr mHullShader = nullptr;
         ID3D11ComputeShaderPtr mCoplanarityComputeShader16 = nullptr;
         ID3D11ComputeShaderPtr mCoplanarityComputeShader32 = nullptr;
-        ID3D11ComputeShaderPtr mCoplanarityComputeShader64 = nullptr;
 		ID3D11DomainShaderPtr mDomainShader = nullptr;
 		ID3D11PixelShaderPtr mPixelShader = nullptr;
 		ID3D11PixelShaderPtr mPixelDebugShader = nullptr;

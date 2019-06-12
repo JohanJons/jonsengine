@@ -121,11 +121,11 @@ namespace JonsEngine
     }
 
 
-    void DX11Pipeline::GeometryStage(const RenderQueue& renderQueue)
+    void DX11Pipeline::GeometryStage( const RenderQueue& renderQueue, const RenderSettings& renderSettings )
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-		mTerrainPass.Render( renderQueue.mTerrains );
+		mTerrainPass.Render( renderQueue.mTerrains, renderSettings.mTerrainPatchSize );
 
 		mGBuffer.BindForRendering();
 
@@ -191,20 +191,15 @@ namespace JonsEngine
             mPostProcessor.FXAAPass(mBackbuffer, mWindowSize);
     }
 
-	void DX11Pipeline::DebugStage( const RenderQueue& renderQueue, const DebugOptions::RenderingFlags debugFlags )
+	void DX11Pipeline::DebugStage( const RenderQueue& renderQueue, const RenderSettings& renderSettings, const DebugOptions::RenderingFlags debugFlags )
 	{
 		bool renderAABBs = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_MODEL_AABB ) || debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_AABB );
 		if ( renderAABBs )
 			mAABBPass.Render( renderQueue.mColorsToAABBsList, renderQueue.mCamera.mCameraViewProjectionMatrix );
 
 		if ( debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME ) )
-			mTerrainPass.RenderDebug( renderQueue.mTerrains );
+			mTerrainPass.RenderDebug( renderQueue.mTerrains, renderSettings.mTerrainPatchSize );
 	}
-
-    void DX11Pipeline::SetTerrainPatchSize( RenderSettings::TerrainPatchSize patchSize )
-    {
-        mTerrainPass.UpdatePatchSize( patchSize );
-    }
 
 	void DX11Pipeline::RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end)
 	{

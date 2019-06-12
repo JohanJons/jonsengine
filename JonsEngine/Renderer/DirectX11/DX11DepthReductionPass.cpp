@@ -30,7 +30,7 @@ namespace JonsEngine
             width = DispatchSize(SDSM_THREAD_GROUP_SIZE, width);
             height = DispatchSize(SDSM_THREAD_GROUP_SIZE, height);
 
-            mDepthReductionRTVs.emplace_back(device, DXGI_FORMAT_R16G16_UNORM, width, height, true);
+            mDepthReductionRTVs.emplace_back(device, context, DXGI_FORMAT_R16G16_UNORM, width, height, true);
         }
 
         // setup readback textures

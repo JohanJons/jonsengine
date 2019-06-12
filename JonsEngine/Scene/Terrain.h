@@ -15,7 +15,7 @@ namespace JonsEngine
 	class Terrain
 	{
 	public:
-		Terrain(const std::string& name, float heightScale, float variationScale, float terrainSizeMultiplyer, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID, const OnTerrainDirtyFunc& onDirtyFunc );
+		Terrain(const std::string& name, float heightScale, float variationScale, const SceneNodeID sceneNodeID, const TerrainDataID terrainDataID, const OnTerrainDirtyFunc& onDirtyFunc );
 
 		void SetHeightScale( float heightScale );
 		float GetHeightScale() const { return mHeightScale; }
@@ -23,10 +23,6 @@ namespace JonsEngine
 		// random variation applied along the normal
 		void SetVariationScale( float variationScale );
 		float GetVariationScale() const { return mVariationScale; }
-
-		// terrain size in relation to the heightmap
-		void SetTerrainSizeMultiplyer( float terrainSizeMultiplyer );
-		float GetTerrainSizeMultiplyer() const { return mTerrainSizeMultiplyer; }
 
 		const std::string& GetName() const { return mName; }
 		SceneNodeID GetSceneNode() const { return mSceneNodeID; }
@@ -40,7 +36,6 @@ namespace JonsEngine
 		std::string mName;
 		float mHeightScale;
 		float mVariationScale;
-		float mTerrainSizeMultiplyer;
 
 		SceneNodeID mSceneNodeID = INVALID_SCENE_NODE_ID;
 		TerrainDataID mTerrainDataID = INVALID_TERRAIN_DATA_ID;

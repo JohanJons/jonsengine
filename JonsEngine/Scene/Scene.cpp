@@ -252,9 +252,9 @@ namespace JonsEngine
     }
 
 
-	TerrainID Scene::CreateTerrain(const std::string& name, float heightScale, float variationScale, float terrainSizeMultiplyer, const SceneNodeID node, const TerrainDataID terrainDataID)
+	TerrainID Scene::CreateTerrain(const std::string& name, float heightScale, float variationScale, const SceneNodeID node, const TerrainDataID terrainDataID)
 	{
-		TerrainID ID = mTerrains.Insert( name, heightScale, variationScale, terrainSizeMultiplyer, node, terrainDataID, std::bind( static_cast<void( Scene::* )( Terrain* terrain )> ( &Scene::MarkAsDirty ), this, std::placeholders::_1 ) );
+		TerrainID ID = mTerrains.Insert( name, heightScale, variationScale, node, terrainDataID, std::bind( static_cast<void( Scene::* )( Terrain* terrain )> ( &Scene::MarkAsDirty ), this, std::placeholders::_1 ) );
 		mTerrainTransforms.AddDirty( ID );
 
 		return ID;

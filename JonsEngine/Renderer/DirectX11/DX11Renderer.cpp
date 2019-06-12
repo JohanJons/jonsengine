@@ -178,12 +178,12 @@ namespace JonsEngine
 
     void DX11Renderer::Render(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags)
     {
-        mPipeline.BeginFrame(renderQueue);
+        mPipeline.BeginFrame( renderQueue );
 
-        mPipeline.GeometryStage(renderQueue);
-        mPipeline.LightingStage(renderQueue, mRenderSettings);
-        mPipeline.PostProcessingStage(renderQueue, elapstedFrameTime, mRenderSettings);
-        mPipeline.DebugStage( renderQueue, debugFlags );
+        mPipeline.GeometryStage( renderQueue, mRenderSettings );
+        mPipeline.LightingStage( renderQueue, mRenderSettings );
+        mPipeline.PostProcessingStage( renderQueue, elapstedFrameTime, mRenderSettings );
+        mPipeline.DebugStage( renderQueue, mRenderSettings, debugFlags );
 
         mPipeline.EndFrame( mRenderSettings );
     }
@@ -240,7 +240,6 @@ namespace JonsEngine
     void DX11Renderer::SetTerrainPatchSize( RenderSettings::TerrainPatchSize patchSize )
     {
         mRenderSettings.mTerrainPatchSize = patchSize;
-        mPipeline.SetTerrainPatchSize( patchSize );
     }
 
 

@@ -96,14 +96,12 @@ namespace JonsEngine
 
 	void TerrainTransforms::RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const Terrain& terrain, const TerrainData& terrainData, uint32_t patchSize )
 	{
-		float terrainSizeMultiplyer = terrain.GetTerrainSizeMultiplyer();
 		uint32_t heightmapWidth = terrainData.GetWidth(), heightmapHeight = terrainData.GetHeight();
-		uint32_t terrainWidth = terrainData.GetWidth() * terrainSizeMultiplyer, terrainHeight = terrainData.GetHeight() * terrainSizeMultiplyer;
 		const std::vector<uint8_t>& heightmapData = terrainData.GetHeightMapData();
 
 		assert( patchSize && heightmapWidth && heightmapHeight );
 
-		int32_t numWidth = GetNumColumns( patchSize, terrainWidth ), numHeight = GetNumRows( patchSize, terrainHeight );
+		int32_t numWidth = GetNumColumns( patchSize, heightmapWidth ), numHeight = GetNumRows( patchSize, heightmapHeight );
 		int32_t gridSize = numWidth * numHeight;
 
 		std::vector<Mat4> transforms;
@@ -111,7 +109,6 @@ namespace JonsEngine
 		transforms.reserve( gridSize );
 		AABBTransformss.reserve( gridSize );
 
-		uint32_t patchExtent = patchSize / 2;
 		for ( int32_t rowNum = -numHeight; rowNum < numHeight; rowNum += 2 )
 		{
 			for ( int32_t colNum = -numWidth; colNum < numWidth; colNum += 2 )
@@ -121,7 +118,7 @@ namespace JonsEngine
 				uint32_t rowIndex = ( rowNum + numHeight ) / 2, colIndex = ( colNum + numWidth ) / 2;
 				GetPatchHeight( minY, maxY, heightmapData, terrain.GetHeightScale(), heightmapWidth, textureExtentWidth, textureExtentHeight, rowIndex, colIndex );
 
-				Mat4 patchScaleTransform = glm::scale( Vec3( patchExtent, 1.0f, patchExtent ) );
+				Mat4 patchScaleTransform = glm::scale( Vec3( patchSize, 1.0f, patchSize ) );
 				transforms.emplace_back( worldTransform * patchScaleTransform * glm::translate( Vec3( colNum, 0.0f, rowNum ) ) );
 
 				float minMaxHeightDiff = maxY - minY;

@@ -2,7 +2,8 @@
 
 namespace JonsEngine
 {
-    DX11DynamicTexture::DX11DynamicTexture(ID3D11DevicePtr device, DXGI_FORMAT textureFormat, uint32_t textureWidth, uint32_t textureHeight, bool createUAV)
+    DX11DynamicTexture::DX11DynamicTexture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DXGI_FORMAT textureFormat, uint32_t textureWidth, uint32_t textureHeight, bool createUAV)
+        : mContext( context )
     {
         D3D11_TEXTURE2D_DESC textureDesc;
         ZeroMemory(&textureDesc, sizeof(D3D11_TEXTURE2D_DESC));
@@ -21,5 +22,21 @@ namespace JonsEngine
         DXCALL(device->CreateShaderResourceView(mTexture, nullptr, &mSRV));
         if (createUAV)
             DXCALL(device->CreateUnorderedAccessView(mTexture, nullptr, &mUAV));
+    }
+
+    void DX11DynamicTexture::BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot) const
+    {
+        mContext->VSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
+        mContext->CSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
+        mContext->DSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
+        mContext->PSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
+    }
+
+    void DX11DynamicTexture::Unbind(const SHADER_TEXTURE_SLOT shaderTextureSlot) const
+    {
+        mContext->VSSetShaderResources( shaderTextureSlot, 1, &gNullSRV.p );
+        mContext->CSSetShaderResources( shaderTextureSlot, 1, &gNullSRV.p );
+        mContext->DSSetShaderResources( shaderTextureSlot, 1, &gNullSRV.p );
+        mContext->PSSetShaderResources( shaderTextureSlot, 1, &gNullSRV.p );
     }
 }

@@ -62,7 +62,6 @@ namespace JonsEngine
             case RenderSettings::TerrainPatchSize::X16: return 16;
             case RenderSettings::TerrainPatchSize::X32: return 32;
             default: JONS_ERROR(Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainPatchSize): Invalid enum");
-            case RenderSettings::TerrainPatchSize::X64: return 64;
         }
     }
 }
