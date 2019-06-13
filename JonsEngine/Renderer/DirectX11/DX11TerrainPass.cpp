@@ -150,22 +150,8 @@ namespace JonsEngine
         GetCoplanarityTextureOutputDimensions( width, height, mTextureMap.GetItem( heightmapID ), mPatchSize );
 
         mTerrainCoplanarityMap.erase( heightmapID );
-        mTerrainCoplanarityMap.emplace( std::piecewise_construct, std::forward_as_tuple( heightmapID ), std::forward_as_tuple( mDevice, mContext, DXGI_FORMAT_R16_UNORM, width, height, true ) );
+        mTerrainCoplanarityMap.emplace( std::piecewise_construct, std::forward_as_tuple( heightmapID ), std::forward_as_tuple( mDevice, mContext, DXGI_FORMAT_R16_FLOAT, width, height, true ) );
         UpdateCoplanarityTexture( heightmapID );
-        // coplanarity value between [0, 1]
-        /*D3D11_TEXTURE2D_DESC coplanarityTextureDesc;
-        ZeroMemory(&coplanarityTextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
-        coplanarityTextureDesc.ArraySize = 1;
-        coplanarityTextureDesc.Format = DXGI_FORMAT_R16_UNORM;
-        coplanarityTextureDesc.Width = width;
-        coplanarityTextureDesc.Height = height;
-        coplanarityTextureDesc.MipLevels = 1;
-        coplanarityTextureDesc.SampleDesc.Count = 1;
-        coplanarityTextureDesc.Usage = D3D11_USAGE_DEFAULT;
-        coplanarityTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-        DXCALL(mDevice->CreateTexture2D(&coplanarityTextureDesc, nullptr, &coplanarityTexture));
-
-        mTerrainCoplanarityMap[ heightmapID ] = coplanarityTexture;*/
     }
 
     void DX11TerrainPass::UpdatePatchSize( RenderSettings::TerrainPatchSize patchSize )
@@ -196,8 +182,10 @@ namespace JonsEngine
                 CreateCoplanarityMap( terrainData.mHeightMap );
 
 			const DX11Texture& heightmap = mTextureMap.GetItem( terrainData.mHeightMap );
+            const DX11DynamicTexture& coplanarityTexture = mTerrainCoplanarityMap.at( terrainData.mHeightMap );
 
 			heightmap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
+            coplanarityTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA_2 );
 
 			mPerTerrainCBuffer.SetData( { terrainData.mHeightScale, terrainData.mVariationScale, terrainData.mWorldMin, terrainData.mWorldMax } );
 			mPerTerrainCBuffer.Bind();
@@ -209,12 +197,16 @@ namespace JonsEngine
 			mQuadMesh.DrawInstanced( numTransforms );
 
 			beginIndex = endIndex;
+
+            heightmap.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
+            coplanarityTexture.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA_2 );
 		}
 	}
 
     void DX11TerrainPass::UpdateCoplanarityTexture( DX11TextureID heightmapID )
     {
-        const DX11DynamicTexture& texture = mTerrainCoplanarityMap.at( heightmapID );
+        const DX11Texture& heightmapTexture = mTextureMap.GetItem( heightmapID );
+        const DX11DynamicTexture& coplanarityTexture = mTerrainCoplanarityMap.at( heightmapID );
 
         uint32_t numWidthInvocations, numHeightInvocations;
         GetCoplanarityTextureOutputDimensions( numWidthInvocations, numHeightInvocations, mTextureMap.GetItem( heightmapID ), mPatchSize );
@@ -222,11 +214,11 @@ namespace JonsEngine
         BindComputeShader();
 
         // TODO: make scope-based binding
-        texture.BindAsShaderResource( SHADER_TEXTURE_SLOT_EXTRA );
-        mContext->CSSetUnorderedAccessViews( UAV_SLOT, 1, &texture.mUAV.p, nullptr ); 
-        //mContext->Dispatch(numWidthInvocations, numHeightInvocations, 1);
+        heightmapTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT_EXTRA );
+        mContext->CSSetUnorderedAccessViews( UAV_SLOT, 1, &coplanarityTexture.mUAV.p, nullptr ); 
+        mContext->Dispatch(numWidthInvocations, numHeightInvocations, 1);
         mContext->CSSetUnorderedAccessViews( UAV_SLOT, 1, &gNullUAV.p, nullptr );
-        texture.Unbind( SHADER_TEXTURE_SLOT_EXTRA );
+        heightmapTexture.Unbind( SHADER_TEXTURE_SLOT_EXTRA );
     }
 
     void DX11TerrainPass::BindComputeShader()

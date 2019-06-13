@@ -4,6 +4,8 @@
 #include "TerrainCommon.hlsl"
 #include "Common.hlsl"
 
+Texture2D gCoplanarityMap : register( TEXTURE_REGISTER_EXTRA_2 );
+
 float3 ComputePatchMidpoint( float3 corner1, float3 corner2, float3 corner3, float3 corner4 )
 {
 	return ( corner1 + corner2 + corner3 + corner4 ) / 4.0f;
@@ -14,6 +16,9 @@ float CalculateTessellationfactor( float3 worldPatchMidpoint )
     float cameraToPatchDistance = distance( gWorldEyePos, worldPatchMidpoint );
 	float scaledDistance = ( cameraToPatchDistance - gMinZ ) / ( gMaxZ - gMinZ );
 	scaledDistance = clamp( scaledDistance, 0.0f, 1.0f );
+
+    float coplanarity = 1.0f + gCoplanarityMap.Load( uint3( 0, 0, 0 ) );
+    scaledDistance *= coplanarity;
 
 	return pow( 2, lerp( 6.0f, 2.0f, scaledDistance ) );
 }

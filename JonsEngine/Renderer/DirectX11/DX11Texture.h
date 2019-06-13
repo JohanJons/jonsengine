@@ -15,6 +15,7 @@ namespace JonsEngine
         DX11Texture( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<uint8_t>& textureData, TextureType textureType, uint32_t textureWidth, uint32_t textureHeight );
 
         void BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot) const;
+        void Unbind( const SHADER_TEXTURE_SLOT shaderTextureSlot ) const;
         void GetDesc( D3D11_TEXTURE2D_DESC& desc )  const;
 
         const DX11TextureID mID;

@@ -28,6 +28,9 @@ namespace JonsGame
     {
         SetupInputCallbacks();
         mEngine.GetWindow().ShowMouseCursor(false);
+
+        mEngine.GetSceneManager().SetActiveScene( mTessellationScene.GetSceneID() );
+        mIsDefaultScene = false;
     }
         
     Game::~Game()

@@ -61,8 +61,19 @@ namespace JonsEngine
     void DX11Texture::BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot) const
     {
 		mContext->VSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
+        mContext->CSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
+        mContext->HSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
 		mContext->DSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
         mContext->PSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
+    }
+
+    void DX11Texture::Unbind(const SHADER_TEXTURE_SLOT shaderTextureSlot) const
+    {
+        mContext->VSSetShaderResources( shaderTextureSlot, 1, &gNullSRV.p );
+        mContext->CSSetShaderResources( shaderTextureSlot, 1, &gNullSRV.p );
+        mContext->HSSetShaderResources( shaderTextureSlot, 1, &gNullSRV.p );
+        mContext->DSSetShaderResources( shaderTextureSlot, 1, &gNullSRV.p );
+        mContext->PSSetShaderResources( shaderTextureSlot, 1, &gNullSRV.p );
     }
 
     void DX11Texture::GetDesc( D3D11_TEXTURE2D_DESC& desc ) const

@@ -26,8 +26,10 @@ namespace JonsEngine
 
     void DX11DynamicTexture::BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot) const
     {
+        // TODO: rework....
         mContext->VSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
         mContext->CSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
+        mContext->HSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
         mContext->DSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
         mContext->PSSetShaderResources( shaderTextureSlot, 1, &mSRV.p );
     }
@@ -36,6 +38,7 @@ namespace JonsEngine
     {
         mContext->VSSetShaderResources( shaderTextureSlot, 1, &gNullSRV.p );
         mContext->CSSetShaderResources( shaderTextureSlot, 1, &gNullSRV.p );
+        mContext->HSSetShaderResources( shaderTextureSlot, 1, &gNullSRV.p );
         mContext->DSSetShaderResources( shaderTextureSlot, 1, &gNullSRV.p );
         mContext->PSSetShaderResources( shaderTextureSlot, 1, &gNullSRV.p );
     }
