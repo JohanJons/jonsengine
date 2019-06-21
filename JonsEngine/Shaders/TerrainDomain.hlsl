@@ -4,7 +4,6 @@
 #include "TerrainCommon.hlsl"
 #include "Common.hlsl"
 
-Texture2D gNormalmap : register( TEXTURE_REGISTER_NORMAL );
 Texture2D gHeightmap : register( TEXTURE_REGISTER_EXTRA );
 Texture2D gPerlinNoiseTexture : register( TEXTURE_REGISTER_PERLIN );
 SamplerState gPointSampler : register( SAMPLER_REGISTER_POINT );
@@ -65,7 +64,10 @@ DomainOut ds_main(PatchTess patchTess, float2 uv : SV_DomainLocation, const Outp
 	ret.mPosition = mul( gFrameViewProj, ret.mPosition );
 
 	ret.mTexcoord = midPointTexcoord;
+
+	// debug; these could be hidden if necessary
     ret.mTesellation = patchTess.mInsideTess[ 0 ];
+	ret.mCoplanarity = 0.4f;
 
 	return ret;
 }

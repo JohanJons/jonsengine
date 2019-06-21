@@ -27,6 +27,7 @@ list( APPEND PIXEL_SHADERS
   SSAOPixel.hlsl
   TerrainPixel.hlsl
   TerrainPixelDebug.hlsl
+  TerrainPixelDebugCoplanarity.hlsl
   Tonemapping.hlsl
 )
 
@@ -44,6 +45,7 @@ list( APPEND DOMAIN_SHADERS
 
 list( APPEND HULL_SHADERS 
   TerrainHull.hlsl
+  TerrainHullDebugCoplanarity.hlsl
 )
 
 list( APPEND NON_COMPILE_SHADERS 

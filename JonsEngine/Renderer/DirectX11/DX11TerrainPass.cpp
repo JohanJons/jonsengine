@@ -5,11 +5,13 @@
 #include "Renderer/RenderSettings.h"
 #include "Compiled/TerrainVertex.h"
 #include "Compiled/TerrainHull.h"
+#include "Compiled/TerrainHullDebugCoplanarity.h"
 #include "Compiled/TerrainComputeCoplanarity16.h"
 #include "Compiled/TerrainComputeCoplanarity32.h"
 #include "Compiled/TerrainDomain.h"
 #include "Compiled/TerrainPixel.h"
 #include "Compiled/TerrainPixelDebug.h"
+#include "Compiled/TerrainPixelDebugCoplanarity.h"
 #include "Core/Math/MathUtils.h"
 #include "Core/Math/AABB.h"
 
@@ -97,11 +99,13 @@ namespace JonsEngine
 		// shaders
 		DXCALL(device->CreateVertexShader(gTerrainVertex, sizeof(gTerrainVertex), nullptr, &mVertexShader));
 		DXCALL(device->CreateHullShader(gTerrainHull, sizeof(gTerrainHull), nullptr, &mHullShader));
+		DXCALL(device->CreateHullShader(gTerrainHullDebugCoplanarity, sizeof(gTerrainHullDebugCoplanarity), nullptr, &mHullShaderDebugCoplanarity));
         DXCALL(device->CreateComputeShader(gTerrainComputeCoplanarity16, sizeof(gTerrainComputeCoplanarity16), nullptr, &mCoplanarityComputeShader16));
         DXCALL(device->CreateComputeShader(gTerrainComputeCoplanarity32, sizeof(gTerrainComputeCoplanarity32), nullptr, &mCoplanarityComputeShader32));
 		DXCALL(device->CreateDomainShader(gTerrainDomain, sizeof(gTerrainDomain), nullptr, &mDomainShader));
 		DXCALL(device->CreatePixelShader(gTerrainPixel, sizeof(gTerrainPixel), nullptr, &mPixelShader));
 		DXCALL( device->CreatePixelShader( gTerrainPixelDebug, sizeof( gTerrainPixelDebug ), nullptr, &mPixelDebugShader ) );
+		DXCALL( device->CreatePixelShader( gTerrainPixelDebugCoplanarity, sizeof( gTerrainPixelDebugCoplanarity ), nullptr, &mPixelDebugCoplanarityShader ) );
 
 		D3D11_RASTERIZER_DESC rasterizerDesc;
 		ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
@@ -125,14 +129,18 @@ namespace JonsEngine
 		UnbindRendering();
 	}
 
-	void DX11TerrainPass::RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize )
+	void DX11TerrainPass::RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, bool drawCoplanarity )
 	{
 		if ( !terrains.GetNumTerrains() )
 			return;
 
-		BindForRendering();
+		BindForRendering( drawCoplanarity );
 
-		mContext->PSSetShader( mPixelDebugShader, nullptr, 0 );
+		if ( drawCoplanarity )
+			mContext->PSSetShader( mPixelDebugCoplanarityShader, nullptr, 0 );
+		else
+			mContext->PSSetShader( mPixelDebugShader, nullptr, 0 );
+
 		ID3D11RasterizerStatePtr prevRasterizer = nullptr;
 		mContext->RSGetState( &prevRasterizer );
 		mContext->RSSetState( mDebugRasterizer );
@@ -187,7 +195,7 @@ namespace JonsEngine
 			heightmap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
             coplanarityTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA_2 );
 
-			mPerTerrainCBuffer.SetData( { terrainData.mHeightScale, terrainData.mVariationScale, terrainData.mWorldMin, terrainData.mWorldMax } );
+			mPerTerrainCBuffer.SetData( { terrainData.mWorldMin, terrainData.mWorldMax, terrainData.mHeightScale, terrainData.mVariationScale, beginIndex } );
 			mPerTerrainCBuffer.Bind();
 
 			uint32_t endIndex = terrainData.mEndIndex;
@@ -239,12 +247,17 @@ namespace JonsEngine
         }
     }
 
-	void DX11TerrainPass::BindForRendering()
+	void DX11TerrainPass::BindForRendering( bool drawCoplanarity )
 	{
 		mContext->VSSetShader(mVertexShader, nullptr, 0);
 		mContext->DSSetShader(mDomainShader, nullptr, 0);
 		mContext->PSSetShader(mPixelShader, nullptr, 0);
-		mContext->HSSetShader(mHullShader, nullptr, 0);
+
+		if ( drawCoplanarity )
+			mContext->HSSetShader(mHullShaderDebugCoplanarity, nullptr, 0);
+		else
+			mContext->HSSetShader(mHullShader, nullptr, 0);
+
 		mContext->IASetInputLayout(mLayout);
 		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_12_CONTROL_POINT_PATCHLIST);
 		mCBuffer.SetData({ mTessData.mMinDistance, mTessData.mMaxDistance, mTessData.mMinFactor, mTessData.mMaxFactor });

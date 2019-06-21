@@ -197,8 +197,10 @@ namespace JonsEngine
 		if ( renderAABBs )
 			mAABBPass.Render( renderQueue.mColorsToAABBsList, renderQueue.mCamera.mCameraViewProjectionMatrix );
 
-		if ( debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME ) )
-			mTerrainPass.RenderDebug( renderQueue.mTerrains, renderSettings.mTerrainPatchSize );
+		bool drawCoplanarity = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_COPLANARITY );
+		bool drawWireframe = drawCoplanarity || debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
+		if ( drawWireframe )
+			mTerrainPass.RenderDebug( renderQueue.mTerrains, renderSettings.mTerrainPatchSize, drawCoplanarity );
 	}
 
 	void DX11Pipeline::RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end)

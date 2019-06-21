@@ -14,12 +14,13 @@ cbuffer PerFrameConstants : register(CBUFFER_REGISTER_DOMAIN)
 
 cbuffer PerTerrainConstants : register(CBUFFER_REGISTER_EXTRA)
 {
-	float gHeightModifier;
-	float gVariationScale;
 	float gWorldMinX;
 	float gWorldMinZ;
 	float gWorldMaxX;
 	float gWorldMaxZ;
+	float gHeightModifier;
+	float gVariationScale;
+	uint gTransformOffset;
 }
 
 
@@ -41,6 +42,7 @@ struct DomainOut
 	float3 mNormal : NORMAL;
 	float2 mTexcoord : TEXCOORD;
     float mTesellation : TESS_FACTOR;
+	float mCoplanarity : COPLANARITY;
 };
 
 struct HullOut

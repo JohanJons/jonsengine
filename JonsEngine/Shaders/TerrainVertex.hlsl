@@ -10,18 +10,12 @@ struct VertexIn
 };
 
 StructuredBuffer<float4x4> gWorldTransforms : register (SBUFFER_REGISTER_EXTRA);
-Texture2D gHeightmap : register( TEXTURE_REGISTER_EXTRA );
-
-float2 WorldXZToTexcoord(float2 worldMinExtent, float2 worldMaxExtent, float2 worldPos)
-{
-	return abs((worldPos - worldMinExtent) / (worldMaxExtent - worldMinExtent));
-}
 
 VertexOut vs_main(VertexIn input)
 {
 	VertexOut ret;
 
-	const uint transformIndex = input.mInstanceID;
+	const uint transformIndex = gTransformOffset + input.mInstanceID;
 	// silly that we have to transpose this...
 	const float4x4 worldTransform = transpose( gWorldTransforms.Load( transformIndex ) );
 

@@ -17,16 +17,25 @@ float CalculateTessellationfactor( float3 worldPatchMidpoint )
 	float scaledDistance = ( cameraToPatchDistance - gMinZ ) / ( gMaxZ - gMinZ );
 	scaledDistance = clamp( scaledDistance, 0.0f, 1.0f );
 
-    float coplanarity = 1.0f + gCoplanarityMap.Load( uint3( 0, 0, 0 ) );
+    float coplanarity = gCoplanarityMap.Load( uint3( 0, 0, 0 ) ).r;
     scaledDistance *= coplanarity;
 
-	return pow( 2, lerp( 6.0f, 2.0f, scaledDistance ) );
+	return pow( 2, lerp( 6.0f, 2.0f, coplanarity ) );
 }
 
 PatchTess PatchHS( InputPatch<VertexOut, 12> inputVertices )
 {
 	PatchTess patch;
 
+#if TERRAIN_DEBUG_COPLANARITY
+	patch.mEdgeTess[ 0 ] = 32;
+	patch.mEdgeTess[ 1 ] = patch.mEdgeTess[ 0 ];
+	patch.mEdgeTess[ 2 ] = patch.mEdgeTess[ 0 ];
+	patch.mEdgeTess[ 3 ] = patch.mEdgeTess[ 0 ];
+
+	patch.mInsideTess[ 0 ] = patch.mEdgeTess[ 0 ];
+	patch.mInsideTess[ 1 ] = patch.mEdgeTess[ 0 ];
+#else
     float3 midPatchMidpoint = ComputePatchMidpoint( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition );
 	float3 edgePatchMidpoint[] = {
 		ComputePatchMidpoint( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 4 ].mWorldPosition, inputVertices[ 5 ].mWorldPosition ),
@@ -50,6 +59,7 @@ PatchTess PatchHS( InputPatch<VertexOut, 12> inputVertices )
 	
 	patch.mInsideTess[ 0 ] = midPatchTessFactor;
 	patch.mInsideTess[ 1 ] = midPatchTessFactor;
+#endif
 
 	return patch;
 }

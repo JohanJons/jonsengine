@@ -166,7 +166,19 @@ namespace JonsGame
 					case Key::FIVE: mTessellationScene.GetTerrain().SetVariationScale( 3.0f ); break;
 					case Key::SIX: mTessellationScene.GetTerrain().SetVariationScale( 6.0f ); break;
 					case Key::SEVEN: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_AABB ); break;
-					case Key::EIGHT: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME ); break;
+					case Key::EIGHT:
+					{
+						// TERRAIN_COPLANARITY / TERRAIN_WIREFRAME mutually exclusive debug options
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_COPLANARITY, false ); 
+						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
+						break;
+					}
+					case Key::NINE:
+					{
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME, false ); 
+						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_COPLANARITY );
+						break;
+					}
 				}
 			}
         }
