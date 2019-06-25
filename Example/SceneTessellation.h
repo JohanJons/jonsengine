@@ -20,6 +20,7 @@ namespace JonsGame
 		void FlipTerrain();
 
 		JonsEngine::SceneID GetSceneID() const { return mID; }
+		JonsEngine::SceneID GetTestSceneID() const { return mID; }
 
 		JonsEngine::Scene& GetJonsScene();
 		JonsEngine::Terrain& GetTerrain();

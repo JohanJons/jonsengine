@@ -18,36 +18,6 @@
 
 namespace JonsEngine
 {
-	/*const std::vector<float> gQuadVertices{
-		-1.0f, 0.0f, -1.0f,
-		1.0f, 0.0f, -1.0f,
-		1.0f, 0.0f, 1.0f,
-		-1.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 3.0f,
-		-1.0f, 0.0f, 3.0f,
-		-1.0f, 0.0f, -3.0f,
-		1.0f, 0.0f, -3.0f,
-		3.0f, 0.0f, -1.0f,
-		3.0f, 0.0f, 1.0f,
-		-3.0f, 0.0f, 1.0f,
-		-3.0f, 0.0f, -1.0f,
-	};*/
-
-	/*const std::vector<float> gQuadVertices{
-		-1.0f, 0.0f, -1.0f,
-		1.0f, 0.0f, -1.0f,
-		1.0f, 0.0f, 1.0f,
-		-1.0f, 0.0f, 1.0f,
-		-1.0f, 0.0f, -3.0f,
-		1.0f, 0.0f, -3.0f,
-		3.0f, 0.0f, -1.0f,
-		3.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 3.0f,
-		-1.0f, 0.0f, 3.0f,
-		-3.0f, 0.0f, 1.0f,
-		-3.0f, 0.0f, -1.0f,
-	};*/
-
 	const std::vector<float> gQuadVertices{
 		0.0f, 0.0f, 0.0f,
 		1.0f, 0.0f, 0.0f,

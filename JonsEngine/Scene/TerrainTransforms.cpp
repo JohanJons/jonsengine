@@ -105,9 +105,9 @@ namespace JonsEngine
 		int32_t gridSize = numWidth * numHeight;
 
 		std::vector<Mat4> transforms;
-		std::vector<Mat4> AABBTransformss;
+		std::vector<Mat4> AABBTransforms;
 		transforms.reserve( gridSize );
-		AABBTransformss.reserve( gridSize );
+		AABBTransforms.reserve( gridSize );
 
 		for ( int32_t rowNum = -numHeight; rowNum < numHeight; rowNum += 2 )
 		{
@@ -122,11 +122,10 @@ namespace JonsEngine
 				transforms.emplace_back( worldTransform * patchScaleTransform * glm::translate( Vec3( colNum / 2, 0.0f, rowNum / 2 ) ) );
 
 				float minMaxHeightDiff = maxY - minY;
-				minMaxHeightDiff /= 2;
-				AABBTransformss.emplace_back( glm::translate( Vec3( 0.0f, minMaxHeightDiff, 0.0f ) ) * glm::scale( Vec3( 1.0, minMaxHeightDiff, 1.0f ) ) *  transforms.back() );
+				AABBTransforms.emplace_back( glm::translate( Vec3( 0.0f, minMaxHeightDiff / 2, 0.0f ) ) * glm::scale( Vec3( 1.0, minMaxHeightDiff, 1.0f ) ) *  transforms.back() );
 			}
 		}
 
-		mTerrainTransforms.emplace_back( ID, std::move( transforms ), std::move( AABBTransformss ) );
+		mTerrainTransforms.emplace_back( ID, std::move( transforms ), std::move( AABBTransforms ) );
 	}
 }

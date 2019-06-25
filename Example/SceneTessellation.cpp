@@ -40,7 +40,10 @@ namespace JonsGame
 
 		scene.SetSkybox( mSkybox );
 
-		scene.GetSceneCamera().TranslateCamera( Vec3( 2048.0f, 40.0f, -1520.0f ) );
+		scene.GetSceneCamera().TranslateCamera( { 2048.0f, 40.0f, -1520.0f } );
+
+		// temp
+		FlipTerrain();
 	}
 
 	SceneTessellation::~SceneTessellation()
@@ -63,6 +66,15 @@ namespace JonsGame
 
 		nodeTerrain.SetVisible( !nodeTerrain.IsVisible() );
 		nodeTerrainTest.SetVisible( !nodeTerrainTest.IsVisible() );
+
+		if ( nodeTerrainTest.IsVisible() )
+		{
+			scene.GetSceneCamera().SetPosition( { 0.0f, 40.0f, 0.0f } );
+		}
+		else
+		{
+			scene.GetSceneCamera().SetPosition( { 2048.0f, 40.0f, -1520.0f } );
+		}
 	}
 
 	JonsEngine::Scene& SceneTessellation::GetJonsScene()

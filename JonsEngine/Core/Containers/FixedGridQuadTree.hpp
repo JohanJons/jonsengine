@@ -43,6 +43,7 @@ namespace JonsEngine
 		FixedGridQuadTree( std::vector<Item>&& Items, std::vector<Mat4>&& AABBTransforms );
 
 		uint32_t GetGridSize() const { return static_cast< uint32_t >( mNodes.size() ); }
+		uint32_t GetAABBCutoffPoint() const { return gNodeAABBCutoffPoint; }
 
 		Item& GetNode( uint32_t index ) { return mNodes.at( index ); }
 		const Item& GetNode( uint32_t index ) const { return mNodes.at( index ); }

@@ -259,16 +259,21 @@ namespace JonsEngine
 
 		std::vector<Mat4> aabbTransforms;
 		aabbTransforms.reserve( mRenderQueue.mTerrains.mTransforms.size() );
-		for ( const TerrainTransformData& transform : transforms )
+		for ( const TerrainTransformData& transformData : transforms )
 		{
-            const Terrain& terrain = scene.GetTerrain( transform.mID );
+            const Terrain& terrain = scene.GetTerrain( transformData.mID );
             const SceneNode& node = scene.GetSceneNode( terrain.GetSceneNode() );
             if ( !node.IsVisible() )
                 continue;
 
-			transform.mQuadTree.CullAABBs( aabbTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
+			transformData.mQuadTree.CullAABBs( aabbTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
 			for ( const Mat4& transform : aabbTransforms )
-				AddAABB( AABBRenderData, transform, unitCubeMeshID, gRed );
+			{
+				// Unit cube is centered in object space. Need to compensate, because terrain AABB isn't
+				uint32_t cutoffPoint = transformData.mQuadTree.GetAABBCutoffPoint();
+				Mat4 unitCubeTranslation = glm::translate( gIdentityMatrix, { cutoffPoint / 2, 0.0f, cutoffPoint / 2 } );
+				AddAABB( AABBRenderData, unitCubeTranslation * transform, unitCubeMeshID, gRed );
+			}
 
 			aabbTransforms.clear();
 		}
