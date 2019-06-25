@@ -5,12 +5,11 @@
 #include "SkyboxVertex.hlsl"
 
 TextureCube gSkybox : register(TEXTURE_REGISTER_EXTRA);
-SamplerState gSampler : register(SAMPLER_REGISTER_ANISOTROPIC);
 
 
 float4 ps_main(GBufferVSOut input) : SV_Target0
 {
-    return gSkybox.Sample(gSampler, input.mTexcoord);
+    return gSkybox.Sample(gAnisotropicSampler, input.mTexcoord);
 }
 
 #endif

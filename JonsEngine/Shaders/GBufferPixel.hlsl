@@ -12,7 +12,6 @@ struct GBufferPSOut
 
 Texture2D gDiffuseTexture : register(TEXTURE_REGISTER_DIFFUSE);
 Texture2D gNormalTexture : register(TEXTURE_REGISTER_NORMAL);
-SamplerState gSampler : register(SAMPLER_REGISTER_ANISOTROPIC);
 
 
 GBufferPSOut ps_main(GBufferVSOut input)
@@ -20,13 +19,13 @@ GBufferPSOut ps_main(GBufferVSOut input)
     GBufferPSOut output;
 
     if (gHasDiffuseTexture)
-        output.mDiffuse = gDiffuseTexture.Sample(gSampler, input.mTexcoord);
+        output.mDiffuse = gDiffuseTexture.Sample(gAnisotropicSampler, input.mTexcoord);
     else
         output.mDiffuse = float4(1.0, 1.0, 1.0, 1.0);
 
     if (gHasNormalTexture)
     {
-        const float3 normalTangentSpace = normalize(gNormalTexture.Sample(gSampler, input.mTexcoord).xyz * 2.0 - 1.0);
+        const float3 normalTangentSpace = normalize(gNormalTexture.Sample(gAnisotropicSampler, input.mTexcoord).xyz * 2.0 - 1.0);
         const float3x3 tangentToWorldSpace = CreateMatrixFromCols(normalize(input.mTangent), normalize(input.mBitangent), normalize(input.mNormal));
 
         output.mNormal = mul(tangentToWorldSpace, normalTangentSpace);

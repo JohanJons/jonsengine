@@ -21,7 +21,6 @@ Texture2D gDepthTexture : register(TEXTURE_REGISTER_DEPTH);
 Texture2D gDiffuseTexture : register(TEXTURE_REGISTER_DIFFUSE);
 Texture2D gNormalTexture : register(TEXTURE_REGISTER_NORMAL);
 TextureCube gShadowmap : register(TEXTURE_REGISTER_EXTRA);
-SamplerState gShadowmapSampler : register(SAMPLER_REGISTER_POINT);
 
 
 float VectorToDepthValue(const float3 Vec)
@@ -51,7 +50,7 @@ float4 ps_main(float4 position : SV_Position) : SV_Target0
     // shadowmapping
     float3 cubemapDir = (float3)(viewPosition - gViewLightPosition);
     cubemapDir.z = -cubemapDir.z;       // TODO: any way to remove this extra instruction?
-    float storedDepth = gShadowmap.Sample(gShadowmapSampler, cubemapDir).r;
+    float storedDepth = gShadowmap.Sample(gPointSampler, cubemapDir).r;
     float visibility = 0.0;
     if (storedDepth - DEPTH_BIAS > VectorToDepthValue(cubemapDir))
         visibility = 1.0;

@@ -7,7 +7,6 @@
 
 Texture2D gFrameTexture : register(TEXTURE_REGISTER_DIFFUSE);
 Texture2D gLuminanceTexture : register(TEXTURE_REGISTER_EXTRA);
-SamplerState gLinearSampler : register(SAMPLER_REGISTER_LINEAR);
 
 cbuffer TonemappingConstants : register(CBUFFER_REGISTER_PIXEL)
 {

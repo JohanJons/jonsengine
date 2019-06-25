@@ -18,7 +18,6 @@ cbuffer SSAOConstants : register(CBUFFER_REGISTER_PIXEL)
 };
 
 Texture2D gDepthTexture : register(TEXTURE_REGISTER_DEPTH);
-SamplerState gPointSampler : register(SAMPLER_REGISTER_POINT);
 
 
 float3 reconstructNormal(float3 positionViewSpace)

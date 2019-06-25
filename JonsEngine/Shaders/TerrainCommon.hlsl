@@ -7,10 +7,8 @@ Texture2D gCoplanarityMap : register( TEXTURE_REGISTER_EXTRA_2 );
 
 cbuffer PerTerrainConstants : register(CBUFFER_REGISTER_DOMAIN)
 {
-	float gWorldMinX;
-	float gWorldMinZ;
-	float gWorldMaxX;
-	float gWorldMaxZ;
+	float2 gWorldMin;
+	float2 gWorldMax;
 	float gHeightModifier;
 	float gVariationScale;
 	uint gTransformOffset;
@@ -47,16 +45,8 @@ struct HullOut
 
 float GetCoplanarity( float2 worldPatchMidpoint )
 {
-	//uint2 extent = uint2( gWorldMaxX - gWorldMinX, gWorldMaxZ - gWorldMinZ );
-	uint2 asd = float2( gWorldMaxX, gWorldMaxZ ) - worldPatchMidpoint;
-	asd /= gTerrainPatchSize;
-	//uint2 offset = uint2( worldPatchMidpoint.xy / uint2( gWorldMaxX, gWorldMaxZ ) );
-
-	return gCoplanarityMap.Load( uint3( asd, 0 ) ).r;
-
-	/*ret.mTexcoord = 1.0f / ( float2(gWorldMaxX, gWorldMaxZ) + ( -float2(gWorldMinX, gWorldMinZ) ) );
-	ret.mTexcoord = ( -float2( gWorldMinX, gWorldMinZ ) + ret.mWorldPosition.xz ) * ret.mTexcoord;
-	ret.mTexcoord = clamp( ret.mTexcoord, 0.0f, 1.0f );*/
+	uint2 uv = ( worldPatchMidpoint - gWorldMin ) / gTerrainPatchSize;
+	return gCoplanarityMap.Load( uint3( uv, 0 ) ).r;
 }
 
 #endif

@@ -5,6 +5,7 @@
 #define FXAA_QUALITY__PRESET 29
 #define FXAA_GREEN_AS_LUMA 1
 
+#include "Common.hlsl"
 #include "FXAA.hlsl"
 
 
@@ -14,7 +15,6 @@ cbuffer FXAACBuffer : register(CBUFFER_REGISTER_PIXEL)
 };
 
 Texture2D gFinalTexture : register(TEXTURE_REGISTER_EXTRA);
-SamplerState gPointSampler : register(SAMPLER_REGISTER_POINT);
 
 float4 ps_main(float4 position : SV_Position) : SV_Target0
 {

@@ -6,8 +6,6 @@
 
 Texture2D gHeightmap : register( TEXTURE_REGISTER_EXTRA );
 Texture2D gPerlinNoiseTexture : register( TEXTURE_REGISTER_PERLIN );
-SamplerState gPointSampler : register( SAMPLER_REGISTER_POINT );
-SamplerState gLinearWrapSampler : register( SAMPLER_REGISTER_LINEAR_WRAP );
 
 float SampleHeightmap( float2 uv, int2 offset )
 {

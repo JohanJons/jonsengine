@@ -21,8 +21,7 @@ VertexOut vs_main(VertexIn input)
 
 	ret.mWorldPosition = mul( worldTransform, float4( input.mPosition, 1 ) ).xyz;
 
-	ret.mTexcoord = 1.0f / ( float2(gWorldMaxX, gWorldMaxZ) + ( -float2(gWorldMinX, gWorldMinZ) ) );
-	ret.mTexcoord = ( -float2( gWorldMinX, gWorldMinZ ) + ret.mWorldPosition.xz ) * ret.mTexcoord;
+	ret.mTexcoord = ( ret.mWorldPosition.xz - gWorldMin ) / ( gWorldMax - gWorldMin );
 	ret.mTexcoord = clamp( ret.mTexcoord, 0.0f, 1.0f );
 
 	return ret;

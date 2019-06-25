@@ -13,9 +13,6 @@ cbuffer AvgLuminanceConstants : register(CBUFFER_REGISTER_PIXEL)
 
 Texture2D gFrameTexture : register(TEXTURE_REGISTER_DIFFUSE);
 Texture2D gPreviousLumTexture : register(TEXTURE_REGISTER_EXTRA);
-SamplerState gPointSampler : register(SAMPLER_REGISTER_POINT);
-SamplerState gLinearSampler : register(SAMPLER_REGISTER_LINEAR);
-
 
 float4 ps_main(FullScreenTexcoordOutput input) : SV_Target0
 {

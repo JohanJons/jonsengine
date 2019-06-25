@@ -11,6 +11,11 @@ static const float3 WHITE = float3( 1.0, 1.0, 1.0 );
 
 StructuredBuffer<float4x4> gBones : register (SBUFFER_REGISTER_BONE_TRANSFORMS);
 
+SamplerState gPointSampler : register(SAMPLER_REGISTER_POINT);
+SamplerState gLinearSampler : register(SAMPLER_REGISTER_LINEAR);
+SamplerState gLinearWrapSampler : register( SAMPLER_REGISTER_LINEAR_WRAP );
+SamplerState gAnisotropicSampler : register(SAMPLER_REGISTER_ANISOTROPIC);
+
 cbuffer PerFrameCB : register(CBUFFER_REGISTER_PER_FRAME)
 {
 	float4x4 gFrameViewProj;
