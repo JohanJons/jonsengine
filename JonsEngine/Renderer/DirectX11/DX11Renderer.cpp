@@ -178,7 +178,7 @@ namespace JonsEngine
 
     void DX11Renderer::Render(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags)
     {
-        mPipeline.BeginFrame( renderQueue );
+        mPipeline.BeginFrame( renderQueue, mRenderSettings );
 
         mPipeline.GeometryStage( renderQueue, mRenderSettings );
         mPipeline.LightingStage( renderQueue, mRenderSettings );

@@ -27,14 +27,6 @@ namespace JonsEngine
 		void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, bool drawCoplanarity );
 
 	private:
-		struct TerrainCBuffer
-		{
-			float mMinDistance;
-			float mMaxDistance;
-			float mMinFactor;
-			float mMaxFactor;
-		};
-
 		struct PerTerrainCBuffer
 		{
 			Vec2 mWorldMin;
@@ -51,7 +43,7 @@ namespace JonsEngine
         void CreateCoplanarityMap( DX11TextureID heightmapID );
         void UpdatePatchSize( RenderSettings::TerrainPatchSize patchSize );
         void BindComputeShader();
-		void BindForRendering( bool drawCoplanarity = false );
+		void BindForRendering();
 		void UnbindRendering();
         bool HasCoplanarityTexture( DX11TextureID heightmapID ) const;
 
@@ -64,6 +56,7 @@ namespace JonsEngine
         ID3D11ComputeShaderPtr mCoplanarityComputeShader16 = nullptr;
         ID3D11ComputeShaderPtr mCoplanarityComputeShader32 = nullptr;
 		ID3D11DomainShaderPtr mDomainShader = nullptr;
+		ID3D11DomainShaderPtr mDomainDebugCoplanarityShader = nullptr;
 		ID3D11PixelShaderPtr mPixelShader = nullptr;
 		ID3D11PixelShaderPtr mPixelDebugShader = nullptr;
 		ID3D11PixelShaderPtr mPixelDebugCoplanarityShader = nullptr;
@@ -72,7 +65,6 @@ namespace JonsEngine
 
         std::map<DX11TextureID, DX11DynamicTexture> mTerrainCoplanarityMap;
 
-		DX11ConstantBuffer<TerrainCBuffer> mCBuffer;
 		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;
 		DX11CPUDynamicBuffer mTransformsBuffer;
 		DX11Mesh mQuadMesh;
@@ -80,6 +72,5 @@ namespace JonsEngine
 		const IDMap<DX11Texture>& mTextureMap;
 
         RenderSettings::TerrainPatchSize mPatchSize;
-		RenderSettings::Tesselation mTessData; // TODO: remove
 	};
 }

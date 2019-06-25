@@ -93,11 +93,11 @@ namespace JonsEngine
     }
 
 
-    void DX11Pipeline::BeginFrame(const RenderQueue& renderQueue)
+    void DX11Pipeline::BeginFrame( const RenderQueue& renderQueue, const RenderSettings& renderSettings )
     {
         mBackbuffer.ClearBackbuffer(gClearColor);
 
-		SetPerFrameCBuffer(renderQueue);
+		SetPerFrameCBuffer( renderQueue, renderSettings );
 
 		// Send all bone transforms to GPU
 		const bool hasBoneData = !renderQueue.mRenderData.mBones.empty();
@@ -108,7 +108,7 @@ namespace JonsEngine
 		}
     }
 
-    void DX11Pipeline::EndFrame(const RenderSettings& renderSettings)
+    void DX11Pipeline::EndFrame( const RenderSettings& renderSettings )
     {
         if ( renderSettings.mVSync )
         {
@@ -260,7 +260,7 @@ namespace JonsEngine
 		}
 	}
 
-	void DX11Pipeline::SetPerFrameCBuffer(const RenderQueue& renderQueue)
+	void DX11Pipeline::SetPerFrameCBuffer( const RenderQueue& renderQueue, const RenderSettings& renderSettings )
 	{
 		auto& camera = renderQueue.mCamera;
 
@@ -271,7 +271,8 @@ namespace JonsEngine
 			glm::inverse(camera.mCameraProjectionMatrix),
 			camera.mCameraPosition,
 			Z_NEAR,
-			Z_FAR
+			Z_FAR,
+			RenderSettingsToVal( renderSettings.mTerrainPatchSize )
 		});
 		mPerFrameCB.Bind();
 	}

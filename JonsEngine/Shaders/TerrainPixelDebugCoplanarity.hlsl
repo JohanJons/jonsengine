@@ -1,6 +1,8 @@
 #ifndef TERRAIN_PIXEL_HLSL
 #define TERRAIN_PIXEL_HLSL
 
+#define TERRAIN_DEBUG_COPLANARITY 1
+
 #include "TerrainCommon.hlsl"
 #include "Common.hlsl"
 
@@ -14,14 +16,7 @@ PixelOut ps_main( DomainOut input )
 {
 	PixelOut ret;
 
-    if ( input.mCoplanarity < 0.5f )
-    {
-		ret.mDiffuse = lerp( RED, GREEN, input.mCoplanarity );
-    }
-    else
-    {
-        ret.mDiffuse = lerp( GREEN, BLUE, input.mCoplanarity );
-    }
+	ret.mDiffuse = lerp( BLACK, RED, input.mCoplanarity );
 
 	return ret;
 }

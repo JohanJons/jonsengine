@@ -41,6 +41,7 @@ list( APPEND COMPUTE_SHADERS
 
 list( APPEND DOMAIN_SHADERS 
   TerrainDomain.hlsl
+  TerrainDomainDebugCoplanarity.hlsl
 )
 
 list( APPEND HULL_SHADERS 

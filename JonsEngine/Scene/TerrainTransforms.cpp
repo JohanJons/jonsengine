@@ -119,7 +119,7 @@ namespace JonsEngine
 				GetPatchHeight( minY, maxY, heightmapData, terrain.GetHeightScale(), heightmapWidth, textureExtentWidth, textureExtentHeight, rowIndex, colIndex );
 
 				Mat4 patchScaleTransform = glm::scale( Vec3( patchSize, 1.0f, patchSize ) );
-				transforms.emplace_back( worldTransform * patchScaleTransform * glm::translate( Vec3( colNum, 0.0f, rowNum ) ) );
+				transforms.emplace_back( worldTransform * patchScaleTransform * glm::translate( Vec3( colNum / 2, 0.0f, rowNum / 2 ) ) );
 
 				float minMaxHeightDiff = maxY - minY;
 				minMaxHeightDiff /= 2;

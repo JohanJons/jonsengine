@@ -36,8 +36,8 @@ namespace JonsEngine
 			const RenderSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Texture>& textureMap);
         ~DX11Pipeline();
 
-        void BeginFrame(const RenderQueue& renderQueue);
-        void EndFrame(const RenderSettings& renderSettings);
+        void BeginFrame( const RenderQueue& renderQueue, const RenderSettings& renderSettings );
+        void EndFrame( const RenderSettings& renderSettings );
 
         void GeometryStage( const RenderQueue& renderQueue, const RenderSettings& renderSettings );
         void LightingStage( const RenderQueue& renderQueue, const RenderSettings& renderSettings );
@@ -54,24 +54,26 @@ namespace JonsEngine
 			Vec3 mWorldEyePos;
 			float mMinZ;
 			float mMaxZ;
-			float __padding[ 3 ];
+			uint32_t mTerrainPatchSize;
+			float __padding[ 2 ];
 
 			PerFrameCB() {}
-			PerFrameCB( const Mat4& viewProj, const Mat4& view, const Mat4& invView, const Mat4& invProj, const Vec3& worldEyePos, float minZ, float maxZ ) :
+			PerFrameCB( const Mat4& viewProj, const Mat4& view, const Mat4& invView, const Mat4& invProj, const Vec3& worldEyePos, float minZ, float maxZ, uint32_t terrainPatchSize ) :
 				mViewProj(viewProj),
 				mView(view),
 				mInvView(invView),
 				mInvProj(invProj),
 				mWorldEyePos( worldEyePos ),
 				mMinZ( minZ ),
-				mMaxZ( maxZ )
+				mMaxZ( maxZ ),
+				mTerrainPatchSize( terrainPatchSize )
 			{
 			}
 		};
 
 		void RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end);
 		void PerformTonemapping(const Milliseconds elapstedFrameTime, const RenderSettings::AutoExposureRate exposureRate, const RenderSettings::ToneMappingAlghorithm alghorithm);
-		void SetPerFrameCBuffer(const RenderQueue& renderQueue);
+		void SetPerFrameCBuffer( const RenderQueue& renderQueue, const RenderSettings& renderSettings );
 
 
         Logger& mLogger;

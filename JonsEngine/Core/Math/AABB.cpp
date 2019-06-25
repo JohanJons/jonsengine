@@ -6,8 +6,8 @@
 
 namespace JonsEngine
 {
-	AABB AABB::gUnitAABB = AABB( { 1.0f, 1.0f, 1.0f }, { -1.0f, -1.0f, -1.0f } );
-	AABB AABB::gUnitQuadAABB = AABB( { 1.0f, 0.0f, 1.0f }, { -1.0f, 0.0f, -1.0f } );
+	AABB AABB::gUnitAABB = AABB( { 0.0f, 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f } );
+	AABB AABB::gUnitQuadAABB = AABB( { 0.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 1.0f } );
 
 	AABB::AABB(const PackageAABB& pkgAABB) :
 		AABB(pkgAABB.mMinBounds, pkgAABB.mMaxBounds)

@@ -9,6 +9,7 @@
 #include "Compiled/TerrainComputeCoplanarity16.h"
 #include "Compiled/TerrainComputeCoplanarity32.h"
 #include "Compiled/TerrainDomain.h"
+#include "Compiled/TerrainDomainDebugCoplanarity.h"
 #include "Compiled/TerrainPixel.h"
 #include "Compiled/TerrainPixelDebug.h"
 #include "Compiled/TerrainPixelDebugCoplanarity.h"
@@ -32,7 +33,7 @@ namespace JonsEngine
 		-3.0f, 0.0f, -1.0f,
 	};*/
 
-	const std::vector<float> gQuadVertices{
+	/*const std::vector<float> gQuadVertices{
 		-1.0f, 0.0f, -1.0f,
 		1.0f, 0.0f, -1.0f,
 		1.0f, 0.0f, 1.0f,
@@ -45,6 +46,21 @@ namespace JonsEngine
 		-1.0f, 0.0f, 3.0f,
 		-3.0f, 0.0f, 1.0f,
 		-3.0f, 0.0f, -1.0f,
+	};*/
+
+	const std::vector<float> gQuadVertices{
+		0.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, -1.0f,
+		1.0f, 0.0f, -1.0f,
+		2.0f, 0.0f, 0.0f,
+		2.0f, 0.0f, 1.0f,
+		1.0f, 0.0f, 2.0f,
+		0.0f, 0.0f, 2.0f,
+		-1.0f, 0.0f, 1.0f,
+		-1.0f, 0.0f, 0.0f,
 	};
 
 	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
@@ -73,8 +89,7 @@ namespace JonsEngine
 		mContext(context),
         mDevice(device),
 
-		mCBuffer(device, context, mCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
-		mPerTerrainCBuffer(device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_EXTRA),
+		mPerTerrainCBuffer(device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
 		mTransformsBuffer(device, context),
 		mQuadMesh(device, context, gQuadVertices, gQuadIndices, AABB::gUnitQuadAABB.Min(), AABB::gUnitQuadAABB.Max()),
 		mVertexTransformer(vertexTransformer),
@@ -103,6 +118,7 @@ namespace JonsEngine
         DXCALL(device->CreateComputeShader(gTerrainComputeCoplanarity16, sizeof(gTerrainComputeCoplanarity16), nullptr, &mCoplanarityComputeShader16));
         DXCALL(device->CreateComputeShader(gTerrainComputeCoplanarity32, sizeof(gTerrainComputeCoplanarity32), nullptr, &mCoplanarityComputeShader32));
 		DXCALL(device->CreateDomainShader(gTerrainDomain, sizeof(gTerrainDomain), nullptr, &mDomainShader));
+		DXCALL(device->CreateDomainShader(gTerrainDomainDebugCoplanarity, sizeof(gTerrainDomainDebugCoplanarity), nullptr, &mDomainDebugCoplanarityShader));
 		DXCALL(device->CreatePixelShader(gTerrainPixel, sizeof(gTerrainPixel), nullptr, &mPixelShader));
 		DXCALL( device->CreatePixelShader( gTerrainPixelDebug, sizeof( gTerrainPixelDebug ), nullptr, &mPixelDebugShader ) );
 		DXCALL( device->CreatePixelShader( gTerrainPixelDebugCoplanarity, sizeof( gTerrainPixelDebugCoplanarity ), nullptr, &mPixelDebugCoplanarityShader ) );
@@ -134,10 +150,14 @@ namespace JonsEngine
 		if ( !terrains.GetNumTerrains() )
 			return;
 
-		BindForRendering( drawCoplanarity );
+		BindForRendering();
 
 		if ( drawCoplanarity )
+		{
+			mContext->HSSetShader( mHullShaderDebugCoplanarity, nullptr, 0 );
+			mContext->DSSetShader( mDomainDebugCoplanarityShader, nullptr, 0 );
 			mContext->PSSetShader( mPixelDebugCoplanarityShader, nullptr, 0 );
+		}
 		else
 			mContext->PSSetShader( mPixelDebugShader, nullptr, 0 );
 
@@ -247,21 +267,15 @@ namespace JonsEngine
         }
     }
 
-	void DX11TerrainPass::BindForRendering( bool drawCoplanarity )
+	void DX11TerrainPass::BindForRendering()
 	{
 		mContext->VSSetShader(mVertexShader, nullptr, 0);
 		mContext->DSSetShader(mDomainShader, nullptr, 0);
 		mContext->PSSetShader(mPixelShader, nullptr, 0);
-
-		if ( drawCoplanarity )
-			mContext->HSSetShader(mHullShaderDebugCoplanarity, nullptr, 0);
-		else
-			mContext->HSSetShader(mHullShader, nullptr, 0);
+		mContext->HSSetShader(mHullShader, nullptr, 0);
 
 		mContext->IASetInputLayout(mLayout);
 		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_12_CONTROL_POINT_PATCHLIST);
-		mCBuffer.SetData({ mTessData.mMinDistance, mTessData.mMaxDistance, mTessData.mMinFactor, mTessData.mMaxFactor });
-		mCBuffer.Bind();
 	}
 
 	void DX11TerrainPass::UnbindRendering()

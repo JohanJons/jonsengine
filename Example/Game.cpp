@@ -64,10 +64,10 @@ namespace JonsGame
 			switch ( evnt.mKey )
 			{
 				// camera
-				case Key::A: camera.TranslateCamera( -camera.Right() * mMoveSpeed * 10.0f );   break;
-				case Key::W: camera.TranslateCamera( camera.Forward() * mMoveSpeed * 10.0f );  break;
-				case Key::S: camera.TranslateCamera( -camera.Forward() * mMoveSpeed * 10.0f ); break;
-				case Key::D: camera.TranslateCamera( camera.Right() * mMoveSpeed * 10.0f );    break;
+				case Key::A: camera.TranslateCamera( -camera.Right() * mMoveSpeed * 30.0f );   break;
+				case Key::W: camera.TranslateCamera( camera.Forward() * mMoveSpeed * 30.0f );  break;
+				case Key::S: camera.TranslateCamera( -camera.Forward() * mMoveSpeed * 30.0f ); break;
+				case Key::D: camera.TranslateCamera( camera.Right() * mMoveSpeed * 30.0f );    break;
 				default:
 					break;
 			}

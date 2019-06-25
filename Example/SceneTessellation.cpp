@@ -40,7 +40,7 @@ namespace JonsGame
 
 		scene.SetSkybox( mSkybox );
 
-		scene.GetSceneCamera().TranslateCamera( Vec3( 90.0f, 40.0f, 0.0f ) );
+		scene.GetSceneCamera().TranslateCamera( Vec3( 2048.0f, 40.0f, 1520.0f ) );
 	}
 
 	SceneTessellation::~SceneTessellation()

@@ -66,8 +66,10 @@ DomainOut ds_main(PatchTess patchTess, float2 uv : SV_DomainLocation, const Outp
 	ret.mTexcoord = midPointTexcoord;
 
 	// debug; these could be hidden if necessary
-    ret.mTesellation = patchTess.mInsideTess[ 0 ];
-	ret.mCoplanarity = 0.4f;
+#ifdef TERRAIN_DEBUG_COPLANARITY
+	ret.mCoplanarity = GetCoplanarity( midPointWorld );
+#endif
+	ret.mTesellation = patchTess.mInsideTess[ 0 ];
 
 	return ret;
 }
