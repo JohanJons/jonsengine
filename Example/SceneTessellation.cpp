@@ -17,10 +17,10 @@ namespace JonsGame
 		mSkybox( resManifest.LoadSkybox( "skybox", mJonsPackage ) ),
 		mNodeTerrain( sceneMgr.GetScene( mID ).CreateSceneNode( "nodeTerrain", sceneMgr.GetScene( mID ).GetRootNodeID() ) ),
 		mNodeTerrainTest( sceneMgr.GetScene( mID ).CreateSceneNode( "nodeTerrainTest", sceneMgr.GetScene( mID ).GetRootNodeID() ) ),
-		mTerrainData( resManifest.CreateTerrainData( "terraindata", "terrain_heightmap", mJonsPackage ) ),
 		mTerrainDataTest( resManifest.CreateTerrainData( "terrainDataTest", "terrain_test", mJonsPackage ) ),
-		mTerrain( sceneMgr.GetScene( mID ).CreateTerrain( "terrain", gTerrainHeightScale, gTerrainVariationScale, mNodeTerrain, mTerrainData ) ),
+		mTerrainData( resManifest.CreateTerrainData( "terraindata", "terrain_heightmap", mJonsPackage ) ),
 		mTerrainTest( sceneMgr.GetScene( mID ).CreateTerrain( "terrainTest", gTerrainHeightScale, gTerrainVariationScale, mNodeTerrainTest, mTerrainDataTest ) ),
+		mTerrain( sceneMgr.GetScene( mID ).CreateTerrain( "terrain", gTerrainHeightScale, gTerrainVariationScale, mNodeTerrain, mTerrainData ) ),
 		mSunDirLightID( sceneMgr.GetScene( mID ).CreateDirectionalLight( "DirectionalLight", 4 ) ),
 		mSun( mSceneMgr.GetScene( mID ).GetDirectionalLight( mSunDirLightID ) )
 	{

@@ -34,10 +34,10 @@ namespace JonsGame
 
 		JonsEngine::SceneNodeID mNodeTerrain;
 		JonsEngine::SceneNodeID mNodeTerrainTest;
-		JonsEngine::TerrainDataID mTerrainData;
 		JonsEngine::TerrainDataID mTerrainDataTest;
-		JonsEngine::TerrainID mTerrain;
+		JonsEngine::TerrainDataID mTerrainData;
 		JonsEngine::TerrainID mTerrainTest;
+		JonsEngine::TerrainID mTerrain;
 
 		JonsEngine::DirectionalLightID mSunDirLightID;
 		Sun mSun;
