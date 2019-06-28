@@ -122,7 +122,7 @@ namespace JonsEngine
 				transforms.emplace_back( worldTransform * patchScaleTransform * glm::translate( Vec3( colNum / 2, 0.0f, rowNum / 2 ) ) );
 
 				float minMaxHeightDiff = maxY - minY;
-				AABBTransforms.emplace_back( glm::translate( Vec3( 0.0f, minMaxHeightDiff / 2, 0.0f ) ) * glm::scale( Vec3( 1.0, minMaxHeightDiff, 1.0f ) ) *  transforms.back() );
+				AABBTransforms.emplace_back( glm::translate( Vec3( 0.0f, minMaxHeightDiff / 2.0f, 0.0f ) ) * glm::scale( Vec3( 1.0, minMaxHeightDiff, 1.0f ) ) *  transforms.back() );
 			}
 		}
 

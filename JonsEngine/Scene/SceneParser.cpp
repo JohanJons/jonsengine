@@ -268,12 +268,7 @@ namespace JonsEngine
 
 			transformData.mQuadTree.CullAABBs( aabbTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
 			for ( const Mat4& transform : aabbTransforms )
-			{
-				// Unit cube is centered in object space. Need to compensate, because terrain AABB isn't
-				uint32_t cutoffPoint = transformData.mQuadTree.GetAABBCutoffPoint();
-				Mat4 unitCubeTranslation = glm::translate( gIdentityMatrix, { cutoffPoint / 2, 0.0f, cutoffPoint / 2 } );
-				AddAABB( AABBRenderData, unitCubeTranslation * transform, unitCubeMeshID, gRed );
-			}
+				AddAABB( AABBRenderData, transform, unitCubeMeshID, gRed );
 
 			aabbTransforms.clear();
 		}
