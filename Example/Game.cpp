@@ -161,10 +161,10 @@ namespace JonsGame
 				{
 					case Key::ONE: mTessellationScene.GetTerrain().SetHeightScale( 80.0f ); break;
 					case Key::TWO: mTessellationScene.GetTerrain().SetHeightScale( 120.0f ); break;
-					case Key::THREE: mTessellationScene.GetTerrain().SetHeightScale( 160.0f ); break;
-					case Key::FOUR: mTessellationScene.GetTerrain().SetVariationScale( 0.0f ); break;
-					case Key::FIVE: mTessellationScene.GetTerrain().SetVariationScale( 3.0f ); break;
-					case Key::SIX: mTessellationScene.GetTerrain().SetVariationScale( 6.0f ); break;
+					case Key::THREE: mTessellationScene.GetTerrain().SetVariationScale( 3.0f ); break;
+					case Key::FOUR: mTessellationScene.GetTerrain().SetVariationScale( 6.0f ); break;
+					case Key::FIVE: mEngine.GetRenderer().SetTerrainPatchSize( RenderSettings::TerrainPatchSize::X16 ); break;
+					case Key::SIX: mEngine.GetRenderer().SetTerrainPatchSize( RenderSettings::TerrainPatchSize::X32 ); break;
 					case Key::SEVEN: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_AABB ); break;
 					case Key::EIGHT:
 					{

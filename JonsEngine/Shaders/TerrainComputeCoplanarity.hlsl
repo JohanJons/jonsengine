@@ -45,7 +45,7 @@ void cs_main(uint3 groupID : SV_GroupID, uint3 dispatchTID : SV_DispatchThreadID
 
         uint cornerX = groupTID.x / lastThreadIndex;
         uint cornerZ = groupTID.y / lastThreadIndex;
-        float bias = 64.0f;
+        float bias = 32.0f;
         gCorners[ cornerX ][ cornerZ ] = float3( cornerX / bias, gDepthSamples[ groupIndex ], cornerZ / bias );
     }
 
@@ -72,7 +72,11 @@ void cs_main(uint3 groupID : SV_GroupID, uint3 dispatchTID : SV_DispatchThreadID
     // step 3: compute patch plane
     if ( isCorner00 )
     {
-        float3 averageNormal = normalize( gRawNormals[ 0 ][ 0 ] + gRawNormals[ 0 ][ 1 ] + gRawNormals[ 1 ][ 0 ] + gRawNormals[ 1 ][ 1 ] );
+		float3 averageNormal = normalize( gRawNormals[ 0 ][ 0 ] + gRawNormals[ 0 ][ 1 ] + gRawNormals[ 1 ][ 0 ] + gRawNormals[ 1 ][ 1 ]  );
+		// TODO: something in the normal calculation must be of, for this to be necessary....
+		// some corners become wierd on the plane
+		averageNormal = abs( averageNormal );
+
         float3 lowestPoint = float3( 0.0f, 1e9f, 0.0f );
         for ( uint i = 0; i < 2; ++i )
         {
