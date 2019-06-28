@@ -34,7 +34,7 @@ namespace JonsEngine
     public:
         DX11Pipeline(Logger& logger, ID3D11DevicePtr device, IDXGISwapChainPtr swapchain, ID3D11DeviceContextPtr context, D3D11_TEXTURE2D_DESC backbufferTextureDesc, DX11Backbuffer& backbuffer,
 			const RenderSettings& settings, IDMap<DX11Mesh>& meshMap, IDMap<DX11Texture>& textureMap);
-        ~DX11Pipeline();
+		~DX11Pipeline() = default;
 
         void BeginFrame( const RenderQueue& renderQueue, const RenderSettings& renderSettings );
         void EndFrame( const RenderSettings& renderSettings );
@@ -52,20 +52,21 @@ namespace JonsEngine
 			Mat4 mInvView;
 			Mat4 mInvProj;
 			Vec3 mWorldEyePos;
-			float mMinZ;
-			float mMaxZ;
+			float __padding1;
+			Vec2 mMinMaxZ;
+			Vec2 mScreenSize;
 			uint32_t mTerrainPatchSize;
-			float __padding[ 2 ];
+			float __padding2[ 3 ];
 
 			PerFrameCB() {}
-			PerFrameCB( const Mat4& viewProj, const Mat4& view, const Mat4& invView, const Mat4& invProj, const Vec3& worldEyePos, float minZ, float maxZ, uint32_t terrainPatchSize ) :
+			PerFrameCB( const Mat4& viewProj, const Mat4& view, const Mat4& invView, const Mat4& invProj, const Vec3& worldEyePos, const Vec2& minMaxZ, const Vec2& screenSize, uint32_t terrainPatchSize ) :
 				mViewProj(viewProj),
 				mView(view),
 				mInvView(invView),
 				mInvProj(invProj),
 				mWorldEyePos( worldEyePos ),
-				mMinZ( minZ ),
-				mMaxZ( maxZ ),
+				mMinMaxZ( minMaxZ ),
+				mScreenSize( screenSize ),
 				mTerrainPatchSize( terrainPatchSize )
 			{
 			}

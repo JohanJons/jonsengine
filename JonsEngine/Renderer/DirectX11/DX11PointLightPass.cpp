@@ -28,9 +28,7 @@ namespace JonsEngine
     }
 
 
-    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const RenderSettings::ShadowResolution shadowmapRes, const uint32_t windowWidth, const uint32_t windowHeight) :
-        mWindowSize(windowWidth, windowHeight),
-        
+    DX11PointLightPass::DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const RenderSettings::ShadowResolution shadowmapRes) :
         mContext(context),
         
         mPixelShader(nullptr),
@@ -174,7 +172,7 @@ namespace JonsEngine
 
         // set point light pixel shader and its cbuffer
         mContext->PSSetShader(mPixelShader, nullptr, 0);
-        mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mColor, viewLightPositonV4, mWindowSize, pointLight.mIntensity, Z_NEAR, pointLight.mRadius));
+        mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mColor, viewLightPositonV4, pointLight.mIntensity, Z_NEAR, pointLight.mRadius));
 		mPointLightCBuffer.Bind();
 
         // run transform pass on sphere + point light shading pass

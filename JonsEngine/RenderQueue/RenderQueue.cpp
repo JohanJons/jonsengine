@@ -4,6 +4,8 @@ namespace JonsEngine
 {
     RenderQueue::RenderQueue() : 
         mAmbientLight(0.0f),
+		mWindowDimensions(0.0f),
+		mWindowAspectRatio(0.0f),
         mSkyboxTextureID(INVALID_DX11_TEXTURE_ID)
     {
     }
@@ -19,7 +21,9 @@ namespace JonsEngine
 		mRenderData.mMaterials.clear();
 		mRenderData.mBones.clear();
 
-		mAmbientLight = Vec4(0.0f);
+		mAmbientLight = Vec4( 0.0f );
+		mWindowDimensions = Vec2( 0.0f );
+		mWindowAspectRatio = 0.0f;
 		mSkyboxTextureID = INVALID_DX11_TEXTURE_ID;
 
 		mTerrains.mTerrainData.clear();

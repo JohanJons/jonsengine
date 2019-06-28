@@ -11,7 +11,6 @@ cbuffer PointLightConstants : register(CBUFFER_REGISTER_PIXEL)
 {
     float4 gLightColor;
     float4 gViewLightPosition;
-    float2 gWindowSize;
     float gLightIntensity;
     float gZNear;
     float gLightRadius;
@@ -39,7 +38,7 @@ float VectorToDepthValue(const float3 Vec)
 float4 ps_main(float4 position : SV_Position) : SV_Target0
 {
     float depth = gDepthTexture[uint2(position.xy)].r;
-    float4 viewPosition = float4(ReconstructViewPosition(depth, float2(position.x / gWindowSize.x, position.y / gWindowSize.y), gFrameInvProj), 1.0);
+    float4 viewPosition = float4(ReconstructViewPosition(depth, float2( position.xy / gWindowDimensions ), gFrameInvProj), 1.0);
     float4 diffuse = gDiffuseTexture[uint2(position.xy)];
     float3 normal = SampleNormalTexture(gNormalTexture, uint2(position.xy));
 

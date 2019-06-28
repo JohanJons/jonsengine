@@ -39,7 +39,7 @@ namespace JonsEngine
 
         // process input and window events
         mWindow.Poll();
-		auto windowDimensions = mWindow.GetWindowDimensions();
+		const Vec2 windowDimensions = mWindow.GetWindowDimensions();
         const float windowAspectRatio = windowDimensions.x / static_cast<float>(windowDimensions.y);
 
         // update scene actors
@@ -49,7 +49,7 @@ namespace JonsEngine
 
         // parse scene into renderqueue for renderer
         const float zNear = mRenderer.GetZNear(), zFar = mRenderer.GetZFar();
-        const RenderQueue& renderQueue = mSceneParser.ParseScene(activeScene, dirtyFlags, debugOptions, windowAspectRatio, zNear, zFar);
+        const RenderQueue& renderQueue = mSceneParser.ParseScene(activeScene, dirtyFlags, debugOptions, windowDimensions, windowAspectRatio, zNear, zFar);
 
         // render the scene
         mRenderer.Render(renderQueue, elapstedFrameTime, debugOptions.mRenderingFlags);

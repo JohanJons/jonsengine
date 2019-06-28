@@ -51,9 +51,12 @@ namespace JonsEngine
     }
 
 
-    const RenderQueue& SceneParser::ParseScene(const Scene& scene, const DirtyFlagsSet dirtyFlags, const DebugOptions& debugOpts, const float windowAspectRatio, const float zNear, const float zFar)
+    const RenderQueue& SceneParser::ParseScene( const Scene& scene, const DirtyFlagsSet dirtyFlags, const DebugOptions& debugOpts, Vec2 windowDimentions, float windowAspectRatio, float zNear, float zFar )
     {
         mRenderQueue.PerFrameClear();
+
+		mRenderQueue.mWindowDimensions = windowDimentions;
+		mRenderQueue.mWindowAspectRatio = windowAspectRatio;
 
 		GetAmbientLight(scene);
 		GetSkybox(scene);

@@ -53,12 +53,9 @@ namespace JonsEngine
     }
 
 
-    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, const RenderSettings::ShadowResolution shadowmapRes,
-        const RenderSettings::ShadowReadbackLatency readbackLatency, const uint32_t windowWidth, const uint32_t windowHeight)
+    DX11DirectionalLightPass::DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass,
+		const RenderSettings::ShadowResolution shadowmapRes, const RenderSettings::ShadowReadbackLatency readbackLatency)
         :
-        mWindowSize(windowWidth, windowHeight),
-        mAspectRatio(mWindowSize.x / mWindowSize.y),
-
         mContext(context),
 
         mPCF2x2Shader(nullptr),
@@ -97,7 +94,7 @@ namespace JonsEngine
     }
 
 
-    void DX11DirectionalLightPass::Render(const RenderableDirectionalLight& directionalLight, const RenderData& renderData, const RenderSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix)
+    void DX11DirectionalLightPass::Render(const RenderableDirectionalLight& directionalLight, const RenderData& renderData, RenderSettings::ShadowFiltering shadowFiltering, float degreesFOV, float aspectRatio, const Mat4& cameraViewMatrix)
     {
         // preserve current state
         D3D11_VIEWPORT prevViewport;
@@ -134,7 +131,7 @@ namespace JonsEngine
             const auto& cascadeSplit = directionalLight.mCascades.at(cascadeIndex);
             
             // create view-projection matrix for cascade
-            const Mat4 perspectiveMatrix = PerspectiveMatrixFov(degreesFOV, mAspectRatio, cascadeSplit.mNearZ, cascadeSplit.mFarZ);
+            const Mat4 perspectiveMatrix = PerspectiveMatrixFov(degreesFOV, aspectRatio, cascadeSplit.mNearZ, cascadeSplit.mFarZ);
             const auto frustumCorners = GetFrustumCorners(perspectiveMatrix * cameraViewMatrix);
             lightVPMatrices[cascadeIndex] = CreateDirLightVPMatrix(frustumCorners, directionalLight.mDirection);
 
@@ -170,7 +167,7 @@ namespace JonsEngine
         const Vec4 camLightDir = glm::normalize(cameraViewMatrix * Vec4(-directionalLight.mDirection, 0));
 
         // set dir light cbuffer data
-        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, splitDistances, directionalLight.mColor, camLightDir, mWindowSize, static_cast<float>(mShadowmap.GetTextureSize())));
+        mDirLightCBuffer.SetData(DirectionalLightCBuffer(lightVPMatrices, splitDistances, directionalLight.mColor, camLightDir, static_cast<float>(mShadowmap.GetTextureSize())));
 		mDirLightCBuffer.Bind();
 
         // bind appropiate shading pixel shader for shadow filtering argument

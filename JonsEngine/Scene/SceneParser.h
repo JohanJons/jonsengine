@@ -16,7 +16,7 @@ namespace JonsEngine
         SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest);
         ~SceneParser();
 
-        const RenderQueue& ParseScene(const Scene& scene, DirtyFlagsSet dirtyFlags, const DebugOptions& debugOpts, const float windowAspectRatio, const float zNear, const float zFar);
+        const RenderQueue& ParseScene( const Scene& scene, DirtyFlagsSet dirtyFlags, const DebugOptions& debugOpts, Vec2 windowDimentions, float windowAspectRatio, float zNear, float zFar );
 
 
     private:

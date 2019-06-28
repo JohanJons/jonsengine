@@ -12,7 +12,7 @@ float3 ComputePatchMidpoint( float3 corner1, float3 corner2, float3 corner3, flo
 float CalculateTessellationfactor( float3 worldPatchMidpoint )
 {
     float cameraToPatchDistance = distance( gWorldEyePos, worldPatchMidpoint );
-	float scaledDistance = ( cameraToPatchDistance - gMinZ ) / ( gMaxZ - gMinZ );
+	float scaledDistance = ( cameraToPatchDistance - gMinMaxZ.x ) / ( gMinMaxZ.y - gMinMaxZ.x );
 	scaledDistance = clamp( scaledDistance, 0.0f, 1.0f );
 
     float coplanarity = GetCoplanarity( worldPatchMidpoint.xz );

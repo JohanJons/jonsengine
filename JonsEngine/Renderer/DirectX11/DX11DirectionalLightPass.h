@@ -25,10 +25,10 @@ namespace JonsEngine
         const static uint32_t NUM_SHADOWMAP_CASCADES = 4;
 
         DX11DirectionalLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11FullscreenTrianglePass& fullscreenPass, DX11VertexTransformPass& transformPass, const RenderSettings::ShadowResolution shadowmapRes,
-            const RenderSettings::ShadowReadbackLatency readbackLatency, const uint32_t windowWidth, const uint32_t windowHeight);
+            const RenderSettings::ShadowReadbackLatency readbackLatency);
         ~DX11DirectionalLightPass();
 
-        void Render(const RenderableDirectionalLight& directionalLight, const RenderData& renderData, const RenderSettings::ShadowFiltering shadowFiltering, const float degreesFOV, const Mat4& cameraViewMatrix);
+        void Render(const RenderableDirectionalLight& directionalLight, const RenderData& renderData, RenderSettings::ShadowFiltering shadowFiltering, float degreesFOV, float aspectRatio, const Mat4& cameraViewMatrix);
 
 
     private:
@@ -38,22 +38,18 @@ namespace JonsEngine
             std::array<float, NUM_SHADOWMAP_CASCADES> mSplitDistances;
             Vec4 mLightColor;
             Vec4 mLightDirection;
-            Vec2 mWindowSize;
             float mShadowmapSize;
-            float __padding;
+            float __padding[ 3 ];
 
 
-            DirectionalLightCBuffer(const std::array<Mat4, NUM_SHADOWMAP_CASCADES>& splitMatrices, const std::array<float, NUM_SHADOWMAP_CASCADES>& splitDistances, const Vec4& lightColor, const Vec4& lightDir, const Vec2& windowSize, const float shadowmapSize) :
-                mSplitVPMatrices(splitMatrices), mSplitDistances(splitDistances), mLightColor(lightColor), mLightDirection(lightDir), mWindowSize(windowSize), mShadowmapSize(shadowmapSize)
+            DirectionalLightCBuffer(const std::array<Mat4, NUM_SHADOWMAP_CASCADES>& splitMatrices, const std::array<float, NUM_SHADOWMAP_CASCADES>& splitDistances, const Vec4& lightColor, const Vec4& lightDir, const float shadowmapSize) :
+                mSplitVPMatrices(splitMatrices), mSplitDistances(splitDistances), mLightColor(lightColor), mLightDirection(lightDir), mShadowmapSize(shadowmapSize)
             {
             }
         };
 
         void BindShadingPixelShader(const RenderSettings::ShadowFiltering shadowFiltering);
 
-
-        const Vec2 mWindowSize;
-        const float mAspectRatio;
 
         ID3D11DeviceContextPtr mContext;
 

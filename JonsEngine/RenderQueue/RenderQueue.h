@@ -14,6 +14,8 @@ namespace JonsEngine
 		void PerFrameClear();
 
         Vec4 mAmbientLight;
+		Vec2 mWindowDimensions;
+		float mWindowAspectRatio;
         DX11TextureID mSkyboxTextureID;
 
         RenderableCamera mCamera;

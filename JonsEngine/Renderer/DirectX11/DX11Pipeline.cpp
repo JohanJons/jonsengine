@@ -33,8 +33,8 @@ namespace JonsEngine
         mGBuffer(device, mContext, backbufferTextureDesc),
 
         mAmbientPass(device, context, mFullscreenPass, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-        mDirectionalLightPass(device, mContext, mFullscreenPass, mVertexTransformPass, settings.mShadowResolution, settings.mShadowReadbackLatency, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
-        mPointLightPass(device, mContext, mVertexTransformPass, settings.mShadowResolution, backbufferTextureDesc.Width, backbufferTextureDesc.Height),
+        mDirectionalLightPass( device, mContext, mFullscreenPass, mVertexTransformPass, settings.mShadowResolution, settings.mShadowReadbackLatency ),
+        mPointLightPass(device, mContext, mVertexTransformPass, settings.mShadowResolution),
 		mToneMapper(device, context, mFullscreenPass),
         mPostProcessor(device, context, mFullscreenPass, backbufferTextureDesc),
         mSkyboxPass(device, context),
@@ -86,10 +86,6 @@ namespace JonsEngine
 
 		// pixelshader that will output lightAccumBuffer to backbuffer
 		DXCALL(device->CreatePixelShader(gSimpleTexturePixel, sizeof(gSimpleTexturePixel), nullptr, &mSimpleTextureShader))
-    }
-
-    DX11Pipeline::~DX11Pipeline()
-    {
     }
 
 
@@ -164,7 +160,7 @@ namespace JonsEngine
         mContext->OMSetBlendState(mAdditiveBlending, nullptr, 0xffffffff);
 
         for (const RenderableDirectionalLight& directionalLight : renderQueue.mDirectionalLights)
-            mDirectionalLightPass.Render(directionalLight, renderQueue.mRenderData, renderSettings.mShadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mCamera.mCameraViewMatrix);
+            mDirectionalLightPass.Render(directionalLight, renderQueue.mRenderData, renderSettings.mShadowFiltering, renderQueue.mCamera.mFOV, renderQueue.mWindowAspectRatio, renderQueue.mCamera.mCameraViewMatrix);
 
         for (const RenderablePointLight& pointLight : renderQueue.mPointLights)
         {
@@ -270,8 +266,8 @@ namespace JonsEngine
 			glm::inverse(camera.mCameraViewMatrix),
 			glm::inverse(camera.mCameraProjectionMatrix),
 			camera.mCameraPosition,
-			Z_NEAR,
-			Z_FAR,
+			Vec2( Z_NEAR, Z_FAR ),
+			renderQueue.mWindowDimensions,
 			RenderSettingsToVal( renderSettings.mTerrainPatchSize )
 		});
 		mPerFrameCB.Bind();

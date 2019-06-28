@@ -30,7 +30,7 @@ namespace JonsEngine
             POINT_LIGHT_DIR_COUNT
         };
 
-        DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const RenderSettings::ShadowResolution shadowmapRes, const uint32_t windowWidth, const uint32_t windowHeight);
+        DX11PointLightPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformPass, const RenderSettings::ShadowResolution shadowmapRes);
         ~DX11PointLightPass();
 
         void Render(const RenderablePointLight& pointLight, const RenderData& renderData, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix);
@@ -41,21 +41,18 @@ namespace JonsEngine
         {
             Vec4 mLightColor;
             Vec4 mLightPosition;
-            Vec2 mWindowSize;
             float mLightIntensity;
             float mZNear;
             float mMaxDistance;
-            uint32_t __padding[3];
+            uint32_t __padding[1];
 
 
-            PointLightCBuffer(const Vec4& lightColor, const Vec4& lightPosition, const Vec2& windowSize, const float lightIntensity, const float zNear, const float maxDistance) :
-                mLightColor(lightColor), mLightPosition(lightPosition), mWindowSize(windowSize), mLightIntensity(lightIntensity), mMaxDistance(maxDistance), mZNear(zNear)
+            PointLightCBuffer(const Vec4& lightColor, const Vec4& lightPosition, const float lightIntensity, const float zNear, const float maxDistance) :
+                mLightColor(lightColor), mLightPosition(lightPosition), mLightIntensity(lightIntensity), mMaxDistance(maxDistance), mZNear(zNear)
             {
             }
         };
 
-
-        const Vec2 mWindowSize;
 
         ID3D11DeviceContextPtr mContext;
 
