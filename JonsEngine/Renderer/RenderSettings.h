@@ -54,19 +54,42 @@ namespace JonsEngine
 			FilmicU2
 		} mToneMapping;
 
-		struct Tesselation
-		{
-			float mMinDistance;
-			float mMaxDistance;
-			float mMinFactor;
-			float mMaxFactor;
-		} mTessellation;
-
         enum class TerrainPatchSize
         {
             X16,
             X32
         } mTerrainPatchSize;
+
+		// units in screenspace for maximum tessellation
+		enum class TerrainPrimitiveLength
+		{
+			X32,
+			X48,
+			X64,
+			X80,
+			X96,
+			X112
+		} mTerrainPrimitiveLength;
+
+		// max tessellation given by screenspace primtive length
+		enum class TerrainTessellationMax
+		{
+			X24,
+			X32,
+			X40,
+			X48,
+			X56,
+			X64
+		} mTerrainTessellationMax;
+
+		// tessellation coplanarity scaling
+		enum class TerrainCoplanarityScale
+		{
+			X05,
+			X1,
+			X2,
+			X3
+		} mTerrainCoplanarityScale;
 
 		AutoExposureRate mAutoExposureRate;
 		bool mBloomEnabled;
@@ -78,14 +101,16 @@ namespace JonsEngine
 	};
 
 	inline RenderSettings::RenderSettings() :
-		mShadowResolution(ShadowResolution::Resolution_2048),
-		mShadowReadbackLatency(ShadowReadbackLatency::Latency_2),
-		mShadowFiltering(ShadowFiltering::PCF_2x2),
-		mAnisotropicFiltering(Anisotropic::X16),
-		mAntiAliasing(AntiAliasing::Fxaa),
-		mToneMapping(ToneMappingAlghorithm::FilmicU2),
-		mTessellation({ 1.0f , 25.0f, 1.0f, 5.0f }),
-        mTerrainPatchSize( TerrainPatchSize::X32 ),
+		mShadowResolution( ShadowResolution::Resolution_2048 ),
+		mShadowReadbackLatency( ShadowReadbackLatency::Latency_2 ),
+		mShadowFiltering( ShadowFiltering::PCF_2x2 ),
+		mAnisotropicFiltering( Anisotropic::X16 ),
+		mAntiAliasing( AntiAliasing::Fxaa ),
+		mToneMapping( ToneMappingAlghorithm::FilmicU2 ),
+		mTerrainPatchSize( TerrainPatchSize::X32 ),
+		mTerrainPrimitiveLength( TerrainPrimitiveLength::X64 ),
+		mTerrainTessellationMax( TerrainTessellationMax::X48 ),
+		mTerrainCoplanarityScale( TerrainCoplanarityScale::X1 ),
 		mAutoExposureRate(DefaultAutoExposureRate()),
 		mBloomEnabled(true),
 		mSSAOEnabled(true),

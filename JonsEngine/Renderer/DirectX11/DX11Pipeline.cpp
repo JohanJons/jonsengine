@@ -40,7 +40,6 @@ namespace JonsEngine
         mSkyboxPass(device, context),
 
 		mTerrainPass(device, context, mVertexTransformPass, mTextureMap, settings.mTerrainPatchSize),
-
 		mPerFrameCB(device, context, mPerFrameCB.CONSTANT_BUFFER_SLOT_PER_FRAME)
     {
 		auto depthStencilBuffer = backbuffer.GetDepthbuffer();
@@ -268,7 +267,10 @@ namespace JonsEngine
 			camera.mCameraPosition,
 			Vec2( Z_NEAR, Z_FAR ),
 			renderQueue.mWindowDimensions,
-			RenderSettingsToVal( renderSettings.mTerrainPatchSize )
+			RenderSettingsToVal( renderSettings.mTerrainPatchSize ),
+			RenderSettingsToVal( renderSettings.mTerrainPrimitiveLength ),
+			RenderSettingsToVal( renderSettings.mTerrainTessellationMax ),
+			RenderSettingsToVal( renderSettings.mTerrainCoplanarityScale )
 		});
 		mPerFrameCB.Bind();
 	}

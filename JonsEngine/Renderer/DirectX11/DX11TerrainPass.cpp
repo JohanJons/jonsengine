@@ -148,7 +148,7 @@ namespace JonsEngine
         GetCoplanarityTextureOutputDimensions( width, height, mTextureMap.GetItem( heightmapID ), mPatchSize );
 
         mTerrainCoplanarityMap.erase( heightmapID );
-        mTerrainCoplanarityMap.emplace( std::piecewise_construct, std::forward_as_tuple( heightmapID ), std::forward_as_tuple( mDevice, mContext, DXGI_FORMAT_R16_FLOAT, width, height, true ) );
+        mTerrainCoplanarityMap.emplace( std::piecewise_construct, std::forward_as_tuple( heightmapID ), std::forward_as_tuple( mDevice, mContext, DXGI_FORMAT_R16_UNORM, width, height, true ) );
         UpdateCoplanarityTexture( heightmapID );
     }
 

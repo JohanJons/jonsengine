@@ -39,6 +39,9 @@ namespace JonsEngine
     uint32_t RenderSettingsToVal( RenderSettings::ShadowReadbackLatency shadowReadbackLatencyEnum );
     uint32_t RenderSettingsToVal( RenderSettings::ShadowResolution shadowResolutionEnum );
     uint32_t RenderSettingsToVal( RenderSettings::TerrainPatchSize patchSizeEnum );
+	uint32_t RenderSettingsToVal( RenderSettings::TerrainPrimitiveLength primitiveLength );
+	uint32_t RenderSettingsToVal( RenderSettings::TerrainTessellationMax tessellationMax );
+	float RenderSettingsToVal( RenderSettings::TerrainCoplanarityScale coplanarityScale );
 
     #ifdef _DEBUG
     #define DXCALL(function)                                                                                                                            \

@@ -26,6 +26,9 @@ cbuffer PerFrameCB : register(CBUFFER_REGISTER_PER_FRAME)
 	float2 gMinMaxZ;
 	float2 gWindowDimensions;
 	uint gTerrainPatchSize;
+	uint gTerrainPrimitveLength;
+	uint gTerrainTessellationMax;
+	float gTerrainCoplanarityScale;
 };
 
 
@@ -89,7 +92,7 @@ float CalcLuminance(const float3 color)
 
 float2 GetScreenSpacePosition( float3 worldPosition )
 {
-	float4 projectedPos = mul( float4( worldPosition, 1.0f ), gFrameViewProj );
+	float4 projectedPos = mul( gFrameViewProj, float4( worldPosition, 1.0f ) );
 
 	float2 screenPos = projectedPos.xy / projectedPos.ww;
 	screenPos = ( screenPos + 1.0f ) * 0.5f * gWindowDimensions;
