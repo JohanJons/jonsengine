@@ -63,12 +63,12 @@ namespace JonsEngine
 		// units in screenspace for maximum tessellation
 		enum class TerrainPrimitiveLength
 		{
-			X32,
-			X48,
 			X64,
-			X80,
 			X96,
-			X112
+			X128,
+			X160,
+			X192,
+			X224
 		} mTerrainPrimitiveLength;
 
 		// max tessellation given by screenspace primtive length
@@ -87,9 +87,21 @@ namespace JonsEngine
 		{
 			X05,
 			X1,
-			X2,
-			X3
+			X1_5,
+			X2
 		} mTerrainCoplanarityScale;
+
+		enum class TerrainCoplanarityTessellationRatio
+		{
+			X03,
+			X04,
+			X05,
+			X06,
+			X065,
+			X07,
+			X075,
+			X08
+		} mTerrainCoplanarityTessellationRatio;
 
 		AutoExposureRate mAutoExposureRate;
 		bool mBloomEnabled;
@@ -108,9 +120,10 @@ namespace JonsEngine
 		mAntiAliasing( AntiAliasing::Fxaa ),
 		mToneMapping( ToneMappingAlghorithm::FilmicU2 ),
 		mTerrainPatchSize( TerrainPatchSize::X32 ),
-		mTerrainPrimitiveLength( TerrainPrimitiveLength::X64 ),
-		mTerrainTessellationMax( TerrainTessellationMax::X48 ),
-		mTerrainCoplanarityScale( TerrainCoplanarityScale::X1 ),
+		mTerrainPrimitiveLength( TerrainPrimitiveLength::X160 ),
+		mTerrainTessellationMax( TerrainTessellationMax::X64 ),
+		mTerrainCoplanarityScale( TerrainCoplanarityScale::X1_5 ),
+		mTerrainCoplanarityTessellationRatio( TerrainCoplanarityTessellationRatio::X07 ),
 		mAutoExposureRate(DefaultAutoExposureRate()),
 		mBloomEnabled(true),
 		mSSAOEnabled(true),

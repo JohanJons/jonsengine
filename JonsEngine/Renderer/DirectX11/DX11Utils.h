@@ -42,6 +42,7 @@ namespace JonsEngine
 	uint32_t RenderSettingsToVal( RenderSettings::TerrainPrimitiveLength primitiveLength );
 	uint32_t RenderSettingsToVal( RenderSettings::TerrainTessellationMax tessellationMax );
 	float RenderSettingsToVal( RenderSettings::TerrainCoplanarityScale coplanarityScale );
+	float RenderSettingsToVal( RenderSettings::TerrainCoplanarityTessellationRatio coplanarityTessRatio );
 
     #ifdef _DEBUG
     #define DXCALL(function)                                                                                                                            \

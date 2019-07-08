@@ -62,6 +62,18 @@ namespace JonsEngine
         RenderSettings::TerrainPatchSize GetTerrainPatchSize() const { return mRenderSettings.mTerrainPatchSize; }
         void SetTerrainPatchSize( RenderSettings::TerrainPatchSize patchSize );
 
+		RenderSettings::TerrainCoplanarityScale GetTerrainCoplanarityScale() const { return mRenderSettings.mTerrainCoplanarityScale; }
+		void SetTerrainCoplanarityScale( RenderSettings::TerrainCoplanarityScale coplanarityScale ) { mRenderSettings.mTerrainCoplanarityScale = coplanarityScale; }
+
+		RenderSettings::TerrainCoplanarityTessellationRatio GetTerrainCoplanarityTessellationRatio() const { return mRenderSettings.mTerrainCoplanarityTessellationRatio; }
+		void SetTerrainCoplanarityTessellationRatio( RenderSettings::TerrainCoplanarityTessellationRatio coplanarityTessRatio ) { mRenderSettings.mTerrainCoplanarityTessellationRatio = coplanarityTessRatio; }
+
+		RenderSettings::TerrainTessellationMax GetTerrainTessellationMax() const { return mRenderSettings.mTerrainTessellationMax; }
+		void SetTerrainTessellationMax( RenderSettings::TerrainTessellationMax terrainTessMax ) { mRenderSettings.mTerrainTessellationMax = terrainTessMax; }
+
+		RenderSettings::TerrainPrimitiveLength GetTerrainPrimitiveLength() const { return mRenderSettings.mTerrainPrimitiveLength; }
+		void SetTerrainPrimitiveLength( RenderSettings::TerrainPrimitiveLength primitveLength ) { mRenderSettings.mTerrainPrimitiveLength = primitveLength; }
+
         bool IsSSAOEnabled() const;
         void SetSSAO(const bool useSSAO);
 

@@ -69,12 +69,12 @@ namespace JonsEngine
 	{
 		switch ( primitiveLength )
 		{
-			case RenderSettings::TerrainPrimitiveLength::X32: return 32;
-			case RenderSettings::TerrainPrimitiveLength::X48: return 48;
 			case RenderSettings::TerrainPrimitiveLength::X64: return 64;
-			case RenderSettings::TerrainPrimitiveLength::X80: return 80;
 			case RenderSettings::TerrainPrimitiveLength::X96: return 96;
-			case RenderSettings::TerrainPrimitiveLength::X112: return 112;
+			case RenderSettings::TerrainPrimitiveLength::X128: return 128;
+			case RenderSettings::TerrainPrimitiveLength::X160: return 160;
+			case RenderSettings::TerrainPrimitiveLength::X192: return 192;
+			case RenderSettings::TerrainPrimitiveLength::X224: return 224;
 			default: JONS_ERROR(Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainPrimitiveLength): Invalid enum");
 		}
 	}
@@ -99,9 +99,25 @@ namespace JonsEngine
 		{
 			case RenderSettings::TerrainCoplanarityScale::X05: return 0.5f;
 			case RenderSettings::TerrainCoplanarityScale::X1: return 1.0f;
+			case RenderSettings::TerrainCoplanarityScale::X1_5: return 1.5f;
 			case RenderSettings::TerrainCoplanarityScale::X2: return 2.0f;
-			case RenderSettings::TerrainCoplanarityScale::X3: return 3.0f;
 			default: JONS_ERROR(Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainCoplanarityScale): Invalid enum");
+		}
+	}
+
+	float RenderSettingsToVal( RenderSettings::TerrainCoplanarityTessellationRatio coplanarityTessRatio )
+	{
+		switch ( coplanarityTessRatio )
+		{
+			case RenderSettings::TerrainCoplanarityTessellationRatio::X03: return 0.3f;
+			case RenderSettings::TerrainCoplanarityTessellationRatio::X04: return 0.4f;
+			case RenderSettings::TerrainCoplanarityTessellationRatio::X05: return 0.5f;
+			case RenderSettings::TerrainCoplanarityTessellationRatio::X06: return 0.6f;
+			case RenderSettings::TerrainCoplanarityTessellationRatio::X065: return 0.65f;
+			case RenderSettings::TerrainCoplanarityTessellationRatio::X07: return 0.7f;
+			case RenderSettings::TerrainCoplanarityTessellationRatio::X075: return 0.75f;
+			case RenderSettings::TerrainCoplanarityTessellationRatio::X08: return 0.8f;
+			default: JONS_ERROR( Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainCoplanarityTessellationRatio): Invalid enum" );
 		}
 	}
 }

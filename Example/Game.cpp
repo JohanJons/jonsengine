@@ -98,6 +98,15 @@ namespace JonsGame
 				switch ( evnt.mKey )
 				{
 					case Key::ONE: mTessellationScene.FlipTerrain(); break;
+					case Key::TWO: mEngine.GetRenderer().SetTerrainCoplanarityScale( RenderSettings::TerrainCoplanarityScale::X05 ); break;
+					case Key::THREE: mEngine.GetRenderer().SetTerrainCoplanarityScale( RenderSettings::TerrainCoplanarityScale::X1 ); break;
+					case Key::FOUR: mEngine.GetRenderer().SetTerrainCoplanarityScale( RenderSettings::TerrainCoplanarityScale::X1_5 ); break;
+					case Key::FIVE: mEngine.GetRenderer().SetTerrainCoplanarityTessellationRatio( RenderSettings::TerrainCoplanarityTessellationRatio::X03 ); break;
+					case Key::SIX: mEngine.GetRenderer().SetTerrainCoplanarityTessellationRatio( RenderSettings::TerrainCoplanarityTessellationRatio::X05 ); break;
+					case Key::SEVEN: mEngine.GetRenderer().SetTerrainCoplanarityTessellationRatio( RenderSettings::TerrainCoplanarityTessellationRatio::X07 ); break;
+					case Key::EIGHT: mEngine.GetRenderer().SetTerrainPrimitiveLength( RenderSettings::TerrainPrimitiveLength::X96 ); break;
+					case Key::NINE: mEngine.GetRenderer().SetTerrainPrimitiveLength( RenderSettings::TerrainPrimitiveLength::X192 ); break;
+					default: break;
 				}
 			}
         }

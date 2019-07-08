@@ -270,7 +270,8 @@ namespace JonsEngine
 			RenderSettingsToVal( renderSettings.mTerrainPatchSize ),
 			RenderSettingsToVal( renderSettings.mTerrainPrimitiveLength ),
 			RenderSettingsToVal( renderSettings.mTerrainTessellationMax ),
-			RenderSettingsToVal( renderSettings.mTerrainCoplanarityScale )
+			RenderSettingsToVal( renderSettings.mTerrainCoplanarityScale ),
+			RenderSettingsToVal( renderSettings.mTerrainCoplanarityTessellationRatio )
 		});
 		mPerFrameCB.Bind();
 	}

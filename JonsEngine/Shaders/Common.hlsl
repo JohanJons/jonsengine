@@ -29,6 +29,7 @@ cbuffer PerFrameCB : register(CBUFFER_REGISTER_PER_FRAME)
 	uint gTerrainPrimitveLength;
 	uint gTerrainTessellationMax;
 	float gTerrainCoplanarityScale;
+	float gTerrainCoplanarityTessellationRatio;
 };
 
 
