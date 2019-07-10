@@ -56,6 +56,12 @@ namespace JonsEngine
 
 	uint32_t TerrainTransforms::UpdateTransforms( uint32_t patchSize )
 	{
+		for ( const TerrainTransformData& transformData : mTerrainTransforms )
+		{
+			if ( transformData.mQuadTree.GetPatchSize() != patchSize )
+				mDirtyTransforms.emplace_back( transformData.mID );
+		}
+
 		uint32_t numUpdated = 0;
 		for (TerrainID ID : mDirtyTransforms)
 		{
@@ -83,7 +89,7 @@ namespace JonsEngine
 	{
 		auto funcIDComparison = [ ID ]( const TerrainTransformData& metadata ) { return ID == metadata.mID; };
 		auto beginIter = mTerrainTransforms.begin(), endIter = mTerrainTransforms.end();
-		std::remove_if( beginIter, endIter, funcIDComparison );
+		mTerrainTransforms.erase( std::remove_if( beginIter, endIter, funcIDComparison ), endIter );
 	}
 
 	bool TerrainTransforms::HasAddedDirty( TerrainID ID ) const
