@@ -123,7 +123,7 @@ namespace JonsEngine
 		mTerrainPrimitiveLength( TerrainPrimitiveLength::X160 ),
 		mTerrainTessellationMax( TerrainTessellationMax::X64 ),
 		mTerrainCoplanarityScale( TerrainCoplanarityScale::X1_5 ),
-		mTerrainCoplanarityTessellationRatio( TerrainCoplanarityTessellationRatio::X07 ),
+		mTerrainCoplanarityTessellationRatio( TerrainCoplanarityTessellationRatio::X06 ),
 		mAutoExposureRate(DefaultAutoExposureRate()),
 		mBloomEnabled(true),
 		mSSAOEnabled(true),

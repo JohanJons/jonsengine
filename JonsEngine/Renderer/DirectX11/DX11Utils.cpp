@@ -61,7 +61,12 @@ namespace JonsEngine
         {
             case RenderSettings::TerrainPatchSize::X16: return 16;
             case RenderSettings::TerrainPatchSize::X32: return 32;
-            default: JONS_ERROR(Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainPatchSize): Invalid enum");
+            default:
+			{
+				JONS_ERROR( Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainPatchSize): Invalid enum" );
+				return 0;
+			}
+
         }
     }
 
@@ -75,7 +80,11 @@ namespace JonsEngine
 			case RenderSettings::TerrainPrimitiveLength::X160: return 160;
 			case RenderSettings::TerrainPrimitiveLength::X192: return 192;
 			case RenderSettings::TerrainPrimitiveLength::X224: return 224;
-			default: JONS_ERROR(Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainPrimitiveLength): Invalid enum");
+			default:
+			{
+				JONS_ERROR( Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainPrimitiveLength): Invalid enum" );
+				return 0;
+			}
 		}
 	}
 
@@ -89,7 +98,11 @@ namespace JonsEngine
 			case RenderSettings::TerrainTessellationMax::X48: return 48;
 			case RenderSettings::TerrainTessellationMax::X56: return 56;
 			case RenderSettings::TerrainTessellationMax::X64: return 64;
-			default: JONS_ERROR(Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainTessellationMax): Invalid enum");
+			default:
+			{
+				JONS_ERROR( Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainTessellationMax): Invalid enum" );
+				return 0;
+			}
 		}
 	}
 
@@ -101,7 +114,11 @@ namespace JonsEngine
 			case RenderSettings::TerrainCoplanarityScale::X1: return 1.0f;
 			case RenderSettings::TerrainCoplanarityScale::X1_5: return 1.5f;
 			case RenderSettings::TerrainCoplanarityScale::X2: return 2.0f;
-			default: JONS_ERROR(Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainCoplanarityScale): Invalid enum");
+			default:
+			{
+				JONS_ERROR( Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainCoplanarityScale): Invalid enum" );
+				return 0.0f;
+			}
 		}
 	}
 
@@ -117,7 +134,11 @@ namespace JonsEngine
 			case RenderSettings::TerrainCoplanarityTessellationRatio::X07: return 0.7f;
 			case RenderSettings::TerrainCoplanarityTessellationRatio::X075: return 0.75f;
 			case RenderSettings::TerrainCoplanarityTessellationRatio::X08: return 0.8f;
-			default: JONS_ERROR( Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainCoplanarityTessellationRatio): Invalid enum" );
+			default:
+			{
+				JONS_ERROR( Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainCoplanarityTessellationRatio): Invalid enum" );
+				return 0.0f;
+			}
 		}
 	}
 }

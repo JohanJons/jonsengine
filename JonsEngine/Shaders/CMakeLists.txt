@@ -28,6 +28,7 @@ list( APPEND PIXEL_SHADERS
   TerrainPixel.hlsl
   TerrainPixelDebug.hlsl
   TerrainPixelDebugCoplanarity.hlsl
+  TerrainPixelDebugNormal.hlsl
   Tonemapping.hlsl
 )
 
@@ -37,6 +38,7 @@ list( APPEND COMPUTE_SHADERS
   SDSMFinalCompute.hlsl
   TerrainComputeCoplanarity16.hlsl
   TerrainComputeCoplanarity32.hlsl
+  TerrainComputeNormal.hlsl
 )
 
 list( APPEND DOMAIN_SHADERS 

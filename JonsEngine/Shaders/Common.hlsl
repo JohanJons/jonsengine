@@ -101,4 +101,32 @@ float2 GetScreenSpacePosition( float3 worldPosition )
 	return screenPos;
 }
 
+float3 SobelFilter( in Texture2D normalTexture, int3 texCoord )
+{
+	float h00 = normalTexture.Load( texCoord, int2( -1, -1 ) ).r;
+	float h10 = normalTexture.Load( texCoord, int2( 0, -1 ) ).r;
+	float h20 = normalTexture.Load( texCoord, int2( 1, -1 ) ).r;
+
+	float h01 = normalTexture.Load( texCoord, int2( -1, 0 ) ).r;
+	float h21 = normalTexture.Load( texCoord, int2( 1, 0 ) ).r;
+
+	float h02 = normalTexture.Load( texCoord, int2( -1, 1 ) ).r;
+	float h12 = normalTexture.Load( texCoord, int2( 0, 1 ) ).r;
+	float h22 = normalTexture.Load( texCoord, int2( 1, 1 ) ).r;
+
+	float Gx = h00 - h20 + 2.0f * h01 - 2.0f * h21 + h02 - h22;
+	float Gy = h00 + 2.0f * h10 + h20 - h02 - 2.0f * h12 - h22;
+	// generate missing Z
+	float Gz = 0.01f * sqrt( max( 0.0f, 1.0f - Gx * Gx - Gy * Gy ) );
+
+	return normalize( float3( 2.0f * Gx, Gz, 2.0f * Gy ) );
+
+	//float Gx = -h00 - 2.0f * h10 - h20 + h02 + 2.0f * h12 + h22;
+	//float Gy = -h02 - 2.0f * h01 - h00 + h22 + 2.0f * h21 + h20;
+	//float h = -im1p1 - 2.0 * i0p1 - ip1p1 + im1m1 + 2.0 * i0m1 + ip1m1;
+	//float v = -im1m1 - 2.0 * im10 - im1p1 + ip1m1 + 2.0 * ip10 + ip1p1;
+	//float mag = length(float2(Gx, Gy));
+	//return normalize( float3( mag, mag, mag ) );
+}
+
 #endif

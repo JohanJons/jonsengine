@@ -7,6 +7,7 @@
 #include "Renderer/DirectX11/DX11Mesh.h"
 #include "Renderer/RenderSettings.h"
 #include "Core/Containers/IDMap.hpp"
+#include "Core/DebugOptions.h"
 
 #include <array>
 #include <map>
@@ -24,7 +25,7 @@ namespace JonsEngine
 		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, RenderSettings::TerrainPatchSize patchSize);
 
 		void Render( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize );
-		void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, bool drawCoplanarity );
+		void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, DebugOptions::RenderingFlags debugFlags );
 
 	private:
 		struct PerTerrainCBuffer
@@ -38,14 +39,25 @@ namespace JonsEngine
 		};
 
 	private:
+		enum class CachedTextureMap
+		{
+			COPLANARITY,
+			NORMAL
+		};
+
 		void RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize );
-        void UpdateCoplanarityTexture( DX11TextureID heightmapID );
-        void CreateCoplanarityMap( DX11TextureID heightmapID );
+		void CreateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
+		void GetTextureMapDimensions( uint32_t& width, uint32_t& height, CachedTextureMap type, DX11TextureID heightmapID );
+		DXGI_FORMAT GetTextureMapFormat( CachedTextureMap type );
+		std::map<DX11TextureID, DX11DynamicTexture>& GetTextureMap( CachedTextureMap type );
+		void UpdateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
+		void BindComputeShader( CachedTextureMap type );
+		void GetDispatchDimensions( uint32_t& x, uint32_t& y, CachedTextureMap type, DX11TextureID heightmapID );
+
         void UpdatePatchSize( RenderSettings::TerrainPatchSize patchSize );
-        void BindComputeShader();
 		void BindForRendering();
 		void UnbindRendering();
-        bool HasCoplanarityTexture( DX11TextureID heightmapID ) const;
+        bool HasCachedTextureMap( CachedTextureMap type, DX11TextureID heightmapID ) const;
 
 		ID3D11DeviceContextPtr mContext = nullptr;
         ID3D11DevicePtr mDevice = nullptr;
@@ -55,15 +67,18 @@ namespace JonsEngine
 		ID3D11HullShaderPtr mHullShaderDebugCoplanarity = nullptr;
         ID3D11ComputeShaderPtr mCoplanarityComputeShader16 = nullptr;
         ID3D11ComputeShaderPtr mCoplanarityComputeShader32 = nullptr;
+		ID3D11ComputeShaderPtr mNormalMapComputeShader = nullptr;
 		ID3D11DomainShaderPtr mDomainShader = nullptr;
 		ID3D11DomainShaderPtr mDomainDebugCoplanarityShader = nullptr;
 		ID3D11PixelShaderPtr mPixelShader = nullptr;
 		ID3D11PixelShaderPtr mPixelDebugShader = nullptr;
 		ID3D11PixelShaderPtr mPixelDebugCoplanarityShader = nullptr;
+		ID3D11PixelShaderPtr mPixelDebugNormalShader = nullptr;
 
 		ID3D11RasterizerStatePtr mDebugRasterizer = nullptr;
 
         std::map<DX11TextureID, DX11DynamicTexture> mTerrainCoplanarityMap;
+		std::map<DX11TextureID, DX11DynamicTexture> mTerrainNormalMap;
 
 		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;
 		DX11CPUDynamicBuffer mTransformsBuffer;

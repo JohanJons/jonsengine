@@ -168,24 +168,30 @@ namespace JonsGame
 			{
 				switch ( evnt.mKey )
 				{
-					case Key::ONE: mTessellationScene.GetTerrain().SetHeightScale( 80.0f ); break;
-					case Key::TWO: mTessellationScene.GetTerrain().SetHeightScale( 120.0f ); break;
-					case Key::THREE: mTessellationScene.GetTerrain().SetVariationScale( 3.0f ); break;
-					case Key::FOUR: mTessellationScene.GetTerrain().SetVariationScale( 6.0f ); break;
-					case Key::FIVE: mEngine.GetRenderer().SetTerrainPatchSize( RenderSettings::TerrainPatchSize::X16 ); break;
-					case Key::SIX: mEngine.GetRenderer().SetTerrainPatchSize( RenderSettings::TerrainPatchSize::X32 ); break;
-					case Key::SEVEN: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_AABB ); break;
+					case Key::TWO: mTessellationScene.GetTerrain().SetVariationScale( 3.0f ); break;
+					case Key::THREE: mTessellationScene.GetTerrain().SetVariationScale( 6.0f ); break;
+					case Key::FOUR: mEngine.GetRenderer().SetTerrainPatchSize( RenderSettings::TerrainPatchSize::X16 ); break;
+					case Key::FIVE: mEngine.GetRenderer().SetTerrainPatchSize( RenderSettings::TerrainPatchSize::X32 ); break;
+					case Key::SIX: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_AABB ); break;
+					case Key::SEVEN:
+					{
+						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_COPLANARITY, false ); 
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_NORMAL, false ); 
+						break;
+					}
 					case Key::EIGHT:
 					{
-						// TERRAIN_COPLANARITY / TERRAIN_WIREFRAME mutually exclusive debug options
-						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_COPLANARITY, false ); 
-						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME, false );
+						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_COPLANARITY );
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_NORMAL, false );
 						break;
 					}
 					case Key::NINE:
 					{
-						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME, false ); 
-						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_COPLANARITY );
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME, false );
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_COPLANARITY, false );
+						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
 						break;
 					}
 				}

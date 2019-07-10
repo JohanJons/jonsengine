@@ -58,4 +58,6 @@
 #define LUM_MAP_WIDTH 1024
 #define LUM_MAP_HEIGHT 1024
 
+#define TERRAIN_NORMAL_THREADS_AXIS 32
+
 #endif

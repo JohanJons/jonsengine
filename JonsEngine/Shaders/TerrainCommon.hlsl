@@ -4,6 +4,7 @@
 #include "Common.hlsl"
 
 Texture2D gCoplanarityMap : register( TEXTURE_REGISTER_EXTRA_2 );
+Texture2D gNormalMap : register( TEXTURE_REGISTER_NORMAL );
 
 cbuffer PerTerrainConstants : register(CBUFFER_REGISTER_DOMAIN)
 {
@@ -47,6 +48,12 @@ float GetCoplanarity( float2 worldPatchMidpoint )
 {
 	uint2 uv = ( worldPatchMidpoint - gWorldMin ) / gTerrainPatchSize;
 	return gCoplanarityMap.Load( uint3( uv, 0 ) ).r;
+}
+
+float GetNormal( float2 worldPatchMidpoint )
+{
+	uint2 uv = ( worldPatchMidpoint - gWorldMin ) / gTerrainPatchSize;
+	return gNormalMap.Load( uint3( uv, 0 ) ).r;
 }
 
 #endif
