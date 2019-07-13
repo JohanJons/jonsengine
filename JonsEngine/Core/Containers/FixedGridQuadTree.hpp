@@ -42,6 +42,7 @@ namespace JonsEngine
 		// Items and AABBs must be sorted left-to-right, row-major in memory, uniform in size
 		FixedGridQuadTree( std::vector<Item>&& Items, std::vector<Mat4>&& AABBTransforms );
 
+		uint32_t GetNumNodes() const { return static_cast< uint32_t >( mNodes.size() ); }
 		uint32_t GetPatchSize() const { return static_cast< uint32_t >( mNodeAABBExtent * 2 ); }
 
 		Item& GetNode( uint32_t index ) { return mNodes.at( index ); }
@@ -73,7 +74,6 @@ namespace JonsEngine
 		uint32_t GetNumNodeElements() const;
 		AABB GetAABB( uint32_t index ) const;
 
-        uint32_t GetNumNodes() const { return static_cast< uint32_t >( mNodes.size() ); }
         uint32_t GetNumAABBs() const { return static_cast< uint32_t >( mNodeAABBs.size() ); }
 
 		std::vector<Item> mNodes;

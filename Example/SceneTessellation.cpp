@@ -26,7 +26,7 @@ namespace JonsGame
 	{
 		JonsEngine::Scene& scene = sceneMgr.GetScene( mID );
 
-		scene.SetAmbientLight( Vec4( 0.1f ) );
+		scene.SetAmbientLight( Vec4( 0.2f ) );
 
 		DirectionalLight& sun = scene.GetDirectionalLight( mSunDirLightID );
 		sun.SetLightColor( Vec4( 6.0f ) );
@@ -41,6 +41,8 @@ namespace JonsGame
 		scene.SetSkybox( mSkybox );
 
 		scene.GetSceneCamera().TranslateCamera( { 1248.0f, 350.0f, -820.0f } );
+
+		FlipTerrain();
 	}
 
 	SceneTessellation::~SceneTessellation()

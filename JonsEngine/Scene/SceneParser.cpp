@@ -204,9 +204,9 @@ namespace JonsEngine
 
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
 			transform.mQuadTree.CullNodes( renderableTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
-			if ( renderableTransforms.empty() )
+			if ( renderableTransforms.empty()  )
 				continue;
-
+			
 			Vec2 worldMin, worldMax;
 			transform.mQuadTree.GetWorldXZBounds( worldMin, worldMax );
 			uint32_t renderableEndIndex = static_cast<uint32_t>( renderableTransforms.size() );
