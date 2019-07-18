@@ -88,9 +88,9 @@ namespace JonsEngine
 		}
 	}
 
-	uint32_t RenderSettingsToVal( RenderSettings::TerrainTessellationMax TerrainTessellationMax )
+	uint32_t RenderSettingsToVal( RenderSettings::TerrainTessellationMax terrainTessellationMax )
 	{
-		switch ( TerrainTessellationMax )
+		switch ( terrainTessellationMax )
 		{
 			case RenderSettings::TerrainTessellationMax::X24: return 24;
 			case RenderSettings::TerrainTessellationMax::X32: return 32;
@@ -101,6 +101,21 @@ namespace JonsEngine
 			default:
 			{
 				JONS_ERROR( Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainTessellationMax): Invalid enum" );
+				return 0;
+			}
+		}
+	}
+
+	uint32_t RenderSettingsToVal( RenderSettings::TerrainCoplanaritySize coplanaritySize )
+	{
+		switch ( coplanaritySize )
+		{
+			case RenderSettings::TerrainCoplanaritySize::X8: return 8;
+			case RenderSettings::TerrainCoplanaritySize::X16: return 16;
+			case RenderSettings::TerrainCoplanaritySize::X32: return 32;
+			default:
+			{
+				JONS_ERROR( Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainCoplanaritySize): Invalid enum" );
 				return 0;
 			}
 		}

@@ -237,9 +237,9 @@ namespace JonsEngine
         mRenderSettings.mToneMapping = alghorithm;
     }
 
-    void DX11Renderer::SetTerrainPatchSize( RenderSettings::TerrainPatchSize patchSize )
+    void DX11Renderer::SetTerrainPatchMinSize( RenderSettings::TerrainPatchMinSize patchSize )
     {
-        mRenderSettings.mTerrainPatchSize = patchSize;
+        mRenderSettings.mTerrainPatchMinSize = patchSize;
     }
 
 

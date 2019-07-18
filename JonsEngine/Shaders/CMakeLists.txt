@@ -36,6 +36,7 @@ list( APPEND COMPUTE_SHADERS
   DepthReadback.hlsl
   SDSMInitialCompute.hlsl
   SDSMFinalCompute.hlsl
+  TerrainComputeCoplanarity8.hlsl
   TerrainComputeCoplanarity16.hlsl
   TerrainComputeCoplanarity32.hlsl
   TerrainComputeNormal.hlsl

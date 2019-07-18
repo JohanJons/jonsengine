@@ -22,10 +22,10 @@ namespace JonsEngine
 	class DX11TerrainPass
 	{
 	public:
-		DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, RenderSettings::TerrainPatchSize patchSize);
+		DX11TerrainPass( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, RenderSettings::TerrainCoplanaritySize coplanaritySize );
 
-		void Render( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize );
-		void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, DebugOptions::RenderingFlags debugFlags );
+		void Render( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize );
+		void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize, DebugOptions::RenderingFlags debugFlags );
 
 	private:
 		struct PerTerrainCBuffer
@@ -45,7 +45,7 @@ namespace JonsEngine
 			NORMAL
 		};
 
-		void RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize );
+		void RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize );
 		void CreateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
 		void GetTextureMapDimensions( uint32_t& width, uint32_t& height, CachedTextureMap type, DX11TextureID heightmapID );
 		DXGI_FORMAT GetTextureMapFormat( CachedTextureMap type );
@@ -54,7 +54,7 @@ namespace JonsEngine
 		void BindComputeShader( CachedTextureMap type );
 		void GetDispatchDimensions( uint32_t& x, uint32_t& y, CachedTextureMap type, DX11TextureID heightmapID );
 
-        void UpdatePatchSize( RenderSettings::TerrainPatchSize patchSize );
+        void UpdatePatchSize( RenderSettings::TerrainCoplanaritySize coplanaritySize );
 		void BindForRendering();
 		void UnbindRendering();
         bool HasCachedTextureMap( CachedTextureMap type, DX11TextureID heightmapID ) const;
@@ -65,6 +65,7 @@ namespace JonsEngine
 		ID3D11VertexShaderPtr mVertexShader = nullptr;
 		ID3D11HullShaderPtr mHullShader = nullptr;
 		ID3D11HullShaderPtr mHullShaderDebugCoplanarity = nullptr;
+		ID3D11ComputeShaderPtr mCoplanarityComputeShader8 = nullptr;
         ID3D11ComputeShaderPtr mCoplanarityComputeShader16 = nullptr;
         ID3D11ComputeShaderPtr mCoplanarityComputeShader32 = nullptr;
 		ID3D11ComputeShaderPtr mNormalMapComputeShader = nullptr;
@@ -86,6 +87,6 @@ namespace JonsEngine
 		DX11VertexTransformPass& mVertexTransformer;
 		const IDMap<DX11Texture>& mTextureMap;
 
-        RenderSettings::TerrainPatchSize mPatchSize;
+        RenderSettings::TerrainCoplanaritySize mCoplanaritySize;
 	};
 }

@@ -38,9 +38,10 @@ namespace JonsEngine
     uint32_t RenderSettingsToVal( RenderSettings::Anisotropic anisotropicEnum );
     uint32_t RenderSettingsToVal( RenderSettings::ShadowReadbackLatency shadowReadbackLatencyEnum );
     uint32_t RenderSettingsToVal( RenderSettings::ShadowResolution shadowResolutionEnum );
-    uint32_t RenderSettingsToVal( RenderSettings::TerrainPatchSize patchSizeEnum );
+    uint32_t RenderSettingsToVal( RenderSettings::TerrainPatchMinSize patchSizeEnum );
 	uint32_t RenderSettingsToVal( RenderSettings::TerrainPrimitiveLength primitiveLength );
 	uint32_t RenderSettingsToVal( RenderSettings::TerrainTessellationMax tessellationMax );
+	uint32_t RenderSettingsToVal( RenderSettings::TerrainCoplanaritySize coplanaritySize );
 	float RenderSettingsToVal( RenderSettings::TerrainCoplanarityScale coplanarityScale );
 	float RenderSettingsToVal( RenderSettings::TerrainCoplanarityTessellationRatio coplanarityTessRatio );
 

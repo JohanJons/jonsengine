@@ -6,6 +6,7 @@
 #include "Compiled/TerrainVertex.h"
 #include "Compiled/TerrainHull.h"
 #include "Compiled/TerrainHullDebugCoplanarity.h"
+#include "Compiled/TerrainComputeCoplanarity8.h"
 #include "Compiled/TerrainComputeCoplanarity16.h"
 #include "Compiled/TerrainComputeCoplanarity32.h"
 #include "Compiled/TerrainComputeNormal.h"
@@ -44,17 +45,15 @@ namespace JonsEngine
 	};
 
 
-	DX11TerrainPass::DX11TerrainPass(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, RenderSettings::TerrainPatchSize patchSize) :
+	DX11TerrainPass::DX11TerrainPass( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, RenderSettings::TerrainCoplanaritySize coplanaritySize ) :
 		mContext(context),
         mDevice(device),
-
 		mPerTerrainCBuffer(device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
 		mTransformsBuffer(device, context),
-		mQuadMesh(device, context, gQuadVertices, gQuadIndices, AABB::gUnitQuadAABB.Min(), AABB::gUnitQuadAABB.Max()),
-		mVertexTransformer(vertexTransformer),
-		mTextureMap(textureMap),
-
-		mPatchSize(patchSize)
+		mQuadMesh( device, context, gQuadVertices, gQuadIndices, AABB::gUnitQuadAABB.Min(), AABB::gUnitQuadAABB.Max() ),
+		mVertexTransformer( vertexTransformer ),
+		mTextureMap( textureMap ),
+		mCoplanaritySize( coplanaritySize )
 	{
 		// input layout
 		// TODO: generalize into one class
@@ -96,17 +95,17 @@ namespace JonsEngine
 		DXCALL(device->CreateRasterizerState(&rasterizerDesc, &mDebugRasterizer));
 	}
 
-	void DX11TerrainPass::Render( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize )
+	void DX11TerrainPass::Render( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize )
 	{
 		if ( !terrains.GetNumTerrains() )
 			return;
 
 		BindForRendering();
-		RenderInternal( terrains, patchSize );
+		RenderInternal( terrains, coplanaritySize );
 		UnbindRendering();
 	}
 
-	void DX11TerrainPass::RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, DebugOptions::RenderingFlags debugFlags )
+	void DX11TerrainPass::RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize, DebugOptions::RenderingFlags debugFlags )
 	{
 		if ( !terrains.GetNumTerrains() )
 			return;
@@ -132,16 +131,16 @@ namespace JonsEngine
 		mContext->RSGetState( &prevRasterizer );
 		mContext->RSSetState( mDebugRasterizer );
 
-		RenderInternal( terrains, patchSize );
+		RenderInternal( terrains, coplanaritySize );
 
 		mContext->RSSetState( prevRasterizer );
 
 		UnbindRendering();
 	}
 
-    void DX11TerrainPass::UpdatePatchSize( RenderSettings::TerrainPatchSize patchSize )
+    void DX11TerrainPass::UpdatePatchSize( RenderSettings::TerrainCoplanaritySize coplanaritySize )
     {
-        mPatchSize = patchSize;
+        mCoplanaritySize = coplanaritySize;
 
         std::vector<DX11TextureID> heightTextures;
         for ( const auto& pair : mTerrainCoplanarityMap )
@@ -155,10 +154,10 @@ namespace JonsEngine
 		}
     }
 
-	void DX11TerrainPass::RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize )
+	void DX11TerrainPass::RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize )
 	{
-        if ( patchSize != mPatchSize )
-            UpdatePatchSize( patchSize );
+        if ( coplanaritySize != mCoplanaritySize )
+            UpdatePatchSize( coplanaritySize );
 
 		mTransformsBuffer.SetData( terrains.mTransforms );
 		mTransformsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA );
@@ -221,8 +220,10 @@ namespace JonsEngine
 		{
 			case CachedTextureMap::COPLANARITY:
 			{
-				uint32_t patchSizeVal = RenderSettingsToVal( mPatchSize );
+				uint32_t patchSizeVal = RenderSettingsToVal( mCoplanaritySize );
 				assert( patchSizeVal > 0 );
+				assert( desc.Width % patchSizeVal == 0 );
+				assert( desc.Height % patchSizeVal == 0 );
 
 				width = desc.Width / patchSizeVal;
 				height = desc.Height / patchSizeVal;
@@ -290,15 +291,21 @@ namespace JonsEngine
 		{
 			case CachedTextureMap::COPLANARITY:
 			{
-				switch ( mPatchSize )
+				switch ( mCoplanaritySize )
 				{
-					case RenderSettings::TerrainPatchSize::X16:
+					case RenderSettings::TerrainCoplanaritySize::X8:
+					{
+						mContext->CSSetShader( mCoplanarityComputeShader8, nullptr, 0 );
+						break;
+					}
+
+					case RenderSettings::TerrainCoplanaritySize::X16:
 					{
 						mContext->CSSetShader( mCoplanarityComputeShader16, nullptr, 0 );
 						break;
 					}
 
-					case RenderSettings::TerrainPatchSize::X32:
+					case RenderSettings::TerrainCoplanaritySize::X32:
 					{
 						mContext->CSSetShader( mCoplanarityComputeShader32, nullptr, 0 );
 						break;
@@ -306,6 +313,7 @@ namespace JonsEngine
 				}
 				break;
 			}
+
 			case CachedTextureMap::NORMAL:
 			{
 				mContext->CSSetShader( mNormalMapComputeShader, nullptr, 0 );
