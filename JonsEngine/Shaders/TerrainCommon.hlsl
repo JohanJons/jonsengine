@@ -46,13 +46,13 @@ struct HullOut
 
 float GetCoplanarity( float2 worldPatchMidpoint )
 {
-	uint2 uv = ( worldPatchMidpoint - gWorldMin ) / gTerrainPatchSize;
+	uint2 uv = ( worldPatchMidpoint - gWorldMin ) / gTerrainCoplanaritySize;
 	return gCoplanarityMap.Load( uint3( uv, 0 ) ).r;
 }
 
 float GetNormal( float2 worldPatchMidpoint )
 {
-	uint2 uv = ( worldPatchMidpoint - gWorldMin ) / gTerrainPatchSize;
+	uint2 uv = ( worldPatchMidpoint - gWorldMin ) / gTerrainCoplanaritySize;
 	return gNormalMap.Load( uint3( uv, 0 ) ).r;
 }
 

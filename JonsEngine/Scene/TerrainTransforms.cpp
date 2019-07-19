@@ -54,11 +54,11 @@ namespace JonsEngine
 			mDirtyTransforms.push_back( ID );
 	}
 
-	uint32_t TerrainTransforms::UpdateTransforms( uint32_t patchSize )
+	uint32_t TerrainTransforms::UpdateTransforms( uint32_t patchMinSize )
 	{
 		for ( const TerrainTransformData& transformData : mTerrainTransforms )
 		{
-			if ( transformData.mQuadTree.GetPatchSize() != patchSize )
+			if ( transformData.mQuadTree.GetPatchMinSize() != patchMinSize )
 				mDirtyTransforms.emplace_back( transformData.mID );
 		}
 
@@ -70,7 +70,7 @@ namespace JonsEngine
 			const Mat4& worldTransform = mSceneNodeLookup.GetNode(terrain.GetSceneNode()).GetWorldTransform();
 
 			RemoveIfAdded( ID );
-			RebuildTransforms( ID, worldTransform, terrain, terrainData, patchSize );
+			RebuildTransforms( ID, worldTransform, terrain, terrainData, patchMinSize );
 
 			++numUpdated;
 		}
@@ -100,14 +100,14 @@ namespace JonsEngine
 		return iter != endIter;
 	}
 
-	void TerrainTransforms::RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const Terrain& terrain, const TerrainData& terrainData, uint32_t patchSize )
+	void TerrainTransforms::RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const Terrain& terrain, const TerrainData& terrainData, uint32_t patchMinSize )
 	{
 		uint32_t heightmapWidth = terrainData.GetWidth(), heightmapHeight = terrainData.GetHeight();
 		const std::vector<uint8_t>& heightmapData = terrainData.GetHeightMapData();
 
-		assert( patchSize && heightmapWidth && heightmapHeight );
+		assert( patchMinSize && heightmapWidth && heightmapHeight );
 
-		int32_t numWidth = GetNumColumns( patchSize, heightmapWidth ), numHeight = GetNumRows( patchSize, heightmapHeight );
+		int32_t numWidth = GetNumColumns( patchMinSize, heightmapWidth ), numHeight = GetNumRows( patchMinSize, heightmapHeight );
 		int32_t gridSize = numWidth * numHeight;
 
 		std::vector<Mat4> transforms;

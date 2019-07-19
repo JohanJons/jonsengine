@@ -67,8 +67,8 @@ namespace JonsEngine
         UpdateAnimatedActors(elapsedTime);
 		UpdateBoneTransforms(elapsedTime);
 
-        uint32_t patchSize = RenderSettingsToVal( mRenderer.GetTerrainPatchSize() );
-		uint32_t updatedTransforms = mTerrainTransforms.UpdateTransforms( patchSize );
+        uint32_t patchMinSize = RenderSettingsToVal( mRenderer.GetTerrainPatchMinSize() );
+		uint32_t updatedTransforms = mTerrainTransforms.UpdateTransforms( patchMinSize );
 		if ( updatedTransforms )
 			mDirtyFlags.set(FlagTerrain, true);
     }

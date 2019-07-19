@@ -4,9 +4,6 @@
 
 using namespace JonsEngine;
 
-constexpr float gTerrainHeightScale = 64.0f;
-constexpr uint32_t gTerrainPatchSize = 64;
-
 namespace JonsGame
 {
     SceneActors::SceneActors( JonsEngine::SceneManager& sceneMgr, JonsEngine::ResourceManifest& resManifest ) :

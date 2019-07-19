@@ -268,7 +268,7 @@ namespace JonsEngine
 			camera.mCameraPosition,
 			Vec2( Z_NEAR, Z_FAR ),
 			renderQueue.mWindowDimensions,
-			RenderSettingsToVal( renderSettings.mTerrainPatchSize ),
+			RenderSettingsToVal( renderSettings.mTerrainCoplanaritySize ),
 			RenderSettingsToVal( renderSettings.mTerrainPrimitiveLength ),
 			RenderSettingsToVal( renderSettings.mTerrainTessellationMax ),
 			RenderSettingsToVal( renderSettings.mTerrainCoplanarityScale ),

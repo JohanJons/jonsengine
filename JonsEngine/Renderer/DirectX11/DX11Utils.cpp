@@ -55,18 +55,17 @@ namespace JonsEngine
         }
     }
 
-    uint32_t RenderSettingsToVal( RenderSettings::TerrainPatchSize patchSizeEnum )
+    uint32_t RenderSettingsToVal( RenderSettings::TerrainPatchMinSize patchSizeEnum )
     {
         switch ( patchSizeEnum )
         {
-            case RenderSettings::TerrainPatchSize::X16: return 16;
-            case RenderSettings::TerrainPatchSize::X32: return 32;
-            default:
-			{
+			default:
 				JONS_ERROR( Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainPatchSize): Invalid enum" );
-				return 0;
-			}
-
+			case RenderSettings::TerrainPatchMinSize::X4: return 4;
+			case RenderSettings::TerrainPatchMinSize::X8: return 8;
+			case RenderSettings::TerrainPatchMinSize::X16: return 16;
+			case RenderSettings::TerrainPatchMinSize::X32: return 32;
+            case RenderSettings::TerrainPatchMinSize::X64: return 64;
         }
     }
 
