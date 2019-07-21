@@ -26,6 +26,8 @@
         StaticActor.h
         Terrain.cpp
         Terrain.h
+        TerrainQuadTree.cpp
+        TerrainQuadTree.h
         TerrainTransforms.cpp
         TerrainTransforms.h
 )

@@ -105,6 +105,7 @@ namespace JonsEngine
 		uint32_t heightmapWidth = terrainData.GetWidth(), heightmapHeight = terrainData.GetHeight();
 		const std::vector<uint8_t>& heightmapData = terrainData.GetHeightMapData();
 
+		patchMinSize = 32;
 		assert( patchMinSize && heightmapWidth && heightmapHeight );
 
 		int32_t numWidth = GetNumColumns( patchMinSize, heightmapWidth ), numHeight = GetNumRows( patchMinSize, heightmapHeight );
@@ -124,7 +125,7 @@ namespace JonsEngine
 				uint32_t rowIndex = ( rowNum + numHeight ) / 2, colIndex = ( colNum + numWidth ) / 2;
 				GetPatchHeight( minY, maxY, heightmapData, terrain.GetHeightScale(), heightmapWidth, textureExtentWidth, textureExtentHeight, rowIndex, colIndex );
 
-				Mat4 patchScaleTransform = glm::scale( Vec3( patchSize, 1.0f, patchSize ) );
+				Mat4 patchScaleTransform = glm::scale( Vec3( patchMinSize, 1.0f, patchMinSize ) );
 				transforms.emplace_back( worldTransform * patchScaleTransform * glm::translate( Vec3( colNum / 2, 0.0f, rowNum / 2 ) ) );
 
 				float minMaxHeightDiff = maxY - minY;
@@ -133,5 +134,7 @@ namespace JonsEngine
 		}
 
 		mTerrainTransforms.emplace_back( ID, std::move( transforms ), std::move( AABBTransforms ) );
+
+		TerrainQuadTree mTeres( heightmapData, heightmapWidth, heightmapHeight, patchMinSize );
 	}
 }
