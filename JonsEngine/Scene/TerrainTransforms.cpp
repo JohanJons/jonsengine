@@ -58,8 +58,8 @@ namespace JonsEngine
 	{
 		for ( const TerrainTransformData& transformData : mTerrainTransforms )
 		{
-			if ( transformData.mQuadTree.GetPatchMinSize() != patchMinSize )
-				mDirtyTransforms.emplace_back( transformData.mID );
+			//if ( transformData.mQuadTree.GetPatchMinSize() != patchMinSize )
+			//	mDirtyTransforms.emplace_back( transformData.mID );
 		}
 
 		uint32_t numUpdated = 0;
@@ -105,6 +105,7 @@ namespace JonsEngine
 		uint32_t heightmapWidth = terrainData.GetWidth(), heightmapHeight = terrainData.GetHeight();
 		const std::vector<uint8_t>& heightmapData = terrainData.GetHeightMapData();
 
+		// TODO
 		patchMinSize = 32;
 		assert( patchMinSize && heightmapWidth && heightmapHeight );
 
@@ -135,6 +136,6 @@ namespace JonsEngine
 
 		mTerrainTransforms.emplace_back( ID, std::move( transforms ), std::move( AABBTransforms ) );
 
-		TerrainQuadTree mTeres( heightmapData, heightmapWidth, heightmapHeight, patchMinSize );
+		TerrainQuadTree mTeres( heightmapData, heightmapWidth, heightmapHeight, 4, terrain.GetHeightScale(), worldTransform );
 	}
 }
