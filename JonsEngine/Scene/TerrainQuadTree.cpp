@@ -25,7 +25,15 @@ namespace JonsEngine
 
 	void TerrainQuadTree::CullNodes( std::vector<Mat4>& nodeTransforms, const Mat4& cameraViewProjTransform ) const
 	{
+		uint32_t numLODRanges = GetNumLODRanges();
+		
+
 		CullQuad( nodeTransforms, mGridTraversal.front(), cameraViewProjTransform );
+	}
+
+	uint32_t TerrainQuadTree::GetNumLODRanges() const
+	{
+		return ( std::log( 3 * GetNumNodes() + 1 ) / std::log( 4 ) ) - 1
 	}
 
 	void TerrainQuadTree::GetWorldXZBounds( Vec2& worldMin, Vec2& worldMax ) const

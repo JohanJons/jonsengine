@@ -34,6 +34,7 @@ namespace JonsEngine
 
 		void CullNodes( std::vector<Mat4>& nodeTransforms, const Mat4& cameraViewProjTransform ) const;
 
+		uint32_t GetNumLODRanges() const;
 		uint32_t GetNumNodes() const { return static_cast<uint32_t>( mGridTraversal.size() ); }
 		uint32_t GetPatchMinSize() const { return mPatchMinSize; }
 		float GetHeightmapScale() const { return mHeightmapScale; }
