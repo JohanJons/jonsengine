@@ -23,17 +23,17 @@ namespace JonsEngine
 		assert( ExpectedNumNodes( width, mPatchMinSize ) == GetNumNodes() );
 	}
 
-	void TerrainQuadTree::CullNodes( std::vector<Mat4>& nodeTransforms, const Mat4& cameraViewProjTransform ) const
+	void TerrainQuadTree::CullNodes( std::vector<Mat4>& nodeTransforms, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const
 	{
-		uint32_t numLODRanges = GetNumLODRanges();
-		
+		std::vector<float> LODRanges;
+		CalculateLODRanges( LODRanges, zNear, zFar );
 
 		CullQuad( nodeTransforms, mGridTraversal.front(), cameraViewProjTransform );
 	}
 
 	uint32_t TerrainQuadTree::GetNumLODRanges() const
 	{
-		return ( std::log( 3 * GetNumNodes() + 1 ) / std::log( 4 ) ) - 1
+		return static_cast<uint32_t>( ( std::log( 3 * GetNumNodes() + 1 ) / std::log( 4 ) ) - 1 );
 	}
 
 	void TerrainQuadTree::GetWorldXZBounds( Vec2& worldMin, Vec2& worldMax ) const
@@ -113,7 +113,7 @@ namespace JonsEngine
 		Vec3 min = quadAABB.mAABB.Min();
 		Vec3 max = quadAABB.mAABB.Max();
 
-		float inf = std::numeric_limits<float>::infinity();
+		constexpr float inf = std::numeric_limits<float>::infinity();
 		float minY = inf, maxY = -inf;
 
 		uint32_t quadWidth = static_cast<uint32_t>( extent.x * 2 ), quadHeight = static_cast<uint32_t>( extent.z * 2 );
@@ -165,6 +165,16 @@ namespace JonsEngine
 		min.y = minY;
 		max.y = maxY;
 		quadAABB.mAABB = AABB( min, max );
+	}
+
+	void TerrainQuadTree::CalculateLODRanges( std::vector<float>& LODs, float zNear, float zFar ) const
+	{
+		uint32_t numLODRanges = GetNumLODRanges();
+		LODs.reserve( numLODRanges );
+
+		//LODLevelDistanceRatio         = 2.0
+
+		float sect = ( zFar - zNear ) / total;
 	}
 }
 

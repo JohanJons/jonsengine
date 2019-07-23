@@ -30,9 +30,10 @@ namespace JonsEngine
 	class TerrainQuadTree
 	{
 	public:
+		TerrainQuadTree() { }
 		TerrainQuadTree( const std::vector<uint8_t>& heightmapData, uint32_t width, uint32_t height, uint32_t patchMinSize, float heightmapScale, const Mat4& worldTransform );
 
-		void CullNodes( std::vector<Mat4>& nodeTransforms, const Mat4& cameraViewProjTransform ) const;
+		void CullNodes( std::vector<Mat4>& nodeTransforms, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const;
 
 		uint32_t GetNumLODRanges() const;
 		uint32_t GetNumNodes() const { return static_cast<uint32_t>( mGridTraversal.size() ); }
@@ -46,6 +47,7 @@ namespace JonsEngine
 		void AddGridNode( uint32_t centerX, uint32_t centerZ, uint32_t width, uint32_t height );
 		// local space during function
 		void ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, uint32_t heightmapWidth );
+		void CalculateLODRanges( std::vector<float>& LODs, float zNear, float zFar ) const;
 
 		uint32_t mPatchMinSize;
 		float mHeightmapScale;

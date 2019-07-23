@@ -177,7 +177,7 @@ namespace JonsEngine
         }
     }
 
-	void SceneParser::TerrainParsing( const Scene& scene, const DirtyFlagsSet dirtyFlags )
+	void SceneParser::TerrainParsing( const Scene& scene, const float zNear, const float zFar, const DirtyFlagsSet dirtyFlags )
 	{
 		const TerrainTransforms& terrainTransforms = scene.GetTerrainTransforms();
 		const std::vector<TerrainTransformData>& transforms = terrainTransforms.GetTransforms();
@@ -203,6 +203,14 @@ namespace JonsEngine
 			float variationScale = terrain.GetVariationScale();
 
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
+
+
+
+			const TerrainQuadTree& quadTree = terrainTransforms.GetQuadTree( ID );
+			quadTree.CullNodes( renderableTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
+
+
+
 			transform.mQuadTree.CullNodes( renderableTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
 			if ( renderableTransforms.empty()  )
 				continue;

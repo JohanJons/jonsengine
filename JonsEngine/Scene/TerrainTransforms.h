@@ -7,6 +7,7 @@
 #include "Scene/TerrainQuadTree.h"
 
 #include <vector>
+#include <map>
 #include <utility>
 
 namespace JonsEngine
@@ -34,6 +35,7 @@ namespace JonsEngine
 
 		uint32_t GetNumEntries() const;
 		const std::vector<TerrainTransformData>& GetTransforms() const { return mTerrainTransforms; }
+		const TerrainQuadTree& GetQuadTree( TerrainID ID ) const;
 
 	private:
 		void RemoveIfAdded( TerrainID ID );
@@ -45,6 +47,7 @@ namespace JonsEngine
 		const IDMapTree<SceneNode>& mSceneNodeLookup;
 
 		std::vector<TerrainTransformData> mTerrainTransforms;
+		std::map<TerrainID, TerrainQuadTree> mTerrainQuadTreeMap;
 		std::vector<TerrainID> mDirtyTransforms;
 	};
 }

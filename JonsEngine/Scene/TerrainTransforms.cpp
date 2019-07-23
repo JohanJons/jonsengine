@@ -85,6 +85,17 @@ namespace JonsEngine
 		return static_cast<uint32_t>( mTerrainTransforms.size() );
 	}
 
+	const TerrainQuadTree& TerrainTransforms::GetQuadTree( TerrainID ID ) const
+	{
+		if ( mTerrainQuadTreeMap.find( ID ) == mTerrainQuadTreeMap.cend() )
+		{
+			const static TerrainQuadTree gStaticEmptyTree;
+			return gStaticEmptyTree;
+		}
+
+		return mTerrainQuadTreeMap.at( ID );
+	}
+
 	void TerrainTransforms::RemoveIfAdded( TerrainID ID )
 	{
 		auto funcIDComparison = [ ID ]( const TerrainTransformData& metadata ) { return ID == metadata.mID; };
@@ -135,7 +146,7 @@ namespace JonsEngine
 		}
 
 		mTerrainTransforms.emplace_back( ID, std::move( transforms ), std::move( AABBTransforms ) );
-
-		TerrainQuadTree mTeres( heightmapData, heightmapWidth, heightmapHeight, 4, terrain.GetHeightScale(), worldTransform );
+		// TODO patchMinSize
+		mTerrainQuadTreeMap.emplace( std::piecewise_construct, std::forward_as_tuple( ID ), std::forward_as_tuple( heightmapData, heightmapWidth, heightmapHeight, 4, terrain.GetHeightScale(), worldTransform ) );
 	}
 }
