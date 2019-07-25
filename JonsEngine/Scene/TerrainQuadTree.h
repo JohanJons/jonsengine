@@ -18,12 +18,14 @@ namespace JonsEngine
 			NUM_CHILDREN
 		};
 
-		QuadNodeAABB( const Vec3& min, const Vec3& max ) :
-			mAABB( min, max )
+		QuadNodeAABB( const Vec3& min, const Vec3& max, uint32_t LODIndex ) :
+			mAABB( min, max ),
+			mLODIndex( LODIndex )
 		{ }
 
 		// world space
 		AABB mAABB;
+		uint32_t mLODIndex = 0;
 		QuadNodeAABB* mChildBegin = nullptr;
 	};
 
@@ -33,7 +35,7 @@ namespace JonsEngine
 		TerrainQuadTree() { }
 		TerrainQuadTree( const std::vector<uint8_t>& heightmapData, uint32_t width, uint32_t height, uint32_t patchMinSize, float heightmapScale, const Mat4& worldTransform );
 
-		void CullNodes( std::vector<Mat4>& nodeTransforms, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const;
+		void CullNodes( std::vector<Mat4>& nodeTransforms, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const;
 
 		uint32_t GetNumLODRanges() const;
 		uint32_t GetNumNodes() const { return static_cast<uint32_t>( mGridTraversal.size() ); }
@@ -42,11 +44,12 @@ namespace JonsEngine
 		void GetWorldXZBounds( Vec2& worldMin, Vec2& worldMax ) const;
 
 	private:
-		void CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Mat4& cameraViewProjTransform ) const;
+		void AddNode( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB ) const;
+		void CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges ) const;
 		uint32_t ExpectedNumNodes( uint32_t width, uint32_t patchMinSize ) const;
-		void AddGridNode( uint32_t centerX, uint32_t centerZ, uint32_t width, uint32_t height );
+		void CreateGridNode( uint32_t centerX, uint32_t centerZ, uint32_t width, uint32_t height, uint32_t LODlevel );
 		// local space during function
-		void ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, uint32_t heightmapWidth );
+		void ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, uint32_t heightmapWidth, uint32_t LODlevel );
 		void CalculateLODRanges( std::vector<float>& LODs, float zNear, float zFar ) const;
 
 		uint32_t mPatchMinSize;

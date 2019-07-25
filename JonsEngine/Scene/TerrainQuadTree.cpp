@@ -12,28 +12,33 @@ namespace JonsEngine
 		assert( patchMinSize && width && height && !heightmapData.empty() );
 
 		mGridTraversal.reserve( ExpectedNumNodes( width, mPatchMinSize ) );
-
-		AddGridNode( width / 2, height / 2, width, height );
+		
+		uint32_t rootLODLevel = 0;
+		CreateGridNode( width / 2, height / 2, width, height, rootLODLevel );
 		QuadNodeAABB& quadAABB = mGridTraversal.back();
-		ProcessQuadNode( quadAABB, heightmapData, width );
+		ProcessQuadNode( quadAABB, heightmapData, width, rootLODLevel );
+
+		// translate negative width&height / 2 to center it at origo
+		Mat4 finalTransform = glm::translate( -Vec3( width / 2, 0, height / 2) );
+		finalTransform = worldTransform * finalTransform;
 
 		for ( QuadNodeAABB& node : mGridTraversal )
-			node.mAABB = node.mAABB * worldTransform;
+			node.mAABB = node.mAABB * finalTransform;
 
 		assert( ExpectedNumNodes( width, mPatchMinSize ) == GetNumNodes() );
 	}
 
-	void TerrainQuadTree::CullNodes( std::vector<Mat4>& nodeTransforms, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const
+	void TerrainQuadTree::CullNodes( std::vector<Mat4>& nodeTransforms, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const
 	{
 		std::vector<float> LODRanges;
 		CalculateLODRanges( LODRanges, zNear, zFar );
 
-		CullQuad( nodeTransforms, mGridTraversal.front(), cameraViewProjTransform );
+		CullQuad( nodeTransforms, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges );
 	}
 
 	uint32_t TerrainQuadTree::GetNumLODRanges() const
 	{
-		return static_cast<uint32_t>( ( std::log( 3 * GetNumNodes() + 1 ) / std::log( 4 ) ) - 1 );
+		return static_cast<uint32_t>( std::log( 3 * GetNumNodes() + 1 ) / std::log( 4 ) );
 	}
 
 	void TerrainQuadTree::GetWorldXZBounds( Vec2& worldMin, Vec2& worldMax ) const
@@ -45,36 +50,46 @@ namespace JonsEngine
 		worldMax = Vec2( maxAABB.x, maxAABB.z );
 	}
 
-	void TerrainQuadTree::CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Mat4& cameraViewProjTransform ) const
+	void TerrainQuadTree::AddNode( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB ) const
 	{
-		/*AABBIntersection intersection = Intersection( quadAABB.mAABB, cameraViewProjTransform );
-		switch ( intersection )
-		{
-			case AABBIntersection::Partial:
-			{
-				if ( !quadAABB.mChildBegin )
-					AddAllItems( nodes, quadAABB );
-				else
-				{
-					for ( uint32_t childIndex = GridQuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < GridQuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
-					{
-						const GridQuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
-						if ( !childQuad.IsValid() )
-							continue;
+		Vec3 center = quadAABB.mAABB.GetCenter();
+		Vec3 extent = quadAABB.mAABB.GetExtent();
 
-						CullQuad( nodes, childQuad, cameraViewProjTransform );
-					}
-				}
-				break;
-			}
-			case AABBIntersection::Inside:
+		Mat4 transform = glm::translate( Vec3( center.x, 0.0f, center.z ) );
+		transform = glm::scale( transform, extent * 2.0f );
+		nodes.emplace_back( transform );
+	}
+
+	void TerrainQuadTree::CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges ) const
+	{
+		AABBIntersection intersection = Intersection( quadAABB.mAABB, cameraViewProjTransform );
+		if ( intersection == AABBIntersection::Outside )
+			return;
+
+		float nodeDistance = LODRanges.at( quadAABB.mLODIndex );
+		float cameraToQuadDistance = glm::distance( cameraWorldPos, quadAABB.mAABB.GetCenter() );
+		bool isWithinRange = cameraToQuadDistance <= nodeDistance;
+		isWithinRange = isWithinRange;
+
+		if ( intersection == AABBIntersection::Partial )
+		{
+			if ( !quadAABB.mChildBegin )
 			{
-				AddAllItems( nodes, quadAABB );
-				break;
+				AddNode( nodes, quadAABB );
 			}
-			default:
-				break;
-		}*/
+			else
+			{
+				for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
+				{
+					const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
+					CullQuad( nodes, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges );
+				}
+			}
+		}
+		else if ( intersection == AABBIntersection::Inside )
+		{
+			AddNode( nodes, quadAABB );
+		}
 	}
 
 	uint32_t TerrainQuadTree::ExpectedNumNodes( uint32_t width, uint32_t patchMinSize ) const
@@ -95,7 +110,7 @@ namespace JonsEngine
 		return numAABBs;
 	}
 
-	void TerrainQuadTree::AddGridNode( uint32_t centerX, uint32_t centerZ, uint32_t width, uint32_t height )
+	void TerrainQuadTree::CreateGridNode( uint32_t centerX, uint32_t centerZ, uint32_t width, uint32_t height, uint32_t LODlevel )
 	{
 		uint32_t extentX = width / 2;
 		uint32_t extentZ = height / 2;
@@ -103,10 +118,10 @@ namespace JonsEngine
 		Vec3 min( centerX - extentX, 0, centerZ - extentZ );
 		Vec3 max( centerX + extentX, 0, centerZ + extentZ );
 
-		mGridTraversal.emplace_back( min, max );
+		mGridTraversal.emplace_back( min, max, LODlevel );
 	}
 
-	void TerrainQuadTree::ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, uint32_t heightmapWidth )
+	void TerrainQuadTree::ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, uint32_t heightmapWidth, uint32_t LODlevel )
 	{
 		Vec3 center = quadAABB.mAABB.GetCenter();
 		Vec3 extent = quadAABB.mAABB.GetExtent();
@@ -144,19 +159,20 @@ namespace JonsEngine
 		uint32_t childHeight = static_cast<uint32_t>( extent.z );
 		uint32_t halfChildWidth = childWidth / 2;
 		uint32_t halfChildHeight = childHeight / 2;
+		uint32_t childNodeLODLevel = LODlevel + 1;
 
 		// TL - TR - BL - BR
-		AddGridNode( centerX - halfChildWidth, centerZ - halfChildHeight, childWidth, childHeight );
+		CreateGridNode( centerX - halfChildWidth, centerZ - halfChildHeight, childWidth, childHeight, childNodeLODLevel );
 		quadAABB.mChildBegin = &mGridTraversal.back();
-		AddGridNode( centerX + halfChildWidth, centerZ - halfChildHeight, childWidth, childHeight );
-		AddGridNode( centerX + halfChildWidth, centerZ + halfChildHeight, childWidth, childHeight );
-		AddGridNode( centerX - halfChildWidth, centerZ + halfChildHeight, childWidth, childHeight );
+		CreateGridNode( centerX + halfChildWidth, centerZ - halfChildHeight, childWidth, childHeight, childNodeLODLevel );
+		CreateGridNode( centerX + halfChildWidth, centerZ + halfChildHeight, childWidth, childHeight, childNodeLODLevel );
+		CreateGridNode( centerX - halfChildWidth, centerZ + halfChildHeight, childWidth, childHeight, childNodeLODLevel );
 
 		// process children and collect min/max Y for AABB
 		for ( uint32_t offset = QuadNodeAABB::TOP_LEFT; offset < QuadNodeAABB::NUM_CHILDREN; ++offset )
 		{
 			QuadNodeAABB& childNode = *( quadAABB.mChildBegin + offset );
-			ProcessQuadNode( childNode, heightmapData, heightmapWidth );
+			ProcessQuadNode( childNode, heightmapData, heightmapWidth, childNodeLODLevel );
 
 			minY = std::min( minY, childNode.mAABB.Min().y );
 			maxY = std::max( maxY, childNode.mAABB.Max().y );
@@ -170,11 +186,28 @@ namespace JonsEngine
 	void TerrainQuadTree::CalculateLODRanges( std::vector<float>& LODs, float zNear, float zFar ) const
 	{
 		uint32_t numLODRanges = GetNumLODRanges();
-		LODs.reserve( numLODRanges );
+		LODs.resize( numLODRanges );
 
-		//LODLevelDistanceRatio         = 2.0
+		const float LODDistanceRatio = 2.0f;
+
+		float total = 0;
+		float currentDetailBalance = 1.0f;
+		for ( uint32_t i = 0; i < numLODRanges; ++i )
+		{
+			total += currentDetailBalance;
+			currentDetailBalance *= LODDistanceRatio;
+		}
 
 		float sect = ( zFar - zNear ) / total;
+
+		float prevPos = zNear;
+		currentDetailBalance = 1.0f;
+		for ( uint32_t i = 0; i < numLODRanges; ++i )
+		{
+			LODs[ numLODRanges - i - 1 ] = prevPos + sect * currentDetailBalance;
+			prevPos = LODs[ numLODRanges - i - 1 ];
+			currentDetailBalance *= LODDistanceRatio;
+		}
 	}
 }
 

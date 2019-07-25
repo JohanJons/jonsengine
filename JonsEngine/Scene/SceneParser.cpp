@@ -66,7 +66,7 @@ namespace JonsEngine
         PointLightCulling(scene);
         DirectionalLightCulling(scene);
 
-		TerrainParsing( scene, dirtyFlags );
+		TerrainParsing( scene, zNear, zFar, dirtyFlags );
 		if ( debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_AABB ) )
 			AddTerrainAABBDebugData( scene );
 
@@ -204,14 +204,12 @@ namespace JonsEngine
 
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
 
-
-
 			const TerrainQuadTree& quadTree = terrainTransforms.GetQuadTree( ID );
-			quadTree.CullNodes( renderableTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
+			quadTree.CullNodes( renderableTransforms, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
 
 
 
-			transform.mQuadTree.CullNodes( renderableTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
+//			transform.mQuadTree.CullNodes( renderableTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
 			if ( renderableTransforms.empty()  )
 				continue;
 			
