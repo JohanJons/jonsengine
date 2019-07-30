@@ -16,8 +16,9 @@ namespace JonsEngine
     {
         switch (shaderSlot)
         {
-            case Shaderslot::Vertex:  mContext->VSSetShaderResources(bindSlot, 1, &mBufferSRV.p); break;
-            case Shaderslot::Pixel:  mContext->PSSetShaderResources(bindSlot, 1, &mBufferSRV.p); break;
+            case Shaderslot::Vertex: mContext->VSSetShaderResources(bindSlot, 1, &mBufferSRV.p); break;
+			case Shaderslot::Hull: mContext->HSSetShaderResources(bindSlot, 1, &mBufferSRV.p); break;
+            case Shaderslot::Pixel: mContext->PSSetShaderResources(bindSlot, 1, &mBufferSRV.p); break;
             default: break;
         }
     }

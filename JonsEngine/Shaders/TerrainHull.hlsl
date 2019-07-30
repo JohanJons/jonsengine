@@ -4,6 +4,8 @@
 #include "TerrainCommon.hlsl"
 #include "Common.hlsl"
 
+StructuredBuffer<float> gLODRanges : register (SBUFFER_REGISTER_EXTRA_2);
+
 #define MIN_TESSELLATION 4.0f
 #define MIN_COPLANARITY 0.1f
 
@@ -21,8 +23,20 @@ float3 ComputePatchMidpoint( float3 corner1, float3 corner2, float3 corner3, flo
 	return ( corner1 + corner2 + corner3 + corner4 ) / 4.0f;
 }
 
-float CalculateTessellationfactor( float3 q1, float3 q2, float3 q3, float3 q4 )
+float CalculateTessellationfactor( float midPatchDistance, float3 q1, float3 q2, float3 q3, float3 q4 )
 {
+	float3 worldPatchMidpoint = ComputePatchMidpoint( q1, q2, q3, q4 );
+	float dist = distance( gWorldEyePos, worldPatchMidpoint );
+	if ( dist <= midPatchDistance )
+	{
+		return 64;
+	}
+	else
+	{
+		return 2;
+	} 
+
+	/*
 	// coplanarity part
 	float3 worldPatchMidpoint = ComputePatchMidpoint( q1, q2, q3, q4 );
 	float coplanarity = GetCoplanarity( worldPatchMidpoint.xz );
@@ -46,6 +60,7 @@ float CalculateTessellationfactor( float3 q1, float3 q2, float3 q3, float3 q4 )
 	finalTessellation = max( finalTessellation, MIN_TESSELLATION );
 
 	return finalTessellation;
+	*/
 }
 
 PatchTess PatchHS( InputPatch<VertexOut, 12> inputVertices )
@@ -61,12 +76,22 @@ PatchTess PatchHS( InputPatch<VertexOut, 12> inputVertices )
 	patch.mInsideTess[ 0 ] = patch.mEdgeTess[ 0 ];
 	patch.mInsideTess[ 1 ] = patch.mEdgeTess[ 0 ];
 #else
-	float midPatchTessFactor = CalculateTessellationfactor( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition );
+	float3 centerPatchMidPoint = ComputePatchMidpoint( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition );
+	float dist = distance( gWorldEyePos, centerPatchMidPoint );
+
+	/*float midPatchTessFactor = CalculateTessellationfactor( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition );
 	float edgePatchTessFactors[] = {
 		CalculateTessellationfactor( inputVertices[ 11 ].mWorldPosition, inputVertices[ 0 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition, inputVertices[ 10 ].mWorldPosition ),
 		CalculateTessellationfactor( inputVertices[ 4 ].mWorldPosition, inputVertices[ 5 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 0 ].mWorldPosition ),
 		CalculateTessellationfactor( inputVertices[ 1 ].mWorldPosition, inputVertices[ 6 ].mWorldPosition, inputVertices[ 7 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition ),
 		CalculateTessellationfactor( inputVertices[ 3 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 8 ].mWorldPosition, inputVertices[ 9 ].mWorldPosition )
+	};*/
+	float midPatchTessFactor = 64.0f;
+	float edgePatchTessFactors[] = {
+		CalculateTessellationfactor( dist, inputVertices[ 11 ].mWorldPosition, inputVertices[ 0 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition, inputVertices[ 10 ].mWorldPosition ),
+		CalculateTessellationfactor( dist, inputVertices[ 4 ].mWorldPosition, inputVertices[ 5 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 0 ].mWorldPosition ),
+		CalculateTessellationfactor( dist, inputVertices[ 1 ].mWorldPosition, inputVertices[ 6 ].mWorldPosition, inputVertices[ 7 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition ),
+		CalculateTessellationfactor( dist, inputVertices[ 3 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 8 ].mWorldPosition, inputVertices[ 9 ].mWorldPosition )
 	};
 
 	patch.mEdgeTess[ 0 ] = min( midPatchTessFactor, edgePatchTessFactors[ 0 ] );

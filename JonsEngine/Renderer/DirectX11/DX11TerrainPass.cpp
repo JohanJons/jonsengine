@@ -49,7 +49,8 @@ namespace JonsEngine
 		mContext(context),
         mDevice(device),
 		mPerTerrainCBuffer(device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
-		mTransformsBuffer(device, context),
+		mTransformsBuffer( device, context ),
+		mLODBuffer( device, context ),
 		mQuadMesh( device, context, gQuadVertices, gQuadIndices, AABB::gUnitQuadAABB.Min(), AABB::gUnitQuadAABB.Max() ),
 		mVertexTransformer( vertexTransformer ),
 		mTextureMap( textureMap ),
@@ -179,8 +180,11 @@ namespace JonsEngine
             coplanarityTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA_2 );
 			normalTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_NORMAL );
 
-			mPerTerrainCBuffer.SetData( { terrainData.mWorldMin, terrainData.mWorldMax, terrainData.mHeightScale, terrainData.mVariationScale, beginIndex } );
+			mPerTerrainCBuffer.SetData( { terrainData.mWorldMin, terrainData.mWorldMax, terrainData.mHeightScale, terrainData.mVariationScale, beginIndex, static_cast<uint32_t>( terrainData.mLODRanges.size() ) } );
 			mPerTerrainCBuffer.Bind();
+
+			mLODBuffer.SetData( terrainData.mLODRanges );
+			mLODBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Hull, SBUFFER_SLOT_EXTRA_2 );
 
 			uint32_t endIndex = terrainData.mEndIndex;
 			assert( endIndex > beginIndex );

@@ -68,7 +68,7 @@ namespace JonsEngine
 
 		TerrainParsing( scene, zNear, zFar, dirtyFlags );
 		if ( debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_AABB ) )
-			AddTerrainAABBDebugData( scene );
+			AddTerrainAABBDebugData( scene, zNear, zFar );
 
 		if (debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_MODEL_AABB ))
 			AddModelAABBDebugData( scene );
@@ -180,11 +180,10 @@ namespace JonsEngine
 	void SceneParser::TerrainParsing( const Scene& scene, const float zNear, const float zFar, const DirtyFlagsSet dirtyFlags )
 	{
 		const TerrainTransforms& terrainTransforms = scene.GetTerrainTransforms();
-		const std::vector<TerrainTransformData>& transforms = terrainTransforms.GetTransforms();
 
-		for ( const TerrainTransformData& transform : transforms )
+		for ( const Terrain& terrain : scene.GetTerrains() )
 		{
-			TerrainID ID = transform.mID;
+			TerrainID ID = scene.GetTerrainID( terrain );
 
 			const Terrain& terrain = scene.GetTerrain(ID);
 			SceneNodeID sceneNodeID = terrain.GetSceneNode();
@@ -202,21 +201,18 @@ namespace JonsEngine
 			float heightScale = terrain.GetHeightScale();
 			float variationScale = terrain.GetVariationScale();
 
+			std::vector<float> LODRanges;
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
 
 			const TerrainQuadTree& quadTree = terrainTransforms.GetQuadTree( ID );
-			quadTree.CullNodes( renderableTransforms, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
-
-
-
-//			transform.mQuadTree.CullNodes( renderableTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
+			quadTree.CullNodes( renderableTransforms, LODRanges, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
 			if ( renderableTransforms.empty()  )
 				continue;
 			
 			Vec2 worldMin, worldMax;
-			transform.mQuadTree.GetWorldXZBounds( worldMin, worldMax );
+			quadTree.GetWorldXZBounds( worldMin, worldMax );
 			uint32_t renderableEndIndex = static_cast<uint32_t>( renderableTransforms.size() );
-			mRenderQueue.mTerrains.mTerrainData.emplace_back( heightmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale );
+			mRenderQueue.mTerrains.mTerrainData.emplace_back( std::move( LODRanges), heightmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale );
 		}
 	}
 
@@ -256,26 +252,28 @@ namespace JonsEngine
 		CullAABB<decltype(animatedActors)>(scene, mResourceManifest, animatedActors, mCullingStrategy, aabbDataContainer, viewProjTransform);
 	}
 
-	void SceneParser::AddTerrainAABBDebugData( const Scene& scene )
+	void SceneParser::AddTerrainAABBDebugData( const Scene& scene, float zNear, float zFar )
 	{
 		DX11MeshID unitCubeMeshID = mResourceManifest.GetUnitCubeModel().GetMeshes().begin()->GetMesh();
 		assert( unitCubeMeshID != INVALID_DX11_MESH_ID );
 
 		RenderableAABBsContainer& AABBRenderData = mRenderQueue.mColorsToAABBsList;
-		
 		const TerrainTransforms& terrainTransforms = scene.GetTerrainTransforms();
-		const std::vector<TerrainTransformData>& transforms = terrainTransforms.GetTransforms();
 
+		// unused atm
+		std::vector<float> lodRanges;
 		std::vector<Mat4> aabbTransforms;
 		aabbTransforms.reserve( mRenderQueue.mTerrains.mTransforms.size() );
-		for ( const TerrainTransformData& transformData : transforms )
+		for ( const Terrain& terrain : scene.GetTerrains() )
 		{
-            const Terrain& terrain = scene.GetTerrain( transformData.mID );
             const SceneNode& node = scene.GetSceneNode( terrain.GetSceneNode() );
             if ( !node.IsVisible() )
                 continue;
 
-			transformData.mQuadTree.CullAABBs( aabbTransforms, mRenderQueue.mCamera.mCameraViewProjectionMatrix );
+			TerrainID ID = scene.GetTerrainID( terrain );
+			const TerrainQuadTree& quadTree = terrainTransforms.GetQuadTree( ID );
+			quadTree.CullNodes( aabbTransforms, lodRanges, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
+
 			for ( const Mat4& transform : aabbTransforms )
 				AddAABB( AABBRenderData, transform, unitCubeMeshID, gRed );
 

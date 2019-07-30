@@ -34,7 +34,7 @@ DomainOut ds_main(PatchTess patchTess, float2 uv : SV_DomainLocation, const Outp
 
 	const int2 offset = 0;
 	const int mipmap = 0;
-	ret.mNormal = gNormalMap.SampleLevel( gLinearSampler, midPointTexcoord, mipmap, offset );
+	ret.mNormal = gNormalMap.SampleLevel( gLinearSampler, midPointTexcoord, mipmap, offset ).rgb;
 	ret.mNormal *= 2.0;
 	ret.mNormal -= 1.0;
 	ret.mNormal = normalize( ret.mNormal );

@@ -35,7 +35,7 @@ namespace JonsEngine
 			float mHeightScale;
 			float mVariationScale;
 			uint32_t mTransformOffset;
-			float __padding[1];
+			uint32_t mNumLODs;
 		};
 
 	private:
@@ -83,6 +83,7 @@ namespace JonsEngine
 
 		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;
 		DX11CPUDynamicBuffer mTransformsBuffer;
+		DX11CPUDynamicBuffer mLODBuffer;
 		DX11Mesh mQuadMesh;
 		DX11VertexTransformPass& mVertexTransformer;
 		const IDMap<DX11Texture>& mTextureMap;

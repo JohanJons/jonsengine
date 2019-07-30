@@ -13,6 +13,7 @@ cbuffer PerTerrainConstants : register(CBUFFER_REGISTER_DOMAIN)
 	float gHeightModifier;
 	float gVariationScale;
 	uint gTransformOffset;
+	uint gNumLODs;
 }
 
 struct PatchTess
@@ -50,10 +51,10 @@ float GetCoplanarity( float2 worldPatchMidpoint )
 	return gCoplanarityMap.Load( uint3( uv, 0 ) ).r;
 }
 
-float GetNormal( float2 worldPatchMidpoint )
+float3 GetNormal( float2 worldPatchMidpoint )
 {
 	uint2 uv = ( worldPatchMidpoint - gWorldMin ) / gTerrainCoplanaritySize;
-	return gNormalMap.Load( uint3( uv, 0 ) ).r;
+	return gNormalMap.Load( uint3( uv, 0 ) ).rgb;
 }
 
 #endif

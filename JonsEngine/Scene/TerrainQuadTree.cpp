@@ -28,12 +28,14 @@ namespace JonsEngine
 		assert( ExpectedNumNodes( width, mPatchMinSize ) == GetNumNodes() );
 	}
 
-	void TerrainQuadTree::CullNodes( std::vector<Mat4>& nodeTransforms, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const
+	void TerrainQuadTree::CullNodes( std::vector<Mat4>& nodeTransforms, std::vector<float>& LODRanges, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const
 	{
-		std::vector<float> LODRanges;
+		nodeTransforms.clear();
+		LODRanges.clear();
+
 		CalculateLODRanges( LODRanges, zNear, zFar );
 
-		CullQuad( nodeTransforms, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges );
+		CullQuad( nodeTransforms, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
 	}
 
 	uint32_t TerrainQuadTree::GetNumLODRanges() const
@@ -60,18 +62,101 @@ namespace JonsEngine
 		nodes.emplace_back( transform );
 	}
 
-	void TerrainQuadTree::CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges ) const
+	bool TerrainQuadTree::CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const
 	{
-		AABBIntersection intersection = Intersection( quadAABB.mAABB, cameraViewProjTransform );
+		// if parent is fully in frustum, so are we
+		AABBIntersection intersection = parentFullyInFrustum ? AABBIntersection::Inside : Intersection( quadAABB.mAABB, cameraViewProjTransform );
 		if ( intersection == AABBIntersection::Outside )
-			return;
+			return false;
 
-		float nodeDistance = LODRanges.at( quadAABB.mLODIndex );
+		float distanceLimit = LODRanges.at( quadAABB.mLODIndex );
+		float cameraToQuadDistance = glm::distance( cameraWorldPos, quadAABB.mAABB.GetCenter() );
+		bool isWithinRange = cameraToQuadDistance <= distanceLimit;
+		if ( !isWithinRange )
+			return false;
+		
+		uint32_t childLODIndex = quadAABB.mLODIndex + 1;
+		bool isValidLODIndex = childLODIndex < LODRanges.size();
+		if ( !isValidLODIndex )
+		{
+			AddNode( nodes, quadAABB );
+			return true;
+		}
+
+		float nextDistanceLimit = LODRanges.at( childLODIndex );
+		bool nextIsWithinRange = cameraToQuadDistance <= nextDistanceLimit;
+		if ( !nextIsWithinRange )
+		{
+			AddNode( nodes, quadAABB );
+			return true;
+		}
+
+		bool completelyInFrustum = intersection == AABBIntersection::Inside;
+		std::array<bool, QuadNodeAABB::NUM_CHILDREN> childrenAdded;
+		for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
+		{
+			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
+			childrenAdded[ childIndex ] = CullQuad( nodes, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum );
+
+			if ( !childrenAdded[ childIndex ] )
+			{
+				// TODO: remove & alter tess level
+				AddNode( nodes, childQuad );
+			}
+		}
+
+		/*for ( bool added : childrenAdded )
+		{
+			if ( !added )
+			{
+
+			}
+		}*/
+
+		//bool allWithinRange = true;
+		/*for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
+		{
+			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
+			float childModeDistance = LODRanges.at( childQuad.mLODIndex );
+			float childCameraToQuadDistance = glm::distance( cameraWorldPos, childQuad.mAABB.GetCenter() );
+			//allWithinRange &= childCameraToQuadDistance <= childModeDistance;
+		}*/
+
+		/*if ( allWithinRange )
+		{
+			for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
+			{
+				const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
+				CullQuad( nodes, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges );
+			}
+		}
+		else
+		{
+			AddNode( nodes, quadAABB );
+		}*/
+
+		/*float nodeDistance = LODRanges.at( quadAABB.mLODIndex );
 		float cameraToQuadDistance = glm::distance( cameraWorldPos, quadAABB.mAABB.GetCenter() );
 		bool isWithinRange = cameraToQuadDistance <= nodeDistance;
 		isWithinRange = isWithinRange;
 
-		if ( intersection == AABBIntersection::Partial )
+		for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
+		{
+			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
+			nodeDistance = LODRanges.at( childQuad.mLODIndex );
+			cameraToQuadDistance = glm::distance( cameraWorldPos, childQuad.mAABB.GetCenter() );
+			bool isWithinRange2 = cameraToQuadDistance <= nodeDistance;
+			isWithinRange2 = isWithinRange2;
+		}
+
+		uint32_t childLODIndex = quadAABB.mLODIndex + 1;
+		bool isValidLODIndex = childLODIndex < LODRanges.size();
+		if ( isValidLODIndex )
+		{
+
+		}*/
+
+		/*if ( intersection == AABBIntersection::Partial || intersection == AABBIntersection::Inside )
 		{
 			if ( !quadAABB.mChildBegin )
 			{
@@ -84,12 +169,31 @@ namespace JonsEngine
 					const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
 					CullQuad( nodes, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges );
 				}
+
+				uint32_t childLODIndex = quadAABB.mLODIndex + 1;
+				bool isValidChildLODIndex = childLODIndex < LODRanges.size();
+				if ( isValidChildLODIndex )
+				{
+					float nodeDistance = LODRanges.at( childLODIndex );
+					float cameraToQuadDistance = glm::distance( cameraWorldPos, quadAABB.mAABB.GetCenter() );
+					bool isWithinRange = cameraToQuadDistance <= nodeDistance;
+				}
+			}
+
+
+			else
+			{
+				for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
+				{
+					const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
+					CullQuad( nodes, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges );
+				}
 			}
 		}
-		else if ( intersection == AABBIntersection::Inside )
-		{
-			AddNode( nodes, quadAABB );
-		}
+		//else if ( intersection == AABBIntersection::Inside )
+		//{
+		//	AddNode( nodes, quadAABB );
+		//}*/
 	}
 
 	uint32_t TerrainQuadTree::ExpectedNumNodes( uint32_t width, uint32_t patchMinSize ) const

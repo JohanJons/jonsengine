@@ -13,6 +13,7 @@ namespace JonsEngine
         enum class Shaderslot
         {
             Vertex,
+			Hull,
             Pixel
         };
 

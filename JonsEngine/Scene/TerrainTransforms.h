@@ -12,19 +12,6 @@
 
 namespace JonsEngine
 {
-	struct TerrainTransformData
-	{
-		typedef FixedGridQuadTree<Mat4> TerrainTransformGridQuadTree;
-
-		TerrainTransformData( TerrainID ID, std::vector<Mat4>&& transforms, std::vector<Mat4>&& AABBTransforms )
-			: mID( ID )
-			, mQuadTree( std::move( transforms ), std::move( AABBTransforms ) )
-		{ }
-
-		TerrainID mID;
-		TerrainTransformGridQuadTree mQuadTree;
-	};
-
 	class TerrainTransforms
 	{
 	public:
@@ -33,12 +20,10 @@ namespace JonsEngine
 		void AddDirty(TerrainID ID);
 		uint32_t UpdateTransforms( uint32_t patchMinSize );
 
-		uint32_t GetNumEntries() const;
-		const std::vector<TerrainTransformData>& GetTransforms() const { return mTerrainTransforms; }
 		const TerrainQuadTree& GetQuadTree( TerrainID ID ) const;
 
 	private:
-		void RemoveIfAdded( TerrainID ID );
+		void AddAllDirty( uint32_t patchMinSize );
 		bool HasAddedDirty( TerrainID ID ) const;
 		void RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const Terrain& terrain, const TerrainData& terrainData, uint32_t patchMinSize );
 
@@ -46,7 +31,6 @@ namespace JonsEngine
 		const IDMap<TerrainData>& mTerrainDataLookup;
 		const IDMapTree<SceneNode>& mSceneNodeLookup;
 
-		std::vector<TerrainTransformData> mTerrainTransforms;
 		std::map<TerrainID, TerrainQuadTree> mTerrainQuadTreeMap;
 		std::vector<TerrainID> mDirtyTransforms;
 	};

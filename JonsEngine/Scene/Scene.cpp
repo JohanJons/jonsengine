@@ -278,6 +278,11 @@ namespace JonsEngine
 		return mTerrains.GetItem( terrainID );
 	}
 
+	TerrainID Scene::GetTerrainID( const Terrain& terrain ) const
+	{
+		return mTerrains.GetID( terrain );
+	}
+
 	Scene::TerrainIterator Scene::GetTerrains() const
 	{
 		return TerrainIterator( mTerrains, 0, mTerrains.Size() );

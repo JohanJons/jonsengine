@@ -80,6 +80,7 @@ namespace JonsEngine
 		void DeleteTerrain( TerrainID& terrainDataID);
 		Terrain& GetTerrain(const TerrainID terrainDataID);
 		const Terrain& GetTerrain(const TerrainID terrainDataID) const;
+		TerrainID GetTerrainID( const Terrain& terrain ) const; // TODO: some other fix
 		TerrainIterator GetTerrains() const;
 
 		void SetAmbientLight(const Vec4& ambientLight);
