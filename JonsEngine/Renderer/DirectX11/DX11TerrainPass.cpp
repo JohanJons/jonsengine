@@ -21,7 +21,7 @@
 
 namespace JonsEngine
 {
-	const std::vector<float> gQuadVertices{
+	/*const std::vector<float> gQuadVertices{
 		-0.5f, 0.0f, -0.5f,
 		0.5f, 0.0f, -0.5f,
 		0.5f, 0.0f, 0.5f,
@@ -34,9 +34,22 @@ namespace JonsEngine
 		-0.5f, 0.0f, 1.5f,
 		-1.5f, 0.0f, 0.5f,
 		-1.5f, 0.0f, -0.5f,
-	};
+	};*/
 
-	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+	const std::vector<float> gQuadVertices{
+		-0.5f, 0.0f, -0.5f,	// BL
+		0.5f, 0.0f, -0.5f,	// BR
+		0.5f, 0.0f, 0.5f,	// TR
+		-0.5f, 0.0f, 0.5f,	// TL
+		0.0f, 0.0f, -1.0f,	// bottom-center
+		1.0f, 0.0f, 0.0f,	// Right-center
+		0.0f, 0.0f, 1.0f,	// Top-center
+		-1.0f, 0.0f, 0.0f	// Left-center
+	}
+
+	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3, 4, 5, 6, 7 };
+
+	//const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 
 	enum VSInputLayout
 	{

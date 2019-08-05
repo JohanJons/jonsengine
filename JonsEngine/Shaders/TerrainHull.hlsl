@@ -9,6 +9,26 @@ StructuredBuffer<float> gLODRanges : register (SBUFFER_REGISTER_EXTRA_2);
 #define MIN_TESSELLATION 4.0f
 #define MIN_COPLANARITY 0.1f
 
+uint GetLOD( float3 worldPos )
+{
+	float dist = distance( gWorldEyePos, worldPos );
+	for ( uint LOD = 0; LOD < gNumLODs; ++LOD )
+	{
+		if ( dist <= gLODRanges[ LOD ] )
+			return LOD;
+	}
+
+	return max( gNumLODS - 1, 0 );
+}
+
+float3 ComputeMidpoints( float3 vertex, float3 midpointM, out float3 midpointS, out float3 midpointL )
+{
+	float3 diff = midpointM - vertex;
+	
+	midpointS = vertex + ( diff / 2 );
+	midpointL = midpointM + diff;
+}
+
 float GetScreenSpaceTessellationScale( float2 screenPos1, float2 screenPos2 )
 {
 	float screenLength = distance( screenPos1, screenPos2 );
@@ -63,7 +83,7 @@ float CalculateTessellationfactor( float midPatchDistance, float3 q1, float3 q2,
 	*/
 }
 
-PatchTess PatchHS( InputPatch<VertexOut, 12> inputVertices )
+PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 {
 	PatchTess patch;
 
@@ -76,8 +96,28 @@ PatchTess PatchHS( InputPatch<VertexOut, 12> inputVertices )
 	patch.mInsideTess[ 0 ] = patch.mEdgeTess[ 0 ];
 	patch.mInsideTess[ 1 ] = patch.mEdgeTess[ 0 ];
 #else
-	float3 centerPatchMidPoint = ComputePatchMidpoint( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition );
-	float dist = distance( gWorldEyePos, centerPatchMidPoint );
+	float3 BL = inputVertices[ 0 ].mWorldPosition;
+	float3 BR = inputVertices[ 1 ].mWorldPosition;
+	float3 TR = inputVertices[ 2 ].mWorldPosition;
+	float3 TL = inputVertices[ 3 ].mWorldPosition;
+	float3 centerPatchMidPoint = ComputePatchMidpoint( BL, BR, TR, TL );
+	uint centerLOD = GetLOD( centerPatchMidPoint );
+
+	float3 rightCenter = inputVertices[ 5 ].mWorldPosition;
+	float3 topCenter = inputVertices[ 6 ].mWorldPosition;
+	float3 leftcenter = inputVertices[ 7 ].mWorldPosition;
+
+
+
+
+
+	float3 bottomCenterM = inputVertices[ 4 ].mWorldPosition;
+	float3 bottomCenterS, bottomCenterL;
+	ComputeMidpoints( BL, bottomCenterM, bottomCenterS, bottomCenterL );
+	
+	float distM = distance( gWorldEyePos, bottomCenterM );
+
+	if ( distM <  )
 
 	/*float midPatchTessFactor = CalculateTessellationfactor( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition );
 	float edgePatchTessFactors[] = {
@@ -111,7 +151,7 @@ PatchTess PatchHS( InputPatch<VertexOut, 12> inputVertices )
 [outputtopology("triangle_ccw")]
 [outputcontrolpoints(4)]
 [patchconstantfunc("PatchHS")]
-HullOut hs_main( InputPatch<VertexOut, 12> verticeData, uint index : SV_OutputControlPointID )
+HullOut hs_main( InputPatch<VertexOut, 8> verticeData, uint index : SV_OutputControlPointID )
 {
 	HullOut ret;
 
