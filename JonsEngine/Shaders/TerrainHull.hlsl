@@ -18,7 +18,23 @@ uint GetLOD( float3 worldPos )
 			return LOD;
 	}
 
-	return max( gNumLODS - 1, 0 );
+	return max( gNumLODs - 1, 0 );
+}
+
+float CalculateTessellation( uint centerLOD, float3 centerVertex, float3 sideCenterM )
+{
+	float3 bottomCenterM = inputVertices[ 4 ].mWorldPosition;
+	uint LOD = GetLOD( bottomCenterM );
+	if ( centerLOD == LOD )
+	{
+
+	}
+
+
+	float3 bottomCenterS, bottomCenterL;
+	ComputeMidpoints( BL, bottomCenterM, bottomCenterS, bottomCenterL );
+
+	float distM = distance( gWorldEyePos, bottomCenterM );
 }
 
 float3 ComputeMidpoints( float3 vertex, float3 midpointM, out float3 midpointS, out float3 midpointL )
@@ -103,21 +119,12 @@ PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 	float3 centerPatchMidPoint = ComputePatchMidpoint( BL, BR, TR, TL );
 	uint centerLOD = GetLOD( centerPatchMidPoint );
 
-	float3 rightCenter = inputVertices[ 5 ].mWorldPosition;
-	float3 topCenter = inputVertices[ 6 ].mWorldPosition;
-	float3 leftcenter = inputVertices[ 7 ].mWorldPosition;
-
-
-
-
-
 	float3 bottomCenterM = inputVertices[ 4 ].mWorldPosition;
-	float3 bottomCenterS, bottomCenterL;
-	ComputeMidpoints( BL, bottomCenterM, bottomCenterS, bottomCenterL );
-	
-	float distM = distance( gWorldEyePos, bottomCenterM );
+	float3 rightCenterM = inputVertices[ 5 ].mWorldPosition;
+	float3 topCenterM = inputVertices[ 6 ].mWorldPosition;
+	float3 leftCenterM = inputVertices[ 7 ].mWorldPosition;
 
-	if ( distM <  )
+	//if ( distM <  )
 
 	/*float midPatchTessFactor = CalculateTessellationfactor( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition );
 	float edgePatchTessFactors[] = {
@@ -128,10 +135,14 @@ PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 	};*/
 	float midPatchTessFactor = 64.0f;
 	float edgePatchTessFactors[] = {
-		CalculateTessellationfactor( dist, inputVertices[ 11 ].mWorldPosition, inputVertices[ 0 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition, inputVertices[ 10 ].mWorldPosition ),
-		CalculateTessellationfactor( dist, inputVertices[ 4 ].mWorldPosition, inputVertices[ 5 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 0 ].mWorldPosition ),
-		CalculateTessellationfactor( dist, inputVertices[ 1 ].mWorldPosition, inputVertices[ 6 ].mWorldPosition, inputVertices[ 7 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition ),
-		CalculateTessellationfactor( dist, inputVertices[ 3 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 8 ].mWorldPosition, inputVertices[ 9 ].mWorldPosition )
+		CalculateTessellation( centerLOD, BL, bottomCenterM ),
+		CalculateTessellation( centerLOD, BR, rightCenterM ),
+		CalculateTessellation( centerLOD, TR, topCenterM ),
+		CalculateTessellation( centerLOD, TL, leftCenterM )
+		//CalculateTessellationfactor( dist, inputVertices[ 11 ].mWorldPosition, inputVertices[ 0 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition, inputVertices[ 10 ].mWorldPosition ),
+		//CalculateTessellationfactor( dist, inputVertices[ 4 ].mWorldPosition, inputVertices[ 5 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 0 ].mWorldPosition ),
+		//CalculateTessellationfactor( dist, inputVertices[ 1 ].mWorldPosition, inputVertices[ 6 ].mWorldPosition, inputVertices[ 7 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition ),
+		//CalculateTessellationfactor( dist, inputVertices[ 3 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 8 ].mWorldPosition, inputVertices[ 9 ].mWorldPosition )
 	};
 
 	patch.mEdgeTess[ 0 ] = min( midPatchTessFactor, edgePatchTessFactors[ 0 ] );
