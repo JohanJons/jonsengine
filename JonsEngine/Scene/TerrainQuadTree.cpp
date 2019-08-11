@@ -5,6 +5,28 @@
 
 namespace JonsEngine
 {
+	/*Vec3 GetAveragedRange( const Vec3& pointA, const Vec3& pointB )
+	{
+		Vec3 average = ( pointA + pointB );
+		average /= 2;
+
+		return average;
+	}
+
+	bool IsWithinDistance( const Vec3& cameraPos, float distance, const AABB& aabb )
+	{
+		const Vec3& center = aabb.GetCenter();
+		const Vec3& extent = aabb.GetExtent();
+
+		if (  )
+
+		for ( int32 x = 0 )
+
+		Vec3
+
+		//float cameraToQuadDistance = glm::distance( cameraWorldPos, quadAABB.mAABB.GetCenter() );
+	}*/
+
 	TerrainQuadTree::TerrainQuadTree( const std::vector<uint8_t>& heightmapData, uint32_t width, uint32_t height, uint32_t patchMinSize, float heightmapScale, const Mat4& worldTransform ) :
 		mPatchMinSize( patchMinSize ),
 		mHeightmapScale( heightmapScale )
@@ -65,49 +87,32 @@ namespace JonsEngine
 	bool TerrainQuadTree::CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const
 	{
 		// if parent is fully in frustum, so are we
-		AABBIntersection intersection = parentFullyInFrustum ? AABBIntersection::Inside : Intersection( quadAABB.mAABB, cameraViewProjTransform );
-		if ( intersection == AABBIntersection::Outside )
+		AABBIntersection frustumIntersection = parentFullyInFrustum ? AABBIntersection::Inside : Intersection( quadAABB.mAABB, cameraViewProjTransform );
+		if ( frustumIntersection == AABBIntersection::Outside )
 			return false;
 
 		float distanceLimit = LODRanges.at( quadAABB.mLODIndex );
-		float cameraToQuadDistance = glm::distance( cameraWorldPos, quadAABB.mAABB.GetCenter() );
-		bool isWithinRange = cameraToQuadDistance <= distanceLimit;
-		if ( !isWithinRange )
+		AABBIntersection intersection = Intersection( quadAABB.mAABB, cameraWorldPos, distanceLimit );
+		bool isWithinDistance = intersection == AABBIntersection::Partial || intersection == AABBIntersection::Inside;
+		if ( !isWithinDistance )
 			return false;
 		
-		uint32_t childLODIndex = quadAABB.mLODIndex + 1;
-		bool isValidLODIndex = childLODIndex < LODRanges.size();
+		uint32_t nextLODIndex = quadAABB.mLODIndex + 1;
+		bool isValidLODIndex = nextLODIndex < LODRanges.size();
 		if ( !isValidLODIndex )
 		{
 			AddNode( nodes, quadAABB );
 			return true;
 		}
 
-		float nextDistanceLimit = LODRanges.at( childLODIndex );
-		bool anyChildIsWithNextRange = false;
-		for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
-		{
-			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
-			float childCameraToQuadDistance = glm::distance( cameraWorldPos, childQuad.mAABB.GetCenter() );
-			if ( childCameraToQuadDistance <= nextDistanceLimit )
-			{
-				anyChildIsWithNextRange = true;
-				break;
-			}
-		}
-
-		if ( !anyChildIsWithNextRange )
-		{
-			AddNode( nodes, quadAABB );
-			return true;
-		}
-
-		/*bool nextIsWithinRange = cameraToQuadDistance <= nextDistanceLimit;
+		float nextDistanceLimit = LODRanges.at( nextLODIndex );
+		AABBIntersection nextIntersection = Intersection( quadAABB.mAABB, cameraWorldPos, nextDistanceLimit );
+		bool nextIsWithinRange = nextIntersection == AABBIntersection::Partial || nextIntersection == AABBIntersection::Inside;
 		if ( !nextIsWithinRange )
 		{
 			AddNode( nodes, quadAABB );
 			return true;
-		}*/
+		}
 
 		bool completelyInFrustum = intersection == AABBIntersection::Inside;
 		std::array<bool, QuadNodeAABB::NUM_CHILDREN> childrenAdded;
@@ -124,96 +129,6 @@ namespace JonsEngine
 		}
 
 		return true;
-
-		/*for ( bool added : childrenAdded )
-		{
-			if ( !added )
-			{
-
-			}
-		}*/
-
-		//bool allWithinRange = true;
-		/*for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
-		{
-			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
-			float childModeDistance = LODRanges.at( childQuad.mLODIndex );
-			float childCameraToQuadDistance = glm::distance( cameraWorldPos, childQuad.mAABB.GetCenter() );
-			//allWithinRange &= childCameraToQuadDistance <= childModeDistance;
-		}*/
-
-		/*if ( allWithinRange )
-		{
-			for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
-			{
-				const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
-				CullQuad( nodes, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges );
-			}
-		}
-		else
-		{
-			AddNode( nodes, quadAABB );
-		}*/
-
-		/*float nodeDistance = LODRanges.at( quadAABB.mLODIndex );
-		float cameraToQuadDistance = glm::distance( cameraWorldPos, quadAABB.mAABB.GetCenter() );
-		bool isWithinRange = cameraToQuadDistance <= nodeDistance;
-		isWithinRange = isWithinRange;
-
-		for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
-		{
-			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
-			nodeDistance = LODRanges.at( childQuad.mLODIndex );
-			cameraToQuadDistance = glm::distance( cameraWorldPos, childQuad.mAABB.GetCenter() );
-			bool isWithinRange2 = cameraToQuadDistance <= nodeDistance;
-			isWithinRange2 = isWithinRange2;
-		}
-
-		uint32_t childLODIndex = quadAABB.mLODIndex + 1;
-		bool isValidLODIndex = childLODIndex < LODRanges.size();
-		if ( isValidLODIndex )
-		{
-
-		}*/
-
-		/*if ( intersection == AABBIntersection::Partial || intersection == AABBIntersection::Inside )
-		{
-			if ( !quadAABB.mChildBegin )
-			{
-				AddNode( nodes, quadAABB );
-			}
-			else
-			{
-				for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
-				{
-					const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
-					CullQuad( nodes, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges );
-				}
-
-				uint32_t childLODIndex = quadAABB.mLODIndex + 1;
-				bool isValidChildLODIndex = childLODIndex < LODRanges.size();
-				if ( isValidChildLODIndex )
-				{
-					float nodeDistance = LODRanges.at( childLODIndex );
-					float cameraToQuadDistance = glm::distance( cameraWorldPos, quadAABB.mAABB.GetCenter() );
-					bool isWithinRange = cameraToQuadDistance <= nodeDistance;
-				}
-			}
-
-
-			else
-			{
-				for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
-				{
-					const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
-					CullQuad( nodes, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges );
-				}
-			}
-		}
-		//else if ( intersection == AABBIntersection::Inside )
-		//{
-		//	AddNode( nodes, quadAABB );
-		//}*/
 	}
 
 	uint32_t TerrainQuadTree::ExpectedNumNodes( uint32_t width, uint32_t patchMinSize ) const
