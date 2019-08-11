@@ -84,12 +84,30 @@ namespace JonsEngine
 		}
 
 		float nextDistanceLimit = LODRanges.at( childLODIndex );
-		bool nextIsWithinRange = cameraToQuadDistance <= nextDistanceLimit;
-		if ( !nextIsWithinRange )
+		bool anyChildIsWithNextRange = false;
+		for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
+		{
+			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
+			float childCameraToQuadDistance = glm::distance( cameraWorldPos, childQuad.mAABB.GetCenter() );
+			if ( childCameraToQuadDistance <= nextDistanceLimit )
+			{
+				anyChildIsWithNextRange = true;
+				break;
+			}
+		}
+
+		if ( !anyChildIsWithNextRange )
 		{
 			AddNode( nodes, quadAABB );
 			return true;
 		}
+
+		/*bool nextIsWithinRange = cameraToQuadDistance <= nextDistanceLimit;
+		if ( !nextIsWithinRange )
+		{
+			AddNode( nodes, quadAABB );
+			return true;
+		}*/
 
 		bool completelyInFrustum = intersection == AABBIntersection::Inside;
 		std::array<bool, QuadNodeAABB::NUM_CHILDREN> childrenAdded;
@@ -104,6 +122,8 @@ namespace JonsEngine
 				AddNode( nodes, childQuad );
 			}
 		}
+
+		return true;
 
 		/*for ( bool added : childrenAdded )
 		{

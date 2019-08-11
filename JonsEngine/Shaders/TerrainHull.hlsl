@@ -12,18 +12,32 @@ StructuredBuffer<float> gLODRanges : register (SBUFFER_REGISTER_EXTRA_2);
 uint GetLOD( float3 worldPos )
 {
 	float dist = distance( gWorldEyePos, worldPos );
-	for ( uint LOD = 0; LOD < gNumLODs; ++LOD )
+	for ( uint LOD = gNumLODs - 1; LOD > 0; --LOD )
 	{
 		if ( dist <= gLODRanges[ LOD ] )
 			return LOD;
 	}
 
-	return max( gNumLODs - 1, 0 );
+	return 0;
 }
 
 float CalculateTessellation( uint centerLOD, float3 centerVertex, float3 sideCenterM )
 {
-	float3 bottomCenterM = inputVertices[ 4 ].mWorldPosition;
+	uint sideLOD = GetLOD( sideCenterM );
+	if ( centerLOD == sideLOD )
+	{
+		return 8;
+	}
+	else if ( centerLOD < sideLOD )
+	{
+		return 16;
+	}
+	else
+	{
+		return 8;
+	}
+
+	/*float3 bottomCenterM = inputVertices[ 4 ].mWorldPosition;
 	uint LOD = GetLOD( bottomCenterM );
 	if ( centerLOD == LOD )
 	{
@@ -34,7 +48,7 @@ float CalculateTessellation( uint centerLOD, float3 centerVertex, float3 sideCen
 	float3 bottomCenterS, bottomCenterL;
 	ComputeMidpoints( BL, bottomCenterM, bottomCenterS, bottomCenterL );
 
-	float distM = distance( gWorldEyePos, bottomCenterM );
+	float distM = distance( gWorldEyePos, bottomCenterM );*/
 }
 
 float3 ComputeMidpoints( float3 vertex, float3 midpointM, out float3 midpointS, out float3 midpointL )
@@ -133,7 +147,7 @@ PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 		CalculateTessellationfactor( inputVertices[ 1 ].mWorldPosition, inputVertices[ 6 ].mWorldPosition, inputVertices[ 7 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition ),
 		CalculateTessellationfactor( inputVertices[ 3 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 8 ].mWorldPosition, inputVertices[ 9 ].mWorldPosition )
 	};*/
-	float midPatchTessFactor = 64.0f;
+	float midPatchTessFactor = 16.0f;
 	float edgePatchTessFactors[] = {
 		CalculateTessellation( centerLOD, BL, bottomCenterM ),
 		CalculateTessellation( centerLOD, BR, rightCenterM ),
@@ -145,10 +159,10 @@ PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 		//CalculateTessellationfactor( dist, inputVertices[ 3 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 8 ].mWorldPosition, inputVertices[ 9 ].mWorldPosition )
 	};
 
-	patch.mEdgeTess[ 0 ] = min( midPatchTessFactor, edgePatchTessFactors[ 0 ] );
-	patch.mEdgeTess[ 1 ] = min( midPatchTessFactor, edgePatchTessFactors[ 1 ] );
-	patch.mEdgeTess[ 2 ] = min( midPatchTessFactor, edgePatchTessFactors[ 2 ] );
-	patch.mEdgeTess[ 3 ] = min( midPatchTessFactor, edgePatchTessFactors[ 3 ] );
+	patch.mEdgeTess[ 0 ] = min( midPatchTessFactor, edgePatchTessFactors[ 3 ] );
+	patch.mEdgeTess[ 1 ] = min( midPatchTessFactor, edgePatchTessFactors[ 0 ] );
+	patch.mEdgeTess[ 2 ] = min( midPatchTessFactor, edgePatchTessFactors[ 1 ] );
+	patch.mEdgeTess[ 3 ] = min( midPatchTessFactor, edgePatchTessFactors[ 2 ] );
 	
 	patch.mInsideTess[ 0 ] = midPatchTessFactor;
 	patch.mInsideTess[ 1 ] = midPatchTessFactor;
@@ -158,7 +172,7 @@ PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 }
 
 [domain("quad")]
-[partitioning("fractional_odd")]
+[partitioning("fractional_even")]
 [outputtopology("triangle_ccw")]
 [outputcontrolpoints(4)]
 [patchconstantfunc("PatchHS")]

@@ -370,7 +370,7 @@ namespace JonsEngine
 		mContext->HSSetShader(mHullShader, nullptr, 0);
 
 		mContext->IASetInputLayout(mLayout);
-		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_12_CONTROL_POINT_PATCHLIST);
+		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_8_CONTROL_POINT_PATCHLIST);
 	}
 
 	void DX11TerrainPass::UnbindRendering()
