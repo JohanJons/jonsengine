@@ -28,6 +28,7 @@ namespace JonsEngine
 
 		mTerrains.mTerrainData.clear();
 		mTerrains.mTransforms.clear();
+		mTerrains.mTessellationEdgeMult.clear();
 
 		mColorsToAABBsList.clear();
     }

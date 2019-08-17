@@ -175,6 +175,7 @@ namespace JonsEngine
 
 		mTransformsBuffer.SetData( terrains.mTransforms );
 		mTransformsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA );
+		//mTransformsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA_3 );
 
 		uint32_t beginIndex = 0;
 		for ( const RenderableTerrainData& terrainData : terrains.mTerrainData )

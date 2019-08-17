@@ -203,9 +203,10 @@ namespace JonsEngine
 
 			std::vector<float> LODRanges;
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
+			std::vector<Vec4>& tessEdgeMult = mRenderQueue.mTerrains.mTessellationEdgeMult;
 
 			const TerrainQuadTree& quadTree = terrainTransforms.GetQuadTree( ID );
-			quadTree.CullNodes( renderableTransforms, LODRanges, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
+			quadTree.CullNodes( renderableTransforms, tessEdgeMult, LODRanges, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
 			if ( renderableTransforms.empty()  )
 				continue;
 			
@@ -263,7 +264,9 @@ namespace JonsEngine
 		// unused atm
 		std::vector<float> lodRanges;
 		std::vector<Mat4> aabbTransforms;
+		std::vector<Vec4> tessEdgeMults;
 		aabbTransforms.reserve( mRenderQueue.mTerrains.mTransforms.size() );
+
 		for ( const Terrain& terrain : scene.GetTerrains() )
 		{
             const SceneNode& node = scene.GetSceneNode( terrain.GetSceneNode() );
@@ -272,7 +275,7 @@ namespace JonsEngine
 
 			TerrainID ID = scene.GetTerrainID( terrain );
 			const TerrainQuadTree& quadTree = terrainTransforms.GetQuadTree( ID );
-			quadTree.CullNodes( aabbTransforms, lodRanges, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
+			quadTree.CullNodes( aabbTransforms, tessEdgeMults, lodRanges, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
 
 			for ( const Mat4& transform : aabbTransforms )
 				AddAABB( AABBRenderData, transform, unitCubeMeshID, gRed );

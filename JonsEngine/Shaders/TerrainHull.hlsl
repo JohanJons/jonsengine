@@ -21,9 +21,24 @@ uint GetLOD( float3 worldPos )
 	return 0;
 }
 
-float CalculateTessellation( uint centerLOD, float3 centerVertex, float3 sideCenterM )
+float CalculateTessellation( uint centerLOD, float3 edgeVertex1, float3 edgeVertex2 )
 {
-	uint sideLOD = GetLOD( sideCenterM );
+	float3 midVertex = ( edgeVertex1 + edgeVertex2 ) / 2;
+	uint edgeLOD = GetLOD( midVertex );
+	if ( edgeLOD == centerLOD )
+	{
+		return 8;
+	}
+	else if ( centerLOD > edgeLOD )
+	{
+		return 16;
+	}
+	else
+	{
+		return 8;
+	}
+
+	/*uint sideLOD = GetLOD( sideCenterM );
 	if ( centerLOD == sideLOD )
 	{
 		return 8;
@@ -35,7 +50,7 @@ float CalculateTessellation( uint centerLOD, float3 centerVertex, float3 sideCen
 	else
 	{
 		return 8;
-	}
+	}*/
 
 	/*float3 bottomCenterM = inputVertices[ 4 ].mWorldPosition;
 	uint LOD = GetLOD( bottomCenterM );
@@ -149,10 +164,14 @@ PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 	};*/
 	float midPatchTessFactor = 16.0f;
 	float edgePatchTessFactors[] = {
-		CalculateTessellation( centerLOD, BL, bottomCenterM ),
-		CalculateTessellation( centerLOD, BR, rightCenterM ),
-		CalculateTessellation( centerLOD, TR, topCenterM ),
-		CalculateTessellation( centerLOD, TL, leftCenterM )
+		CalculateTessellation( centerLOD, BL, BR ),
+		CalculateTessellation( centerLOD, BR, TR ),
+		CalculateTessellation( centerLOD, TR, TL ),
+		CalculateTessellation( centerLOD, TL, BL )
+		//CalculateTessellation( centerLOD, BL, bottomCenterM ),
+		//CalculateTessellation( centerLOD, BR, rightCenterM ),
+		//CalculateTessellation( centerLOD, TR, topCenterM ),
+		//CalculateTessellation( centerLOD, TL, leftCenterM )
 		//CalculateTessellationfactor( dist, inputVertices[ 11 ].mWorldPosition, inputVertices[ 0 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition, inputVertices[ 10 ].mWorldPosition ),
 		//CalculateTessellationfactor( dist, inputVertices[ 4 ].mWorldPosition, inputVertices[ 5 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 0 ].mWorldPosition ),
 		//CalculateTessellationfactor( dist, inputVertices[ 1 ].mWorldPosition, inputVertices[ 6 ].mWorldPosition, inputVertices[ 7 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition ),
