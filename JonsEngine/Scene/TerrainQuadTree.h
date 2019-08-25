@@ -18,13 +18,15 @@ namespace JonsEngine
 			NUM_CHILDREN
 		};
 
-		QuadNodeAABB( const Vec3& min, const Vec3& max, uint32_t LODIndex ) :
-			mAABB( min, max ),
+		QuadNodeAABB( const Vec3& frustumMin, const Vec3& frustumMax, const Vec3& distanceMin, const Vec3& distanceMax, uint32_t LODIndex ) :
+			mFrustumAABB( frustumMin, frustumMax ),
+			mDistanceAABB( distanceMin, distanceMax ),
 			mLODIndex( LODIndex )
 		{ }
 
 		// world space
-		AABB mAABB;
+		AABB mFrustumAABB;
+		AABB mDistanceAABB;
 		uint32_t mLODIndex = 0;
 		QuadNodeAABB* mChildBegin = nullptr;
 	};
@@ -47,9 +49,9 @@ namespace JonsEngine
 		void AddNode( std::vector<Mat4>& nodes, std::vector<Vec4>& tessEdgeMult, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const std::vector<float>& LODRanges ) const;
 		bool CullQuad( std::vector<Mat4>& nodes, std::vector<Vec4>& tessEdgeMult, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const;
 		uint32_t ExpectedNumNodes( uint32_t width, uint32_t patchMinSize ) const;
-		void CreateGridNode( uint32_t centerX, uint32_t centerZ, uint32_t width, uint32_t height, uint32_t LODlevel );
+		void CreateGridNode( uint32_t centerX, uint32_t centerZ, uint32_t width, uint32_t height, uint32_t LODlevel, float yTranslation );
 		// local space during function
-		void ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, uint32_t heightmapWidth, uint32_t LODlevel );
+		void ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, uint32_t heightmapWidth, uint32_t LODlevel, float yTranslation );
 		void CalculateLODRanges( std::vector<float>& LODs, float zNear, float zFar ) const;
 
 		uint32_t mPatchMinSize;

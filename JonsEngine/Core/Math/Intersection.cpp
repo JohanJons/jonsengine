@@ -69,6 +69,29 @@ namespace JonsEngine
         return distSquared > 0 ? AABBIntersection::Partial : AABBIntersection::Outside;
     }
 
+	AABBIntersection IntersectionXZ( const AABB& aabb, const Vec3& sphereCentre, const float sphereRadius )
+	{
+		// this could probably be simplified
+
+		float distSquared = std::pow( sphereRadius, 2.0f );
+		const Vec3 min = aabb.Min();
+		const Vec3 max = aabb.Max();
+
+		if ( IsPointInSphere( sphereCentre, sphereRadius, min ) && IsPointInSphere( sphereCentre, sphereRadius, max ) )
+			return AABBIntersection::Inside;
+
+		if ( sphereCentre.x < min.x )
+			distSquared -= std::pow( sphereCentre.x - min.x, 2.0f );
+		else if ( sphereCentre.x > max.x )
+			distSquared -= std::pow( sphereCentre.x - max.x, 2.0f );
+		if ( sphereCentre.z < min.z )
+			distSquared -= std::pow( sphereCentre.z - min.z, 2.0f );
+		else if ( sphereCentre.z > max.z )
+			distSquared -= std::pow( sphereCentre.z - max.z, 2.0f );
+
+		return distSquared > 0 ? AABBIntersection::Partial : AABBIntersection::Outside;
+	}
+
     template<class PlaneContainer>
     AABBIntersection AABBPlaneContainerIntersection(const AABB& aabb, const PlaneContainer& kdop)
     {

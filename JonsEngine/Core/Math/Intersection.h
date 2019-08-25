@@ -28,6 +28,7 @@ namespace JonsEngine
     // "does aabb intersect ..."
     AABBIntersection Intersection(const AABB& aabb, const Mat4& frustumMatrix);
     AABBIntersection Intersection(const AABB& aabb, const Vec3& sphereCentre, const float sphereRadius);
+	AABBIntersection IntersectionXZ(const AABB& aabb, const Vec3& sphereCentre, const float sphereRadius);
     AABBIntersection Intersection(const AABB& aabb, const FrustumPlanes& frustumPlanes);
     AABBIntersection Intersection(const AABB& aabb, const KDOP& kdop);
     AABBIntersection Intersection(const AABB& aabb, const ConstRangedIterator<KDOP>& rangedKDOP);

@@ -6,10 +6,38 @@
 
 StructuredBuffer<float> gLODRanges : register (SBUFFER_REGISTER_EXTRA_2);
 
+/*
+float dmin = 0;
+float  r2 = r * r;
+for( i = 0; i < n; i++ ) {
+	if( C[i] < Bmin[i] ) dmin += SQR(C[i] - Bmin[i] ); else
+		if( C[i] > Bmax[i] ) dmin += SQR( C[i] - Bmax[i] );     
+}
+if( dmin <= r2 ) return( TRUE );
+*/
+
+
+
 #define MIN_TESSELLATION 4.0f
 #define MIN_COPLANARITY 0.1f
 
-uint GetLOD( float3 worldPos )
+bool SphereIntersects( float3 sphereCenter, float radius, float3 aabbMin, float3 aabbMax )
+{
+	float dmin = 0;
+	float radiusSquared = radius * radius;
+
+	for( int i = 0; i < 3; ++i )
+	{
+		if( sphereCenter[i] < aabbMin[i] )
+			dmin += pow( sphereCenter[i] - aabbMin[i], 2 );
+		else if( sphereCenter[i] > aabbMax[i] )
+			dmin += pow( sphereCenter[i] - aabbMax[i], 2 );
+	}
+
+	return dmin <= radiusSquared;
+}
+
+/*uint GetLOD( float3 worldPos )
 {
 	float dist = distance( gWorldEyePos, worldPos );
 	for ( uint LOD = gNumLODs - 1; LOD > 0; --LOD )
@@ -19,51 +47,46 @@ uint GetLOD( float3 worldPos )
 	}
 
 	return 0;
+}*/
+
+uint GetLOD( float3 minVertex, float3 maxVertex )
+{
+	for ( uint LOD = gNumLODs - 1; LOD > 0; --LOD )
+	{
+		float dist = gLODRanges[ LOD ];
+		if ( SphereIntersects( gWorldEyePos, dist, minVertex, maxVertex ) )
+		{
+			return LOD;
+		}
+	}
+
+	return 0;
 }
 
-float CalculateTessellation( uint centerLOD, float3 edgeVertex1, float3 edgeVertex2 )
+float CalculateTessellation( uint centerLOD, float3 minVertex, float3 maxVertex )
 {
-	float3 midVertex = ( edgeVertex1 + edgeVertex2 ) / 2;
-	uint edgeLOD = GetLOD( midVertex );
-	if ( edgeLOD == centerLOD )
+	float tessellation = 8.0f;
+
+	float dist = gLODRanges[ centerLOD ];
+	if ( !SphereIntersects( gWorldEyePos, dist, minVertex, maxVertex ) )
 	{
-		return 8;
-	}
-	else if ( centerLOD > edgeLOD )
-	{
-		return 16;
+		tessellation = 4.0f;
 	}
 	else
 	{
-		return 8;
+		uint nextLOD = centerLOD + 1;
+		nextLOD = clamp( nextLOD, 0, gNumLODs - 1 );
+		if ( nextLOD != centerLOD )
+		{
+			dist = gLODRanges[ nextLOD ];
+			if ( SphereIntersects( gWorldEyePos, dist, minVertex, maxVertex ) )
+			{
+				tessellation = 16.0f;
+			}
+		}
 	}
 
-	/*uint sideLOD = GetLOD( sideCenterM );
-	if ( centerLOD == sideLOD )
-	{
-		return 8;
-	}
-	else if ( centerLOD < sideLOD )
-	{
-		return 16;
-	}
-	else
-	{
-		return 8;
-	}*/
-
-	/*float3 bottomCenterM = inputVertices[ 4 ].mWorldPosition;
-	uint LOD = GetLOD( bottomCenterM );
-	if ( centerLOD == LOD )
-	{
-
-	}
-
-
-	float3 bottomCenterS, bottomCenterL;
-	ComputeMidpoints( BL, bottomCenterM, bottomCenterS, bottomCenterL );
-
-	float distM = distance( gWorldEyePos, bottomCenterM );*/
+	return tessellation;
 }
 
 float3 ComputeMidpoints( float3 vertex, float3 midpointM, out float3 midpointS, out float3 midpointL )
@@ -88,46 +111,6 @@ float3 ComputePatchMidpoint( float3 corner1, float3 corner2, float3 corner3, flo
 	return ( corner1 + corner2 + corner3 + corner4 ) / 4.0f;
 }
 
-float CalculateTessellationfactor( float midPatchDistance, float3 q1, float3 q2, float3 q3, float3 q4 )
-{
-	float3 worldPatchMidpoint = ComputePatchMidpoint( q1, q2, q3, q4 );
-	float dist = distance( gWorldEyePos, worldPatchMidpoint );
-	if ( dist <= midPatchDistance )
-	{
-		return 64;
-	}
-	else
-	{
-		return 2;
-	} 
-
-	/*
-	// coplanarity part
-	float3 worldPatchMidpoint = ComputePatchMidpoint( q1, q2, q3, q4 );
-	float coplanarity = GetCoplanarity( worldPatchMidpoint.xz );
-	coplanarity *= gTerrainCoplanarityScale;
-
-	float tessCoplanarity = gTerrainTessellationMax * gTerrainCoplanarityTessellationRatio;
-	tessCoplanarity *= coplanarity;
-	tessCoplanarity = max( tessCoplanarity, MIN_COPLANARITY );
-
-	// screen space part
-	float2 screenPos1 = GetScreenSpacePosition( q1 );
-	float2 screenPos2 = GetScreenSpacePosition( q2 );
-	float2 screenPos3 = GetScreenSpacePosition( q3 );
-	float2 screenPos4 = GetScreenSpacePosition( q4 );
-
-	float screenSpaceScale = max( GetScreenSpaceTessellationScale( screenPos1, screenPos3 ), GetScreenSpaceTessellationScale( screenPos2, screenPos4 ) );
-	float tessScreenSpace = gTerrainTessellationMax * ( 1.0f - gTerrainCoplanarityTessellationRatio );
-	tessScreenSpace *= screenSpaceScale;
-
-	float finalTessellation = tessCoplanarity + tessScreenSpace;
-	finalTessellation = max( finalTessellation, MIN_TESSELLATION );
-
-	return finalTessellation;
-	*/
-}
-
 PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 {
 	PatchTess patch;
@@ -145,29 +128,21 @@ PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 	float3 BR = inputVertices[ 1 ].mWorldPosition;
 	float3 TR = inputVertices[ 2 ].mWorldPosition;
 	float3 TL = inputVertices[ 3 ].mWorldPosition;
-	float3 centerPatchMidPoint = ComputePatchMidpoint( BL, BR, TR, TL );
-	uint centerLOD = GetLOD( centerPatchMidPoint );
+	//float3 centerPatchMidPoint = ComputePatchMidpoint( BL, BR, TR, TL );
+	//uint centerLOD = GetLOD( centerPatchMidPoint );
+	uint centerLOD = GetLOD( BL, TR );
 
-	float3 bottomCenterM = inputVertices[ 4 ].mWorldPosition;
-	float3 rightCenterM = inputVertices[ 5 ].mWorldPosition;
-	float3 topCenterM = inputVertices[ 6 ].mWorldPosition;
-	float3 leftCenterM = inputVertices[ 7 ].mWorldPosition;
+	float3 bottomQuadVertex = inputVertices[ 4 ].mWorldPosition;
+	float3 rightQuadVertex = inputVertices[ 5 ].mWorldPosition;
+	float3 topQuadVertex = inputVertices[ 6 ].mWorldPosition;
+	float3 leftQuadVertex = inputVertices[ 7 ].mWorldPosition;
 
-	//if ( distM <  )
-
-	/*float midPatchTessFactor = CalculateTessellationfactor( inputVertices[ 0 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition );
-	float edgePatchTessFactors[] = {
-		CalculateTessellationfactor( inputVertices[ 11 ].mWorldPosition, inputVertices[ 0 ].mWorldPosition, inputVertices[ 3 ].mWorldPosition, inputVertices[ 10 ].mWorldPosition ),
-		CalculateTessellationfactor( inputVertices[ 4 ].mWorldPosition, inputVertices[ 5 ].mWorldPosition, inputVertices[ 1 ].mWorldPosition, inputVertices[ 0 ].mWorldPosition ),
-		CalculateTessellationfactor( inputVertices[ 1 ].mWorldPosition, inputVertices[ 6 ].mWorldPosition, inputVertices[ 7 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition ),
-		CalculateTessellationfactor( inputVertices[ 3 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 8 ].mWorldPosition, inputVertices[ 9 ].mWorldPosition )
-	};*/
 	float midPatchTessFactor = 16.0f;
 	float edgePatchTessFactors[] = {
-		CalculateTessellation( centerLOD, BL, BR ),
-		CalculateTessellation( centerLOD, BR, TR ),
-		CalculateTessellation( centerLOD, TR, TL ),
-		CalculateTessellation( centerLOD, TL, BL )
+		CalculateTessellation( centerLOD, bottomQuadVertex, BR ),
+		CalculateTessellation( centerLOD, BR, rightQuadVertex ),
+		CalculateTessellation( centerLOD, TL, topQuadVertex ),
+		CalculateTessellation( centerLOD, leftQuadVertex, TL )
 		//CalculateTessellation( centerLOD, BL, bottomCenterM ),
 		//CalculateTessellation( centerLOD, BR, rightCenterM ),
 		//CalculateTessellation( centerLOD, TR, topCenterM ),

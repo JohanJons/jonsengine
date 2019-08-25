@@ -41,10 +41,10 @@ namespace JonsEngine
 		0.5f, 0.0f, -0.5f,	// BR
 		0.5f, 0.0f, 0.5f,	// TR
 		-0.5f, 0.0f, 0.5f,	// TL
-		0.0f, 0.0f, -1.0f,	// bottom-center
-		1.0f, 0.0f, 0.0f,	// Right-center
-		0.0f, 0.0f, 1.0f,	// Top-center
-		-1.0f, 0.0f, 0.0f	// Left-center
+		-0.5f, 0.0f, -1.5f,	// Bottom-left
+		1.5f, 0.0f, 0.5f,	// Right-top
+		0.5f, 0.0f, 1.5f,	// Top-right
+		-1.5f, 0.0f, -0.5f	// Left-Bottom
 	};
 
 	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3, 4, 5, 6, 7 };
