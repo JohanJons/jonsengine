@@ -5,6 +5,16 @@
 
 namespace JonsEngine
 {
+	void GetTransformExtentsXZ( const Mat4& transform, Vec2& min, Vec2& max )
+	{
+		const Vec4& translation = transform[ 3 ];
+		float xExtent = transform[ 0 ].x / 2;
+		float zExtent = transform[ 2 ].z / 2;
+
+		min = Vec2( translation.x - xExtent, translation.z - zExtent );
+		max = Vec2( translation.x + xExtent, translation.z + zExtent );
+	}
+
 	TerrainQuadTree::TerrainQuadTree( const std::vector<uint8_t>& heightmapData, uint32_t width, uint32_t height, uint32_t patchMinSize, float heightmapScale, const Mat4& worldTransform ) :
 		mPatchMinSize( patchMinSize ),
 		mHeightmapScale( heightmapScale )
@@ -24,10 +34,7 @@ namespace JonsEngine
 		finalTransform = worldTransform * finalTransform;
 
 		for ( QuadNodeAABB& node : mGridTraversal )
-		{
 			node.mFrustumAABB = node.mFrustumAABB * finalTransform;
-			node.mDistanceAABB = node.mDistanceAABB * finalTransform;
-		}
 
 		assert( ExpectedNumNodes( width, mPatchMinSize ) == GetNumNodes() );
 	}
@@ -40,6 +47,8 @@ namespace JonsEngine
 		CalculateLODRanges( LODRanges, zNear, zFar );
 
 		CullQuad( nodeTransforms, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
+
+		CalculateTessellationFactors( nodeTransforms, tessEdgeMult );
 	}
 
 	uint32_t TerrainQuadTree::GetNumLODRanges() const
@@ -56,7 +65,7 @@ namespace JonsEngine
 		worldMax = Vec2( maxAABB.x, maxAABB.z );
 	}
 
-	void TerrainQuadTree::AddNode( std::vector<Mat4>& nodes, std::vector<Vec4>& tessEdgeMult, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const std::vector<float>& LODRanges ) const
+	void TerrainQuadTree::AddNode( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const std::vector<float>& LODRanges ) const
 	{
 		Vec3 center = quadAABB.mFrustumAABB.GetCenter();
 		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
@@ -66,7 +75,7 @@ namespace JonsEngine
 		nodes.emplace_back( transform );
 	}
 
-	bool TerrainQuadTree::CullQuad( std::vector<Mat4>& nodes, std::vector<Vec4>& tessEdgeMult, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const
+	bool TerrainQuadTree::CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const
 	{
 		// if parent is fully in frustum, so are we
 		AABBIntersection frustumIntersection = parentFullyInFrustum ? AABBIntersection::Inside : Intersection( quadAABB.mFrustumAABB, cameraViewProjTransform );
@@ -74,7 +83,7 @@ namespace JonsEngine
 			return false;
 
 		float distanceLimit = LODRanges.at( quadAABB.mLODIndex );
-		AABBIntersection intersection = Intersection( quadAABB.mDistanceAABB, cameraWorldPos, distanceLimit );
+		AABBIntersection intersection = Intersection( quadAABB.mFrustumAABB, cameraWorldPos, distanceLimit );
 		bool isWithinDistance = intersection == AABBIntersection::Partial || intersection == AABBIntersection::Inside;
 		if ( !isWithinDistance )
 			return false;
@@ -83,16 +92,16 @@ namespace JonsEngine
 		bool isValidLODIndex = nextLODIndex < LODRanges.size();
 		if ( !isValidLODIndex )
 		{
-			AddNode( nodes, tessEdgeMult, quadAABB, cameraWorldPos, LODRanges );
+			AddNode( nodes, quadAABB, cameraWorldPos, LODRanges );
 			return true;
 		}
 
 		float nextDistanceLimit = LODRanges.at( nextLODIndex );
-		AABBIntersection nextIntersection = Intersection( quadAABB.mDistanceAABB, cameraWorldPos, nextDistanceLimit );
+		AABBIntersection nextIntersection = Intersection( quadAABB.mFrustumAABB, cameraWorldPos, nextDistanceLimit );
 		bool nextIsWithinRange = nextIntersection == AABBIntersection::Partial || nextIntersection == AABBIntersection::Inside;
 		if ( !nextIsWithinRange )
 		{
-			AddNode( nodes, tessEdgeMult, quadAABB, cameraWorldPos, LODRanges );
+			AddNode( nodes, quadAABB, cameraWorldPos, LODRanges );
 			return true;
 		}
 
@@ -101,12 +110,12 @@ namespace JonsEngine
 		for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
 		{
 			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
-			childrenAdded[ childIndex ] = CullQuad( nodes, tessEdgeMult, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum );
+			childrenAdded[ childIndex ] = CullQuad( nodes, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum );
 
 			if ( !childrenAdded[ childIndex ] )
 			{
 				// TODO: remove & alter tess level
-				AddNode( nodes, tessEdgeMult, childQuad, cameraWorldPos, LODRanges );
+				AddNode( nodes, childQuad, cameraWorldPos, LODRanges );
 			}
 		}
 
@@ -142,10 +151,7 @@ namespace JonsEngine
 		Vec3 frustumMin( minX, 0, minZ );
 		Vec3 frustumMax( maxX, 0, maxZ );
 
-		Vec3 distanceMin( minX, yTranslation, minZ );
-		Vec3 distanceMax( maxX, yTranslation, maxZ );
-
-		mGridTraversal.emplace_back( frustumMin, frustumMax, distanceMin, distanceMax, LODlevel );
+		mGridTraversal.emplace_back( frustumMin, frustumMax, LODlevel );
 	}
 
 	void TerrainQuadTree::ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, uint32_t heightmapWidth, uint32_t LODlevel, float yTranslation )
@@ -236,5 +242,29 @@ namespace JonsEngine
 			currentDetailBalance *= LODDistanceRatio;
 		}
 	}
-}
 
+	void TerrainQuadTree::CalculateTessellationFactors( std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult ) const
+	{
+		for ( const Mat4& transform : nodeTransforms )
+		{
+			Vec2 transformMin, transformMax;
+			GetTransformExtentsXZ( transform, transformMin, transformMax );
+
+			float midX = ( transformMin.x + transformMax.x ) / 2;
+			float midZ = ( transformMin.y + transformMax.y ) / 2;
+
+			for ( const Mat4& otherTransform : nodeTransforms )
+			{
+				if ( &transform == &otherTransform )
+				{
+					continue;
+				}
+
+				Vec2 otherMin, otherMax;
+				GetTransformExtentsXZ( transform, otherMin, otherMax );
+
+				if ( tra )
+			}
+		}
+	}
+}
