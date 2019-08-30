@@ -23,6 +23,11 @@ foreach( SOURCE ${SOURCES})
 	source_group("${REL_SOURCE_DIR_NO_SLASH}" FILES "${SOURCE}")
 endforeach()
 
+target_sources( JonsEngine
+    INTERFACE
+		${CMAKE_CURRENT_SOURCE_DIR}/JonsEngine.natvis
+)
+
 target_compile_definitions( JonsEngine PUBLIC BOOST_ALL_NO_LIB )
 target_include_directories( JonsEngine PUBLIC ${CMAKE_CURRENT_LIST_DIR} )
 
