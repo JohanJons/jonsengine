@@ -26,6 +26,7 @@ struct VertexOut
 {
 	float3 mWorldPosition : POSITION;
 	float2 mTexcoord : TEXCOORD;
+	uint mInstanceID : SV_InstanceID;
 };
 
 struct DomainOut

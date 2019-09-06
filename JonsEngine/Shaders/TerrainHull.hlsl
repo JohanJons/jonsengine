@@ -5,6 +5,7 @@
 #include "Common.hlsl"
 
 StructuredBuffer<float> gLODRanges : register (SBUFFER_REGISTER_EXTRA_2);
+StructuredBuffer<float4> gTessEdgeFactors : register (SBUFFER_REGISTER_EXTRA_3);
 
 /*
 float dmin = 0;
@@ -63,27 +64,30 @@ uint GetLOD( float3 minVertex, float3 maxVertex )
 	return 0;
 }
 
-float CalculateTessellation( uint centerLOD, float3 minVertex, float3 maxVertex )
+/*float CalculateTessellation( uint centerLOD, float3 minVertex, float3 maxVertex )
+{
+	float tessellation = 4.0f;
+
+	uint nextLOD = centerLOD + 1;
+	nextLOD = clamp( nextLOD, 0, gNumLODs - 1 );
+	if ( nextLOD != centerLOD )
+	{
+		float dist = gLODRanges[ nextLOD ];
+		if ( SphereIntersects( gWorldEyePos, dist, minVertex, maxVertex ) )
+		{
+			tessellation = 8.0f;
+		}
+	}
+
+	return tessellation;
+}*/
+
+float CalculateTessellation( float edgeFactor )
 {
 	float tessellation = 8.0f;
-
-	float dist = gLODRanges[ centerLOD ];
-	if ( !SphereIntersects( gWorldEyePos, dist, minVertex, maxVertex ) )
+	//if ( edgeFactor < 2.0f )
 	{
-		tessellation = 4.0f;
-	}
-	else
-	{
-		uint nextLOD = centerLOD + 1;
-		nextLOD = clamp( nextLOD, 0, gNumLODs - 1 );
-		if ( nextLOD != centerLOD )
-		{
-			dist = gLODRanges[ nextLOD ];
-			if ( SphereIntersects( gWorldEyePos, dist, minVertex, maxVertex ) )
-			{
-				tessellation = 16.0f;
-			}
-		}
+		tessellation *= edgeFactor;
 	}
 
 	return tessellation;
@@ -115,6 +119,8 @@ PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 {
 	PatchTess patch;
 
+	uint instanceID = inputVertices[ 0 ].mInstanceID;
+
 #if TERRAIN_DEBUG_COPLANARITY
 	patch.mEdgeTess[ 0 ] = 32;
 	patch.mEdgeTess[ 1 ] = patch.mEdgeTess[ 0 ];
@@ -137,12 +143,17 @@ PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 	float3 topQuadVertex = inputVertices[ 6 ].mWorldPosition;
 	float3 leftQuadVertex = inputVertices[ 7 ].mWorldPosition;
 
-	float midPatchTessFactor = 16.0f;
+	float leftFactor = gTessEdgeFactors[ instanceID ].x;
+	float bottomFactor = gTessEdgeFactors[ instanceID ].y;
+	float rightFactor = gTessEdgeFactors[ instanceID ].z;
+	float topFactor = gTessEdgeFactors[ instanceID ].w;
+
+	float midPatchTessFactor = 64.0f;
 	float edgePatchTessFactors[] = {
-		CalculateTessellation( centerLOD, bottomQuadVertex, BR ),
-		CalculateTessellation( centerLOD, BR, rightQuadVertex ),
-		CalculateTessellation( centerLOD, TL, topQuadVertex ),
-		CalculateTessellation( centerLOD, leftQuadVertex, TL )
+		CalculateTessellation( leftFactor ),
+		CalculateTessellation( bottomFactor ),
+		CalculateTessellation( rightFactor ),
+		CalculateTessellation( topFactor )
 		//CalculateTessellation( centerLOD, BL, bottomCenterM ),
 		//CalculateTessellation( centerLOD, BR, rightCenterM ),
 		//CalculateTessellation( centerLOD, TR, topCenterM ),
@@ -153,10 +164,10 @@ PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 		//CalculateTessellationfactor( dist, inputVertices[ 3 ].mWorldPosition, inputVertices[ 2 ].mWorldPosition, inputVertices[ 8 ].mWorldPosition, inputVertices[ 9 ].mWorldPosition )
 	};
 
-	patch.mEdgeTess[ 0 ] = min( midPatchTessFactor, edgePatchTessFactors[ 3 ] );
-	patch.mEdgeTess[ 1 ] = min( midPatchTessFactor, edgePatchTessFactors[ 0 ] );
-	patch.mEdgeTess[ 2 ] = min( midPatchTessFactor, edgePatchTessFactors[ 1 ] );
-	patch.mEdgeTess[ 3 ] = min( midPatchTessFactor, edgePatchTessFactors[ 2 ] );
+	patch.mEdgeTess[ 0 ] = min( midPatchTessFactor, edgePatchTessFactors[ 0 ] );
+	patch.mEdgeTess[ 1 ] = min( midPatchTessFactor, edgePatchTessFactors[ 1 ] );
+	patch.mEdgeTess[ 2 ] = min( midPatchTessFactor, edgePatchTessFactors[ 2 ] );
+	patch.mEdgeTess[ 3 ] = min( midPatchTessFactor, edgePatchTessFactors[ 3 ] );
 	
 	patch.mInsideTess[ 0 ] = midPatchTessFactor;
 	patch.mInsideTess[ 1 ] = midPatchTessFactor;

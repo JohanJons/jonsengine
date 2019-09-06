@@ -252,6 +252,11 @@ namespace JonsEngine
 
 			float midX = ( transformMin.x + transformMax.x ) / 2;
 			float midZ = ( transformMin.y + transformMax.y ) / 2;
+			Vec2 top( midX, transformMax.y ), left( transformMin.x, midZ ), bottom( midX, transformMin.y ), right( transformMax.x, midZ );
+
+			// order: left - bottom - right - top
+			tessEdgeMult.emplace_back( 1.0f );
+			Vec4& tessMult = tessEdgeMult.back();
 
 			for ( const Mat4& otherTransform : nodeTransforms )
 			{
@@ -261,9 +266,31 @@ namespace JonsEngine
 				}
 
 				Vec2 otherMin, otherMax;
-				GetTransformExtentsXZ( transform, otherMin, otherMax );
+				GetTransformExtentsXZ( otherTransform, otherMin, otherMax );
 
-				if ( tra )
+				// left-edge
+				if ( left.x == otherMax.x && ( left.y == otherMin.y || left.y == otherMax.y ) )
+				{
+					tessMult.x = transform[ 0 ].x / otherTransform[ 0 ].x;
+				}
+
+				// bottom-edge
+				if ( bottom.y == otherMax.y && ( bottom.x >= otherMin.x && bottom.x <= otherMax.x ) )
+				{
+					tessMult.y = transform[ 0 ].x / otherTransform[ 0 ].x;
+				}
+
+				// right-edge
+				if ( right.x == otherMin.x && ( right.y >= otherMin.y && right.y <= otherMax.y ) )
+				{
+					tessMult.z = transform[ 0 ].x / otherTransform[ 0 ].x;
+				}
+
+				// top-edge
+				if ( top.y == otherMin.y && ( top.x >= otherMin.x && top.x <= otherMax.x ) )
+				{
+					tessMult.w = transform[ 0 ].x / otherTransform[ 0 ].x;
+				}
 			}
 		}
 	}

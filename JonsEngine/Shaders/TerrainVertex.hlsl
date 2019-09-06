@@ -24,6 +24,8 @@ VertexOut vs_main(VertexIn input)
 	ret.mTexcoord = ( ret.mWorldPosition.xz - gWorldMin ) / ( gWorldMax - gWorldMin );
 	ret.mTexcoord = clamp( ret.mTexcoord, 0.0f, 1.0f );
 
+	ret.mInstanceID = input.mInstanceID;
+
 	return ret;
 }
 

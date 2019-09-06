@@ -83,6 +83,7 @@ namespace JonsEngine
 
 		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;
 		DX11CPUDynamicBuffer mTransformsBuffer;
+		DX11CPUDynamicBuffer mTessEdgeMultBuffer;
 		DX11CPUDynamicBuffer mLODBuffer;
 		DX11Mesh mQuadMesh;
 		DX11VertexTransformPass& mVertexTransformer;

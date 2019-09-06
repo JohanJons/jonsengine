@@ -41,10 +41,10 @@ namespace JonsEngine
 		0.5f, 0.0f, -0.5f,	// BR
 		0.5f, 0.0f, 0.5f,	// TR
 		-0.5f, 0.0f, 0.5f,	// TL
-		-0.5f, 0.0f, -1.5f,	// Bottom-left
-		1.5f, 0.0f, 0.5f,	// Right-top
-		0.5f, 0.0f, 1.5f,	// Top-right
-		-1.5f, 0.0f, -0.5f	// Left-Bottom
+		-0.5f, 0.0f, -1.0f,	// Bottom-left
+		1.0f, 0.0f, 0.5f,	// Right-top
+		0.5f, 0.0f, 1.0f,	// Top-right
+		-1.0f, 0.0f, -0.5f	// Left-Bottom
 	};
 
 	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3, 4, 5, 6, 7 };
@@ -63,6 +63,7 @@ namespace JonsEngine
         mDevice(device),
 		mPerTerrainCBuffer(device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
 		mTransformsBuffer( device, context ),
+		mTessEdgeMultBuffer( device, context ),
 		mLODBuffer( device, context ),
 		mQuadMesh( device, context, gQuadVertices, gQuadIndices, AABB::gUnitQuadAABB.Min(), AABB::gUnitQuadAABB.Max() ),
 		mVertexTransformer( vertexTransformer ),
@@ -174,7 +175,9 @@ namespace JonsEngine
             UpdatePatchSize( coplanaritySize );
 
 		mTransformsBuffer.SetData( terrains.mTransforms );
+		mTessEdgeMultBuffer.SetData( terrains.mTessellationEdgeMult );
 		mTransformsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA );
+		mTessEdgeMultBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Hull, SBUFFER_SLOT_EXTRA_3 );
 		//mTransformsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA_3 );
 
 		uint32_t beginIndex = 0;
@@ -210,7 +213,7 @@ namespace JonsEngine
 
             heightmap.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
             coplanarityTexture.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA_2 );
-			coplanarityTexture.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_NORMAL );
+			normalTexture.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_NORMAL );
 		}
 	}
 
