@@ -21,35 +21,14 @@
 
 namespace JonsEngine
 {
-	/*const std::vector<float> gQuadVertices{
-		-0.5f, 0.0f, -0.5f,
-		0.5f, 0.0f, -0.5f,
-		0.5f, 0.0f, 0.5f,
-		-0.5f, 0.0f, 0.5f,
-		-0.5f, 0.0f, -1.5f,
-		0.5f, 0.0f, -1.5f,
-		1.5f, 0.0f, -0.5f,
-		1.5f, 0.0f, 0.5f,
-		0.5f, 0.0f, 1.5f,
-		-0.5f, 0.0f, 1.5f,
-		-1.5f, 0.0f, 0.5f,
-		-1.5f, 0.0f, -0.5f,
-	};*/
-
 	const std::vector<float> gQuadVertices{
 		-0.5f, 0.0f, -0.5f,	// BL
 		0.5f, 0.0f, -0.5f,	// BR
 		0.5f, 0.0f, 0.5f,	// TR
 		-0.5f, 0.0f, 0.5f,	// TL
-		-0.5f, 0.0f, -1.0f,	// Bottom-left
-		1.0f, 0.0f, 0.5f,	// Right-top
-		0.5f, 0.0f, 1.0f,	// Top-right
-		-1.0f, 0.0f, -0.5f	// Left-Bottom
 	};
 
-	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3, 4, 5, 6, 7 };
-
-	//const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+	const std::vector<uint16_t> gQuadIndices{ 0, 1, 2, 3 };
 
 	enum VSInputLayout
 	{
@@ -177,8 +156,7 @@ namespace JonsEngine
 		mTransformsBuffer.SetData( terrains.mTransforms );
 		mTessEdgeMultBuffer.SetData( terrains.mTessellationEdgeMult );
 		mTransformsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA );
-		mTessEdgeMultBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Hull, SBUFFER_SLOT_EXTRA_3 );
-		//mTransformsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA_3 );
+		mTessEdgeMultBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Hull, SBUFFER_SLOT_EXTRA_2 );
 
 		uint32_t beginIndex = 0;
 		for ( const RenderableTerrainData& terrainData : terrains.mTerrainData )
@@ -197,7 +175,7 @@ namespace JonsEngine
             coplanarityTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA_2 );
 			normalTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_NORMAL );
 
-			mPerTerrainCBuffer.SetData( { terrainData.mWorldMin, terrainData.mWorldMax, terrainData.mHeightScale, terrainData.mVariationScale, beginIndex, static_cast<uint32_t>( terrainData.mLODRanges.size() ) } );
+			mPerTerrainCBuffer.SetData( { terrainData.mWorldMin, terrainData.mWorldMax, terrainData.mHeightScale, terrainData.mVariationScale, beginIndex } );
 			mPerTerrainCBuffer.Bind();
 
 			mLODBuffer.SetData( terrainData.mLODRanges );

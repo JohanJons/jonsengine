@@ -271,25 +271,25 @@ namespace JonsEngine
 				// left-edge
 				if ( left.x == otherMax.x && ( left.y == otherMin.y || left.y == otherMax.y ) )
 				{
-					tessMult.x = transform[ 0 ].x / otherTransform[ 0 ].x;
+					tessMult.x = 2.0f;
 				}
 
 				// bottom-edge
-				if ( bottom.y == otherMax.y && ( bottom.x >= otherMin.x && bottom.x <= otherMax.x ) )
+				if ( bottom.y == otherMax.y && ( bottom.x == otherMin.x || bottom.x == otherMax.x ) )
 				{
-					tessMult.y = transform[ 0 ].x / otherTransform[ 0 ].x;
+					tessMult.y = 2.0f;
 				}
 
 				// right-edge
-				if ( right.x == otherMin.x && ( right.y >= otherMin.y && right.y <= otherMax.y ) )
+				if ( right.x == otherMin.x && ( right.y == otherMin.y || right.y == otherMax.y ) )
 				{
-					tessMult.z = transform[ 0 ].x / otherTransform[ 0 ].x;
+					tessMult.z = 2.0f;
 				}
 
 				// top-edge
-				if ( top.y == otherMin.y && ( top.x >= otherMin.x && top.x <= otherMax.x ) )
+				if ( top.y == otherMin.y && ( top.x == otherMin.x || top.x == otherMax.x ) )
 				{
-					tessMult.w = transform[ 0 ].x / otherTransform[ 0 ].x;
+					tessMult.w = 2.0f;
 				}
 			}
 		}

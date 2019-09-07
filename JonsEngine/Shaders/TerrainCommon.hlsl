@@ -13,7 +13,6 @@ cbuffer PerTerrainConstants : register(CBUFFER_REGISTER_DOMAIN)
 	float gHeightModifier;
 	float gVariationScale;
 	uint gTransformOffset;
-	uint gNumLODs;	// largest range, index zero
 }
 
 struct PatchTess
