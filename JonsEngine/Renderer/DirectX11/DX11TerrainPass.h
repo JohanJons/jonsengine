@@ -35,6 +35,7 @@ namespace JonsEngine
 			float mHeightScale;
 			float mVariationScale;
 			uint32_t mTransformOffset;
+			float __padding;
 		};
 
 	private:

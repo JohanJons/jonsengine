@@ -43,7 +43,6 @@ namespace JonsEngine
 		mPerTerrainCBuffer(device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
 		mTransformsBuffer( device, context ),
 		mTessEdgeMultBuffer( device, context ),
-		mLODBuffer( device, context ),
 		mQuadMesh( device, context, gQuadVertices, gQuadIndices, AABB::gUnitQuadAABB.Min(), AABB::gUnitQuadAABB.Max() ),
 		mVertexTransformer( vertexTransformer ),
 		mTextureMap( textureMap ),
@@ -177,9 +176,6 @@ namespace JonsEngine
 
 			mPerTerrainCBuffer.SetData( { terrainData.mWorldMin, terrainData.mWorldMax, terrainData.mHeightScale, terrainData.mVariationScale, beginIndex } );
 			mPerTerrainCBuffer.Bind();
-
-			mLODBuffer.SetData( terrainData.mLODRanges );
-			mLODBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Hull, SBUFFER_SLOT_EXTRA_2 );
 
 			uint32_t endIndex = terrainData.mEndIndex;
 			assert( endIndex > beginIndex );
@@ -352,7 +348,7 @@ namespace JonsEngine
 		mContext->HSSetShader(mHullShader, nullptr, 0);
 
 		mContext->IASetInputLayout(mLayout);
-		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_8_CONTROL_POINT_PATCHLIST);
+		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST);
 	}
 
 	void DX11TerrainPass::UnbindRendering()

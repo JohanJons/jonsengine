@@ -14,7 +14,9 @@ PixelOut ps_main( DomainOut input )
 {
 	PixelOut ret;
 
-    float tess = input.mTesellation / 64;
+	ret.mDiffuse = RED;
+
+    /*float tess = input.mTesellation / 32;
     if ( input.mTesellation < 32 )
     {
         ret.mDiffuse = lerp( RED, GREEN, tess );
@@ -22,7 +24,7 @@ PixelOut ps_main( DomainOut input )
     else
     {
         ret.mDiffuse = lerp( GREEN, BLUE, tess );
-    }
+    }*/
 
 	return ret;
 }

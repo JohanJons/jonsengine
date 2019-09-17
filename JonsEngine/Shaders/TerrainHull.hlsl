@@ -11,11 +11,8 @@ StructuredBuffer<float4> gTessEdgeFactors : register (SBUFFER_REGISTER_EXTRA_2);
 
 float CalculateTessellation( float edgeFactor )
 {
-	float tessellation = 8.0f;
-	//if ( edgeFactor < 2.0f )
-	{
-		tessellation *= edgeFactor;
-	}
+	float tessellation = 32.0f;
+	tessellation *= edgeFactor;
 
 	return tessellation;
 }
@@ -34,7 +31,7 @@ float3 ComputePatchMidpoint( float3 corner1, float3 corner2, float3 corner3, flo
 	return ( corner1 + corner2 + corner3 + corner4 ) / 4.0f;
 }
 
-PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
+PatchTess PatchHS( InputPatch<VertexOut, 4> inputVertices )
 {
 	PatchTess patch;
 
@@ -54,7 +51,6 @@ PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 	float rightFactor = gTessEdgeFactors[ instanceID ].z;
 	float topFactor = gTessEdgeFactors[ instanceID ].w;
 
-	float midPatchTessFactor = 64.0f;
 	float edgePatchTessFactors[] = {
 		CalculateTessellation( leftFactor ),
 		CalculateTessellation( bottomFactor ),
@@ -67,6 +63,7 @@ PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 	patch.mEdgeTess[ 2 ] = edgePatchTessFactors[ 2 ];
 	patch.mEdgeTess[ 3 ] = edgePatchTessFactors[ 3 ];
 	
+	float midPatchTessFactor = 32.0f;
 	patch.mInsideTess[ 0 ] = midPatchTessFactor;
 	patch.mInsideTess[ 1 ] = midPatchTessFactor;
 #endif
@@ -79,7 +76,7 @@ PatchTess PatchHS( InputPatch<VertexOut, 8> inputVertices )
 [outputtopology("triangle_ccw")]
 [outputcontrolpoints(4)]
 [patchconstantfunc("PatchHS")]
-HullOut hs_main( InputPatch<VertexOut, 8> verticeData, uint index : SV_OutputControlPointID )
+HullOut hs_main( InputPatch<VertexOut, 4> verticeData, uint index : SV_OutputControlPointID )
 {
 	HullOut ret;
 
