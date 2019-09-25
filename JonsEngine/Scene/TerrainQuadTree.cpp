@@ -258,7 +258,79 @@ namespace JonsEngine
 			tessEdgeMult.emplace_back( 1.0f );
 			Vec4& tessMult = tessEdgeMult.back();
 
-			for ( const Mat4& otherTransform : nodeTransforms )
+			//auto isBorderingFunc = []( const Mat4& transform ) {};
+			for ( int32_t index = static_cast<int32_t>( nodeTransforms.size() ) - 1; index >= 0; --index )
+			{
+				Mat4& otherTransform = nodeTransforms[ index ];
+				if ( &transform == &otherTransform )
+				{
+					continue;
+				}
+
+				Vec2 otherMin, otherMax;
+				GetTransformExtentsXZ( otherTransform, otherMin, otherMax );
+
+				// left-edge
+				if ( left.x == otherMax.x && ( left.y == otherMin.y || left.y == otherMax.y ) )
+				{
+					float otherLength = otherMax.y - otherMin.y;
+					float thislength = transformMax.y - transformMin.y;
+					if ( thislength / otherLength >= 4.0f )
+					{
+						otherTransform[ 0 ][ 0 ] *= 0.5f;
+						otherTransform[ 3 ][ 0 ] -= otherTransform[ 0 ][ 0 ];
+					}
+
+					tessMult.x = 2.0f;
+				}
+				// bottom-edge
+				else if ( bottom.y == otherMax.y && ( bottom.x == otherMin.x || bottom.x == otherMax.x ) )
+				{
+					float otherLength = otherMax.x - otherMin.x;
+					float thislength = transformMax.x - transformMin.x;
+					if ( thislength / otherLength >= 4.0f )
+					{
+						otherTransform[ 2 ][ 2 ] *= 0.5f;
+						otherTransform[ 3 ][ 2 ] -= otherTransform[ 2 ][ 2 ];
+					}
+
+					tessMult.y = 2.0f;
+				}
+				// right-edge
+				else if ( right.x == otherMin.x && ( right.y == otherMin.y || right.y == otherMax.y ) )
+				{
+					float otherLength = otherMax.y - otherMin.y;
+					float thislength = transformMax.y - transformMin.y;
+					if ( thislength / otherLength >= 4.0f )
+					{
+						otherTransform[ 0 ][ 0 ] *= 0.5f;
+						otherTransform[ 3 ][ 0 ] += otherTransform[ 2 ][ 2 ];
+					}
+
+					tessMult.z = 2.0f;
+				}
+				// top-edge
+				else if ( top.y == otherMin.y && ( top.x == otherMin.x || top.x == otherMax.x ) )
+				{
+					float otherLength = otherMax.x - otherMin.x;
+					float thislength = transformMax.x - transformMin.x;
+					if ( thislength / otherLength >= 4.0f )
+					{
+						otherTransform[ 2 ][ 2 ] *= 0.5f;
+						otherTransform[ 3 ][ 2 ] += otherTransform[ 2 ][ 2 ];
+					}
+
+					tessMult.y = 2.0f;
+				}
+			}
+
+
+			// DEBUG
+			// DEBUG
+			// DEBUG
+			// DEBUG
+			// DEBUG
+			for ( Mat4& otherTransform : nodeTransforms )
 			{
 				if ( &transform == &otherTransform )
 				{
@@ -271,25 +343,34 @@ namespace JonsEngine
 				// left-edge
 				if ( left.x == otherMax.x && ( left.y == otherMin.y || left.y == otherMax.y ) )
 				{
-					tessMult.x = 2.0f;
+					float otherLength = otherMax.y - otherMin.y;
+					float thislength = transformMax.y - transformMin.y;
+					thislength = transformMax.y - transformMin.y;
+					assert( thislength / otherLength < 4.0f );
 				}
-
 				// bottom-edge
-				if ( bottom.y == otherMax.y && ( bottom.x == otherMin.x || bottom.x == otherMax.x ) )
+				else if ( bottom.y == otherMax.y && ( bottom.x == otherMin.x || bottom.x == otherMax.x ) )
 				{
+					float otherLength = otherMax.x - otherMin.x;
+					float thislength = transformMax.x - transformMin.x;
 					tessMult.y = 2.0f;
+					assert( thislength / otherLength < 4.0f );
 				}
-
 				// right-edge
-				if ( right.x == otherMin.x && ( right.y == otherMin.y || right.y == otherMax.y ) )
+				else if ( right.x == otherMin.x && ( right.y == otherMin.y || right.y == otherMax.y ) )
 				{
+					float otherLength = otherMax.y - otherMin.y;
+					float thislength = transformMax.y - transformMin.y;
 					tessMult.z = 2.0f;
+					assert( thislength / otherLength < 4.0f );
 				}
-
 				// top-edge
-				if ( top.y == otherMin.y && ( top.x == otherMin.x || top.x == otherMax.x ) )
+				else if ( top.y == otherMin.y && ( top.x == otherMin.x || top.x == otherMax.x ) )
 				{
-					tessMult.w = 2.0f;
+					float otherLength = otherMax.x - otherMin.x;
+					float thislength = transformMax.x - transformMin.x;
+					tessMult.y = 2.0f;
+					assert( thislength / otherLength < 4.0f );
 				}
 			}
 		}
