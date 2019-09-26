@@ -75,25 +75,26 @@ namespace JonsEngine
 		nodes.emplace_back( transform );
 	}
 
-	bool TerrainQuadTree::CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const
+	TerrainQuadTree::CullStatus TerrainQuadTree::CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const
 	{
 		// if parent is fully in frustum, so are we
 		AABBIntersection frustumIntersection = parentFullyInFrustum ? AABBIntersection::Inside : Intersection( quadAABB.mFrustumAABB, cameraViewProjTransform );
 		if ( frustumIntersection == AABBIntersection::Outside )
-			return false;
+			return CullStatus::OutOfFrustum;
 
 		float distanceLimit = LODRanges.at( quadAABB.mLODIndex );
 		AABBIntersection intersection = Intersection( quadAABB.mFrustumAABB, cameraWorldPos, distanceLimit );
 		bool isWithinDistance = intersection == AABBIntersection::Partial || intersection == AABBIntersection::Inside;
 		if ( !isWithinDistance )
-			return false;
+			return CullStatus::OutOfRange;
 		
+		// last LOD
 		uint32_t nextLODIndex = quadAABB.mLODIndex + 1;
 		bool isValidLODIndex = nextLODIndex < LODRanges.size();
 		if ( !isValidLODIndex )
 		{
 			AddNode( nodes, quadAABB, cameraWorldPos, LODRanges );
-			return true;
+			return CullStatus::Added;
 		}
 
 		float nextDistanceLimit = LODRanges.at( nextLODIndex );
@@ -102,24 +103,26 @@ namespace JonsEngine
 		if ( !nextIsWithinRange )
 		{
 			AddNode( nodes, quadAABB, cameraWorldPos, LODRanges );
-			return true;
+			return CullStatus::Added;
 		}
 
-		bool completelyInFrustum = intersection == AABBIntersection::Inside;
-		std::array<bool, QuadNodeAABB::NUM_CHILDREN> childrenAdded;
+		CullStatus Status = CullStatus::OutOfFrustum;
+		bool completelyInFrustum = frustumIntersection == AABBIntersection::Inside;
+		std::array<CullStatus, QuadNodeAABB::NUM_CHILDREN> childrenAdded;
 		for ( uint32_t childIndex = QuadNodeAABB::ChildOffset::TOP_LEFT; childIndex < QuadNodeAABB::ChildOffset::NUM_CHILDREN; ++childIndex )
 		{
 			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
 			childrenAdded[ childIndex ] = CullQuad( nodes, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum );
 
-			if ( !childrenAdded[ childIndex ] )
+			if ( childrenAdded[ childIndex ] == CullStatus::OutOfRange )
 			{
 				// TODO: remove & alter tess level
 				AddNode( nodes, childQuad, cameraWorldPos, LODRanges );
+				Status = CullStatus::Added;
 			}
 		}
 
-		return true;
+		return Status;
 	}
 
 	uint32_t TerrainQuadTree::ExpectedNumNodes( uint32_t width, uint32_t patchMinSize ) const
@@ -245,8 +248,13 @@ namespace JonsEngine
 
 	void TerrainQuadTree::CalculateTessellationFactors( std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult ) const
 	{
-		for ( const Mat4& transform : nodeTransforms )
+		tessEdgeMult.resize( nodeTransforms.size(), Vec4( 1.0f ) );
+
+		int32_t numNodes = static_cast<int32_t>( nodeTransforms.size() );
+		for ( int32_t outerIndex = numNodes - 1; outerIndex >= 0; --outerIndex )
 		{
+			Mat4& transform = nodeTransforms[ outerIndex ];
+
 			Vec2 transformMin, transformMax;
 			GetTransformExtentsXZ( transform, transformMin, transformMax );
 
@@ -254,23 +262,15 @@ namespace JonsEngine
 			float midZ = ( transformMin.y + transformMax.y ) / 2;
 			Vec2 top( midX, transformMax.y ), left( transformMin.x, midZ ), bottom( midX, transformMin.y ), right( transformMax.x, midZ );
 
-			// order: left - bottom - right - top
-			tessEdgeMult.emplace_back( 1.0f );
-			Vec4& tessMult = tessEdgeMult.back();
-
-			//auto isBorderingFunc = []( const Mat4& transform ) {};
-			for ( int32_t index = static_cast<int32_t>( nodeTransforms.size() ) - 1; index >= 0; --index )
+			for ( int32_t innerIndex = outerIndex - 1; innerIndex >= 0; --innerIndex )
 			{
-				Mat4& otherTransform = nodeTransforms[ index ];
-				if ( &transform == &otherTransform )
-				{
-					continue;
-				}
+				Mat4& otherTransform = nodeTransforms[ innerIndex ];
+				// order: left - bottom - right - top
+				Vec4& otherTessMult = tessEdgeMult[ innerIndex ];
 
 				Vec2 otherMin, otherMax;
 				GetTransformExtentsXZ( otherTransform, otherMin, otherMax );
 
-				// left-edge
 				if ( left.x == otherMax.x && ( left.y == otherMin.y || left.y == otherMax.y ) )
 				{
 					float otherLength = otherMax.y - otherMin.y;
@@ -281,7 +281,23 @@ namespace JonsEngine
 						otherTransform[ 3 ][ 0 ] -= otherTransform[ 0 ][ 0 ];
 					}
 
-					tessMult.x = 2.0f;
+					/*Vec3 scale( otherTransform[ 0 ][ 0 ] );
+					scale.z /= 2.0f;
+					Mat4 scaleTransform = glm::scale( scale );
+
+					Vec3 translation( otherTransform[ 3 ][ 0 ] ) ;
+					translation.x += ( otherTransform[ 0 ][ 0 ] * 2.0f );
+
+					Vec3 translation1( translation );
+
+
+					Mat4 translation1 = glm::translate( )
+
+
+					Mat4 transform( 1.0f );
+
+					nodeTransforms.emplace_back();*/
+					otherTessMult.x = 2.0f;
 				}
 				// bottom-edge
 				else if ( bottom.y == otherMax.y && ( bottom.x == otherMin.x || bottom.x == otherMax.x ) )
@@ -294,7 +310,7 @@ namespace JonsEngine
 						otherTransform[ 3 ][ 2 ] -= otherTransform[ 2 ][ 2 ];
 					}
 
-					tessMult.y = 2.0f;
+					otherTessMult.y = 2.0f;
 				}
 				// right-edge
 				else if ( right.x == otherMin.x && ( right.y == otherMin.y || right.y == otherMax.y ) )
@@ -307,7 +323,7 @@ namespace JonsEngine
 						otherTransform[ 3 ][ 0 ] += otherTransform[ 2 ][ 2 ];
 					}
 
-					tessMult.z = 2.0f;
+					otherTessMult.z = 2.0f;
 				}
 				// top-edge
 				else if ( top.y == otherMin.y && ( top.x == otherMin.x || top.x == otherMax.x ) )
@@ -320,10 +336,22 @@ namespace JonsEngine
 						otherTransform[ 3 ][ 2 ] += otherTransform[ 2 ][ 2 ];
 					}
 
-					tessMult.y = 2.0f;
+					otherTessMult.y = 2.0f;
 				}
 			}
+		}
 
+
+
+
+		for ( const Mat4& transform : nodeTransforms )
+		{
+			Vec2 transformMin, transformMax;
+			GetTransformExtentsXZ( transform, transformMin, transformMax );
+
+			float midX = ( transformMin.x + transformMax.x ) / 2;
+			float midZ = ( transformMin.y + transformMax.y ) / 2;
+			Vec2 top( midX, transformMax.y ), left( transformMin.x, midZ ), bottom( midX, transformMin.y ), right( transformMax.x, midZ );
 
 			// DEBUG
 			// DEBUG
@@ -345,7 +373,6 @@ namespace JonsEngine
 				{
 					float otherLength = otherMax.y - otherMin.y;
 					float thislength = transformMax.y - transformMin.y;
-					thislength = transformMax.y - transformMin.y;
 					assert( thislength / otherLength < 4.0f );
 				}
 				// bottom-edge
@@ -353,7 +380,6 @@ namespace JonsEngine
 				{
 					float otherLength = otherMax.x - otherMin.x;
 					float thislength = transformMax.x - transformMin.x;
-					tessMult.y = 2.0f;
 					assert( thislength / otherLength < 4.0f );
 				}
 				// right-edge
@@ -361,7 +387,6 @@ namespace JonsEngine
 				{
 					float otherLength = otherMax.y - otherMin.y;
 					float thislength = transformMax.y - transformMin.y;
-					tessMult.z = 2.0f;
 					assert( thislength / otherLength < 4.0f );
 				}
 				// top-edge
@@ -369,7 +394,6 @@ namespace JonsEngine
 				{
 					float otherLength = otherMax.x - otherMin.x;
 					float thislength = transformMax.x - transformMin.x;
-					tessMult.y = 2.0f;
 					assert( thislength / otherLength < 4.0f );
 				}
 			}
