@@ -254,7 +254,7 @@ namespace JonsEngine
 	void TerrainQuadTree::CalculateTessellationFactors( std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult ) const
 	{
 		tessEdgeMult.resize( nodeTransforms.size(), Vec4( 1.0f ) );
-		return;
+		
 		for ( int32_t mainIndex = 0; mainIndex < static_cast<int32_t>( nodeTransforms.size() ); ++mainIndex )
 		{
 			Mat4& transform = nodeTransforms[ mainIndex ];
