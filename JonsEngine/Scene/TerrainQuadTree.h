@@ -53,8 +53,8 @@ namespace JonsEngine
 
 		void AddNode( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const std::vector<float>& LODRanges ) const;
 		CullStatus CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const;
-		uint32_t ExpectedNumNodes( uint32_t width, uint32_t patchMinSize ) const;
-		void CreateGridNode( uint32_t centerX, uint32_t centerZ, uint32_t width, uint32_t height, uint32_t LODlevel, float yTranslation );
+		uint32_t ExpectedNumNodes( float width, uint32_t patchMinSize ) const;
+		void CreateGridNode( float centerX, float centerZ, float width, float height, uint32_t LODlevel, float yTranslation );
 		// local space during function
 		void ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, uint32_t heightmapWidth, uint32_t LODlevel, float yTranslation );
 		void CalculateLODRanges( std::vector<float>& LODs, float zNear, float zFar ) const;

@@ -188,7 +188,8 @@ namespace JonsEngine
 
 	void DX11Pipeline::DebugStage( const RenderQueue& renderQueue, const RenderSettings& renderSettings, const DebugOptions::RenderingFlags debugFlags )
 	{
-		bool renderAABBs = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_MODEL_AABB ) || debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_AABB );
+		bool renderAABBs = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_MODEL_AABB ) || debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_AABB ) ||
+			debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_PATCH );
 		if ( renderAABBs )
 			mAABBPass.Render( renderQueue.mColorsToAABBsList, renderQueue.mCamera.mCameraViewProjectionMatrix );
 

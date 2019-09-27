@@ -19,24 +19,27 @@ namespace JonsEngine
 		mPatchMinSize( patchMinSize ),
 		mHeightmapScale( heightmapScale )
 	{
-		assert( patchMinSize && width && height && !heightmapData.empty() );
+		float fWidth = static_cast<float>( width );
+		float fHeight = static_cast<float>( height );
 
-		mGridTraversal.reserve( ExpectedNumNodes( width, mPatchMinSize ) );
+		assert( patchMinSize && fWidth >= 0.0f && fHeight >= 0.0f && !heightmapData.empty() );
+
+		mGridTraversal.reserve( ExpectedNumNodes( fWidth, mPatchMinSize ) );
 		
 		float yTranslation = worldTransform[ 3 ].y;
 		uint32_t rootLODLevel = 0;
-		CreateGridNode( width / 2, height / 2, width, height, rootLODLevel, yTranslation );
+		CreateGridNode( fWidth / 2, fHeight / 2, fWidth, fHeight, rootLODLevel, yTranslation );
 		QuadNodeAABB& quadAABB = mGridTraversal.back();
 		ProcessQuadNode( quadAABB, heightmapData, width, rootLODLevel, yTranslation );
 
 		// translate negative width&height / 2 to center it at origo
-		Mat4 finalTransform = glm::translate( -Vec3( width / 2, 0, height / 2) );
+		Mat4 finalTransform = glm::translate( -Vec3( fWidth / 2, 0, fHeight / 2) );
 		finalTransform = worldTransform * finalTransform;
 
 		for ( QuadNodeAABB& node : mGridTraversal )
 			node.mFrustumAABB = node.mFrustumAABB * finalTransform;
 
-		assert( ExpectedNumNodes( width, mPatchMinSize ) == GetNumNodes() );
+		assert( ExpectedNumNodes( fWidth, mPatchMinSize ) == GetNumNodes() );
 	}
 
 	void TerrainQuadTree::CullNodes( std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult, std::vector<float>& LODRanges, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const
@@ -49,6 +52,8 @@ namespace JonsEngine
 		CullQuad( nodeTransforms, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
 
 		CalculateTessellationFactors( nodeTransforms, tessEdgeMult );
+
+		assert( nodeTransforms.size() == tessEdgeMult.size() );
 	}
 
 	uint32_t TerrainQuadTree::GetNumLODRanges() const
@@ -125,11 +130,11 @@ namespace JonsEngine
 		return Status;
 	}
 
-	uint32_t TerrainQuadTree::ExpectedNumNodes( uint32_t width, uint32_t patchMinSize ) const
+	uint32_t TerrainQuadTree::ExpectedNumNodes( float width, uint32_t patchMinSize ) const
 	{
 		assert( width && patchMinSize );
 		
-		uint32_t curr = width;
+		uint32_t curr = static_cast<uint32_t>( width );
 		uint32_t pow = 2;
 		// +1 for toplevel AABB node
 		uint32_t numAABBs = 1;
@@ -143,13 +148,13 @@ namespace JonsEngine
 		return numAABBs;
 	}
 
-	void TerrainQuadTree::CreateGridNode( uint32_t centerX, uint32_t centerZ, uint32_t width, uint32_t height, uint32_t LODlevel, float yTranslation )
+	void TerrainQuadTree::CreateGridNode( float centerX, float centerZ, float width, float height, uint32_t LODlevel, float yTranslation )
 	{
-		uint32_t extentX = width / 2;
-		uint32_t extentZ = height / 2;
+		float extentX = width / 2;
+		float extentZ = height / 2;
 
-		uint32_t minX = centerX - extentX, maxX = centerX + extentX;
-		uint32_t minZ = centerZ - extentZ, maxZ = centerZ + extentZ;
+		float minX = centerX - extentX, maxX = centerX + extentX;
+		float minZ = centerZ - extentZ, maxZ = centerZ + extentZ;
 
 		Vec3 frustumMin( minX, 0, minZ );
 		Vec3 frustumMax( maxX, 0, maxZ );
@@ -190,11 +195,11 @@ namespace JonsEngine
 			return;
 		}
 
-		uint32_t centerX = static_cast<uint32_t>( center.x ), centerZ = static_cast<uint32_t>( center.z );
-		uint32_t childWidth = static_cast<uint32_t>( extent.x );
-		uint32_t childHeight = static_cast<uint32_t>( extent.z );
-		uint32_t halfChildWidth = childWidth / 2;
-		uint32_t halfChildHeight = childHeight / 2;
+		float centerX = center.x, centerZ = center.z;
+		float childWidth = extent.x;
+		float childHeight = extent.z;
+		float halfChildWidth = childWidth / 2;
+		float halfChildHeight = childHeight / 2;
 		uint32_t childNodeLODLevel = LODlevel + 1;
 
 		// TL - TR - BL - BR
@@ -227,7 +232,7 @@ namespace JonsEngine
 		const float LODDistanceRatio = 2.0f;
 
 		float total = 0;
-		float currentDetailBalance = 1.0f;
+		float currentDetailBalance = 0.25f;
 		for ( uint32_t i = 0; i < numLODRanges; ++i )
 		{
 			total += currentDetailBalance;
@@ -249,101 +254,197 @@ namespace JonsEngine
 	void TerrainQuadTree::CalculateTessellationFactors( std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult ) const
 	{
 		tessEdgeMult.resize( nodeTransforms.size(), Vec4( 1.0f ) );
-
-		int32_t numNodes = static_cast<int32_t>( nodeTransforms.size() );
-		for ( int32_t outerIndex = numNodes - 1; outerIndex >= 0; --outerIndex )
+		return;
+		for ( int32_t mainIndex = 0; mainIndex < static_cast<int32_t>( nodeTransforms.size() ); ++mainIndex )
 		{
-			Mat4& transform = nodeTransforms[ outerIndex ];
+			Mat4& transform = nodeTransforms[ mainIndex ];
+			// order: left - bottom - right - top
+			Vec4& tessMult = tessEdgeMult[ mainIndex ];
 
 			Vec2 transformMin, transformMax;
 			GetTransformExtentsXZ( transform, transformMin, transformMax );
 
-			float midX = ( transformMin.x + transformMax.x ) / 2;
-			float midZ = ( transformMin.y + transformMax.y ) / 2;
-			Vec2 top( midX, transformMax.y ), left( transformMin.x, midZ ), bottom( midX, transformMin.y ), right( transformMax.x, midZ );
+			//float midX = ( transformMin.x + transformMax.x ) / 2;
+			//float midZ = ( transformMin.y + transformMax.y ) / 2;
+			//Vec2 top( midX, transformMax.y ), left( transformMin.x, midZ ), bottom( midX, transformMin.y ), right( transformMax.x, midZ );
 
-			for ( int32_t innerIndex = outerIndex - 1; innerIndex >= 0; --innerIndex )
+			for ( const Mat4& otherTransform : nodeTransforms )
 			{
-				Mat4& otherTransform = nodeTransforms[ innerIndex ];
-				// order: left - bottom - right - top
-				Vec4& otherTessMult = tessEdgeMult[ innerIndex ];
+				if ( &otherTransform == &transform )
+					continue;
 
 				Vec2 otherMin, otherMax;
 				GetTransformExtentsXZ( otherTransform, otherMin, otherMax );
 
-				if ( left.x == otherMax.x && ( left.y == otherMin.y || left.y == otherMax.y ) )
+				// left
+				if ( transformMin.x == otherMax.x && ( transformMax.y >= otherMax.y && transformMin.y <= otherMin.y ) )
 				{
 					float otherLength = otherMax.y - otherMin.y;
 					float thislength = transformMax.y - transformMin.y;
-					if ( thislength / otherLength >= 4.0f )
+					if ( thislength > otherLength )
 					{
-						otherTransform[ 0 ][ 0 ] *= 0.5f;
-						otherTransform[ 3 ][ 0 ] -= otherTransform[ 0 ][ 0 ];
+						tessMult.x = 2.0f;
 					}
 
-					/*Vec3 scale( otherTransform[ 0 ][ 0 ] );
-					scale.z /= 2.0f;
-					Mat4 scaleTransform = glm::scale( scale );
+					if ( thislength / otherLength == 4.0f )
+					{
+						transform[ 0 ][ 0 ] *= 0.5f;
+						transform[ 3 ][ 0 ] += transform[ 0 ][ 0 ];
 
-					Vec3 translation( otherTransform[ 3 ][ 0 ] ) ;
-					translation.x += ( otherTransform[ 0 ][ 0 ] * 2.0f );
+						Vec3 scale( transform[ 0 ][ 0 ], transform[ 1 ][ 1 ], transform[ 2 ][ 2 ] );
+						scale.z /= 2.0f;
+						Mat4 scaleTransform = glm::scale( scale );
 
-					Vec3 translation1( translation );
+						Vec3 translation( transform[ 3 ] );
+						translation.x -= ( transform[ 0 ][ 0 ] * 2.0f );
 
+						Vec3 translation1( translation );
+						translation1.z -= scale.z;
+						Mat4 transform1 = glm::translate( translation1 );
+						transform1 *= scaleTransform;
 
-					Mat4 translation1 = glm::translate( )
+						nodeTransforms.emplace_back( transform1 );
+						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
 
+						Vec3 translation2( translation );
+						translation2.z += scale.z;
+						Mat4 transform2 = glm::translate( translation2 );
+						transform2 *= scaleTransform;
 
-					Mat4 transform( 1.0f );
+						nodeTransforms.emplace_back( transform2 );
+						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
 
-					nodeTransforms.emplace_back();*/
-					otherTessMult.x = 2.0f;
+						break;
+					}
 				}
 				// bottom-edge
-				else if ( bottom.y == otherMax.y && ( bottom.x == otherMin.x || bottom.x == otherMax.x ) )
+				else if ( transformMin.y == otherMax.y && ( transformMax.x >= otherMax.x && transformMin.x <= otherMin.x ) )
 				{
 					float otherLength = otherMax.x - otherMin.x;
 					float thislength = transformMax.x - transformMin.x;
-					if ( thislength / otherLength >= 4.0f )
+					if ( thislength > otherLength )
 					{
-						otherTransform[ 2 ][ 2 ] *= 0.5f;
-						otherTransform[ 3 ][ 2 ] -= otherTransform[ 2 ][ 2 ];
+						tessMult.y = 2.0f;
 					}
 
-					otherTessMult.y = 2.0f;
+					if ( thislength / otherLength == 4.0f )
+					{
+						transform[ 2 ][ 2 ] *= 0.5f;
+						transform[ 3 ][ 2 ] += transform[ 2 ][ 2 ];
+
+						Vec3 scale( transform[ 0 ][ 0 ], transform[ 1 ][ 1 ], transform[ 2 ][ 2 ] );
+						scale.x /= 2.0f;
+						Mat4 scaleTransform = glm::scale( scale );
+
+						Vec3 translation( transform[ 3 ] );
+						translation.z -= ( transform[ 2 ][ 2 ] * 2.0f );
+
+						Vec3 translation1( translation );
+						translation1.x -= scale.x;
+						Mat4 transform1 = glm::translate( translation1 );
+						transform1 *= scaleTransform;
+
+						nodeTransforms.emplace_back( transform1 );
+						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
+
+						Vec3 translation2( translation );
+						translation2.x += scale.x;
+						Mat4 transform2 = glm::translate( translation2 );
+						transform2 *= scaleTransform;
+
+						nodeTransforms.emplace_back( transform2 );
+						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
+
+						break;
+					}
 				}
 				// right-edge
-				else if ( right.x == otherMin.x && ( right.y == otherMin.y || right.y == otherMax.y ) )
+				else if ( transformMax.x == otherMin.x && ( transformMax.y >= otherMax.y && transformMin.y <= otherMin.y ) )
 				{
 					float otherLength = otherMax.y - otherMin.y;
 					float thislength = transformMax.y - transformMin.y;
-					if ( thislength / otherLength >= 4.0f )
+					if ( thislength > otherLength )
 					{
-						otherTransform[ 0 ][ 0 ] *= 0.5f;
-						otherTransform[ 3 ][ 0 ] += otherTransform[ 2 ][ 2 ];
+						tessMult.z = 2.0f;
 					}
 
-					otherTessMult.z = 2.0f;
+					if ( thislength / otherLength == 4.0f )
+					{
+						transform[ 0 ][ 0 ] *= 0.5f;
+						transform[ 3 ][ 0 ] -= transform[ 0 ][ 0 ];
+
+						Vec3 scale( transform[ 0 ][ 0 ], transform[ 1 ][ 1 ], transform[ 2 ][ 2 ] );
+						scale.z /= 2.0f;
+						Mat4 scaleTransform = glm::scale( scale );
+
+						Vec3 translation( transform[ 3 ] );
+						translation.x += ( transform[ 0 ][ 0 ] * 2.0f );
+
+						Vec3 translation1( translation );
+						translation1.z -= scale.z;
+						Mat4 transform1 = glm::translate( translation1 );
+						transform1 *= scaleTransform;
+
+						nodeTransforms.emplace_back( transform1 );
+						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
+
+						Vec3 translation2( translation );
+						translation2.z += scale.z;
+						Mat4 transform2 = glm::translate( translation2 );
+						transform2 *= scaleTransform;
+
+						nodeTransforms.emplace_back( transform2 );
+						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
+
+						break;
+					}
 				}
 				// top-edge
-				else if ( top.y == otherMin.y && ( top.x == otherMin.x || top.x == otherMax.x ) )
+				else if ( transformMax.y == otherMin.y && ( transformMax.x >= otherMax.x && transformMin.x <= otherMin.x ) )
 				{
 					float otherLength = otherMax.x - otherMin.x;
 					float thislength = transformMax.x - transformMin.x;
-					if ( thislength / otherLength >= 4.0f )
+					if ( thislength > otherLength )
 					{
-						otherTransform[ 2 ][ 2 ] *= 0.5f;
-						otherTransform[ 3 ][ 2 ] += otherTransform[ 2 ][ 2 ];
+						tessMult.w = 2.0f;
 					}
 
-					otherTessMult.y = 2.0f;
+					if ( thislength / otherLength == 4.0f )
+					{
+						transform[ 2 ][ 2 ] *= 0.5f;
+						transform[ 3 ][ 2 ] -= transform[ 2 ][ 2 ];
+
+						Vec3 scale( transform[ 0 ][ 0 ], transform[ 1 ][ 1 ], transform[ 2 ][ 2 ] );
+						scale.x /= 2.0f;
+						Mat4 scaleTransform = glm::scale( scale );
+
+						Vec3 translation( transform[ 3 ] );
+						translation.z += ( transform[ 2 ][ 2 ] * 2.0f );
+
+						Vec3 translation1( translation );
+						translation1.x -= scale.x;
+						Mat4 transform1 = glm::translate( translation1 );
+						transform1 *= scaleTransform;
+
+						nodeTransforms.emplace_back( transform1 );
+						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
+
+						Vec3 translation2( translation );
+						translation2.x += scale.x;
+						Mat4 transform2 = glm::translate( translation2 );
+						transform2 *= scaleTransform;
+
+						nodeTransforms.emplace_back( transform2 );
+						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
+
+						break;
+					}
 				}
+
 			}
 		}
 
-
-
-
+		
 		for ( const Mat4& transform : nodeTransforms )
 		{
 			Vec2 transformMin, transformMax;
@@ -373,28 +474,28 @@ namespace JonsEngine
 				{
 					float otherLength = otherMax.y - otherMin.y;
 					float thislength = transformMax.y - transformMin.y;
-					assert( thislength / otherLength < 4.0f );
+					//assert( thislength / otherLength < 4.0f );
 				}
 				// bottom-edge
 				else if ( bottom.y == otherMax.y && ( bottom.x == otherMin.x || bottom.x == otherMax.x ) )
 				{
 					float otherLength = otherMax.x - otherMin.x;
 					float thislength = transformMax.x - transformMin.x;
-					assert( thislength / otherLength < 4.0f );
+					//assert( thislength / otherLength < 4.0f );
 				}
 				// right-edge
 				else if ( right.x == otherMin.x && ( right.y == otherMin.y || right.y == otherMax.y ) )
 				{
 					float otherLength = otherMax.y - otherMin.y;
 					float thislength = transformMax.y - transformMin.y;
-					assert( thislength / otherLength < 4.0f );
+					//assert( thislength / otherLength < 4.0f );
 				}
 				// top-edge
 				else if ( top.y == otherMin.y && ( top.x == otherMin.x || top.x == otherMax.x ) )
 				{
 					float otherLength = otherMax.x - otherMin.x;
 					float thislength = transformMax.x - transformMin.x;
-					assert( thislength / otherLength < 4.0f );
+					//assert( thislength / otherLength < 4.0f );
 				}
 			}
 		}

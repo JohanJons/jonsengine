@@ -67,8 +67,11 @@ namespace JonsEngine
         DirectionalLightCulling(scene);
 
 		TerrainParsing( scene, zNear, zFar, dirtyFlags );
-		if ( debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_AABB ) )
-			AddTerrainAABBDebugData( scene, zNear, zFar );
+
+		bool drawTerrainAABB = debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_AABB );
+		bool drawTerrainPatches = debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_PATCH );
+		if ( drawTerrainAABB || drawTerrainPatches )
+			AddTerrainAABBDebugData( scene, zNear, zFar, drawTerrainPatches );
 
 		if (debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_MODEL_AABB ))
 			AddModelAABBDebugData( scene );
@@ -253,7 +256,7 @@ namespace JonsEngine
 		CullAABB<decltype(animatedActors)>(scene, mResourceManifest, animatedActors, mCullingStrategy, aabbDataContainer, viewProjTransform);
 	}
 
-	void SceneParser::AddTerrainAABBDebugData( const Scene& scene, float zNear, float zFar )
+	void SceneParser::AddTerrainAABBDebugData( const Scene& scene, float zNear, float zFar, bool doPatches )
 	{
 		DX11MeshID unitCubeMeshID = mResourceManifest.GetUnitCubeModel().GetMeshes().begin()->GetMesh();
 		assert( unitCubeMeshID != INVALID_DX11_MESH_ID );
@@ -277,8 +280,13 @@ namespace JonsEngine
 			const TerrainQuadTree& quadTree = terrainTransforms.GetQuadTree( ID );
 			quadTree.CullNodes( aabbTransforms, tessEdgeMults, lodRanges, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
 
-			for ( const Mat4& transform : aabbTransforms )
+			for ( Mat4& transform : aabbTransforms )
+			{
+				if ( doPatches )
+					transform[ 1 ][ 1 ] = 0.0f;
+
 				AddAABB( AABBRenderData, transform, unitCubeMeshID, gRed );
+			}
 
 			aabbTransforms.clear();
 		}

@@ -172,7 +172,7 @@ namespace JonsGame
 					case Key::THREE: mTessellationScene.GetTerrain().SetVariationScale( 6.0f ); break;
 					case Key::FOUR: mEngine.GetRenderer().SetTerrainCoplanaritySize( RenderSettings::TerrainCoplanaritySize::X8 ); break;
 					case Key::FIVE: mEngine.GetRenderer().SetTerrainCoplanaritySize( RenderSettings::TerrainCoplanaritySize::X16 ); break;
-					case Key::SIX: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_AABB ); break;
+					case Key::SIX: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_PATCH ); break;
 					case Key::SEVEN:
 					{
 						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );

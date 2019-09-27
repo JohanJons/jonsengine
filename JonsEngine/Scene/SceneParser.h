@@ -30,7 +30,7 @@ namespace JonsEngine
 		void GetAmbientLight(const Scene& scene);
 		// needs to run after ViewFrustumCulling
 		void AddModelAABBDebugData(const Scene& scene);
-		void AddTerrainAABBDebugData( const Scene& scene, float zNear, float zFar );
+		void AddTerrainAABBDebugData( const Scene& scene, float zNear, float zFar, bool doPatches );
 
 
         const ResourceManifest& mResourceManifest;
