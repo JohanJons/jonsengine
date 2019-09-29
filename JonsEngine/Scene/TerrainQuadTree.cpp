@@ -289,17 +289,17 @@ namespace JonsEngine
 					if ( thislength / otherLength == 4.0f )
 					{
 						transform[ 0 ][ 0 ] *= 0.5f;
-						transform[ 3 ][ 0 ] += transform[ 0 ][ 0 ];
+						transform[ 3 ][ 0 ] += transform[ 0 ][ 0 ] / 2.0f;
 
 						Vec3 scale( transform[ 0 ][ 0 ], transform[ 1 ][ 1 ], transform[ 2 ][ 2 ] );
 						scale.z /= 2.0f;
 						Mat4 scaleTransform = glm::scale( scale );
 
 						Vec3 translation( transform[ 3 ] );
-						translation.x -= ( transform[ 0 ][ 0 ] * 2.0f );
+						translation.x -= ( transform[ 0 ][ 0 ] );
 
 						Vec3 translation1( translation );
-						translation1.z -= scale.z;
+						translation1.z += scale.z / 2.0f;
 						Mat4 transform1 = glm::translate( translation1 );
 						transform1 *= scaleTransform;
 
@@ -307,7 +307,7 @@ namespace JonsEngine
 						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
 
 						Vec3 translation2( translation );
-						translation2.z += scale.z;
+						translation2.z -= scale.z / 2.0f;
 						Mat4 transform2 = glm::translate( translation2 );
 						transform2 *= scaleTransform;
 
@@ -330,17 +330,17 @@ namespace JonsEngine
 					if ( thislength / otherLength == 4.0f )
 					{
 						transform[ 2 ][ 2 ] *= 0.5f;
-						transform[ 3 ][ 2 ] += transform[ 2 ][ 2 ];
+						transform[ 3 ][ 2 ] += transform[ 2 ][ 2 ] / 2.0f;
 
 						Vec3 scale( transform[ 0 ][ 0 ], transform[ 1 ][ 1 ], transform[ 2 ][ 2 ] );
 						scale.x /= 2.0f;
 						Mat4 scaleTransform = glm::scale( scale );
 
 						Vec3 translation( transform[ 3 ] );
-						translation.z -= ( transform[ 2 ][ 2 ] * 2.0f );
+						translation.z -= transform[ 2 ][ 2 ];
 
 						Vec3 translation1( translation );
-						translation1.x -= scale.x;
+						translation1.x += scale.x / 2.0f;
 						Mat4 transform1 = glm::translate( translation1 );
 						transform1 *= scaleTransform;
 
@@ -348,7 +348,7 @@ namespace JonsEngine
 						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
 
 						Vec3 translation2( translation );
-						translation2.x += scale.x;
+						translation2.x -= scale.x / 2.0f;
 						Mat4 transform2 = glm::translate( translation2 );
 						transform2 *= scaleTransform;
 
@@ -371,17 +371,17 @@ namespace JonsEngine
 					if ( thislength / otherLength == 4.0f )
 					{
 						transform[ 0 ][ 0 ] *= 0.5f;
-						transform[ 3 ][ 0 ] -= transform[ 0 ][ 0 ];
+						transform[ 3 ][ 0 ] -= transform[ 0 ][ 0 ] / 2.0f;
 
 						Vec3 scale( transform[ 0 ][ 0 ], transform[ 1 ][ 1 ], transform[ 2 ][ 2 ] );
 						scale.z /= 2.0f;
 						Mat4 scaleTransform = glm::scale( scale );
 
 						Vec3 translation( transform[ 3 ] );
-						translation.x += ( transform[ 0 ][ 0 ] * 2.0f );
+						translation.x += ( transform[ 0 ][ 0 ] );
 
 						Vec3 translation1( translation );
-						translation1.z -= scale.z;
+						translation1.z += scale.z / 2.0f;
 						Mat4 transform1 = glm::translate( translation1 );
 						transform1 *= scaleTransform;
 
@@ -389,7 +389,7 @@ namespace JonsEngine
 						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
 
 						Vec3 translation2( translation );
-						translation2.z += scale.z;
+						translation2.z -= scale.z / 2.0f;
 						Mat4 transform2 = glm::translate( translation2 );
 						transform2 *= scaleTransform;
 
@@ -412,17 +412,17 @@ namespace JonsEngine
 					if ( thislength / otherLength == 4.0f )
 					{
 						transform[ 2 ][ 2 ] *= 0.5f;
-						transform[ 3 ][ 2 ] -= transform[ 2 ][ 2 ];
+						transform[ 3 ][ 2 ] -= transform[ 2 ][ 2 ] / 2.0f;
 
 						Vec3 scale( transform[ 0 ][ 0 ], transform[ 1 ][ 1 ], transform[ 2 ][ 2 ] );
 						scale.x /= 2.0f;
 						Mat4 scaleTransform = glm::scale( scale );
 
 						Vec3 translation( transform[ 3 ] );
-						translation.z += ( transform[ 2 ][ 2 ] * 2.0f );
+						translation.z += transform[ 2 ][ 2 ];
 
 						Vec3 translation1( translation );
-						translation1.x -= scale.x;
+						translation1.x += scale.x / 2.0f;
 						Mat4 transform1 = glm::translate( translation1 );
 						transform1 *= scaleTransform;
 
@@ -430,7 +430,7 @@ namespace JonsEngine
 						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
 
 						Vec3 translation2( translation );
-						translation2.x += scale.x;
+						translation2.x -= scale.x / 2.0f;
 						Mat4 transform2 = glm::translate( translation2 );
 						transform2 *= scaleTransform;
 
@@ -474,28 +474,28 @@ namespace JonsEngine
 				{
 					float otherLength = otherMax.y - otherMin.y;
 					float thislength = transformMax.y - transformMin.y;
-					//assert( thislength / otherLength < 4.0f );
+					assert( thislength / otherLength < 4.0f );
 				}
 				// bottom-edge
 				else if ( bottom.y == otherMax.y && ( bottom.x == otherMin.x || bottom.x == otherMax.x ) )
 				{
 					float otherLength = otherMax.x - otherMin.x;
 					float thislength = transformMax.x - transformMin.x;
-					//assert( thislength / otherLength < 4.0f );
+					assert( thislength / otherLength < 4.0f );
 				}
 				// right-edge
 				else if ( right.x == otherMin.x && ( right.y == otherMin.y || right.y == otherMax.y ) )
 				{
 					float otherLength = otherMax.y - otherMin.y;
 					float thislength = transformMax.y - transformMin.y;
-					//assert( thislength / otherLength < 4.0f );
+					assert( thislength / otherLength < 4.0f );
 				}
 				// top-edge
 				else if ( top.y == otherMin.y && ( top.x == otherMin.x || top.x == otherMax.x ) )
 				{
 					float otherLength = otherMax.x - otherMin.x;
 					float thislength = transformMax.x - transformMin.x;
-					//assert( thislength / otherLength < 4.0f );
+					assert( thislength / otherLength < 4.0f );
 				}
 			}
 		}
