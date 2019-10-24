@@ -310,7 +310,32 @@ namespace JonsEngine
 
 		for ( int32_t index = 0; index < mGridTraversal.size(); ++index )
 		{
+			const QuadNodeAABB& nodeAABB = mGridTraversal[ index ];
+			const QuadNodeNeighbours& nodeNeighbours = mGridNeighbours[ index ];
 
+			const QuadNodeAABB* pLeftNeighbour = nodeNeighbours.mSameLODNeighbours[ QuadNodeNeighbours::LEFT ];
+			if ( !pLeftNeighbour && nodeAABB.mFrustumAABB.Min().x != worldMin.x )
+			{
+				return false;
+			}
+
+			const QuadNodeAABB* pBottomNeighbour = nodeNeighbours.mSameLODNeighbours[ QuadNodeNeighbours::BOTTOM ];
+			if ( !pBottomNeighbour && nodeAABB.mFrustumAABB.Min().z != worldMin.y )
+			{
+				return false;
+			}
+
+			const QuadNodeAABB* pRightNeighbour = nodeNeighbours.mSameLODNeighbours[ QuadNodeNeighbours::RIGHT ];
+			if ( !pRightNeighbour && nodeAABB.mFrustumAABB.Max().z != worldMax.x )
+			{
+				return false;
+			}
+
+			const QuadNodeAABB* pTopNeighbour = nodeNeighbours.mSameLODNeighbours[ QuadNodeNeighbours::TOP ];
+			if ( !pTopNeighbour && nodeAABB.mFrustumAABB.Max().y != worldMax.y )
+			{
+				return false;
+			}
 		}
 
 		return true;
