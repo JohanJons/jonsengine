@@ -5,14 +5,82 @@
 
 #include <set>
 
-namespace JonsEngine
+namespace
 {
+	using namespace JonsEngine;
+
 	using ChildNeighbours = std::array<QuadNodeAABB::ChildNode, 4>;
 	constexpr std::array<QuadNodeAABB::ChildNode, 4> TLNeighbours{ QuadNodeAABB::INVALID, QuadNodeAABB::BOTTOM_LEFT, QuadNodeAABB::TOP_RIGHT, QuadNodeAABB::INVALID };
 	constexpr std::array<QuadNodeAABB::ChildNode, 4> BLNeighbours{ QuadNodeAABB::INVALID, QuadNodeAABB::INVALID, QuadNodeAABB::BOTTOM_RIGHT, QuadNodeAABB::TOP_LEFT };
 	constexpr std::array<QuadNodeAABB::ChildNode, 4> BRNeighbours{ QuadNodeAABB::BOTTOM_LEFT, QuadNodeAABB::INVALID, QuadNodeAABB::INVALID, QuadNodeAABB::TOP_RIGHT };
 	constexpr std::array<QuadNodeAABB::ChildNode, 4> TRNeighbours{ QuadNodeAABB::TOP_LEFT, QuadNodeAABB::BOTTOM_RIGHT, QuadNodeAABB::INVALID, QuadNodeAABB::INVALID };
 	constexpr std::array<ChildNeighbours, 4> ChildNeighbourData{ TLNeighbours, BLNeighbours, BRNeighbours, TRNeighbours };
+
+	void PopNeighbouringChildren( QuadNodeAABB::ChildNode& first, QuadNodeAABB::ChildNode& second, std::vector<QuadNodeAABB::ChildNode>& childNodes )
+	{
+		first = QuadNodeAABB::INVALID;
+		second = QuadNodeAABB::INVALID;
+
+		if ( childNodes.empty() )
+		{
+			return;
+		}
+
+		first = childNodes.back();
+		childNodes.pop_back();
+		if ( childNodes.empty() )
+		{
+			return;
+		}
+
+		for ( int32_t index = 0; index < static_cast<int32_t>( childNodes.size() ); ++index )
+		{
+			QuadNodeAABB::ChildNode other = childNodes[ index ];
+
+			// only direct neighbours
+			if ( other - first % 2 != 0 )
+			{
+				second = other;
+				childNodes.erase( childNodes.begin() + index );
+				break;
+			}
+		}
+
+		assert( first != QuadNodeAABB::INVALID && second != QuadNodeAABB::INVALID );
+	}
+
+	void AddNode( std::vector<Mat4>& nodes, const QuadNodeAABB& firstNode )
+	{
+		Vec3 center = firstNode.mFrustumAABB.GetCenter();
+		Vec3 extent = firstNode.mFrustumAABB.GetExtent();
+
+		Mat4 transform = glm::translate( Vec3( center.x, 0.0f, center.z ) );
+		transform = glm::scale( transform, extent * 2.0f );
+		nodes.emplace_back( transform );
+	}
+
+	void AddNode( std::vector<Mat4>& nodes, const QuadNodeAABB& firstNode, const QuadNodeAABB& secondNode, QuadNodeAABB::ChildNode firstIndex, QuadNodeAABB::ChildNode secondIndex )
+	{
+		Vec3 center = ( firstNode.mFrustumAABB.GetCenter() + secondNode.mFrustumAABB.GetCenter() ) / 2.0f;
+		Vec3 extent = firstNode.mFrustumAABB.GetExtent();
+
+		QuadNodeAABB::ChildNode lowerIndex = firstIndex > secondIndex ? secondIndex : firstIndex;
+		QuadNodeAABB::ChildNode higherIndex = lowerIndex == firstIndex ? secondIndex : firstIndex;
+		if ( ( lowerIndex == QuadNodeAABB::TOP_LEFT && higherIndex == QuadNodeAABB::TOP_RIGHT ) || ( lowerIndex == QuadNodeAABB::BOTTOM_LEFT && higherIndex == QuadNodeAABB::BOTTOM_RIGHT ) )
+		{
+			extent.x *= 2.0f;
+		}
+		else if ( ( lowerIndex == QuadNodeAABB::TOP_LEFT && higherIndex == QuadNodeAABB::BOTTOM_LEFT ) || ( lowerIndex == QuadNodeAABB::BOTTOM_RIGHT && higherIndex == QuadNodeAABB::TOP_RIGHT ) )
+		{
+			extent.z *= 2.0f;
+		}
+		else
+			assert( false && "Wrong child index pairing" );
+
+		Mat4 transform = glm::translate( Vec3( center.x, 0.0f, center.z ) );
+		transform = glm::scale( transform, extent * 2.0f );
+		nodes.emplace_back( transform );
+	}
 
 	QuadNodeAABB::ChildNode GetOpposite( QuadNodeAABB::ChildNode child, QuadNodeNeighbours::Facing facing )
 	{
@@ -56,6 +124,15 @@ namespace JonsEngine
 		min = Vec2( translation.x - xExtent, translation.z - zExtent );
 		max = Vec2( translation.x + xExtent, translation.z + zExtent );
 	}
+}
+
+namespace JonsEngine
+{
+	PerCullData::PerCullData( uint32_t numTreeNodes )
+	{
+		mHighestLODNodes.reserve( 64 );
+		mNodeAddedLookup.resize( numTreeNodes, false );
+	}
 
 	TerrainQuadTree::TerrainQuadTree( const std::vector<uint8_t>& heightmapData, uint32_t width, uint32_t height, uint32_t patchMinSize, float heightmapScale, const Mat4& worldTransform ) :
 		mPatchMinSize( patchMinSize ),
@@ -98,7 +175,10 @@ namespace JonsEngine
 
 		CalculateLODRanges( LODRanges, zNear, zFar );
 
-		CullQuad( nodeTransforms, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
+		PerCullData cullData( GetNumNodes() );
+		CalculateHighestLODNodes( cullData, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
+		CalculateNodeTransforms( cullData, nodeTransforms, tessEdgeMult, LODRanges );
+		//CullQuad( nodeTransforms, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
 
 		CalculateTessellationFactors( nodeTransforms, tessEdgeMult );
 
@@ -313,92 +393,67 @@ namespace JonsEngine
 			const QuadNodeAABB& nodeAABB = mGridTraversal[ index ];
 			const QuadNodeNeighbours& nodeNeighbours = mGridNeighbours[ index ];
 
+			Vec3 nodeMin = nodeAABB.mFrustumAABB.Min();
+			Vec3 nodeMax = nodeAABB.mFrustumAABB.Max();
+
 			const QuadNodeAABB* pLeftNeighbour = nodeNeighbours.mSameLODNeighbours[ QuadNodeNeighbours::LEFT ];
-			if ( !pLeftNeighbour && nodeAABB.mFrustumAABB.Min().x != worldMin.x )
+			if ( pLeftNeighbour )
+			{
+				Vec3 neighbourMax = pLeftNeighbour->mFrustumAABB.Max();
+				if ( neighbourMax.x != nodeMin.x )
+				{
+					return false;
+				}
+			}
+			else if ( nodeMin.x != worldMin.x )
 			{
 				return false;
 			}
 
 			const QuadNodeAABB* pBottomNeighbour = nodeNeighbours.mSameLODNeighbours[ QuadNodeNeighbours::BOTTOM ];
-			if ( !pBottomNeighbour && nodeAABB.mFrustumAABB.Min().z != worldMin.y )
+			if ( pBottomNeighbour )
+			{
+				Vec3 neighbourMax = pBottomNeighbour->mFrustumAABB.Max();
+				if ( neighbourMax.z != nodeMin.z )
+				{
+					return false;
+				}
+			}
+			else if ( nodeMin.z != worldMin.y )
 			{
 				return false;
 			}
 
 			const QuadNodeAABB* pRightNeighbour = nodeNeighbours.mSameLODNeighbours[ QuadNodeNeighbours::RIGHT ];
-			if ( !pRightNeighbour && nodeAABB.mFrustumAABB.Max().z != worldMax.x )
+			if ( pRightNeighbour )
+			{
+				Vec3 neighbourMin = pRightNeighbour->mFrustumAABB.Min();
+				if ( neighbourMin.x != nodeMax.x )
+				{
+					return false;
+				}
+			}
+			else if ( nodeMax.x != worldMax.x )
 			{
 				return false;
 			}
 
 			const QuadNodeAABB* pTopNeighbour = nodeNeighbours.mSameLODNeighbours[ QuadNodeNeighbours::TOP ];
-			if ( !pTopNeighbour && nodeAABB.mFrustumAABB.Max().y != worldMax.y )
+			if ( pTopNeighbour )
+			{
+				Vec3 neighbourMin = pTopNeighbour->mFrustumAABB.Min();
+				if ( neighbourMin.z != nodeMax.z )
+				{
+					return false;
+				}
+			}
+			else if ( nodeMax.z != worldMax.y )
 			{
 				return false;
 			}
 		}
 
 		return true;
-	}
-
-	void TerrainQuadTree::AddNode( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const std::vector<float>& LODRanges ) const
-	{
-		Vec3 center = quadAABB.mFrustumAABB.GetCenter();
-		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
-
-		Mat4 transform = glm::translate( Vec3( center.x, 0.0f, center.z ) );
-		transform = glm::scale( transform, extent * 2.0f );
-		nodes.emplace_back( transform );
-	}
-
-	TerrainQuadTree::CullStatus TerrainQuadTree::CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const
-	{
-		// if parent is fully in frustum, so are we
-		AABBIntersection frustumIntersection = parentFullyInFrustum ? AABBIntersection::Inside : Intersection( quadAABB.mFrustumAABB, cameraViewProjTransform );
-		if ( frustumIntersection == AABBIntersection::Outside )
-			return CullStatus::OutOfFrustum;
-
-		float distanceLimit = LODRanges.at( quadAABB.mLODIndex );
-		AABBIntersection intersection = Intersection( quadAABB.mFrustumAABB, cameraWorldPos, distanceLimit );
-		bool isWithinDistance = intersection == AABBIntersection::Partial || intersection == AABBIntersection::Inside;
-		if ( !isWithinDistance )
-			return CullStatus::OutOfRange;
-		
-		// last LOD
-		uint32_t nextLODIndex = quadAABB.mLODIndex + 1;
-		bool isValidLODIndex = nextLODIndex < LODRanges.size();
-		if ( !isValidLODIndex )
-		{
-			AddNode( nodes, quadAABB, cameraWorldPos, LODRanges );
-			return CullStatus::Added;
-		}
-
-		float nextDistanceLimit = LODRanges.at( nextLODIndex );
-		AABBIntersection nextIntersection = Intersection( quadAABB.mFrustumAABB, cameraWorldPos, nextDistanceLimit );
-		bool nextIsWithinRange = nextIntersection == AABBIntersection::Partial || nextIntersection == AABBIntersection::Inside;
-		if ( !nextIsWithinRange )
-		{
-			AddNode( nodes, quadAABB, cameraWorldPos, LODRanges );
-			return CullStatus::Added;
-		}
-
-		CullStatus Status = CullStatus::OutOfFrustum;
-		bool completelyInFrustum = frustumIntersection == AABBIntersection::Inside;
-		std::array<CullStatus, QuadNodeAABB::NUM_CHILDREN> childrenAdded;
-		for ( int32_t childIndex = QuadNodeAABB::TOP_LEFT; childIndex < QuadNodeAABB::ChildNode::NUM_CHILDREN; ++childIndex )
-		{
-			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
-			childrenAdded[ childIndex ] = CullQuad( nodes, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum );
-
-			if ( childrenAdded[ childIndex ] == CullStatus::OutOfRange )
-			{
-				// TODO: remove & alter tess level
-				AddNode( nodes, childQuad, cameraWorldPos, LODRanges );
-				Status = CullStatus::Added;
-			}
-		}
-
-		return Status;
 	}
 
 	void TerrainQuadTree::CalculateLODRanges( std::vector<float>& LODs, float zNear, float zFar ) const
@@ -425,6 +480,150 @@ namespace JonsEngine
 			LODs[ numLODRanges - i - 1 ] = prevPos + sect * currentDetailBalance;
 			prevPos = LODs[ numLODRanges - i - 1 ];
 			currentDetailBalance *= LODDistanceRatio;
+		}
+	}
+
+	TerrainQuadTree::CullStatus TerrainQuadTree::CalculateHighestLODNodes( PerCullData& cullData, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const
+	{
+		auto AddNodeFunc = [ &cullData ]( const QuadNodeAABB& nodeToAdd )
+		{
+			std::vector<const QuadNodeAABB*>& nodes = cullData.mHighestLODNodes;
+
+			if ( !cullData.mHighestLODNodes.empty() )
+			{
+				uint32_t currentLOD = nodes.front()->mLODIndex;
+				uint32_t nodeLOD = nodeToAdd.mLODIndex;
+				if ( nodeLOD < currentLOD )
+					return;
+
+				if ( nodeLOD > currentLOD )
+				{
+					nodes.clear();
+				}
+			}
+
+			nodes.emplace_back( &nodeToAdd );
+		};
+
+		// TODO: rewrite into non-recursive
+
+		// if parent is fully in frustum, so are we
+		AABBIntersection frustumIntersection = parentFullyInFrustum ? AABBIntersection::Inside : Intersection( quadAABB.mFrustumAABB, cameraViewProjTransform );
+		if ( frustumIntersection == AABBIntersection::Outside )
+			return CullStatus::OutOfFrustum;
+
+		float distanceLimit = LODRanges.at( quadAABB.mLODIndex );
+		AABBIntersection intersection = Intersection( quadAABB.mFrustumAABB, cameraWorldPos, distanceLimit );
+		bool isWithinDistance = intersection == AABBIntersection::Partial || intersection == AABBIntersection::Inside;
+		if ( !isWithinDistance )
+			return CullStatus::OutOfRange;
+
+		// last LOD
+		uint32_t nextLODIndex = quadAABB.mLODIndex + 1;
+		bool isValidLODIndex = nextLODIndex < LODRanges.size();
+		if ( !isValidLODIndex )
+		{
+			AddNodeFunc( quadAABB );
+			return CullStatus::Added;
+		}
+
+		float nextDistanceLimit = LODRanges.at( nextLODIndex );
+		AABBIntersection nextIntersection = Intersection( quadAABB.mFrustumAABB, cameraWorldPos, nextDistanceLimit );
+		bool nextIsWithinRange = nextIntersection == AABBIntersection::Partial || nextIntersection == AABBIntersection::Inside;
+		if ( !nextIsWithinRange )
+		{
+			AddNodeFunc( quadAABB );
+			return CullStatus::Added;
+		}
+
+		CullStatus Status = CullStatus::OutOfFrustum;
+		bool completelyInFrustum = frustumIntersection == AABBIntersection::Inside;
+		std::array<CullStatus, QuadNodeAABB::NUM_CHILDREN> childrenAdded;
+		for ( int32_t childIndex = QuadNodeAABB::TOP_LEFT; childIndex < QuadNodeAABB::ChildNode::NUM_CHILDREN; ++childIndex )
+		{
+			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
+			childrenAdded[ childIndex ] = CalculateHighestLODNodes( cullData, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum );
+
+			//if ( childStatus == CullStatus::OutOfRange )
+			//{
+			//	AddNodeFunc( childQuad );
+			//	Status = CullStatus::Added;
+			//}
+		}
+
+		if ( childrenAdded[ 0 ] == CullStatus::OutOfRange && childrenAdded[ 1 ] == CullStatus::OutOfRange && childrenAdded[ 2 ] == CullStatus::OutOfRange && childrenAdded[ 3 ]  == CullStatus::OutOfRange )
+		{
+			AddNodeFunc( quadAABB );
+		}
+
+		Status = CullStatus::Added;
+
+		return Status;
+	}
+
+	void TerrainQuadTree::CalculateNodeTransforms( PerCullData& cullData, std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult, const std::vector<float>& LODRanges ) const
+	{
+		std::deque<const QuadNodeAABB*>& nodeQueue = cullData.mNodeQueue;
+		const std::vector<const QuadNodeAABB*>& highestLODNodes = cullData.mHighestLODNodes;
+
+		const QuadNodeAABB* beginNode = &mGridTraversal.front();
+		for ( const QuadNodeAABB* node : highestLODNodes )
+		{
+			uint32_t index = static_cast<uint32_t>( node -  beginNode );
+			cullData.mNodeAddedLookup.set( index );
+		}
+		nodeQueue.insert( nodeQueue.begin(), highestLODNodes.cbegin(), highestLODNodes.cend() );
+
+		std::vector<QuadNodeAABB::ChildNode> childrenNotAdded;
+		childrenNotAdded.reserve( QuadNodeAABB::NUM_CHILDREN );
+
+		while ( !nodeQueue.empty() )
+		{
+			const QuadNodeAABB* node = nodeQueue.front();
+			nodeQueue.pop_front();
+
+			if ( node->mChildBegin )
+			{
+				for ( int32_t childIndex = QuadNodeAABB::TOP_LEFT; childIndex < QuadNodeAABB::ChildNode::NUM_CHILDREN; ++childIndex )
+				{
+					const QuadNodeAABB* childQuad = node->mChildBegin + childIndex;
+					uint32_t index = static_cast<uint32_t>( childQuad - beginNode );
+					bool added = cullData.mNodeAddedLookup.test( index );
+
+					if ( !added )
+						childrenNotAdded.emplace_back( static_cast<QuadNodeAABB::ChildNode>( childIndex ) );
+				}
+
+				while ( !childrenNotAdded.empty() )
+				{
+					QuadNodeAABB::ChildNode firstIndex, secondIndex;
+					PopNeighbouringChildren( firstIndex, secondIndex, childrenNotAdded );
+
+					assert( firstIndex != QuadNodeAABB::INVALID );
+
+					const QuadNodeAABB* childNodeFirst = node->mChildBegin + firstIndex;
+					if ( secondIndex == QuadNodeAABB::INVALID )
+					{
+						AddNode( nodeTransforms, *childNodeFirst );
+					}
+					else
+					{
+						const QuadNodeAABB* childNodeSecond = node->mChildBegin + secondIndex;
+						AddNode( nodeTransforms, *childNodeFirst, *childNodeSecond, firstIndex, secondIndex );
+					}
+				}
+			}
+			else
+			{
+				AddNode( nodeTransforms, *node );
+				
+				uint32_t parentIndex = static_cast<uint32_t>( node->mParent - beginNode );
+				if ( !cullData.mNodeAddedLookup.test( parentIndex ) )
+				{
+					nodeQueue.push_back( node->mParent );
+					cullData.mNodeAddedLookup.set( parentIndex );
+				}
+			}
 		}
 	}
 

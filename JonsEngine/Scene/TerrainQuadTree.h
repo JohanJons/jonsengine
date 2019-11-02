@@ -4,6 +4,8 @@
 #include "Core/Math/AABB.h"
 
 #include <vector>
+#include <deque>
+#include "boost/dynamic_bitset.hpp"
 
 namespace JonsEngine
 {
@@ -47,10 +49,19 @@ namespace JonsEngine
 		std::array<const QuadNodeAABB*, 4> mSameLODNeighbours;
 	};
 
+	struct PerCullData
+	{
+		PerCullData( uint32_t numTreeNodes );
+
+		std::vector<const QuadNodeAABB*> mHighestLODNodes;
+		std::deque<const QuadNodeAABB*> mNodeQueue;
+		boost::dynamic_bitset<> mNodeAddedLookup;
+	};
+
 	class TerrainQuadTree
 	{
 	public:
-		TerrainQuadTree() { }
+		TerrainQuadTree() = default;
 		TerrainQuadTree( const std::vector<uint8_t>& heightmapData, uint32_t width, uint32_t height, uint32_t patchMinSize, float heightmapScale, const Mat4& worldTransform );
 
 		void CullNodes( std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult, std::vector<float>& LODRanges, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const;
@@ -77,9 +88,9 @@ namespace JonsEngine
 
 		uint32_t ExpectedNumNodes( float width, uint32_t patchMinSize ) const;
 
-		void AddNode( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const std::vector<float>& LODRanges ) const;
-		CullStatus CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const;
 		void CalculateLODRanges( std::vector<float>& LODs, float zNear, float zFar ) const;
+		CullStatus CalculateHighestLODNodes( PerCullData& cullData, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const;
+		void CalculateNodeTransforms( PerCullData& cullData, std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult, const std::vector<float>& LODRanges ) const;
 		void CalculateTessellationFactors( std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult ) const;
 
 		uint32_t mPatchMinSize;

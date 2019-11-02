@@ -65,10 +65,10 @@ namespace JonsGame
 
 		nodeTerrain.SetVisible( !nodeTerrain.IsVisible() );
 		nodeTerrainTest.SetVisible( !nodeTerrainTest.IsVisible() );
-
+		
 		if ( nodeTerrainTest.IsVisible() )
 		{
-			scene.GetSceneCamera().SetPosition( { -41.63, 5.68, 14.8 } );
+			scene.GetSceneCamera().SetPosition( { -42.23, 16.97, 18.2348 } );
 			//scene.GetSceneCamera().SetPosition( { -31.9, 4.47, 0.286 } );
 		}
 		else
