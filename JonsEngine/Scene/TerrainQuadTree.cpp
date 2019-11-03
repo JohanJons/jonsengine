@@ -574,9 +574,6 @@ namespace JonsEngine
 		}
 		nodeQueue.insert( nodeQueue.begin(), highestLODNodes.cbegin(), highestLODNodes.cend() );
 
-		std::vector<QuadNodeAABB::ChildNode> childrenNotAdded;
-		childrenNotAdded.reserve( QuadNodeAABB::NUM_CHILDREN );
-
 		while ( !nodeQueue.empty() )
 		{
 			const QuadNodeAABB* node = nodeQueue.front();
@@ -587,42 +584,35 @@ namespace JonsEngine
 				for ( int32_t childIndex = QuadNodeAABB::TOP_LEFT; childIndex < QuadNodeAABB::ChildNode::NUM_CHILDREN; ++childIndex )
 				{
 					const QuadNodeAABB* childQuad = node->mChildBegin + childIndex;
-					uint32_t index = static_cast<uint32_t>( childQuad - beginNode );
+					uint32_t nodeIndex = static_cast<uint32_t>( childQuad - beginNode );
+					const QuadNodeNeighbours& neighbours = mGridNeighbours.at( nodeIndex );
+
+					bool hasLowerLODNeighbours = false;
+					for ( int32_t neighbourOffset = QuadNodeNeighbours::LEFT; neighbourOffset < QuadNodeNeighbours::NUM_OFFSETS; ++neighbourOffset )
+					{
+						const QuadNodeAABB* neighbourQuad = neighbours.mSameLODNeighbours.at( neighbourOffset );
+						uint32_t neighbourIndex = static_cast<uint32_t>( neighbourQuad - beginNode );
+						if ( !cullData.mNodeAddedLookup.test( neighbourIndex ) )
+							continue;
+
+						
+					}
+
 					bool added = cullData.mNodeAddedLookup.test( index );
 
-					if ( !added )
+					//if ( !added )
 						childrenNotAdded.emplace_back( static_cast<QuadNodeAABB::ChildNode>( childIndex ) );
 				}
 
-				while ( !childrenNotAdded.empty() )
-				{
-					QuadNodeAABB::ChildNode firstIndex, secondIndex;
-					PopNeighbouringChildren( firstIndex, secondIndex, childrenNotAdded );
-
-					assert( firstIndex != QuadNodeAABB::INVALID );
-
-					const QuadNodeAABB* childNodeFirst = node->mChildBegin + firstIndex;
-					if ( secondIndex == QuadNodeAABB::INVALID )
-					{
-						AddNode( nodeTransforms, *childNodeFirst );
-					}
-					else
-					{
-						const QuadNodeAABB* childNodeSecond = node->mChildBegin + secondIndex;
-						AddNode( nodeTransforms, *childNodeFirst, *childNodeSecond, firstIndex, secondIndex );
-					}
-				}
 			}
 			else
-			{
 				AddNode( nodeTransforms, *node );
-				
-				uint32_t parentIndex = static_cast<uint32_t>( node->mParent - beginNode );
-				if ( !cullData.mNodeAddedLookup.test( parentIndex ) )
-				{
-					nodeQueue.push_back( node->mParent );
-					cullData.mNodeAddedLookup.set( parentIndex );
-				}
+
+			uint32_t parentIndex = static_cast<uint32_t>( node->mParent - beginNode );
+			if ( !cullData.mNodeAddedLookup.test( parentIndex ) )
+			{
+				nodeQueue.push_back( node->mParent );
+				cullData.mNodeAddedLookup.set( parentIndex );
 			}
 		}
 	}
