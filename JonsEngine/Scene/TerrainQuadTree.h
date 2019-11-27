@@ -49,11 +49,19 @@ namespace JonsEngine
 		std::array<const QuadNodeAABB*, 4> mSameLODNeighbours;
 	};
 
+	enum class QuadNodeCullStatus
+	{
+		OutOfFrustum,
+		OutOfRange,
+		Added
+	};
+
 	struct PerCullData
 	{
 		PerCullData( uint32_t numTreeNodes );
 
 		std::vector<const QuadNodeAABB*> mHighestLODNodes;
+		std::vector<QuadNodeCullStatus> mIntersectionResults;
 		std::deque<const QuadNodeAABB*> mNodeQueue;
 		boost::dynamic_bitset<> mNodeAddedLookup;
 	};
@@ -73,13 +81,6 @@ namespace JonsEngine
 		void GetWorldXZBounds( Vec2& worldMin, Vec2& worldMax ) const;
 
 	private:
-		enum class CullStatus
-		{
-			OutOfFrustum,
-			OutOfRange,
-			Added
-		};
-
 		void CreateGridNode( QuadNodeAABB* parent, float centerX, float centerZ, float width, float height, uint32_t LODlevel, float yTranslation );
 		// local space during function
 		void ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, uint32_t heightmapWidth, uint32_t LODlevel, float yTranslation );
@@ -88,8 +89,15 @@ namespace JonsEngine
 
 		uint32_t ExpectedNumNodes( float width, uint32_t patchMinSize ) const;
 
+
+
+		void AddNode2( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const std::vector<float>& LODRanges ) const;
+		QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const;
+
+
+
 		void CalculateLODRanges( std::vector<float>& LODs, float zNear, float zFar ) const;
-		CullStatus CalculateHighestLODNodes( PerCullData& cullData, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const;
+		QuadNodeCullStatus CalculateHighestLODNodes( PerCullData& cullData, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const;
 		void CalculateNodeTransforms( PerCullData& cullData, std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult, const std::vector<float>& LODRanges ) const;
 		void CalculateTessellationFactors( std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult ) const;
 
