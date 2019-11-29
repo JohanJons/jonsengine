@@ -56,14 +56,10 @@ namespace JonsEngine
 		Added
 	};
 
-	struct PerCullData
+	struct RenderedNode
 	{
-		PerCullData( uint32_t numTreeNodes );
 
-		std::vector<const QuadNodeAABB*> mHighestLODNodes;
-		std::vector<QuadNodeCullStatus> mIntersectionResults;
-		std::deque<const QuadNodeAABB*> mNodeQueue;
-		boost::dynamic_bitset<> mNodeAddedLookup;
+		std::array<bool, 4> mAddedChildren;
 	};
 
 	class TerrainQuadTree
@@ -89,17 +85,10 @@ namespace JonsEngine
 
 		uint32_t ExpectedNumNodes( float width, uint32_t patchMinSize ) const;
 
-
-
-		void AddNode2( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const std::vector<float>& LODRanges ) const;
+		void AddNode( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const std::vector<float>& LODRanges ) const;
 		QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const;
 
-
-
 		void CalculateLODRanges( std::vector<float>& LODs, float zNear, float zFar ) const;
-		QuadNodeCullStatus CalculateHighestLODNodes( PerCullData& cullData, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const;
-		void CalculateNodeTransforms( PerCullData& cullData, std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult, const std::vector<float>& LODRanges ) const;
-		void CalculateTessellationFactors( std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult ) const;
 
 		uint32_t mPatchMinSize;
 		float mHeightmapScale;

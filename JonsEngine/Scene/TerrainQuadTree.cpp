@@ -49,39 +49,6 @@ namespace
 		assert( first != QuadNodeAABB::INVALID && second != QuadNodeAABB::INVALID );
 	}
 
-	void AddNode( std::vector<Mat4>& nodes, const QuadNodeAABB& firstNode )
-	{
-		Vec3 center = firstNode.mFrustumAABB.GetCenter();
-		Vec3 extent = firstNode.mFrustumAABB.GetExtent();
-
-		Mat4 transform = glm::translate( Vec3( center.x, 0.0f, center.z ) );
-		transform = glm::scale( transform, extent * 2.0f );
-		nodes.emplace_back( transform );
-	}
-
-	void AddNode( std::vector<Mat4>& nodes, const QuadNodeAABB& firstNode, const QuadNodeAABB& secondNode, QuadNodeAABB::ChildNode firstIndex, QuadNodeAABB::ChildNode secondIndex )
-	{
-		Vec3 center = ( firstNode.mFrustumAABB.GetCenter() + secondNode.mFrustumAABB.GetCenter() ) / 2.0f;
-		Vec3 extent = firstNode.mFrustumAABB.GetExtent();
-
-		QuadNodeAABB::ChildNode lowerIndex = firstIndex > secondIndex ? secondIndex : firstIndex;
-		QuadNodeAABB::ChildNode higherIndex = lowerIndex == firstIndex ? secondIndex : firstIndex;
-		if ( ( lowerIndex == QuadNodeAABB::TOP_LEFT && higherIndex == QuadNodeAABB::TOP_RIGHT ) || ( lowerIndex == QuadNodeAABB::BOTTOM_LEFT && higherIndex == QuadNodeAABB::BOTTOM_RIGHT ) )
-		{
-			extent.x *= 2.0f;
-		}
-		else if ( ( lowerIndex == QuadNodeAABB::TOP_LEFT && higherIndex == QuadNodeAABB::BOTTOM_LEFT ) || ( lowerIndex == QuadNodeAABB::BOTTOM_RIGHT && higherIndex == QuadNodeAABB::TOP_RIGHT ) )
-		{
-			extent.z *= 2.0f;
-		}
-		else
-			assert( false && "Wrong child index pairing" );
-
-		Mat4 transform = glm::translate( Vec3( center.x, 0.0f, center.z ) );
-		transform = glm::scale( transform, extent * 2.0f );
-		nodes.emplace_back( transform );
-	}
-
 	QuadNodeAABB::ChildNode GetOpposite( QuadNodeAABB::ChildNode child, QuadNodeNeighbours::Facing facing )
 	{
 		switch ( facing )
@@ -128,13 +95,6 @@ namespace
 
 namespace JonsEngine
 {
-	PerCullData::PerCullData( uint32_t numTreeNodes )
-	{
-		mHighestLODNodes.reserve( 64 );
-		mIntersectionResults.resize( numTreeNodes, QuadNodeCullStatus::OutOfFrustum );
-		mNodeAddedLookup.resize( numTreeNodes, false );
-	}
-
 	TerrainQuadTree::TerrainQuadTree( const std::vector<uint8_t>& heightmapData, uint32_t width, uint32_t height, uint32_t patchMinSize, float heightmapScale, const Mat4& worldTransform ) :
 		mPatchMinSize( patchMinSize ),
 		mHeightmapScale( heightmapScale )
@@ -173,17 +133,18 @@ namespace JonsEngine
 	{
 		nodeTransforms.clear();
 		LODRanges.clear();
+		//tessEdgeMult.clear();
 
 		CalculateLODRanges( LODRanges, zNear, zFar );
 
-		PerCullData cullData( GetNumNodes() );
+		//PerCullData cullData( GetNumNodes() );
 		//CalculateHighestLODNodes( cullData, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
 		//CalculateNodeTransforms( cullData, nodeTransforms, tessEdgeMult, LODRanges );
-		CullQuad( nodeTransforms, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
+		//CullQuad( nodeTransforms, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
 
-		CalculateTessellationFactors( nodeTransforms, tessEdgeMult );
+		//CalculateTessellationFactors( nodeTransforms, tessEdgeMult );
 
-		assert( nodeTransforms.size() == tessEdgeMult.size() );
+		//assert( nodeTransforms.size() == tessEdgeMult.size() );
 	}
 
 	uint32_t TerrainQuadTree::GetNumLODRanges() const
@@ -484,13 +445,7 @@ namespace JonsEngine
 		}
 	}
 
-
-
-
-
-
-
-	void TerrainQuadTree::AddNode2( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const std::vector<float>& LODRanges ) const
+	void TerrainQuadTree::AddNode( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const std::vector<float>& LODRanges ) const
 	{
 		Vec3 center = quadAABB.mFrustumAABB.GetCenter();
 		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
@@ -518,7 +473,7 @@ namespace JonsEngine
 		bool isValidLODIndex = nextLODIndex < LODRanges.size();
 		if ( !isValidLODIndex )
 		{
-			AddNode2( nodes, quadAABB, cameraWorldPos, LODRanges );
+			AddNode( nodes, quadAABB, cameraWorldPos, LODRanges );
 			return QuadNodeCullStatus::Added;
 		}
 
@@ -527,7 +482,7 @@ namespace JonsEngine
 		bool nextIsWithinRange = nextIntersection == AABBIntersection::Partial || nextIntersection == AABBIntersection::Inside;
 		if ( !nextIsWithinRange )
 		{
-			AddNode2( nodes, quadAABB, cameraWorldPos, LODRanges );
+			AddNode( nodes, quadAABB, cameraWorldPos, LODRanges );
 			return QuadNodeCullStatus::Added;
 		}
 
@@ -553,434 +508,5 @@ namespace JonsEngine
 		}
 
 		return Status;
-	}
-
-
-
-
-
-
-
-	QuadNodeCullStatus TerrainQuadTree::CalculateHighestLODNodes( PerCullData& cullData, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const
-	{
-		auto AddNodeFunc = [ &cullData ]( const QuadNodeAABB& nodeToAdd )
-		{
-			std::vector<const QuadNodeAABB*>& nodes = cullData.mHighestLODNodes;
-
-			if ( !cullData.mHighestLODNodes.empty() )
-			{
-				uint32_t currentLOD = nodes.front()->mLODIndex;
-				uint32_t nodeLOD = nodeToAdd.mLODIndex;
-				if ( nodeLOD < currentLOD )
-					return;
-
-				if ( nodeLOD > currentLOD )
-				{
-					nodes.clear();
-				}
-			}
-
-			nodes.emplace_back( &nodeToAdd );
-		};
-
-		// TODO: rewrite into non-recursive
-
-		// if parent is fully in frustum, so are we
-		AABBIntersection frustumIntersection = parentFullyInFrustum ? AABBIntersection::Inside : Intersection( quadAABB.mFrustumAABB, cameraViewProjTransform );
-		if ( frustumIntersection == AABBIntersection::Outside )
-			return QuadNodeCullStatus::OutOfFrustum;
-
-		float distanceLimit = LODRanges.at( quadAABB.mLODIndex );
-		AABBIntersection intersection = Intersection( quadAABB.mFrustumAABB, cameraWorldPos, distanceLimit );
-		bool isWithinDistance = intersection == AABBIntersection::Partial || intersection == AABBIntersection::Inside;
-		if ( !isWithinDistance )
-			return QuadNodeCullStatus::OutOfRange;
-		
-		// last LOD
-		uint32_t nextLODIndex = quadAABB.mLODIndex + 1;
-		bool isValidLODIndex = nextLODIndex < LODRanges.size();
-		if ( !isValidLODIndex )
-		{
-			AddNodeFunc( quadAABB );
-			return QuadNodeCullStatus::Added;
-		}
-
-		float nextDistanceLimit = LODRanges.at( nextLODIndex );
-		AABBIntersection nextIntersection = Intersection( quadAABB.mFrustumAABB, cameraWorldPos, nextDistanceLimit );
-		bool nextIsWithinRange = nextIntersection == AABBIntersection::Partial || nextIntersection == AABBIntersection::Inside;
-		if ( !nextIsWithinRange )
-		{
-			AddNodeFunc( quadAABB );
-			return QuadNodeCullStatus::Added;
-		}
-
-		QuadNodeCullStatus Status = QuadNodeCullStatus::OutOfFrustum;
-		bool completelyInFrustum = frustumIntersection == AABBIntersection::Inside;
-		std::array<QuadNodeCullStatus, QuadNodeAABB::NUM_CHILDREN> childrenAdded;
-		for ( int32_t childIndex = QuadNodeAABB::TOP_LEFT; childIndex < QuadNodeAABB::ChildNode::NUM_CHILDREN; ++childIndex )
-		{
-			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
-			childrenAdded[ childIndex ] = CalculateHighestLODNodes( cullData, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum );
-
-			uint32_t nodeIndex = static_cast<uint32_t>( &childQuad - &mGridTraversal.front() );
-			cullData.mIntersectionResults[ nodeIndex ] = childrenAdded[ childIndex ];
-			//if ( childStatus == CullStatus::OutOfRange )
-			//{
-			//	AddNodeFunc( childQuad );
-			//	Status = CullStatus::Added;
-			//}
-		}
-
-		if ( childrenAdded[ 0 ] == QuadNodeCullStatus::OutOfRange && childrenAdded[ 1 ] == QuadNodeCullStatus::OutOfRange && childrenAdded[ 2 ] == QuadNodeCullStatus::OutOfRange && childrenAdded[ 3 ]  == QuadNodeCullStatus::OutOfRange )
-		{
-			AddNodeFunc( quadAABB );
-		}
-
-		Status = QuadNodeCullStatus::Added;
-
-		uint32_t nodeIndex = static_cast<uint32_t>( &quadAABB - &mGridTraversal.front() );
-		cullData.mIntersectionResults[ nodeIndex ] = Status;
-
-		return Status;
-	}
-
-	void TerrainQuadTree::CalculateNodeTransforms( PerCullData& cullData, std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult, const std::vector<float>& LODRanges ) const
-	{
-		std::deque<const QuadNodeAABB*>& nodeQueue = cullData.mNodeQueue;
-		const std::vector<const QuadNodeAABB*>& highestLODNodes = cullData.mHighestLODNodes;
-
-		const QuadNodeAABB* beginNode = &mGridTraversal.front();
-		for ( const QuadNodeAABB* node : highestLODNodes )
-		{
-			uint32_t index = static_cast<uint32_t>( node -  beginNode );
-			cullData.mNodeAddedLookup.set( index );
-		}
-		nodeQueue.insert( nodeQueue.begin(), highestLODNodes.cbegin(), highestLODNodes.cend() );
-
-		while ( !nodeQueue.empty() )
-		{
-			const QuadNodeAABB* node = nodeQueue.front();
-			nodeQueue.pop_front();
-
-			if ( node->mChildBegin )
-			{
-				for ( int32_t childIndex = QuadNodeAABB::TOP_LEFT; childIndex < QuadNodeAABB::ChildNode::NUM_CHILDREN; ++childIndex )
-				{
-					const QuadNodeAABB* childQuad = node->mChildBegin + childIndex;
-					uint32_t nodeIndex = static_cast<uint32_t>( childQuad - beginNode );
-					const QuadNodeNeighbours& neighbours = mGridNeighbours.at( nodeIndex );
-
-					bool hasLowerLODNeighbours = false;
-					for ( int32_t neighbourOffset = QuadNodeNeighbours::LEFT; neighbourOffset < QuadNodeNeighbours::NUM_OFFSETS && !hasLowerLODNeighbours; ++neighbourOffset )
-					{
-						const QuadNodeAABB* neighbourQuad = neighbours.mSameLODNeighbours.at( neighbourOffset );
-						if ( !neighbourQuad )
-							continue;
-
-						uint32_t neighbourIndex = static_cast<uint32_t>( neighbourQuad - beginNode );
-						if ( !cullData.mNodeAddedLookup.test( neighbourIndex ) )
-							continue;
-
-						if ( !neighbourQuad->mChildBegin )
-							continue;
-
-						for ( int32_t childOfNeighbourIndex = QuadNodeAABB::TOP_LEFT; childOfNeighbourIndex < QuadNodeAABB::ChildNode::NUM_CHILDREN; ++childOfNeighbourIndex )
-						{
-							const QuadNodeAABB* childOfNeighbourQuad = neighbourQuad->mChildBegin + childOfNeighbourIndex;
-							uint32_t childOfNeighbourNodeIndex = static_cast<uint32_t>( childOfNeighbourQuad - beginNode );
-							if ( cullData.mNodeAddedLookup.test( childOfNeighbourNodeIndex ) )
-							{
-								hasLowerLODNeighbours = true;
-								break;
-							}
-						}
-					}
-
-					if ( hasLowerLODNeighbours )
-					{
-						for ( int32_t childIndex = QuadNodeAABB::TOP_LEFT; childIndex < QuadNodeAABB::ChildNode::NUM_CHILDREN; ++childIndex )
-						{
-							const QuadNodeAABB* childOfChildQuad = node->mChildBegin + childIndex;
-							AddNode( nodeTransforms, *childOfChildQuad );
-							uint32_t childOfChildNodeIndex = static_cast<uint32_t>( childOfChildQuad - beginNode );
-							cullData.mNodeAddedLookup.set( childOfChildNodeIndex );
-						}
-					}
-					else
-					{
-						AddNode( nodeTransforms, *childQuad );
-					}
-
-					cullData.mNodeAddedLookup.set( nodeIndex );
-				}
-
-			}
-			else
-				AddNode( nodeTransforms, *node );
-
-			if ( !node->mParent )
-				continue;
-
-			uint32_t parentIndex = static_cast<uint32_t>( node->mParent - beginNode );
-			QuadNodeCullStatus cullStatus = cullData.mIntersectionResults[ parentIndex ];
-			bool isNotAdded = !cullData.mNodeAddedLookup.test( parentIndex );
-			bool isWithinFrustum = cullStatus != QuadNodeCullStatus::OutOfFrustum;
-
-			if ( isNotAdded && isWithinFrustum )
-			{
-				nodeQueue.push_back( node->mParent );
-				cullData.mNodeAddedLookup.set( parentIndex );
-			}
-		}
-	}
-
-	void TerrainQuadTree::CalculateTessellationFactors( std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult ) const
-	{
-		tessEdgeMult.resize( nodeTransforms.size(), Vec4( 1.0f ) );
-		
-		for ( int32_t mainIndex = 0; mainIndex < static_cast<int32_t>( nodeTransforms.size() ); ++mainIndex )
-		{
-			Mat4& transform = nodeTransforms[ mainIndex ];
-			// order: left - bottom - right - top
-			Vec4& tessMult = tessEdgeMult[ mainIndex ];
-
-			Vec2 transformMin, transformMax;
-			GetTransformExtentsXZ( transform, transformMin, transformMax );
-
-			//float midX = ( transformMin.x + transformMax.x ) / 2;
-			//float midZ = ( transformMin.y + transformMax.y ) / 2;
-			//Vec2 top( midX, transformMax.y ), left( transformMin.x, midZ ), bottom( midX, transformMin.y ), right( transformMax.x, midZ );
-
-			for ( const Mat4& otherTransform : nodeTransforms )
-			{
-				if ( &otherTransform == &transform )
-					continue;
-
-				Vec2 otherMin, otherMax;
-				GetTransformExtentsXZ( otherTransform, otherMin, otherMax );
-
-				// left
-				if ( transformMin.x == otherMax.x && ( transformMax.y >= otherMax.y && transformMin.y <= otherMin.y ) )
-				{
-					float otherLength = otherMax.y - otherMin.y;
-					float thislength = transformMax.y - transformMin.y;
-					if ( thislength > otherLength )
-					{
-						tessMult.x = 2.0f;
-					}
-
-					if ( thislength / otherLength == 4.0f )
-					{
-						transform[ 0 ][ 0 ] *= 0.5f;
-						transform[ 3 ][ 0 ] += transform[ 0 ][ 0 ] / 2.0f;
-
-						Vec3 scale( transform[ 0 ][ 0 ], transform[ 1 ][ 1 ], transform[ 2 ][ 2 ] );
-						scale.z /= 2.0f;
-						Mat4 scaleTransform = glm::scale( scale );
-
-						Vec3 translation( transform[ 3 ] );
-						translation.x -= ( transform[ 0 ][ 0 ] );
-
-						Vec3 translation1( translation );
-						translation1.z += scale.z / 2.0f;
-						Mat4 transform1 = glm::translate( translation1 );
-						transform1 *= scaleTransform;
-
-						nodeTransforms.emplace_back( transform1 );
-						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
-
-						Vec3 translation2( translation );
-						translation2.z -= scale.z / 2.0f;
-						Mat4 transform2 = glm::translate( translation2 );
-						transform2 *= scaleTransform;
-
-						nodeTransforms.emplace_back( transform2 );
-						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
-
-						break;
-					}
-				}
-				// bottom-edge
-				else if ( transformMin.y == otherMax.y && ( transformMax.x >= otherMax.x && transformMin.x <= otherMin.x ) )
-				{
-					float otherLength = otherMax.x - otherMin.x;
-					float thislength = transformMax.x - transformMin.x;
-					if ( thislength > otherLength )
-					{
-						tessMult.y = 2.0f;
-					}
-
-					if ( thislength / otherLength == 4.0f )
-					{
-						transform[ 2 ][ 2 ] *= 0.5f;
-						transform[ 3 ][ 2 ] += transform[ 2 ][ 2 ] / 2.0f;
-
-						Vec3 scale( transform[ 0 ][ 0 ], transform[ 1 ][ 1 ], transform[ 2 ][ 2 ] );
-						scale.x /= 2.0f;
-						Mat4 scaleTransform = glm::scale( scale );
-
-						Vec3 translation( transform[ 3 ] );
-						translation.z -= transform[ 2 ][ 2 ];
-
-						Vec3 translation1( translation );
-						translation1.x += scale.x / 2.0f;
-						Mat4 transform1 = glm::translate( translation1 );
-						transform1 *= scaleTransform;
-
-						nodeTransforms.emplace_back( transform1 );
-						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
-
-						Vec3 translation2( translation );
-						translation2.x -= scale.x / 2.0f;
-						Mat4 transform2 = glm::translate( translation2 );
-						transform2 *= scaleTransform;
-
-						nodeTransforms.emplace_back( transform2 );
-						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
-
-						break;
-					}
-				}
-				// right-edge
-				else if ( transformMax.x == otherMin.x && ( transformMax.y >= otherMax.y && transformMin.y <= otherMin.y ) )
-				{
-					float otherLength = otherMax.y - otherMin.y;
-					float thislength = transformMax.y - transformMin.y;
-					if ( thislength > otherLength )
-					{
-						tessMult.z = 2.0f;
-					}
-
-					if ( thislength / otherLength == 4.0f )
-					{
-						transform[ 0 ][ 0 ] *= 0.5f;
-						transform[ 3 ][ 0 ] -= transform[ 0 ][ 0 ] / 2.0f;
-
-						Vec3 scale( transform[ 0 ][ 0 ], transform[ 1 ][ 1 ], transform[ 2 ][ 2 ] );
-						scale.z /= 2.0f;
-						Mat4 scaleTransform = glm::scale( scale );
-
-						Vec3 translation( transform[ 3 ] );
-						translation.x += ( transform[ 0 ][ 0 ] );
-
-						Vec3 translation1( translation );
-						translation1.z += scale.z / 2.0f;
-						Mat4 transform1 = glm::translate( translation1 );
-						transform1 *= scaleTransform;
-
-						nodeTransforms.emplace_back( transform1 );
-						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
-
-						Vec3 translation2( translation );
-						translation2.z -= scale.z / 2.0f;
-						Mat4 transform2 = glm::translate( translation2 );
-						transform2 *= scaleTransform;
-
-						nodeTransforms.emplace_back( transform2 );
-						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
-
-						break;
-					}
-				}
-				// top-edge
-				else if ( transformMax.y == otherMin.y && ( transformMax.x >= otherMax.x && transformMin.x <= otherMin.x ) )
-				{
-					float otherLength = otherMax.x - otherMin.x;
-					float thislength = transformMax.x - transformMin.x;
-					if ( thislength > otherLength )
-					{
-						tessMult.w = 2.0f;
-					}
-
-					if ( thislength / otherLength == 4.0f )
-					{
-						transform[ 2 ][ 2 ] *= 0.5f;
-						transform[ 3 ][ 2 ] -= transform[ 2 ][ 2 ] / 2.0f;
-
-						Vec3 scale( transform[ 0 ][ 0 ], transform[ 1 ][ 1 ], transform[ 2 ][ 2 ] );
-						scale.x /= 2.0f;
-						Mat4 scaleTransform = glm::scale( scale );
-
-						Vec3 translation( transform[ 3 ] );
-						translation.z += transform[ 2 ][ 2 ];
-
-						Vec3 translation1( translation );
-						translation1.x += scale.x / 2.0f;
-						Mat4 transform1 = glm::translate( translation1 );
-						transform1 *= scaleTransform;
-
-						nodeTransforms.emplace_back( transform1 );
-						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
-
-						Vec3 translation2( translation );
-						translation2.x -= scale.x / 2.0f;
-						Mat4 transform2 = glm::translate( translation2 );
-						transform2 *= scaleTransform;
-
-						nodeTransforms.emplace_back( transform2 );
-						tessEdgeMult.emplace_back( Vec4( 1.0f ) );
-
-						break;
-					}
-				}
-
-			}
-		}
-
-		
-		for ( const Mat4& transform : nodeTransforms )
-		{
-			Vec2 transformMin, transformMax;
-			GetTransformExtentsXZ( transform, transformMin, transformMax );
-
-			float midX = ( transformMin.x + transformMax.x ) / 2;
-			float midZ = ( transformMin.y + transformMax.y ) / 2;
-			Vec2 top( midX, transformMax.y ), left( transformMin.x, midZ ), bottom( midX, transformMin.y ), right( transformMax.x, midZ );
-
-			// DEBUG
-			// DEBUG
-			// DEBUG
-			// DEBUG
-			// DEBUG
-			for ( Mat4& otherTransform : nodeTransforms )
-			{
-				if ( &transform == &otherTransform )
-				{
-					continue;
-				}
-
-				Vec2 otherMin, otherMax;
-				GetTransformExtentsXZ( otherTransform, otherMin, otherMax );
-
-				// left-edge
-				if ( left.x == otherMax.x && ( left.y == otherMin.y || left.y == otherMax.y ) )
-				{
-					float otherLength = otherMax.y - otherMin.y;
-					float thislength = transformMax.y - transformMin.y;
-					assert( thislength / otherLength < 4.0f );
-				}
-				// bottom-edge
-				else if ( bottom.y == otherMax.y && ( bottom.x == otherMin.x || bottom.x == otherMax.x ) )
-				{
-					float otherLength = otherMax.x - otherMin.x;
-					float thislength = transformMax.x - transformMin.x;
-					assert( thislength / otherLength < 4.0f );
-				}
-				// right-edge
-				else if ( right.x == otherMin.x && ( right.y == otherMin.y || right.y == otherMax.y ) )
-				{
-					float otherLength = otherMax.y - otherMin.y;
-					float thislength = transformMax.y - transformMin.y;
-					assert( thislength / otherLength < 4.0f );
-				}
-				// top-edge
-				else if ( top.y == otherMin.y && ( top.x == otherMin.x || top.x == otherMax.x ) )
-				{
-					float otherLength = otherMax.x - otherMin.x;
-					float thislength = transformMax.x - transformMin.x;
-					assert( thislength / otherLength < 4.0f );
-				}
-			}
-		}
 	}
 }
