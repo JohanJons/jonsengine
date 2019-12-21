@@ -67,7 +67,8 @@ namespace JonsEngine
 
 		uint32_t ExpectedNumNodes( float width, uint32_t patchMinSize ) const;
 
-		void AddNode( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB, uint32_t LOD ) const;
+		void AddNode( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB ) const;
+		void AddNode( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB, bool addBL, bool addBR, bool addTR, bool addTL ) const;
 		QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const;
 
 		void CalculateLODRanges( std::vector<float>& LODs, float zNear, float zFar ) const;

@@ -57,6 +57,7 @@ namespace JonsEngine
 		//tessEdgeMult.clear();
 
 		CalculateLODRanges( LODRanges, zNear, zFar );
+		CullQuad( renderableQuads, mGridTraversal.front(), );
 
 		//PerCullData cullData( GetNumNodes() );
 		//CalculateHighestLODNodes( cullData, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
@@ -204,14 +205,26 @@ namespace JonsEngine
 		}
 	}
 
-	void TerrainQuadTree::AddNode( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB, uint32_t LOD, bool addBL, bool addBR,  ) const
+	void TerrainQuadTree::AddNode( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB ) const
+	{
+		AddNode( renderableQuads, quadAABB, true, true, true, true );
+	}
+
+	void TerrainQuadTree::AddNode( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB, bool addBL, bool addBR, bool addTR, bool addTL ) const
 	{
 		Vec3 center = quadAABB.mFrustumAABB.GetCenter();
 		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
 
 		Mat4 transform = glm::translate( Vec3( center.x, 0.0f, center.z ) );
 		transform = glm::scale( transform, extent * 2.0f );
-		renderableQuads.emplace_back( transform, LOD );
+
+		std::bitset<QuadChildEnum::QUAD_CHILD_COUNT> bitset;
+		bitset.set( QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT, addBL );
+		bitset.set( QuadChildEnum::QUAD_CHILD_BOTTOM_RIGHT, addBR );
+		bitset.set( QuadChildEnum::QUAD_CHILD_TOP_RIGHT, addTR );
+		bitset.set( QuadChildEnum::QUAD_CHILD_TOP_LEFT, addTL );
+
+		renderableQuads.emplace_back( transform, quadAABB.mLODIndex, bitset );
 	}
 
 	QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const
@@ -232,7 +245,7 @@ namespace JonsEngine
 		bool isValidLODIndex = nextLODIndex < LODRanges.size();
 		if ( !isValidLODIndex )
 		{
-			AddNode( renderableQuads, quadAABB, quadAABB.mLODIndex );
+			AddNode( renderableQuads, quadAABB );
 			return QuadNodeCullStatus::Added;
 		}
 
@@ -241,7 +254,7 @@ namespace JonsEngine
 		bool nextIsWithinRange = nextIntersection == AABBIntersection::Partial || nextIntersection == AABBIntersection::Inside;
 		if ( !nextIsWithinRange )
 		{
-			AddNode( renderableQuads, quadAABB, cameraWorldPos, LODRanges );
+			AddNode( renderableQuads, quadAABB );
 			return QuadNodeCullStatus::Added;
 		}
 
@@ -252,19 +265,23 @@ namespace JonsEngine
 		{
 			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
 			childrenAdded[ childIndex ] = CullQuad( renderableQuads, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum );
-
-			if ( childrenAdded[ childIndex ] == QuadNodeCullStatus::OutOfRange )
-			{
-				// TODO: remove & alter tess level
-				//AddNode2( nodes, childQuad, cameraWorldPos, LODRanges );
-				//Status = QuadNodeCullStatus::Added;
-			}
 		}
 
-		if ( childrenAdded[ 0 ] == QuadNodeCullStatus::Added || childrenAdded[ 1 ] == QuadNodeCullStatus::Added || childrenAdded[ 2 ] == QuadNodeCullStatus::Added || childrenAdded[ 3 ] == QuadNodeCullStatus::Added )
+		// remove if childnodes already selected, or out of frustum
+		bool removeBL = childrenAdded[ 0 ] == QuadNodeCullStatus::Added || childrenAdded[ 0 ] == QuadNodeCullStatus::OutOfRange;
+		bool removeBR = childrenAdded[ 1 ] != QuadNodeCullStatus::Added || childrenAdded[ 1 ] == QuadNodeCullStatus::OutOfRange;
+		bool removeTR = childrenAdded[ 2 ] != QuadNodeCullStatus::Added || childrenAdded[ 2 ] == QuadNodeCullStatus::OutOfRange;
+		bool removeTL = childrenAdded[ 3 ] != QuadNodeCullStatus::Added || childrenAdded[ 3 ] == QuadNodeCullStatus::OutOfRange;
+		bool doAddSelf = !removeBL || !removeBR || !removeTR || !removeTL;
+
+		if ( doAddSelf )
 		{
+			AddNode( renderableQuads, quadAABB, !removeBL, !removeBR, !removeTR, !removeTL );
+
 			Status = QuadNodeCullStatus::Added;
 		}
+		else
+			Status = QuadNodeCullStatus::OutOfFrustum;
 
 		return Status;
 	}
