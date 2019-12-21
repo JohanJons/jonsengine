@@ -56,4 +56,9 @@ namespace JonsEngine
 
         mLastFrameTime = currentFrameTime;
     }
+
+	WindowManager& Engine::GetWindow() { return mWindow; }
+	DX11Renderer& Engine::GetRenderer() { return mRenderer; }
+	ResourceManifest& Engine::GetResourceManifest() { return mResourceManifest; }
+	SceneManager& Engine::GetSceneManager() { return mSceneManager; }
 }

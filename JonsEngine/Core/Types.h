@@ -47,4 +47,15 @@ namespace JonsEngine
 	typedef iVec2 MouseMovement;
 	typedef uVec2 WindowPosition;
 	typedef uVec2 WindowDimensions;
+
+	enum QuadChildEnum : uint32_t
+	{
+		QUAD_CHILD_BOTTOM_LEFT = 0,
+		QUAD_CHILD_BOTTOM_RIGHT,
+		QUAD_CHILD_TOP_RIGHT,
+		QUAD_CHILD_TOP_LEFT,
+		QUAD_CHILD_COUNT
+	};
+
+	static_assert( QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT == 0, "Be mindful of offsets in loops" );
 }

@@ -6,6 +6,7 @@
 
 #include <limits>
 #include <vector>
+#include <bitset>
 
 namespace JonsEngine
 {
@@ -153,8 +154,7 @@ namespace JonsEngine
 
 	struct RenderableTerrainData
 	{
-		RenderableTerrainData( std::vector<float>&& LODs, DX11TextureID heightMap, uint32_t endIndex, Vec2 worldMin, Vec2 worldMax, float heightScale, float variationScale ) :
-			mLODRanges( std::move( LODs ) ),
+		RenderableTerrainData( DX11TextureID heightMap, uint32_t endIndex, Vec2 worldMin, Vec2 worldMax, float heightScale, float variationScale ) :
 			mHeightMap( heightMap ),
 			mEndIndex( endIndex ),
 			mWorldMin( worldMin ),
@@ -163,7 +163,6 @@ namespace JonsEngine
 			mVariationScale( variationScale )
 		{ }
 
-		std::vector<float> mLODRanges;
 		DX11TextureID mHeightMap;
 		uint32_t mEndIndex;
 		Vec2 mWorldMin;
@@ -172,11 +171,17 @@ namespace JonsEngine
 		float mVariationScale;
 	};
 
+	struct RenderableTerrainQuad
+	{
+		Mat4 mTransform;
+		uint32_t mLODLevel;
+		std::bitset<QuadChildEnum::QUAD_CHILD_COUNT> mRenderedParts;
+	};
+
 	struct RenderableTerrains
 	{
 		std::vector<RenderableTerrainData> mTerrainData;
-		std::vector<Mat4> mTransforms;
-		std::vector<Vec4> mTessellationEdgeMult;
+		std::vector<RenderableTerrainQuad> mTerrainQuads;
 
 		uint32_t GetNumTerrains() const { return static_cast<uint32_t>( mTerrainData.size() ); }
 	};

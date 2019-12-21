@@ -62,6 +62,9 @@ namespace JonsEngine
         RenderSettings::TerrainPatchMinSize GetTerrainPatchMinSize() const { return mRenderSettings.mTerrainPatchMinSize; }
         void SetTerrainPatchMinSize( RenderSettings::TerrainPatchMinSize patchSize );
 
+		RenderSettings::TerrainPatchMaxSize GetTerrainPatchMaxSize() const { return mRenderSettings.mTerrainPatchMaxSize; }
+		void SetTerrainPatchMaxSize( RenderSettings::TerrainPatchMaxSize patchSize );
+
 		RenderSettings::TerrainCoplanaritySize GetTerrainCoplanaritySize() const { return mRenderSettings.mTerrainCoplanaritySize; }
 		void SetTerrainCoplanaritySize( RenderSettings::TerrainCoplanaritySize coplanaritySize ) { mRenderSettings.mTerrainCoplanaritySize = coplanaritySize; }
 

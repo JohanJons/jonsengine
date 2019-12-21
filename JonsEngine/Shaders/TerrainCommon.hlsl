@@ -6,6 +6,11 @@
 Texture2D gCoplanarityMap : register( TEXTURE_REGISTER_EXTRA_2 );
 Texture2D gNormalMap : register( TEXTURE_REGISTER_NORMAL );
 
+cbuffer PerQuadConstants : register( CBUFFER_REGISTER_VERTEX )
+{
+	float4x4 gQuadWVPTransform;
+}
+
 cbuffer PerTerrainConstants : register(CBUFFER_REGISTER_DOMAIN)
 {
 	float2 gWorldMin;
@@ -25,7 +30,6 @@ struct VertexOut
 {
 	float3 mWorldPosition : POSITION;
 	float2 mTexcoord : TEXCOORD;
-	uint mInstanceID : SV_InstanceID;
 };
 
 struct DomainOut

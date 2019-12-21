@@ -34,6 +34,7 @@ namespace JonsEngine
         ~DX11Mesh();
 
         void Draw();
+		void Draw( uint32_t offset, uint32_t numIndices );
 		void DrawInstanced(uint32_t numInstances);
         void DrawPositions();
 		void DrawPositionsInstanced(uint32_t numInstances);
@@ -44,6 +45,8 @@ namespace JonsEngine
 
 
     private:
+		void BindAllBuffers();
+
         ID3D11DeviceContextPtr mContext;
         ID3D11BufferPtr mVertexBuffer;
         ID3D11BufferPtr mNormalBuffer;

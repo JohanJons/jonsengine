@@ -35,7 +35,7 @@ PatchTess PatchHS( InputPatch<VertexOut, 4> inputVertices )
 {
 	PatchTess patch;
 
-	uint instanceID = inputVertices[ 0 ].mInstanceID;
+	uint instanceID = 0;// inputVertices[ 0 ].mInstanceID;
 
 #if TERRAIN_DEBUG_COPLANARITY
 	patch.mEdgeTess[ 0 ] = 32;

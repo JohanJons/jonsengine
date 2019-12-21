@@ -11,7 +11,7 @@ namespace JonsEngine
 	class TerrainData
 	{
 	public:
-		TerrainData(const std::string& name, uint32_t width, uint32_t height, DX11TextureID heightMap, const std::vector<uint8_t>& heightmapData);
+		TerrainData(const std::string& name, uint32_t width, uint32_t height, DX11TextureID heightMap, const std::vector<uint8_t>& heightmapData );
 
 		const std::string& GetName() const { return mName; }
 		uint32_t GetWidth() const { return mWidth; }

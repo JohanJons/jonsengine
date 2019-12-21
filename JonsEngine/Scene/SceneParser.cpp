@@ -205,18 +205,17 @@ namespace JonsEngine
 			float variationScale = terrain.GetVariationScale();
 
 			std::vector<float> LODRanges;
-			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
-			std::vector<Vec4>& tessEdgeMult = mRenderQueue.mTerrains.mTessellationEdgeMult;
+			std::vector<RenderableTerrainQuad>& renderableQuads = mRenderQueue.mTerrains.mTerrainQuads;
 
 			const TerrainQuadTree& quadTree = terrainTransforms.GetQuadTree( ID );
-			quadTree.CullNodes( renderableTransforms, tessEdgeMult, LODRanges, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
-			if ( renderableTransforms.empty()  )
+			quadTree.CullNodes( renderableQuads, LODRanges, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
+			if ( renderableQuads.empty()  )
 				continue;
 			
 			Vec2 worldMin, worldMax;
 			quadTree.GetWorldXZBounds( worldMin, worldMax );
-			uint32_t renderableEndIndex = static_cast<uint32_t>( renderableTransforms.size() );
-			mRenderQueue.mTerrains.mTerrainData.emplace_back( std::move( LODRanges), heightmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale );
+			uint32_t renderableEndIndex = static_cast<uint32_t>( renderableQuads.size() );
+			mRenderQueue.mTerrains.mTerrainData.emplace_back( heightmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale );
 		}
 	}
 
@@ -267,10 +266,11 @@ namespace JonsEngine
 		// unused atm
 		std::vector<float> lodRanges;
 		std::vector<Mat4> aabbTransforms;
-		std::vector<Vec4> tessEdgeMults;
-		aabbTransforms.reserve( mRenderQueue.mTerrains.mTransforms.size() );
+		aabbTransforms.reserve( mRenderQueue.mTerrains.mTerrainQuads.size() );
 
-		for ( const Terrain& terrain : scene.GetTerrains() )
+		// just copy normal culled terrain data...?
+
+		/*for ( const Terrain& terrain : scene.GetTerrains() )
 		{
             const SceneNode& node = scene.GetSceneNode( terrain.GetSceneNode() );
             if ( !node.IsVisible() )
@@ -278,7 +278,7 @@ namespace JonsEngine
 
 			TerrainID ID = scene.GetTerrainID( terrain );
 			const TerrainQuadTree& quadTree = terrainTransforms.GetQuadTree( ID );
-			quadTree.CullNodes( aabbTransforms, tessEdgeMults, lodRanges, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
+			quadTree.CullNodes( aabbTransforms, lodRanges, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
 
 			for ( Mat4& transform : aabbTransforms )
 			{
@@ -289,7 +289,7 @@ namespace JonsEngine
 			}
 
 			aabbTransforms.clear();
-		}
+		}*/
 	}
 
 

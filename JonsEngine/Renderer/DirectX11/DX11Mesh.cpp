@@ -139,20 +139,20 @@ namespace JonsEngine
 
     void DX11Mesh::Draw()
     {
-		DrawInstanced(1);
+		DrawInstanced( 1 );
     }
+
+	void DX11Mesh::Draw( uint32_t offset, uint32_t numIndices )
+	{
+		BindAllBuffers();
+
+		mContext->IASetIndexBuffer( mIndexBuffer, DXGI_FORMAT_R16_UINT, 0 );
+		mContext->DrawIndexed( numIndices, offset, 0 );
+	}
 
 	void DX11Mesh::DrawInstanced(uint32_t numInstances)
 	{
-		mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gPositionStride, &gStaticOffset);
-		if (mNormalBuffer)
-			mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer.p, &gNormalStride, &gStaticOffset);
-		if (mTexcoordBuffer)
-			mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer.p, &gTexcoordStride, &gStaticOffset);
-		if (mTangentBuffer)
-			mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer.p, &gTangentStride, &gStaticOffset);
-		if (mHasBones)
-			mContext->IASetVertexBuffers(VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_WEIGHTS, 1, &mBoneWeightBuffer.p, &gBoneWeightStride, &gStaticOffset);
+		BindAllBuffers();
 
 		mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 		mContext->DrawIndexedInstanced(mNumIndices, numInstances, 0, 0, 0);
@@ -160,7 +160,7 @@ namespace JonsEngine
 
 	void DX11Mesh::DrawPositions()
 	{
-		DrawPositionsInstanced(1);
+		DrawPositionsInstanced( 1 );
 	}
 
 	void DX11Mesh::DrawPositionsInstanced(const uint32_t numInstances)
@@ -185,6 +185,19 @@ namespace JonsEngine
         mContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R16_UINT, mNumIndices * sizeof(uint16_t));
         mContext->DrawIndexed(numAABBPoints, 0, 0);
     }
+
+	void DX11Mesh::BindAllBuffers()
+	{
+		mContext->IASetVertexBuffers( VertexBufferSlot::VERTEX_BUFFER_SLOT_POSITIONS, 1, &mVertexBuffer.p, &gPositionStride, &gStaticOffset );
+		if ( mNormalBuffer )
+			mContext->IASetVertexBuffers( VertexBufferSlot::VERTEX_BUFFER_SLOT_NORMALS, 1, &mNormalBuffer.p, &gNormalStride, &gStaticOffset );
+		if ( mTexcoordBuffer )
+			mContext->IASetVertexBuffers( VertexBufferSlot::VERTEX_BUFFER_SLOT_TEXCOORDS, 1, &mTexcoordBuffer.p, &gTexcoordStride, &gStaticOffset );
+		if ( mTangentBuffer )
+			mContext->IASetVertexBuffers( VertexBufferSlot::VERTEX_BUFFER_SLOT_TANGENTS, 1, &mTangentBuffer.p, &gTangentStride, &gStaticOffset );
+		if ( mHasBones )
+			mContext->IASetVertexBuffers( VertexBufferSlot::VERTEX_BUFFER_SLOT_BONE_WEIGHTS, 1, &mBoneWeightBuffer.p, &gBoneWeightStride, &gStaticOffset );
+	}
 
 
     void AppendAABBVertices(std::vector<float>& vertexContainer, const Vec3& minBounds, const Vec3& maxBounds)

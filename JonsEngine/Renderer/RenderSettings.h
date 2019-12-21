@@ -56,12 +56,22 @@ namespace JonsEngine
 
         enum class TerrainPatchMinSize
         {
+			X2,
             X4,
 			X8,
 			X16,
-            X32,
-			X64
+            X32
         } mTerrainPatchMinSize;
+
+		enum class TerrainPatchMaxSize
+		{
+			X64,
+			X128,
+			X256,
+			X512,
+			X1024,
+			X2048
+		} mTerrainPatchMaxSize;
 
 		enum class TerrainCoplanaritySize
 		{
@@ -129,7 +139,8 @@ namespace JonsEngine
 		mAnisotropicFiltering( Anisotropic::X16 ),
 		mAntiAliasing( AntiAliasing::Fxaa ),
 		mToneMapping( ToneMappingAlghorithm::FilmicU2 ),
-		mTerrainPatchMinSize( TerrainPatchMinSize::X4 ),
+		mTerrainPatchMinSize( TerrainPatchMinSize::X2 ),
+		mTerrainPatchMaxSize( TerrainPatchMaxSize::X256 ),
 		mTerrainCoplanaritySize( TerrainCoplanaritySize::X16 ),
 		mTerrainPrimitiveLength( TerrainPrimitiveLength::X160 ),
 		mTerrainTessellationMax( TerrainTessellationMax::X64 ),

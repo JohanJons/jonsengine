@@ -5,9 +5,11 @@
 #include "Renderer/DirectX11/DX11CPUDynamicBuffer.h"
 #include "Renderer/DirectX11/DX11DynamicTexture.h"
 #include "Renderer/DirectX11/DX11Mesh.h"
+#include "Renderer/RenderDefs.h"
 #include "Renderer/RenderSettings.h"
 #include "Core/Containers/IDMap.hpp"
 #include "Core/DebugOptions.h"
+#include "Core/Types.h"
 
 #include <array>
 #include <map>
@@ -22,10 +24,14 @@ namespace JonsEngine
 	class DX11TerrainPass
 	{
 	public:
-		DX11TerrainPass( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, RenderSettings::TerrainCoplanaritySize coplanaritySize );
+		DX11TerrainPass( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, RenderSettings::TerrainPatchMinSize minSize,
+		 RenderSettings::TerrainPatchMaxSize maxSize );
 
-		void Render( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize );
-		void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize, DebugOptions::RenderingFlags debugFlags );
+		void Render( const RenderableTerrains& terrains, RenderSettings::TerrainPatchMinSize minSize, RenderSettings::TerrainPatchMaxSize maxSize );
+		void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchMinSize minSize, RenderSettings::TerrainPatchMaxSize maxSize, DebugOptions::RenderingFlags debugFlags );
+
+		//void Render( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize );
+		//void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize, DebugOptions::RenderingFlags debugFlags );
 
 	private:
 		struct PerTerrainCBuffer
@@ -38,30 +44,65 @@ namespace JonsEngine
 			float __padding;
 		};
 
+		struct PerQuadCBuffer
+		{
+			Mat4 mTransform;
+		};
+
+		struct GridMeshData
+		{
+			GridMeshData() = default;
+			GridMeshData( DX11Mesh&& mesh, uint32_t BL, uint32_t BR, uint32_t TR, uint32_t TL ) :
+				mMesh( std::move( mesh ) ),
+				mEndIndices{ BL, BR, TR, TL }
+			{
+			}
+
+			DX11Mesh mMesh;
+			std::array<uint32_t, QuadChildEnum::QUAD_CHILD_COUNT> mEndIndices;
+		};
+
 	private:
-		enum class CachedTextureMap
+		/*enum class CachedTextureMap
 		{
 			COPLANARITY,
 			NORMAL
-		};
+		};*/
 
-		void RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize );
-		void CreateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
-		void GetTextureMapDimensions( uint32_t& width, uint32_t& height, CachedTextureMap type, DX11TextureID heightmapID );
-		DXGI_FORMAT GetTextureMapFormat( CachedTextureMap type );
-		std::map<DX11TextureID, DX11DynamicTexture>& GetTextureMap( CachedTextureMap type );
-		void UpdateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
-		void BindComputeShader( CachedTextureMap type );
-		void GetDispatchDimensions( uint32_t& x, uint32_t& y, CachedTextureMap type, DX11TextureID heightmapID );
-
-        void UpdatePatchSize( RenderSettings::TerrainCoplanaritySize coplanaritySize );
 		void BindForRendering();
 		void UnbindRendering();
-        bool HasCachedTextureMap( CachedTextureMap type, DX11TextureID heightmapID ) const;
+
+		bool ShouldRecreateGridMesh( RenderSettings::TerrainPatchMinSize minSize, RenderSettings::TerrainPatchMaxSize maxSize );
+		void CreateGridMesh( RenderSettings::TerrainPatchMinSize minSize, RenderSettings::TerrainPatchMaxSize maxSize );
+		GridMeshData& GetGridMeshFromLOD( uint32_t LOD );
+
+		//void RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize );
+		//void CreateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
+		//void GetTextureMapDimensions( uint32_t& width, uint32_t& height, CachedTextureMap type, DX11TextureID heightmapID );
+		//DXGI_FORMAT GetTextureMapFormat( CachedTextureMap type );
+		//std::map<DX11TextureID, DX11DynamicTexture>& GetTextureMap( CachedTextureMap type );
+		//void UpdateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
+		//void BindComputeShader( CachedTextureMap type );
+		//void GetDispatchDimensions( uint32_t& x, uint32_t& y, CachedTextureMap type, DX11TextureID heightmapID );
+
+        //void UpdatePatchSize( RenderSettings::TerrainCoplanaritySize coplanaritySize );
+		//void BindForRendering();
+		//void UnbindRendering();
+        //bool HasCachedTextureMap( CachedTextureMap type, DX11TextureID heightmapID ) const;
 
 		ID3D11DeviceContextPtr mContext = nullptr;
         ID3D11DevicePtr mDevice = nullptr;
 		ID3D11InputLayoutPtr mLayout = nullptr;
+		ID3D11VertexShaderPtr mVertexShader = nullptr;
+		ID3D11PixelShaderPtr mPixelShader = nullptr;
+
+		RenderSettings::TerrainPatchMinSize mCachedMinSize;
+		RenderSettings::TerrainPatchMaxSize mCachedMaxSize;
+		std::vector<GridMeshData> mGridMeshes;
+
+		DX11ConstantBuffer<PerQuadCBuffer> mPerQuadCBuffer;
+
+		/*ID3D11InputLayoutPtr mLayout = nullptr;
 		ID3D11VertexShaderPtr mVertexShader = nullptr;
 		ID3D11HullShaderPtr mHullShader = nullptr;
 		ID3D11HullShaderPtr mHullShaderDebugCoplanarity = nullptr;
@@ -77,8 +118,9 @@ namespace JonsEngine
 		ID3D11PixelShaderPtr mPixelDebugNormalShader = nullptr;
 
 		ID3D11RasterizerStatePtr mDebugRasterizer = nullptr;
+		*/
 
-        std::map<DX11TextureID, DX11DynamicTexture> mTerrainCoplanarityMap;
+       /* std::map<DX11TextureID, DX11DynamicTexture> mTerrainCoplanarityMap;
 		std::map<DX11TextureID, DX11DynamicTexture> mTerrainNormalMap;
 
 		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;
@@ -88,6 +130,6 @@ namespace JonsEngine
 		DX11VertexTransformPass& mVertexTransformer;
 		const IDMap<DX11Texture>& mTextureMap;
 
-        RenderSettings::TerrainCoplanaritySize mCoplanaritySize;
+        RenderSettings::TerrainCoplanaritySize mCoplanaritySize;*/
 	};
 }

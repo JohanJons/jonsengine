@@ -9,79 +9,6 @@ namespace
 {
 	using namespace JonsEngine;
 
-	using ChildNeighbours = std::array<QuadNodeAABB::ChildNode, 4>;
-	constexpr std::array<QuadNodeAABB::ChildNode, 4> TLNeighbours{ QuadNodeAABB::INVALID, QuadNodeAABB::BOTTOM_LEFT, QuadNodeAABB::TOP_RIGHT, QuadNodeAABB::INVALID };
-	constexpr std::array<QuadNodeAABB::ChildNode, 4> BLNeighbours{ QuadNodeAABB::INVALID, QuadNodeAABB::INVALID, QuadNodeAABB::BOTTOM_RIGHT, QuadNodeAABB::TOP_LEFT };
-	constexpr std::array<QuadNodeAABB::ChildNode, 4> BRNeighbours{ QuadNodeAABB::BOTTOM_LEFT, QuadNodeAABB::INVALID, QuadNodeAABB::INVALID, QuadNodeAABB::TOP_RIGHT };
-	constexpr std::array<QuadNodeAABB::ChildNode, 4> TRNeighbours{ QuadNodeAABB::TOP_LEFT, QuadNodeAABB::BOTTOM_RIGHT, QuadNodeAABB::INVALID, QuadNodeAABB::INVALID };
-	constexpr std::array<ChildNeighbours, 4> ChildNeighbourData{ TLNeighbours, BLNeighbours, BRNeighbours, TRNeighbours };
-
-	void PopNeighbouringChildren( QuadNodeAABB::ChildNode& first, QuadNodeAABB::ChildNode& second, std::vector<QuadNodeAABB::ChildNode>& childNodes )
-	{
-		first = QuadNodeAABB::INVALID;
-		second = QuadNodeAABB::INVALID;
-
-		if ( childNodes.empty() )
-		{
-			return;
-		}
-
-		first = childNodes.back();
-		childNodes.pop_back();
-		if ( childNodes.empty() )
-		{
-			return;
-		}
-
-		for ( int32_t index = 0; index < static_cast<int32_t>( childNodes.size() ); ++index )
-		{
-			QuadNodeAABB::ChildNode other = childNodes[ index ];
-
-			// only direct neighbours
-			if ( other - first % 2 != 0 )
-			{
-				second = other;
-				childNodes.erase( childNodes.begin() + index );
-				break;
-			}
-		}
-
-		assert( first != QuadNodeAABB::INVALID && second != QuadNodeAABB::INVALID );
-	}
-
-	QuadNodeAABB::ChildNode GetOpposite( QuadNodeAABB::ChildNode child, QuadNodeNeighbours::Facing facing )
-	{
-		switch ( facing )
-		{
-			case QuadNodeNeighbours::RIGHT:
-			case QuadNodeNeighbours::LEFT:
-			{
-				switch ( child )
-				{
-					case QuadNodeAABB::BOTTOM_LEFT: return QuadNodeAABB::BOTTOM_RIGHT;
-					case QuadNodeAABB::BOTTOM_RIGHT: return QuadNodeAABB::BOTTOM_LEFT;
-					case QuadNodeAABB::TOP_LEFT: return QuadNodeAABB::TOP_RIGHT;
-					case QuadNodeAABB::TOP_RIGHT: return QuadNodeAABB::TOP_LEFT;
-					default: return QuadNodeAABB::NUM_CHILDREN;
-				}
-			}
-
-			case QuadNodeNeighbours::TOP:
-			case QuadNodeNeighbours::BOTTOM:
-			{
-				switch ( child )
-				{
-					case QuadNodeAABB::BOTTOM_LEFT: return QuadNodeAABB::TOP_LEFT;
-					case QuadNodeAABB::BOTTOM_RIGHT: return QuadNodeAABB::TOP_RIGHT;
-					case QuadNodeAABB::TOP_LEFT: return QuadNodeAABB::BOTTOM_LEFT;
-					case QuadNodeAABB::TOP_RIGHT: return QuadNodeAABB::BOTTOM_RIGHT;
-					default: return QuadNodeAABB::NUM_CHILDREN;
-				}
-			}
-			default: return QuadNodeAABB::NUM_CHILDREN;
-		}
-	}
-
 	void GetTransformExtentsXZ( const Mat4& transform, Vec2& min, Vec2& max )
 	{
 		const Vec4& translation = transform[ 3 ];
@@ -106,7 +33,6 @@ namespace JonsEngine
 
 		uint32_t numNodes = ExpectedNumNodes( fWidth, mPatchMinSize );
 		mGridTraversal.reserve( numNodes );
-		mGridNeighbours.resize( numNodes );
 		
 		float yTranslation = worldTransform[ 3 ].y;
 		uint32_t rootLODLevel = 0;
@@ -121,17 +47,12 @@ namespace JonsEngine
 		for ( QuadNodeAABB& node : mGridTraversal )
 			node.mFrustumAABB = node.mFrustumAABB * finalTransform;
 
-		// precompute neighbours
-		ComputeNeighbours();
-		assert( ValidateNeighbours() );
-
 		assert( numNodes == GetNumNodes() );
-		assert( mGridTraversal.size() == mGridNeighbours.size() );
 	}
 
-	void TerrainQuadTree::CullNodes( std::vector<Mat4>& nodeTransforms, std::vector<Vec4>& tessEdgeMult, std::vector<float>& LODRanges, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const
+	void TerrainQuadTree::CullNodes( std::vector<RenderableTerrainQuad>& renderableQuads, std::vector<float>& LODRanges, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const
 	{
-		nodeTransforms.clear();
+		renderableQuads.clear();
 		LODRanges.clear();
 		//tessEdgeMult.clear();
 
@@ -233,15 +154,16 @@ namespace JonsEngine
 		float halfChildHeight = childHeight / 2;
 		uint32_t childNodeLODLevel = LODlevel + 1;
 
-		// TL - BL - BR - TR
-		CreateGridNode( &quadAABB, centerX - halfChildWidth, centerZ + halfChildHeight, childWidth, childHeight, childNodeLODLevel, yTranslation );
-		quadAABB.mChildBegin = &mGridTraversal.back();
+		// BL - BR - TR - TL
+		// TODO: validate
 		CreateGridNode( &quadAABB, centerX - halfChildWidth, centerZ - halfChildHeight, childWidth, childHeight, childNodeLODLevel, yTranslation );
+		quadAABB.mChildBegin = &mGridTraversal.back();
 		CreateGridNode( &quadAABB, centerX + halfChildWidth, centerZ - halfChildHeight, childWidth, childHeight, childNodeLODLevel, yTranslation );
 		CreateGridNode( &quadAABB, centerX + halfChildWidth, centerZ + halfChildHeight, childWidth, childHeight, childNodeLODLevel, yTranslation );
+		CreateGridNode( &quadAABB, centerX - halfChildWidth, centerZ + halfChildHeight, childWidth, childHeight, childNodeLODLevel, yTranslation );
 
 		// process children and collect min/max Y for AABB
-		for ( int32_t childIndex = QuadNodeAABB::TOP_LEFT; childIndex < QuadNodeAABB::NUM_CHILDREN; ++childIndex )
+		for ( uint32_t childIndex = QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT; childIndex < QuadChildEnum::QUAD_CHILD_COUNT; ++childIndex )
 		{
 			QuadNodeAABB& childNode = *( quadAABB.mChildBegin + childIndex );
 			ProcessQuadNode( childNode, heightmapData, heightmapWidth, childNodeLODLevel, yTranslation );
@@ -253,169 +175,6 @@ namespace JonsEngine
 		min.y = minY;
 		max.y = maxY;
 		quadAABB.mFrustumAABB = AABB( min, max );
-	}
-
-	void TerrainQuadTree::ComputeNeighbours()
-	{
-		std::vector<QuadNodeAABB*> sortedNodes;
-		for ( QuadNodeAABB& node : mGridTraversal )
-			sortedNodes.emplace_back( &node );
-
-		auto cmpFunc = []( const QuadNodeAABB* A, const QuadNodeAABB* B ) { return A->mLODIndex < B->mLODIndex; };
-		std::sort( sortedNodes.begin(), sortedNodes.end(), cmpFunc );
-
-		for ( QuadNodeAABB* quadNode : sortedNodes )
-		{
-			if ( !quadNode->mChildBegin )
-				continue;
-
-			QuadNodeAABB* rootNode = &( *mGridTraversal.begin() );
-
-			size_t quadNodeIndex = std::distance( rootNode, quadNode );
-			QuadNodeNeighbours& parentNeighboursData = mGridNeighbours.at( quadNodeIndex );
-
-			//QuadNodeNeighbours* parentNeighboursData = nullptr;
-			//if ( quadNode->mParent )
-			//{
-			//	size_t parentNodeIndex = std::distance( rootNode, quadNode->mParent );
-			//	parentNeighboursData = &mGridNeighbours.at( parentNodeIndex );
-			//}
-
-			const QuadNodeAABB* topLeftChild = quadNode->mChildBegin + QuadNodeAABB::TOP_LEFT;
-			const QuadNodeAABB* bottomLeftChild = quadNode->mChildBegin + QuadNodeAABB::BOTTOM_LEFT;
-			const QuadNodeAABB* bottomRightChild = quadNode->mChildBegin + QuadNodeAABB::BOTTOM_RIGHT;
-			const QuadNodeAABB* topRightChild = quadNode->mChildBegin + QuadNodeAABB::TOP_RIGHT;
-
-			for ( int32_t childOffset = QuadNodeAABB::TOP_LEFT; childOffset < QuadNodeAABB::NUM_CHILDREN; ++childOffset )
-			{
-				QuadNodeAABB* currentChild = quadNode->mChildBegin + childOffset;
-
-				size_t childQuadNodeIndex = std::distance( rootNode, currentChild );
-				QuadNodeNeighbours& childNeighboursData = mGridNeighbours.at( childQuadNodeIndex );
-				const ChildNeighbours& neighbourMapping = ChildNeighbourData[ childOffset ];
-
-				for ( int32_t neighbourOffset = QuadNodeNeighbours::LEFT; neighbourOffset < QuadNodeNeighbours::NUM_OFFSETS; ++neighbourOffset )
-				{
-					QuadNodeAABB::ChildNode sibling = neighbourMapping[ neighbourOffset ];
-					switch ( sibling )
-					{
-						case QuadNodeAABB::TOP_LEFT:
-						{
-							childNeighboursData.mSameLODNeighbours[ neighbourOffset ] = topLeftChild;
-							break;
-						}
-
-						case QuadNodeAABB::BOTTOM_LEFT:
-						{
-							childNeighboursData.mSameLODNeighbours[ neighbourOffset ] = bottomLeftChild;
-							break;
-						}
-
-						case QuadNodeAABB::BOTTOM_RIGHT:
-						{
-							childNeighboursData.mSameLODNeighbours[ neighbourOffset ] = bottomRightChild;
-							break;
-						}
-
-						case QuadNodeAABB::TOP_RIGHT:
-						{
-							childNeighboursData.mSameLODNeighbours[ neighbourOffset ] = topRightChild;
-							break;
-						}
-
-						default:
-						{
-							const QuadNodeAABB* parentNeighbour = parentNeighboursData.mSameLODNeighbours[ neighbourOffset ];
-							if ( !parentNeighbour )
-								continue;
-
-							QuadNodeAABB::ChildNode opposite = GetOpposite( static_cast<QuadNodeAABB::ChildNode>( childOffset ), static_cast<QuadNodeNeighbours::Facing>( neighbourOffset ) );
-							const QuadNodeAABB* neighbourChild = parentNeighbour->mChildBegin + opposite;
-							assert( neighbourChild );
-
-							childNeighboursData.mSameLODNeighbours[ neighbourOffset ] = neighbourChild;
-							// must find manually!
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	bool TerrainQuadTree::ValidateNeighbours() const
-	{
-		Vec2 worldMin, worldMax;
-		GetWorldXZBounds( worldMin, worldMax );
-
-		assert( mGridTraversal.size() == mGridNeighbours.size() );
-
-		for ( int32_t index = 0; index < mGridTraversal.size(); ++index )
-		{
-			const QuadNodeAABB& nodeAABB = mGridTraversal[ index ];
-			const QuadNodeNeighbours& nodeNeighbours = mGridNeighbours[ index ];
-
-			Vec3 nodeMin = nodeAABB.mFrustumAABB.Min();
-			Vec3 nodeMax = nodeAABB.mFrustumAABB.Max();
-
-			const QuadNodeAABB* pLeftNeighbour = nodeNeighbours.mSameLODNeighbours[ QuadNodeNeighbours::LEFT ];
-			if ( pLeftNeighbour )
-			{
-				Vec3 neighbourMax = pLeftNeighbour->mFrustumAABB.Max();
-				if ( neighbourMax.x != nodeMin.x )
-				{
-					return false;
-				}
-			}
-			else if ( nodeMin.x != worldMin.x )
-			{
-				return false;
-			}
-
-			const QuadNodeAABB* pBottomNeighbour = nodeNeighbours.mSameLODNeighbours[ QuadNodeNeighbours::BOTTOM ];
-			if ( pBottomNeighbour )
-			{
-				Vec3 neighbourMax = pBottomNeighbour->mFrustumAABB.Max();
-				if ( neighbourMax.z != nodeMin.z )
-				{
-					return false;
-				}
-			}
-			else if ( nodeMin.z != worldMin.y )
-			{
-				return false;
-			}
-
-			const QuadNodeAABB* pRightNeighbour = nodeNeighbours.mSameLODNeighbours[ QuadNodeNeighbours::RIGHT ];
-			if ( pRightNeighbour )
-			{
-				Vec3 neighbourMin = pRightNeighbour->mFrustumAABB.Min();
-				if ( neighbourMin.x != nodeMax.x )
-				{
-					return false;
-				}
-			}
-			else if ( nodeMax.x != worldMax.x )
-			{
-				return false;
-			}
-
-			const QuadNodeAABB* pTopNeighbour = nodeNeighbours.mSameLODNeighbours[ QuadNodeNeighbours::TOP ];
-			if ( pTopNeighbour )
-			{
-				Vec3 neighbourMin = pTopNeighbour->mFrustumAABB.Min();
-				if ( neighbourMin.z != nodeMax.z )
-				{
-					return false;
-				}
-			}
-			else if ( nodeMax.z != worldMax.y )
-			{
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	void TerrainQuadTree::CalculateLODRanges( std::vector<float>& LODs, float zNear, float zFar ) const
@@ -445,17 +204,17 @@ namespace JonsEngine
 		}
 	}
 
-	void TerrainQuadTree::AddNode( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const std::vector<float>& LODRanges ) const
+	void TerrainQuadTree::AddNode( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB, uint32_t LOD, bool addBL, bool addBR,  ) const
 	{
 		Vec3 center = quadAABB.mFrustumAABB.GetCenter();
 		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
 
 		Mat4 transform = glm::translate( Vec3( center.x, 0.0f, center.z ) );
 		transform = glm::scale( transform, extent * 2.0f );
-		nodes.emplace_back( transform );
+		renderableQuads.emplace_back( transform, LOD );
 	}
 
-	QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<Mat4>& nodes, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const
+	QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const
 	{
 		// if parent is fully in frustum, so are we
 		AABBIntersection frustumIntersection = parentFullyInFrustum ? AABBIntersection::Inside : Intersection( quadAABB.mFrustumAABB, cameraViewProjTransform );
@@ -473,7 +232,7 @@ namespace JonsEngine
 		bool isValidLODIndex = nextLODIndex < LODRanges.size();
 		if ( !isValidLODIndex )
 		{
-			AddNode( nodes, quadAABB, cameraWorldPos, LODRanges );
+			AddNode( renderableQuads, quadAABB, quadAABB.mLODIndex );
 			return QuadNodeCullStatus::Added;
 		}
 
@@ -482,17 +241,17 @@ namespace JonsEngine
 		bool nextIsWithinRange = nextIntersection == AABBIntersection::Partial || nextIntersection == AABBIntersection::Inside;
 		if ( !nextIsWithinRange )
 		{
-			AddNode( nodes, quadAABB, cameraWorldPos, LODRanges );
+			AddNode( renderableQuads, quadAABB, cameraWorldPos, LODRanges );
 			return QuadNodeCullStatus::Added;
 		}
 
 		QuadNodeCullStatus Status = QuadNodeCullStatus::OutOfFrustum;
 		bool completelyInFrustum = frustumIntersection == AABBIntersection::Inside;
-		std::array<QuadNodeCullStatus, QuadNodeAABB::NUM_CHILDREN> childrenAdded;
-		for ( uint32_t childIndex = QuadNodeAABB::TOP_LEFT; childIndex < QuadNodeAABB::NUM_CHILDREN; ++childIndex )
+		std::array<QuadNodeCullStatus, QuadChildEnum::QUAD_CHILD_COUNT> childrenAdded;
+		for ( uint32_t childIndex = QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT; childIndex < QuadChildEnum::QUAD_CHILD_COUNT; ++childIndex )
 		{
 			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
-			childrenAdded[ childIndex ] = CullQuad( nodes, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum );
+			childrenAdded[ childIndex ] = CullQuad( renderableQuads, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum );
 
 			if ( childrenAdded[ childIndex ] == QuadNodeCullStatus::OutOfRange )
 			{

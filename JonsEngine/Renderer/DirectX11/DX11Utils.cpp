@@ -60,14 +60,29 @@ namespace JonsEngine
         switch ( patchSizeEnum )
         {
 			default:
-				JONS_ERROR( Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainPatchSize): Invalid enum" );
+				JONS_ERROR( Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainPatchMinSize): Invalid enum" );
+			case RenderSettings::TerrainPatchMinSize::X2: return 2;
 			case RenderSettings::TerrainPatchMinSize::X4: return 4;
 			case RenderSettings::TerrainPatchMinSize::X8: return 8;
 			case RenderSettings::TerrainPatchMinSize::X16: return 16;
 			case RenderSettings::TerrainPatchMinSize::X32: return 32;
-            case RenderSettings::TerrainPatchMinSize::X64: return 64;
         }
     }
+
+	uint32_t RenderSettingsToVal( RenderSettings::TerrainPatchMaxSize patchSizeEnum )
+	{
+		switch ( patchSizeEnum )
+		{
+			default:
+				JONS_ERROR( Logger::GetRendererLogger(), "DX11Utils::RenderSettingsToVal(RenderSettings::TerrainPatchMaxSize): Invalid enum" );
+			case RenderSettings::TerrainPatchMaxSize::X64: return 64;
+			case RenderSettings::TerrainPatchMaxSize::X128: return 128;
+			case RenderSettings::TerrainPatchMaxSize::X256: return 256;
+			case RenderSettings::TerrainPatchMaxSize::X512: return 512;
+			case RenderSettings::TerrainPatchMaxSize::X1024: return 1024;
+			case RenderSettings::TerrainPatchMaxSize::X2048: return 2048;
+		}
+	}
 
 	uint32_t RenderSettingsToVal( RenderSettings::TerrainPrimitiveLength primitiveLength )
 	{

@@ -242,6 +242,11 @@ namespace JonsEngine
         mRenderSettings.mTerrainPatchMinSize = patchSize;
     }
 
+	void DX11Renderer::SetTerrainPatchMaxSize( RenderSettings::TerrainPatchMaxSize patchSize )
+	{
+		mRenderSettings.mTerrainPatchMaxSize = patchSize;
+	}
+
 
     bool DX11Renderer::IsSSAOEnabled() const
     {

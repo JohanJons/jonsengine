@@ -39,7 +39,7 @@ namespace JonsEngine
         mPostProcessor(device, context, mFullscreenPass, backbufferTextureDesc),
         mSkyboxPass(device, context),
 
-		mTerrainPass( device, context, mVertexTransformPass, mTextureMap, settings.mTerrainCoplanaritySize ),
+		mTerrainPass( device, context, mVertexTransformPass, mTextureMap, settings.mTerrainPatchMinSize, settings.mTerrainPatchMaxSize ),
 		mPerFrameCB( device, context, mPerFrameCB.CONSTANT_BUFFER_SLOT_PER_FRAME )
     {
 		auto depthStencilBuffer = backbuffer.GetDepthbuffer();
@@ -120,7 +120,7 @@ namespace JonsEngine
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-		mTerrainPass.Render( renderQueue.mTerrains, renderSettings.mTerrainCoplanaritySize );
+		mTerrainPass.Render( renderQueue.mTerrains, renderSettings.mTerrainPatchMinSize, renderSettings.mTerrainPatchMaxSize );
 
 		mGBuffer.BindForRendering();
 
@@ -197,7 +197,7 @@ namespace JonsEngine
 		bool drawNormals = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
 		bool drawWireframe = drawCoplanarity || drawNormals || debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
 		if ( drawWireframe )
-			mTerrainPass.RenderDebug( renderQueue.mTerrains, renderSettings.mTerrainCoplanaritySize, debugFlags );
+			mTerrainPass.RenderDebug( renderQueue.mTerrains, renderSettings.mTerrainPatchMinSize, renderSettings.mTerrainPatchMaxSize, debugFlags );
 	}
 
 	void DX11Pipeline::RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end)
