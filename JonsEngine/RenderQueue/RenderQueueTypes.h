@@ -154,7 +154,8 @@ namespace JonsEngine
 
 	struct RenderableTerrainData
 	{
-		RenderableTerrainData( DX11TextureID heightMap, uint32_t endIndex, Vec2 worldMin, Vec2 worldMax, float heightScale, float variationScale ) :
+		RenderableTerrainData( std::vector<Vec2>&& morphConstants, DX11TextureID heightMap, uint32_t endIndex, Vec2 worldMin, Vec2 worldMax, float heightScale, float variationScale ) :
+			mLODMorphConstants( std::move( morphConstants ) ),
 			mHeightMap( heightMap ),
 			mEndIndex( endIndex ),
 			mWorldMin( worldMin ),
@@ -163,6 +164,7 @@ namespace JonsEngine
 			mVariationScale( variationScale )
 		{ }
 
+		std::vector<Vec2> mLODMorphConstants;
 		DX11TextureID mHeightMap;
 		uint32_t mEndIndex;
 		Vec2 mWorldMin;
@@ -173,9 +175,18 @@ namespace JonsEngine
 
 	struct RenderableTerrainQuad
 	{
+		using QuadFlagsSet = std::bitset<QuadChildEnum::QUAD_CHILD_COUNT>;
+
+		RenderableTerrainQuad() = default;
+		RenderableTerrainQuad( const Mat4& transform, uint32_t LOD, QuadFlagsSet& set ) :
+			mTransform( transform ),
+			mLODLevel( LOD ),
+			mRenderedParts( set )
+		{ }
+
 		Mat4 mTransform;
 		uint32_t mLODLevel;
-		std::bitset<QuadChildEnum::QUAD_CHILD_COUNT> mRenderedParts;
+		QuadFlagsSet mRenderedParts;
 	};
 
 	struct RenderableTerrains

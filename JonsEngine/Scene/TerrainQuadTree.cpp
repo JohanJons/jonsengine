@@ -50,14 +50,14 @@ namespace JonsEngine
 		assert( numNodes == GetNumNodes() );
 	}
 
-	void TerrainQuadTree::CullNodes( std::vector<RenderableTerrainQuad>& renderableQuads, std::vector<float>& LODRanges, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const
+	void TerrainQuadTree::CullNodes( std::vector<RenderableTerrainQuad>& renderableQuads, std::vector<float>& LODRanges, std::vector<Vec2>& morphConstants, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const
 	{
 		renderableQuads.clear();
 		LODRanges.clear();
-		//tessEdgeMult.clear();
+		morphConstants.clear();
 
-		CalculateLODRanges( LODRanges, zNear, zFar );
-		CullQuad( renderableQuads, mGridTraversal.front(), );
+		CalculateLODRanges( LODRanges, morphConstants, zNear, zFar );
+		CullQuad( renderableQuads, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
 
 		//PerCullData cullData( GetNumNodes() );
 		//CalculateHighestLODNodes( cullData, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
@@ -178,7 +178,7 @@ namespace JonsEngine
 		quadAABB.mFrustumAABB = AABB( min, max );
 	}
 
-	void TerrainQuadTree::CalculateLODRanges( std::vector<float>& LODs, float zNear, float zFar ) const
+	void TerrainQuadTree::CalculateLODRanges( std::vector<float>& LODs, std::vector<Vec2>& morphConstants, float zNear, float zFar ) const
 	{
 		uint32_t numLODRanges = GetNumLODRanges();
 		LODs.resize( numLODRanges );
@@ -202,6 +202,16 @@ namespace JonsEngine
 			LODs[ numLODRanges - i - 1 ] = prevPos + sect * currentDetailBalance;
 			prevPos = LODs[ numLODRanges - i - 1 ];
 			currentDetailBalance *= LODDistanceRatio;
+		}
+
+		prevPos = zNear;
+		for ( uint32_t i = 0; i < numLODRanges; ++i )
+		{
+			uint32_t index = numLODRanges - i - 1;
+			//selectionObj->m_morphEnd[ i ] = selectionObj->m_visibilityRanges[ index ];
+			//selectionObj->m_morphStart[ i ] = prevPos + ( selectionObj->m_morphEnd[ i ] - prevPos ) * selectionObj->m_morphStartRatio;
+
+			//prevPos = selectionObj->m_morphStart[ i ];
 		}
 	}
 

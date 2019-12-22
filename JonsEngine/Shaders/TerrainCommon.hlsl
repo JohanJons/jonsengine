@@ -8,7 +8,8 @@ Texture2D gNormalMap : register( TEXTURE_REGISTER_NORMAL );
 
 cbuffer PerQuadConstants : register( CBUFFER_REGISTER_VERTEX )
 {
-	float4x4 gQuadWVPTransform;
+	float4x4 gQuadWorldTransform;
+	uint gLODLevel;
 }
 
 cbuffer PerTerrainConstants : register(CBUFFER_REGISTER_DOMAIN)
@@ -28,7 +29,7 @@ struct PatchTess
 
 struct VertexOut
 {
-	float3 mWorldPosition : POSITION;
+	float4 mPosition : SV_POSITION;
 	float2 mTexcoord : TEXCOORD;
 };
 

@@ -46,7 +46,15 @@ namespace JonsEngine
 
 		struct PerQuadCBuffer
 		{
+			PerQuadCBuffer() = default;
+			PerQuadCBuffer( const Mat4& transform, uint32_t LOD ) :
+				mTransform( transform ),
+				mLOD( LOD )
+			{ }
+
 			Mat4 mTransform;
+			uint32_t mLOD;
+			uint32_t __padding[ 3 ];
 		};
 
 		struct GridMeshData
@@ -101,6 +109,7 @@ namespace JonsEngine
 		std::vector<GridMeshData> mGridMeshes;
 
 		DX11ConstantBuffer<PerQuadCBuffer> mPerQuadCBuffer;
+		DX11CPUDynamicBuffer mLODMorphConstantsBuffer;
 
 		/*ID3D11InputLayoutPtr mLayout = nullptr;
 		ID3D11VertexShaderPtr mVertexShader = nullptr;

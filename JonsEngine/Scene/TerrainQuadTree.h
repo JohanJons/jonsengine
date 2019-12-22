@@ -52,7 +52,7 @@ namespace JonsEngine
 		TerrainQuadTree() = default;
 		TerrainQuadTree( const std::vector<uint8_t>& heightmapData, uint32_t width, uint32_t height, uint32_t patchMinSize, float heightmapScale, const Mat4& worldTransform );
 
-		void CullNodes( std::vector<RenderableTerrainQuad>& renderableQuads, std::vector<float>& LODRanges, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const;
+		void CullNodes( std::vector<RenderableTerrainQuad>& renderableQuads, std::vector<float>& LODRanges, std::vector<Vec2>& morphConstants, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const;
 
 		uint32_t GetNumLODRanges() const;
 		uint32_t GetNumNodes() const { return static_cast<uint32_t>( mGridTraversal.size() ); }
@@ -71,7 +71,7 @@ namespace JonsEngine
 		void AddNode( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB, bool addBL, bool addBR, bool addTR, bool addTL ) const;
 		QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const;
 
-		void CalculateLODRanges( std::vector<float>& LODs, float zNear, float zFar ) const;
+		void CalculateLODRanges( std::vector<float>& LODs, std::vector<Vec2>& morphConstants, float zNear, float zFar ) const;
 
 		uint32_t mPatchMinSize;
 		float mHeightmapScale;

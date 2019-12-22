@@ -43,7 +43,8 @@ namespace JonsEngine
         mDevice(device),
 		mCachedMinSize( minSize ),
 		mCachedMaxSize( maxSize ),
-		mPerQuadCBuffer( device, context, mPerQuadCBuffer.CONSTANT_BUFFER_SLOT_VERTEX )
+		mPerQuadCBuffer( device, context, mPerQuadCBuffer.CONSTANT_BUFFER_SLOT_VERTEX ),
+		mLODMorphConstantsBuffer( device, context )
 		/*mPerTerrainCBuffer(device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
 		mTransformsBuffer( device, context ),
 		mTessEdgeMultBuffer( device, context ),
@@ -110,6 +111,9 @@ namespace JonsEngine
 		uint32_t beginIndex = 0;
 		for ( const RenderableTerrainData& terrainData : terrains.mTerrainData )
 		{
+			mLODMorphConstantsBuffer.SetData( terrainData.mLODMorphConstants );
+			mLODMorphConstantsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA );
+
 			uint32_t endIndex = terrainData.mEndIndex;
 			assert( endIndex > beginIndex );
 
@@ -117,10 +121,11 @@ namespace JonsEngine
 			for ( uint32_t index = beginIndex; index < endIndex; ++index )
 			{
 				const RenderableTerrainQuad& quad = terrains.mTerrainQuads.at( index );
-				GridMeshData& gridMesh = GetGridMeshFromLOD( quad.mLODLevel );
 
-				mPerQuadCBuffer.SetData( { quad.mTransform } );
+				mPerQuadCBuffer.SetData( { quad.mTransform, quad.mLODLevel } );
 				mPerQuadCBuffer.Bind();
+
+				GridMeshData& gridMesh = GetGridMeshFromLOD( quad.mLODLevel );
 
 				// TODO: draw some quad pairings in one drawcall
 
