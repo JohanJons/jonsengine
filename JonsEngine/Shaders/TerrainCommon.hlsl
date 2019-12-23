@@ -30,7 +30,7 @@ struct PatchTess
 struct VertexOut
 {
 	float4 mPosition : SV_POSITION;
-	float2 mTexcoord : TEXCOORD;
+	//float2 mTexcoord : TEXCOORD;
 };
 
 struct DomainOut

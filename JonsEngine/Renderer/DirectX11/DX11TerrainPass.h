@@ -100,6 +100,7 @@ namespace JonsEngine
 
 		ID3D11DeviceContextPtr mContext = nullptr;
         ID3D11DevicePtr mDevice = nullptr;
+		const IDMap<DX11Texture>& mTextureMap;
 		ID3D11InputLayoutPtr mLayout = nullptr;
 		ID3D11VertexShaderPtr mVertexShader = nullptr;
 		ID3D11PixelShaderPtr mPixelShader = nullptr;

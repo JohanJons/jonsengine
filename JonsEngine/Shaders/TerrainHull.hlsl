@@ -80,8 +80,8 @@ HullOut hs_main( InputPatch<VertexOut, 4> verticeData, uint index : SV_OutputCon
 {
 	HullOut ret;
 
-	ret.mWorldPosition = verticeData[ index ].mWorldPosition;
-	ret.mTexcoord = verticeData[ index ].mTexcoord;
+	//ret.mWorldPosition = verticeData[ index ].mWorldPosition;
+	//ret.mTexcoord = verticeData[ index ].mTexcoord;
 
 	return ret;
 }

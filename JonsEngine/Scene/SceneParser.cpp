@@ -205,17 +205,18 @@ namespace JonsEngine
 			float variationScale = terrain.GetVariationScale();
 
 			std::vector<float> LODRanges;
+			std::vector<Vec2> morphConstants;
 			std::vector<RenderableTerrainQuad>& renderableQuads = mRenderQueue.mTerrains.mTerrainQuads;
 
 			const TerrainQuadTree& quadTree = terrainTransforms.GetQuadTree( ID );
-			quadTree.CullNodes( renderableQuads, LODRanges, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
+			quadTree.CullNodes( renderableQuads, LODRanges, morphConstants, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
 			if ( renderableQuads.empty()  )
 				continue;
 			
 			Vec2 worldMin, worldMax;
 			quadTree.GetWorldXZBounds( worldMin, worldMax );
 			uint32_t renderableEndIndex = static_cast<uint32_t>( renderableQuads.size() );
-			mRenderQueue.mTerrains.mTerrainData.emplace_back( heightmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale );
+			mRenderQueue.mTerrains.mTerrainData.emplace_back( std::move( morphConstants ), heightmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale );
 		}
 	}
 

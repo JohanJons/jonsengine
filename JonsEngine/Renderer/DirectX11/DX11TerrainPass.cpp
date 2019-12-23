@@ -39,8 +39,9 @@ namespace JonsEngine
 
 	DX11TerrainPass::DX11TerrainPass( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, RenderSettings::TerrainPatchMinSize minSize,
 		RenderSettings::TerrainPatchMaxSize maxSize ):
-		mContext(context),
-        mDevice(device),
+		mContext( context ),
+        mDevice( device ),
+		mTextureMap( textureMap ),
 		mCachedMinSize( minSize ),
 		mCachedMaxSize( maxSize ),
 		mPerQuadCBuffer( device, context, mPerQuadCBuffer.CONSTANT_BUFFER_SLOT_VERTEX ),
@@ -111,6 +112,9 @@ namespace JonsEngine
 		uint32_t beginIndex = 0;
 		for ( const RenderableTerrainData& terrainData : terrains.mTerrainData )
 		{
+			const DX11Texture& heightmap = mTextureMap.GetItem( terrainData.mHeightMap );
+			heightmap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
+
 			mLODMorphConstantsBuffer.SetData( terrainData.mLODMorphConstants );
 			mLODMorphConstantsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA );
 
@@ -148,6 +152,7 @@ namespace JonsEngine
 			}
 
 			beginIndex = endIndex;
+			heightmap.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
 		}
 
 		UnbindRendering();

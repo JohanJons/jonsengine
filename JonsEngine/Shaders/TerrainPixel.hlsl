@@ -10,7 +10,7 @@ struct PixelOut
 };
 
 
-PixelOut ps_main(DomainOut input)
+PixelOut ps_main( VertexOut input)
 {
 	PixelOut ret;
 

@@ -8,6 +8,8 @@ struct VertexIn
 	float3 mPosition : POSITION;
 };
 
+Texture2D gHeightmap : register( TEXTURE_REGISTER_EXTRA );
+
 StructuredBuffer<float2> gLODMorphConstants : register ( SBUFFER_REGISTER_EXTRA );
 
 float2 GetTextureCoordinates( float3 worldPos )
@@ -35,13 +37,13 @@ VertexOut vs_main(VertexIn input)
 	// To be used
 	float4 unmorphedPos = float4( worldPos.xyz, 1.0f );
 
-	float cameraDistanceToVertex = distance( worldPos, gWorldEyePos );
+	float cameraDistanceToVertex = distance( worldPos.xyz, gWorldEyePos );
 
 	VertexOut ret;
 	ret.mPosition = mul( gFrameViewProj, worldPos );;
 
-	ret.mTexcoord = ( ret.mWorldPosition.xz - gWorldMin ) / ( gWorldMax - gWorldMin );
-	ret.mTexcoord = clamp( ret.mTexcoord, 0.0f, 1.0f );
+	//ret.mTexcoord = ( worldPos.xz - gWorldMin ) / ( gWorldMax - gWorldMin );
+	//ret.mTexcoord = clamp( ret.mTexcoord, 0.0f, 1.0f );
 
 	//ret.mInstanceID = input.mInstanceID;
 

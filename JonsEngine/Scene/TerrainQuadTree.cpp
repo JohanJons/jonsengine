@@ -9,6 +9,8 @@ namespace
 {
 	using namespace JonsEngine;
 
+	constexpr float gMorphStartRatio = 0.667f;
+
 	void GetTransformExtentsXZ( const Mat4& transform, Vec2& min, Vec2& max )
 	{
 		const Vec4& translation = transform[ 3 ];
@@ -181,7 +183,10 @@ namespace JonsEngine
 	void TerrainQuadTree::CalculateLODRanges( std::vector<float>& LODs, std::vector<Vec2>& morphConstants, float zNear, float zFar ) const
 	{
 		uint32_t numLODRanges = GetNumLODRanges();
+		assert( numLODRanges > 0 );
+
 		LODs.resize( numLODRanges );
+		morphConstants.resize( numLODRanges );
 
 		const float LODDistanceRatio = 2.0f;
 
@@ -199,8 +204,10 @@ namespace JonsEngine
 		currentDetailBalance = 1.0f;
 		for ( uint32_t i = 0; i < numLODRanges; ++i )
 		{
-			LODs[ numLODRanges - i - 1 ] = prevPos + sect * currentDetailBalance;
-			prevPos = LODs[ numLODRanges - i - 1 ];
+			uint32_t index = numLODRanges - i - 1;
+
+			LODs[ index ] = prevPos + sect * currentDetailBalance;
+			prevPos = LODs[ index ];
 			currentDetailBalance *= LODDistanceRatio;
 		}
 
@@ -208,10 +215,15 @@ namespace JonsEngine
 		for ( uint32_t i = 0; i < numLODRanges; ++i )
 		{
 			uint32_t index = numLODRanges - i - 1;
-			//selectionObj->m_morphEnd[ i ] = selectionObj->m_visibilityRanges[ index ];
-			//selectionObj->m_morphStart[ i ] = prevPos + ( selectionObj->m_morphEnd[ i ] - prevPos ) * selectionObj->m_morphStartRatio;
 
-			//prevPos = selectionObj->m_morphStart[ i ];
+			float morphEnd = LODs[ index ];
+			float morphStart = prevPos + ( morphEnd - prevPos ) * gMorphStartRatio;
+
+			// TEMP
+			morphConstants[ index ].x = morphStart;
+			morphConstants[ index ].y = morphEnd;
+
+			prevPos = morphStart;
 		}
 	}
 
