@@ -219,11 +219,13 @@ namespace JonsEngine
 			float morphEnd = LODs[ index ];
 			float morphStart = prevPos + ( morphEnd - prevPos ) * gMorphStartRatio;
 
-			// TEMP
-			morphConstants[ index ].x = morphStart;
-			morphConstants[ index ].y = morphEnd;
+			prevPos = morphEnd;
 
-			prevPos = morphStart;
+			const float errorFudge = 0.01f;
+			morphEnd = glm::lerp( morphEnd, morphStart, errorFudge );
+			
+			morphConstants[ index ].x = morphEnd / ( morphEnd - morphStart );
+			morphConstants[ index ].y = 1.0f / ( morphEnd - morphStart );
 		}
 	}
 
