@@ -24,11 +24,11 @@ namespace JonsEngine
 	class DX11TerrainPass
 	{
 	public:
-		DX11TerrainPass( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, RenderSettings::TerrainPatchMinSize minSize,
-		 RenderSettings::TerrainPatchMaxSize maxSize );
+		DX11TerrainPass( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap,
+			RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio );
 
-		void Render( const RenderableTerrains& terrains, RenderSettings::TerrainPatchMinSize minSize, RenderSettings::TerrainPatchMaxSize maxSize );
-		void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchMinSize minSize, RenderSettings::TerrainPatchMaxSize maxSize, DebugOptions::RenderingFlags debugFlags );
+		void Render( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio );
+		void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio, DebugOptions::RenderingFlags debugFlags );
 
 		//void Render( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize );
 		//void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize, DebugOptions::RenderingFlags debugFlags );
@@ -41,17 +41,11 @@ namespace JonsEngine
 			float mHeightScale;
 			float mVariationScale;
 			uint32_t mTransformOffset;
-			float __padding;
+			uint32_t __padding;
 		};
 
 		struct PerQuadCBuffer
 		{
-			PerQuadCBuffer() = default;
-			PerQuadCBuffer( const Mat4& transform, uint32_t LOD ) :
-				mTransform( transform ),
-				mLOD( LOD )
-			{ }
-
 			Mat4 mTransform;
 			uint32_t mLOD;
 			uint32_t __padding[ 3 ];
@@ -63,8 +57,7 @@ namespace JonsEngine
 			GridMeshData( DX11Mesh&& mesh, uint32_t BL, uint32_t BR, uint32_t TR, uint32_t TL ) :
 				mMesh( std::move( mesh ) ),
 				mEndIndices{ BL, BR, TR, TL }
-			{
-			}
+			{ }
 
 			DX11Mesh mMesh;
 			std::array<uint32_t, QuadChildEnum::QUAD_CHILD_COUNT> mEndIndices;
@@ -80,9 +73,8 @@ namespace JonsEngine
 		void BindForRendering();
 		void UnbindRendering();
 
-		bool ShouldRecreateGridMesh( RenderSettings::TerrainPatchMinSize minSize, RenderSettings::TerrainPatchMaxSize maxSize );
-		void CreateGridMesh( RenderSettings::TerrainPatchMinSize minSize, RenderSettings::TerrainPatchMaxSize maxSize );
-		GridMeshData& GetGridMeshFromLOD( uint32_t LOD );
+		bool ShouldRecreateGridMesh( RenderSettings::TerrainPatchSize newPatchSize, RenderSettings::TerrainPatchVerticeRatio newVertexRatio );
+		void CreateGridMesh( RenderSettings::TerrainPatchSize newPatchSize, RenderSettings::TerrainPatchVerticeRatio newVertexRatio );
 
 		//void RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize );
 		//void CreateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
@@ -105,11 +97,12 @@ namespace JonsEngine
 		ID3D11VertexShaderPtr mVertexShader = nullptr;
 		ID3D11PixelShaderPtr mPixelShader = nullptr;
 
-		RenderSettings::TerrainPatchMinSize mCachedMinSize;
-		RenderSettings::TerrainPatchMaxSize mCachedMaxSize;
-		std::vector<GridMeshData> mGridMeshes;
+		RenderSettings::TerrainPatchSize mCachedPatchSize;
+		RenderSettings::TerrainPatchVerticeRatio mCachedPatchVertexRatio;
+		GridMeshData mGridMesh;
 
 		DX11ConstantBuffer<PerQuadCBuffer> mPerQuadCBuffer;
+		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;
 		DX11CPUDynamicBuffer mLODMorphConstantsBuffer;
 
 		/*ID3D11InputLayoutPtr mLayout = nullptr;

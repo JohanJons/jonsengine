@@ -12,7 +12,7 @@ cbuffer PerQuadConstants : register( CBUFFER_REGISTER_VERTEX )
 	uint gLODLevel;
 }
 
-cbuffer PerTerrainConstants : register(CBUFFER_REGISTER_DOMAIN)
+cbuffer PerTerrainConstants : register( CBUFFER_REGISTER_EXTRA )
 {
 	float2 gWorldMin;
 	float2 gWorldMax;

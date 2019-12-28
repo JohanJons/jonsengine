@@ -54,24 +54,23 @@ namespace JonsEngine
 			FilmicU2
 		} mToneMapping;
 
-        enum class TerrainPatchMinSize
-        {
-			X2,
-            X4,
-			X8,
-			X16,
-            X32
-        } mTerrainPatchMinSize;
-
-		enum class TerrainPatchMaxSize
+		enum class TerrainPatchSize
 		{
+			X16,
+			X32,
 			X64,
 			X128,
 			X256,
-			X512,
-			X1024,
-			X2048
-		} mTerrainPatchMaxSize;
+			X512
+		} mTerrainPatchSize;
+
+		enum class TerrainPatchVerticeRatio
+		{
+			X0_5,
+			X1,
+			X1_5,
+			X2
+		} mTerrainVertexRatio;
 
 		enum class TerrainCoplanaritySize
 		{
@@ -139,8 +138,8 @@ namespace JonsEngine
 		mAnisotropicFiltering( Anisotropic::X16 ),
 		mAntiAliasing( AntiAliasing::Fxaa ),
 		mToneMapping( ToneMappingAlghorithm::FilmicU2 ),
-		mTerrainPatchMinSize( TerrainPatchMinSize::X2 ),
-		mTerrainPatchMaxSize( TerrainPatchMaxSize::X256 ),
+		mTerrainPatchSize( TerrainPatchSize::X32 ),
+		mTerrainVertexRatio( TerrainPatchVerticeRatio::X1 ),
 		mTerrainCoplanaritySize( TerrainCoplanaritySize::X16 ),
 		mTerrainPrimitiveLength( TerrainPrimitiveLength::X160 ),
 		mTerrainTessellationMax( TerrainTessellationMax::X64 ),

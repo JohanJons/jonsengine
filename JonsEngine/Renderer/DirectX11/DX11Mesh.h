@@ -26,6 +26,7 @@ namespace JonsEngine
 
 
 		// TODO: make template to accept generic data container rather than just vectors
+		DX11Mesh() = default;
 		DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds);
         DX11Mesh(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, const std::vector<float>& vertexData, const std::vector<float>& normalData, const std::vector<float>& texCoords,
             const std::vector<float>& tangentData, const std::vector<uint16_t>& indexData, const Vec3& minBounds, const Vec3& maxBounds);
@@ -41,9 +42,6 @@ namespace JonsEngine
         void DrawAABB();
 
 
-        const DX11MeshID mMeshID;
-
-
     private:
 		void BindAllBuffers();
 
@@ -55,8 +53,9 @@ namespace JonsEngine
         ID3D11BufferPtr mBoneWeightBuffer;
         ID3D11BufferPtr mIndexBuffer;
 
-        const uint32_t mNumVertices;
-        const uint32_t mNumIndices;
-        const bool mHasBones;
+		DX11MeshID mMeshID;
+        uint32_t mNumVertices;
+        uint32_t mNumIndices;
+        bool mHasBones;
     };
 }

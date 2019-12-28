@@ -237,16 +237,15 @@ namespace JonsEngine
         mRenderSettings.mToneMapping = alghorithm;
     }
 
-    void DX11Renderer::SetTerrainPatchMinSize( RenderSettings::TerrainPatchMinSize patchSize )
-    {
-        mRenderSettings.mTerrainPatchMinSize = patchSize;
-    }
-
-	void DX11Renderer::SetTerrainPatchMaxSize( RenderSettings::TerrainPatchMaxSize patchSize )
+	void DX11Renderer::SetTerrainPatchSize( RenderSettings::TerrainPatchSize patchSize )
 	{
-		mRenderSettings.mTerrainPatchMaxSize = patchSize;
+		mRenderSettings.mTerrainPatchSize = patchSize;
 	}
 
+	void DX11Renderer::SetTerrainPatchVertexRatio( RenderSettings::TerrainPatchVerticeRatio vertexRatio )
+	{
+		mRenderSettings.mTerrainVertexRatio = vertexRatio;
+	}
 
     bool DX11Renderer::IsSSAOEnabled() const
     {

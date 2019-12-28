@@ -59,11 +59,11 @@ namespace JonsEngine
         RenderSettings::ToneMappingAlghorithm GetToneMappingAlghorithm() const;
         void SetToneMappingAlghorithm(const RenderSettings::ToneMappingAlghorithm alghorithm);
 
-        RenderSettings::TerrainPatchMinSize GetTerrainPatchMinSize() const { return mRenderSettings.mTerrainPatchMinSize; }
-        void SetTerrainPatchMinSize( RenderSettings::TerrainPatchMinSize patchSize );
+		RenderSettings::TerrainPatchSize GetTerrainPatchSize() const { return mRenderSettings.mTerrainPatchSize; }
+		void SetTerrainPatchSize( RenderSettings::TerrainPatchSize patchSize );
 
-		RenderSettings::TerrainPatchMaxSize GetTerrainPatchMaxSize() const { return mRenderSettings.mTerrainPatchMaxSize; }
-		void SetTerrainPatchMaxSize( RenderSettings::TerrainPatchMaxSize patchSize );
+		RenderSettings::TerrainPatchVerticeRatio GetTerrainPatchVertexRatio() const { return mRenderSettings.mTerrainVertexRatio; }
+		void SetTerrainPatchVertexRatio( RenderSettings::TerrainPatchVerticeRatio patchSize );
 
 		RenderSettings::TerrainCoplanaritySize GetTerrainCoplanaritySize() const { return mRenderSettings.mTerrainCoplanaritySize; }
 		void SetTerrainCoplanaritySize( RenderSettings::TerrainCoplanaritySize coplanaritySize ) { mRenderSettings.mTerrainCoplanaritySize = coplanaritySize; }

@@ -37,14 +37,15 @@ namespace JonsEngine
 	};
 
 
-	DX11TerrainPass::DX11TerrainPass( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap, RenderSettings::TerrainPatchMinSize minSize,
-		RenderSettings::TerrainPatchMaxSize maxSize ):
+	DX11TerrainPass::DX11TerrainPass( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap,
+		RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio ):
 		mContext( context ),
         mDevice( device ),
 		mTextureMap( textureMap ),
-		mCachedMinSize( minSize ),
-		mCachedMaxSize( maxSize ),
+		mCachedPatchSize( patchSize ),
+		mCachedPatchVertexRatio( vertexRatio ),
 		mPerQuadCBuffer( device, context, mPerQuadCBuffer.CONSTANT_BUFFER_SLOT_VERTEX ),
+		mPerTerrainCBuffer( device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_EXTRA ),
 		mLODMorphConstantsBuffer( device, context )
 		/*mPerTerrainCBuffer(device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
 		mTransformsBuffer( device, context ),
@@ -96,16 +97,16 @@ namespace JonsEngine
 		rasterizerDesc.AntialiasedLineEnable = false;
 		DXCALL(device->CreateRasterizerState(&rasterizerDesc, &mDebugRasterizer));*/
 
-		CreateGridMesh( minSize, maxSize );
+		CreateGridMesh( patchSize, vertexRatio );
 	}
 
-	void DX11TerrainPass::Render( const RenderableTerrains& terrains, RenderSettings::TerrainPatchMinSize minSize, RenderSettings::TerrainPatchMaxSize maxSize )
+	void DX11TerrainPass::Render( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio )
 	{
 		if ( !terrains.GetNumTerrains() )
 			return;
 
-		if ( ShouldRecreateGridMesh( minSize, maxSize ) )
-			CreateGridMesh( minSize, maxSize );
+		if ( ShouldRecreateGridMesh( patchSize, vertexRatio ) )
+			CreateGridMesh( patchSize, vertexRatio );
 
 		BindForRendering();
 
@@ -114,6 +115,9 @@ namespace JonsEngine
 		{
 			const DX11Texture& heightmap = mTextureMap.GetItem( terrainData.mHeightMap );
 			heightmap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
+			
+			mPerTerrainCBuffer.SetData( { terrainData.mWorldMin, terrainData.mWorldMax, terrainData.mHeightScale, terrainData.mVariationScale, beginIndex } );
+			mPerTerrainCBuffer.Bind();
 
 			mLODMorphConstantsBuffer.SetData( terrainData.mLODMorphConstants );
 			mLODMorphConstantsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA );
@@ -129,8 +133,6 @@ namespace JonsEngine
 				mPerQuadCBuffer.SetData( { quad.mTransform, quad.mLODLevel } );
 				mPerQuadCBuffer.Bind();
 
-				GridMeshData& gridMesh = GetGridMeshFromLOD( quad.mLODLevel );
-
 				// TODO: draw some quad pairings in one drawcall
 
 				uint32_t quadBeginIndex = 0;
@@ -139,17 +141,23 @@ namespace JonsEngine
 					if ( !quad.mRenderedParts.test( quadOffset ) )
 						continue;
 
-					uint32_t quadEndIndex = gridMesh.mEndIndices.at( quadOffset );
+					uint32_t quadEndIndex = mGridMesh.mEndIndices.at( quadOffset );
 					assert( quadEndIndex > quadBeginIndex );
 
 					uint32_t numIndices = quadEndIndex - quadBeginIndex;
 					assert( numIndices > 0 );
 
-					gridMesh.mMesh.Draw( quadBeginIndex, numIndices );
+					mGridMesh.mMesh.Draw( quadBeginIndex, numIndices );
 
 					quadBeginIndex = quadEndIndex;
+
+					break;
 				}
+
+				break;
 			}
+
+			break;
 
 			beginIndex = endIndex;
 			heightmap.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
@@ -158,7 +166,7 @@ namespace JonsEngine
 		UnbindRendering();
 	}
 
-	void DX11TerrainPass::RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchMinSize minSize, RenderSettings::TerrainPatchMaxSize maxSize, DebugOptions::RenderingFlags debugFlags )
+	void DX11TerrainPass::RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio, DebugOptions::RenderingFlags debugFlags )
 	{
 
 	}
@@ -235,97 +243,84 @@ namespace JonsEngine
 		//mContext->HSSetShader( nullptr, nullptr, 0 );
 	}
 
-	bool DX11TerrainPass::ShouldRecreateGridMesh( RenderSettings::TerrainPatchMinSize minSize, RenderSettings::TerrainPatchMaxSize maxSize )
+	bool DX11TerrainPass::ShouldRecreateGridMesh( RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio newVertexRatio )
 	{
-		return mCachedMinSize != minSize || mCachedMaxSize != maxSize;
+		return mCachedPatchSize != patchSize || mCachedPatchVertexRatio != newVertexRatio;
 	}
 
-	void DX11TerrainPass::CreateGridMesh( RenderSettings::TerrainPatchMinSize minSize, RenderSettings::TerrainPatchMaxSize maxSize )
+	void DX11TerrainPass::CreateGridMesh( RenderSettings::TerrainPatchSize newPatchSize, RenderSettings::TerrainPatchVerticeRatio newVertexRatio )
 	{
-		if ( mCachedMinSize != minSize )
-			mCachedMinSize = minSize;
+		if ( mCachedPatchSize != newPatchSize )
+			mCachedPatchSize = newPatchSize;
 
-		if ( mCachedMaxSize != maxSize )
-			mCachedMaxSize = maxSize;
+		if ( mCachedPatchVertexRatio != newVertexRatio )
+			mCachedPatchVertexRatio = newVertexRatio;
 
-		int32_t minVal = RenderSettingsToVal( minSize );
-		int32_t maxVal = RenderSettingsToVal( maxSize );
-		assert( minVal <= maxVal );
+		uint32_t patchSize = RenderSettingsToVal( mCachedPatchSize );
+		float vertexRatio = RenderSettingsToVal( mCachedPatchVertexRatio );
 
-		int32_t factor = maxVal - minVal;
-		assert( factor % 2 == 0 );
-		factor = static_cast<int32_t>( sqrt( factor ) );
-		assert( factor > 0 );
-
-		mGridMeshes.reserve( factor );
+		int32_t dimension = static_cast<int32_t>( static_cast<float>( patchSize ) * vertexRatio );
+		assert( dimension > 0 );
 		
-		int32_t maxPositions = ( maxVal + 1 ) * ( maxVal + 1 ) * 3;
-		int32_t maxIndices = maxVal * maxVal * 2 * 3;
+		int32_t maxVertices = ( dimension + 1 ) * ( dimension + 1 ) * 3;
+		int32_t maxIndices = dimension * dimension * 2 * 3;
 
 		std::vector<float> vertices;
 		std::vector<uint16_t> indices;
-		vertices.reserve( maxPositions );
+		vertices.reserve( maxVertices );
 		indices.reserve( maxIndices );
-		for ( int32_t dimensions = minVal; dimensions <= maxVal; dimensions *= 2 )
-		{
-			int32_t vertDim = dimensions + 1;
-			int32_t halfVertDim = vertDim / 2;
 
-			for ( int32_t z = 0; z < vertDim; ++z )
+		int32_t vertDim = dimension + 1;
+		int32_t halfVertDim = vertDim / 2;
+
+		for ( int32_t z = 0; z < vertDim; ++z )
+		{
+			for ( int32_t x = 0; x < vertDim; ++x )
 			{
-				for ( int32_t x = 0; x < vertDim; ++x )
+				// from bottom-left to top-right
+				float posX = x - ( dimension / 2.0f );
+				float posZ = z - ( dimension / 2.0f );
+				//float posX = x / ( float) dimensions;
+				//float posZ = z / ( float) dimensions;
+				vertices.insert( vertices.end(), { posX, 0.0f, posZ } );
+			}
+		}
+
+		auto quadIndiceFunc = [ &indices, vertDim, halfVertDim ]( int32_t initialX, int32_t initialZ, int32_t finalX, int32_t finalZ )
+		{
+			for ( int32_t z = initialZ; z < finalZ; ++z )
+			{
+				for ( int32_t x = initialX; x < finalX; ++x )
 				{
-					// from bottom-left to top-right
-					float posX = x - ( dimensions / 2.0f );
-					float posZ = z - ( dimensions / 2.0f );
-					vertices.insert( vertices.end(), { posX, 0.0f, posZ } );
+					uint16_t v1 = x + vertDim * z;
+					uint16_t v2 = ( x + 1 ) + vertDim * z;
+					uint16_t v3 = x + vertDim * ( z + 1 );
+					uint16_t v4 = ( x + 1 ) + vertDim * ( z + 1 );
+
+					indices.insert( indices.end(), { v1, v2, v3, v2, v4, v3 } );
 				}
 			}
+		};
 
-			auto quadIndiceFunc = [ &indices, vertDim, halfVertDim ]( int32_t initialX, int32_t initialZ, int32_t finalX, int32_t finalZ )
-			{
-				for ( int32_t z = initialZ; z < finalZ; ++z )
-				{
-					for ( int32_t x = initialX; x < finalX; ++x )
-					{
-						uint16_t v1 = x + vertDim * z;
-						uint16_t v2 = ( x + 1 ) + vertDim * z;
-						uint16_t v3 = x + vertDim * ( z + 1 );
-						uint16_t v4 = ( x + 1 ) + vertDim * ( z + 1 );
+		// BL - BR - TR - TL
+		uint32_t BLEnd, BREnd, TREnd, TLEnd;
+		quadIndiceFunc( 0, 0, halfVertDim, halfVertDim );
+		BLEnd = static_cast<uint32_t>( indices.size() );
 
-						indices.insert( indices.end(), { v1, v2, v3, v2, v4, v3 } );
-					}
-				}
-			};
+		quadIndiceFunc( halfVertDim, 0, vertDim, halfVertDim );
+		BREnd = static_cast<uint32_t>( indices.size() );
 
-			// BL - BR - TR - TL
-			uint32_t BLEnd, BREnd, TREnd, TLEnd;
-			quadIndiceFunc( 0, 0, halfVertDim, halfVertDim );
-			BLEnd = static_cast<uint32_t>( indices.size() );
+		quadIndiceFunc( halfVertDim, halfVertDim, vertDim, vertDim );
+		TREnd = static_cast<uint32_t>( indices.size() );
 
-			quadIndiceFunc( halfVertDim, 0, vertDim, halfVertDim );
-			BREnd = static_cast<uint32_t>( indices.size() );
+		quadIndiceFunc( 0, halfVertDim, halfVertDim, vertDim );
+		TLEnd = static_cast<uint32_t>( indices.size() );
 
-			quadIndiceFunc( halfVertDim, halfVertDim, vertDim, vertDim );
-			TREnd = static_cast<uint32_t>( indices.size() );
+		Vec3 minBounds( -dimension / 2.0f, 0.0f, -dimension / 2.0f );
+		Vec3 maxBounds( dimension / 2.0f, 0.0f, dimension / 2.0f );
 
-			quadIndiceFunc( 0, halfVertDim, halfVertDim, vertDim );
-			TLEnd = static_cast<uint32_t>( indices.size() );
-
-			Vec3 minBounds( -dimensions / 2.0f, 0.0f, -dimensions / 2.0f );
-			Vec3 maxBounds( dimensions / 2.0f, 0.0f, dimensions / 2.0f );
-
-			DX11Mesh mesh( mDevice, mContext, vertices, indices, minBounds, maxBounds );
-			mGridMeshes.emplace_back( std::move( mesh ), BLEnd, BREnd, TREnd, TLEnd );
-
-			vertices.clear();
-			indices.clear();
-		}
-	}
-
-	DX11TerrainPass::GridMeshData& DX11TerrainPass::GetGridMeshFromLOD( uint32_t LOD )
-	{
-		return mGridMeshes.at( LOD );
+		DX11Mesh mesh( mDevice, mContext, vertices, indices, minBounds, maxBounds );
+		mGridMesh = std::move( GridMeshData( std::move( mesh ), BLEnd, BREnd, TREnd, TLEnd ) );
 	}
 
 
