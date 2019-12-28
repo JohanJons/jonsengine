@@ -39,6 +39,8 @@ namespace JonsEngine
 
     const Vec3& AABB::GetExtent() const
     {
+		assert( mAABBExtent.x >= 0 && mAABBExtent.y >= 0 && mAABBExtent.z >= 0 );
+
         return mAABBExtent;
     }
 

@@ -44,25 +44,6 @@ namespace JonsEngine
 			uint32_t __padding;
 		};
 
-		struct PerQuadCBuffer
-		{
-			Mat4 mTransform;
-			uint32_t mLOD;
-			uint32_t __padding[ 3 ];
-		};
-
-		struct GridMeshData
-		{
-			GridMeshData() = default;
-			GridMeshData( DX11Mesh&& mesh, uint32_t BL, uint32_t BR, uint32_t TR, uint32_t TL ) :
-				mMesh( std::move( mesh ) ),
-				mEndIndices{ BL, BR, TR, TL }
-			{ }
-
-			DX11Mesh mMesh;
-			std::array<uint32_t, QuadChildEnum::QUAD_CHILD_COUNT> mEndIndices;
-		};
-
 	private:
 		/*enum class CachedTextureMap
 		{
@@ -99,11 +80,11 @@ namespace JonsEngine
 
 		RenderSettings::TerrainPatchSize mCachedPatchSize;
 		RenderSettings::TerrainPatchVerticeRatio mCachedPatchVertexRatio;
-		GridMeshData mGridMesh;
+		DX11Mesh mGridMesh;
 
-		DX11ConstantBuffer<PerQuadCBuffer> mPerQuadCBuffer;
 		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;
 		DX11CPUDynamicBuffer mLODMorphConstantsBuffer;
+		DX11CPUDynamicBuffer mTransformBuffer;
 
 		/*ID3D11InputLayoutPtr mLayout = nullptr;
 		ID3D11VertexShaderPtr mVertexShader = nullptr;

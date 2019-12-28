@@ -52,14 +52,14 @@ namespace JonsEngine
 		assert( numNodes == GetNumNodes() );
 	}
 
-	void TerrainQuadTree::CullNodes( std::vector<RenderableTerrainQuad>& renderableQuads, std::vector<float>& LODRanges, std::vector<Vec2>& morphConstants, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const
+	void TerrainQuadTree::CullNodes( std::vector<Mat4>& renderableTransforms, std::vector<float>& LODRanges, std::vector<Vec2>& morphConstants, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const
 	{
-		renderableQuads.clear();
+		renderableTransforms.clear();
 		LODRanges.clear();
 		morphConstants.clear();
 
 		CalculateLODRanges( LODRanges, morphConstants, zNear, zFar );
-		CullQuad( renderableQuads, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
+		CullQuad( renderableTransforms, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
 
 		//PerCullData cullData( GetNumNodes() );
 		//CalculateHighestLODNodes( cullData, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
@@ -227,12 +227,7 @@ namespace JonsEngine
 		}
 	}
 
-	void TerrainQuadTree::AddNode( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB ) const
-	{
-		AddNode( renderableQuads, quadAABB, true, true, true, true );
-	}
-
-	void TerrainQuadTree::AddNode( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB, bool addBL, bool addBR, bool addTR, bool addTL ) const
+	void TerrainQuadTree::AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB ) const
 	{
 		Vec3 center = quadAABB.mFrustumAABB.GetCenter();
 		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
@@ -240,16 +235,49 @@ namespace JonsEngine
 		Mat4 transform = glm::translate( Vec3( center.x, 0.0f, center.z ) );
 		transform = glm::scale( transform, extent * 2.0f );
 
-		std::bitset<QuadChildEnum::QUAD_CHILD_COUNT> bitset;
-		bitset.set( QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT, addBL );
-		bitset.set( QuadChildEnum::QUAD_CHILD_BOTTOM_RIGHT, addBR );
-		bitset.set( QuadChildEnum::QUAD_CHILD_TOP_RIGHT, addTR );
-		bitset.set( QuadChildEnum::QUAD_CHILD_TOP_LEFT, addTL );
-
-		renderableQuads.emplace_back( transform, quadAABB.mLODIndex, bitset );
+		renderableTransforms.emplace_back( transform );
 	}
 
-	QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<RenderableTerrainQuad>& renderableQuads, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const
+	void TerrainQuadTree::AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, bool addBL, bool addBR, bool addTR, bool addTL ) const
+	{
+		Vec3 center = quadAABB.mFrustumAABB.GetCenter();
+		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
+		Vec3 halfExtent = extent / 2.0f;
+
+		if ( addBL )
+		{
+			Mat4 transform = glm::translate( Vec3( center.x - halfExtent.x, 0.0f, center.z - halfExtent.x ) );
+			transform = glm::scale( transform, extent );
+
+			renderableTransforms.emplace_back( transform );
+		}
+
+		if ( addBR )
+		{
+			Mat4 transform = glm::translate( Vec3( center.x + halfExtent.x, 0.0f, center.z - halfExtent.x ) );
+			transform = glm::scale( transform, extent );
+
+			renderableTransforms.emplace_back( transform );
+		}
+
+		if ( addTR )
+		{
+			Mat4 transform = glm::translate( Vec3( center.x + halfExtent.x, 0.0f, center.z + halfExtent.x ) );
+			transform = glm::scale( transform, extent );
+
+			renderableTransforms.emplace_back( transform );
+		}
+
+		if ( addTL )
+		{
+			Mat4 transform = glm::translate( Vec3( center.x - halfExtent.x, 0.0f, center.z + halfExtent.x ) );
+			transform = glm::scale( transform, extent );
+
+			renderableTransforms.emplace_back( transform );
+		}
+	}
+
+	QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const
 	{
 		// if parent is fully in frustum, so are we
 		AABBIntersection frustumIntersection = parentFullyInFrustum ? AABBIntersection::Inside : Intersection( quadAABB.mFrustumAABB, cameraViewProjTransform );
@@ -267,7 +295,7 @@ namespace JonsEngine
 		bool isValidLODIndex = nextLODIndex < LODRanges.size();
 		if ( !isValidLODIndex )
 		{
-			AddNode( renderableQuads, quadAABB );
+			AddNode( renderableTransforms, quadAABB );
 			return QuadNodeCullStatus::Added;
 		}
 
@@ -276,7 +304,7 @@ namespace JonsEngine
 		bool nextIsWithinRange = nextIntersection == AABBIntersection::Partial || nextIntersection == AABBIntersection::Inside;
 		if ( !nextIsWithinRange )
 		{
-			AddNode( renderableQuads, quadAABB );
+			AddNode( renderableTransforms, quadAABB );
 			return QuadNodeCullStatus::Added;
 		}
 
@@ -286,7 +314,7 @@ namespace JonsEngine
 		for ( uint32_t childIndex = QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT; childIndex < QuadChildEnum::QUAD_CHILD_COUNT; ++childIndex )
 		{
 			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
-			childrenAdded[ childIndex ] = CullQuad( renderableQuads, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum );
+			childrenAdded[ childIndex ] = CullQuad( renderableTransforms, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum );
 		}
 
 		// remove if childnodes already selected, or out of frustum
@@ -298,7 +326,7 @@ namespace JonsEngine
 
 		if ( doAddSelf )
 		{
-			AddNode( renderableQuads, quadAABB, !removeBL, !removeBR, !removeTR, !removeTL );
+			AddNode( renderableTransforms, quadAABB, !removeBL, !removeBR, !removeTR, !removeTL );
 
 			Status = QuadNodeCullStatus::Added;
 		}

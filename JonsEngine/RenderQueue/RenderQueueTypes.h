@@ -173,26 +173,10 @@ namespace JonsEngine
 		float mVariationScale;
 	};
 
-	struct RenderableTerrainQuad
-	{
-		using QuadFlagsSet = std::bitset<QuadChildEnum::QUAD_CHILD_COUNT>;
-
-		RenderableTerrainQuad() = default;
-		RenderableTerrainQuad( const Mat4& transform, uint32_t LOD, QuadFlagsSet& set ) :
-			mTransform( transform ),
-			mLODLevel( LOD ),
-			mRenderedParts( set )
-		{ }
-
-		Mat4 mTransform;
-		uint32_t mLODLevel;
-		QuadFlagsSet mRenderedParts;
-	};
-
 	struct RenderableTerrains
 	{
 		std::vector<RenderableTerrainData> mTerrainData;
-		std::vector<RenderableTerrainQuad> mTerrainQuads;
+		std::vector<Mat4> mTransforms;
 
 		uint32_t GetNumTerrains() const { return static_cast<uint32_t>( mTerrainData.size() ); }
 	};

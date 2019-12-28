@@ -44,9 +44,9 @@ namespace JonsEngine
 		mTextureMap( textureMap ),
 		mCachedPatchSize( patchSize ),
 		mCachedPatchVertexRatio( vertexRatio ),
-		mPerQuadCBuffer( device, context, mPerQuadCBuffer.CONSTANT_BUFFER_SLOT_VERTEX ),
 		mPerTerrainCBuffer( device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_EXTRA ),
-		mLODMorphConstantsBuffer( device, context )
+		mLODMorphConstantsBuffer( device, context ),
+		mTransformBuffer( device, context )
 		/*mPerTerrainCBuffer(device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
 		mTransformsBuffer( device, context ),
 		mTessEdgeMultBuffer( device, context ),
@@ -110,6 +110,9 @@ namespace JonsEngine
 
 		BindForRendering();
 
+		mTransformBuffer.SetData( terrains.mTransforms );
+		mTransformBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA_2 );
+
 		uint32_t beginIndex = 0;
 		for ( const RenderableTerrainData& terrainData : terrains.mTerrainData )
 		{
@@ -126,38 +129,8 @@ namespace JonsEngine
 			assert( endIndex > beginIndex );
 
 			uint32_t numTransforms = endIndex - beginIndex;
-			for ( uint32_t index = beginIndex; index < endIndex; ++index )
-			{
-				const RenderableTerrainQuad& quad = terrains.mTerrainQuads.at( index );
 
-				mPerQuadCBuffer.SetData( { quad.mTransform, quad.mLODLevel } );
-				mPerQuadCBuffer.Bind();
-
-				// TODO: draw some quad pairings in one drawcall
-
-				uint32_t quadBeginIndex = 0;
-				for ( uint32_t quadOffset = QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT; quadOffset < QuadChildEnum::QUAD_CHILD_COUNT; ++quadOffset )
-				{
-					if ( !quad.mRenderedParts.test( quadOffset ) )
-						continue;
-
-					uint32_t quadEndIndex = mGridMesh.mEndIndices.at( quadOffset );
-					assert( quadEndIndex > quadBeginIndex );
-
-					uint32_t numIndices = quadEndIndex - quadBeginIndex;
-					assert( numIndices > 0 );
-
-					mGridMesh.mMesh.Draw( quadBeginIndex, numIndices );
-
-					quadBeginIndex = quadEndIndex;
-
-					break;
-				}
-
-				break;
-			}
-
-			break;
+			mGridMesh.DrawInstanced( numTransforms );
 
 			beginIndex = endIndex;
 			heightmap.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
@@ -319,8 +292,7 @@ namespace JonsEngine
 		Vec3 minBounds( -dimension / 2.0f, 0.0f, -dimension / 2.0f );
 		Vec3 maxBounds( dimension / 2.0f, 0.0f, dimension / 2.0f );
 
-		DX11Mesh mesh( mDevice, mContext, vertices, indices, minBounds, maxBounds );
-		mGridMesh = std::move( GridMeshData( std::move( mesh ), BLEnd, BREnd, TREnd, TLEnd ) );
+		mGridMesh = DX11Mesh( mDevice, mContext, vertices, indices, minBounds, maxBounds );
 	}
 
 

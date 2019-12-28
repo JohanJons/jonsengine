@@ -27,7 +27,7 @@ namespace JonsEngine
 		mSkyboxTextureID = INVALID_DX11_TEXTURE_ID;
 
 		mTerrains.mTerrainData.clear();
-		mTerrains.mTerrainQuads.clear();
+		mTerrains.mTransforms.clear();
 
 		mColorsToAABBsList.clear();
     }

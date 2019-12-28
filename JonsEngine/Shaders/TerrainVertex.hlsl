@@ -6,11 +6,12 @@
 struct VertexIn
 {
 	float3 mPosition : POSITION;
+	uint mInstanceID : SV_InstanceID;
 };
 
 Texture2D gHeightmap : register( TEXTURE_REGISTER_EXTRA );
 
-StructuredBuffer<float2> gLODMorphConstants : register ( SBUFFER_REGISTER_EXTRA );
+StructuredBuffer<float4x4> gTerrainWorldTransforms : register ( SBUFFER_REGISTER_EXTRA_2 );
 
 float2 GetTextureCoordinates( float3 worldPos )
 {
@@ -30,7 +31,11 @@ float SampleHeightmap( float2 uv )
 
 VertexOut vs_main(VertexIn input)
 {
-	float4 worldPos = mul( gQuadWorldTransform, float4( input.mPosition, 1 ) );
+	const uint transformIndex = gTransformOffset + input.mInstanceID;
+	// silly that we have to transpose this...
+	const float4x4 worldTransform = transpose( gTerrainWorldTransforms.Load( transformIndex ) );
+
+	float4 worldPos = mul( worldTransform, float4( input.mPosition, 1 ) );
 	float2 preMorphTexcoord = GetTextureCoordinates( worldPos.xyz );
 	worldPos.z = SampleHeightmap( preMorphTexcoord );
 
@@ -40,7 +45,7 @@ VertexOut vs_main(VertexIn input)
 	float cameraDistanceToVertex = distance( worldPos.xyz, gWorldEyePos );
 
 	VertexOut ret;
-	ret.mPosition = mul( gFrameViewProj, worldPos );;
+	ret.mPosition = mul( gFrameViewProj, worldPos );
 
 	//ret.mTexcoord = ( worldPos.xz - gWorldMin ) / ( gWorldMax - gWorldMin );
 	//ret.mTexcoord = clamp( ret.mTexcoord, 0.0f, 1.0f );

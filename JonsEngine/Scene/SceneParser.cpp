@@ -206,16 +206,16 @@ namespace JonsEngine
 
 			std::vector<float> LODRanges;
 			std::vector<Vec2> morphConstants;
-			std::vector<RenderableTerrainQuad>& renderableQuads = mRenderQueue.mTerrains.mTerrainQuads;
+			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
 
 			const TerrainQuadTree& quadTree = terrainTransforms.GetQuadTree( ID );
-			quadTree.CullNodes( renderableQuads, LODRanges, morphConstants, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
-			if ( renderableQuads.empty()  )
+			quadTree.CullNodes( renderableTransforms, LODRanges, morphConstants, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
+			if ( renderableTransforms.empty()  )
 				continue;
 			
 			Vec2 worldMin, worldMax;
 			quadTree.GetWorldXZBounds( worldMin, worldMax );
-			uint32_t renderableEndIndex = static_cast<uint32_t>( renderableQuads.size() );
+			uint32_t renderableEndIndex = static_cast<uint32_t>( renderableTransforms.size() );
 			mRenderQueue.mTerrains.mTerrainData.emplace_back( std::move( morphConstants ), heightmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale );
 		}
 	}
@@ -267,7 +267,7 @@ namespace JonsEngine
 		// unused atm
 		std::vector<float> lodRanges;
 		std::vector<Mat4> aabbTransforms;
-		aabbTransforms.reserve( mRenderQueue.mTerrains.mTerrainQuads.size() );
+		aabbTransforms.reserve( mRenderQueue.mTerrains.mTransforms.size() );
 
 		// just copy normal culled terrain data...?
 

@@ -6,6 +6,8 @@
 Texture2D gCoplanarityMap : register( TEXTURE_REGISTER_EXTRA_2 );
 Texture2D gNormalMap : register( TEXTURE_REGISTER_NORMAL );
 
+StructuredBuffer<float2> gLODMorphConstants : register ( SBUFFER_REGISTER_EXTRA );
+
 cbuffer PerQuadConstants : register( CBUFFER_REGISTER_VERTEX )
 {
 	float4x4 gQuadWorldTransform;
