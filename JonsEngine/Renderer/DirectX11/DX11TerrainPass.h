@@ -45,31 +45,31 @@ namespace JonsEngine
 		};
 
 	private:
-		/*enum class CachedTextureMap
+		enum class CachedTextureMap
 		{
 			COPLANARITY,
 			NORMAL
-		};*/
+		};
 
 		void BindForRendering();
 		void UnbindRendering();
 
 		bool ShouldRecreateGridMesh( RenderSettings::TerrainPatchSize newPatchSize, RenderSettings::TerrainPatchVerticeRatio newVertexRatio );
 		void CreateGridMesh( RenderSettings::TerrainPatchSize newPatchSize, RenderSettings::TerrainPatchVerticeRatio newVertexRatio );
+		void RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio );
 
-		//void RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize );
-		//void CreateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
-		//void GetTextureMapDimensions( uint32_t& width, uint32_t& height, CachedTextureMap type, DX11TextureID heightmapID );
-		//DXGI_FORMAT GetTextureMapFormat( CachedTextureMap type );
-		//std::map<DX11TextureID, DX11DynamicTexture>& GetTextureMap( CachedTextureMap type );
-		//void UpdateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
-		//void BindComputeShader( CachedTextureMap type );
-		//void GetDispatchDimensions( uint32_t& x, uint32_t& y, CachedTextureMap type, DX11TextureID heightmapID );
+		bool HasCachedTextureMap( CachedTextureMap type, DX11TextureID heightmapID ) const;
+		void CreateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
+		void GetTextureMapDimensions( uint32_t& width, uint32_t& height, CachedTextureMap type, DX11TextureID heightmapID );
+		DXGI_FORMAT GetTextureMapFormat( CachedTextureMap type );
+		std::map<DX11TextureID, DX11DynamicTexture>& GetTextureMap( CachedTextureMap type );
+		void UpdateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
+		void BindComputeShader( CachedTextureMap type );
+		void GetDispatchDimensions( uint32_t& x, uint32_t& y, CachedTextureMap type, DX11TextureID heightmapID );
 
         //void UpdatePatchSize( RenderSettings::TerrainCoplanaritySize coplanaritySize );
 		//void BindForRendering();
 		//void UnbindRendering();
-        //bool HasCachedTextureMap( CachedTextureMap type, DX11TextureID heightmapID ) const;
 
 		ID3D11DeviceContextPtr mContext = nullptr;
         ID3D11DevicePtr mDevice = nullptr;
@@ -77,9 +77,13 @@ namespace JonsEngine
 		ID3D11InputLayoutPtr mLayout = nullptr;
 		ID3D11VertexShaderPtr mVertexShader = nullptr;
 		ID3D11PixelShaderPtr mPixelShader = nullptr;
+		ID3D11PixelShaderPtr mPixelDebugShader = nullptr;
+		ID3D11RasterizerStatePtr mDebugRasterizer = nullptr;
+		ID3D11ComputeShaderPtr mNormalMapComputeShader = nullptr;
 
 		RenderSettings::TerrainPatchSize mCachedPatchSize;
 		RenderSettings::TerrainPatchVerticeRatio mCachedPatchVertexRatio;
+		std::map<DX11TextureID, DX11DynamicTexture> mTerrainNormalMap;
 		DX11Mesh mGridMesh;
 
 		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;

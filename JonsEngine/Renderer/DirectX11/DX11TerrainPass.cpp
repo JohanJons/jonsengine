@@ -49,10 +49,8 @@ namespace JonsEngine
 		mTransformBuffer( device, context )
 		/*mPerTerrainCBuffer(device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_DOMAIN),
 		mTransformsBuffer( device, context ),
-		mTessEdgeMultBuffer( device, context ),
 		mQuadMesh( device, context, gQuadVertices, gQuadIndices, AABB::gUnitQuadAABB.Min(), AABB::gUnitQuadAABB.Max() ),
 		mVertexTransformer( vertexTransformer ),
-		mTextureMap( textureMap ),
 		mCoplanaritySize( coplanaritySize )*/
 	{
 		// input layout
@@ -67,10 +65,12 @@ namespace JonsEngine
 		inputDescription[VSInputLayout::POSITION].AlignedByteOffset = 0;
 		inputDescription[VSInputLayout::POSITION].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputDescription[VSInputLayout::POSITION].InstanceDataStepRate = 0;
-		DXCALL(device->CreateInputLayout( inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gTerrainVertex, sizeof( gTerrainVertex ), &mLayout ));
+		DXCALL( device->CreateInputLayout( inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gTerrainVertex, sizeof( gTerrainVertex ), &mLayout ) );
 
-		DXCALL(device->CreateVertexShader( gTerrainVertex, sizeof( gTerrainVertex ), nullptr, &mVertexShader ));
-		DXCALL(device->CreatePixelShader( gTerrainPixel, sizeof( gTerrainPixel ), nullptr, &mPixelShader ));
+		DXCALL( device->CreateVertexShader( gTerrainVertex, sizeof( gTerrainVertex ), nullptr, &mVertexShader ) );
+		DXCALL( device->CreatePixelShader( gTerrainPixel, sizeof( gTerrainPixel ), nullptr, &mPixelShader ) );
+		DXCALL( device->CreatePixelShader( gTerrainPixelDebug, sizeof( gTerrainPixelDebug ), nullptr, &mPixelDebugShader ) );
+		DXCALL( device->CreateComputeShader( gTerrainComputeNormal, sizeof( gTerrainComputeNormal ), nullptr, &mNormalMapComputeShader ) );
 
 		// shaders
 		/*DXCALL(device->CreateVertexShader(gTerrainVertex, sizeof(gTerrainVertex), nullptr, &mVertexShader));
@@ -84,10 +84,10 @@ namespace JonsEngine
 		DXCALL(device->CreatePixelShader(gTerrainPixel, sizeof(gTerrainPixel), nullptr, &mPixelShader));
 		DXCALL( device->CreatePixelShader( gTerrainPixelDebug, sizeof( gTerrainPixelDebug ), nullptr, &mPixelDebugShader ) );
 		DXCALL( device->CreatePixelShader( gTerrainPixelDebugCoplanarity, sizeof( gTerrainPixelDebugCoplanarity ), nullptr, &mPixelDebugCoplanarityShader ) );
-		DXCALL( device->CreatePixelShader( gTerrainPixelDebugNormal, sizeof( gTerrainPixelDebugNormal ), nullptr, &mPixelDebugNormalShader ) );
+		DXCALL( device->CreatePixelShader( gTerrainPixelDebugNormal, sizeof( gTerrainPixelDebugNormal ), nullptr, &mPixelDebugNormalShader ) );*/
 
 		D3D11_RASTERIZER_DESC rasterizerDesc;
-		ZeroMemory(&rasterizerDesc, sizeof(D3D11_RASTERIZER_DESC));
+		ZeroMemory( &rasterizerDesc, sizeof( D3D11_RASTERIZER_DESC ) );
 		rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;
 		rasterizerDesc.CullMode = D3D11_CULL_BACK;
 		rasterizerDesc.FrontCounterClockwise = true;
@@ -95,7 +95,7 @@ namespace JonsEngine
 		rasterizerDesc.ScissorEnable = false;
 		rasterizerDesc.MultisampleEnable = false;
 		rasterizerDesc.AntialiasedLineEnable = false;
-		DXCALL(device->CreateRasterizerState(&rasterizerDesc, &mDebugRasterizer));*/
+		DXCALL( device->CreateRasterizerState( &rasterizerDesc, &mDebugRasterizer ) );
 
 		CreateGridMesh( patchSize, vertexRatio );
 	}
@@ -105,43 +105,44 @@ namespace JonsEngine
 		if ( !terrains.GetNumTerrains() )
 			return;
 
-		if ( ShouldRecreateGridMesh( patchSize, vertexRatio ) )
-			CreateGridMesh( patchSize, vertexRatio );
-
 		BindForRendering();
-
-		mTransformBuffer.SetData( terrains.mTransforms );
-		mTransformBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA_2 );
-
-		uint32_t beginIndex = 0;
-		for ( const RenderableTerrainData& terrainData : terrains.mTerrainData )
-		{
-			const DX11Texture& heightmap = mTextureMap.GetItem( terrainData.mHeightMap );
-			heightmap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
-			
-			mPerTerrainCBuffer.SetData( { terrainData.mWorldMin, terrainData.mWorldMax, terrainData.mHeightScale, terrainData.mVariationScale, beginIndex } );
-			mPerTerrainCBuffer.Bind();
-
-			mLODMorphConstantsBuffer.SetData( terrainData.mLODMorphConstants );
-			mLODMorphConstantsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA );
-
-			uint32_t endIndex = terrainData.mEndIndex;
-			assert( endIndex > beginIndex );
-
-			uint32_t numTransforms = endIndex - beginIndex;
-
-			mGridMesh.DrawInstanced( numTransforms );
-
-			beginIndex = endIndex;
-			heightmap.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
-		}
-
+		RenderInternal( terrains, patchSize, vertexRatio );
 		UnbindRendering();
 	}
 
 	void DX11TerrainPass::RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio, DebugOptions::RenderingFlags debugFlags )
 	{
+		if ( !terrains.GetNumTerrains() )
+			return;
 
+		BindForRendering();
+
+		bool drawCoplanarity = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_COPLANARITY );
+		bool drawNormals = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
+		if ( drawCoplanarity )
+		{
+			assert( false && "Unhandled case" );
+			//mContext->HSSetShader( mHullShaderDebugCoplanarity, nullptr, 0 );
+			//mContext->DSSetShader( mDomainDebugCoplanarityShader, nullptr, 0 );
+			//mContext->PSSetShader( mPixelDebugCoplanarityShader, nullptr, 0 );
+		}
+		else if ( drawNormals )
+		{
+			assert( false && "Unhandled case" );
+			//mContext->PSSetShader( mPixelDebugNormalShader, nullptr, 0 );
+		}
+		else
+			mContext->PSSetShader( mPixelDebugShader, nullptr, 0 );
+
+		ID3D11RasterizerStatePtr prevRasterizer = nullptr;
+		mContext->RSGetState( &prevRasterizer );
+		mContext->RSSetState( mDebugRasterizer );
+
+		RenderInternal( terrains, patchSize, vertexRatio );
+
+		mContext->RSSetState( prevRasterizer );
+
+		UnbindRendering();
 	}
 
 
@@ -250,44 +251,26 @@ namespace JonsEngine
 		{
 			for ( int32_t x = 0; x < vertDim; ++x )
 			{
-				// from bottom-left to top-right
-				float posX = x - ( dimension / 2.0f );
-				float posZ = z - ( dimension / 2.0f );
-				//float posX = x / ( float) dimensions;
-				//float posZ = z / ( float) dimensions;
+				float posX = x / static_cast<float>( dimension );
+				float posZ = z / static_cast<float>( dimension );
+				posX -= 0.5f;
+				posZ -= 0.5f;
+
 				vertices.insert( vertices.end(), { posX, 0.0f, posZ } );
 			}
 		}
 
-		auto quadIndiceFunc = [ &indices, vertDim, halfVertDim ]( int32_t initialX, int32_t initialZ, int32_t finalX, int32_t finalZ )
+		for ( int32_t z = 0; z < dimension; ++z )
 		{
-			for ( int32_t z = initialZ; z < finalZ; ++z )
+			for ( int32_t x = 0; x < dimension; ++x )
 			{
-				for ( int32_t x = initialX; x < finalX; ++x )
-				{
-					uint16_t v1 = x + vertDim * z;
-					uint16_t v2 = ( x + 1 ) + vertDim * z;
-					uint16_t v3 = x + vertDim * ( z + 1 );
-					uint16_t v4 = ( x + 1 ) + vertDim * ( z + 1 );
-
-					indices.insert( indices.end(), { v1, v2, v3, v2, v4, v3 } );
-				}
+				uint16_t v1 = x + vertDim * z;
+				uint16_t v2 = ( x + 1 ) + vertDim * z;
+				uint16_t v3 = x + vertDim * ( z + 1 );
+				uint16_t v4 = ( x + 1 ) + vertDim * ( z + 1 );
+				indices.insert( indices.end(), { v3, v2, v1, v3, v4, v2 } );
 			}
-		};
-
-		// BL - BR - TR - TL
-		uint32_t BLEnd, BREnd, TREnd, TLEnd;
-		quadIndiceFunc( 0, 0, halfVertDim, halfVertDim );
-		BLEnd = static_cast<uint32_t>( indices.size() );
-
-		quadIndiceFunc( halfVertDim, 0, vertDim, halfVertDim );
-		BREnd = static_cast<uint32_t>( indices.size() );
-
-		quadIndiceFunc( halfVertDim, halfVertDim, vertDim, vertDim );
-		TREnd = static_cast<uint32_t>( indices.size() );
-
-		quadIndiceFunc( 0, halfVertDim, halfVertDim, vertDim );
-		TLEnd = static_cast<uint32_t>( indices.size() );
+		}
 
 		Vec3 minBounds( -dimension / 2.0f, 0.0f, -dimension / 2.0f );
 		Vec3 maxBounds( dimension / 2.0f, 0.0f, dimension / 2.0f );
@@ -295,6 +278,47 @@ namespace JonsEngine
 		mGridMesh = DX11Mesh( mDevice, mContext, vertices, indices, minBounds, maxBounds );
 	}
 
+	void DX11TerrainPass::RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio )
+	{
+		if ( !terrains.GetNumTerrains() )
+			return;
+
+		if ( ShouldRecreateGridMesh( patchSize, vertexRatio ) )
+			CreateGridMesh( patchSize, vertexRatio );
+
+		mTransformBuffer.SetData( terrains.mTransforms );
+		mTransformBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA_2 );
+
+		uint32_t beginIndex = 0;
+		for ( const RenderableTerrainData& terrainData : terrains.mTerrainData )
+		{
+			if ( !HasCachedTextureMap( CachedTextureMap::NORMAL, terrainData.mHeightMap ) )
+				CreateTextureMap( CachedTextureMap::NORMAL, terrainData.mHeightMap );
+
+			const DX11Texture& heightmap = mTextureMap.GetItem( terrainData.mHeightMap );
+			const DX11DynamicTexture& normalTexture = mTerrainNormalMap.at( terrainData.mHeightMap );
+			heightmap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
+			normalTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_NORMAL );
+
+			mPerTerrainCBuffer.SetData( { terrainData.mWorldMin, terrainData.mWorldMax, terrainData.mHeightScale, terrainData.mVariationScale, beginIndex } );
+			mPerTerrainCBuffer.Bind();
+
+			mLODMorphConstantsBuffer.SetData( terrainData.mLODMorphConstants );
+			mLODMorphConstantsBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA );
+
+			uint32_t endIndex = terrainData.mEndIndex;
+			assert( endIndex > beginIndex );
+
+			uint32_t numTransforms = endIndex - beginIndex;
+
+			mGridMesh.DrawInstanced( numTransforms );
+
+			normalTexture.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_NORMAL );
+			heightmap.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
+
+			beginIndex = endIndex;
+		}
+	}
 
    /* void DX11TerrainPass::UpdatePatchSize( RenderSettings::TerrainCoplanaritySize coplanaritySize )
     {
@@ -356,7 +380,21 @@ namespace JonsEngine
 		}
 	}*/
 
-	/*void DX11TerrainPass::CreateTextureMap( CachedTextureMap type, DX11TextureID heightmapID )
+	bool DX11TerrainPass::HasCachedTextureMap( CachedTextureMap type, DX11TextureID heightmapID ) const
+	{
+		switch ( type )
+		{
+			//case CachedTextureMap::COPLANARITY:  return mTerrainCoplanarityMap.find( heightmapID ) != mTerrainCoplanarityMap.cend();
+			case CachedTextureMap::NORMAL:  return mTerrainNormalMap.find( heightmapID ) != mTerrainNormalMap.cend();
+			default:
+			{
+				assert( false && "Unhandled case" );
+				return false;
+			}
+		}
+	}
+
+	void DX11TerrainPass::CreateTextureMap( CachedTextureMap type, DX11TextureID heightmapID )
 	{
 		uint32_t width, height;
 		GetTextureMapDimensions( width, height, type, heightmapID );
@@ -378,7 +416,7 @@ namespace JonsEngine
 
 		switch ( type )
 		{
-			case CachedTextureMap::COPLANARITY:
+			/*case CachedTextureMap::COPLANARITY:
 			{
 				uint32_t patchSizeVal = RenderSettingsToVal( mCoplanaritySize );
 				assert( patchSizeVal > 0 );
@@ -388,7 +426,7 @@ namespace JonsEngine
 				width = desc.Width / patchSizeVal;
 				height = desc.Height / patchSizeVal;
 				break;
-			}
+			}*/
 
 			case CachedTextureMap::NORMAL:
 			{
@@ -396,6 +434,9 @@ namespace JonsEngine
 				height = desc.Height;
 				break;
 			}
+
+			default:
+				assert( false && "Unhandled case" );
 		}
 	}
 
@@ -403,7 +444,7 @@ namespace JonsEngine
 	{
 		switch ( type )
 		{
-			case CachedTextureMap::COPLANARITY: return DXGI_FORMAT_R16_UNORM;
+			//case CachedTextureMap::COPLANARITY: return DXGI_FORMAT_R16_UNORM;
 			case CachedTextureMap::NORMAL: return DXGI_FORMAT_R10G10B10A2_UNORM;
 			default:
 			{
@@ -417,7 +458,7 @@ namespace JonsEngine
 	{
 		switch ( type )
 		{
-			case CachedTextureMap::COPLANARITY: return mTerrainCoplanarityMap;
+			//case CachedTextureMap::COPLANARITY: return mTerrainCoplanarityMap;
 			case CachedTextureMap::NORMAL: return mTerrainNormalMap;
 			default:
 			{
@@ -449,10 +490,11 @@ namespace JonsEngine
 	{
 		switch ( type )
 		{
-			case CachedTextureMap::COPLANARITY:
+			/*case CachedTextureMap::COPLANARITY:
 			{
 				switch ( mCoplanaritySize )
 				{
+					default: assert( false && "Unhandled case" );
 					case RenderSettings::TerrainCoplanaritySize::X8:
 					{
 						mContext->CSSetShader( mCoplanarityComputeShader8, nullptr, 0 );
@@ -472,13 +514,15 @@ namespace JonsEngine
 					}
 				}
 				break;
-			}
+			}*/
 
 			case CachedTextureMap::NORMAL:
 			{
 				mContext->CSSetShader( mNormalMapComputeShader, nullptr, 0 );
 				break;
 			}
+			default:
+				assert( false && "Unhandled case" );
 		}
 	}
 
@@ -489,52 +533,21 @@ namespace JonsEngine
 
 		switch ( type )
 		{
-			case CachedTextureMap::COPLANARITY:
+			/*case CachedTextureMap::COPLANARITY:
 			{
 				x = width;
 				y = height;
 				break;
-			}
-
+			}*/
 			case CachedTextureMap::NORMAL:
 			{
 				x = width / TERRAIN_NORMAL_THREADS_AXIS;
 				y = height / TERRAIN_NORMAL_THREADS_AXIS;
 				break;
 			}
-		}
-	}
 
-	void DX11TerrainPass::BindForRendering()
-	{
-		mContext->VSSetShader(mVertexShader, nullptr, 0);
-		mContext->DSSetShader(mDomainShader, nullptr, 0);
-		mContext->PSSetShader(mPixelShader, nullptr, 0);
-		mContext->HSSetShader(mHullShader, nullptr, 0);
-
-		mContext->IASetInputLayout(mLayout);
-		mContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_4_CONTROL_POINT_PATCHLIST);
-	}
-
-	void DX11TerrainPass::UnbindRendering()
-	{
-		mContext->VSSetShader( nullptr, nullptr, 0 );
-		mContext->DSSetShader( nullptr, nullptr, 0 );
-		mContext->HSSetShader( nullptr, nullptr, 0 );
-		mContext->PSSetShader( nullptr, nullptr, 0 );
-	}
-
-    bool DX11TerrainPass::HasCachedTextureMap( CachedTextureMap type, DX11TextureID heightmapID ) const
-    {
-		switch ( type )
-		{
-			case CachedTextureMap::COPLANARITY:  return mTerrainCoplanarityMap.find( heightmapID ) != mTerrainCoplanarityMap.cend();
-			case CachedTextureMap::NORMAL:  return mTerrainNormalMap.find( heightmapID ) != mTerrainNormalMap.cend();
 			default:
-			{
 				assert( false && "Unhandled case" );
-				return false;
-			}
 		}
-    }*/
+	}
 }

@@ -234,6 +234,9 @@ namespace JonsEngine
 		Vec3 center = quadAABB.mFrustumAABB.GetCenter();
 		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
 
+		center.y = 0.0f;
+		extent.y = 0.0f;
+
 		Mat4 transform = glm::translate( Vec3( center.x, 0.0f, center.z ) );
 		transform = glm::scale( transform, extent * 2.0f );
 
@@ -246,9 +249,12 @@ namespace JonsEngine
 		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
 		Vec3 halfExtent = extent / 2.0f;
 
+		center.y = 0.0f;
+		extent.y = 0.0f;
+
 		if ( addBL )
 		{
-			Mat4 transform = glm::translate( Vec3( center.x - halfExtent.x, 0.0f, center.z - halfExtent.x ) );
+			Mat4 transform = glm::translate( Vec3( center.x - halfExtent.x, 0.0f, center.z - halfExtent.z ) );
 			transform = glm::scale( transform, extent );
 
 			renderableTransforms.emplace_back( transform );
@@ -256,7 +262,7 @@ namespace JonsEngine
 
 		if ( addBR )
 		{
-			Mat4 transform = glm::translate( Vec3( center.x + halfExtent.x, 0.0f, center.z - halfExtent.x ) );
+			Mat4 transform = glm::translate( Vec3( center.x + halfExtent.x, 0.0f, center.z - halfExtent.z ) );
 			transform = glm::scale( transform, extent );
 
 			renderableTransforms.emplace_back( transform );
@@ -264,7 +270,7 @@ namespace JonsEngine
 
 		if ( addTR )
 		{
-			Mat4 transform = glm::translate( Vec3( center.x + halfExtent.x, 0.0f, center.z + halfExtent.x ) );
+			Mat4 transform = glm::translate( Vec3( center.x + halfExtent.x, 0.0f, center.z + halfExtent.z ) );
 			transform = glm::scale( transform, extent );
 
 			renderableTransforms.emplace_back( transform );
@@ -272,7 +278,7 @@ namespace JonsEngine
 
 		if ( addTL )
 		{
-			Mat4 transform = glm::translate( Vec3( center.x - halfExtent.x, 0.0f, center.z + halfExtent.x ) );
+			Mat4 transform = glm::translate( Vec3( center.x - halfExtent.x, 0.0f, center.z + halfExtent.z ) );
 			transform = glm::scale( transform, extent );
 
 			renderableTransforms.emplace_back( transform );
@@ -310,7 +316,6 @@ namespace JonsEngine
 			return QuadNodeCullStatus::Added;
 		}
 
-		QuadNodeCullStatus Status = QuadNodeCullStatus::OutOfFrustum;
 		bool completelyInFrustum = frustumIntersection == AABBIntersection::Inside;
 		std::array<QuadNodeCullStatus, QuadChildEnum::QUAD_CHILD_COUNT> childrenAdded;
 		for ( uint32_t childIndex = QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT; childIndex < QuadChildEnum::QUAD_CHILD_COUNT; ++childIndex )
@@ -320,21 +325,22 @@ namespace JonsEngine
 		}
 
 		// remove if childnodes already selected, or out of frustum
-		bool removeBL = childrenAdded[ 0 ] == QuadNodeCullStatus::Added || childrenAdded[ 0 ] == QuadNodeCullStatus::OutOfRange;
-		bool removeBR = childrenAdded[ 1 ] != QuadNodeCullStatus::Added || childrenAdded[ 1 ] == QuadNodeCullStatus::OutOfRange;
-		bool removeTR = childrenAdded[ 2 ] != QuadNodeCullStatus::Added || childrenAdded[ 2 ] == QuadNodeCullStatus::OutOfRange;
-		bool removeTL = childrenAdded[ 3 ] != QuadNodeCullStatus::Added || childrenAdded[ 3 ] == QuadNodeCullStatus::OutOfRange;
-		bool doAddSelf = !removeBL || !removeBR || !removeTR || !removeTL;
+		bool removeBL = childrenAdded[ 0 ] == QuadNodeCullStatus::Added || childrenAdded[ 0 ] == QuadNodeCullStatus::OutOfFrustum;
+		bool removeBR = childrenAdded[ 1 ] == QuadNodeCullStatus::Added || childrenAdded[ 1 ] == QuadNodeCullStatus::OutOfFrustum;
+		bool removeTR = childrenAdded[ 2 ] == QuadNodeCullStatus::Added || childrenAdded[ 2 ] == QuadNodeCullStatus::OutOfFrustum;
+		bool removeTL = childrenAdded[ 3 ] == QuadNodeCullStatus::Added || childrenAdded[ 3 ] == QuadNodeCullStatus::OutOfFrustum;
+		bool doAddSelf = !( removeBL && removeBR && removeTR && removeTL );
 
 		if ( doAddSelf )
 		{
 			AddNode( renderableTransforms, quadAABB, !removeBL, !removeBR, !removeTR, !removeTL );
 
-			Status = QuadNodeCullStatus::Added;
+			return QuadNodeCullStatus::Added;
 		}
-		else
-			Status = QuadNodeCullStatus::OutOfFrustum;
 
-		return Status;
+		if ( childrenAdded[ 0 ] == QuadNodeCullStatus::Added || childrenAdded[ 1 ] == QuadNodeCullStatus::Added || childrenAdded[ 2 ] == QuadNodeCullStatus::Added || childrenAdded[ 3 ] == QuadNodeCullStatus::Added )
+			return QuadNodeCullStatus::Added;
+		else
+			return QuadNodeCullStatus::OutOfFrustum;
 	}
 }

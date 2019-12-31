@@ -262,12 +262,15 @@ namespace JonsEngine
 		assert( unitCubeMeshID != INVALID_DX11_MESH_ID );
 
 		RenderableAABBsContainer& AABBRenderData = mRenderQueue.mColorsToAABBsList;
-		const TerrainTransforms& terrainTransforms = scene.GetTerrainTransforms();
 
-		// unused atm
-		std::vector<float> lodRanges;
-		std::vector<Mat4> aabbTransforms;
-		aabbTransforms.reserve( mRenderQueue.mTerrains.mTransforms.size() );
+		for ( const Mat4& transform : mRenderQueue.mTerrains.mTransforms )
+		{
+			Mat4 debugTransform = transform;
+			if ( doPatches )
+				debugTransform[ 1 ][ 1 ] = 0.0f;
+
+			AddAABB( AABBRenderData, transform, unitCubeMeshID, gRed );
+		}
 
 		// just copy normal culled terrain data...?
 

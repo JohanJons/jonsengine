@@ -40,7 +40,7 @@ namespace JonsGame
 
 		scene.SetSkybox( mSkybox );
 
-		scene.GetSceneCamera().TranslateCamera( { 162.3f, 49.5f, -118.7f } );
+		scene.GetSceneCamera().TranslateCamera( { -231.1f, 13.9f, 112.3f } );
 
 		FlipTerrain();
 	}
@@ -68,7 +68,7 @@ namespace JonsGame
 		
 		if ( nodeTerrainTest.IsVisible() )
 		{
-			scene.GetSceneCamera().SetPosition( { -42.23, 16.97, 18.2348 } );
+			scene.GetSceneCamera().SetPosition( { -231.1f, 13.9f, 112.3f } );
 			//scene.GetSceneCamera().SetPosition( { -31.9, 4.47, 0.286 } );
 		}
 		else

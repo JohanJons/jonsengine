@@ -37,16 +37,24 @@ VertexOut vs_main(VertexIn input)
 
 	float4 worldPos = mul( worldTransform, float4( input.mPosition, 1 ) );
 	float2 preMorphTexcoord = GetTextureCoordinates( worldPos.xyz );
-	worldPos.z = SampleHeightmap( preMorphTexcoord );
+	worldPos.y = SampleHeightmap( preMorphTexcoord ) * gHeightModifier;
 
 	// To be used
 	float4 unmorphedPos = float4( worldPos.xyz, 1.0f );
 
 	float cameraDistanceToVertex = distance( worldPos.xyz, gWorldEyePos );
+	
+	const int2 offset = 0;
+	const int mipmap = 0;
+	float3 normal = gNormalMap.SampleLevel( gLinearSampler, preMorphTexcoord, mipmap, offset ).rgb;
+	normal *= 2.0;
+	normal -= 1.0;
+	normal = mul( ( float3x3 )gFrameView, normal );
+	normal = normalize( normal );
 
 	VertexOut ret;
 	ret.mPosition = mul( gFrameViewProj, worldPos );
-
+	ret.mNormal = normal;
 	//ret.mTexcoord = ( worldPos.xz - gWorldMin ) / ( gWorldMax - gWorldMin );
 	//ret.mTexcoord = clamp( ret.mTexcoord, 0.0f, 1.0f );
 

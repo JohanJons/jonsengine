@@ -32,6 +32,7 @@ struct PatchTess
 struct VertexOut
 {
 	float4 mPosition : SV_POSITION;
+	float3 mNormal : NORMAL;
 	//float2 mTexcoord : TEXCOORD;
 };
 

@@ -25,20 +25,6 @@ namespace JonsEngine
 		QuadNodeAABB* mChildBegin = nullptr;
 	};
 
-	struct QuadNodeNeighbours
-	{
-		enum Facing : uint32_t
-		{
-			LEFT = 0,
-			BOTTOM,
-			RIGHT,
-			TOP,
-			NUM_OFFSETS
-		};
-
-		std::array<const QuadNodeAABB*, 4> mSameLODNeighbours;
-	};
-
 	enum class QuadNodeCullStatus
 	{
 		OutOfFrustum,
