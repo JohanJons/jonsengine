@@ -58,7 +58,8 @@ DomainOut ds_main(PatchTess patchTess, float2 uv : SV_DomainLocation, const Outp
 
 	// debug; these could be hidden if necessary
 #ifdef TERRAIN_DEBUG_COPLANARITY
-	ret.mCoplanarity = GetCoplanarity( midPointWorld );
+	//ret.mCoplanarity = GetCoplanarity( midPointWorld );
+	ret.mCoplanarity = 1.0f;
 #endif
 	ret.mTesellation = patchTess.mInsideTess[ 0 ];
 

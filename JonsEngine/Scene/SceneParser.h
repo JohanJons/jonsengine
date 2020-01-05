@@ -16,7 +16,8 @@ namespace JonsEngine
         SceneParser(const EngineSettings& engineSettings, const ResourceManifest& resManifest);
         ~SceneParser();
 
-        const RenderQueue& ParseScene( const Scene& scene, DirtyFlagsSet dirtyFlags, const DebugOptions& debugOpts, Vec2 windowDimentions, float windowAspectRatio, float zNear, float zFar );
+        const RenderQueue& ParseScene( const Scene& scene, DirtyFlagsSet dirtyFlags, const DebugOptions& debugOpts, Vec2 windowDimentions, float windowAspectRatio,
+			float zNear, float zFar, RenderSettings::TerrainPatchMaxSize terrainMaxPatchSize );
 
 
     private:
@@ -24,7 +25,7 @@ namespace JonsEngine
         void ViewFrustumCulling(const Scene& scene, const float windowAspectRatio, const float zNear, const float zFar);
         void PointLightCulling(const Scene& scene);
         void DirectionalLightCulling(const Scene& scene);
-		void TerrainParsing( const Scene& scene, float zNear, float zFar, const DirtyFlagsSet dirtyFlags );
+		void TerrainParsing( const Scene& scene, float zNear, float zFar, RenderSettings::TerrainPatchMaxSize terrainMaxPatchSize, const DirtyFlagsSet dirtyFlags );
 		void CopyBoneTransforms(const Scene& scene);
 		void GetSkybox(const Scene& scene);
 		void GetAmbientLight(const Scene& scene);

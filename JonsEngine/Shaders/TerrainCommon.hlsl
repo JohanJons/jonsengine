@@ -6,14 +6,6 @@
 Texture2D gCoplanarityMap : register( TEXTURE_REGISTER_EXTRA_2 );
 Texture2D gNormalMap : register( TEXTURE_REGISTER_NORMAL );
 
-StructuredBuffer<float2> gLODMorphConstants : register ( SBUFFER_REGISTER_EXTRA );
-
-cbuffer PerQuadConstants : register( CBUFFER_REGISTER_VERTEX )
-{
-	float4x4 gQuadWorldTransform;
-	uint gLODLevel;
-}
-
 cbuffer PerTerrainConstants : register( CBUFFER_REGISTER_EXTRA )
 {
 	float2 gWorldMin;
@@ -53,16 +45,18 @@ struct HullOut
 	float2 mTexcoord : TEXCOORD;
 };
 
-float GetCoplanarity( float2 worldPatchMidpoint )
+/*float GetCoplanarity( float2 worldPatchMidpoint )
 {
 	uint2 uv = ( worldPatchMidpoint - gWorldMin ) / gTerrainCoplanaritySize;
 	return gCoplanarityMap.Load( uint3( uv, 0 ) ).r;
-}
+}*/
 
+/*
 float3 GetNormal( float2 worldPatchMidpoint )
 {
 	uint2 uv = ( worldPatchMidpoint - gWorldMin ) / gTerrainCoplanaritySize;
 	return gNormalMap.Load( uint3( uv, 0 ) ).rgb;
 }
+*/
 
 #endif

@@ -39,7 +39,7 @@ namespace JonsEngine
         mPostProcessor(device, context, mFullscreenPass, backbufferTextureDesc),
         mSkyboxPass(device, context),
 
-		mTerrainPass( device, context, mVertexTransformPass, mTextureMap, settings.mTerrainPatchSize, settings.mTerrainVertexRatio ),
+		mTerrainPass( device, context, mVertexTransformPass, mTextureMap, settings.mTerrainMeshDimensions ),
 		mPerFrameCB( device, context, mPerFrameCB.CONSTANT_BUFFER_SLOT_PER_FRAME )
     {
 		auto depthStencilBuffer = backbuffer.GetDepthbuffer();
@@ -120,7 +120,7 @@ namespace JonsEngine
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-		mTerrainPass.Render( renderQueue.mTerrains, renderSettings.mTerrainPatchSize, renderSettings.mTerrainVertexRatio );
+		mTerrainPass.Render( renderQueue.mTerrains, renderSettings.mTerrainMeshDimensions );
 
 		mGBuffer.BindForRendering();
 
@@ -197,7 +197,7 @@ namespace JonsEngine
 		bool drawNormals = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
 		bool drawWireframe = drawCoplanarity || drawNormals || debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
 		if ( drawWireframe )
-			mTerrainPass.RenderDebug( renderQueue.mTerrains, renderSettings.mTerrainPatchSize, renderSettings.mTerrainVertexRatio, debugFlags );
+			mTerrainPass.RenderDebug( renderQueue.mTerrains, renderSettings.mTerrainMeshDimensions, debugFlags );
 	}
 
 	void DX11Pipeline::RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end)
@@ -269,11 +269,8 @@ namespace JonsEngine
 			camera.mCameraPosition,
 			Vec2( Z_NEAR, Z_FAR ),
 			renderQueue.mWindowDimensions,
-			RenderSettingsToVal( renderSettings.mTerrainCoplanaritySize ),
-			RenderSettingsToVal( renderSettings.mTerrainPrimitiveLength ),
-			RenderSettingsToVal( renderSettings.mTerrainTessellationMax ),
-			RenderSettingsToVal( renderSettings.mTerrainCoplanarityScale ),
-			RenderSettingsToVal( renderSettings.mTerrainCoplanarityTessellationRatio )
+			RenderSettingsToVal( renderSettings.mTerrainPatchMinSize ),
+			RenderSettingsToVal( renderSettings.mTerrainPatchMaxSize )
 		});
 		mPerFrameCB.Bind();
 	}

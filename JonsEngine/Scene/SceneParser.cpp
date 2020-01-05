@@ -2,6 +2,8 @@
 
 #include "Scene/Scene.h"
 #include "Resources/ResourceManifest.h"
+#include "Renderer/RenderSettings.h"
+#include "Renderer/DirectX11/DX11Utils.h"
 #include "Core/Types.h"
 #include "Core/DebugOptions.h"
 #include "Core/Math/MathUtils.h"
@@ -51,7 +53,8 @@ namespace JonsEngine
     }
 
 
-    const RenderQueue& SceneParser::ParseScene( const Scene& scene, const DirtyFlagsSet dirtyFlags, const DebugOptions& debugOpts, Vec2 windowDimentions, float windowAspectRatio, float zNear, float zFar )
+    const RenderQueue& SceneParser::ParseScene( const Scene& scene, const DirtyFlagsSet dirtyFlags, const DebugOptions& debugOpts, Vec2 windowDimentions, float windowAspectRatio,
+		float zNear, float zFar, RenderSettings::TerrainPatchMaxSize terrainMaxPatchSize )
     {
         mRenderQueue.PerFrameClear();
 
@@ -66,7 +69,7 @@ namespace JonsEngine
         PointLightCulling(scene);
         DirectionalLightCulling(scene);
 
-		TerrainParsing( scene, zNear, zFar, dirtyFlags );
+		TerrainParsing( scene, zNear, zFar, terrainMaxPatchSize, dirtyFlags );
 
 		bool drawTerrainAABB = debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_AABB );
 		bool drawTerrainPatches = debugOpts.mRenderingFlags.test( debugOpts.RENDER_FLAG_DRAW_TERRAIN_PATCH );
@@ -180,7 +183,7 @@ namespace JonsEngine
         }
     }
 
-	void SceneParser::TerrainParsing( const Scene& scene, const float zNear, const float zFar, const DirtyFlagsSet dirtyFlags )
+	void SceneParser::TerrainParsing( const Scene& scene, const float zNear, const float zFar, RenderSettings::TerrainPatchMaxSize terrainMaxPatchSize, const DirtyFlagsSet dirtyFlags )
 	{
 		const TerrainTransforms& terrainTransforms = scene.GetTerrainTransforms();
 
@@ -208,8 +211,9 @@ namespace JonsEngine
 			std::vector<Vec2> morphConstants;
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
 
+			uint32_t maxPatchSize = RenderSettingsToVal( terrainMaxPatchSize );
 			const TerrainQuadTree& quadTree = terrainTransforms.GetQuadTree( ID );
-			quadTree.CullNodes( renderableTransforms, LODRanges, morphConstants, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
+			quadTree.CullNodes( renderableTransforms, LODRanges, morphConstants, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar, maxPatchSize );
 			if ( renderableTransforms.empty()  )
 				continue;
 			
@@ -269,7 +273,7 @@ namespace JonsEngine
 			if ( doPatches )
 				debugTransform[ 1 ][ 1 ] = 0.0f;
 
-			AddAABB( AABBRenderData, transform, unitCubeMeshID, gRed );
+			AddAABB( AABBRenderData, debugTransform, unitCubeMeshID, gRed );
 		}
 
 		// just copy normal culled terrain data...?

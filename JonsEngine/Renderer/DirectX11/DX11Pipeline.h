@@ -55,16 +55,13 @@ namespace JonsEngine
 			float __padding1;
 			Vec2 mMinMaxZ;
 			Vec2 mScreenSize;
-			uint32_t mTerrainCoplanaritySize;
-			uint32_t mTerrainPrimitveLength;
-			uint32_t mTerrainTessellationMax;
-			float mTerrainCoplanarityScale;
-			float mTerrainCoplanarityTessellationRatio;
-			float __padding2[ 3 ];
+			uint32_t mTerrainMinSize;
+			uint32_t mTerrainMaxSize;
+			float __padding2[ 2 ];
 
 			PerFrameCB() {}
 			PerFrameCB( const Mat4& viewProj, const Mat4& view, const Mat4& invView, const Mat4& invProj, const Vec3& worldEyePos, const Vec2& minMaxZ, const Vec2& screenSize,
-				uint32_t terrainCoplanaritySize, uint32_t primitiveLength, uint32_t tessellationMax, float coplanarityScale, float coplanarityTessRatio ) :
+				uint32_t terrainMinSize, uint32_t terrainMaxSize ) :
 				mViewProj(viewProj),
 				mView(view),
 				mInvView(invView),
@@ -72,11 +69,8 @@ namespace JonsEngine
 				mWorldEyePos( worldEyePos ),
 				mMinMaxZ( minMaxZ ),
 				mScreenSize( screenSize ),
-				mTerrainCoplanaritySize( terrainCoplanaritySize ),
-				mTerrainPrimitveLength( primitiveLength ),
-				mTerrainTessellationMax( tessellationMax ),
-				mTerrainCoplanarityScale( coplanarityScale ),
-				mTerrainCoplanarityTessellationRatio( coplanarityTessRatio )
+				mTerrainMinSize( terrainMinSize ),
+				mTerrainMaxSize( terrainMaxSize )
 			{
 			}
 		};

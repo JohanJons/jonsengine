@@ -25,10 +25,10 @@ namespace JonsEngine
 	{
 	public:
 		DX11TerrainPass( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap,
-			RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio );
+			RenderSettings::TerrainMeshDimensions meshDimensions );
 
-		void Render( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio );
-		void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio, DebugOptions::RenderingFlags debugFlags );
+		void Render( const RenderableTerrains& terrains, RenderSettings::TerrainMeshDimensions meshDimensions );
+		void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainMeshDimensions meshDimensions, DebugOptions::RenderingFlags debugFlags );
 
 		//void Render( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize );
 		//void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize, DebugOptions::RenderingFlags debugFlags );
@@ -54,9 +54,9 @@ namespace JonsEngine
 		void BindForRendering();
 		void UnbindRendering();
 
-		bool ShouldRecreateGridMesh( RenderSettings::TerrainPatchSize newPatchSize, RenderSettings::TerrainPatchVerticeRatio newVertexRatio );
-		void CreateGridMesh( RenderSettings::TerrainPatchSize newPatchSize, RenderSettings::TerrainPatchVerticeRatio newVertexRatio );
-		void RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio );
+		bool ShouldRecreateGridMesh( RenderSettings::TerrainMeshDimensions meshDimensions );
+		void CreateGridMesh( RenderSettings::TerrainMeshDimensions meshDimensions );
+		void RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainMeshDimensions meshDimensions );
 
 		bool HasCachedTextureMap( CachedTextureMap type, DX11TextureID heightmapID ) const;
 		void CreateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
@@ -81,8 +81,7 @@ namespace JonsEngine
 		ID3D11RasterizerStatePtr mDebugRasterizer = nullptr;
 		ID3D11ComputeShaderPtr mNormalMapComputeShader = nullptr;
 
-		RenderSettings::TerrainPatchSize mCachedPatchSize;
-		RenderSettings::TerrainPatchVerticeRatio mCachedPatchVertexRatio;
+		RenderSettings::TerrainMeshDimensions mCachedMeshDimensions;
 		std::map<DX11TextureID, DX11DynamicTexture> mTerrainNormalMap;
 		DX11Mesh mGridMesh;
 

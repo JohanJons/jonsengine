@@ -38,9 +38,9 @@ namespace JonsEngine
 		TerrainQuadTree() = default;
 		TerrainQuadTree( const std::vector<uint8_t>& heightmapData, uint32_t width, uint32_t height, uint32_t patchMinSize, float heightmapScale, const Mat4& worldTransform );
 
-		void CullNodes( std::vector<Mat4>& renderableTransforms, std::vector<float>& LODRanges, std::vector<Vec2>& morphConstants, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const;
+		void CullNodes( std::vector<Mat4>& renderableTransforms, std::vector<float>& LODRanges, std::vector<Vec2>& morphConstants, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform,
+			float zNear, float zFar, uint32_t maxPatchSize ) const;
 
-		uint32_t GetNumLODRanges() const;
 		uint32_t GetNumNodes() const { return static_cast<uint32_t>( mGridTraversal.size() ); }
 		uint32_t GetPatchMinSize() const { return mPatchMinSize; }
 		float GetHeightmapScale() const { return mHeightmapScale; }
@@ -53,11 +53,12 @@ namespace JonsEngine
 
 		uint32_t ExpectedNumNodes( float width, uint32_t patchMinSize ) const;
 
-		void AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB ) const;
-		void AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, bool addBL, bool addBR, bool addTR, bool addTL ) const;
-		QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, const std::vector<float>& LODRanges, bool parentFullyInFrustum ) const;
+		void AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, uint32_t maxPatchSize ) const;
+		void AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, uint32_t maxPatchSize, bool addBL, bool addBR, bool addTR, bool addTL ) const;
+		QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform,
+			const std::vector<float>& LODRanges, bool parentFullyInFrustum, uint32_t maxPatchSize ) const;
 
-		void CalculateLODRanges( std::vector<float>& LODs, std::vector<Vec2>& morphConstants, float zNear, float zFar ) const;
+		void CalculateLODRanges( std::vector<float>& LODs, std::vector<Vec2>& morphConstants, float zNear, float zFar, uint32_t maxPatchSize ) const;
 
 		uint32_t mPatchMinSize;
 		float mHeightmapScale;

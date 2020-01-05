@@ -48,8 +48,9 @@ namespace JonsEngine
 		auto dirtyFlags = activeScene.GetAndResetDirtyFlags();
 
         // parse scene into renderqueue for renderer
+		RenderSettings::TerrainPatchMaxSize terrainMaxPatchSize = mRenderer.GetTerrainPatchMaxSize();
         const float zNear = mRenderer.GetZNear(), zFar = mRenderer.GetZFar();
-        const RenderQueue& renderQueue = mSceneParser.ParseScene(activeScene, dirtyFlags, debugOptions, windowDimensions, windowAspectRatio, zNear, zFar);
+        const RenderQueue& renderQueue = mSceneParser.ParseScene( activeScene, dirtyFlags, debugOptions, windowDimensions, windowAspectRatio, zNear, zFar, terrainMaxPatchSize );
 
         // render the scene
         mRenderer.Render(renderQueue, elapstedFrameTime, debugOptions.mRenderingFlags);

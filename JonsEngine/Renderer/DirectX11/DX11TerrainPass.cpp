@@ -38,12 +38,11 @@ namespace JonsEngine
 
 
 	DX11TerrainPass::DX11TerrainPass( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap,
-		RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio ):
+		RenderSettings::TerrainMeshDimensions meshDimensions ):
 		mContext( context ),
         mDevice( device ),
 		mTextureMap( textureMap ),
-		mCachedPatchSize( patchSize ),
-		mCachedPatchVertexRatio( vertexRatio ),
+		mCachedMeshDimensions( meshDimensions ),
 		mPerTerrainCBuffer( device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_EXTRA ),
 		mLODMorphConstantsBuffer( device, context ),
 		mTransformBuffer( device, context )
@@ -97,20 +96,20 @@ namespace JonsEngine
 		rasterizerDesc.AntialiasedLineEnable = false;
 		DXCALL( device->CreateRasterizerState( &rasterizerDesc, &mDebugRasterizer ) );
 
-		CreateGridMesh( patchSize, vertexRatio );
+		CreateGridMesh( meshDimensions );
 	}
 
-	void DX11TerrainPass::Render( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio )
+	void DX11TerrainPass::Render( const RenderableTerrains& terrains, RenderSettings::TerrainMeshDimensions meshDimensions )
 	{
 		if ( !terrains.GetNumTerrains() )
 			return;
 
 		BindForRendering();
-		RenderInternal( terrains, patchSize, vertexRatio );
+		RenderInternal( terrains, meshDimensions );
 		UnbindRendering();
 	}
 
-	void DX11TerrainPass::RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio, DebugOptions::RenderingFlags debugFlags )
+	void DX11TerrainPass::RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainMeshDimensions meshDimensions, DebugOptions::RenderingFlags debugFlags )
 	{
 		if ( !terrains.GetNumTerrains() )
 			return;
@@ -138,7 +137,7 @@ namespace JonsEngine
 		mContext->RSGetState( &prevRasterizer );
 		mContext->RSSetState( mDebugRasterizer );
 
-		RenderInternal( terrains, patchSize, vertexRatio );
+		RenderInternal( terrains, meshDimensions );
 
 		mContext->RSSetState( prevRasterizer );
 
@@ -217,24 +216,17 @@ namespace JonsEngine
 		//mContext->HSSetShader( nullptr, nullptr, 0 );
 	}
 
-	bool DX11TerrainPass::ShouldRecreateGridMesh( RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio newVertexRatio )
+	bool DX11TerrainPass::ShouldRecreateGridMesh( RenderSettings::TerrainMeshDimensions meshDimensions )
 	{
-		return mCachedPatchSize != patchSize || mCachedPatchVertexRatio != newVertexRatio;
+		return mCachedMeshDimensions != meshDimensions;
 	}
 
-	void DX11TerrainPass::CreateGridMesh( RenderSettings::TerrainPatchSize newPatchSize, RenderSettings::TerrainPatchVerticeRatio newVertexRatio )
+	void DX11TerrainPass::CreateGridMesh( RenderSettings::TerrainMeshDimensions meshDimensions )
 	{
-		if ( mCachedPatchSize != newPatchSize )
-			mCachedPatchSize = newPatchSize;
+		if ( mCachedMeshDimensions != meshDimensions )
+			mCachedMeshDimensions = meshDimensions;
 
-		if ( mCachedPatchVertexRatio != newVertexRatio )
-			mCachedPatchVertexRatio = newVertexRatio;
-
-		uint32_t patchSize = RenderSettingsToVal( mCachedPatchSize );
-		float vertexRatio = RenderSettingsToVal( mCachedPatchVertexRatio );
-
-		int32_t dimension = static_cast<int32_t>( static_cast<float>( patchSize ) * vertexRatio );
-		assert( dimension > 0 );
+		int32_t dimension = static_cast<int32_t>( RenderSettingsToVal( mCachedMeshDimensions ) );
 		
 		int32_t maxVertices = ( dimension + 1 ) * ( dimension + 1 ) * 3;
 		int32_t maxIndices = dimension * dimension * 2 * 3;
@@ -278,13 +270,13 @@ namespace JonsEngine
 		mGridMesh = DX11Mesh( mDevice, mContext, vertices, indices, minBounds, maxBounds );
 	}
 
-	void DX11TerrainPass::RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainPatchSize patchSize, RenderSettings::TerrainPatchVerticeRatio vertexRatio )
+	void DX11TerrainPass::RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainMeshDimensions meshDimensions )
 	{
 		if ( !terrains.GetNumTerrains() )
 			return;
 
-		if ( ShouldRecreateGridMesh( patchSize, vertexRatio ) )
-			CreateGridMesh( patchSize, vertexRatio );
+		if ( ShouldRecreateGridMesh( meshDimensions ) )
+			CreateGridMesh( meshDimensions );
 
 		mTransformBuffer.SetData( terrains.mTransforms );
 		mTransformBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA_2 );

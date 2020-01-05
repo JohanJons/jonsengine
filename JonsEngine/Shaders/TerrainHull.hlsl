@@ -17,14 +17,14 @@ float CalculateTessellation( float edgeFactor )
 	return tessellation;
 }
 
-float GetScreenSpaceTessellationScale( float2 screenPos1, float2 screenPos2 )
+/*float GetScreenSpaceTessellationScale( float2 screenPos1, float2 screenPos2 )
 {
 	float screenLength = distance( screenPos1, screenPos2 );
 	float scale = screenLength / (float) gTerrainPrimitveLength;
 	scale = saturate( scale );
 
 	return scale;
-}
+}*/
 
 float3 ComputePatchMidpoint( float3 corner1, float3 corner2, float3 corner3, float3 corner4 )
 {
@@ -80,8 +80,8 @@ HullOut hs_main( InputPatch<VertexOut, 4> verticeData, uint index : SV_OutputCon
 {
 	HullOut ret;
 
-	//ret.mWorldPosition = verticeData[ index ].mWorldPosition;
-	//ret.mTexcoord = verticeData[ index ].mTexcoord;
+	ret.mWorldPosition = float3( 1, 1, 1 );
+	ret.mTexcoord = float2( 1, 1 );
 
 	return ret;
 }
