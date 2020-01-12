@@ -52,12 +52,12 @@ namespace JonsEngine
 		void ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, uint32_t heightmapWidth, uint32_t LODlevel, float yTranslation );
 
 		uint32_t ExpectedNumNodes( float width, uint32_t patchMinSize ) const;
+		bool ValidateCulledNodes( std::vector<Mat4>& renderableTransforms ) const;
 
 		void AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, uint32_t maxPatchSize ) const;
 		void AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, uint32_t maxPatchSize, bool addBL, bool addBR, bool addTR, bool addTL ) const;
 		QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform,
 			const std::vector<float>& LODRanges, bool parentFullyInFrustum, uint32_t maxPatchSize ) const;
-
 		void CalculateLODRanges( std::vector<float>& LODs, std::vector<Vec2>& morphConstants, float zNear, float zFar, uint32_t maxPatchSize ) const;
 
 		uint32_t mPatchMinSize;

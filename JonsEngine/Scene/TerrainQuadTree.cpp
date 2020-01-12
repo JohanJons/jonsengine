@@ -62,6 +62,10 @@ namespace JonsEngine
 		CalculateLODRanges( LODRanges, morphConstants, zNear, zFar, maxPatchSize );
 		CullQuad( renderableTransforms, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false, maxPatchSize );
 
+#if _DEBUG
+		assert( ValidateCulledNodes( renderableTransforms ) ); 
+#endif
+
 		//PerCullData cullData( GetNumNodes() );
 		//CalculateHighestLODNodes( cullData, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
 		//CalculateNodeTransforms( cullData, nodeTransforms, tessEdgeMult, LODRanges );
@@ -97,6 +101,35 @@ namespace JonsEngine
 		}
 
 		return numAABBs;
+	}
+
+	bool TerrainQuadTree::ValidateCulledNodes( std::vector<Mat4>& renderableTransforms ) const
+	{
+		for ( uint32_t index = 0; index < renderableTransforms.size(); ++index )
+		{
+			const Mat4& firstMat = renderableTransforms.at( index );
+
+			Vec2 min, max;
+			GetTransformExtentsXZ( firstMat, min, max );
+
+			for ( uint32_t otherIndex = index + 1; otherIndex < renderableTransforms.size(); ++otherIndex )
+			{
+				const Mat4& secondMat = renderableTransforms.at( otherIndex );
+
+				Vec2 otherMin, otherMax;
+				GetTransformExtentsXZ( secondMat, otherMin, otherMax );
+
+				if ( ( otherMin.x <= min.x && otherMax.x > min.x ) || // to the left
+					( otherMax.x >= max.x && otherMin.x < max.x ) ) // to the right
+				{
+					if ( ( otherMin.y <= min.y && otherMax.y > min.y ) ||
+						( otherMax.y >= max.y && otherMin.y < max.y ) )
+						return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	void TerrainQuadTree::CreateGridNode( QuadNodeAABB* parent, float centerX, float centerZ, float width, float height, uint32_t LODlevel, float yTranslation )
