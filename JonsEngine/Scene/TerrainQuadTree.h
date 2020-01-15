@@ -27,6 +27,7 @@ namespace JonsEngine
 
 	enum class QuadNodeCullStatus
 	{
+		Undefined,
 		OutOfFrustum,
 		OutOfRange,
 		Added
@@ -54,10 +55,10 @@ namespace JonsEngine
 		uint32_t ExpectedNumNodes( float width, uint32_t patchMinSize ) const;
 		bool ValidateCulledNodes( std::vector<Mat4>& renderableTransforms ) const;
 
-		void AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, uint32_t maxPatchSize ) const;
-		void AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, uint32_t maxPatchSize, bool addBL, bool addBR, bool addTR, bool addTL ) const;
+		void AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, uint32_t maxPatchSize, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum ) const;
+		void AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, uint32_t maxPatchSize, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum, bool addBL, bool addBR, bool addTR, bool addTL ) const;
 		QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform,
-			const std::vector<float>& LODRanges, bool parentFullyInFrustum, uint32_t maxPatchSize ) const;
+			const std::vector<float>& LODRanges, bool parentFullyInFrustum, bool parentTooLargePatch, uint32_t maxPatchSize ) const;
 		void CalculateLODRanges( std::vector<float>& LODs, std::vector<Vec2>& morphConstants, float zNear, float zFar, uint32_t maxPatchSize ) const;
 
 		uint32_t mPatchMinSize;

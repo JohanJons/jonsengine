@@ -20,6 +20,14 @@ namespace
 		min = Vec2( translation.x - xExtent, translation.z - zExtent );
 		max = Vec2( translation.x + xExtent, translation.z + zExtent );
 	}
+
+	bool IsPatchTooLarge( const QuadNodeAABB& quadAABB, uint32_t maxPatchSize )
+	{
+		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
+		bool isTooLargePatch = ( static_cast<uint32_t>( extent.x * 2.0f ) > maxPatchSize || static_cast<uint32_t>( extent.z * 2.0f > maxPatchSize ) );
+
+		return isTooLargePatch;
+	}
 }
 
 namespace JonsEngine
@@ -59,8 +67,11 @@ namespace JonsEngine
 		LODRanges.clear();
 		morphConstants.clear();
 
+		const QuadNodeAABB& rootNode = mGridTraversal.front();
+		bool isTooLargePatch = IsPatchTooLarge( rootNode, maxPatchSize );
+
 		CalculateLODRanges( LODRanges, morphConstants, zNear, zFar, maxPatchSize );
-		CullQuad( renderableTransforms, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false, maxPatchSize );
+		CullQuad( renderableTransforms, rootNode, cameraWorldPos, cameraViewProjTransform, LODRanges, false, isTooLargePatch, maxPatchSize );
 
 #if _DEBUG
 		assert( ValidateCulledNodes( renderableTransforms ) ); 
@@ -257,49 +268,40 @@ namespace JonsEngine
 		}
 	}
 
-	void TerrainQuadTree::AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, uint32_t maxPatchSize ) const
+	void TerrainQuadTree::AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, uint32_t maxPatchSize, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum ) const
 	{
 		Vec3 center = quadAABB.mFrustumAABB.GetCenter();
 		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
 
-		if ( extent.x >= maxPatchSize && extent.z >= maxPatchSize )
-		{
-			for ( uint32_t childIndex = QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT; childIndex < QuadChildEnum::QUAD_CHILD_COUNT; ++childIndex )
-			{
-				QuadNodeAABB& childNode = *( quadAABB.mChildBegin + childIndex );
-				AddNode( renderableTransforms, childNode, maxPatchSize );
-			}
-		}
-		else
-		{
-			Mat4 transform = glm::translate( Vec3( center.x, 0.0f, center.z ) );
-			transform = glm::scale( transform, extent * 2.0f );
+		assert( extent.x * 2.0f <= maxPatchSize && extent.z * 2.0f <= maxPatchSize );
 
-			renderableTransforms.emplace_back( transform );
-		}
+		Mat4 transform = glm::translate( Vec3( center.x, 0.0f, center.z ) );
+		transform = glm::scale( transform, extent * 2.0f );
+
+		renderableTransforms.emplace_back( transform );
 	}
 
-	void TerrainQuadTree::AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, uint32_t maxPatchSize, bool addBL, bool addBR, bool addTR, bool addTL ) const
+	void TerrainQuadTree::AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, uint32_t maxPatchSize, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum, bool addBL, bool addBR, bool addTR, bool addTL ) const
 	{
 		Vec3 center = quadAABB.mFrustumAABB.GetCenter();
 		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
 		Vec3 halfExtent = extent / 2.0f;
 
 		if ( addBL )
-			AddNode( renderableTransforms, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT ), maxPatchSize );
+			AddNode( renderableTransforms, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT ), maxPatchSize, cameraViewProjTransform, parentFullyInFrustum );
 
 		if ( addBR )
-			AddNode( renderableTransforms, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_BOTTOM_RIGHT ), maxPatchSize );
+			AddNode( renderableTransforms, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_BOTTOM_RIGHT ), maxPatchSize, cameraViewProjTransform, parentFullyInFrustum );
 
 		if ( addTR )
-			AddNode( renderableTransforms, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_TOP_RIGHT ), maxPatchSize );
+			AddNode( renderableTransforms, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_TOP_RIGHT ), maxPatchSize, cameraViewProjTransform, parentFullyInFrustum );
 
 		if ( addTL )
-			AddNode( renderableTransforms, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_TOP_LEFT ), maxPatchSize );
+			AddNode( renderableTransforms, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_TOP_LEFT ), maxPatchSize, cameraViewProjTransform, parentFullyInFrustum );
 	}
 
 	QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform,
-		const std::vector<float>& LODRanges, bool parentFullyInFrustum, uint32_t maxPatchSize ) const
+		const std::vector<float>& LODRanges, bool parentFullyInFrustum, bool parentTooLargePatch, uint32_t maxPatchSize ) const
 	{
 		// if parent is fully in frustum, so are we
 		AABBIntersection frustumIntersection = parentFullyInFrustum ? AABBIntersection::Inside : Intersection( quadAABB.mFrustumAABB, cameraViewProjTransform );
@@ -309,33 +311,36 @@ namespace JonsEngine
 		float distanceLimit = LODRanges.at( quadAABB.mLODIndex );
 		AABBIntersection intersection = Intersection( quadAABB.mFrustumAABB, cameraWorldPos, distanceLimit );
 		bool isWithinDistance = intersection == AABBIntersection::Partial || intersection == AABBIntersection::Inside;
-		if ( !isWithinDistance )
+		if ( !parentTooLargePatch && !isWithinDistance )
 			return QuadNodeCullStatus::OutOfRange;
+
+		bool completelyInFrustum = frustumIntersection == AABBIntersection::Inside;
 
 		// last LOD
 		uint32_t nextLODIndex = quadAABB.mLODIndex + 1;
 		bool isValidLODIndex = nextLODIndex < LODRanges.size();
 		if ( !isValidLODIndex )
 		{
-			AddNode( renderableTransforms, quadAABB, maxPatchSize );
+			AddNode( renderableTransforms, quadAABB, maxPatchSize, cameraViewProjTransform, completelyInFrustum );
 			return QuadNodeCullStatus::Added;
 		}
+
+		bool isTooLargePatch = IsPatchTooLarge( quadAABB, maxPatchSize );
 
 		float nextDistanceLimit = LODRanges.at( nextLODIndex );
 		AABBIntersection nextIntersection = Intersection( quadAABB.mFrustumAABB, cameraWorldPos, nextDistanceLimit );
 		bool nextIsWithinRange = nextIntersection == AABBIntersection::Partial || nextIntersection == AABBIntersection::Inside;
-		if ( !nextIsWithinRange )
+		if ( !isTooLargePatch && !nextIsWithinRange )
 		{
-			AddNode( renderableTransforms, quadAABB, maxPatchSize );
+			AddNode( renderableTransforms, quadAABB, maxPatchSize, cameraViewProjTransform, completelyInFrustum );
 			return QuadNodeCullStatus::Added;
 		}
 
-		bool completelyInFrustum = frustumIntersection == AABBIntersection::Inside;
-		std::array<QuadNodeCullStatus, QuadChildEnum::QUAD_CHILD_COUNT> childrenAdded;
+		std::array<QuadNodeCullStatus, QuadChildEnum::QUAD_CHILD_COUNT> childrenAdded{ QuadNodeCullStatus::Undefined, QuadNodeCullStatus::Undefined, QuadNodeCullStatus::Undefined, QuadNodeCullStatus::Undefined };
 		for ( uint32_t childIndex = QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT; childIndex < QuadChildEnum::QUAD_CHILD_COUNT; ++childIndex )
 		{
 			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
-			childrenAdded[ childIndex ] = CullQuad( renderableTransforms, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum, maxPatchSize );
+			childrenAdded[ childIndex ] = CullQuad( renderableTransforms, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum, isTooLargePatch, maxPatchSize );
 		}
 
 		// remove if childnodes already selected, or out of frustum
@@ -347,7 +352,7 @@ namespace JonsEngine
 
 		if ( doAddSelf )
 		{
-			AddNode( renderableTransforms, quadAABB, maxPatchSize, !removeBL, !removeBR, !removeTR, !removeTL );
+			AddNode( renderableTransforms, quadAABB, maxPatchSize, cameraViewProjTransform, completelyInFrustum, !removeBL, !removeBR, !removeTR, !removeTL );
 
 			return QuadNodeCullStatus::Added;
 		}
