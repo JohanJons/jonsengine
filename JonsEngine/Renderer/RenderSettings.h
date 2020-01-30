@@ -151,7 +151,7 @@ namespace JonsEngine
 		mToneMapping( ToneMappingAlghorithm::FilmicU2 ),
 		mTerrainPatchMinSize( TerrainPatchMinSize::X2 ),
 		mTerrainPatchMaxSize( TerrainPatchMaxSize::X128 ),
-		mTerrainMeshDimensions( TerrainMeshDimensions::X16 ),
+		mTerrainMeshDimensions( TerrainMeshDimensions::X32 ),
 		mTerrainCoplanaritySize( TerrainCoplanaritySize::X16 ),
 		mTerrainPrimitiveLength( TerrainPrimitiveLength::X160 ),
 		mTerrainTessellationMax( TerrainTessellationMax::X64 ),

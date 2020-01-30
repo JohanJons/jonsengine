@@ -68,20 +68,19 @@ VertexOut vs_main(VertexIn input)
 	float2 morphConstants = gLODMorphConstants.Load( LODlevel );
 
 	// hmm this shouldn't be needed
-	float bias = 0.01f;
+	//float bias = 0.01f;
 
-	morphConstants.xy -= bias;
-	float morphLerpK  = 1.0f - clamp( morphConstants.x - cameraDistanceToVertex * morphConstants.y, 0.0, 1.0 );
+	//morphConstants.xy -= bias;
+	float morphLerpK  = 1.0f - clamp( morphConstants.x - cameraDistanceToVertex * morphConstants.y, 0.0f, 1.0f );
 
-	float gridDimHalf = 8.0f;
-	float oneOverGridDim = 2.0f / 16.0f;
+	float gridDimHalf = 16.0f;
+	float oneOverGridDim = 2.0f / 32.0f;
 
 	float2 fracPart = ( frac( input.mPosition.xz * float2( gridDimHalf, gridDimHalf ) ) * float2( oneOverGridDim, oneOverGridDim ) ) * float2( scaleX, scaleZ );
 	worldPos.xz = worldPos.xz - ( fracPart * morphLerpK );
 
 	float2 postMorphTexcoord = GetTextureCoordinates( worldPos.xyz );
 	worldPos.y = SampleHeightmap( postMorphTexcoord ) * gHeightModifier;
-	//worldPos
 
 	const int2 offset = 0;
 	const int mipmap = 0;

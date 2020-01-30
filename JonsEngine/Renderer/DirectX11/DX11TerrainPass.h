@@ -30,9 +30,6 @@ namespace JonsEngine
 		void Render( const RenderableTerrains& terrains, RenderSettings::TerrainMeshDimensions meshDimensions );
 		void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainMeshDimensions meshDimensions, DebugOptions::RenderingFlags debugFlags );
 
-		//void Render( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize );
-		//void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainCoplanaritySize coplanaritySize, DebugOptions::RenderingFlags debugFlags );
-
 	private:
 		struct PerTerrainCBuffer
 		{
