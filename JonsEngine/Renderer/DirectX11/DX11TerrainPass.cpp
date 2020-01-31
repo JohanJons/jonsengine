@@ -120,14 +120,14 @@ namespace JonsEngine
 		bool drawNormals = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
 		if ( drawCoplanarity )
 		{
-			assert( false && "Unhandled case" );
+			//assert( false && "Unhandled case" );
 			//mContext->HSSetShader( mHullShaderDebugCoplanarity, nullptr, 0 );
 			//mContext->DSSetShader( mDomainDebugCoplanarityShader, nullptr, 0 );
 			//mContext->PSSetShader( mPixelDebugCoplanarityShader, nullptr, 0 );
 		}
 		else if ( drawNormals )
 		{
-			assert( false && "Unhandled case" );
+			//assert( false && "Unhandled case" );
 			//mContext->PSSetShader( mPixelDebugNormalShader, nullptr, 0 );
 		}
 		else

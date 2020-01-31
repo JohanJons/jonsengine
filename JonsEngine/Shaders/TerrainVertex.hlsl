@@ -38,7 +38,7 @@ uint GetPatchLODLevel( uint scaleX, uint scaleZ )
 
 	uint LOD = numLODs - 1;
 	uint LODsize = gTerrainPatchMinSize;
-	while ( LODsize <= scaleX && LODsize <= scaleZ )
+	while ( LODsize < scaleX && LODsize < scaleZ )
 	{
 		--LOD;
 		LODsize *= 2;
@@ -73,8 +73,9 @@ VertexOut vs_main(VertexIn input)
 	//morphConstants.xy -= bias;
 	float morphLerpK  = 1.0f - clamp( morphConstants.x - cameraDistanceToVertex * morphConstants.y, 0.0f, 1.0f );
 
-	float gridDimHalf = 16.0f;
-	float oneOverGridDim = 2.0f / 32.0f;
+	float meshSize = ( float) gTerrainMeshSize;
+	float gridDimHalf = meshSize / 2.0f;
+	float oneOverGridDim = 2.0f / meshSize;
 
 	float2 fracPart = ( frac( input.mPosition.xz * float2( gridDimHalf, gridDimHalf ) ) * float2( oneOverGridDim, oneOverGridDim ) ) * float2( scaleX, scaleZ );
 	worldPos.xz = worldPos.xz - ( fracPart * morphLerpK );

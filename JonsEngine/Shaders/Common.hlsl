@@ -27,6 +27,7 @@ cbuffer PerFrameCB : register(CBUFFER_REGISTER_PER_FRAME)
 	float2 gWindowDimensions;
 	uint gTerrainPatchMinSize;
 	uint gTerrainPatchMaxSize;
+	uint gTerrainMeshSize;
 };
 
 

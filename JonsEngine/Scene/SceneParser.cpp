@@ -211,9 +211,8 @@ namespace JonsEngine
 			std::vector<Vec2> morphConstants;
 			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
 
-			uint32_t maxPatchSize = RenderSettingsToVal( terrainMaxPatchSize );
 			const TerrainQuadTree& quadTree = terrainTransforms.GetQuadTree( ID );
-			quadTree.CullNodes( renderableTransforms, LODRanges, morphConstants, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar, maxPatchSize );
+			quadTree.CullNodes( renderableTransforms, LODRanges, morphConstants, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
 			if ( renderableTransforms.empty()  )
 				continue;
 			

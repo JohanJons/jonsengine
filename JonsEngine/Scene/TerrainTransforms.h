@@ -17,14 +17,14 @@ namespace JonsEngine
 		TerrainTransforms(const IDMap<Terrain>& terrainLookup, const IDMap<TerrainData>& terrainDataLookup, const IDMapTree<SceneNode>& sceneNodeLookup);
 
 		void AddDirty(TerrainID ID);
-		uint32_t UpdateTransforms( uint32_t patchMinSize );
+		uint32_t UpdateTransforms( uint32_t patchMinSize, uint32_t patchMaxSize );
 
 		const TerrainQuadTree& GetQuadTree( TerrainID ID ) const;
 
 	private:
-		void AddAllDirty( uint32_t patchMinSize );
+		void AddAllDirty( uint32_t patchMinSize, uint32_t patchMaxSize );
 		bool HasAddedDirty( TerrainID ID ) const;
-		void RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const Terrain& terrain, const TerrainData& terrainData, uint32_t patchMinSize );
+		void RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const Terrain& terrain, const TerrainData& terrainData, uint32_t patchMinSize, uint32_t patchMaxSize );
 
 		const IDMap<Terrain>& mTerrainLookup;
 		const IDMap<TerrainData>& mTerrainDataLookup;

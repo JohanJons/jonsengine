@@ -22,9 +22,9 @@ namespace JonsEngine
 			mDirtyTransforms.push_back( ID );
 	}
 
-	uint32_t TerrainTransforms::UpdateTransforms( uint32_t patchMinSize )
+	uint32_t TerrainTransforms::UpdateTransforms( uint32_t patchMinSize, uint32_t patchMaxSize )
 	{
-		AddAllDirty( patchMinSize );
+		AddAllDirty( patchMinSize, patchMaxSize );
 
 		uint32_t numUpdated = 0;
 		for (TerrainID ID : mDirtyTransforms)
@@ -34,7 +34,7 @@ namespace JonsEngine
 			const Mat4& worldTransform = mSceneNodeLookup.GetNode(terrain.GetSceneNode()).GetWorldTransform();
 
 			mTerrainQuadTreeMap.erase( ID );
-			RebuildTransforms( ID, worldTransform, terrain, terrainData, patchMinSize );
+			RebuildTransforms( ID, worldTransform, terrain, terrainData, patchMinSize, patchMaxSize );
 
 			++numUpdated;
 		}
@@ -55,14 +55,14 @@ namespace JonsEngine
 		return mTerrainQuadTreeMap.at( ID );
 	}
 
-	void TerrainTransforms::AddAllDirty( uint32_t patchMinSize )
+	void TerrainTransforms::AddAllDirty( uint32_t patchMinSize, uint32_t patchMaxSize )
 	{
 		for ( const auto& pair : mTerrainQuadTreeMap )
 		{
 			const TerrainID& ID = pair.first;
 			const TerrainQuadTree& tree = pair.second;
 
-			if ( tree.GetPatchMinSize() != patchMinSize )
+			if ( tree.GetPatchMinSize() != patchMinSize || tree.GetPatchMaxSize() != patchMaxSize )
 				AddDirty( ID );
 		}
 	}
@@ -75,13 +75,13 @@ namespace JonsEngine
 		return iter != endIter;
 	}
 
-	void TerrainTransforms::RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const Terrain& terrain, const TerrainData& terrainData, uint32_t patchMinSize )
+	void TerrainTransforms::RebuildTransforms( TerrainID ID, const Mat4& worldTransform, const Terrain& terrain, const TerrainData& terrainData, uint32_t patchMinSize, uint32_t patchMaxSize )
 	{
 		uint32_t heightmapWidth = terrainData.GetWidth(), heightmapHeight = terrainData.GetHeight();
 		const std::vector<uint8_t>& heightmapData = terrainData.GetHeightMapData();
 
 		assert( patchMinSize && heightmapWidth && heightmapHeight );
 
-		mTerrainQuadTreeMap.emplace( std::piecewise_construct, std::forward_as_tuple( ID ), std::forward_as_tuple( heightmapData, heightmapWidth, heightmapHeight, patchMinSize, terrain.GetHeightScale(), worldTransform ) );
+		mTerrainQuadTreeMap.emplace( std::piecewise_construct, std::forward_as_tuple( ID ), std::forward_as_tuple( heightmapData, heightmapWidth, heightmapHeight, patchMinSize, patchMaxSize, terrain.GetHeightScale(), worldTransform ) );
 	}
 }

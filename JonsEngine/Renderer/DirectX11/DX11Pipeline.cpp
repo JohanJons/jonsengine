@@ -270,7 +270,8 @@ namespace JonsEngine
 			Vec2( Z_NEAR, Z_FAR ),
 			renderQueue.mWindowDimensions,
 			RenderSettingsToVal( renderSettings.mTerrainPatchMinSize ),
-			RenderSettingsToVal( renderSettings.mTerrainPatchMaxSize )
+			RenderSettingsToVal( renderSettings.mTerrainPatchMaxSize ),
+			RenderSettingsToVal( renderSettings.mTerrainMeshDimensions )
 		});
 		mPerFrameCB.Bind();
 	}
