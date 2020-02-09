@@ -55,14 +55,14 @@ namespace JonsEngine
 			float __padding1;
 			Vec2 mMinMaxZ;
 			Vec2 mScreenSize;
-			uint32_t mTerrainMinSize;
-			uint32_t mTerrainMaxSize;
-			uint32_t mTerrainMeshSize;
+			float mTerrainMinSize;
+			float mTerrainMaxSize;
+			float mTerrainMeshSize;
 			float __padding2[ 1 ];
 
 			PerFrameCB() {}
 			PerFrameCB( const Mat4& viewProj, const Mat4& view, const Mat4& invView, const Mat4& invProj, const Vec3& worldEyePos, const Vec2& minMaxZ, const Vec2& screenSize,
-				uint32_t terrainMinSize, uint32_t terrainMaxSize, uint32_t terrainMeshSize ) :
+				float terrainMinSize, float terrainMaxSize, float terrainMeshSize ) :
 				mViewProj(viewProj),
 				mView(view),
 				mInvView(invView),

@@ -25,9 +25,9 @@ cbuffer PerFrameCB : register(CBUFFER_REGISTER_PER_FRAME)
 	float3 gWorldEyePos;
 	float2 gMinMaxZ;
 	float2 gWindowDimensions;
-	uint gTerrainPatchMinSize;
-	uint gTerrainPatchMaxSize;
-	uint gTerrainMeshSize;
+	float gTerrainPatchMinSize;
+	float gTerrainPatchMaxSize;
+	float gTerrainMeshSize;
 };
 
 

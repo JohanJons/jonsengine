@@ -261,6 +261,10 @@ namespace JonsEngine
 	{
 		auto& camera = renderQueue.mCamera;
 
+		float minPatchSize = static_cast<float>( RenderSettingsToVal( renderSettings.mTerrainPatchMinSize ) );
+		float maxPatchSize = static_cast<float>( RenderSettingsToVal( renderSettings.mTerrainPatchMaxSize ) );
+		float terrainMeshDimensions = static_cast<float>( RenderSettingsToVal( renderSettings.mTerrainMeshDimensions ) );
+
 		mPerFrameCB.SetData({ 
 			camera.mCameraViewProjectionMatrix,
 			camera.mCameraViewMatrix,
@@ -269,9 +273,9 @@ namespace JonsEngine
 			camera.mCameraPosition,
 			Vec2( Z_NEAR, Z_FAR ),
 			renderQueue.mWindowDimensions,
-			RenderSettingsToVal( renderSettings.mTerrainPatchMinSize ),
-			RenderSettingsToVal( renderSettings.mTerrainPatchMaxSize ),
-			RenderSettingsToVal( renderSettings.mTerrainMeshDimensions )
+			minPatchSize,
+			maxPatchSize,
+			terrainMeshDimensions
 		});
 		mPerFrameCB.Bind();
 	}

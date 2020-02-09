@@ -30,15 +30,15 @@ float SampleHeightmap( float2 uv )
 	return gHeightmap.SampleLevel( gLinearSampler, uv, mipmap, offset ).r;
 }
 
-uint GetPatchLODLevel( uint scaleX, uint scaleZ )
+uint GetPatchLODLevel( float scaleX, float scaleZ )
 {
 	uint numLODs = 0;
 	uint stride = 0;
 	gLODMorphConstants.GetDimensions( numLODs, stride );
 
 	uint LOD = numLODs - 1;
-	uint LODsize = gTerrainPatchMinSize;
-	while ( LODsize < scaleX && LODsize < scaleZ )
+	float LODsize = gTerrainPatchMinSize;
+	while ( LODsize < scaleX || LODsize < scaleZ )
 	{
 		--LOD;
 		LODsize *= 2;
@@ -64,7 +64,7 @@ VertexOut vs_main(VertexIn input)
 	float scaleZ = worldTransform[ 2 ][ 2 ];
 
 	float cameraDistanceToVertex = distance( worldPos.xyz, gWorldEyePos );
-	uint LODlevel = GetPatchLODLevel( ( uint )scaleX, ( uint )scaleZ );
+	uint LODlevel = GetPatchLODLevel( scaleX, scaleZ );
 	float2 morphConstants = gLODMorphConstants.Load( LODlevel );
 
 	// hmm this shouldn't be needed
