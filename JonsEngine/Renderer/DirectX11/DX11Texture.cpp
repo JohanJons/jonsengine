@@ -89,8 +89,10 @@ namespace JonsEngine
 			case TextureType::Diffuse:
 			case TextureType::Skybox:
 				return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-			case TextureType::Height:
+			case TextureType::Height8:
 				return DXGI_FORMAT_R8_UNORM;
+			case TextureType::Height16:
+				return DXGI_FORMAT_R16_UNORM;
 			case TextureType::Normal:
 				return DXGI_FORMAT_R8G8B8A8_UNORM;
 
@@ -123,6 +125,7 @@ namespace JonsEngine
 			case DXGI_FORMAT_R8G8B8A8_UNORM:
 			case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB: return 4;
 			case DXGI_FORMAT_R8_UNORM: return 1;
+			case DXGI_FORMAT_R16_UNORM: return 2;
 			default: assert( false && "Unsupported texture format!" );
 		}
 

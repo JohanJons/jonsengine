@@ -37,7 +37,7 @@ namespace JonsEngine
         void DeleteMaterial(MaterialID& materialID);
         const Material& GetMaterial(MaterialID materialID) const;
 
-		TerrainDataID CreateTerrainData(const std::string& name, const std::string& heightmap, JonsPackagePtr jonsPkg);
+		TerrainDataID CreateTerrainData(const std::string& name, const std::string& heightmap, TextureType type, JonsPackagePtr jonsPkg);
 		void DeleteTerrainData(TerrainDataID& terrainDataId);
 		const TerrainData& GetTerrainData(TerrainDataID terrainDataId) const;
 		const IDMap<TerrainData>& GetTerrainDataMap() const { return mTerrainData; }

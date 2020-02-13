@@ -167,9 +167,9 @@ namespace JonsEngine
     }
 
 
-	TerrainDataID ResourceManifest::CreateTerrainData( const std::string& name, const std::string& heightmap, const JonsPackagePtr jonsPkg )
+	TerrainDataID ResourceManifest::CreateTerrainData( const std::string& name, const std::string& heightmap, TextureType type, const JonsPackagePtr jonsPkg )
 	{
-		auto heightIter = FindTextureInContainer( heightmap, TextureType::Height, jonsPkg->mTextures );
+		auto heightIter = FindTextureInContainer( heightmap, type, jonsPkg->mTextures );
 		auto textureEndIter = jonsPkg->mTextures.cend();
 		if ( heightIter == textureEndIter )
 			return INVALID_TERRAIN_DATA_ID;
@@ -181,7 +181,7 @@ namespace JonsEngine
 		const std::vector<uint8_t>& heightMapData = heightIter->mTextureData;
 		assert( !heightMapData.empty() );
 
-		DX11TextureID heightMapTexture = LoadTexture( heightmap, TextureType::Height, heightMapData, terrainWidth, terrainHeight );
+		DX11TextureID heightMapTexture = LoadTexture( heightmap, type, heightMapData, terrainWidth, terrainHeight );
 
 		return mTerrainData.Insert( name, terrainWidth, terrainHeight, heightMapTexture, heightMapData );
 	}

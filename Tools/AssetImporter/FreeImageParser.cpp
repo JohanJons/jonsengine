@@ -108,7 +108,8 @@ namespace JonsAssetImporter
 			case TextureType::Normal:	// TODO: normals into R8...
 			case TextureType::Skybox:
 				return ProcessTextureRGB( texture, bitmap, 0, heightInPixels - 1, widthInPixels, heightInPixels );
-			case TextureType::Height:
+			case TextureType::Height8:
+			case TextureType::Height16:
 				return ProcessTextureGreyscale( texture, bitmap, 0, heightInPixels - 1, widthInPixels, heightInPixels );
 			default:
 				break;
@@ -156,16 +157,25 @@ namespace JonsAssetImporter
 		const FREE_IMAGE_COLOR_TYPE colorType = FreeImage_GetColorType( bitmap );
 		const uint32_t bytesPerPixel = FreeImage_GetBPP( bitmap ) / 8;
 
-		// R8 only
-		assert( bytesPerPixel == 1 );
+		// R8/R16 only
+		if ( bytesPerPixel != 1 && bytesPerPixel != 2 )
+		{
+			Log( "ERROR: Invalid BPP for heightmap: " + bytesPerPixel );
+			return false;
+		}
 
-		for ( unsigned y = 0; y < height; ++y ) {
+		for ( unsigned y = 0; y < height; ++y )
+		{
 			BYTE *bits = FreeImage_GetScanLine( bitmap, offsetHeight - y );
 			bits += ( offsetWidth * bytesPerPixel );
 
-			for ( unsigned x = 0; x < width; ++x ) {
-				texture.mTextureData.push_back( bits[ FI_RGBA_RED ] );
-				bits += bytesPerPixel;
+			for ( unsigned x = 0; x < width; ++x )
+			{
+				for ( uint32_t byte = 0; byte < bytesPerPixel; ++byte )
+				{
+					texture.mTextureData.push_back( bits[ FI_RGBA_RED ] );
+					++bits;
+				}
 			}
 		}
 

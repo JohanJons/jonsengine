@@ -17,7 +17,8 @@ namespace JonsEngine
     {
         Diffuse,
         Normal,
-		Height,
+		Height8,
+		Height16,
         Skybox
     };
     

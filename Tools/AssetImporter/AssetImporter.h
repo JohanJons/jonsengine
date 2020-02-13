@@ -8,6 +8,8 @@
 #include <vector>
 #include <string>
 
+// TODO: this whole thing could use an overhaul
+
 namespace JonsAssetImporter
 {
     enum class Command

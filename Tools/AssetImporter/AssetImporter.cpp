@@ -14,7 +14,8 @@ namespace JonsAssetImporter
         Model,
 		Texture_Diffuse,
 		Texture_Normal,
-		Texture_Height,
+		Texture_Height8,
+		Texture_Height16,
         Skybox,
         AssetName,
 		Package
@@ -110,7 +111,8 @@ namespace JonsAssetImporter
 
 				case ParamType::Texture_Diffuse:
 				case ParamType::Texture_Normal:
-				case ParamType::Texture_Height:
+				case ParamType::Texture_Height8:
+				case ParamType::Texture_Height16:
                 {
 					TextureType type;
 					switch (assetType)
@@ -118,7 +120,8 @@ namespace JonsAssetImporter
 						default:
 						case ParamType::Texture_Diffuse: type = TextureType::Diffuse; break;
 						case ParamType::Texture_Normal:  type = TextureType::Normal; break;
-						case ParamType::Texture_Height:  type = TextureType::Height; break;
+						case ParamType::Texture_Height8: type = TextureType::Height8; break;
+						case ParamType::Texture_Height16: type = TextureType::Height16; break;
 					}
 
 					ret = freeimageParser.ProcessTexture2D(assetPath, assetName, type, pkg);
@@ -166,9 +169,14 @@ namespace JonsAssetImporter
 			paramType = ParamType::Texture_Normal;
 			return true;
 		}
-		else if (parameter == "-texture_height")
+		else if (parameter == "-texture_height8")
 		{
-			paramType = ParamType::Texture_Height;
+			paramType = ParamType::Texture_Height8;
+			return true;
+		}
+		else if ( parameter == "-texture_height16" )
+		{
+			paramType = ParamType::Texture_Height16;
 			return true;
 		}
         else if (parameter == "-skybox")
@@ -197,7 +205,8 @@ namespace JonsAssetImporter
             case ParamType::Model:
             case ParamType::Texture_Diffuse:
 			case ParamType::Texture_Normal:
-			case ParamType::Texture_Height:
+			case ParamType::Texture_Height8:
+			case ParamType::Texture_Height16:
             case ParamType::Skybox:
             {
                 assetPaths.emplace_back(type, parameter);

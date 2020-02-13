@@ -143,7 +143,7 @@ namespace JonsEngine
 
         // general usage perlin-noise texture exposed to shaders
         std::vector<uint8_t> perlinNoiseVec( gPerlinNoiseArr, gPerlinNoiseArr + ( gPerlinNoiseArrWidth * gPerlinNoiseArrHeight ) );
-        DX11TextureID perlinNoiseID = CreateTexture( TextureType::Height, perlinNoiseVec, gPerlinNoiseArrWidth, gPerlinNoiseArrHeight );
+        DX11TextureID perlinNoiseID = CreateTexture( TextureType::Height8, perlinNoiseVec, gPerlinNoiseArrWidth, gPerlinNoiseArrHeight );
         mTextures.GetItem( perlinNoiseID ).BindAsShaderResource( SHADER_TEXTURE_SLOT_PERLIN );
 
         gDX11Renderer = this;
