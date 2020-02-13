@@ -183,7 +183,7 @@ namespace JonsEngine
 
 		DX11TextureID heightMapTexture = LoadTexture( heightmap, type, heightMapData, terrainWidth, terrainHeight );
 
-		return mTerrainData.Insert( name, terrainWidth, terrainHeight, heightMapTexture, heightMapData );
+		return mTerrainData.Insert( name, terrainWidth, terrainHeight, heightMapTexture, type, heightMapData );
 	}
 
 	void ResourceManifest::DeleteTerrainData(TerrainDataID& terrainDataId)

@@ -37,7 +37,7 @@ namespace JonsEngine
 	{
 	public:
 		TerrainQuadTree() = default;
-		TerrainQuadTree( const std::vector<uint8_t>& heightmapData, uint32_t width, uint32_t height, uint32_t patchMinSize, uint32_t patchMaxSize, float heightmapScale, const Mat4& worldTransform );
+		TerrainQuadTree( const std::vector<uint8_t>& heightmapData, TextureType heightmapType, uint32_t width, uint32_t height, uint32_t patchMinSize, uint32_t patchMaxSize, float heightmapScale, const Mat4& worldTransform );
 
 		void CullNodes( std::vector<Mat4>& renderableTransforms, std::vector<float>& LODRanges, std::vector<Vec2>& morphConstants, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform,
 			float zNear, float zFar ) const;
@@ -52,7 +52,7 @@ namespace JonsEngine
 	private:
 		void CreateGridNode( QuadNodeAABB* parent, float centerX, float centerZ, float width, float height, uint32_t level, float yTranslation );
 		// local space during function
-		void ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, uint32_t heightmapWidth, uint32_t treeLevel, float yTranslation );
+		void ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, TextureType heightmapType, uint32_t heightmapWidth, uint32_t treeLevel, float yTranslation );
 
 		uint32_t ExpectedNumNodes( float width, uint32_t patchMinSize ) const;
 		bool ValidateCulledNodes( std::vector<Mat4>& renderableTransforms ) const;

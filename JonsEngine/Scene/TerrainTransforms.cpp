@@ -79,9 +79,11 @@ namespace JonsEngine
 	{
 		uint32_t heightmapWidth = terrainData.GetWidth(), heightmapHeight = terrainData.GetHeight();
 		const std::vector<uint8_t>& heightmapData = terrainData.GetHeightMapData();
+		TextureType heightmapType = terrainData.GetTextureType();
 
 		assert( patchMinSize && heightmapWidth && heightmapHeight );
+		assert( heightmapType == TextureType::Height8 || heightmapType == TextureType::Height16 );
 
-		mTerrainQuadTreeMap.emplace( std::piecewise_construct, std::forward_as_tuple( ID ), std::forward_as_tuple( heightmapData, heightmapWidth, heightmapHeight, patchMinSize, patchMaxSize, terrain.GetHeightScale(), worldTransform ) );
+		mTerrainQuadTreeMap.emplace( std::piecewise_construct, std::forward_as_tuple( ID ), std::forward_as_tuple( heightmapData, heightmapType, heightmapWidth, heightmapHeight, patchMinSize, patchMaxSize, terrain.GetHeightScale(), worldTransform ) );
 	}
 }

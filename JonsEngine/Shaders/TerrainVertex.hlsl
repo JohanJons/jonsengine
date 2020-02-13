@@ -67,10 +67,6 @@ VertexOut vs_main(VertexIn input)
 	uint LODlevel = GetPatchLODLevel( scaleX, scaleZ );
 	float2 morphConstants = gLODMorphConstants.Load( LODlevel );
 
-	// hmm this shouldn't be needed
-	//float bias = 0.01f;
-
-	//morphConstants.xy -= bias;
 	float morphLerpK  = 1.0f - clamp( morphConstants.x - cameraDistanceToVertex * morphConstants.y, 0.0f, 1.0f );
 
 	float meshSize = ( float) gTerrainMeshSize;
