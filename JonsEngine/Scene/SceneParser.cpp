@@ -209,16 +209,21 @@ namespace JonsEngine
 
 			std::vector<float> LODRanges;
 			std::vector<Vec2> morphConstants;
-			std::vector<Mat4>& renderableTransforms = mRenderQueue.mTerrains.mTransforms;
+			std::vector<Mat4>& transforms = mRenderQueue.mTerrains.mTransforms;
+			std::vector<uint32_t>& LODs = mRenderQueue.mTerrains.mLODs;
 
+			QuadTreeCullData cullData{ transforms, LODs, LODRanges, morphConstants };
 			const TerrainQuadTree& quadTree = terrainTransforms.GetQuadTree( ID );
-			quadTree.CullNodes( renderableTransforms, LODRanges, morphConstants, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
-			if ( renderableTransforms.empty()  )
+			quadTree.CullNodes( cullData, mRenderQueue.mCamera.mCameraPosition, mRenderQueue.mCamera.mCameraViewProjectionMatrix, zNear, zFar );
+			if ( transforms.empty()  )
 				continue;
 			
+			// LODs & transforms share index offset
+			assert( LODs.size() == transforms.size() );
+
 			Vec2 worldMin, worldMax;
 			quadTree.GetWorldXZBounds( worldMin, worldMax );
-			uint32_t renderableEndIndex = static_cast<uint32_t>( renderableTransforms.size() );
+			uint32_t renderableEndIndex = static_cast<uint32_t>( transforms.size() );
 			mRenderQueue.mTerrains.mTerrainData.emplace_back( std::move( morphConstants ), heightmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale );
 		}
 	}

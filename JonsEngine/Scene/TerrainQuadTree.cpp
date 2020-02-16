@@ -77,31 +77,17 @@ namespace JonsEngine
 		assert( numNodes == GetNumNodes() );
 	}
 
-	void TerrainQuadTree::CullNodes( std::vector<Mat4>& renderableTransforms, std::vector<float>& LODRanges, std::vector<Vec2>& morphConstants, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform,
-		float zNear, float zFar ) const
+	void TerrainQuadTree::CullNodes( QuadTreeCullData& outData, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const
 	{
-		renderableTransforms.clear();
-		LODRanges.clear();
-		morphConstants.clear();
-
 		const QuadNodeAABB& rootNode = mGridTraversal.front();
 		bool isTooLargePatch = GetPatchSize( rootNode ) > mPatchMaxSize;
 
-		CalculateLODRanges( LODRanges, morphConstants, zNear, zFar );
-		CullQuad( renderableTransforms, rootNode, cameraWorldPos, cameraViewProjTransform, LODRanges, false, isTooLargePatch );
+		CalculateLODRanges( outData, zNear, zFar );
+		CullQuad( outData, rootNode, cameraWorldPos, cameraViewProjTransform, false, isTooLargePatch );
 
 #if _DEBUG
-		assert( ValidateCulledNodes( renderableTransforms ) ); 
+		assert( ValidateCulledNodes( outData.mTransforms ) ); 
 #endif
-
-		//PerCullData cullData( GetNumNodes() );
-		//CalculateHighestLODNodes( cullData, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
-		//CalculateNodeTransforms( cullData, nodeTransforms, tessEdgeMult, LODRanges );
-		//CullQuad( nodeTransforms, mGridTraversal.front(), cameraWorldPos, cameraViewProjTransform, LODRanges, false );
-
-		//CalculateTessellationFactors( nodeTransforms, tessEdgeMult );
-
-		//assert( nodeTransforms.size() == tessEdgeMult.size() );
 	}
 
 	uint32_t TerrainQuadTree::GetNumLODLevels() const
@@ -265,19 +251,19 @@ namespace JonsEngine
 
 		uint32_t numLODs = GetNumLODLevels();
 		assert( patchSize >= mPatchMinSize );
-		uint32_t diff = log2( patchSize ) - log2( mPatchMinSize ) + 1;
+		uint32_t diff = static_cast<uint32_t>( log2( patchSize ) - log2( mPatchMinSize ) ) + 1;
 		assert( diff <= numLODs );
 		LOD = numLODs - diff;
 
 		return LOD;
 	}
 
-	void TerrainQuadTree::CalculateLODRanges( std::vector<float>& LODs, std::vector<Vec2>& morphConstants, float zNear, float zFar ) const
+	void TerrainQuadTree::CalculateLODRanges( QuadTreeCullData& outData, float zNear, float zFar ) const
 	{
 		uint32_t numLODRanges = GetNumLODLevels();
 
-		LODs.resize( numLODRanges );
-		morphConstants.resize( numLODRanges );
+		outData.mLODRanges.resize( numLODRanges );
+		outData.mMorphConstants.resize( numLODRanges );
 
 		const float LODDistanceRatio = 2.0f;
 
@@ -297,8 +283,8 @@ namespace JonsEngine
 		{
 			uint32_t index = numLODRanges - i - 1;
 
-			LODs[ index ] = prevPos + sect * currentDetailBalance;
-			prevPos = LODs[ index ];
+			outData.mLODRanges[ index ] = prevPos + sect * currentDetailBalance;
+			prevPos = outData.mLODRanges[ index ];
 			currentDetailBalance *= LODDistanceRatio;
 		}
 
@@ -307,7 +293,7 @@ namespace JonsEngine
 		{
 			uint32_t index = numLODRanges - i - 1;
 
-			float morphEnd = LODs[ index ];
+			float morphEnd = outData.mLODRanges[ index ];
 			float morphStart = prevPos + ( morphEnd - prevPos ) * gMorphStartRatio;
 
 			prevPos = morphEnd;
@@ -315,12 +301,12 @@ namespace JonsEngine
 			const float errorFudge = 0.01f;
 			morphEnd = glm::lerp( morphEnd, morphStart, errorFudge );
 			
-			morphConstants[ index ].x = morphEnd / ( morphEnd - morphStart );
-			morphConstants[ index ].y = 1.0f / ( morphEnd - morphStart );
+			outData.mMorphConstants[ index ].x = morphEnd / ( morphEnd - morphStart );
+			outData.mMorphConstants[ index ].y = 1.0f / ( morphEnd - morphStart );
 		}
 	}
 
-	void TerrainQuadTree::AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum ) const
+	void TerrainQuadTree::AddNode( QuadTreeCullData& outData, const QuadNodeAABB& quadAABB, uint32_t LODLevel, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum ) const
 	{
 		Vec3 center = quadAABB.mFrustumAABB.GetCenter();
 		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
@@ -330,30 +316,30 @@ namespace JonsEngine
 		Mat4 transform = glm::translate( Vec3( center.x, 0.0f, center.z ) );
 		transform = glm::scale( transform, extent * 2.0f );
 
-		renderableTransforms.emplace_back( transform );
+		outData.mTransforms.emplace_back( transform );
+		outData.mLODs.emplace_back( LODLevel );
 	}
 
-	void TerrainQuadTree::AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum, bool addBL, bool addBR, bool addTR, bool addTL ) const
+	void TerrainQuadTree::AddNode( QuadTreeCullData& outData, const QuadNodeAABB& quadAABB, uint32_t LODLevel, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum, bool addBL, bool addBR, bool addTR, bool addTL ) const
 	{
 		Vec3 center = quadAABB.mFrustumAABB.GetCenter();
 		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
 		Vec3 halfExtent = extent / 2.0f;
 
 		if ( addBL )
-			AddNode( renderableTransforms, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT ), cameraViewProjTransform, parentFullyInFrustum );
+			AddNode( outData, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT ), LODLevel, cameraViewProjTransform, parentFullyInFrustum );
 
 		if ( addBR )
-			AddNode( renderableTransforms, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_BOTTOM_RIGHT ), cameraViewProjTransform, parentFullyInFrustum );
+			AddNode( outData, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_BOTTOM_RIGHT ), LODLevel, cameraViewProjTransform, parentFullyInFrustum );
 
 		if ( addTR )
-			AddNode( renderableTransforms, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_TOP_RIGHT ), cameraViewProjTransform, parentFullyInFrustum );
+			AddNode( outData, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_TOP_RIGHT ), LODLevel, cameraViewProjTransform, parentFullyInFrustum );
 
 		if ( addTL )
-			AddNode( renderableTransforms, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_TOP_LEFT ), cameraViewProjTransform, parentFullyInFrustum );
+			AddNode( outData, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_TOP_LEFT ), LODLevel, cameraViewProjTransform, parentFullyInFrustum );
 	}
 
-	QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform,
-		const std::vector<float>& LODRanges, bool parentFullyInFrustum, bool parentTooLargePatch ) const
+	QuadNodeCullStatus TerrainQuadTree::CullQuad( QuadTreeCullData& outData, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum, bool parentTooLargePatch ) const
 	{
 		// if parent is fully in frustum, so are we
 		AABBIntersection frustumIntersection = parentFullyInFrustum ? AABBIntersection::Inside : Intersection( quadAABB.mFrustumAABB, cameraViewProjTransform );
@@ -362,7 +348,7 @@ namespace JonsEngine
 
 		uint32_t LODLevel = GetLODLevel( quadAABB );
 
-		float distanceLimit = LODRanges.at( LODLevel );
+		float distanceLimit = outData.mLODRanges.at( LODLevel );
 		AABBIntersection intersection = Intersection( quadAABB.mFrustumAABB, cameraWorldPos, distanceLimit );
 		bool isWithinDistance = intersection == AABBIntersection::Partial || intersection == AABBIntersection::Inside;
 		if ( !parentTooLargePatch && !isWithinDistance )
@@ -372,21 +358,21 @@ namespace JonsEngine
 
 		// last LOD
 		uint32_t nextLODIndex = LODLevel + 1;
-		bool isValidLODIndex = nextLODIndex < LODRanges.size();
+		bool isValidLODIndex = nextLODIndex < outData.mLODRanges.size();
 		if ( !isValidLODIndex )
 		{
-			AddNode( renderableTransforms, quadAABB, cameraViewProjTransform, completelyInFrustum );
+			AddNode( outData, quadAABB, LODLevel, cameraViewProjTransform, completelyInFrustum );
 			return QuadNodeCullStatus::Added;
 		}
 
 		bool isTooLargePatch = GetPatchSize( quadAABB ) > mPatchMaxSize;
 
-		float nextDistanceLimit = LODRanges.at( nextLODIndex );
+		float nextDistanceLimit = outData.mLODRanges.at( nextLODIndex );
 		AABBIntersection nextIntersection = Intersection( quadAABB.mFrustumAABB, cameraWorldPos, nextDistanceLimit );
 		bool nextIsWithinRange = nextIntersection == AABBIntersection::Partial || nextIntersection == AABBIntersection::Inside;
 		if ( !isTooLargePatch && !nextIsWithinRange )
 		{
-			AddNode( renderableTransforms, quadAABB, cameraViewProjTransform, completelyInFrustum );
+			AddNode( outData, quadAABB, LODLevel, cameraViewProjTransform, completelyInFrustum );
 			return QuadNodeCullStatus::Added;
 		}
 
@@ -394,7 +380,7 @@ namespace JonsEngine
 		for ( uint32_t childIndex = QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT; childIndex < QuadChildEnum::QUAD_CHILD_COUNT; ++childIndex )
 		{
 			const QuadNodeAABB& childQuad = *( quadAABB.mChildBegin + childIndex );
-			childrenAdded[ childIndex ] = CullQuad( renderableTransforms, childQuad, cameraWorldPos, cameraViewProjTransform, LODRanges, completelyInFrustum, isTooLargePatch );
+			childrenAdded[ childIndex ] = CullQuad( outData, childQuad, cameraWorldPos, cameraViewProjTransform, completelyInFrustum, isTooLargePatch );
 		}
 
 		// remove if childnodes already selected, or out of frustum
@@ -406,7 +392,7 @@ namespace JonsEngine
 
 		if ( doAddSelf )
 		{
-			AddNode( renderableTransforms, quadAABB, cameraViewProjTransform, completelyInFrustum, !removeBL, !removeBR, !removeTR, !removeTL );
+			AddNode( outData, quadAABB, LODLevel, cameraViewProjTransform, completelyInFrustum, !removeBL, !removeBR, !removeTR, !removeTL );
 
 			return QuadNodeCullStatus::Added;
 		}

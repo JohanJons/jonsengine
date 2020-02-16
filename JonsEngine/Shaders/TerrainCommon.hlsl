@@ -25,6 +25,8 @@ struct VertexOut
 {
 	float4 mPosition : SV_POSITION;
 	float3 mNormal : NORMAL;
+	uint mLOD : LOD;
+	float mMorph : MORPH;
 	//float2 mTexcoord : TEXCOORD;
 };
 
@@ -44,19 +46,5 @@ struct HullOut
 	float3 mWorldPosition : POSITION;
 	float2 mTexcoord : TEXCOORD;
 };
-
-/*float GetCoplanarity( float2 worldPatchMidpoint )
-{
-	uint2 uv = ( worldPatchMidpoint - gWorldMin ) / gTerrainCoplanaritySize;
-	return gCoplanarityMap.Load( uint3( uv, 0 ) ).r;
-}*/
-
-/*
-float3 GetNormal( float2 worldPatchMidpoint )
-{
-	uint2 uv = ( worldPatchMidpoint - gWorldMin ) / gTerrainCoplanaritySize;
-	return gNormalMap.Load( uint3( uv, 0 ) ).rgb;
-}
-*/
 
 #endif

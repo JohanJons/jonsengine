@@ -10,6 +10,14 @@
 
 namespace JonsEngine
 {
+	struct QuadTreeCullData
+	{
+		std::vector<Mat4>& mTransforms;
+		std::vector<uint32_t>& mLODs;
+		std::vector<float>& mLODRanges;
+		std::vector<Vec2>& mMorphConstants;
+	};
+
 	struct QuadNodeAABB
 	{
 		QuadNodeAABB( const Vec3& frustumMin, const Vec3& frustumMax, QuadNodeAABB* parent, uint32_t level ) :
@@ -39,8 +47,7 @@ namespace JonsEngine
 		TerrainQuadTree() = default;
 		TerrainQuadTree( const std::vector<uint8_t>& heightmapData, TextureType heightmapType, uint32_t width, uint32_t height, uint32_t patchMinSize, uint32_t patchMaxSize, float heightmapScale, const Mat4& worldTransform );
 
-		void CullNodes( std::vector<Mat4>& renderableTransforms, std::vector<float>& LODRanges, std::vector<Vec2>& morphConstants, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform,
-			float zNear, float zFar ) const;
+		void CullNodes( QuadTreeCullData& outData, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, float zNear, float zFar ) const;
 
 		uint32_t GetNumNodes() const { return static_cast<uint32_t>( mGridTraversal.size() ); }
 		uint32_t GetPatchMinSize() const { return mPatchMinSize; }
@@ -57,14 +64,13 @@ namespace JonsEngine
 		uint32_t ExpectedNumNodes( float width, uint32_t patchMinSize ) const;
 		bool ValidateCulledNodes( std::vector<Mat4>& renderableTransforms ) const;
 
-		void AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum ) const;
-		void AddNode( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum, bool addBL, bool addBR, bool addTR, bool addTL ) const;
-		QuadNodeCullStatus TerrainQuadTree::CullQuad( std::vector<Mat4>& renderableTransforms, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform,
-			const std::vector<float>& LODRanges, bool parentFullyInFrustum, bool parentTooLargePatch ) const;
+		void AddNode( QuadTreeCullData& outData, const QuadNodeAABB& quadAABB, uint32_t LODLevel, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum ) const;
+		void AddNode( QuadTreeCullData& outData, const QuadNodeAABB& quadAABB, uint32_t LODLevel, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum, bool addBL, bool addBR, bool addTR, bool addTL ) const;
+		QuadNodeCullStatus TerrainQuadTree::CullQuad( QuadTreeCullData& outData, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum, bool parentTooLargePatch ) const;
 
 		uint32_t GetPatchSize( const QuadNodeAABB& quadAABB ) const;
 		uint32_t GetLODLevel( const QuadNodeAABB& quadAABB ) const;
-		void CalculateLODRanges( std::vector<float>& LODs, std::vector<Vec2>& morphConstants, float zNear, float zFar ) const;
+		void CalculateLODRanges( QuadTreeCullData& outData, float zNear, float zFar ) const;
 
 		uint32_t mPatchMinSize = 0;
 		uint32_t mPatchMaxSize = 0;

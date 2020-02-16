@@ -177,6 +177,7 @@ namespace JonsEngine
 	{
 		std::vector<RenderableTerrainData> mTerrainData;
 		std::vector<Mat4> mTransforms;
+		std::vector<uint32_t> mLODs;
 
 		uint32_t GetNumTerrains() const { return static_cast<uint32_t>( mTerrainData.size() ); }
 	};

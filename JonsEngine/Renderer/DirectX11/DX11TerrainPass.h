@@ -85,6 +85,7 @@ namespace JonsEngine
 		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;
 		DX11CPUDynamicBuffer mLODMorphConstantsBuffer;
 		DX11CPUDynamicBuffer mTransformBuffer;
+		DX11CPUDynamicBuffer mLODLevelBuffer;
 
 		/*ID3D11InputLayoutPtr mLayout = nullptr;
 		ID3D11VertexShaderPtr mVertexShader = nullptr;

@@ -16,7 +16,7 @@ PixelOut ps_main( DomainOut input )
 {
 	PixelOut ret;
 
-	ret.mDiffuse = lerp( BLACK, RED, input.mCoplanarity );
+	ret.mDiffuse = lerp( COLOR_BLACK, COLOR_RED, input.mCoplanarity );
 
 	return ret;
 }
