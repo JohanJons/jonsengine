@@ -327,16 +327,32 @@ namespace JonsEngine
 		Vec3 halfExtent = extent / 2.0f;
 
 		if ( addBL )
-			AddNode( outData, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT ), LODLevel, cameraViewProjTransform, parentFullyInFrustum );
+		{
+			const QuadNodeAABB& childAABB = *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT );
+			uint32_t childLOD = GetLODLevel( childAABB );
+			AddNode( outData, childAABB, childLOD, cameraViewProjTransform, parentFullyInFrustum );
+		}
 
 		if ( addBR )
-			AddNode( outData, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_BOTTOM_RIGHT ), LODLevel, cameraViewProjTransform, parentFullyInFrustum );
+		{
+			const QuadNodeAABB& childAABB = *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_BOTTOM_RIGHT );
+			uint32_t childLOD = GetLODLevel( childAABB );
+			AddNode( outData, childAABB, childLOD, cameraViewProjTransform, parentFullyInFrustum );
+		}
 
 		if ( addTR )
-			AddNode( outData, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_TOP_RIGHT ), LODLevel, cameraViewProjTransform, parentFullyInFrustum );
+		{
+			const QuadNodeAABB& childAABB = *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_TOP_RIGHT );
+			uint32_t childLOD = GetLODLevel( childAABB );
+			AddNode( outData, childAABB, childLOD, cameraViewProjTransform, parentFullyInFrustum );
+		}
 
 		if ( addTL )
-			AddNode( outData, *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_TOP_LEFT ), LODLevel, cameraViewProjTransform, parentFullyInFrustum );
+		{
+			const QuadNodeAABB& childAABB = *( quadAABB.mChildBegin + QuadChildEnum::QUAD_CHILD_TOP_LEFT );
+			uint32_t childLOD = GetLODLevel( childAABB );
+			AddNode( outData, childAABB, childLOD, cameraViewProjTransform, parentFullyInFrustum );
+		}
 	}
 
 	QuadNodeCullStatus TerrainQuadTree::CullQuad( QuadTreeCullData& outData, const QuadNodeAABB& quadAABB, const Vec3& cameraWorldPos, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum, bool parentTooLargePatch ) const
