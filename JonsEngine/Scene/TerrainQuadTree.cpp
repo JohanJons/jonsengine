@@ -28,13 +28,14 @@ namespace
 			case TextureType::Height8:
 			{
 				uint8_t val = heightmapData.at( index );
-				return static_cast<float>( val );
+				return Normalize( val );
 			}
 			case TextureType::Height16:
 			{
 				uint32_t twoByteIndex = index * 2;
-				uint16_t val = static_cast<uint16_t>( heightmapData.at( twoByteIndex ) );
-				return static_cast<float>( val );
+				const uint8_t* dat = &heightmapData.at( twoByteIndex );
+				uint16_t val = *( reinterpret_cast<const uint16_t*>( dat ) );
+				return Normalize( val );
 			}
 			default:
 			{
@@ -186,7 +187,6 @@ namespace JonsEngine
 				{
 					uint32_t index = col + ( row * heightmapWidth );
 					float val = GetHeightVal( heightmapData, heightmapType, index );
-					val = Normalize( val );
 					val *= mHeightmapScale;
 
 					minY = std::min( minY, val );
