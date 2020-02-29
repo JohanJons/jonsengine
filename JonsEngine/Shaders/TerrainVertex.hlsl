@@ -39,8 +39,8 @@ VertexOut vs_main(VertexIn input)
 	const uint LODlevel = gTerrainLODLevels.Load( transformIndex );
 
 	float4 worldPos = mul( worldTransform, float4( input.mPosition, 1 ) );
-	//float2 preMorphTexcoord = GetTextureCoordinates( worldPos.xyz );
-	//worldPos.y = SampleHeightmap( preMorphTexcoord ) * gHeightModifier;
+	float2 preMorphTexcoord = GetTextureCoordinates( worldPos.xyz );
+	worldPos.y = SampleHeightmap( preMorphTexcoord ) * gHeightModifier;
 
 	// To be used
 	float4 unmorphedPos = float4( worldPos.xyz, 1.0f );
