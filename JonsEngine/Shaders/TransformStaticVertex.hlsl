@@ -6,6 +6,7 @@
 cbuffer TransformConstants : register(CBUFFER_REGISTER_VERTEX)
 {
     float4x4 gWVPMatrix;
+	uint gBoneIndexOffset;
 };
 
 

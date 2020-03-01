@@ -7,6 +7,7 @@
 cbuffer TransformConstants : register(CBUFFER_REGISTER_VERTEX)
 {
     float4x4 gViewProjectionMatrix;
+	uint gBoneIndexOffset;
 };
 
 StructuredBuffer<float4x4> gWorldTransforms : register (SBUFFER_REGISTER_EXTRA);
