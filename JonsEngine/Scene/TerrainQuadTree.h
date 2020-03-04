@@ -57,9 +57,9 @@ namespace JonsEngine
 		void GetWorldXZBounds( Vec2& worldMin, Vec2& worldMax ) const;
 
 	private:
-		void CreateGridNode( QuadNodeAABB* parent, float centerX, float centerZ, float width, float height, uint32_t level, float yTranslation );
+		void CreateGridNode( QuadNodeAABB* parent, float centerX, float centerZ, float width, float height, uint32_t level );
 		// local space during function
-		void ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, TextureType heightmapType, uint32_t heightmapWidth, uint32_t treeLevel, float yTranslation );
+		void ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, TextureType heightmapType, uint32_t heightmapWidth, uint32_t heightmapHeight, uint32_t treeLevel );
 
 		uint32_t ExpectedNumNodes( float width, uint32_t patchMinSize ) const;
 		bool ValidateCulledNodes( std::vector<Mat4>& renderableTransforms ) const;
@@ -75,6 +75,7 @@ namespace JonsEngine
 		uint32_t mPatchMinSize = 0;
 		uint32_t mPatchMaxSize = 0;
 		float mHeightmapScale;
+		float mWorldYTranslation;
 		std::vector<QuadNodeAABB> mGridTraversal;
 	};
 }

@@ -38,17 +38,16 @@ VertexOut vs_main(VertexIn input)
 	const float4x4 worldTransform = transpose( gTerrainWorldTransforms.Load( transformIndex ) );
 	const uint LODlevel = gTerrainLODLevels.Load( transformIndex );
 
-	float4 worldPos = mul( worldTransform, float4( input.mPosition, 1 ) );
-	float2 preMorphTexcoord = GetTextureCoordinates( worldPos.xyz );
-	worldPos.y = SampleHeightmap( preMorphTexcoord ) * gHeightModifier;
+	const float4 worldPos = mul( worldTransform, float4( input.mPosition, 1 ) );
 
-	// To be used
-	float4 unmorphedPos = float4( worldPos.xyz, 1.0f );
+	float4 preMorphPos = worldPos;
+	float2 preMorphTexcoord = GetTextureCoordinates( preMorphPos.xyz );
+	preMorphPos.y += SampleHeightmap( preMorphTexcoord ) * gHeightModifier;
 
 	float scaleX = worldTransform[ 0 ][ 0 ];
 	float scaleZ = worldTransform[ 2 ][ 2 ];
 
-	float cameraDistanceToVertex = distance( worldPos.xyz, gWorldEyePos );
+	float cameraDistanceToVertex = distance( preMorphPos.xyz, gWorldEyePos );
 	float2 morphConstants = gLODMorphConstants.Load( LODlevel );
 
 	float morphLerpK  = 1.0f - clamp( morphConstants.x - cameraDistanceToVertex * morphConstants.y, 0.0f, 1.0f );
@@ -58,10 +57,11 @@ VertexOut vs_main(VertexIn input)
 	float oneOverGridDim = 2.0f / meshSize;
 
 	float2 fracPart = ( frac( input.mPosition.xz * float2( gridDimHalf, gridDimHalf ) ) * float2( oneOverGridDim, oneOverGridDim ) ) * float2( scaleX, scaleZ );
-	worldPos.xz = worldPos.xz - ( fracPart * morphLerpK );
+	preMorphPos.xz = preMorphPos.xz - ( fracPart * morphLerpK );
 
-	float2 postMorphTexcoord = GetTextureCoordinates( worldPos.xyz );
-	worldPos.y = SampleHeightmap( postMorphTexcoord ) * gHeightModifier;
+	float4 postMorphPos = preMorphPos;
+	float2 postMorphTexcoord = GetTextureCoordinates( preMorphPos.xyz );
+	postMorphPos.y += SampleHeightmap( postMorphTexcoord ) * gHeightModifier;
 
 	const int2 offset = 0;
 	const int mipmap = 0;
@@ -70,15 +70,11 @@ VertexOut vs_main(VertexIn input)
 	normal -= 1.0;
 
 	VertexOut ret;
-	ret.mPosition = mul( gFrameViewProj, worldPos );
+	ret.mPosition = mul( gFrameViewProj, postMorphPos );
 	ret.mNormal = mul( ( float3x3 )gFrameView, normal );
 	ret.mNormal = normalize( ret.mNormal );
 	ret.mLOD = LODlevel;
 	ret.mMorph = morphLerpK;
-	//ret.mTexcoord = ( worldPos.xz - gWorldMin ) / ( gWorldMax - gWorldMin );
-	//ret.mTexcoord = clamp( ret.mTexcoord, 0.0f, 1.0f );
-
-	//ret.mInstanceID = input.mInstanceID;
 
 	return ret;
 }

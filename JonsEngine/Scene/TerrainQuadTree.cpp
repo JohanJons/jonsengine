@@ -51,6 +51,7 @@ namespace JonsEngine
 	TerrainQuadTree::TerrainQuadTree( const std::vector<uint8_t>& heightmapData, TextureType heightmapType, uint32_t width, uint32_t height, uint32_t patchMinSize, uint32_t patchMaxSize, float heightmapScale, const Mat4& worldTransform ) :
 		mPatchMinSize( patchMinSize ),
 		mPatchMaxSize( patchMaxSize ),
+		mWorldYTranslation( worldTransform[ 3 ].y ),
 		mHeightmapScale( heightmapScale )
 	{
 		float fWidth = static_cast<float>( width );
@@ -62,11 +63,10 @@ namespace JonsEngine
 		uint32_t numNodes = ExpectedNumNodes( fWidth, mPatchMinSize );
 		mGridTraversal.reserve( numNodes );
 		
-		float yTranslation = worldTransform[ 3 ].y;
 		uint32_t rootTreeLevel = 0;
-		CreateGridNode( nullptr, fWidth / 2, fHeight / 2, fWidth, fHeight, rootTreeLevel, yTranslation );
+		CreateGridNode( nullptr, fWidth / 2, fHeight / 2, fWidth, fHeight, rootTreeLevel );
 		QuadNodeAABB& quadAABB = mGridTraversal.back();
-		ProcessQuadNode( quadAABB, heightmapData, heightmapType, width, rootTreeLevel, yTranslation );
+		ProcessQuadNode( quadAABB, heightmapData, heightmapType, width, height, rootTreeLevel );
 
 		// translate negative width&height / 2 to center it at origo
 		Mat4 finalTransform = glm::translate( -Vec3( fWidth / 2, 0, fHeight / 2) );
@@ -153,7 +153,7 @@ namespace JonsEngine
 		return true;
 	}
 
-	void TerrainQuadTree::CreateGridNode( QuadNodeAABB* parent, float centerX, float centerZ, float width, float height, uint32_t treeLevel, float yTranslation )
+	void TerrainQuadTree::CreateGridNode( QuadNodeAABB* parent, float centerX, float centerZ, float width, float height, uint32_t treeLevel )
 	{
 		float extentX = width / 2;
 		float extentZ = height / 2;
@@ -167,7 +167,7 @@ namespace JonsEngine
 		mGridTraversal.emplace_back( frustumMin, frustumMax, parent, treeLevel );
 	}
 
-	void TerrainQuadTree::ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, TextureType heightmapType, uint32_t heightmapWidth, uint32_t treeLevel, float yTranslation )
+	void TerrainQuadTree::ProcessQuadNode( QuadNodeAABB& quadAABB, const std::vector<uint8_t>& heightmapData, TextureType heightmapType, uint32_t heightmapWidth, uint32_t heightmapHeight, uint32_t treeLevel )
 	{
 		Vec3 center = quadAABB.mFrustumAABB.GetCenter();
 		Vec3 extent = quadAABB.mFrustumAABB.GetExtent();
@@ -180,10 +180,21 @@ namespace JonsEngine
 		uint32_t quadWidth = static_cast<uint32_t>( extent.x * 2 ), quadHeight = static_cast<uint32_t>( extent.z * 2 );
 		if ( quadWidth <= mPatchMinSize && quadHeight <= mPatchMinSize )
 		{
+			int32_t beginCol = static_cast<int32_t>( min.x );
+			int32_t beginRow = static_cast<int32_t>( min.z );
+			int32_t endCol = static_cast<int32_t>( max.x );
+			int32_t endRow = static_cast<int32_t>( max.z );
+
+			// increase width/height by one to prevent frustum culling issues
+			beginCol = std::max( 0, beginCol - 1 );
+			beginRow = std::max( 0, beginRow - 1 );
+			endCol = std::min( static_cast<int32_t>( heightmapWidth ), endCol + 1 );
+			endRow = std::min( static_cast<int32_t>( heightmapHeight ), endRow + 1 );
+
 			//leaf node; parse in heightmap data to complete AABB, which will seep upwards
-			for ( uint32_t col = static_cast<uint32_t>( min.x ); col < max.x; ++col )
+			for ( int32_t col = beginCol; col < endCol; ++col )
 			{
-				for ( uint32_t row = static_cast<uint32_t>( min.z ); row < max.z; ++row )
+				for ( int32_t row = beginRow; row < endRow; ++row )
 				{
 					uint32_t index = col + ( row * heightmapWidth );
 					float val = GetHeightVal( heightmapData, heightmapType, index );
@@ -210,17 +221,17 @@ namespace JonsEngine
 
 		// BL - BR - TR - TL
 		// TODO: validate
-		CreateGridNode( &quadAABB, centerX - halfChildWidth, centerZ - halfChildHeight, childWidth, childHeight, childNodeTreeLevel, yTranslation );
+		CreateGridNode( &quadAABB, centerX - halfChildWidth, centerZ - halfChildHeight, childWidth, childHeight, childNodeTreeLevel );
 		quadAABB.mChildBegin = &mGridTraversal.back();
-		CreateGridNode( &quadAABB, centerX + halfChildWidth, centerZ - halfChildHeight, childWidth, childHeight, childNodeTreeLevel, yTranslation );
-		CreateGridNode( &quadAABB, centerX + halfChildWidth, centerZ + halfChildHeight, childWidth, childHeight, childNodeTreeLevel, yTranslation );
-		CreateGridNode( &quadAABB, centerX - halfChildWidth, centerZ + halfChildHeight, childWidth, childHeight, childNodeTreeLevel, yTranslation );
+		CreateGridNode( &quadAABB, centerX + halfChildWidth, centerZ - halfChildHeight, childWidth, childHeight, childNodeTreeLevel );
+		CreateGridNode( &quadAABB, centerX + halfChildWidth, centerZ + halfChildHeight, childWidth, childHeight, childNodeTreeLevel );
+		CreateGridNode( &quadAABB, centerX - halfChildWidth, centerZ + halfChildHeight, childWidth, childHeight, childNodeTreeLevel );
 
 		// process children and collect min/max Y for AABB
 		for ( uint32_t childIndex = QuadChildEnum::QUAD_CHILD_BOTTOM_LEFT; childIndex < QuadChildEnum::QUAD_CHILD_COUNT; ++childIndex )
 		{
 			QuadNodeAABB& childNode = *( quadAABB.mChildBegin + childIndex );
-			ProcessQuadNode( childNode, heightmapData, heightmapType, heightmapWidth, childNodeTreeLevel, yTranslation );
+			ProcessQuadNode( childNode, heightmapData, heightmapType, heightmapWidth, heightmapHeight, childNodeTreeLevel );
 
 			minY = std::min( minY, childNode.mFrustumAABB.Min().y );
 			maxY = std::max( maxY, childNode.mFrustumAABB.Max().y );
@@ -313,7 +324,7 @@ namespace JonsEngine
 
 		assert( extent.x * 2.0f <= mPatchMaxSize && extent.z * 2.0f <= mPatchMaxSize );
 
-		Mat4 transform = glm::translate( Vec3( center.x, 0.0f, center.z ) );
+		Mat4 transform = glm::translate( Vec3( center.x, mWorldYTranslation, center.z ) );
 		transform = glm::scale( transform, extent * 2.0f );
 
 		outData.mTransforms.emplace_back( transform );
