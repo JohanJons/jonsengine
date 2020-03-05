@@ -64,10 +64,6 @@ namespace JonsEngine
 		void BindComputeShader( CachedTextureMap type );
 		void GetDispatchDimensions( uint32_t& x, uint32_t& y, CachedTextureMap type, DX11TextureID heightmapID );
 
-        //void UpdatePatchSize( RenderSettings::TerrainCoplanaritySize coplanaritySize );
-		//void BindForRendering();
-		//void UnbindRendering();
-
 		ID3D11DeviceContextPtr mContext = nullptr;
         ID3D11DevicePtr mDevice = nullptr;
 		const IDMap<DX11Texture>& mTextureMap;
@@ -86,35 +82,5 @@ namespace JonsEngine
 		DX11CPUDynamicBuffer mLODMorphConstantsBuffer;
 		DX11CPUDynamicBuffer mTransformBuffer;
 		DX11CPUDynamicBuffer mLODLevelBuffer;
-
-		/*ID3D11InputLayoutPtr mLayout = nullptr;
-		ID3D11VertexShaderPtr mVertexShader = nullptr;
-		ID3D11HullShaderPtr mHullShader = nullptr;
-		ID3D11HullShaderPtr mHullShaderDebugCoplanarity = nullptr;
-		ID3D11ComputeShaderPtr mCoplanarityComputeShader8 = nullptr;
-        ID3D11ComputeShaderPtr mCoplanarityComputeShader16 = nullptr;
-        ID3D11ComputeShaderPtr mCoplanarityComputeShader32 = nullptr;
-		ID3D11ComputeShaderPtr mNormalMapComputeShader = nullptr;
-		ID3D11DomainShaderPtr mDomainShader = nullptr;
-		ID3D11DomainShaderPtr mDomainDebugCoplanarityShader = nullptr;
-		ID3D11PixelShaderPtr mPixelShader = nullptr;
-		ID3D11PixelShaderPtr mPixelDebugShader = nullptr;
-		ID3D11PixelShaderPtr mPixelDebugCoplanarityShader = nullptr;
-		ID3D11PixelShaderPtr mPixelDebugNormalShader = nullptr;
-
-		ID3D11RasterizerStatePtr mDebugRasterizer = nullptr;
-		*/
-
-       /* std::map<DX11TextureID, DX11DynamicTexture> mTerrainCoplanarityMap;
-		std::map<DX11TextureID, DX11DynamicTexture> mTerrainNormalMap;
-
-		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;
-		DX11CPUDynamicBuffer mTransformsBuffer;
-		DX11CPUDynamicBuffer mTessEdgeMultBuffer;
-		DX11Mesh mQuadMesh;
-		DX11VertexTransformPass& mVertexTransformer;
-		const IDMap<DX11Texture>& mTextureMap;
-
-        RenderSettings::TerrainCoplanaritySize mCoplanaritySize;*/
 	};
 }

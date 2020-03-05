@@ -37,7 +37,6 @@ VertexOut vs_main(VertexIn input)
 	// silly that we have to transpose this...
 	const float4x4 worldTransform = transpose( gTerrainWorldTransforms.Load( transformIndex ) );
 	const uint LODlevel = gTerrainLODLevels.Load( transformIndex );
-
 	const float4 worldPos = mul( worldTransform, float4( input.mPosition, 1 ) );
 
 	float4 preMorphPos = worldPos;
@@ -59,8 +58,10 @@ VertexOut vs_main(VertexIn input)
 	float2 fracPart = ( frac( input.mPosition.xz * float2( gridDimHalf, gridDimHalf ) ) * float2( oneOverGridDim, oneOverGridDim ) ) * float2( scaleX, scaleZ );
 	preMorphPos.xz = preMorphPos.xz - ( fracPart * morphLerpK );
 
-	float4 postMorphPos = preMorphPos;
 	float2 postMorphTexcoord = GetTextureCoordinates( preMorphPos.xyz );
+
+	float4 postMorphPos = worldPos;
+	postMorphPos.xz = preMorphPos.xz;
 	postMorphPos.y += SampleHeightmap( postMorphTexcoord ) * gHeightModifier;
 
 	const int2 offset = 0;
