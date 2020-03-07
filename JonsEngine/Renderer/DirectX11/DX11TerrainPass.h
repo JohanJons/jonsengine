@@ -44,7 +44,6 @@ namespace JonsEngine
 	private:
 		enum class CachedTextureMap
 		{
-			COPLANARITY,
 			NORMAL
 		};
 
@@ -69,8 +68,10 @@ namespace JonsEngine
 		const IDMap<DX11Texture>& mTextureMap;
 		ID3D11InputLayoutPtr mLayout = nullptr;
 		ID3D11VertexShaderPtr mVertexShader = nullptr;
+		ID3D11VertexShaderPtr mVertexDebugNormalShader = nullptr;
 		ID3D11PixelShaderPtr mPixelShader = nullptr;
 		ID3D11PixelShaderPtr mPixelDebugShader = nullptr;
+		ID3D11PixelShaderPtr mPixelDebugNormalShader = nullptr;
 		ID3D11RasterizerStatePtr mDebugRasterizer = nullptr;
 		ID3D11ComputeShaderPtr mNormalMapComputeShader = nullptr;
 

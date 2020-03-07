@@ -3,7 +3,6 @@
 
 #include "Common.hlsl"
 
-Texture2D gCoplanarityMap : register( TEXTURE_REGISTER_EXTRA_2 );
 Texture2D gNormalMap : register( TEXTURE_REGISTER_NORMAL );
 
 cbuffer PerTerrainConstants : register( CBUFFER_REGISTER_EXTRA )
@@ -15,36 +14,15 @@ cbuffer PerTerrainConstants : register( CBUFFER_REGISTER_EXTRA )
 	uint gTransformOffset;
 }
 
-struct PatchTess
-{
-	float mEdgeTess[4] : SV_TessFactor;
-	float mInsideTess[2] : SV_InsideTessFactor;
-};
-
 struct VertexOut
 {
 	float4 mPosition : SV_POSITION;
 	float3 mNormal : NORMAL;
 	uint mLOD : LOD;
 	float mMorph : MORPH;
-	//float2 mTexcoord : TEXCOORD;
-};
-
-struct DomainOut
-{
-	float4 mPosition : SV_POSITION;
-	float3 mNormal : NORMAL;
-	float2 mTexcoord : TEXCOORD;
-    float mTesellation : TESS_FACTOR;
-#ifdef TERRAIN_DEBUG_COPLANARITY
-	float mCoplanarity : COPLANARITY;
+#ifdef TERRAIN_DEBUG_NORMAL
+	float3 mWorldNormal : WORLD_NORMAL;
 #endif
-};
-
-struct HullOut
-{
-	float3 mWorldPosition : POSITION;
-	float2 mTexcoord : TEXCOORD;
 };
 
 #endif

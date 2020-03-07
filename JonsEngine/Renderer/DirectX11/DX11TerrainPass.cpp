@@ -4,17 +4,10 @@
 #include "Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "Renderer/RenderSettings.h"
 #include "Compiled/TerrainVertex.h"
-#include "Compiled/TerrainHull.h"
-#include "Compiled/TerrainHullDebugCoplanarity.h"
-#include "Compiled/TerrainComputeCoplanarity8.h"
-#include "Compiled/TerrainComputeCoplanarity16.h"
-#include "Compiled/TerrainComputeCoplanarity32.h"
+#include "Compiled/TerrainVertexNormalDebug.h"
 #include "Compiled/TerrainComputeNormal.h"
-#include "Compiled/TerrainDomain.h"
-#include "Compiled/TerrainDomainDebugCoplanarity.h"
 #include "Compiled/TerrainPixel.h"
 #include "Compiled/TerrainPixelDebug.h"
-#include "Compiled/TerrainPixelDebugCoplanarity.h"
 #include "Compiled/TerrainPixelDebugNormal.h"
 #include "Core/Math/MathUtils.h"
 #include "Core/Math/AABB.h"
@@ -63,8 +56,10 @@ namespace JonsEngine
 		DXCALL( device->CreateInputLayout( inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gTerrainVertex, sizeof( gTerrainVertex ), &mLayout ) );
 
 		DXCALL( device->CreateVertexShader( gTerrainVertex, sizeof( gTerrainVertex ), nullptr, &mVertexShader ) );
+		DXCALL( device->CreateVertexShader( gTerrainVertexNormalDebug, sizeof( gTerrainVertexNormalDebug ), nullptr, &mVertexDebugNormalShader ) );
 		DXCALL( device->CreatePixelShader( gTerrainPixel, sizeof( gTerrainPixel ), nullptr, &mPixelShader ) );
 		DXCALL( device->CreatePixelShader( gTerrainPixelDebug, sizeof( gTerrainPixelDebug ), nullptr, &mPixelDebugShader ) );
+		DXCALL( device->CreatePixelShader( gTerrainPixelDebugNormal, sizeof( gTerrainPixelDebugNormal ), nullptr, &mPixelDebugNormalShader ) );
 		DXCALL( device->CreateComputeShader( gTerrainComputeNormal, sizeof( gTerrainComputeNormal ), nullptr, &mNormalMapComputeShader ) );
 
 		D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -98,19 +93,11 @@ namespace JonsEngine
 
 		BindForRendering();
 
-		bool drawCoplanarity = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_COPLANARITY );
 		bool drawNormals = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
-		if ( drawCoplanarity )
+		if ( drawNormals )
 		{
-			//assert( false && "Unhandled case" );
-			//mContext->HSSetShader( mHullShaderDebugCoplanarity, nullptr, 0 );
-			//mContext->DSSetShader( mDomainDebugCoplanarityShader, nullptr, 0 );
-			//mContext->PSSetShader( mPixelDebugCoplanarityShader, nullptr, 0 );
-		}
-		else if ( drawNormals )
-		{
-			//assert( false && "Unhandled case" );
-			//mContext->PSSetShader( mPixelDebugNormalShader, nullptr, 0 );
+			mContext->VSSetShader( mVertexDebugNormalShader, nullptr, 0 );
+			mContext->PSSetShader( mPixelDebugNormalShader, nullptr, 0 );
 		}
 		else
 			mContext->PSSetShader( mPixelDebugShader, nullptr, 0 );
@@ -244,7 +231,6 @@ namespace JonsEngine
 	{
 		switch ( type )
 		{
-			//case CachedTextureMap::COPLANARITY:  return mTerrainCoplanarityMap.find( heightmapID ) != mTerrainCoplanarityMap.cend();
 			case CachedTextureMap::NORMAL:  return mTerrainNormalMap.find( heightmapID ) != mTerrainNormalMap.cend();
 			default:
 			{
@@ -276,18 +262,6 @@ namespace JonsEngine
 
 		switch ( type )
 		{
-			/*case CachedTextureMap::COPLANARITY:
-			{
-				uint32_t patchSizeVal = RenderSettingsToVal( mCoplanaritySize );
-				assert( patchSizeVal > 0 );
-				assert( desc.Width % patchSizeVal == 0 );
-				assert( desc.Height % patchSizeVal == 0 );
-
-				width = desc.Width / patchSizeVal;
-				height = desc.Height / patchSizeVal;
-				break;
-			}*/
-
 			case CachedTextureMap::NORMAL:
 			{
 				width = desc.Width;
@@ -304,7 +278,6 @@ namespace JonsEngine
 	{
 		switch ( type )
 		{
-			//case CachedTextureMap::COPLANARITY: return DXGI_FORMAT_R16_UNORM;
 			case CachedTextureMap::NORMAL: return DXGI_FORMAT_R10G10B10A2_UNORM;
 			default:
 			{
@@ -318,7 +291,6 @@ namespace JonsEngine
 	{
 		switch ( type )
 		{
-			//case CachedTextureMap::COPLANARITY: return mTerrainCoplanarityMap;
 			case CachedTextureMap::NORMAL: return mTerrainNormalMap;
 			default:
 			{
@@ -350,32 +322,6 @@ namespace JonsEngine
 	{
 		switch ( type )
 		{
-			/*case CachedTextureMap::COPLANARITY:
-			{
-				switch ( mCoplanaritySize )
-				{
-					default: assert( false && "Unhandled case" );
-					case RenderSettings::TerrainCoplanaritySize::X8:
-					{
-						mContext->CSSetShader( mCoplanarityComputeShader8, nullptr, 0 );
-						break;
-					}
-
-					case RenderSettings::TerrainCoplanaritySize::X16:
-					{
-						mContext->CSSetShader( mCoplanarityComputeShader16, nullptr, 0 );
-						break;
-					}
-
-					case RenderSettings::TerrainCoplanaritySize::X32:
-					{
-						mContext->CSSetShader( mCoplanarityComputeShader32, nullptr, 0 );
-						break;
-					}
-				}
-				break;
-			}*/
-
 			case CachedTextureMap::NORMAL:
 			{
 				mContext->CSSetShader( mNormalMapComputeShader, nullptr, 0 );
@@ -393,12 +339,6 @@ namespace JonsEngine
 
 		switch ( type )
 		{
-			/*case CachedTextureMap::COPLANARITY:
-			{
-				x = width;
-				y = height;
-				break;
-			}*/
 			case CachedTextureMap::NORMAL:
 			{
 				x = width / TERRAIN_NORMAL_THREADS_AXIS;

@@ -193,9 +193,8 @@ namespace JonsEngine
 		if ( renderAABBs )
 			mAABBPass.Render( renderQueue.mColorsToAABBsList, renderQueue.mCamera.mCameraViewProjectionMatrix );
 
-		bool drawCoplanarity = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_COPLANARITY );
 		bool drawNormals = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
-		bool drawWireframe = drawCoplanarity || drawNormals || debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
+		bool drawWireframe = drawNormals || debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
 		if ( drawWireframe )
 			mTerrainPass.RenderDebug( renderQueue.mTerrains, renderSettings.mTerrainMeshDimensions, debugFlags );
 	}

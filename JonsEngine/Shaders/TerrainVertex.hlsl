@@ -72,6 +72,9 @@ VertexOut vs_main(VertexIn input)
 
 	VertexOut ret;
 	ret.mPosition = mul( gFrameViewProj, postMorphPos );
+#ifdef TERRAIN_DEBUG_NORMAL
+	ret.mWorldNormal = normal;
+#endif
 	ret.mNormal = mul( ( float3x3 )gFrameView, normal );
 	ret.mNormal = normalize( ret.mNormal );
 	ret.mLOD = LODlevel;

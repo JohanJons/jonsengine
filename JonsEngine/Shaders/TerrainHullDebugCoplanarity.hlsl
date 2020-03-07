@@ -1,7 +1,0 @@
-#ifndef TERRAIN_HULL_DEBUG_COPLANARITY_HLSL
-#define TERRAIN_HULL_DEBUG_COPLANARITY_HLSL
-
-#define TERRAIN_DEBUG_COPLANARITY 1
-#include "TerrainHull.hlsl"
-
-#endif

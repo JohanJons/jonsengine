@@ -118,13 +118,6 @@ float3 SobelFilter( in Texture2D normalTexture, int3 texCoord )
 	float Gz = 0.01f * sqrt( max( 0.0f, 1.0f - Gx * Gx - Gy * Gy ) );
 
 	return normalize( float3( 2.0f * Gx, Gz, 2.0f * Gy ) );
-
-	//float Gx = -h00 - 2.0f * h10 - h20 + h02 + 2.0f * h12 + h22;
-	//float Gy = -h02 - 2.0f * h01 - h00 + h22 + 2.0f * h21 + h20;
-	//float h = -im1p1 - 2.0 * i0p1 - ip1p1 + im1m1 + 2.0 * i0m1 + ip1m1;
-	//float v = -im1m1 - 2.0 * im10 - im1p1 + ip1m1 + 2.0 * ip10 + ip1p1;
-	//float mag = length(float2(Gx, Gy));
-	//return normalize( float3( mag, mag, mag ) );
 }
 
 #endif
