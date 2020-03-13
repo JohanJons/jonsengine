@@ -194,8 +194,8 @@ namespace JonsEngine
 			mAABBPass.Render( renderQueue.mColorsToAABBsList, renderQueue.mCamera.mCameraViewProjectionMatrix );
 
 		bool drawNormals = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
-		bool drawWireframe = drawNormals || debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
-		if ( drawWireframe )
+		bool drawWireframe = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
+		if ( drawNormals || drawWireframe )
 			mTerrainPass.RenderDebug( renderQueue.mTerrains, renderSettings.mTerrainMeshDimensions, debugFlags );
 	}
 

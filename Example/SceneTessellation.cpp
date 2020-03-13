@@ -35,7 +35,7 @@ namespace JonsGame
 		SceneNode& nodeTerrain = scene.GetSceneNode( mNodeTerrain );
 		SceneNode& nodeTerrainTest = scene.GetSceneNode( mNodeTerrainTest );
 		nodeTerrain.TranslateNode( Vec3( 0.0f, 0.0f, 0.0f ) );
-		nodeTerrainTest.TranslateNode( Vec3( 0.0f, 0.0f, 0.0f ) );
+		nodeTerrainTest.TranslateNode( Vec3( 300.0f, 670.0f, 0.0f ) );
 		nodeTerrainTest.SetVisible( false );
 
 		scene.SetSkybox( mSkybox );
@@ -66,7 +66,7 @@ namespace JonsGame
 		
 		if ( nodeTerrainTest.IsVisible() )
 		{
-			scene.GetSceneCamera().SetPosition( { 211.4f, 102.1f, 32.9f } );
+			scene.GetSceneCamera().SetPosition( { 211.4f, 702.1f, 32.9f } );
 			//scene.GetSceneCamera().SetPosition( { -31.9, 4.47, 0.286 } );
 		}
 		else

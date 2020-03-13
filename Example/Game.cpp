@@ -124,6 +124,8 @@ namespace JonsGame
 				//  misc
 				case Key::N: mEngine.GetWindow().SetFullscreen( true ); break;
 				case Key::M: mEngine.GetWindow().SetFullscreen( false ); break;
+				case Key::U: mEngine.GetRenderer().SetSSAO( false ); break;
+				case Key::I: mEngine.GetRenderer().SetSSAO( true ); break;
 				case Key::V: mEngine.GetWindow().ShowMouseCursor( true ); break;
 				case Key::B: mEngine.GetWindow().ShowMouseCursor( false ); break;
 				case Key::X: mEngine.GetWindow().SetScreenResolution( 1080, 720 ); break;
@@ -153,8 +155,6 @@ namespace JonsGame
 					//  renderering
 					case Key::ONE: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_MODEL_AABB ); break;
 					case Key::FOUR: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_SHADOWMAP_SPLITS ); break;
-					case Key::U: mEngine.GetRenderer().SetSSAO( false ); break;
-					case Key::I: mEngine.GetRenderer().SetSSAO( true ); break;
 					case Key::H: mEngine.GetRenderer().SetAnisotropicFiltering( RenderSettings::Anisotropic::X1 ); break;
 					case Key::J: mEngine.GetRenderer().SetAnisotropicFiltering( RenderSettings::Anisotropic::X16 ); break;
 					case Key::K: mEngine.GetRenderer().SetAntiAliasing( RenderSettings::AntiAliasing::None ); break;
@@ -176,21 +176,12 @@ namespace JonsGame
 					case Key::SEVEN:
 					{
 						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
-						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_COPLANARITY, false ); 
 						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_NORMAL, false ); 
 						break;
 					}
 					case Key::EIGHT:
 					{
 						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME, false );
-						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_COPLANARITY );
-						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_NORMAL, false );
-						break;
-					}
-					case Key::NINE:
-					{
-						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME, false );
-						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_COPLANARITY, false );
 						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
 						break;
 					}

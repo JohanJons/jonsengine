@@ -103,12 +103,17 @@ namespace JonsEngine
 			mContext->PSSetShader( mPixelDebugShader, nullptr, 0 );
 
 		ID3D11RasterizerStatePtr prevRasterizer = nullptr;
-		mContext->RSGetState( &prevRasterizer );
-		mContext->RSSetState( mDebugRasterizer );
+		bool drawWireframe = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
+		if ( drawWireframe )
+		{
+			mContext->RSGetState( &prevRasterizer );
+			mContext->RSSetState( mDebugRasterizer );
+		}
 
 		RenderInternal( terrains, meshDimensions );
 
-		mContext->RSSetState( prevRasterizer );
+		if ( drawWireframe )
+			mContext->RSSetState( prevRasterizer );
 
 		UnbindRendering();
 	}
