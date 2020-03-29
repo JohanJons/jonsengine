@@ -113,7 +113,6 @@ namespace JonsEngine
         DX11Sampler mLinearWrapSampler;
         DX11Sampler mShadowmapSampler;
         DX11Sampler mShadowmapNoCompareSampler;
-        bool mSSAOEnabled;
 
         DX11Pipeline mPipeline;
     };

@@ -52,7 +52,7 @@ namespace JonsEngine
 		uint32_t GetNumNodes() const { return static_cast<uint32_t>( mGridTraversal.size() ); }
 		uint32_t GetPatchMinSize() const { return mPatchMinSize; }
 		uint32_t GetPatchMaxSize() const { return mPatchMaxSize; }
-		uint32_t GetNumLODLevels() const;
+		uint32_t GetNumLODLevels() const { return mNumLODs; }
 		float GetHeightmapScale() const { return mHeightmapScale; }
 		void GetWorldXZBounds( Vec2& worldMin, Vec2& worldMax ) const;
 
@@ -71,9 +71,11 @@ namespace JonsEngine
 		uint32_t GetPatchSize( const QuadNodeAABB& quadAABB ) const;
 		uint32_t GetLODLevel( const QuadNodeAABB& quadAABB ) const;
 		void CalculateLODRanges( QuadTreeCullData& outData, float zNear, float zFar ) const;
+		uint32_t CalculateNumLODs( uint32_t width, uint32_t height ) const;
 
 		uint32_t mPatchMinSize = 0;
 		uint32_t mPatchMaxSize = 0;
+		uint32_t mNumLODs = 0;
 		float mHeightmapScale;
 		float mWorldYTranslation;
 		std::vector<QuadNodeAABB> mGridTraversal;

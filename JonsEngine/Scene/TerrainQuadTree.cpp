@@ -51,6 +51,7 @@ namespace JonsEngine
 	TerrainQuadTree::TerrainQuadTree( const std::vector<uint8_t>& heightmapData, TextureType heightmapType, uint32_t width, uint32_t height, uint32_t patchMinSize, uint32_t patchMaxSize, float heightmapScale, const Mat4& worldTransform ) :
 		mPatchMinSize( patchMinSize ),
 		mPatchMaxSize( patchMaxSize ),
+		mNumLODs( CalculateNumLODs( width, height ) ),
 		mWorldYTranslation( worldTransform[ 3 ].y ),
 		mHeightmapScale( heightmapScale )
 	{
@@ -62,7 +63,7 @@ namespace JonsEngine
 
 		uint32_t numNodes = ExpectedNumNodes( fWidth, mPatchMinSize );
 		mGridTraversal.reserve( numNodes );
-		
+
 		uint32_t rootTreeLevel = 0;
 		CreateGridNode( nullptr, fWidth / 2, fHeight / 2, fWidth, fHeight, rootTreeLevel );
 		QuadNodeAABB& quadAABB = mGridTraversal.back();
@@ -89,12 +90,6 @@ namespace JonsEngine
 #if _DEBUG
 		assert( ValidateCulledNodes( outData.mTransforms ) ); 
 #endif
-	}
-
-	uint32_t TerrainQuadTree::GetNumLODLevels() const
-	{
-		uint32_t numLODRanges = static_cast<uint32_t>( log2( mPatchMaxSize ) - log2( mPatchMinSize ) ) + 1;
-		return numLODRanges;
 	}
 
 	void TerrainQuadTree::GetWorldXZBounds( Vec2& worldMin, Vec2& worldMax ) const
@@ -315,6 +310,31 @@ namespace JonsEngine
 			outData.mMorphConstants[ index ].x = morphEnd / ( morphEnd - morphStart );
 			outData.mMorphConstants[ index ].y = 1.0f / ( morphEnd - morphStart );
 		}
+	}
+
+	uint32_t TerrainQuadTree::CalculateNumLODs( uint32_t width, uint32_t height ) const
+	{
+		// I am sure there is a smarter way to calculate this
+		auto calcLodsFunc = [ this ]( uint32_t sizeParam )
+		{
+			float curr = static_cast<float>( sizeParam );
+			while ( curr > static_cast<float>( mPatchMaxSize ) )
+				curr /= 2.0f;
+
+			uint32_t numLODs = 0;
+			while ( curr >= static_cast<float>( mPatchMinSize ) )
+			{
+				++numLODs;
+				curr /= 2.0f;
+			}
+
+			return numLODs;
+		};
+
+		uint32_t numLODs = calcLodsFunc( width );
+		numLODs = std::min( numLODs, calcLodsFunc( height ) );
+
+		return numLODs;
 	}
 
 	void TerrainQuadTree::AddNode( QuadTreeCullData& outData, const QuadNodeAABB& quadAABB, uint32_t LODLevel, const Mat4& cameraViewProjTransform, bool parentFullyInFrustum ) const
