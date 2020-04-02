@@ -120,7 +120,7 @@ namespace JonsEngine
     {
         mGBuffer.BindForGeometryStage(mDSV);
 
-		mTerrainPass.Render( renderQueue.mTerrains, renderSettings.mTerrainMeshDimensions );
+		mTerrainPass.Render( renderQueue.mTerrains, renderSettings );
 
 		mGBuffer.BindForRendering();
 
@@ -196,7 +196,7 @@ namespace JonsEngine
 		bool drawNormals = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
 		bool drawWireframe = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
 		if ( drawNormals || drawWireframe )
-			mTerrainPass.RenderDebug( renderQueue.mTerrains, renderSettings.mTerrainMeshDimensions, debugFlags );
+			mTerrainPass.RenderDebug( renderQueue.mTerrains, renderSettings, debugFlags );
 	}
 
 	void DX11Pipeline::RenderMeshes(const RenderQueue& renderQueue, const RenderableMesh::ContainerType& meshContainer, const RenderableMesh::Index begin, const RenderableMesh::Index end)

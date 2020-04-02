@@ -83,55 +83,12 @@ namespace JonsEngine
 			X64
 		} mTerrainMeshDimensions;
 
-		enum class TerrainCoplanaritySize
+		enum class TerrainNormals
 		{
-			X8,
-			X16,
-			X32
-		} mTerrainCoplanaritySize;
-
-		// units in screenspace for maximum tessellation
-		enum class TerrainPrimitiveLength
-		{
-			X64,
-			X96,
-			X128,
-			X160,
-			X192,
-			X224
-		} mTerrainPrimitiveLength;
-
-		// max tessellation given by screenspace primtive length
-		enum class TerrainTessellationMax
-		{
-			X24,
-			X32,
-			X40,
-			X48,
-			X56,
-			X64
-		} mTerrainTessellationMax;
-
-		// tessellation coplanarity scaling
-		enum class TerrainCoplanarityScale
-		{
-			X05,
-			X1,
-			X1_5,
-			X2
-		} mTerrainCoplanarityScale;
-
-		enum class TerrainCoplanarityTessellationRatio
-		{
-			X03,
-			X04,
-			X05,
-			X06,
-			X065,
-			X07,
-			X075,
-			X08
-		} mTerrainCoplanarityTessellationRatio;
+			SIMPLE,
+			BETTER,
+			BEST
+		} mTerrainNormals;
 
 		AutoExposureRate mAutoExposureRate;
 		bool mBloomEnabled;
@@ -152,11 +109,7 @@ namespace JonsEngine
 		mTerrainPatchMinSize( TerrainPatchMinSize::X2 ),
 		mTerrainPatchMaxSize( TerrainPatchMaxSize::X128 ),
 		mTerrainMeshDimensions( TerrainMeshDimensions::X8 ),
-		mTerrainCoplanaritySize( TerrainCoplanaritySize::X16 ),
-		mTerrainPrimitiveLength( TerrainPrimitiveLength::X160 ),
-		mTerrainTessellationMax( TerrainTessellationMax::X64 ),
-		mTerrainCoplanarityScale( TerrainCoplanarityScale::X1_5 ),
-		mTerrainCoplanarityTessellationRatio( TerrainCoplanarityTessellationRatio::X06 ),
+		mTerrainNormals( TerrainNormals::SIMPLE ),
 		mAutoExposureRate(DefaultAutoExposureRate()),
 		mBloomEnabled(true),
 		mSSAOEnabled(true),

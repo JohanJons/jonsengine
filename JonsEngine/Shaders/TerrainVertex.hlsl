@@ -1,6 +1,8 @@
 #ifndef TERRAIN_VERTEX_HLSL
 #define TERRAIN_VERTEX_HLSL
 
+#define TERRAIN_DEBUG_NORMAL 1
+
 #include "TerrainCommon.hlsl"
 
 struct VertexIn
@@ -78,9 +80,97 @@ VertexOut vs_main(VertexIn input)
 
 	const int2 offset = 0;
 	const int mipmap = 0;
-	float3 normal = gNormalMap.SampleLevel( gLinearSampler, texcoord, mipmap, offset ).rgb;
-	normal *= 2.0;
-	normal -= 1.0;
+	//float3 normal = gNormalMap.SampleLevel( gLinearSampler, texcoord, mipmap, offset ).rgb;
+	//int2 inputz = texcoord * ( worldPos.xz - gWorldMin ) / ( gWorldMax - gWorldMin );
+	//float3 normal = SobelFilter( gHeightmap, int3( inputz, 0) );
+	//normal *= 2.0;
+	//normal -= 1.0;
+
+
+	/*float4 h;
+	h[0] = gHeightmap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 0,-1) ).r * gHeightModifier;
+	h[1] = gHeightmap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2(-1, 0) ).r * gHeightModifier;
+	h[2] = gHeightmap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 1, 0) ).r * gHeightModifier;
+	h[3] = gHeightmap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 0, 1) ).r * gHeightModifier;
+	float3 n;
+	n.z = h[0] - h[3];
+	n.x = h[1] - h[2];
+	n.y = 2;
+
+	n *= 2.0;
+	n -= 1.0;
+
+	float3 normal = normalize(n); */
+	float3 normal = float3( 0, 1, 0 );
+#ifdef TERRAIN_NORMAL_SIMPLE
+	float3 n;
+	n = gNormalMap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 0,-1) ).xyz;
+	n += gNormalMap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2(-1, 0) ).xyz;
+	n += gNormalMap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 1, 0) ).xyz;
+	n += gNormalMap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 0, 1) ).xyz;
+	n /= 4;
+
+	n *= 2.0;
+	n -= 1.0;
+
+	normal = normalize(n);
+#endif
+
+#ifdef TERRAIN_NORMAL_BETTER
+	/*float3 n;
+	n = gNormalMap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 0,-1) ).xyz;
+	n += gNormalMap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2(-1, 0) ).xyz;
+	n += gNormalMap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 1, 0) ).xyz;
+	n += gNormalMap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 0, 1) ).xyz;
+	n /= 4;
+
+	n *= 2.0;
+	n -= 1.0;
+
+	normal = normalize(n); */
+
+	float4 h;
+	h[0] = gHeightmap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 0, -1) ).r * gHeightModifier;
+	h[1] = gHeightmap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( -1, 0 ) ).r * gHeightModifier;
+	h[2] = gHeightmap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 1, 0) ).r * gHeightModifier;
+	h[3] = gHeightmap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 0, 1) ).r * gHeightModifier;
+	float3 n;
+	n.z = h[0] - h[3];
+	n.x = h[1] - h[2];
+	n.y = 1;
+
+	normal = normalize(n); 
+
+#endif
+
+#ifdef TERRAIN_NORMAL_BEST
+	/*float3 n;
+	n = gNormalMap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 0,0) ).xyz;
+	n += gNormalMap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 0,-1) ).xyz;
+	n += gNormalMap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2(-1, 0) ).xyz;
+	n += gNormalMap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 1, 0) ).xyz;
+	n += gNormalMap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 0, 1) ).xyz;
+	n /= 5;
+
+	n *= 2.0;
+	n -= 1.0;
+
+	normal = normalize(n); */
+
+	float zb = gHeightmap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 0, -1) ).r * gHeightModifier;
+	float zc = gHeightmap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 1, 0) ).r * gHeightModifier;
+	float zd = gHeightmap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 1, 1) ).r * gHeightModifier;
+	float ze = gHeightmap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( 0, 1) ).r * gHeightModifier;
+	float zf = gHeightmap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( -1, 0) ).r * gHeightModifier;
+	float zg = gHeightmap.SampleLevel(gAnisotropicSampler, texcoord, mipmap, float2( -1, -1) ).r * gHeightModifier;
+
+	float x = 2 * zf + zc + zg - zb - 2 * zc - zd;
+	float z = 2 * zb + zc + zg - zd - 2 * ze - zf;
+	float y = 2.0f;
+
+	normal = float3( x, y, z );
+	normal = normalize( normal );
+#endif
 
 	VertexOut ret;
 	ret.mPosition = mul( gFrameViewProj, outWorldPos );

@@ -4,7 +4,9 @@
 #include "Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "Renderer/RenderSettings.h"
 #include "Compiled/TerrainVertex.h"
-#include "Compiled/TerrainVertexNormalDebug.h"
+#include "Compiled/TerrainVertexNormalSimple.h"
+#include "Compiled/TerrainVertexNormalBetter.h"
+#include "Compiled/TerrainVertexNormalBest.h"
 #include "Compiled/TerrainComputeNormal.h"
 #include "Compiled/TerrainPixel.h"
 #include "Compiled/TerrainPixelDebug.h"
@@ -55,8 +57,9 @@ namespace JonsEngine
 		inputDescription[VSInputLayout::POSITION].InstanceDataStepRate = 0;
 		DXCALL( device->CreateInputLayout( inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gTerrainVertex, sizeof( gTerrainVertex ), &mLayout ) );
 
-		DXCALL( device->CreateVertexShader( gTerrainVertex, sizeof( gTerrainVertex ), nullptr, &mVertexShader ) );
-		DXCALL( device->CreateVertexShader( gTerrainVertexNormalDebug, sizeof( gTerrainVertexNormalDebug ), nullptr, &mVertexDebugNormalShader ) );
+		DXCALL( device->CreateVertexShader( gTerrainVertexNormalSimple, sizeof( gTerrainVertexNormalSimple ), nullptr, &mVertexShaderSimple ) );
+		DXCALL( device->CreateVertexShader( gTerrainVertexNormalBetter, sizeof( gTerrainVertexNormalBetter ), nullptr, &mVertexShaderBetter ) );
+		DXCALL( device->CreateVertexShader( gTerrainVertexNormalBest, sizeof( gTerrainVertexNormalBest ), nullptr, &mVertexShaderBest ) );
 		DXCALL( device->CreatePixelShader( gTerrainPixel, sizeof( gTerrainPixel ), nullptr, &mPixelShader ) );
 		DXCALL( device->CreatePixelShader( gTerrainPixelDebug, sizeof( gTerrainPixelDebug ), nullptr, &mPixelDebugShader ) );
 		DXCALL( device->CreatePixelShader( gTerrainPixelDebugNormal, sizeof( gTerrainPixelDebugNormal ), nullptr, &mPixelDebugNormalShader ) );
@@ -76,27 +79,26 @@ namespace JonsEngine
 		CreateGridMesh( meshDimensions );
 	}
 
-	void DX11TerrainPass::Render( const RenderableTerrains& terrains, RenderSettings::TerrainMeshDimensions meshDimensions )
+	void DX11TerrainPass::Render( const RenderableTerrains& terrains, const RenderSettings& settings )
 	{
 		if ( !terrains.GetNumTerrains() )
 			return;
 
-		BindForRendering();
-		RenderInternal( terrains, meshDimensions );
+		BindForRendering( settings.mTerrainNormals );
+		RenderInternal( terrains, settings );
 		UnbindRendering();
 	}
 
-	void DX11TerrainPass::RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainMeshDimensions meshDimensions, DebugOptions::RenderingFlags debugFlags )
+	void DX11TerrainPass::RenderDebug( const RenderableTerrains& terrains, const RenderSettings& settings, DebugOptions::RenderingFlags debugFlags )
 	{
 		if ( !terrains.GetNumTerrains() )
 			return;
 
-		BindForRendering();
+		BindForRendering( settings.mTerrainNormals );
 
 		bool drawNormals = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
 		if ( drawNormals )
 		{
-			mContext->VSSetShader( mVertexDebugNormalShader, nullptr, 0 );
 			mContext->PSSetShader( mPixelDebugNormalShader, nullptr, 0 );
 		}
 		else
@@ -110,7 +112,7 @@ namespace JonsEngine
 			mContext->RSSetState( mDebugRasterizer );
 		}
 
-		RenderInternal( terrains, meshDimensions );
+		RenderInternal( terrains, settings );
 
 		if ( drawWireframe )
 			mContext->RSSetState( prevRasterizer );
@@ -118,9 +120,17 @@ namespace JonsEngine
 		UnbindRendering();
 	}
 
-	void DX11TerrainPass::BindForRendering()
+	void DX11TerrainPass::BindForRendering( RenderSettings::TerrainNormals normalSetting )
 	{
-		mContext->VSSetShader( mVertexShader, nullptr, 0 );
+		switch ( normalSetting )
+		{
+			case RenderSettings::TerrainNormals::BEST: mContext->VSSetShader( mVertexShaderBest, nullptr, 0 ); break;
+			case RenderSettings::TerrainNormals::BETTER: mContext->VSSetShader( mVertexShaderBetter, nullptr, 0 ); break;
+			case RenderSettings::TerrainNormals::SIMPLE:
+			default:
+				mContext->VSSetShader( mVertexShaderSimple, nullptr, 0 ); break;
+		}
+
 		mContext->PSSetShader( mPixelShader, nullptr, 0 );
 
 		mContext->IASetInputLayout( mLayout );
@@ -187,13 +197,13 @@ namespace JonsEngine
 		mGridMesh = DX11Mesh( mDevice, mContext, vertices, indices, minBounds, maxBounds );
 	}
 
-	void DX11TerrainPass::RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainMeshDimensions meshDimensions )
+	void DX11TerrainPass::RenderInternal( const RenderableTerrains& terrains, const RenderSettings& settings )
 	{
 		if ( !terrains.GetNumTerrains() )
 			return;
 
-		if ( ShouldRecreateGridMesh( meshDimensions ) )
-			CreateGridMesh( meshDimensions );
+		if ( ShouldRecreateGridMesh( settings.mTerrainMeshDimensions ) )
+			CreateGridMesh( settings.mTerrainMeshDimensions );
 
 		mTransformBuffer.SetData( terrains.mTransforms );
 		mTransformBuffer.Bind( DX11CPUDynamicBuffer::Shaderslot::Vertex, SBUFFER_SLOT_EXTRA_2 );

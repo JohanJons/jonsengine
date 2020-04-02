@@ -68,20 +68,8 @@ namespace JonsEngine
 		RenderSettings::TerrainMeshDimensions GetTerrainPatchVertexRatio() const { return mRenderSettings.mTerrainMeshDimensions; }
 		void SetTerrainMeshDimensions( RenderSettings::TerrainMeshDimensions meshDimensions );
 
-		RenderSettings::TerrainCoplanaritySize GetTerrainCoplanaritySize() const { return mRenderSettings.mTerrainCoplanaritySize; }
-		void SetTerrainCoplanaritySize( RenderSettings::TerrainCoplanaritySize coplanaritySize ) { mRenderSettings.mTerrainCoplanaritySize = coplanaritySize; }
-
-		RenderSettings::TerrainCoplanarityScale GetTerrainCoplanarityScale() const { return mRenderSettings.mTerrainCoplanarityScale; }
-		void SetTerrainCoplanarityScale( RenderSettings::TerrainCoplanarityScale coplanarityScale ) { mRenderSettings.mTerrainCoplanarityScale = coplanarityScale; }
-
-		RenderSettings::TerrainCoplanarityTessellationRatio GetTerrainCoplanarityTessellationRatio() const { return mRenderSettings.mTerrainCoplanarityTessellationRatio; }
-		void SetTerrainCoplanarityTessellationRatio( RenderSettings::TerrainCoplanarityTessellationRatio coplanarityTessRatio ) { mRenderSettings.mTerrainCoplanarityTessellationRatio = coplanarityTessRatio; }
-
-		RenderSettings::TerrainTessellationMax GetTerrainTessellationMax() const { return mRenderSettings.mTerrainTessellationMax; }
-		void SetTerrainTessellationMax( RenderSettings::TerrainTessellationMax terrainTessMax ) { mRenderSettings.mTerrainTessellationMax = terrainTessMax; }
-
-		RenderSettings::TerrainPrimitiveLength GetTerrainPrimitiveLength() const { return mRenderSettings.mTerrainPrimitiveLength; }
-		void SetTerrainPrimitiveLength( RenderSettings::TerrainPrimitiveLength primitveLength ) { mRenderSettings.mTerrainPrimitiveLength = primitveLength; }
+		RenderSettings::TerrainNormals GetTerrainNormals() const { return mRenderSettings.mTerrainNormals; }
+		void SetTerrainNormals( RenderSettings::TerrainNormals normals ) { mRenderSettings.mTerrainNormals = normals; }
 
         bool IsSSAOEnabled() const;
         void SetSSAO(const bool useSSAO);

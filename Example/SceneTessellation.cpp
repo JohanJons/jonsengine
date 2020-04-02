@@ -71,7 +71,7 @@ namespace JonsGame
 		}
 		else
 		{
-			scene.GetSceneCamera().SetPosition( { 476.0f, 29.0f, -145.0f } );
+			scene.GetSceneCamera().SetPosition( { 1058.0f, 40.0f, -235.0f } );
 		}
 	}
 

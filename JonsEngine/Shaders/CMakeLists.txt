@@ -5,7 +5,9 @@ list( APPEND VERTEX_SHADERS
   GBufferVertexAnimated.hlsl
   SkyboxVertex.hlsl
   TerrainVertex.hlsl
-  TerrainVertexNormalDebug.hlsl
+  TerrainVertexNormalSimple.hlsl
+  TerrainVertexNormalBetter.hlsl
+  TerrainVertexNormalBest.hlsl
   TransformAnimatedVertex.hlsl
   TransformStaticInstancedVertex.hlsl
   TransformStaticVertex.hlsl

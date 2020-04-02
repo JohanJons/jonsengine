@@ -27,8 +27,8 @@ namespace JonsEngine
 		DX11TerrainPass( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap,
 			RenderSettings::TerrainMeshDimensions meshDimensions );
 
-		void Render( const RenderableTerrains& terrains, RenderSettings::TerrainMeshDimensions meshDimensions );
-		void RenderDebug( const RenderableTerrains& terrains, RenderSettings::TerrainMeshDimensions meshDimensions, DebugOptions::RenderingFlags debugFlags );
+		void Render( const RenderableTerrains& terrains, const RenderSettings& settings );
+		void RenderDebug( const RenderableTerrains& terrains, const RenderSettings& settings, DebugOptions::RenderingFlags debugFlags );
 
 	private:
 		struct PerTerrainCBuffer
@@ -47,12 +47,12 @@ namespace JonsEngine
 			NORMAL
 		};
 
-		void BindForRendering();
+		void BindForRendering( RenderSettings::TerrainNormals normalSetting );
 		void UnbindRendering();
 
 		bool ShouldRecreateGridMesh( RenderSettings::TerrainMeshDimensions meshDimensions );
 		void CreateGridMesh( RenderSettings::TerrainMeshDimensions meshDimensions );
-		void RenderInternal( const RenderableTerrains& terrains, RenderSettings::TerrainMeshDimensions meshDimensions );
+		void RenderInternal( const RenderableTerrains& terrains, const RenderSettings& settings );
 
 		bool HasCachedTextureMap( CachedTextureMap type, DX11TextureID heightmapID ) const;
 		void CreateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
@@ -67,8 +67,9 @@ namespace JonsEngine
         ID3D11DevicePtr mDevice = nullptr;
 		const IDMap<DX11Texture>& mTextureMap;
 		ID3D11InputLayoutPtr mLayout = nullptr;
-		ID3D11VertexShaderPtr mVertexShader = nullptr;
-		ID3D11VertexShaderPtr mVertexDebugNormalShader = nullptr;
+		ID3D11VertexShaderPtr mVertexShaderSimple = nullptr;
+		ID3D11VertexShaderPtr mVertexShaderBetter = nullptr;
+		ID3D11VertexShaderPtr mVertexShaderBest = nullptr;
 		ID3D11PixelShaderPtr mPixelShader = nullptr;
 		ID3D11PixelShaderPtr mPixelDebugShader = nullptr;
 		ID3D11PixelShaderPtr mPixelDebugNormalShader = nullptr;

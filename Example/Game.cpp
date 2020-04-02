@@ -98,14 +98,9 @@ namespace JonsGame
 				switch ( evnt.mKey )
 				{
 					case Key::ONE: mTessellationScene.FlipTerrain(); break;
-					case Key::TWO: mEngine.GetRenderer().SetTerrainCoplanarityScale( RenderSettings::TerrainCoplanarityScale::X05 ); break;
-					case Key::THREE: mEngine.GetRenderer().SetTerrainCoplanarityScale( RenderSettings::TerrainCoplanarityScale::X1 ); break;
-					case Key::FOUR: mEngine.GetRenderer().SetTerrainCoplanarityScale( RenderSettings::TerrainCoplanarityScale::X1_5 ); break;
-					case Key::FIVE: mEngine.GetRenderer().SetTerrainCoplanarityTessellationRatio( RenderSettings::TerrainCoplanarityTessellationRatio::X03 ); break;
-					case Key::SIX: mEngine.GetRenderer().SetTerrainCoplanarityTessellationRatio( RenderSettings::TerrainCoplanarityTessellationRatio::X05 ); break;
-					case Key::SEVEN: mEngine.GetRenderer().SetTerrainCoplanarityTessellationRatio( RenderSettings::TerrainCoplanarityTessellationRatio::X07 ); break;
-					case Key::EIGHT: mEngine.GetRenderer().SetTerrainPrimitiveLength( RenderSettings::TerrainPrimitiveLength::X96 ); break;
-					case Key::NINE: mEngine.GetRenderer().SetTerrainPrimitiveLength( RenderSettings::TerrainPrimitiveLength::X192 ); break;
+					case Key::TWO: mEngine.GetRenderer().SetTerrainNormals( RenderSettings::TerrainNormals::SIMPLE ); break;
+					case Key::THREE: mEngine.GetRenderer().SetTerrainNormals( RenderSettings::TerrainNormals::BETTER ); break;
+					case Key::FOUR: mEngine.GetRenderer().SetTerrainNormals( RenderSettings::TerrainNormals::BEST ); break;
 					default: break;
 				}
 			}
@@ -170,8 +165,6 @@ namespace JonsGame
 				{
 					case Key::TWO: mTessellationScene.GetTerrain().SetVariationScale( 3.0f ); break;
 					case Key::THREE: mTessellationScene.GetTerrain().SetVariationScale( 6.0f ); break;
-					case Key::FOUR: mEngine.GetRenderer().SetTerrainCoplanaritySize( RenderSettings::TerrainCoplanaritySize::X8 ); break;
-					case Key::FIVE: mEngine.GetRenderer().SetTerrainCoplanaritySize( RenderSettings::TerrainCoplanaritySize::X16 ); break;
 					case Key::SIX: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_PATCH ); break;
 					case Key::SEVEN:
 					{
