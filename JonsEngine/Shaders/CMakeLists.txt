@@ -7,7 +7,6 @@ list( APPEND VERTEX_SHADERS
   TerrainVertex.hlsl
   TerrainVertexNormalSimple.hlsl
   TerrainVertexNormalBetter.hlsl
-  TerrainVertexNormalBest.hlsl
   TransformAnimatedVertex.hlsl
   TransformStaticInstancedVertex.hlsl
   TransformStaticVertex.hlsl

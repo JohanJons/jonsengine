@@ -14,10 +14,12 @@ PixelOut ps_main( VertexOut input)
 {
 	PixelOut ret;
 
+#ifdef TERRAIN_VERTEX_NORMALS
 	ret.mNormal = input.mNormal;
 	ret.mNormal += 1.0f;
 	ret.mNormal *= 0.5f;
 	//ret.mNormal = normalize( ret.mNormal );
+#endif
 
 	ret.mDiffuse = float4( 0.0f, 1.0f, 1.0f, 1.0f);
 
