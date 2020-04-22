@@ -4,13 +4,12 @@
 #include "Renderer/DirectX11/DX11VertexTransformPass.h"
 #include "Renderer/RenderSettings.h"
 #include "Compiled/TerrainVertex.h"
-#include "Compiled/TerrainVertexNormalSimple.h"
-#include "Compiled/TerrainVertexNormalBetter.h"
-#include "Compiled/TerrainVertexNormalBest.h"
 #include "Compiled/TerrainComputeNormal.h"
-#include "Compiled/TerrainPixel.h"
 #include "Compiled/TerrainPixelDebug.h"
-#include "Compiled/TerrainPixelDebugNormal.h"
+#include "Compiled/TerrainPixelNormalSimple.h"
+#include "Compiled/TerrainPixelNormalSimpleDebug.h"
+#include "Compiled/TerrainPixelNormalBetter.h"
+#include "Compiled/TerrainPixelNormalBetterDebug.h"
 #include "Core/Math/MathUtils.h"
 #include "Core/Math/AABB.h"
 
@@ -57,12 +56,12 @@ namespace JonsEngine
 		inputDescription[VSInputLayout::POSITION].InstanceDataStepRate = 0;
 		DXCALL( device->CreateInputLayout( inputDescription, VSInputLayout::NUM_INPUT_LAYOUTS, gTerrainVertex, sizeof( gTerrainVertex ), &mLayout ) );
 
-		DXCALL( device->CreateVertexShader( gTerrainVertexNormalSimple, sizeof( gTerrainVertexNormalSimple ), nullptr, &mVertexShaderSimple ) );
-		DXCALL( device->CreateVertexShader( gTerrainVertexNormalBetter, sizeof( gTerrainVertexNormalBetter ), nullptr, &mVertexShaderBetter ) );
-		DXCALL( device->CreateVertexShader( gTerrainVertexNormalBest, sizeof( gTerrainVertexNormalBest ), nullptr, &mVertexShaderBest ) );
-		DXCALL( device->CreatePixelShader( gTerrainPixel, sizeof( gTerrainPixel ), nullptr, &mPixelShader ) );
-		DXCALL( device->CreatePixelShader( gTerrainPixelDebug, sizeof( gTerrainPixelDebug ), nullptr, &mPixelDebugShader ) );
-		DXCALL( device->CreatePixelShader( gTerrainPixelDebugNormal, sizeof( gTerrainPixelDebugNormal ), nullptr, &mPixelDebugNormalShader ) );
+		DXCALL( device->CreateVertexShader( gTerrainVertex, sizeof( gTerrainVertex ), nullptr, &mVertexShader ) );
+		DXCALL( device->CreatePixelShader( gTerrainPixelNormalSimple, sizeof( gTerrainPixelNormalSimple ), nullptr, &mPixelNormalSimpleShader ) );
+		DXCALL( device->CreatePixelShader( gTerrainPixelNormalSimpleDebug, sizeof( gTerrainPixelNormalSimpleDebug ), nullptr, &mPixelNormalSimpleShaderDebug ) );
+		DXCALL( device->CreatePixelShader( gTerrainPixelNormalBetter, sizeof( gTerrainPixelNormalBetter ), nullptr, &mPixelNormalBetterShader ) );
+		DXCALL( device->CreatePixelShader( gTerrainPixelNormalBetterDebug, sizeof( gTerrainPixelNormalBetterDebug ), nullptr, &mPixelNormalBetterShaderDebug ) );
+		DXCALL( device->CreatePixelShader( gTerrainPixelDebug, sizeof( gTerrainPixelDebug ), nullptr, &mPixelCDLODDebugShader ) );
 		DXCALL( device->CreateComputeShader( gTerrainComputeNormal, sizeof( gTerrainComputeNormal ), nullptr, &mNormalMapComputeShader ) );
 
 		D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -99,10 +98,24 @@ namespace JonsEngine
 		bool drawNormals = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
 		if ( drawNormals )
 		{
-			mContext->PSSetShader( mPixelDebugNormalShader, nullptr, 0 );
+			switch ( settings.mTerrainNormals )
+			{
+				case RenderSettings::TerrainNormals::BEST:
+				case RenderSettings::TerrainNormals::BETTER:
+				{
+					mContext->PSSetShader( mPixelNormalBetterShaderDebug, nullptr, 0 );
+					break;
+				}
+				case RenderSettings::TerrainNormals::SIMPLE:
+				default:
+				{
+					mContext->PSSetShader( mPixelNormalSimpleShaderDebug, nullptr, 0 );
+					break;
+				}
+			}
 		}
 		else
-			mContext->PSSetShader( mPixelDebugShader, nullptr, 0 );
+			mContext->PSSetShader( mPixelCDLODDebugShader, nullptr, 0 );
 
 		ID3D11RasterizerStatePtr prevRasterizer = nullptr;
 		bool drawWireframe = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
@@ -122,16 +135,23 @@ namespace JonsEngine
 
 	void DX11TerrainPass::BindForRendering( RenderSettings::TerrainNormals normalSetting )
 	{
+		mContext->VSSetShader( mVertexShader, nullptr, 0 );
+
 		switch ( normalSetting )
 		{
-			case RenderSettings::TerrainNormals::BEST: mContext->VSSetShader( mVertexShaderBest, nullptr, 0 ); break;
-			case RenderSettings::TerrainNormals::BETTER: mContext->VSSetShader( mVertexShaderBetter, nullptr, 0 ); break;
+			case RenderSettings::TerrainNormals::BEST:
+			case RenderSettings::TerrainNormals::BETTER:
+			{
+				mContext->PSSetShader( mPixelNormalBetterShader, nullptr, 0 );
+				break;
+			}
 			case RenderSettings::TerrainNormals::SIMPLE:
 			default:
-				mContext->VSSetShader( mVertexShaderSimple, nullptr, 0 ); break;
+			{
+				mContext->PSSetShader( mPixelNormalSimpleShader, nullptr, 0 );
+				break;
+			}
 		}
-
-		mContext->PSSetShader( mPixelShader, nullptr, 0 );
 
 		mContext->IASetInputLayout( mLayout );
 		mContext->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
@@ -263,7 +283,7 @@ namespace JonsEngine
 
 		auto& Map = GetTextureMap( type );
 		Map.erase( heightmapID );
-		Map.emplace( std::piecewise_construct, std::forward_as_tuple( heightmapID ), std::forward_as_tuple( mDevice, mContext, textureFormat, width, height, true ) );
+		Map.emplace( std::piecewise_construct, std::forward_as_tuple( heightmapID ), std::forward_as_tuple( mDevice, mContext, textureFormat, width, height, true, true ) );
 		UpdateTextureMap( type, heightmapID );
 	}
 
@@ -331,6 +351,8 @@ namespace JonsEngine
 		mContext->Dispatch( dispatchX, dispatchY, 1 );
 		mContext->CSSetUnorderedAccessViews( UAV_SLOT, 1, &gNullUAV.p, nullptr );
 		heightmapTexture.Unbind( SHADER_TEXTURE_SLOT_EXTRA );
+
+		mContext->GenerateMips( textureMap.mSRV );
 	}
 
 	void DX11TerrainPass::BindComputeShader( CachedTextureMap type )

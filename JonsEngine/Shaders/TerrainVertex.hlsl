@@ -1,8 +1,6 @@
 #ifndef TERRAIN_VERTEX_HLSL
 #define TERRAIN_VERTEX_HLSL
 
-#define TERRAIN_DEBUG_NORMAL 1
-
 #include "TerrainCommon.hlsl"
 
 struct VertexIn
@@ -31,36 +29,6 @@ float SampleHeightmap( float2 texcoord )
 	int offset = 0;
 
 	return gHeightmap.SampleLevel( gLinearSampler, texcoord, mipmap, offset ).r;
-}
-
-float3 CalculateSimpleVertexNormals( float2 texcoord )
-{
-	int mipmap = 0;
-
-	float zb = gHeightmap.SampleLevel(gLinearSampler, texcoord, mipmap, float2( 0, -1) ).r * gHeightModifier;
-	float zc = gHeightmap.SampleLevel(gLinearSampler, texcoord, mipmap, float2( 1, 0) ).r * gHeightModifier;
-	float zd = gHeightmap.SampleLevel(gLinearSampler, texcoord, mipmap, float2( 1, 1) ).r * gHeightModifier;
-	float ze = gHeightmap.SampleLevel(gLinearSampler, texcoord, mipmap, float2( 0, 1) ).r * gHeightModifier;
-	float zf = gHeightmap.SampleLevel(gLinearSampler, texcoord, mipmap, float2( -1, 0) ).r * gHeightModifier;
-	float zg = gHeightmap.SampleLevel(gLinearSampler, texcoord, mipmap, float2( -1, -1) ).r * gHeightModifier;
-
-	float x = 2 * zf + zc + zg - zb - 2 * zc - zd;
-	float z = 2 * zb + zc + zg - zd - 2 * ze - zf;
-	float y = 2.0f;
-
-	float3 normal = float3( x, y, z );
-
-	return normalize( normal );
-}
-
-float3 CalculateBetterVertexNormals( float2 texcoord )
-{
-	int2 offset = 0;
-	int mipmap = 0;
-
-	float3 normal = gHeightmap.SampleLevel(gLinearSampler, texcoord, mipmap, offset ).rgb;
-
-	return normalize( normal );
 }
 
 VertexOut vs_main(VertexIn input)
@@ -108,22 +76,9 @@ VertexOut vs_main(VertexIn input)
 		outWorldPos.y += SampleHeightmap( texcoord ) * gHeightModifier;
 	}
 
-#ifdef TERRAIN_NORMAL_SIMPLE
-	float3 normal = CalculateSimpleVertexNormals( texcoord );
-#elif TERRAIN_NORMAL_BETTER
-	float3 normal = CalculateBetterVertexNormals( texcoord );
-#endif
-
 	VertexOut ret;
 	ret.mPosition = mul( gFrameViewProj, outWorldPos );
 	ret.mTexcoord = texcoord;
-#if TERRAIN_VERTEX_NORMALS
-	ret.mNormal = mul( ( float3x3 )gFrameView, normal );
-	ret.mNormal = normalize( ret.mNormal );
-	#ifdef TERRAIN_DEBUG_NORMAL
-		ret.mWorldNormal = normal;
-	#endif
-#endif
 	ret.mLOD = LODlevel;
 	ret.mMorph = morphLerpK;
 

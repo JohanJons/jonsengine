@@ -6,7 +6,7 @@
 
 struct PixelOut
 {
-	float3 mDiffuse : SV_Target0;
+	float4 mDiffuse : SV_Target0;
 };
 
 static const uint gNumDebugColors = 3;
@@ -18,7 +18,7 @@ PixelOut ps_main( VertexOut input )
 
 	float3 currLod = DebugLODColors[ input.mLOD % gNumDebugColors ];
 	float3 nextLod = DebugLODColors[ ( input.mLOD - 1 ) % gNumDebugColors ];
-	ret.mDiffuse = lerp( currLod, nextLod, input.mMorph );
+	ret.mDiffuse = float4( lerp( currLod, nextLod, input.mMorph ), 1.0f );
 
 	return ret;
 }

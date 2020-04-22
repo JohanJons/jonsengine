@@ -1,0 +1,7 @@
+#ifndef TERRAIN_PIXEL_NORMAL_BETTER_DEBUG_HLSL
+#define TERRAIN_PIXEL_NORMAL_BETTER_DEBUG_HLSL
+
+#define TERRAIN_NORMAL_DEBUG 1
+#include "TerrainPixelNormalBetter.hlsl"
+
+#endif

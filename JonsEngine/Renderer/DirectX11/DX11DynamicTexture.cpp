@@ -2,7 +2,7 @@
 
 namespace JonsEngine
 {
-    DX11DynamicTexture::DX11DynamicTexture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DXGI_FORMAT textureFormat, uint32_t textureWidth, uint32_t textureHeight, bool createUAV)
+    DX11DynamicTexture::DX11DynamicTexture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DXGI_FORMAT textureFormat, uint32_t textureWidth, uint32_t textureHeight, bool createUAV, bool generateMips)
         : mContext( context )
     {
         D3D11_TEXTURE2D_DESC textureDesc;
@@ -16,6 +16,8 @@ namespace JonsEngine
         textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
         if (createUAV)
             textureDesc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
+		if ( generateMips )
+			textureDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
         DXCALL(device->CreateTexture2D(&textureDesc, nullptr, &mTexture));
         DXCALL(device->CreateRenderTargetView(mTexture, nullptr, &mRTV));

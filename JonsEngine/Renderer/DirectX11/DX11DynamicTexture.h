@@ -11,7 +11,7 @@ namespace JonsEngine
     {
     public:
         DX11DynamicTexture() = default;
-        DX11DynamicTexture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DXGI_FORMAT textureFormat, uint32_t textureWidth, uint32_t textureHeight, bool createUAV);
+        DX11DynamicTexture(ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DXGI_FORMAT textureFormat, uint32_t textureWidth, uint32_t textureHeight, bool createUAV, bool generateMips);
 
         void BindAsShaderResource(const SHADER_TEXTURE_SLOT shaderTextureSlot) const;
         void Unbind(const SHADER_TEXTURE_SLOT shaderTextureSlot) const;

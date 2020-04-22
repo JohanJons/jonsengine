@@ -67,12 +67,12 @@ namespace JonsEngine
         ID3D11DevicePtr mDevice = nullptr;
 		const IDMap<DX11Texture>& mTextureMap;
 		ID3D11InputLayoutPtr mLayout = nullptr;
-		ID3D11VertexShaderPtr mVertexShaderSimple = nullptr;
-		ID3D11VertexShaderPtr mVertexShaderBetter = nullptr;
-		ID3D11VertexShaderPtr mVertexShaderBest = nullptr;
-		ID3D11PixelShaderPtr mPixelShader = nullptr;
-		ID3D11PixelShaderPtr mPixelDebugShader = nullptr;
-		ID3D11PixelShaderPtr mPixelDebugNormalShader = nullptr;
+		ID3D11VertexShaderPtr mVertexShader = nullptr;
+		ID3D11PixelShaderPtr mPixelNormalSimpleShader = nullptr;
+		ID3D11PixelShaderPtr mPixelNormalSimpleShaderDebug = nullptr;
+		ID3D11PixelShaderPtr mPixelNormalBetterShader = nullptr;
+		ID3D11PixelShaderPtr mPixelNormalBetterShaderDebug = nullptr;
+		ID3D11PixelShaderPtr mPixelCDLODDebugShader = nullptr;
 		ID3D11RasterizerStatePtr mDebugRasterizer = nullptr;
 		ID3D11ComputeShaderPtr mNormalMapComputeShader = nullptr;
 

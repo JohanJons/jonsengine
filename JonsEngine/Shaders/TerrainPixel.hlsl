@@ -6,22 +6,34 @@
 struct PixelOut
 {
 	float4 mDiffuse : SV_Target0;
+#ifndef TERRAIN_NORMAL_DEBUG
 	float3 mNormal : SV_Target1;
+#endif
 };
-
 
 PixelOut ps_main( VertexOut input)
 {
 	PixelOut ret;
 
-#ifdef TERRAIN_VERTEX_NORMALS
-	ret.mNormal = input.mNormal;
-	ret.mNormal += 1.0f;
-	ret.mNormal *= 0.5f;
-	//ret.mNormal = normalize( ret.mNormal );
+#if TERRAIN_NORMAL_SIMPLE
+	float3 worldNormal = gNormalMap.Sample( gLinearSampler, input.mTexcoord ).xyz;
+#elif TERRAIN_NORMAL_BETTER
+	float3 worldNormal = gNormalMap.Sample( gAnisotropicSampler, input.mTexcoord ).xyz;
+#else
+	float3 worldNormal = float3( 1.0f, 1.0f, 1.0f );
 #endif
 
+#if TERRAIN_NORMAL_DEBUG
+	ret.mDiffuse = float4( worldNormal, 1.0f );
+#else
+	float3 viewNormal = mul( ( float3x3 )gFrameView, worldNormal );
+	viewNormal = normalize( viewNormal );
+	viewNormal += 1.0f;
+	viewNormal *= 0.5f;
+
+	ret.mNormal = viewNormal;
 	ret.mDiffuse = float4( 0.0f, 1.0f, 1.0f, 1.0f);
+#endif
 
 	return ret;
 }

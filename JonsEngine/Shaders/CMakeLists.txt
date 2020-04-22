@@ -5,8 +5,6 @@ list( APPEND VERTEX_SHADERS
   GBufferVertexAnimated.hlsl
   SkyboxVertex.hlsl
   TerrainVertex.hlsl
-  TerrainVertexNormalSimple.hlsl
-  TerrainVertexNormalBetter.hlsl
   TransformAnimatedVertex.hlsl
   TransformStaticInstancedVertex.hlsl
   TransformStaticVertex.hlsl
@@ -27,9 +25,11 @@ list( APPEND PIXEL_SHADERS
   SimpleTexturePixel.hlsl
   SkyboxPixel.hlsl
   SSAOPixel.hlsl
-  TerrainPixel.hlsl
   TerrainPixelDebug.hlsl
-  TerrainPixelDebugNormal.hlsl
+  TerrainPixelNormalSimple.hlsl
+  TerrainPixelNormalBetter.hlsl
+  TerrainPixelNormalSimpleDebug.hlsl
+  TerrainPixelNormalBetterDebug.hlsl
   Tonemapping.hlsl
 )
 
@@ -55,6 +55,7 @@ list( APPEND NON_COMPILE_SHADERS
   OptimizedPCF.hlsl
   Shadowmapping.hlsl
   TerrainCommon.hlsl
+  TerrainPixel.hlsl
 )
 
 add_library( JonsShaders OBJECT ${VERTEX_SHADERS} ${PIXEL_SHADERS} ${COMPUTE_SHADERS} ${DOMAIN_SHADERS} ${HULL_SHADERS} ${NON_COMPILE_SHADERS} )
