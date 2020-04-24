@@ -86,15 +86,15 @@ namespace JonsEngine
 		enum class TerrainNormals
 		{
 			SIMPLE,
-			BETTER,
-			BEST
+			BETTER
 		} mTerrainNormals;
 
 		AutoExposureRate mAutoExposureRate;
-		bool mBloomEnabled;
-		bool mSSAOEnabled;
-        bool mVSync;
-
+		bool mBloomEnabled = true;
+		bool mSSAOEnabled = true;
+		bool mVSync = true;
+		float mZNear = 1.0f;
+		float mZFar = 1024.0f;
 
 		RenderSettings();
 	};
@@ -106,14 +106,11 @@ namespace JonsEngine
 		mAnisotropicFiltering( Anisotropic::X16 ),
 		mAntiAliasing( AntiAliasing::Fxaa ),
 		mToneMapping( ToneMappingAlghorithm::FilmicU2 ),
-		mTerrainPatchMinSize( TerrainPatchMinSize::X2 ),
-		mTerrainPatchMaxSize( TerrainPatchMaxSize::X128 ),
-		mTerrainMeshDimensions( TerrainMeshDimensions::X8 ),
+		mTerrainPatchMinSize( TerrainPatchMinSize::X16 ),
+		mTerrainPatchMaxSize( TerrainPatchMaxSize::X256 ),
+		mTerrainMeshDimensions( TerrainMeshDimensions::X16 ),
 		mTerrainNormals( TerrainNormals::SIMPLE ),
-		mAutoExposureRate(DefaultAutoExposureRate()),
-		mBloomEnabled(true),
-		mSSAOEnabled(true),
-        mVSync(true)
+		mAutoExposureRate(DefaultAutoExposureRate())
 	{
 	}
 }

@@ -13,7 +13,7 @@ namespace JonsGame
 	class SceneTessellation
 	{
 	public:
-		SceneTessellation( JonsEngine::SceneManager& sceneMgr, JonsEngine::ResourceManifest& resManifest );
+		SceneTessellation( JonsEngine::DX11Renderer& renderer, JonsEngine::SceneManager& sceneMgr, JonsEngine::ResourceManifest& resManifest );
 		~SceneTessellation();
 
 		void Update();
@@ -27,6 +27,7 @@ namespace JonsGame
 
 	private:
 		const JonsEngine::SceneNodeID mID;
+		JonsEngine::DX11Renderer& mRenderer;
 		JonsEngine::SceneManager& mSceneMgr;
 		JonsEngine::JonsPackagePtr mJonsPackage;
 

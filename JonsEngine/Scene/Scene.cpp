@@ -366,9 +366,12 @@ namespace JonsEngine
         float minCameraDepth = 0.01f;
         float maxCameraDepth = 1.0f;
     
-        mRenderer.ReduceDepth(minCameraDepth, maxCameraDepth);
+        mRenderer.ReduceDepth(minCameraDepth, maxCameraDepth );
+
+		float zNear = mRenderer.GetZNear();
+		float zFar = mRenderer.GetZFar();
         for (DirectionalLight& dirLight : mDirectionalLights)
-            dirLight.UpdateCascadesBoundingVolume(viewMatrix, cameraFov, windowAspectRatio, minCameraDepth, maxCameraDepth);
+            dirLight.UpdateCascadesBoundingVolume( viewMatrix, cameraFov, windowAspectRatio, minCameraDepth, maxCameraDepth, zNear, zFar );
     }
     
     void Scene::UpdateAnimatedActors(const Milliseconds elapsedTime)

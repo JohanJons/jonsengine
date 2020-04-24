@@ -107,7 +107,7 @@ namespace JonsEngine
     }
 
 
-    void DX11PointLightPass::Render(const RenderablePointLight& pointLight, const RenderData& renderData, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix)
+    void DX11PointLightPass::Render( const RenderablePointLight& pointLight, const RenderData& renderData, const Mat4& camViewMatrix, const Mat4& camViewProjMatrix, const RenderSettings& renderSettings )
     {
         // preserve current state
         ID3D11RasterizerStatePtr prevRasterizerState = nullptr;
@@ -123,7 +123,6 @@ namespace JonsEngine
         const Vec4 viewLightPositonV4 = camViewMatrix * Vec4(pointLight.mPosition, 1.0);
         const Vec3 viewLightPositonV3 = Vec3(viewLightPositonV4);
 
-
         //
         // shadow pass
         //
@@ -134,7 +133,7 @@ namespace JonsEngine
         mContext->RSSetState(mRSCullFront);
         mShadowmap.BindForDrawing();
 
-        const Mat4 faceProjmatrix = PerspectiveMatrixFov(90.0f, 1.0f, Z_NEAR, pointLight.mRadius);
+        const Mat4 faceProjmatrix = PerspectiveMatrixFov(90.0f, 1.0f, renderSettings.mZNear, pointLight.mRadius);
         for (uint32_t face = 0; face < DX11PointLightPass::POINT_LIGHT_DIR_COUNT; ++face)
         {
 			mShadowmap.BindDepthView(face);
@@ -172,7 +171,7 @@ namespace JonsEngine
 
         // set point light pixel shader and its cbuffer
         mContext->PSSetShader(mPixelShader, nullptr, 0);
-        mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mColor, viewLightPositonV4, pointLight.mIntensity, Z_NEAR, pointLight.mRadius));
+        mPointLightCBuffer.SetData(PointLightCBuffer(pointLight.mColor, viewLightPositonV4, pointLight.mIntensity, renderSettings.mZNear, pointLight.mRadius));
 		mPointLightCBuffer.Bind();
 
         // run transform pass on sphere + point light shading pass

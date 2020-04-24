@@ -10,8 +10,9 @@ constexpr float gTerrainVariationScale = 2.0f;
 
 namespace JonsGame
 {
-	SceneTessellation::SceneTessellation( JonsEngine::SceneManager& sceneMgr, JonsEngine::ResourceManifest& resManifest ) :
+	SceneTessellation::SceneTessellation( JonsEngine::DX11Renderer& renderer, JonsEngine::SceneManager& sceneMgr, JonsEngine::ResourceManifest& resManifest ) :
 		mID( sceneMgr.CreateScene( "TessellationScene" ) ),
+		mRenderer( renderer ),
 		mSceneMgr( sceneMgr ),
 		mJonsPackage( ReadJonsPkg( "assets.jons" ) ),
 		mSkybox( resManifest.LoadSkybox( "skybox", mJonsPackage ) ),
@@ -66,11 +67,14 @@ namespace JonsGame
 		
 		if ( nodeTerrainTest.IsVisible() )
 		{
+			mRenderer.SetZNear( 1.0f );
+			mRenderer.SetZFar( 1024.0f );
 			scene.GetSceneCamera().SetPosition( { 211.4f, 702.1f, 32.9f } );
-			//scene.GetSceneCamera().SetPosition( { -31.9, 4.47, 0.286 } );
 		}
 		else
 		{
+			mRenderer.SetZNear( 2.0f );
+			mRenderer.SetZFar( 4098.0f );
 			scene.GetSceneCamera().SetPosition( { 1058.0f, 40.0f, -235.0f } );
 		}
 	}

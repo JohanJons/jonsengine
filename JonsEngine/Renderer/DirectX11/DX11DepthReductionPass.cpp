@@ -52,15 +52,18 @@ namespace JonsEngine
     }
 
 
-    void DX11DepthReductionPass::ReduceDepth(float& minDepth, float& maxDepth)
+    void DX11DepthReductionPass::ReduceDepth( float& minDepth, float& maxDepth, const RenderSettings& renderSettings )
     {
         mContext->OMSetRenderTargets(0, nullptr, nullptr);
 
+		float zNear = renderSettings.mZNear;
+		float zFar = renderSettings.mZFar;
+
         // first pass
         // TODO: why neg. [2].z?
-        const float perspClipNear = PerspectiveNearPlane(Z_NEAR, Z_FAR);
-        const float perspClipFar = PerspectiveFarPlane(Z_NEAR, Z_FAR);
-        mSDSMCBuffer.SetData(SDSMCBuffer(-perspClipNear, perspClipFar, Z_NEAR, Z_FAR));
+        const float perspClipNear = PerspectiveNearPlane(zNear, zFar);
+        const float perspClipFar = PerspectiveFarPlane(zNear, zFar);
+        mSDSMCBuffer.SetData(SDSMCBuffer(-perspClipNear, perspClipFar, zNear, zFar));
 		mSDSMCBuffer.Bind();
 
         auto& initialRTV = mDepthReductionRTVs.front();

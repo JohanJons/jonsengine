@@ -100,7 +100,6 @@ namespace JonsEngine
 		{
 			switch ( settings.mTerrainNormals )
 			{
-				case RenderSettings::TerrainNormals::BEST:
 				case RenderSettings::TerrainNormals::BETTER:
 				{
 					mContext->PSSetShader( mPixelNormalBetterShaderDebug, nullptr, 0 );
@@ -139,7 +138,6 @@ namespace JonsEngine
 
 		switch ( normalSetting )
 		{
-			case RenderSettings::TerrainNormals::BEST:
 			case RenderSettings::TerrainNormals::BETTER:
 			{
 				mContext->PSSetShader( mPixelNormalBetterShader, nullptr, 0 );

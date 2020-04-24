@@ -24,7 +24,7 @@ namespace JonsEngine
         void SetLightColor(const Vec4& lightColor);
 
         void SetCascadeSplitLambda(const float lambda);
-        void UpdateCascadesBoundingVolume(const Mat4& viewMatrix, const float degreesFOV, const float aspectRatio, const float minDepth, const float maxDepth);
+        void UpdateCascadesBoundingVolume(const Mat4& viewMatrix, const float degreesFOV, const float aspectRatio, const float minDepth, const float maxDepth, float zNear, float zFar );
         
         BoundingVolume GetBoundingVolume(const uint32_t cascadeIndex) const;
         void GetSplitDistance(const uint32_t cascadeIndex, float& nearZ, float& farZ) const;
@@ -36,7 +36,7 @@ namespace JonsEngine
 
 
 	private:
-        void UpdateSplitDistances(const float minDepth, const float maxDepth);
+        void UpdateSplitDistances( const float minDepth, const float maxDepth, float zNear, float zFar );
         void UpdateKDOP(const FrustumPlanes& frustumPlanes, const FrustumCorners& frustumCorners);
 
 

@@ -182,9 +182,9 @@ namespace JonsEngine
         mPipeline.EndFrame( mRenderSettings );
     }
 
-    void DX11Renderer::ReduceDepth(float& minDepth, float& maxDepth)
+    void DX11Renderer::ReduceDepth( float& minDepth, float& maxDepth )
     {
-        mDepthReductionPass.ReduceDepth(minDepth, maxDepth);
+        mDepthReductionPass.ReduceDepth( minDepth, maxDepth, mRenderSettings );
     }
 
 
@@ -264,13 +264,23 @@ namespace JonsEngine
 
     float DX11Renderer::GetZNear() const
     {
-        return Z_NEAR;
+        return mRenderSettings.mZNear;
     }
 
     float DX11Renderer::GetZFar() const
     {
-        return Z_FAR;
+        return mRenderSettings.mZFar;
     }
+
+	void DX11Renderer::SetZNear( float zNear )
+	{
+		mRenderSettings.mZNear = zNear;
+	}
+
+	void DX11Renderer::SetZFar( float zFar )
+	{
+		mRenderSettings.mZFar = zFar;
+	}
 
     RenderSettings::ShadowResolution DX11Renderer::GetShadowResolution() const
     {

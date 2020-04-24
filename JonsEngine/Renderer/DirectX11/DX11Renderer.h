@@ -45,7 +45,7 @@ namespace JonsEngine
         DX11TextureID CreateTexture(TextureType textureType, const std::vector<uint8_t>& textureData, uint32_t textureWidth, uint32_t textureHeight);
 
         void Render(const RenderQueue& renderQueue, const Milliseconds elapstedFrameTime, const DebugOptions::RenderingFlags debugFlags);
-        void ReduceDepth(float& minDepth, float& maxDepth);
+        void ReduceDepth( float& minDepth, float& maxDepth );
 
         RenderSettings::Anisotropic GetAnisotropicFiltering() const;
         void SetAnisotropicFiltering(const RenderSettings::Anisotropic anisotropic);
@@ -75,8 +75,12 @@ namespace JonsEngine
         void SetSSAO(const bool useSSAO);
 
         float GetDepthValue(const WindowPosition& position);
+
         float GetZNear() const;
         float GetZFar() const;
+		void SetZNear( float zNear );
+		void SetZFar( float zFar );
+
         RenderSettings::ShadowResolution GetShadowResolution() const;
         RenderSettings::ShadowReadbackLatency GetShadowReadbackLatency() const;
 

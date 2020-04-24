@@ -15,10 +15,6 @@
 
 namespace JonsEngine
 {
-    // TODO: make dynamic?
-    const float Z_NEAR = 1.0f;
-    const float Z_FAR = 1024.0f;
-
     typedef std::array<float, 4> DX11Color;
 	constexpr const DX11Color gClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 	constexpr const float* GetClearColor() { return &gClearColor.front(); };

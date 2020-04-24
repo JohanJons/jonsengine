@@ -34,12 +34,12 @@ namespace JonsEngine
         mCascadeSplitLambda = lambda;
     }
 
-    void DirectionalLight::UpdateCascadesBoundingVolume(const Mat4& viewMatrix, const float degreesFOV, const float aspectRatio, const float minDepth, const float maxDepth)
+    void DirectionalLight::UpdateCascadesBoundingVolume(const Mat4& viewMatrix, const float degreesFOV, const float aspectRatio, const float minDepth, const float maxDepth, float zNear, float zFar )
     {
         mKDOP.clear();
         mCascadeKDOPRange.clear();
 
-        UpdateSplitDistances(minDepth, maxDepth);
+        UpdateSplitDistances( minDepth, maxDepth, zNear, zFar );
 
         for (uint32_t cascadeIndex = 0; cascadeIndex < mNumShadowmapCascades; ++cascadeIndex)
         {
@@ -97,12 +97,12 @@ namespace JonsEngine
     }
 
 
-    void DirectionalLight::UpdateSplitDistances(const float minDepth, const float maxDepth)
+    void DirectionalLight::UpdateSplitDistances( const float minDepth, const float maxDepth, float zNear, float zFar )
     {
         mSplitDistances.clear();
 
-        const float nearClip = Z_NEAR;
-        const float farClip = Z_FAR;
+        const float nearClip = zNear;
+        const float farClip = zFar;
         const float clipRange = farClip - nearClip;
 
         const float minZ = nearClip + minDepth * clipRange;

@@ -24,7 +24,7 @@ namespace JonsGame
     Game::Game() : 
 		mEngine(mSettings),
 		mGameScene( mEngine.GetSceneManager(), mEngine.GetResourceManifest() ),
-		mTessellationScene( mEngine.GetSceneManager(), mEngine.GetResourceManifest() )
+		mTessellationScene( mEngine.GetRenderer(), mEngine.GetSceneManager(), mEngine.GetResourceManifest() )
     {
         SetupInputCallbacks();
         mEngine.GetWindow().ShowMouseCursor(false);
@@ -100,7 +100,6 @@ namespace JonsGame
 					case Key::ONE: mTessellationScene.FlipTerrain(); break;
 					case Key::TWO: mEngine.GetRenderer().SetTerrainNormals( RenderSettings::TerrainNormals::SIMPLE ); break;
 					case Key::THREE: mEngine.GetRenderer().SetTerrainNormals( RenderSettings::TerrainNormals::BETTER ); break;
-					case Key::FOUR: mEngine.GetRenderer().SetTerrainNormals( RenderSettings::TerrainNormals::BEST ); break;
 					default: break;
 				}
 			}
