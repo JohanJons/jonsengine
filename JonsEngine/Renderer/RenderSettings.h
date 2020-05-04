@@ -107,7 +107,7 @@ namespace JonsEngine
 		mAntiAliasing( AntiAliasing::Fxaa ),
 		mToneMapping( ToneMappingAlghorithm::FilmicU2 ),
 		mTerrainPatchMinSize( TerrainPatchMinSize::X16 ),
-		mTerrainPatchMaxSize( TerrainPatchMaxSize::X256 ),
+		mTerrainPatchMaxSize( TerrainPatchMaxSize::X512 ),
 		mTerrainMeshDimensions( TerrainMeshDimensions::X16 ),
 		mTerrainNormals( TerrainNormals::SIMPLE ),
 		mAutoExposureRate(DefaultAutoExposureRate())
