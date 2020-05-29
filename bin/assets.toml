@@ -1,0 +1,52 @@
+[package]
+name = "assets.jons"
+
+# models
+[[models]]
+name = "wuson"
+path = "Assets/Testwuson.X"
+
+[[models]]
+name = "cube"
+path = "Assets/cube_with_color.obj"
+
+[[models]]
+name = "chair"
+path = "Assets/chair/chair.obj"
+
+[[models]]
+name = "sectoid"
+path = "Assets/sectoid/sectoid.dae"
+
+[[models]]
+name = "house"
+path = "Assets/house/house.obj"
+
+[[models]]
+name = "bob"
+path = "Assets/boblampclean.md5mesh"
+
+[[models]]
+name = "sas"
+path = "Assets/SAS/sas.dae"
+
+# textures
+[[textures]]
+name = "checkers"
+path = "Assets/checker.dds"
+type = "diffuse"
+
+[[textures]]
+name = "terrain_heightmap"
+path = "Assets/terrain_heightmap.png"
+type = "height16"
+
+[[textures]]
+name = "terrain_test"
+path = "Assets/tessellation_test.png"
+type = "height8"
+
+[[textures]]
+name = "skybox"
+path = "Assets/skybox_v.jpg"
+type = "skybox"

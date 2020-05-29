@@ -15,10 +15,14 @@ SET( ASSIMP_BUILD_ASSIMP_TOOLS OFF CACHE BOOL "" FORCE )
 SET( ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE )
 SET( BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE )
 
+# toml11
+SET( toml11_BUILD_TEST OFF CACHE BOOL "" FORCE )
+
 add_subdirectory( glm )
 add_subdirectory( dlmalloc )
 add_subdirectory( assimp-3.3.1 ${CMAKE_BINARY_DIR}/assimp )
 add_subdirectory( FreeImage )
+add_subdirectory( toml11 )
 
 # add assimp include dirs
 get_target_property( ASSIMP_INCLUDE assimp INCLUDE_DIRECTORIES )

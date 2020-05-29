@@ -35,17 +35,16 @@ namespace JonsAssetImporter
 	bool VerifyNoDuplicateTextureNames(const JonsPackagePtr pkg);
 
 
-    ParseResult ParseCommands(const Command command, std::vector<std::string>& parameters)
+    ParseResult ParseCommands( const std::vector<std::string>& parameters )
     {
         Assimp assimpImporter;
         FreeImage freeimageParser;
 
-        if (parameters.size() <= 0)
+        if ( parameters.size() <= 0 )
         {
             Log("ERROR: No commands given");
             return { false, GetLog() };
         }
-
 
         std::vector<AssetPath> assetPaths;
         std::vector<AssetName> assetNames;
