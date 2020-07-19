@@ -5,6 +5,7 @@
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "FreeImage.h"
+#include "toml.hpp"
 #include <vector>
 #include <string>
 
@@ -13,7 +14,7 @@ namespace JonsAssetImporter
     struct ParseResult
     {
         bool mSuccess;
-        const std::string& mLog;
+        std::string mLog;
     };
 
     ParseResult ParseCommands( const std::vector<std::string>& parameters );

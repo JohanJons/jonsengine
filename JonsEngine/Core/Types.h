@@ -19,7 +19,8 @@ namespace JonsEngine
         Normal,
 		Height8,
 		Height16,
-        Skybox
+        Skybox,
+		Unknown
     };
     
     // TODO: move mesh/texture id definitions

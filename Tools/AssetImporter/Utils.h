@@ -13,5 +13,5 @@ namespace JonsAssetImporter
 
 
     void Log(const std::string& msg);
-    const std::string& GetLog();
+	std::string FlushLog();
 }

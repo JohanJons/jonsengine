@@ -8,6 +8,22 @@ using namespace JonsEngine;
 
 namespace JonsAssetImporter
 {
+	TextureType GetTextureTypeFromString( const std::string& name )
+	{
+		if ( name.compare( "diffuse" ) == 0 )
+			return TextureType::Diffuse;
+		else if ( name.compare( "normal" ) == 0 )
+			return TextureType::Normal;
+		else if ( name.compare( "height8" ) == 0 )
+			return TextureType::Height8;
+		else if ( name.compare( "height16" ) == 0 )
+			return TextureType::Height16;
+		else if ( name.compare( "skybox" ) == 0 )
+			return TextureType::Skybox;
+
+		return TextureType::Unknown;
+	}
+
     enum class ParamType
     {
         Unknown,
@@ -40,11 +56,27 @@ namespace JonsAssetImporter
         Assimp assimpImporter;
         FreeImage freeimageParser;
 
-        if ( parameters.size() <= 0 )
+        if ( parameters.size() != 1 )
         {
-            Log("ERROR: No commands given");
-            return { false, GetLog() };
+            Log("ERROR: expected only 1 argument");
+            return { false, FlushLog() };
         }
+
+		const std::string& tomlFile = parameters.front();
+
+		toml::value data;
+		try {
+			data = toml::parse( tomlFile );
+		}
+		catch ( const std::runtime_error& e )
+		{
+			std::string error( "ERROR: " );
+			error.append( e.what() );
+			Log( error );
+			return { false, FlushLog() };
+		}
+
+		const auto title = toml::find<std::string>(data, "title");
 
         std::vector<AssetPath> assetPaths;
         std::vector<AssetName> assetNames;

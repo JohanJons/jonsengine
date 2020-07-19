@@ -15,8 +15,11 @@ namespace JonsAssetImporter
 		gLog.append("\n");
     }
 
-    const std::string& GetLog()
-    {
-        return gLog;
-    }
+	std::string FlushLog()
+	{
+		std::string ret = gLog;
+		gLog.clear();
+
+		return ret;
+	}
 }
