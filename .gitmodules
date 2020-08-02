@@ -1,3 +1,0 @@
-[submodule "Thirdparty/toml11"]
-	path = Thirdparty/toml11
-	url = https://github.com/ToruNiina/toml11.git

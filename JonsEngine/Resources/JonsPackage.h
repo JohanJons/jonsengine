@@ -32,7 +32,7 @@ namespace JonsEngine
         PackageHeader();
     
     
-        std::string mSignature;
+        std::string mName;
         uint8_t mMajorVersion;
         uint8_t mMinorVersion;
     };
@@ -195,9 +195,9 @@ namespace boost
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::PackageHeader& header, const unsigned int version)
         {
+			ar & header.mName;
             ar & header.mMajorVersion;
             ar & header.mMinorVersion;
-            ar & header.mSignature;
         }
 
         template<class Archive>

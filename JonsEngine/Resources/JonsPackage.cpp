@@ -13,7 +13,6 @@
 namespace JonsEngine
 {
     PackageHeader::PackageHeader() :
-        mSignature("jons"),
         mMajorVersion(LatestMajorVersion),
         mMinorVersion(LatestMinorVersion)
     {

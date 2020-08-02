@@ -12,6 +12,7 @@ namespace JonsAssetImporter
     typedef std::pair<uint32_t, uint32_t> MaterialPair;
 
 
-    void Log(const std::string& msg);
+    void Log( const std::string& msg );
+	void Log( const std::exception& e );
 	std::string FlushLog();
 }

@@ -9,6 +9,8 @@ target_sources( JonsAssetImporter
         Assimp.h
         FreeImageParser.cpp
         FreeImageParser.h
+		TOMLParser.cpp
+		TOMLParser.h
         Utils.cpp
         Utils.h
 )

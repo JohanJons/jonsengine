@@ -1,5 +1,7 @@
+outfile = "assets.jons"
+
 [package]
-name = "assets.jons"
+name = "test assets"
 
 # models
 [[models]]
