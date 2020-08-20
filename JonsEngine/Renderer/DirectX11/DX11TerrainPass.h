@@ -41,12 +41,13 @@ namespace JonsEngine
 			uint32_t __padding;
 		};
 
-	private:
-		enum class CachedTextureMap
+		struct PerTerrainData
 		{
-			NORMAL
+			DX11DynamicTexture mNormalMap;
+			DX11DynamicTexture mWaterMap;
 		};
 
+	private:
 		void BindForRendering( RenderSettings::TerrainNormals normalSetting );
 		void UnbindRendering();
 
@@ -54,8 +55,8 @@ namespace JonsEngine
 		void CreateGridMesh( RenderSettings::TerrainMeshDimensions meshDimensions );
 		void RenderInternal( const RenderableTerrains& terrains, const RenderSettings& settings );
 
-		bool HasCachedTextureMap( CachedTextureMap type, DX11TextureID heightmapID ) const;
-		void CreateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
+		PerTerrainData& GetOrCreateTerrainData( DX11TextureID heightmapID );
+
 		void GetTextureMapDimensions( uint32_t& width, uint32_t& height, CachedTextureMap type, DX11TextureID heightmapID );
 		DXGI_FORMAT GetTextureMapFormat( CachedTextureMap type );
 		std::map<DX11TextureID, DX11DynamicTexture>& GetTextureMap( CachedTextureMap type );
@@ -77,7 +78,7 @@ namespace JonsEngine
 		ID3D11ComputeShaderPtr mNormalMapComputeShader = nullptr;
 
 		RenderSettings::TerrainMeshDimensions mCachedMeshDimensions;
-		std::map<DX11TextureID, DX11DynamicTexture> mTerrainNormalMap;
+		std::map<DX11TextureID, PerTerrainData> mTerrainData;
 		DX11Mesh mGridMesh;
 
 		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;

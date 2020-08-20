@@ -232,11 +232,10 @@ namespace JonsEngine
 		uint32_t beginIndex = 0;
 		for ( const RenderableTerrainData& terrainData : terrains.mTerrainData )
 		{
-			if ( !HasCachedTextureMap( CachedTextureMap::NORMAL, terrainData.mHeightMap ) )
-				CreateTextureMap( CachedTextureMap::NORMAL, terrainData.mHeightMap );
-
 			const DX11Texture& heightmap = mTextureMap.GetItem( terrainData.mHeightMap );
-			const DX11DynamicTexture& normalTexture = mTerrainNormalMap.at( terrainData.mHeightMap );
+			PerTerrainData& dx11TerrainData = GetOrCreateTerrainData( terrainData.mHeightMap );
+
+			const DX11DynamicTexture& normalTexture = dx11TerrainData.mNormalMap;
 			heightmap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
 			normalTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_NORMAL );
 
@@ -258,6 +257,16 @@ namespace JonsEngine
 
 			beginIndex = endIndex;
 		}
+	}
+
+	DX11TerrainPass::PerTerrainData& DX11TerrainPass::GetOrCreateTerrainData( DX11TextureID heightmapID )
+	{
+		if ( mTerrainData.find( heightmapID ) == mTerrainData.end() )
+		{
+			mTerrainData.emplace( heightmapID );
+		}
+
+		return mTerrainData.at( heightmapID );
 	}
 
 	bool DX11TerrainPass::HasCachedTextureMap( CachedTextureMap type, DX11TextureID heightmapID ) const
