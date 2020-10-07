@@ -5,7 +5,6 @@
 namespace JonsEngine
 {
 	static const std::string gDefaultAllocatorName = "DefaultHeapAllocator";
-
     static HeapAllocator gHeapAllocator(gDefaultAllocatorName);
 
 

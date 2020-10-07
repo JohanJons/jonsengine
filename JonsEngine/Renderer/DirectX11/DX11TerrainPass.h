@@ -41,12 +41,15 @@ namespace JonsEngine
 			uint32_t __padding;
 		};
 
-	private:
-		enum class CachedTextureMap
+		struct TerrainRenderData
 		{
-			NORMAL
+			TerrainRenderData( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, uint32_t textureWidth, uint32_t textureHeight );
+
+			DX11DynamicTexture mNormalMap;
+			DX11DynamicTexture mTopographyMap;
 		};
 
+	private:
 		void BindForRendering( RenderSettings::TerrainNormals normalSetting );
 		void UnbindRendering();
 
@@ -54,14 +57,11 @@ namespace JonsEngine
 		void CreateGridMesh( RenderSettings::TerrainMeshDimensions meshDimensions );
 		void RenderInternal( const RenderableTerrains& terrains, const RenderSettings& settings );
 
-		bool HasCachedTextureMap( CachedTextureMap type, DX11TextureID heightmapID ) const;
-		void CreateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
-		void GetTextureMapDimensions( uint32_t& width, uint32_t& height, CachedTextureMap type, DX11TextureID heightmapID );
-		DXGI_FORMAT GetTextureMapFormat( CachedTextureMap type );
-		std::map<DX11TextureID, DX11DynamicTexture>& GetTextureMap( CachedTextureMap type );
-		void UpdateTextureMap( CachedTextureMap type, DX11TextureID heightmapID );
-		void BindComputeShader( CachedTextureMap type );
-		void GetDispatchDimensions( uint32_t& x, uint32_t& y, CachedTextureMap type, DX11TextureID heightmapID );
+		TerrainRenderData& AccessOrCreateRenderData( DX11TextureID heightmapID );
+
+		void GetTextureDimensions( uint32_t& width, uint32_t& height, DX11TextureID heightmapID );
+		void UpdateRenderData( TerrainRenderData& renderData, DX11TextureID heightmapID );
+		void GetDispatchDimensions( uint32_t& x, uint32_t& y, DX11TextureID heightmapID );
 
 		ID3D11DeviceContextPtr mContext = nullptr;
         ID3D11DevicePtr mDevice = nullptr;
@@ -73,11 +73,12 @@ namespace JonsEngine
 		ID3D11PixelShaderPtr mPixelNormalBetterShader = nullptr;
 		ID3D11PixelShaderPtr mPixelNormalBetterShaderDebug = nullptr;
 		ID3D11PixelShaderPtr mPixelCDLODDebugShader = nullptr;
+		ID3D11PixelShaderPtr mPixelTopographyDebugShader = nullptr;
 		ID3D11RasterizerStatePtr mDebugRasterizer = nullptr;
 		ID3D11ComputeShaderPtr mNormalMapComputeShader = nullptr;
 
 		RenderSettings::TerrainMeshDimensions mCachedMeshDimensions;
-		std::map<DX11TextureID, DX11DynamicTexture> mTerrainNormalMap;
+		std::map<DX11TextureID, TerrainRenderData> mTerrainData;
 		DX11Mesh mGridMesh;
 
 		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;

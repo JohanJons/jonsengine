@@ -6,6 +6,7 @@
 #include "Compiled/TerrainVertex.h"
 #include "Compiled/TerrainComputeNormal.h"
 #include "Compiled/TerrainPixelDebug.h"
+#include "Compiled/TerrainPixelTopographyDebug.h"
 #include "Compiled/TerrainPixelNormalSimple.h"
 #include "Compiled/TerrainPixelNormalSimpleDebug.h"
 #include "Compiled/TerrainPixelNormalBetter.h"
@@ -30,6 +31,11 @@ namespace JonsEngine
 		NUM_INPUT_LAYOUTS
 	};
 
+	DX11TerrainPass::TerrainRenderData::TerrainRenderData( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, uint32_t textureWidth, uint32_t textureHeight ) :
+		mNormalMap( device, context, DXGI_FORMAT_R10G10B10A2_UNORM, textureWidth, textureHeight, true, true ),
+		mTopographyMap( device, context, DXGI_FORMAT_R8_UINT, textureWidth, textureHeight, true, true ) // TODO
+	{
+	}
 
 	DX11TerrainPass::DX11TerrainPass( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, DX11VertexTransformPass& vertexTransformer, const IDMap<DX11Texture>& textureMap,
 		RenderSettings::TerrainMeshDimensions meshDimensions ):
@@ -62,6 +68,7 @@ namespace JonsEngine
 		DXCALL( device->CreatePixelShader( gTerrainPixelNormalBetter, sizeof( gTerrainPixelNormalBetter ), nullptr, &mPixelNormalBetterShader ) );
 		DXCALL( device->CreatePixelShader( gTerrainPixelNormalBetterDebug, sizeof( gTerrainPixelNormalBetterDebug ), nullptr, &mPixelNormalBetterShaderDebug ) );
 		DXCALL( device->CreatePixelShader( gTerrainPixelDebug, sizeof( gTerrainPixelDebug ), nullptr, &mPixelCDLODDebugShader ) );
+		DXCALL( device->CreatePixelShader( gTerrainPixelTopographyDebug, sizeof( gTerrainPixelTopographyDebug ), nullptr, &mPixelTopographyDebugShader ) );
 		DXCALL( device->CreateComputeShader( gTerrainComputeNormal, sizeof( gTerrainComputeNormal ), nullptr, &mNormalMapComputeShader ) );
 
 		D3D11_RASTERIZER_DESC rasterizerDesc;
@@ -96,6 +103,8 @@ namespace JonsEngine
 		BindForRendering( settings.mTerrainNormals );
 
 		bool drawNormals = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
+		bool drawTopography = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_TOPOGRAPHY );
+
 		if ( drawNormals )
 		{
 			switch ( settings.mTerrainNormals )
@@ -112,6 +121,10 @@ namespace JonsEngine
 					break;
 				}
 			}
+		}
+		else if ( drawTopography )
+		{
+			mContext->PSSetShader( mPixelTopographyDebugShader, nullptr, 0 );
 		}
 		else
 			mContext->PSSetShader( mPixelCDLODDebugShader, nullptr, 0 );
@@ -232,13 +245,14 @@ namespace JonsEngine
 		uint32_t beginIndex = 0;
 		for ( const RenderableTerrainData& terrainData : terrains.mTerrainData )
 		{
-			if ( !HasCachedTextureMap( CachedTextureMap::NORMAL, terrainData.mHeightMap ) )
-				CreateTextureMap( CachedTextureMap::NORMAL, terrainData.mHeightMap );
+			const TerrainRenderData& renderData = AccessOrCreateRenderData( terrainData.mHeightMap );
+			const DX11DynamicTexture& normalMap = renderData.mNormalMap;
+			const DX11DynamicTexture& topography = renderData.mTopographyMap;
 
 			const DX11Texture& heightmap = mTextureMap.GetItem( terrainData.mHeightMap );
-			const DX11DynamicTexture& normalTexture = mTerrainNormalMap.at( terrainData.mHeightMap );
 			heightmap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
-			normalTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_NORMAL );
+			normalMap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_NORMAL );
+			topography.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA_2 );
 
 			mPerTerrainCBuffer.SetData( { terrainData.mWorldMin, terrainData.mWorldMax, terrainData.mHeightScale, terrainData.mVariationScale, beginIndex } );
 			mPerTerrainCBuffer.Bind();
@@ -253,39 +267,35 @@ namespace JonsEngine
 
 			mGridMesh.DrawInstanced( numTransforms );
 
-			normalTexture.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_NORMAL );
+			topography.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA_2 );
+			normalMap.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_NORMAL );
 			heightmap.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
 
 			beginIndex = endIndex;
 		}
 	}
 
-	bool DX11TerrainPass::HasCachedTextureMap( CachedTextureMap type, DX11TextureID heightmapID ) const
+	DX11TerrainPass::TerrainRenderData& DX11TerrainPass::AccessOrCreateRenderData( DX11TextureID heightmapID )
 	{
-		switch ( type )
+		auto iterFind = mTerrainData.find( heightmapID );
+		if ( iterFind != mTerrainData.cend() )
 		{
-			case CachedTextureMap::NORMAL:  return mTerrainNormalMap.find( heightmapID ) != mTerrainNormalMap.cend();
-			default:
-			{
-				assert( false && "Unhandled case" );
-				return false;
-			}
+			return iterFind->second;
 		}
-	}
 
-	void DX11TerrainPass::CreateTextureMap( CachedTextureMap type, DX11TextureID heightmapID )
-	{
 		uint32_t width, height;
-		GetTextureMapDimensions( width, height, type, heightmapID );
-		DXGI_FORMAT textureFormat = GetTextureMapFormat( type );
+		GetTextureDimensions( width, height, heightmapID );
 
-		auto& Map = GetTextureMap( type );
-		Map.erase( heightmapID );
-		Map.emplace( std::piecewise_construct, std::forward_as_tuple( heightmapID ), std::forward_as_tuple( mDevice, mContext, textureFormat, width, height, true, true ) );
-		UpdateTextureMap( type, heightmapID );
+		mTerrainData.erase( heightmapID );
+		auto iterEmplace = mTerrainData.emplace( std::piecewise_construct, std::forward_as_tuple( heightmapID ), std::forward_as_tuple( mDevice, mContext, width, height ) );
+		TerrainRenderData& renderData = iterEmplace.first->second;
+
+		UpdateRenderData( renderData, heightmapID );
+
+		return renderData;
 	}
 
-	void DX11TerrainPass::GetTextureMapDimensions( uint32_t& width, uint32_t& height, CachedTextureMap type, DX11TextureID heightmapID )
+	void DX11TerrainPass::GetTextureDimensions( uint32_t& width, uint32_t& height, DX11TextureID heightmapID )
 	{
 		const DX11Texture& heightTexture = mTextureMap.GetItem( heightmapID );
 
@@ -293,96 +303,39 @@ namespace JonsEngine
 		ZeroMemory( &desc, sizeof( D3D11_TEXTURE2D_DESC ) );
 		heightTexture.GetDesc( desc );
 
-		switch ( type )
-		{
-			case CachedTextureMap::NORMAL:
-			{
-				width = desc.Width;
-				height = desc.Height;
-				break;
-			}
-
-			default:
-				assert( false && "Unhandled case" );
-		}
+		width = desc.Width;
+		height = desc.Height;
 	}
 
-	DXGI_FORMAT DX11TerrainPass::GetTextureMapFormat( CachedTextureMap type )
-	{
-		switch ( type )
-		{
-			case CachedTextureMap::NORMAL: return DXGI_FORMAT_R10G10B10A2_UNORM;
-			default:
-			{
-				assert( false && "Unhandled case" );
-				return DXGI_FORMAT();
-			}
-		}
-	}
-
-	std::map<DX11TextureID, DX11DynamicTexture>& DX11TerrainPass::GetTextureMap( CachedTextureMap type )
-	{
-		switch ( type )
-		{
-			case CachedTextureMap::NORMAL: return mTerrainNormalMap;
-			default:
-			{
-				assert( false && "Unhandled case" );
-				static std::map<DX11TextureID, DX11DynamicTexture> gEmptyMap;
-				return gEmptyMap;
-			}
-		}
-	}
-
-	void DX11TerrainPass::UpdateTextureMap( CachedTextureMap type, DX11TextureID heightmapID )
+	void DX11TerrainPass::UpdateRenderData( TerrainRenderData& renderData, DX11TextureID heightmapID )
 	{
 		const DX11Texture& heightmapTexture = mTextureMap.GetItem( heightmapID );
-		const DX11DynamicTexture& textureMap = GetTextureMap( type ).at( heightmapID );
+		const DX11DynamicTexture& normalMap = renderData.mNormalMap;
+		const DX11DynamicTexture& topography = renderData.mTopographyMap;
 
-		BindComputeShader( type );
+		mContext->CSSetShader( mNormalMapComputeShader, nullptr, 0 );
 
 		uint32_t dispatchX, dispatchY;
-		GetDispatchDimensions( dispatchX, dispatchY, type, heightmapID );
+		GetDispatchDimensions( dispatchX, dispatchY, heightmapID );
 
 		heightmapTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT_EXTRA );
-		mContext->CSSetUnorderedAccessViews( UAV_SLOT, 1, &textureMap.mUAV.p, nullptr );
+		mContext->CSSetUnorderedAccessViews( UAV_SLOT_0, 1, &normalMap.mUAV.p, nullptr );
+		mContext->CSSetUnorderedAccessViews( UAV_SLOT_1, 1, &topography.mUAV.p, nullptr );
 		mContext->Dispatch( dispatchX, dispatchY, 1 );
-		mContext->CSSetUnorderedAccessViews( UAV_SLOT, 1, &gNullUAV.p, nullptr );
+
+		mContext->CSSetUnorderedAccessViews( UAV_SLOT_0, 1, &gNullUAV.p, nullptr );
+		mContext->CSSetUnorderedAccessViews( UAV_SLOT_1, 1, &gNullUAV.p, nullptr );
 		heightmapTexture.Unbind( SHADER_TEXTURE_SLOT_EXTRA );
 
-		mContext->GenerateMips( textureMap.mSRV );
+		mContext->GenerateMips( normalMap.mSRV );
 	}
 
-	void DX11TerrainPass::BindComputeShader( CachedTextureMap type )
-	{
-		switch ( type )
-		{
-			case CachedTextureMap::NORMAL:
-			{
-				mContext->CSSetShader( mNormalMapComputeShader, nullptr, 0 );
-				break;
-			}
-			default:
-				assert( false && "Unhandled case" );
-		}
-	}
-
-	void DX11TerrainPass::GetDispatchDimensions( uint32_t& x, uint32_t& y, CachedTextureMap type, DX11TextureID heightmapID )
+	void DX11TerrainPass::GetDispatchDimensions( uint32_t& x, uint32_t& y, DX11TextureID heightmapID )
 	{
 		uint32_t width, height;
-		GetTextureMapDimensions( width, height, type, heightmapID );
+		GetTextureDimensions( width, height, heightmapID );
 
-		switch ( type )
-		{
-			case CachedTextureMap::NORMAL:
-			{
-				x = width / TERRAIN_NORMAL_THREADS_AXIS;
-				y = height / TERRAIN_NORMAL_THREADS_AXIS;
-				break;
-			}
-
-			default:
-				assert( false && "Unhandled case" );
-		}
+		x = width / TERRAIN_NORMAL_THREADS_AXIS;
+		y = height / TERRAIN_NORMAL_THREADS_AXIS;
 	}
 }

@@ -2,7 +2,7 @@
 
 #include "Core/Types.h"
 
-#include <string.h>
+#include <string>
 
 namespace JonsEngine
 {
@@ -33,7 +33,7 @@ namespace JonsEngine
 
 
     private:
-        const std::string mAllocatorName;
+        std::string mAllocatorName;
     };
 
 

@@ -8,7 +8,7 @@
 groupshared float2 depthSamples[SDSM_NUM_THREADS];
 
 Texture2D<float> gDepthTexture : register(TEXTURE_REGISTER_DEPTH);
-RWTexture2D<unorm float2> gOutputMap : register(UAV_REGISTER);
+RWTexture2D<unorm float2> gOutputMap : register(UAV_REGISTER_0);
 
 cbuffer SDSMConstants : register(CBUFFER_REGISTER_COMPUTE)
 {

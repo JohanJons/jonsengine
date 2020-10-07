@@ -26,6 +26,7 @@ list( APPEND PIXEL_SHADERS
   SkyboxPixel.hlsl
   SSAOPixel.hlsl
   TerrainPixelDebug.hlsl
+  TerrainPixelTopographyDebug.hlsl
   TerrainPixelNormalSimple.hlsl
   TerrainPixelNormalBetter.hlsl
   TerrainPixelNormalSimpleDebug.hlsl

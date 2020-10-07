@@ -6,6 +6,10 @@
 static const float3 COLOR_RED = float3( 1.0, 0.0, 0.0 );
 static const float3 COLOR_GREEN = float3( 0.0, 1.0, 0.0 );
 static const float3 COLOR_BLUE = float3( 0.0, 0.0, 1.0 );
+static const float3 COLOR_CYAN = float3( 0.0, 1.0, 1.0 );
+static const float3 COLOR_YELLOW = float3( 1.0, 1.0, 0.0 );
+static const float3 COLOR_ORANGE = float3( 1.0, 0.5, 0.25 );
+static const float3 COLOR_GREY = float3( 0.5, 0.5, 0.5 );
 static const float3 COLOR_BLACK = float3( 0.0, 0.0, 0.0 );
 static const float3 COLOR_WHITE = float3( 1.0, 1.0, 1.0 );
 

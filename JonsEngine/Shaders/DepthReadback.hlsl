@@ -6,7 +6,7 @@
 
 
 Texture2D gDepthTexture : register(TEXTURE_REGISTER_DEPTH);
-RWBuffer<float> gOutputDepth : register(UAV_REGISTER);
+RWBuffer<float> gOutputDepth : register(UAV_REGISTER_0);
 
 cbuffer DepthReadbackConstants : register(CBUFFER_REGISTER_COMPUTE)
 {

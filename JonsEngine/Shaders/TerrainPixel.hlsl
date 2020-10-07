@@ -32,7 +32,7 @@ PixelOut ps_main( VertexOut input)
 	viewNormal *= 0.5f;
 
 	ret.mNormal = viewNormal;
-	ret.mDiffuse = float4( 0.0f, 1.0f, 1.0f, 1.0f);
+	ret.mDiffuse = float4( 0.5f, 0.5f, 1.0f, 1.0f);
 #endif
 
 	return ret;

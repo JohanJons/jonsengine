@@ -51,7 +51,7 @@ namespace JonsEngine
 		mDepthbuffer->GetDesc(&depthDesc);
 
 		mContext->CSSetShader(mReadbackShader, nullptr, 0);
-		mContext->CSSetUnorderedAccessViews(UAV_SLOT, 1, &mCSUAV.p, nullptr);
+		mContext->CSSetUnorderedAccessViews(UAV_SLOT_0, 1, &mCSUAV.p, nullptr);
 		mCBuffer.SetData({ { position.x, position.y } });
 		mCBuffer.Bind();
 

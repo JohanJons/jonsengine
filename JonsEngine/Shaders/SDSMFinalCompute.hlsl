@@ -8,7 +8,7 @@
 groupshared float2 depthSamples[SDSM_NUM_THREADS];
 
 Texture2D<float2> gReductionTexture : register(TEXTURE_REGISTER_EXTRA);
-RWTexture2D<unorm float2> gOutputMap : register(UAV_REGISTER);
+RWTexture2D<unorm float2> gOutputMap : register(UAV_REGISTER_0);
 
 
 [numthreads(SDSM_THREAD_GROUP_SIZE, SDSM_THREAD_GROUP_SIZE, 1)]
