@@ -167,23 +167,38 @@ namespace JonsEngine
     }
 
 
-	TerrainDataID ResourceManifest::CreateTerrainData( const std::string& name, const std::string& heightmap, TextureType type, const JonsPackagePtr jonsPkg )
+	TerrainDataID ResourceManifest::CreateTerrainData( const std::string& name, const JonsPackagePtr jonsPkg )
 	{
-		auto heightIter = FindTextureInContainer( heightmap, type, jonsPkg->mTextures );
-		auto textureEndIter = jonsPkg->mTextures.cend();
-		if ( heightIter == textureEndIter )
+		auto terrianIter = FindInContainer( name, jonsPkg->mTerrains );
+		if ( terrianIter == jonsPkg->mTerrains.cend() )
 			return INVALID_TERRAIN_DATA_ID;
 
-		uint32_t terrainWidth = heightIter->mTextureWidth;
-		uint32_t terrainHeight = heightIter->mTextureHeight;
+        if ( terrianIter->mHeightmap == PackageTexture::INVALID_TEXTURE_INDEX )
+        {
+            JONS_LOG_ERROR( Logger::GetCoreLogger(), "No heightmap for terrain" );
+            return INVALID_TERRAIN_DATA_ID;
+        }
+
+        const PackageTerrain& pkgTerrain = *terrianIter;
+		DX11TextureID heightTexture = INVALID_DX11_TEXTURE_ID, riversTexture = INVALID_DX11_TEXTURE_ID;
+
+		auto& pkgHeightmap = jonsPkg->mTextures.at( pkgTerrain.mHeightmap );
+        heightTexture = LoadTexture( pkgHeightmap.mName, pkgHeightmap.mType, pkgHeightmap.mTextureData, pkgHeightmap.mTextureWidth, pkgHeightmap.mTextureHeight );
+
+		if ( pkgTerrain.mRivermap != PackageTexture::INVALID_TEXTURE_INDEX )
+		{
+			auto& pkgRiversmap = jonsPkg->mTextures.at( pkgTerrain.mRivermap );
+            riversTexture = LoadTexture( pkgRiversmap.mName, pkgRiversmap.mType, pkgRiversmap.mTextureData, pkgRiversmap.mTextureWidth, pkgRiversmap.mTextureHeight );
+		}
+
+		uint32_t terrainWidth = pkgHeightmap.mTextureWidth;
+		uint32_t terrainHeight = pkgHeightmap.mTextureHeight;
 		assert( terrainWidth > 0 && terrainHeight > 0 );
 
-		const std::vector<uint8_t>& heightMapData = heightIter->mTextureData;
-		assert( !heightMapData.empty() );
+        TextureType heightmapTextureType = pkgHeightmap.mType;
+		const std::vector<uint8_t>& heightMapData = pkgHeightmap.mTextureData;
 
-		DX11TextureID heightMapTexture = LoadTexture( heightmap, type, heightMapData, terrainWidth, terrainHeight );
-
-		return mTerrainData.Insert( name, terrainWidth, terrainHeight, heightMapTexture, type, heightMapData );
+		return mTerrainData.Insert( name, terrainWidth, terrainHeight, heightTexture, riversTexture, heightmapTextureType, heightMapData );
 	}
 
 	void ResourceManifest::DeleteTerrainData(TerrainDataID& terrainDataId)

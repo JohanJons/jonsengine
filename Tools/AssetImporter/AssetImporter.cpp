@@ -41,6 +41,7 @@ namespace JonsAssetImporter
 	void CreatePackageHeader( JonsPackagePtr jonsPkg, const TomlData& tomlPkg );
 	void ImportModels( JonsPackagePtr jonsPkg, const TomlData& tomlPkg, Assimp& assimpImporter, FreeImage& freeimageParser );
 	void ImportTextures( JonsPackagePtr jonsPkg, const TomlData& tomlPkg, FreeImage& freeimageParser );
+	void ImportTerrains( JonsPackagePtr jonsPkg, const TomlData& tomlPkg );
 
 	template <typename T>
 	bool VerifyNoDuplicateName( const std::vector<T>& arr, const std::string& name );
@@ -70,6 +71,7 @@ namespace JonsAssetImporter
 		CreatePackageHeader( jonsPkg, tomlPkg );
 		ImportModels( jonsPkg, tomlPkg, assimpImporter, freeimageParser );
 		ImportTextures( jonsPkg, tomlPkg, freeimageParser );
+		ImportTerrains( jonsPkg, tomlPkg );
 
 		std::string outfileName = GetTOMLData<std::string>( tomlPkg, "outfile" );
 		WriteJonsPkg( outfileName, jonsPkg );
@@ -127,6 +129,38 @@ namespace JonsAssetImporter
 				freeimageParser.ProcessSkybox( path, name, jonsPkg);
 			else
 				freeimageParser.ProcessTexture2D( path, name, type, jonsPkg );
+		}
+	}
+
+	void ImportTerrains( JonsPackagePtr jonsPkg, const TomlData& tomlPkg )
+	{
+		const auto& terrains = GetTOMLData<std::vector<toml::table>>( tomlPkg, "terrains" );
+		if ( terrains.empty() )
+			return;
+
+		for ( const auto& terrainEntry : terrains )
+		{
+			std::string name = GetTOMLData<std::string>( terrainEntry, "name" );
+			std::string heightmap = GetTOMLData<std::string>( terrainEntry, "heightmap" );
+
+			std::string riversmap;
+			if ( TOMLContains( terrainEntry, "rivermap" ) )
+			{
+				riversmap = GetTOMLData<std::string>( terrainEntry, "rivermap" );
+			}
+
+			jonsPkg->mTerrains.emplace_back( std::move( name ) );
+			PackageTerrain& pkgTerrain = jonsPkg->mTerrains.back();
+
+			if ( !heightmap.empty() )
+			{
+				pkgTerrain.mHeightmap = jonsPkg->FindTexture( heightmap );
+			}
+
+			if ( !riversmap.empty() )
+			{
+				pkgTerrain.mRivermap = jonsPkg->FindTexture( riversmap );
+			}
 		}
 	}
 

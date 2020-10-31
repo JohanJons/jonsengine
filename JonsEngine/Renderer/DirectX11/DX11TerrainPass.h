@@ -57,10 +57,10 @@ namespace JonsEngine
 		void CreateGridMesh( RenderSettings::TerrainMeshDimensions meshDimensions );
 		void RenderInternal( const RenderableTerrains& terrains, const RenderSettings& settings );
 
-		TerrainRenderData& AccessOrCreateRenderData( DX11TextureID heightmapID );
+		TerrainRenderData& AccessOrCreateRenderData( DX11TextureID heightmapID, DX11TextureID rivermapID );
 
 		void GetTextureDimensions( uint32_t& width, uint32_t& height, DX11TextureID heightmapID );
-		void UpdateRenderData( TerrainRenderData& renderData, DX11TextureID heightmapID );
+		void UpdateRenderData( TerrainRenderData& renderData, DX11TextureID heightmapID, DX11TextureID rivermapID );
 		void GetDispatchDimensions( uint32_t& x, uint32_t& y, DX11TextureID heightmapID );
 
 		ID3D11DeviceContextPtr mContext = nullptr;

@@ -34,6 +34,10 @@ cbuffer PerFrameCB : register(CBUFFER_REGISTER_PER_FRAME)
 	float gTerrainMeshSize;
 };
 
+bool IsEqual( float3 a, float3 b )
+{
+	return a.x == b.x && a.y == b.y && a.z == b.z;
+}
 
 float3 SampleNormalTexture(in Texture2D normalTexture, uint2 samplePosition)
 {

@@ -167,12 +167,25 @@ namespace JonsEngine
 		BoneParentMap mBoneParentMap;
     };
 
+    struct PackageTerrain
+    {
+        PackageTerrain() = default;
+        PackageTerrain( std::string&& terrainName );
+
+        std::string mName;
+        PackageTexture::TextureIndex mHeightmap;
+        PackageTexture::TextureIndex mRivermap;
+    };
+
     struct JonsPackage
     {
         PackageHeader mHeader;
         std::vector<PackageModel> mModels;
         std::vector<PackageMaterial> mMaterials;
 		std::vector<PackageTexture> mTextures;
+        std::vector<PackageTerrain> mTerrains;
+
+        PackageTexture::TextureIndex FindTexture( const std::string& name ) const;
     };
 
 
@@ -296,6 +309,14 @@ namespace boost
 			ar & model.mBoneParentMap;
         }
 
+		template<class Archive>
+		void serialize( Archive& ar, JonsEngine::PackageTerrain& model, const unsigned int version )
+		{
+			ar& model.mName;
+			ar& model.mHeightmap;
+            ar& model.mRivermap;
+		}
+
         template<class Archive>
         void serialize(Archive & ar, JonsEngine::JonsPackage& pkg, const unsigned int version)
         {
@@ -303,6 +324,7 @@ namespace boost
             ar & pkg.mModels;
             ar & pkg.mMaterials;
             ar & pkg.mTextures;
+            ar & pkg.mTerrains;
         }
 
         template<class Archive>

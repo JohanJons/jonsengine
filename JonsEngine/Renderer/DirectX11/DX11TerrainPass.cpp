@@ -33,7 +33,7 @@ namespace JonsEngine
 
 	DX11TerrainPass::TerrainRenderData::TerrainRenderData( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, uint32_t textureWidth, uint32_t textureHeight ) :
 		mNormalMap( device, context, DXGI_FORMAT_R10G10B10A2_UNORM, textureWidth, textureHeight, true, true ),
-		mTopographyMap( device, context, DXGI_FORMAT_R8_UINT, textureWidth, textureHeight, true, true ) // TODO
+		mTopographyMap( device, context, DXGI_FORMAT_R8G8B8A8_UINT, textureWidth, textureHeight, true, true ) // TODO
 	{
 	}
 
@@ -245,10 +245,10 @@ namespace JonsEngine
 		uint32_t beginIndex = 0;
 		for ( const RenderableTerrainData& terrainData : terrains.mTerrainData )
 		{
-			const TerrainRenderData& renderData = AccessOrCreateRenderData( terrainData.mHeightMap );
+			const TerrainRenderData& renderData = AccessOrCreateRenderData( terrainData.mHeightMap, terrainData.mRiversMap );
+
 			const DX11DynamicTexture& normalMap = renderData.mNormalMap;
 			const DX11DynamicTexture& topography = renderData.mTopographyMap;
-
 			const DX11Texture& heightmap = mTextureMap.GetItem( terrainData.mHeightMap );
 			heightmap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
 			normalMap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_NORMAL );
@@ -275,7 +275,7 @@ namespace JonsEngine
 		}
 	}
 
-	DX11TerrainPass::TerrainRenderData& DX11TerrainPass::AccessOrCreateRenderData( DX11TextureID heightmapID )
+	DX11TerrainPass::TerrainRenderData& DX11TerrainPass::AccessOrCreateRenderData( DX11TextureID heightmapID, DX11TextureID rivermapID )
 	{
 		auto iterFind = mTerrainData.find( heightmapID );
 		if ( iterFind != mTerrainData.cend() )
@@ -290,7 +290,7 @@ namespace JonsEngine
 		auto iterEmplace = mTerrainData.emplace( std::piecewise_construct, std::forward_as_tuple( heightmapID ), std::forward_as_tuple( mDevice, mContext, width, height ) );
 		TerrainRenderData& renderData = iterEmplace.first->second;
 
-		UpdateRenderData( renderData, heightmapID );
+		UpdateRenderData( renderData, heightmapID, rivermapID );
 
 		return renderData;
 	}
@@ -307,9 +307,10 @@ namespace JonsEngine
 		height = desc.Height;
 	}
 
-	void DX11TerrainPass::UpdateRenderData( TerrainRenderData& renderData, DX11TextureID heightmapID )
+	void DX11TerrainPass::UpdateRenderData( TerrainRenderData& renderData, DX11TextureID heightmapID, DX11TextureID rivermapID )
 	{
 		const DX11Texture& heightmapTexture = mTextureMap.GetItem( heightmapID );
+
 		const DX11DynamicTexture& normalMap = renderData.mNormalMap;
 		const DX11DynamicTexture& topography = renderData.mTopographyMap;
 
@@ -319,6 +320,13 @@ namespace JonsEngine
 		GetDispatchDimensions( dispatchX, dispatchY, heightmapID );
 
 		heightmapTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT_EXTRA );
+
+		if ( rivermapID != INVALID_DX11_TEXTURE_ID )
+		{
+			const DX11Texture& rivermapTexture = mTextureMap.GetItem( rivermapID );
+			rivermapTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT_EXTRA_2 );
+		}
+
 		mContext->CSSetUnorderedAccessViews( UAV_SLOT_0, 1, &normalMap.mUAV.p, nullptr );
 		mContext->CSSetUnorderedAccessViews( UAV_SLOT_1, 1, &topography.mUAV.p, nullptr );
 		mContext->Dispatch( dispatchX, dispatchY, 1 );
@@ -326,6 +334,7 @@ namespace JonsEngine
 		mContext->CSSetUnorderedAccessViews( UAV_SLOT_0, 1, &gNullUAV.p, nullptr );
 		mContext->CSSetUnorderedAccessViews( UAV_SLOT_1, 1, &gNullUAV.p, nullptr );
 		heightmapTexture.Unbind( SHADER_TEXTURE_SLOT_EXTRA );
+		heightmapTexture.Unbind( SHADER_TEXTURE_SLOT_EXTRA_2 );
 
 		mContext->GenerateMips( normalMap.mSRV );
 	}

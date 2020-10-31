@@ -21,6 +21,9 @@ using namespace JonsEngine;
 
 namespace JonsGame
 {
+	constexpr float gFastSpeedMulti = 30.0f;
+	constexpr float gVeryFastSpeedMulti = 90.0f;
+
     Game::Game() : 
 		mEngine(mSettings),
 		mGameScene( mEngine.GetSceneManager(), mEngine.GetResourceManifest() ),
@@ -64,10 +67,10 @@ namespace JonsGame
 			switch ( evnt.mKey )
 			{
 				// camera
-				case Key::A: camera.TranslateCamera( -camera.Right() * mMoveSpeed * 30.0f );   break;
-				case Key::W: camera.TranslateCamera( camera.Forward() * mMoveSpeed * 30.0f );  break;
-				case Key::S: camera.TranslateCamera( -camera.Forward() * mMoveSpeed * 30.0f ); break;
-				case Key::D: camera.TranslateCamera( camera.Right() * mMoveSpeed * 30.0f );    break;
+				case Key::A: camera.TranslateCamera( -camera.Right() * mMoveSpeed * gFastSpeedMulti );   break;
+				case Key::W: camera.TranslateCamera( camera.Forward() * mMoveSpeed * gFastSpeedMulti );  break;
+				case Key::S: camera.TranslateCamera( -camera.Forward() * mMoveSpeed * gFastSpeedMulti ); break;
+				case Key::D: camera.TranslateCamera( camera.Right() * mMoveSpeed * gFastSpeedMulti );    break;
 				default:
 					break;
 			}
@@ -104,6 +107,19 @@ namespace JonsGame
 				}
 			}
         }
+		else if ( evnt.mControlPressed )
+		{
+			switch ( evnt.mKey )
+			{
+				// camera
+				case Key::A: camera.TranslateCamera( -camera.Right() * mMoveSpeed * gVeryFastSpeedMulti );   break;
+				case Key::W: camera.TranslateCamera( camera.Forward() * mMoveSpeed * gVeryFastSpeedMulti );  break;
+				case Key::S: camera.TranslateCamera( -camera.Forward() * mMoveSpeed * gVeryFastSpeedMulti ); break;
+				case Key::D: camera.TranslateCamera( camera.Right() * mMoveSpeed * gVeryFastSpeedMulti );    break;
+				default:
+					break;
+			}
+		}
         // no modifiers
         else
         {

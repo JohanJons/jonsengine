@@ -125,6 +125,26 @@ namespace JonsEngine
     {
     }
 
+    PackageTerrain::PackageTerrain( std::string&& terrainName ) :
+        mName( std::move( terrainName ) ),
+        mHeightmap( PackageTexture::INVALID_TEXTURE_INDEX ),
+        mRivermap( PackageTexture::INVALID_TEXTURE_INDEX )
+    {
+    }
+
+    PackageTexture::TextureIndex JonsPackage::FindTexture( const std::string& name ) const
+    {
+        for ( int32_t index = 0; index < mTextures.size(); ++index )
+        {
+            const PackageTexture& texture = mTextures.at( index );
+            if ( texture.mName == name )
+            {
+                return index;
+            }
+        }
+        
+        return PackageTexture::INVALID_TEXTURE_INDEX;
+    }
 
     JonsPackagePtr ReadJonsPkg(const std::string& jonsPkgName)
     {

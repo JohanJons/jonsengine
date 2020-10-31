@@ -10,7 +10,7 @@
 #define TOPOGRAPHY_COUNT 4
 
 Texture2D gNormalMap : register( TEXTURE_REGISTER_NORMAL );
-Texture2D gTopographyMap : register( TEXTURE_REGISTER_EXTRA_2 );
+Texture2D<uint3> gTopographyMap : register( TEXTURE_REGISTER_EXTRA_2 );
 
 cbuffer PerTerrainConstants : register( CBUFFER_REGISTER_EXTRA )
 {
@@ -28,25 +28,5 @@ struct VertexOut
 	uint mLOD : LOD;
 	float mMorph : MORPH;
 };
-
-uint GetTopography( float heightVal )
-{
-	if ( heightVal <= 0.0f )
-	{
-		return TOPOGRAPHY_SEA;
-	}
-	else if ( heightVal > 0.0f && heightVal <= 0.1f )
-	{
-		return TOPOGRAPHY_RIVER;
-	}
-	else if ( heightVal > 0.1f && heightVal < 0.4f )
-	{
-		return TOPOGRAPHY_PLAINS;
-	}
-	else
-	{
-		return TOPOGRAPHY_MOUNTAINS;
-	}
-}
 
 #endif

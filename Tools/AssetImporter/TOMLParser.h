@@ -8,6 +8,7 @@ namespace JonsAssetImporter
 	using TomlData = toml::value;
 
 	TomlData LoadTOML( const std::string& filePath );
+	bool TOMLContains( const TomlData& package, const std::string& key );
 
 	template <typename T>
 	T GetTOMLData( const TomlData& package, const std::string& key )

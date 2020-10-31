@@ -204,6 +204,7 @@ namespace JonsEngine
 			const TerrainData& terrainData = mResourceManifest.GetTerrainData( terrainDataID );
 
 			DX11TextureID heightmap = terrainData.GetHeightMap();
+			DX11TextureID riversmap = terrainData.GetRiversMap();
 			float heightScale = terrain.GetHeightScale();
 			float variationScale = terrain.GetVariationScale();
 
@@ -224,7 +225,7 @@ namespace JonsEngine
 			Vec2 worldMin, worldMax;
 			quadTree.GetWorldXZBounds( worldMin, worldMax );
 			uint32_t renderableEndIndex = static_cast<uint32_t>( transforms.size() );
-			mRenderQueue.mTerrains.mTerrainData.emplace_back( std::move( morphConstants ), heightmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale );
+			mRenderQueue.mTerrains.mTerrainData.emplace_back( std::move( morphConstants ), heightmap, riversmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale );
 		}
 	}
 

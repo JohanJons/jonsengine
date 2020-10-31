@@ -44,6 +44,11 @@ path = "Assets/terrain_heightmap.png"
 type = "height16"
 
 [[textures]]
+name = "terrain_rivers"
+path = "Assets/rivers_larger.png"
+type = "diffuse"
+
+[[textures]]
 name = "terrain_test"
 path = "Assets/tessellation_test.png"
 type = "height8"
@@ -52,3 +57,13 @@ type = "height8"
 name = "skybox"
 path = "Assets/skybox_v.jpg"
 type = "skybox"
+
+# terrains
+[[terrains]]
+name = "test"
+heightmap = "terrain_test"
+
+[[terrains]]
+name = "mesopotamia"
+heightmap = "terrain_heightmap"
+rivermap = "terrain_rivers"

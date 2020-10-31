@@ -15,8 +15,10 @@ PixelOut ps_main( VertexOut input )
 {
 	PixelOut ret;
 
-	uint topographyIndex = gTopographyMap.Sample( gLinearSampler, input.mTexcoord ).r;
-	float3 debugColor = DebugTopographyColors[ topographyIndex ];
+	int2 index = input.mTexcoord * int2(12000, 9000);
+
+	uint3 topographyIndex = gTopographyMap.Load( int3( index, 0 ) );
+	float3 debugColor = DebugTopographyColors[ topographyIndex.x ];
 	ret.mDiffuse = float4( debugColor, 1.0f );
 
 	return ret;
