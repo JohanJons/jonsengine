@@ -57,7 +57,7 @@ void cs_main(uint3 groupID : SV_GroupID, uint3 dispatchTID : SV_DispatchThreadID
 {
 	int3 texCoord = int3( dispatchTID.xy, 0 );
 
-	float3 normal = SobelFilter( texCoord );
+	float3 normal = SobelFilter( gHeightmap, texCoord );
 	normal += 1.0f;
 	normal *= 0.5f;
 

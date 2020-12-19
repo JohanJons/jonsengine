@@ -41,7 +41,9 @@ namespace JonsGame
 
 		scene.SetSkybox( mSkybox );
 
-		FlipTerrain();
+		scene.GetSceneCamera().SetPosition( { 1058.0f, 140.0f, -235.0f } );
+
+		//FlipTerrain();
 	}
 
 	SceneTessellation::~SceneTessellation()

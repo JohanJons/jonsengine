@@ -45,7 +45,7 @@ type = "height16"
 
 [[textures]]
 name = "terrain_rivers"
-path = "Assets/rivers_larger.png"
+path = "Assets/rivers_real.png"
 type = "diffuse"
 
 [[textures]]
