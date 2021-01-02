@@ -9,6 +9,15 @@ struct VertexIn
 	uint mInstanceID : SV_InstanceID;
 };
 
+cbuffer PerTerrainConstants : register( CBUFFER_REGISTER_EXTRA )
+{
+	float2 gWorldMin;
+	float2 gWorldMax;
+	float gHeightModifier;
+	float gVariationScale;
+	uint gTransformOffset;
+}
+
 Texture2D gHeightmap : register( TEXTURE_REGISTER_EXTRA );
 
 StructuredBuffer<float2> gLODMorphConstants : register ( SBUFFER_REGISTER_EXTRA );

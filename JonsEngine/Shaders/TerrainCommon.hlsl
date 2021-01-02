@@ -12,15 +12,6 @@
 Texture2D gNormalMap : register( TEXTURE_REGISTER_NORMAL );
 Texture2D<uint3> gTopographyMap : register( TEXTURE_REGISTER_EXTRA_2 );
 
-cbuffer PerTerrainConstants : register( CBUFFER_REGISTER_EXTRA )
-{
-	float2 gWorldMin;
-	float2 gWorldMax;
-	float gHeightModifier;
-	float gVariationScale;
-	uint gTransformOffset;
-}
-
 struct VertexOut
 {
 	float4 mPosition : SV_POSITION;

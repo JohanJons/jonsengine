@@ -27,6 +27,7 @@ list( APPEND PIXEL_SHADERS
   SSAOPixel.hlsl
   TerrainPixelDebug.hlsl
   TerrainPixelTopographyDebug.hlsl
+  TerrainPixelMoistureDebug.hlsl
   TerrainPixelNormalSimple.hlsl
   TerrainPixelNormalBetter.hlsl
   TerrainPixelNormalSimpleDebug.hlsl
@@ -39,6 +40,8 @@ list( APPEND COMPUTE_SHADERS
   SDSMInitialCompute.hlsl
   SDSMFinalCompute.hlsl
   TerrainComputeNormal.hlsl
+  TerrainComputeJFA.hlsl
+  TerrainComputeMoisture.hlsl
 )
 
 list( APPEND DOMAIN_SHADERS 

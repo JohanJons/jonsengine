@@ -41,12 +41,21 @@ namespace JonsEngine
 			uint32_t __padding;
 		};
 
+		struct JFACBuffer
+		{
+			int32_t mOffsetX;
+			int32_t mOffsetY;
+			uint32_t __padding[ 2 ];
+		};
+
 		struct TerrainRenderData
 		{
 			TerrainRenderData( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, uint32_t textureWidth, uint32_t textureHeight );
 
 			DX11DynamicTexture mNormalMap;
 			DX11DynamicTexture mTopographyMap;
+			DX11DynamicTexture mJumpFloodRiverMap;
+			DX11DynamicTexture mMoistureMap;
 		};
 
 	private:
@@ -60,8 +69,12 @@ namespace JonsEngine
 		TerrainRenderData& AccessOrCreateRenderData( DX11TextureID heightmapID, DX11TextureID rivermapID );
 
 		void GetTextureDimensions( uint32_t& width, uint32_t& height, DX11TextureID heightmapID );
-		void UpdateRenderData( TerrainRenderData& renderData, DX11TextureID heightmapID, DX11TextureID rivermapID );
 		void GetDispatchDimensions( uint32_t& x, uint32_t& y, DX11TextureID heightmapID );
+
+		void UpdateRenderData( TerrainRenderData& renderData, DX11TextureID heightmapID, DX11TextureID rivermapID );
+		void UpdateNormalMapAndPrepJFA( TerrainRenderData& renderData, DX11TextureID heightmapID, DX11TextureID rivermapID, uint32_t dispatchX, uint32_t dispatchY );
+		void UpdateJFA( TerrainRenderData& renderData, uint32_t width, uint32_t height, uint32_t dispatchX, uint32_t dispatchY );
+		void UpdateMoistureMap(TerrainRenderData& renderData, uint32_t dispatchX, uint32_t dispatchY);
 
 		ID3D11DeviceContextPtr mContext = nullptr;
         ID3D11DevicePtr mDevice = nullptr;
@@ -74,14 +87,18 @@ namespace JonsEngine
 		ID3D11PixelShaderPtr mPixelNormalBetterShaderDebug = nullptr;
 		ID3D11PixelShaderPtr mPixelCDLODDebugShader = nullptr;
 		ID3D11PixelShaderPtr mPixelTopographyDebugShader = nullptr;
+		ID3D11PixelShaderPtr mPixelMoistureDebugShader = nullptr;
 		ID3D11RasterizerStatePtr mDebugRasterizer = nullptr;
 		ID3D11ComputeShaderPtr mNormalMapComputeShader = nullptr;
+		ID3D11ComputeShaderPtr mJFAComputeShader = nullptr;
+		ID3D11ComputeShaderPtr mMoistureComputeShader = nullptr;
 
 		RenderSettings::TerrainMeshDimensions mCachedMeshDimensions;
 		std::map<DX11TextureID, TerrainRenderData> mTerrainData;
 		DX11Mesh mGridMesh;
 
 		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;
+		DX11ConstantBuffer<JFACBuffer> mJFACBuffer;
 		DX11CPUDynamicBuffer mLODMorphConstantsBuffer;
 		DX11CPUDynamicBuffer mTransformBuffer;
 		DX11CPUDynamicBuffer mLODLevelBuffer;

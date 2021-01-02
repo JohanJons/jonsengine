@@ -196,7 +196,8 @@ namespace JonsEngine
 		bool drawNormals = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
 		bool drawWireframe = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
         bool drawTopography = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_TOPOGRAPHY );
-		if ( drawNormals || drawWireframe || drawTopography )
+        bool drawMoisture = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_MOISTURE );
+		if ( drawNormals || drawWireframe || drawTopography || drawMoisture )
 			mTerrainPass.RenderDebug( renderQueue.mTerrains, renderSettings, debugFlags );
 	}
 

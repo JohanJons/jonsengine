@@ -39,6 +39,11 @@ bool IsEqual( float3 a, float3 b )
 	return a.x == b.x && a.y == b.y && a.z == b.z;
 }
 
+bool IsZero( int2 value )
+{
+	return value.x == 0 && value.y == 0;
+}
+
 float3 SampleNormalTexture(in Texture2D normalTexture, uint2 samplePosition)
 {
     float3 normal = normalTexture[samplePosition].xyz;

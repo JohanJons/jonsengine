@@ -5,8 +5,11 @@
 #include "Renderer/RenderSettings.h"
 #include "Compiled/TerrainVertex.h"
 #include "Compiled/TerrainComputeNormal.h"
+#include "Compiled/TerrainComputeJFA.h"
+#include "Compiled/TerrainComputeMoisture.h"
 #include "Compiled/TerrainPixelDebug.h"
 #include "Compiled/TerrainPixelTopographyDebug.h"
+#include "Compiled/TerrainPixelMoistureDebug.h"
 #include "Compiled/TerrainPixelNormalSimple.h"
 #include "Compiled/TerrainPixelNormalSimpleDebug.h"
 #include "Compiled/TerrainPixelNormalBetter.h"
@@ -33,7 +36,9 @@ namespace JonsEngine
 
 	DX11TerrainPass::TerrainRenderData::TerrainRenderData( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, uint32_t textureWidth, uint32_t textureHeight ) :
 		mNormalMap( device, context, DXGI_FORMAT_R10G10B10A2_UNORM, textureWidth, textureHeight, true, true ),
-		mTopographyMap( device, context, DXGI_FORMAT_R8G8B8A8_UINT, textureWidth, textureHeight, true, true ) // TODO
+		mTopographyMap( device, context, DXGI_FORMAT_R8G8B8A8_UINT, textureWidth, textureHeight, true, true ),
+		mJumpFloodRiverMap( device, context, DXGI_FORMAT_R16G16_UINT, textureWidth, textureHeight, true, true ),
+		mMoistureMap( device, context, DXGI_FORMAT_R32_FLOAT, textureWidth, textureHeight, true, true )
 	{
 	}
 
@@ -44,6 +49,7 @@ namespace JonsEngine
 		mTextureMap( textureMap ),
 		mCachedMeshDimensions( meshDimensions ),
 		mPerTerrainCBuffer( device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_EXTRA ),
+		mJFACBuffer( device, context, mJFACBuffer.CONSTANT_BUFFER_SLOT_EXTRA ),
 		mLODMorphConstantsBuffer( device, context ),
 		mTransformBuffer( device, context ),
 		mLODLevelBuffer( device, context )
@@ -69,7 +75,10 @@ namespace JonsEngine
 		DXCALL( device->CreatePixelShader( gTerrainPixelNormalBetterDebug, sizeof( gTerrainPixelNormalBetterDebug ), nullptr, &mPixelNormalBetterShaderDebug ) );
 		DXCALL( device->CreatePixelShader( gTerrainPixelDebug, sizeof( gTerrainPixelDebug ), nullptr, &mPixelCDLODDebugShader ) );
 		DXCALL( device->CreatePixelShader( gTerrainPixelTopographyDebug, sizeof( gTerrainPixelTopographyDebug ), nullptr, &mPixelTopographyDebugShader ) );
+		DXCALL( device->CreatePixelShader( gTerrainPixelMoistureDebug, sizeof( gTerrainPixelMoistureDebug ), nullptr, &mPixelMoistureDebugShader ) );
 		DXCALL( device->CreateComputeShader( gTerrainComputeNormal, sizeof( gTerrainComputeNormal ), nullptr, &mNormalMapComputeShader ) );
+		DXCALL( device->CreateComputeShader( gTerrainComputeJFA, sizeof( gTerrainComputeJFA ), nullptr, &mJFAComputeShader ) );
+		DXCALL( device->CreateComputeShader( gTerrainComputeMoisture, sizeof( gTerrainComputeMoisture ), nullptr, &mMoistureComputeShader ) );
 
 		D3D11_RASTERIZER_DESC rasterizerDesc;
 		ZeroMemory( &rasterizerDesc, sizeof( D3D11_RASTERIZER_DESC ) );
@@ -104,6 +113,7 @@ namespace JonsEngine
 
 		bool drawNormals = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
 		bool drawTopography = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_TOPOGRAPHY );
+		bool drawMoisture = debugFlags.test( DebugOptions::RenderingFlag::RENDER_FLAG_DRAW_TERRAIN_MOISTURE );
 
 		if ( drawNormals )
 		{
@@ -125,6 +135,10 @@ namespace JonsEngine
 		else if ( drawTopography )
 		{
 			mContext->PSSetShader( mPixelTopographyDebugShader, nullptr, 0 );
+		}
+		else if ( drawMoisture )
+		{
+			mContext->PSSetShader( mPixelMoistureDebugShader, nullptr, 0 );
 		}
 		else
 			mContext->PSSetShader( mPixelCDLODDebugShader, nullptr, 0 );
@@ -249,10 +263,12 @@ namespace JonsEngine
 
 			const DX11DynamicTexture& normalMap = renderData.mNormalMap;
 			const DX11DynamicTexture& topography = renderData.mTopographyMap;
+			const DX11DynamicTexture& moisture = renderData.mMoistureMap;
 			const DX11Texture& heightmap = mTextureMap.GetItem( terrainData.mHeightMap );
 			heightmap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
 			normalMap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_NORMAL );
 			topography.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA_2 );
+			moisture.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA_3 );
 
 			mPerTerrainCBuffer.SetData( { terrainData.mWorldMin, terrainData.mWorldMax, terrainData.mHeightScale, terrainData.mVariationScale, beginIndex } );
 			mPerTerrainCBuffer.Bind();
@@ -267,6 +283,7 @@ namespace JonsEngine
 
 			mGridMesh.DrawInstanced( numTransforms );
 
+			moisture.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA_3 );
 			topography.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA_2 );
 			normalMap.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_NORMAL );
 			heightmap.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
@@ -307,17 +324,36 @@ namespace JonsEngine
 		height = desc.Height;
 	}
 
+	void DX11TerrainPass::GetDispatchDimensions( uint32_t& x, uint32_t& y, DX11TextureID heightmapID )
+	{
+		uint32_t width, height;
+		GetTextureDimensions( width, height, heightmapID );
+
+		x = width / TERRAIN_NORMAL_THREADS_AXIS;
+		y = height / TERRAIN_NORMAL_THREADS_AXIS;
+	}
+
 	void DX11TerrainPass::UpdateRenderData( TerrainRenderData& renderData, DX11TextureID heightmapID, DX11TextureID rivermapID )
+	{
+		uint32_t width, height;
+		GetTextureDimensions( width, height, heightmapID );
+
+		uint32_t dispatchX, dispatchY;
+		GetDispatchDimensions( dispatchX, dispatchY, heightmapID );
+
+		UpdateNormalMapAndPrepJFA( renderData, heightmapID, rivermapID, dispatchX, dispatchY );
+		UpdateJFA( renderData, width, height, dispatchX, dispatchY );
+		UpdateMoistureMap( renderData, dispatchX, dispatchY );
+	}
+
+	void DX11TerrainPass::UpdateNormalMapAndPrepJFA( TerrainRenderData& renderData, DX11TextureID heightmapID, DX11TextureID rivermapID, uint32_t dispatchX, uint32_t dispatchY )
 	{
 		const DX11Texture& heightmapTexture = mTextureMap.GetItem( heightmapID );
 
 		const DX11DynamicTexture& normalMap = renderData.mNormalMap;
-		const DX11DynamicTexture& topography = renderData.mTopographyMap;
+		const DX11DynamicTexture& JFARiverMap = renderData.mJumpFloodRiverMap;
 
 		mContext->CSSetShader( mNormalMapComputeShader, nullptr, 0 );
-
-		uint32_t dispatchX, dispatchY;
-		GetDispatchDimensions( dispatchX, dispatchY, heightmapID );
 
 		heightmapTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT_EXTRA );
 
@@ -328,7 +364,7 @@ namespace JonsEngine
 		}
 
 		mContext->CSSetUnorderedAccessViews( UAV_SLOT_0, 1, &normalMap.mUAV.p, nullptr );
-		mContext->CSSetUnorderedAccessViews( UAV_SLOT_1, 1, &topography.mUAV.p, nullptr );
+		mContext->CSSetUnorderedAccessViews( UAV_SLOT_1, 1, &JFARiverMap.mUAV.p, nullptr );
 		mContext->Dispatch( dispatchX, dispatchY, 1 );
 
 		mContext->CSSetUnorderedAccessViews( UAV_SLOT_0, 1, &gNullUAV.p, nullptr );
@@ -339,12 +375,55 @@ namespace JonsEngine
 		mContext->GenerateMips( normalMap.mSRV );
 	}
 
-	void DX11TerrainPass::GetDispatchDimensions( uint32_t& x, uint32_t& y, DX11TextureID heightmapID )
+	void DX11TerrainPass::UpdateJFA( TerrainRenderData& renderData, uint32_t width, uint32_t height, uint32_t dispatchX, uint32_t dispatchY )
 	{
-		uint32_t width, height;
-		GetTextureDimensions( width, height, heightmapID );
+		const DX11DynamicTexture& JFARiverMap = renderData.mJumpFloodRiverMap;
 
-		x = width / TERRAIN_NORMAL_THREADS_AXIS;
-		y = height / TERRAIN_NORMAL_THREADS_AXIS;
+		mContext->CSSetShader( mJFAComputeShader, nullptr, 0 );
+
+		mJFACBuffer.Bind();
+
+		mContext->CSSetUnorderedAccessViews( UAV_SLOT_0, 1, &JFARiverMap.mUAV.p, nullptr );
+
+		int32_t logX = static_cast<int32_t>( std::log2( width ) );
+		int32_t logY = static_cast<int32_t>( std::log2( height ) );
+
+		int32_t numRuns = std::max( logX, logY );
+		for ( int32_t runIndex = 0; runIndex < numRuns; ++runIndex )
+		{
+			int32_t offsetX = static_cast<int32_t>( std::pow( 2, logX - runIndex - 1 ) );
+			int32_t offsetY = static_cast<int32_t>( std::pow( 2, logY - runIndex - 1 ) );
+
+			mJFACBuffer.SetData( { offsetX, offsetY } );
+			mContext->Dispatch( dispatchX, dispatchY, 1 );
+		}
+
+		mContext->CSSetUnorderedAccessViews( UAV_SLOT_0, 1, &gNullUAV.p, nullptr );
+	}
+
+	void DX11TerrainPass::UpdateMoistureMap( TerrainRenderData& renderData, uint32_t dispatchX, uint32_t dispatchY )
+	{
+		const DX11DynamicTexture& JFARiverMap = renderData.mJumpFloodRiverMap;
+		const DX11DynamicTexture& moistureMap = renderData.mMoistureMap;
+
+		float dist = glm::sqrt( glm::dot( glm::vec2( 8119.0f, 8119.0f ), glm::vec2( 8119.0f, 4500.0f ) ) );
+		float dist2 = glm::sqrt( glm::dot( glm::vec2( 811.0f, 811.0f ), glm::vec2( 811.0f, 450.0f ) ) );
+		float dist3 = glm::sqrt( glm::dot( glm::vec2( 0.0f, 0.0f ), glm::vec2( 0.0f, 2.0f ) ) );
+
+		float d1 = glm::distance( glm::vec2( 8119.0f, 8119.0f ), glm::vec2( 8119.0f, 4500.0f ) );
+		float d2 = glm::distance( glm::vec2( 811.0f, 811.0f ), glm::vec2( 811.0f, 450.0f ) );
+		float d3 = glm::distance( glm::vec2( 0.0f, 0.0f ), glm::vec2( 0.0f, 2.0f ) );
+
+		mContext->CSSetShader( mMoistureComputeShader, nullptr, 0 );
+
+		JFARiverMap.BindAsShaderResource( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
+
+		mContext->CSSetUnorderedAccessViews( UAV_SLOT_0, 1, &moistureMap.mUAV.p, nullptr );
+
+		mContext->Dispatch( dispatchX, dispatchY, 1 );
+
+		mContext->CSSetUnorderedAccessViews( UAV_SLOT_0, 1, &gNullUAV.p, nullptr );
+
+		JFARiverMap.Unbind( SHADER_TEXTURE_SLOT::SHADER_TEXTURE_SLOT_EXTRA );
 	}
 }

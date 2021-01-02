@@ -180,25 +180,36 @@ namespace JonsGame
 				{
 					case Key::TWO: mTessellationScene.GetTerrain().SetVariationScale( 3.0f ); break;
 					case Key::THREE: mTessellationScene.GetTerrain().SetVariationScale( 6.0f ); break;
-					case Key::SIX: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_PATCH ); break;
+					case Key::FOUR: mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_PATCH ); break;
+					case Key::FIVE:
+					{
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_TOPOGRAPHY, false );
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_NORMAL, false );
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_MOISTURE, false );
+						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
+						break;
+					}
+					case Key::SIX:
+					{
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_TOPOGRAPHY, false );
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME, false );
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_MOISTURE, false );
+						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
+						break;
+					}
 					case Key::SEVEN:
 					{
 						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_TOPOGRAPHY, false );
-						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_NORMAL, false ); 
-						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME );
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME, false );
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_NORMAL, false );
+						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_MOISTURE );
 						break;
 					}
 					case Key::EIGHT:
 					{
-						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_TOPOGRAPHY, false );
-						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME, false );
-						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_NORMAL );
-						break;
-					}
-					case Key::NINE:
-					{
 						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_WIREFRAME, false );
 						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_NORMAL, false );
+						mDebugOptions.mRenderingFlags.set( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_MOISTURE, false );
 						mDebugOptions.mRenderingFlags.flip( DebugOptions::RENDER_FLAG_DRAW_TERRAIN_TOPOGRAPHY );
 						break;
 					}
