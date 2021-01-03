@@ -1,9 +1,10 @@
 #include "AssetImporter.h"
 
+#include "Core/Utils/TOMLParser.h"
+
 #include "Utils.h"
 #include "Assimp.h"
 #include "FreeImageParser.h"
-#include "TOMLParser.h"
 
 using namespace JonsEngine;
 
@@ -46,6 +47,7 @@ namespace JonsAssetImporter
 	template <typename T>
 	bool VerifyNoDuplicateName( const std::vector<T>& arr, const std::string& name );
 
+	auto gLogLambdaFunc = []( const std::string& error ) { Log( error ); };
 
     ParseResult ParseCommands( const std::vector<std::string>& parameters )
     {
@@ -60,7 +62,7 @@ namespace JonsAssetImporter
 
 		const std::string& tomlFile = parameters.front();
 
-		TomlData tomlPkg = LoadTOML( tomlFile );
+		TomlData tomlPkg = LoadTOML( tomlFile, gLogLambdaFunc );
 		if ( tomlPkg.is_uninitialized() )
 		{
 			return { false, FlushLog() };
@@ -73,7 +75,7 @@ namespace JonsAssetImporter
 		ImportTextures( jonsPkg, tomlPkg, freeimageParser );
 		ImportTerrains( jonsPkg, tomlPkg );
 
-		std::string outfileName = GetTOMLData<std::string>( tomlPkg, "outfile" );
+		std::string outfileName = GetTOMLData<std::string>( tomlPkg, "outfile", gLogLambdaFunc );
 		WriteJonsPkg( outfileName, jonsPkg );
 
 		return { true, FlushLog() };
@@ -81,21 +83,21 @@ namespace JonsAssetImporter
 
 	void CreatePackageHeader( JonsPackagePtr jonsPkg, const TomlData& tomlPkg )
 	{
-		const TomlData& packageInfo = GetTOMLData<TomlData>( tomlPkg, "package" );
+		const TomlData& packageInfo = GetTOMLData<TomlData>( tomlPkg, "package", gLogLambdaFunc );
 
-		jonsPkg->mHeader.mName = GetTOMLData<std::string>( packageInfo, "name" );
+		jonsPkg->mHeader.mName = GetTOMLData<std::string>( packageInfo, "name", gLogLambdaFunc );
 	}
 
 	void ImportModels( JonsPackagePtr jonsPkg, const TomlData& tomlPkg, Assimp& assimpImporter, FreeImage& freeimageParser )
 	{
-		const auto& models = GetTOMLData<std::vector<toml::table>>( tomlPkg, "models" );
+		const auto& models = GetTOMLData<std::vector<toml::table>>( tomlPkg, "models", gLogLambdaFunc );
 		if ( models.empty() )
 			return;
 
 		for ( const auto& modelEntry : models )
 		{
-			std::string name = GetTOMLData<std::string>( modelEntry, "name" );
-			std::string path = GetTOMLData<std::string>( modelEntry, "path" );
+			std::string name = GetTOMLData<std::string>( modelEntry, "name", gLogLambdaFunc );
+			std::string path = GetTOMLData<std::string>( modelEntry, "path", gLogLambdaFunc );
 
 			if ( !VerifyNoDuplicateName( jonsPkg->mModels, name ) )
 			{
@@ -109,15 +111,15 @@ namespace JonsAssetImporter
 
 	void ImportTextures( JonsPackagePtr jonsPkg, const TomlData& tomlPkg, FreeImage& freeimageParser )
 	{
-		const auto& textures = GetTOMLData<std::vector<toml::table>>( tomlPkg, "textures" );
+		const auto& textures = GetTOMLData<std::vector<toml::table>>( tomlPkg, "textures", gLogLambdaFunc );
 		if ( textures.empty() )
 			return;
 
 		for ( const auto& textureEntry : textures )
 		{
-			std::string name = GetTOMLData<std::string>( textureEntry, "name" );
-			std::string path = GetTOMLData<std::string>( textureEntry, "path" );
-			TextureType type = GetTextureTypeFromString( GetTOMLData<std::string>( textureEntry, "type" ) );
+			std::string name = GetTOMLData<std::string>( textureEntry, "name", gLogLambdaFunc );
+			std::string path = GetTOMLData<std::string>( textureEntry, "path", gLogLambdaFunc );
+			TextureType type = GetTextureTypeFromString( GetTOMLData<std::string>( textureEntry, "type", gLogLambdaFunc ) );
 
 			if ( !VerifyNoDuplicateName( jonsPkg->mTextures, name ) )
 			{
@@ -134,19 +136,19 @@ namespace JonsAssetImporter
 
 	void ImportTerrains( JonsPackagePtr jonsPkg, const TomlData& tomlPkg )
 	{
-		const auto& terrains = GetTOMLData<std::vector<toml::table>>( tomlPkg, "terrains" );
+		const auto& terrains = GetTOMLData<std::vector<toml::table>>( tomlPkg, "terrains", gLogLambdaFunc );
 		if ( terrains.empty() )
 			return;
 
 		for ( const auto& terrainEntry : terrains )
 		{
-			std::string name = GetTOMLData<std::string>( terrainEntry, "name" );
-			std::string heightmap = GetTOMLData<std::string>( terrainEntry, "heightmap" );
+			std::string name = GetTOMLData<std::string>( terrainEntry, "name", gLogLambdaFunc );
+			std::string heightmap = GetTOMLData<std::string>( terrainEntry, "heightmap", gLogLambdaFunc );
 
 			std::string riversmap;
 			if ( TOMLContains( terrainEntry, "rivermap" ) )
 			{
-				riversmap = GetTOMLData<std::string>( terrainEntry, "rivermap" );
+				riversmap = GetTOMLData<std::string>( terrainEntry, "rivermap", gLogLambdaFunc );
 			}
 
 			jonsPkg->mTerrains.emplace_back( std::move( name ) );

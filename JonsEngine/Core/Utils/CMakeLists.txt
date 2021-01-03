@@ -7,4 +7,6 @@
         TimeUtils.h
         Timer.cpp
         Timer.h
+        TOMLParser.cpp
+		TOMLParser.h
 )
