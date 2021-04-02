@@ -24,6 +24,12 @@ namespace JonsEngine
 		void SetVariationScale( float variationScale );
 		float GetVariationScale() const { return mVariationScale; }
 
+		void SetMoistureFalloffBegin( float moistureFalloffBegin ) { mMoistureFalloffBegin = moistureFalloffBegin; }
+		float GetMoistureFalloffBegin() const { return mMoistureFalloffBegin; }
+
+		void SetMoistureFalloffDistance( float moistureFalloffDistance ) { mMoistureFalloffDistance = moistureFalloffDistance; }
+		float GetMoistureFalloffDistance() const { return mMoistureFalloffDistance; }
+
 		const std::string& GetName() const { return mName; }
 		SceneNodeID GetSceneNode() const { return mSceneNodeID; }
 		TerrainDataID GetTerrainData() const { return mTerrainDataID; }
@@ -34,8 +40,10 @@ namespace JonsEngine
 
 	private:
 		std::string mName;
-		float mHeightScale;
-		float mVariationScale;
+		float mHeightScale = 0.0f;
+		float mVariationScale = 0.0f;
+		float mMoistureFalloffBegin = 0.0f;
+		float mMoistureFalloffDistance = 0.0f;
 
 		SceneNodeID mSceneNodeID = INVALID_SCENE_NODE_ID;
 		TerrainDataID mTerrainDataID = INVALID_TERRAIN_DATA_ID;

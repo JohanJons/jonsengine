@@ -125,7 +125,7 @@ namespace JonsEngine
 		TerrainTransforms mTerrainTransforms;
 
 		DirtyFlagsSet mDirtyFlags;
-        bool mHasDirtySceneNodes;
+        bool mHasDirtySceneNodes = false;
         const SceneNodeID mRootNodeID;
     };
 

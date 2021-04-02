@@ -3,6 +3,8 @@
 
 #include "TerrainCommon.hlsl"
 
+Texture2D gNormalMap : register(TEXTURE_REGISTER_NORMAL);
+
 struct PixelOut
 {
 	float4 mDiffuse : SV_Target0;

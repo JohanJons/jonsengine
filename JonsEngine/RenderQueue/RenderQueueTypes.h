@@ -149,30 +149,28 @@ namespace JonsEngine
 		Mat4 mCameraProjectionMatrix;
 		Mat4 mCameraViewProjectionMatrix;
 		Vec3 mCameraPosition;
-		float mFOV;
+		float mFOV = 0.0f;
 	};
 
 	struct RenderableTerrainData
 	{
-		RenderableTerrainData( std::vector<Vec2>&& morphConstants, DX11TextureID heightMap, DX11TextureID riversMap, uint32_t endIndex, Vec2 worldMin, Vec2 worldMax, float heightScale, float variationScale ) :
+		RenderableTerrainData( std::vector<Vec2>&& morphConstants, DX11TextureID heightMap, DX11TextureID riversMap, uint32_t endIndex ) :
 			mLODMorphConstants( std::move( morphConstants ) ),
 			mHeightMap( heightMap ),
 			mRiversMap( riversMap ),
-			mEndIndex( endIndex ),
-			mWorldMin( worldMin ),
-			mWorldMax( worldMax ),
-			mHeightScale( heightScale ),
-			mVariationScale( variationScale )
+			mEndIndex( endIndex )
 		{ }
 
 		std::vector<Vec2> mLODMorphConstants;
 		DX11TextureID mHeightMap;
 		DX11TextureID mRiversMap;
-		uint32_t mEndIndex;
+		uint32_t mEndIndex = 0;
 		Vec2 mWorldMin;
 		Vec2 mWorldMax;
-		float mHeightScale;
-		float mVariationScale;
+		float mHeightScale = 0.0f;
+		float mVariationScale = 0.0f;
+		float mMoistureFalloffBegin = 0.0f;
+		float mMoistureFalloffDistance = 0.0f;
 	};
 
 	struct RenderableTerrains

@@ -38,7 +38,7 @@ namespace JonsEngine
 		mTerrainTransforms( std::move( other.mTerrainTransforms )),
 		mDirtyFlags( std::move( other.mDirtyFlags )),
 		mHasDirtySceneNodes( other.mHasDirtySceneNodes ),
-		mRootNodeID( std::move( other.mRootNodeID ))
+		mRootNodeID( other.mRootNodeID )
 	{
 		// the objects with callbacks to the scene needs special care
 

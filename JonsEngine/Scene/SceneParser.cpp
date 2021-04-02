@@ -225,7 +225,15 @@ namespace JonsEngine
 			Vec2 worldMin, worldMax;
 			quadTree.GetWorldXZBounds( worldMin, worldMax );
 			uint32_t renderableEndIndex = static_cast<uint32_t>( transforms.size() );
-			mRenderQueue.mTerrains.mTerrainData.emplace_back( std::move( morphConstants ), heightmap, riversmap, renderableEndIndex, worldMin, worldMax, heightScale, variationScale );
+			mRenderQueue.mTerrains.mTerrainData.emplace_back( std::move( morphConstants ), heightmap, riversmap, renderableEndIndex );
+
+			RenderableTerrainData& data = mRenderQueue.mTerrains.mTerrainData.back();
+			data.mWorldMin = worldMin;
+			data.mWorldMax = worldMax;
+			data.mHeightScale = heightScale;
+			data.mVariationScale = variationScale;
+			data.mMoistureFalloffBegin = terrain.GetMoistureFalloffBegin();
+			data.mMoistureFalloffDistance = terrain.GetMoistureFalloffDistance();
 		}
 	}
 

@@ -4,6 +4,17 @@
 #include "TerrainCommon.hlsl"
 #include "Common.hlsl"
 
+Texture2D<uint3> gTopographyMap : register( TEXTURE_REGISTER_EXTRA_2 );
+
+cbuffer PerTerrainConstants : register( CBUFFER_REGISTER_EXTRA )
+{
+	float2 gWorldMin;
+	float2 gWorldMax;
+	float gHeightModifier;
+	float gVariationScale;
+	uint gTransformOffset;
+}
+
 struct PixelOut
 {
 	float4 mDiffuse : SV_Target0;
@@ -15,7 +26,7 @@ PixelOut ps_main( VertexOut input )
 {
 	PixelOut ret;
 
-	int2 index = input.mTexcoord * int2(12000, 9000);
+	int2 index = input.mTexcoord * ( int2( gWorldMax - gWorldMin ) ) ;
 
 	uint3 topographyIndex = gTopographyMap.Load( int3( index, 0 ) );
 	float3 debugColor = DebugTopographyColors[ topographyIndex.x ];

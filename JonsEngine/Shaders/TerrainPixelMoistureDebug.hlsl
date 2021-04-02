@@ -24,12 +24,12 @@ PixelOut ps_main( VertexOut input )
 {
 	PixelOut ret;
 
-	int2 index = input.mTexcoord * int2(12000, 9000);
+	int2 index = input.mTexcoord * ( int2( gWorldMax - gWorldMin ) ) ;
 
-	float dist = gMoistureMap.Load( int3( index, 0 ) ).x;
-	float moisture = 1 - dist / ( distance( gWorldMin, gWorldMax ) );
+	float moisture = gMoistureMap.Load( int3( index, 0 ) ).x;
+	float4 moistureColor = float4( lerp( COLOR_GREY, COLOR_GREEN, moisture ), 1.0 );
 
-	ret.mDiffuse = float4( moisture, moisture, moisture, 1.0f );
+	ret.mDiffuse = moistureColor;
 
 	return ret;
 }

@@ -9,9 +9,6 @@
 #define TOPOGRAPHY_MOUNTAINS 3
 #define TOPOGRAPHY_COUNT 4
 
-Texture2D gNormalMap : register( TEXTURE_REGISTER_NORMAL );
-Texture2D<uint3> gTopographyMap : register( TEXTURE_REGISTER_EXTRA_2 );
-
 struct VertexOut
 {
 	float4 mPosition : SV_POSITION;

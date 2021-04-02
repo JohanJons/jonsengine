@@ -5,7 +5,7 @@
 #include "Common.hlsl"
 #include "TerrainCommon.hlsl"
 
-cbuffer PerTerrainConstants : register( CBUFFER_REGISTER_EXTRA )
+cbuffer JFAConstants : register( CBUFFER_REGISTER_EXTRA )
 {
 	int2 gSampleOffset;
 }

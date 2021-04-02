@@ -39,6 +39,15 @@ namespace JonsGame
 		nodeTerrainTest.TranslateNode( Vec3( 300.0f, 670.0f, 0.0f ) );
 		nodeTerrainTest.SetVisible( false );
 
+		Terrain& terrainMeso = scene.GetTerrain( mTerrain );
+		const TerrainData& terrainDataMeso = resManifest.GetTerrainData( terrainMeso.GetTerrainData() );
+
+		float moistureFalloffBegin = std::log2( terrainDataMeso.GetWidth() );
+		float moistureFalloffDistance = moistureFalloffBegin * 20.0f;
+
+		terrainMeso.SetMoistureFalloffBegin( moistureFalloffBegin );
+		terrainMeso.SetMoistureFalloffDistance( moistureFalloffDistance );
+
 		scene.SetSkybox( mSkybox );
 
 		scene.GetSceneCamera().SetPosition( { 1058.0f, 140.0f, -235.0f } );

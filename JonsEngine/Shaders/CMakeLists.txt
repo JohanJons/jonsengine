@@ -39,6 +39,7 @@ list( APPEND COMPUTE_SHADERS
   DepthReadback.hlsl
   SDSMInitialCompute.hlsl
   SDSMFinalCompute.hlsl
+  TerrainComputeAltitude.hlsl
   TerrainComputeNormal.hlsl
   TerrainComputeJFA.hlsl
   TerrainComputeMoisture.hlsl

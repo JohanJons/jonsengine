@@ -19,6 +19,7 @@ namespace JonsEngine
 	class DX11Texture;
 	class DX11VertexTransformPass;
 	struct RenderableTerrains;
+	struct RenderableTerrainData;
     struct RenderSettings;
 
 	class DX11TerrainPass
@@ -48,12 +49,24 @@ namespace JonsEngine
 			uint32_t __padding[ 2 ];
 		};
 
+		struct MoistureCBuffer
+		{
+			float mDistanceFalloffBegin;
+			float mDistanceFalloffDistance;
+			float mHeightScale;
+			uint32_t __padding;
+		};
+
 		struct TerrainRenderData
 		{
 			TerrainRenderData( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, uint32_t textureWidth, uint32_t textureHeight );
 
+			float mMoistureFalloffBegin = 0.0f;
+			float mMoistureFalloffDistance = 0.0f;
+
 			DX11DynamicTexture mNormalMap;
 			DX11DynamicTexture mTopographyMap;
+			DX11DynamicTexture mAverageAltitudeMap;
 			DX11DynamicTexture mJumpFloodRiverMap;
 			DX11DynamicTexture mMoistureMap;
 		};
@@ -66,15 +79,18 @@ namespace JonsEngine
 		void CreateGridMesh( RenderSettings::TerrainMeshDimensions meshDimensions );
 		void RenderInternal( const RenderableTerrains& terrains, const RenderSettings& settings );
 
-		TerrainRenderData& AccessOrCreateRenderData( DX11TextureID heightmapID, DX11TextureID rivermapID );
+		TerrainRenderData& AccessOrCreateRenderData( const RenderableTerrainData& terrainData );
 
 		void GetTextureDimensions( uint32_t& width, uint32_t& height, DX11TextureID heightmapID );
 		void GetDispatchDimensions( uint32_t& x, uint32_t& y, DX11TextureID heightmapID );
 
-		void UpdateRenderData( TerrainRenderData& renderData, DX11TextureID heightmapID, DX11TextureID rivermapID );
+		bool ShouldUpdateBackendTerrainData( const RenderableTerrainData& sceneTerrainData, const TerrainRenderData& renderTerrainData );
+		void UpdateRenderData( TerrainRenderData& renderData, const RenderableTerrainData& sceneTerrainData );
+		void UpdateAltitudeMaps( TerrainRenderData& renderData, DX11TextureID heightmapID, uint32_t dispatchX, uint32_t dispatchY );
 		void UpdateNormalMapAndPrepJFA( TerrainRenderData& renderData, DX11TextureID heightmapID, DX11TextureID rivermapID, uint32_t dispatchX, uint32_t dispatchY );
 		void UpdateJFA( TerrainRenderData& renderData, uint32_t width, uint32_t height, uint32_t dispatchX, uint32_t dispatchY );
-		void UpdateMoistureMap(TerrainRenderData& renderData, uint32_t dispatchX, uint32_t dispatchY);
+		void UpdateMoistureMap( TerrainRenderData& renderData, DX11TextureID heightmapID, float moistureFalloffBegin, float moistureFalloffDistance, float heightScale );
+
 
 		ID3D11DeviceContextPtr mContext = nullptr;
         ID3D11DevicePtr mDevice = nullptr;
@@ -90,6 +106,7 @@ namespace JonsEngine
 		ID3D11PixelShaderPtr mPixelMoistureDebugShader = nullptr;
 		ID3D11RasterizerStatePtr mDebugRasterizer = nullptr;
 		ID3D11ComputeShaderPtr mNormalMapComputeShader = nullptr;
+		ID3D11ComputeShaderPtr mAltitudeComputeShader = nullptr;
 		ID3D11ComputeShaderPtr mJFAComputeShader = nullptr;
 		ID3D11ComputeShaderPtr mMoistureComputeShader = nullptr;
 
@@ -99,6 +116,7 @@ namespace JonsEngine
 
 		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;
 		DX11ConstantBuffer<JFACBuffer> mJFACBuffer;
+		DX11ConstantBuffer<MoistureCBuffer> mMoistureCBuffer;
 		DX11CPUDynamicBuffer mLODMorphConstantsBuffer;
 		DX11CPUDynamicBuffer mTransformBuffer;
 		DX11CPUDynamicBuffer mLODLevelBuffer;
