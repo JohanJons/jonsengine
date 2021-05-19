@@ -29,7 +29,7 @@ void cs_main(uint3 groupID : SV_GroupID, uint3 dispatchTID : SV_DispatchThreadID
 
     if ( groupIndex == 0 && !isOnlySea )
     {
-        // only average height for non-sea samples
+        // only avg height for non-sea samples
         gTotalHeightVals /= ( numSamples - gNumSeaSamples );
         InterlockedAdd( gAverageHeight[ uint2(0, 0) ], gTotalHeightVals );
     }
