@@ -49,6 +49,13 @@ namespace JonsEngine
 			uint32_t __padding[ 2 ];
 		};
 
+		struct AverageAltitudeCBuffer
+		{
+			uint32_t mDispatchX;
+			uint32_t mDispatchY;
+			uint32_t __padding[ 2 ];
+		};
+
 		struct MoistureCBuffer
 		{
 			float mDistanceFalloffBegin;
@@ -66,7 +73,8 @@ namespace JonsEngine
 
 			DX11DynamicTexture mNormalMap;
 			DX11DynamicTexture mTopographyMap;
-			DX11DynamicTexture mAverageAltitudeMap;
+			DX11DynamicTexture mAltitudeMap;
+			DX11DynamicTexture mAverageAltitude;
 			DX11DynamicTexture mJumpFloodRiverMap;
 			DX11DynamicTexture mMoistureMap;
 		};
@@ -107,6 +115,8 @@ namespace JonsEngine
 		ID3D11RasterizerStatePtr mDebugRasterizer = nullptr;
 		ID3D11ComputeShaderPtr mNormalMapComputeShader = nullptr;
 		ID3D11ComputeShaderPtr mAltitudeComputeShader = nullptr;
+		ID3D11ComputeShaderPtr mAverageAltitudeComputeShader = nullptr;
+		ID3D11ComputeShaderPtr mAverageAltitudeFinalComputeShader = nullptr;
 		ID3D11ComputeShaderPtr mJFAComputeShader = nullptr;
 		ID3D11ComputeShaderPtr mMoistureComputeShader = nullptr;
 
@@ -117,6 +127,7 @@ namespace JonsEngine
 		DX11ConstantBuffer<PerTerrainCBuffer> mPerTerrainCBuffer;
 		DX11ConstantBuffer<JFACBuffer> mJFACBuffer;
 		DX11ConstantBuffer<MoistureCBuffer> mMoistureCBuffer;
+		DX11ConstantBuffer<AverageAltitudeCBuffer> mAvgAltitudeCBuffer;
 		DX11CPUDynamicBuffer mLODMorphConstantsBuffer;
 		DX11CPUDynamicBuffer mTransformBuffer;
 		DX11CPUDynamicBuffer mLODLevelBuffer;

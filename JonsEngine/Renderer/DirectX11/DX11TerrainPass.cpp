@@ -6,8 +6,10 @@
 #include "Compiled/TerrainVertex.h"
 #include "Compiled/TerrainComputeNormal.h"
 #include "Compiled/TerrainComputeAltitude.h"
+#include "Compiled/TerrainComputeAltitudeFinal.h"
 #include "Compiled/TerrainComputeJFA.h"
 #include "Compiled/TerrainComputeMoisture.h"
+#include "Compiled/TerrainComputeTopography.h"
 #include "Compiled/TerrainPixelDebug.h"
 #include "Compiled/TerrainPixelTopographyDebug.h"
 #include "Compiled/TerrainPixelMoistureDebug.h"
@@ -38,7 +40,8 @@ namespace JonsEngine
 	DX11TerrainPass::TerrainRenderData::TerrainRenderData( ID3D11DevicePtr device, ID3D11DeviceContextPtr context, uint32_t textureWidth, uint32_t textureHeight ) :
 		mNormalMap( device, context, DXGI_FORMAT_R10G10B10A2_UNORM, textureWidth, textureHeight, true, true ),
 		mTopographyMap( device, context, DXGI_FORMAT_R8G8B8A8_UINT, textureWidth, textureHeight, true, true ),
-		mAverageAltitudeMap( device, context, DXGI_FORMAT_R32_UINT, 2, 2, true, true ),
+		mAltitudeMap( device, context, DXGI_FORMAT_R16_FLOAT, textureWidth, textureHeight, true, true ),
+		mAverageAltitude( device, context, DXGI_FORMAT_R32_UINT, 1, 1, true, true ),
 		mJumpFloodRiverMap( device, context, DXGI_FORMAT_R16G16_UINT, textureWidth, textureHeight, true, true ),
 		mMoistureMap( device, context, DXGI_FORMAT_R32_FLOAT, textureWidth, textureHeight, true, true )
 	{
@@ -53,6 +56,7 @@ namespace JonsEngine
 		mPerTerrainCBuffer( device, context, mPerTerrainCBuffer.CONSTANT_BUFFER_SLOT_EXTRA ),
 		mJFACBuffer( device, context, mJFACBuffer.CONSTANT_BUFFER_SLOT_EXTRA ),
 		mMoistureCBuffer( device, context, mMoistureCBuffer.CONSTANT_BUFFER_SLOT_EXTRA ),
+		mAvgAltitudeCBuffer(device, context, mAvgAltitudeCBuffer.CONSTANT_BUFFER_SLOT_EXTRA),
 		mLODMorphConstantsBuffer( device, context ),
 		mTransformBuffer( device, context ),
 		mLODLevelBuffer( device, context )
@@ -80,7 +84,9 @@ namespace JonsEngine
 		DXCALL( device->CreatePixelShader( gTerrainPixelTopographyDebug, sizeof( gTerrainPixelTopographyDebug ), nullptr, &mPixelTopographyDebugShader ) );
 		DXCALL( device->CreatePixelShader( gTerrainPixelMoistureDebug, sizeof( gTerrainPixelMoistureDebug ), nullptr, &mPixelMoistureDebugShader ) );
 		DXCALL( device->CreateComputeShader( gTerrainComputeNormal, sizeof( gTerrainComputeNormal ), nullptr, &mNormalMapComputeShader ) );
-		DXCALL( device->CreateComputeShader( gTerrainComputeAltitude, sizeof( gTerrainComputeAltitude ), nullptr, &mAltitudeComputeShader ) );
+		DXCALL( device->CreateComputeShader( gTerrainComputeAverageAltitude, sizeof( gTerrainComputeAverageAltitude ), nullptr, &mAverageAltitudeComputeShader ) );
+		DXCALL( device->CreateComputeShader( gTerrainComputeAverageAltitudeFinal, sizeof( gTerrainComputeAverageAltitudeFinal ), nullptr, &mAverageAltitudeFinalComputeShader ) );
+		DXCALL( device->CreateComputeShader( gTerrainComputeTopography, sizeof( gTerrainComputeTopography ), nullptr, &mTopographyComputeShader ) );
 		DXCALL( device->CreateComputeShader( gTerrainComputeJFA, sizeof( gTerrainComputeJFA ), nullptr, &mJFAComputeShader ) );
 		DXCALL( device->CreateComputeShader( gTerrainComputeMoisture, sizeof( gTerrainComputeMoisture ), nullptr, &mMoistureComputeShader ) );
 
@@ -374,13 +380,27 @@ namespace JonsEngine
 	{
 		const DX11Texture& heightmapTexture = mTextureMap.GetItem( heightmapID );
 
-		const DX11DynamicTexture& altitudeMap = renderData.mAverageAltitudeMap;
-
-		mContext->CSSetShader( mAltitudeComputeShader, nullptr, 0 );
+		const DX11DynamicTexture& averageAltitude = renderData.mAverageAltitude;
+		const DX11DynamicTexture& altitudeMap = renderData.mAltitudeMap;
 
 		heightmapTexture.BindAsShaderResource( SHADER_TEXTURE_SLOT_EXTRA );
+
+		// average height
+		mContext->CSSetUnorderedAccessViews( UAV_SLOT_0, 1, &averageAltitude.mUAV.p, nullptr );
+
+		mContext->CSSetShader( mAverageAltitudeComputeShader, nullptr, 0 );
+		mContext->Dispatch( dispatchX, dispatchY, 1 );
+
+		mAvgAltitudeCBuffer.SetData( { dispatchX, dispatchY } );
+		mAvgAltitudeCBuffer.Bind();
+
+		mContext->CSSetShader( mAverageAltitudeFinalComputeShader, nullptr, 0 );
+		mContext->Dispatch( 1, 1, 1 );
+
+		// per-sample altitude
 		mContext->CSSetUnorderedAccessViews( UAV_SLOT_0, 1, &altitudeMap.mUAV.p, nullptr );
 
+		mContext->CSSetShader( mAltitudeComputeShader, nullptr, 0 );
 		mContext->Dispatch( dispatchX, dispatchY, 1 );
 
 		mContext->CSSetUnorderedAccessViews( UAV_SLOT_0, 1, &gNullUAV.p, nullptr );

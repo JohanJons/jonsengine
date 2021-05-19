@@ -40,6 +40,8 @@ list( APPEND COMPUTE_SHADERS
   SDSMInitialCompute.hlsl
   SDSMFinalCompute.hlsl
   TerrainComputeAltitude.hlsl
+  TerrainComputeAverageAltitude.hlsl
+  TerrainComputeAverageAltitudeFinal.hlsl
   TerrainComputeNormal.hlsl
   TerrainComputeJFA.hlsl
   TerrainComputeMoisture.hlsl
