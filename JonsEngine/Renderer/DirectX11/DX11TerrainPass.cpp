@@ -6,7 +6,8 @@
 #include "Compiled/TerrainVertex.h"
 #include "Compiled/TerrainComputeNormal.h"
 #include "Compiled/TerrainComputeAltitude.h"
-#include "Compiled/TerrainComputeAltitudeFinal.h"
+#include "Compiled/TerrainComputeAverageAltitude.h"
+#include "Compiled/TerrainComputeAverageAltitudeFinal.h"
 #include "Compiled/TerrainComputeJFA.h"
 #include "Compiled/TerrainComputeMoisture.h"
 #include "Compiled/TerrainComputeTopography.h"
@@ -57,6 +58,7 @@ namespace JonsEngine
 		mJFACBuffer( device, context, mJFACBuffer.CONSTANT_BUFFER_SLOT_EXTRA ),
 		mMoistureCBuffer( device, context, mMoistureCBuffer.CONSTANT_BUFFER_SLOT_EXTRA ),
 		mAvgAltitudeCBuffer(device, context, mAvgAltitudeCBuffer.CONSTANT_BUFFER_SLOT_EXTRA),
+		mAltitudeKernelCBuffer(device, context, mAltitudeKernelCBuffer.CONSTANT_BUFFER_SLOT_EXTRA),
 		mLODMorphConstantsBuffer( device, context ),
 		mTransformBuffer( device, context ),
 		mLODLevelBuffer( device, context )
@@ -84,9 +86,9 @@ namespace JonsEngine
 		DXCALL( device->CreatePixelShader( gTerrainPixelTopographyDebug, sizeof( gTerrainPixelTopographyDebug ), nullptr, &mPixelTopographyDebugShader ) );
 		DXCALL( device->CreatePixelShader( gTerrainPixelMoistureDebug, sizeof( gTerrainPixelMoistureDebug ), nullptr, &mPixelMoistureDebugShader ) );
 		DXCALL( device->CreateComputeShader( gTerrainComputeNormal, sizeof( gTerrainComputeNormal ), nullptr, &mNormalMapComputeShader ) );
+		DXCALL( device->CreateComputeShader( gTerrainComputeAltitude, sizeof( gTerrainComputeAltitude ), nullptr, &mAltitudeComputeShader ) );
 		DXCALL( device->CreateComputeShader( gTerrainComputeAverageAltitude, sizeof( gTerrainComputeAverageAltitude ), nullptr, &mAverageAltitudeComputeShader ) );
 		DXCALL( device->CreateComputeShader( gTerrainComputeAverageAltitudeFinal, sizeof( gTerrainComputeAverageAltitudeFinal ), nullptr, &mAverageAltitudeFinalComputeShader ) );
-		DXCALL( device->CreateComputeShader( gTerrainComputeTopography, sizeof( gTerrainComputeTopography ), nullptr, &mTopographyComputeShader ) );
 		DXCALL( device->CreateComputeShader( gTerrainComputeJFA, sizeof( gTerrainComputeJFA ), nullptr, &mJFAComputeShader ) );
 		DXCALL( device->CreateComputeShader( gTerrainComputeMoisture, sizeof( gTerrainComputeMoisture ), nullptr, &mMoistureComputeShader ) );
 
@@ -399,6 +401,10 @@ namespace JonsEngine
 
 		// per-sample altitude
 		mContext->CSSetUnorderedAccessViews( UAV_SLOT_0, 1, &altitudeMap.mUAV.p, nullptr );
+
+		// TODO
+		mAltitudeKernelCBuffer.SetData( { 3 } );
+		mAltitudeKernelCBuffer.Bind();
 
 		mContext->CSSetShader( mAltitudeComputeShader, nullptr, 0 );
 		mContext->Dispatch( dispatchX, dispatchY, 1 );

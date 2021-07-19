@@ -8,31 +8,34 @@
 Texture2D gHeightmap : register( TEXTURE_REGISTER_EXTRA );
 RWTexture2D<float> gAverageHeight : register( UAV_REGISTER_0 );
 
+cbuffer KernelSize : register( CBUFFER_REGISTER_EXTRA )
+{
+    int gKernelSize;
+}
+
 [numthreads(TERRAIN_NORMAL_THREADS_AXIS, TERRAIN_NORMAL_THREADS_AXIS, 1)]
 void cs_main(uint3 groupID : SV_GroupID, uint3 dispatchTID : SV_DispatchThreadID, uint3 groupTID : SV_GroupThreadID, uint groupIndex : SV_GroupIndex)
 {
-	int2 texCoord = dispatchTID.xy;
+	const int2 texCoord = dispatchTID.xy;
 
-    GroupMemoryBarrierWithGroupSync();
+    const int kernelSize = 3;
+    const int xHalfSize = kernelSize / 2;
+    const int yHalfSize = kernelSize / 2;
 
-    uint texHeight = uint( gHeightmap[ texCoord ].r * 1000 );
-    
-    if ( texHeight == 0 )
-        InterlockedAdd( gNumSeaSamples, 1 );
-    else
-        InterlockedAdd( gTotalHeightVals, texHeight );
-
-    GroupMemoryBarrierWithGroupSync();
-
-    uint numSamples = TERRAIN_NORMAL_THREADS_AXIS * TERRAIN_NORMAL_THREADS_AXIS;
-    bool isOnlySea = gNumSeaSamples == numSamples;
-
-    if ( groupIndex == 0 && !isOnlySea )
+    float totalHeight = 0.0f;
+    for ( int offsetX = -xHalfSize; offsetX <= xHalfSize; ++offsetX )
     {
-        // only average height for non-sea samples
-        gTotalHeightVals /= ( numSamples - gNumSeaSamples );
-        InterlockedAdd( gAverageHeight[ uint2(0, 0) ], gTotalHeightVals );
+        for ( int offsetY = -yHalfSize; offsetY <= yHalfSize; ++offsetY )
+        {
+            const int2 offsetTexcoord = texCoord + int2( offsetX, offsetY );
+            totalHeight += gHeightmap[ offsetTexcoord ].r;
+        }
     }
+
+    const int numSamples = kernelSize * kernelSize;
+    const float averageHeight = totalHeight / numSamples;
+
+    gAverageHeight[ texCoord ] = averageHeight;
 }
 
 #endif

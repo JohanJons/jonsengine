@@ -56,6 +56,12 @@ namespace JonsEngine
 			uint32_t __padding[ 2 ];
 		};
 
+		struct AltitudeKernelCBuffer
+		{
+			int32_t mKernelSize;
+			uint32_t __padding[ 3 ];
+		};
+
 		struct MoistureCBuffer
 		{
 			float mDistanceFalloffBegin;
@@ -128,6 +134,7 @@ namespace JonsEngine
 		DX11ConstantBuffer<JFACBuffer> mJFACBuffer;
 		DX11ConstantBuffer<MoistureCBuffer> mMoistureCBuffer;
 		DX11ConstantBuffer<AverageAltitudeCBuffer> mAvgAltitudeCBuffer;
+		DX11ConstantBuffer<AltitudeKernelCBuffer> mAltitudeKernelCBuffer;
 		DX11CPUDynamicBuffer mLODMorphConstantsBuffer;
 		DX11CPUDynamicBuffer mTransformBuffer;
 		DX11CPUDynamicBuffer mLODLevelBuffer;
